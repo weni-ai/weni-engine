@@ -34,6 +34,6 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path("", schema_view.with_ui("redoc")),
-    path('admin/', admin.site.urls),
+    path("admin/", admin.site.urls),
     path("v1/", include(rookly_api_v1_urls)),
 ]
