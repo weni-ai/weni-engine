@@ -1,0 +1,19 @@
+# use container-based Ubuntu Trusty
+dist: bionic
+sudo: true
+
+language: python
+python:
+  - "3.6.8"
+
+services:
+  - docker
+
+install:
+  - pip install pipenv
+  - pipenv install --system --dev
+
+script:
+  - python manage.py migrate
+  - python manage.py collectstatic
+  - flake8
