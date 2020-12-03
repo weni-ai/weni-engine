@@ -5,12 +5,13 @@ verify_ssl = true
 
 [dev-packages]
 flake8 = "~=3.8.4"
-black = "~=20.8b1"
+black = "==20.8b1"
 
 [packages]
 django = "~=2.2.17"
 djangorestframework = "~=3.12.2"
 drf-yasg2 = "~=1.19.4"
+django-environ = "~=0.4.5"
 
 [requires]
 python_version = "3.6"
