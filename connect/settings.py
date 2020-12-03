@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "drf_yasg2",
     "mozilla_django_oidc",
+    "connect.common",
 ]
 
 MIDDLEWARE = [
