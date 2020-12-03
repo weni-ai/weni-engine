@@ -8,3 +8,4 @@ class DashboardNewsletter(models.Model):
 
     title = models.CharField(_("title"), max_length=36)
     description = models.TextField(_("description"))
+    created_at = models.DateTimeField(_("created at"), auto_now_add=True)
