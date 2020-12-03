@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "drf_yasg2",
+    "django_filters",
     "mozilla_django_oidc",
     "connect.common",
 ]
@@ -156,3 +157,14 @@ OIDC_DRF_AUTH_BACKEND = env.str(
     "OIDC_DRF_AUTH_BACKEND",
     default="mozilla_django_oidc.auth.OIDCAuthenticationBackend",
 )
+
+# Swagger
+
+SWAGGER_SETTINGS = {
+    "USE_SESSION_AUTH": False,
+    "DOC_EXPANSION": "list",
+    "APIS_SORTER": "alpha",
+    "SECURITY_DEFINITIONS": {
+        "OIDC": {"type": "apiKey", "name": "Authorization", "in": "header"}
+    },
+}
