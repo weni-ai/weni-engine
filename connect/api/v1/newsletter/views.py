@@ -7,9 +7,7 @@ from connect.common.models import DashboardNewsletter
 
 
 class DashboardNewsletterViewSet(
-    mixins.ListModelMixin,
-    mixins.RetrieveModelMixin,
-    GenericViewSet
+    mixins.ListModelMixin, mixins.RetrieveModelMixin, GenericViewSet
 ):
     """
     List all newsletter.

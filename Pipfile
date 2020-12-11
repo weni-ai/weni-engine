@@ -14,6 +14,10 @@ drf-yasg2 = "~=1.19.4"
 django-environ = "~=0.4.5"
 mozilla-django-oidc = "~=1.2.4"
 django-filter = "~=2.4.0"
+celery = "~=4.4.0"
+django-celery-results = "~=1.1.2"
+redis = "~=3.5.3"
+django-celery-beat = "~=2.1.0"
 
 [requires]
 python_version = "3.6"

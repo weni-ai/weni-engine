@@ -7,20 +7,30 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='DashboardNewsletter',
+            name="DashboardNewsletter",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=36, verbose_name='title')),
-                ('description', models.TextField(verbose_name='description')),
-                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='created at')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("title", models.CharField(max_length=36, verbose_name="title")),
+                ("description", models.TextField(verbose_name="description")),
+                (
+                    "created_at",
+                    models.DateTimeField(auto_now_add=True, verbose_name="created at"),
+                ),
             ],
             options={
-                'verbose_name': 'dashboard newsletter',
+                "verbose_name": "dashboard newsletter",
             },
         ),
     ]

@@ -22,6 +22,7 @@ env = environ.Env(
     LANGUAGE_CODE=(str, "en-us"),
     TIME_ZONE=(str, "UTC"),
     STATIC_URL=(str, "/static/"),
+    CELERY_BROKER_URL=(str, "redis://localhost:6379/0"),
 )
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -54,6 +55,8 @@ INSTALLED_APPS = [
     "django_filters",
     "mozilla_django_oidc",
     "connect.common",
+    "django_celery_results",
+    "django_celery_beat",
 ]
 
 MIDDLEWARE = [
@@ -168,3 +171,11 @@ SWAGGER_SETTINGS = {
         "OIDC": {"type": "apiKey", "name": "Authorization", "in": "header"}
     },
 }
+
+# Celery
+
+CELERY_RESULT_BACKEND = "django-db"
+CELERY_BROKER_URL = env.str("CELERY_BROKER_URL")
+CELERY_ACCEPT_CONTENT = ["application/json"]
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TASK_SERIALIZER = "json"
