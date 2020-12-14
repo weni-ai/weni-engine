@@ -12,11 +12,21 @@ class DashboardNewsletter(models.Model):
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
 
 
-class ServicesStatus(models.Model):
+class Service(models.Model):
+    class Meta:
+        verbose_name = _("service")
+
+    url = models.URLField(_("service url"), unique=True)
+    status = models.BooleanField(_("status service"), default=False)
+    created_at = models.DateTimeField(_("created at"), auto_now_add=True)
+    default = models.BooleanField(_("service default"), default=False)
+
+
+class ServiceStatus(models.Model):
     class Meta:
         verbose_name = _("service status")
+        ordering = ["created_at"]
 
-    url = models.URLField(_("service url"))
+    service = models.OneToOneField(Service, models.CASCADE)
     user = models.ForeignKey(User, models.CASCADE)
-    status = models.BooleanField(_("status service"), default=False)
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)

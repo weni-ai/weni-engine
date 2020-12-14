@@ -1,6 +1,6 @@
 from rest_framework import routers
 
-from connect.api.v1.newsletter.views import DashboardNewsletterViewSet
+from connect.api.v1.dashboard.views import NewsletterViewSet, StatusServiceViewSet
 
 
 class Router(routers.SimpleRouter):
@@ -77,4 +77,5 @@ class Router(routers.SimpleRouter):
 
 
 router = Router()
-router.register("dashboard/newsletter", DashboardNewsletterViewSet)
+router.register("dashboard/newsletter", NewsletterViewSet)
+router.register("dashboard/status-service", StatusServiceViewSet)

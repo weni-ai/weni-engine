@@ -1,7 +1,7 @@
 import requests
 
 from connect.celery import app
-from connect.common.models import ServicesStatus
+from connect.common.models import Service
 
 
 @app.task()
@@ -21,7 +21,7 @@ def status_service() -> None:
         except Exception:
             return False
 
-    for service in ServicesStatus.objects.all():
+    for service in Service.objects.all():
         service.status = is_page_available(
             url=service.url, method_request=requests.get, timeout=10
         )
