@@ -1,5 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -28,5 +30,12 @@ class ServiceStatus(models.Model):
         ordering = ["created_at"]
 
     service = models.OneToOneField(Service, models.CASCADE)
-    user = models.ForeignKey(User, models.CASCADE)
+    user = models.ForeignKey(User, models.CASCADE, related_name="service_status")
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
+
+
+@receiver(post_save, sender=User)
+def create_service_status(sender, instance, created, **kwargs):
+    if created:
+        for service in Service.objects.filter(default=True):
+            instance.service_status.create(service=service)

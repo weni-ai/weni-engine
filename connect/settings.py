@@ -158,7 +158,7 @@ OIDC_RP_SIGN_ALGO = env.str("OIDC_RP_SIGN_ALGO", default="RS256")
 OIDC_OP_LOGOUT_ENDPOINT = env.str("OIDC_OP_LOGOUT_ENDPOINT")
 OIDC_DRF_AUTH_BACKEND = env.str(
     "OIDC_DRF_AUTH_BACKEND",
-    default="mozilla_django_oidc.auth.OIDCAuthenticationBackend",
+    default="connect.oidc_authentication.ConnectOIDCAuthenticationBackend",
 )
 
 # Swagger
