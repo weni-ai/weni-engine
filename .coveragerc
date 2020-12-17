@@ -6,6 +6,7 @@ omit =
     ./connect/common/apps.py
     ./connect/api/v1/tests/*
     ./connect/common/tests.py
+    ./connect/common/tasks.py
     ./connect/common/migrations/*
 
 [report]
