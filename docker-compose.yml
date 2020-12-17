@@ -1,0 +1,84 @@
+# Attention:
+# Use this docker-compose to:
+# - Up development environment: docker-compose up
+# - Build docker images: docker-compose build
+
+version: '3.6'
+
+services:
+  database:
+      image: postgres
+      ports:
+        - 5432:5432
+      networks:
+        - default
+        - connect
+      environment:
+        - POSTGRES_USER=${POSTGRES_USER:-connect}
+        - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-connect}
+        - POSTGRES_DB=${POSTGRES_DB:-connect}
+  connect:
+    image: ${DOCKER_IMAGE_NAME:-ilha/connect}:${TAG:-latest}
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - ${ENGINE_PORT:-80}:80
+    networks:
+      - default
+      - connect
+    environment:
+      - SECRET_KEY=${SECRET_KEY:-SK}
+      - DEBUG=${DEBUG:-true}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS:-*}
+      - DEFAULT_DATABASE=${DEFAULT_DATABASE:-postgres://connect:connect@database:5432/connect}
+      - LANGUAGE_CODE=${LANGUAGE_CODE:-en-us}
+      - TIME_ZONE=${TIME_ZONE:-UTC}
+      - STATIC_URL=${TIME_ZONE:-/static/}
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL:-redis://redis:6379/0}
+      - OIDC_RP_CLIENT_ID=${OIDC_RP_CLIENT_ID}
+      - OIDC_RP_CLIENT_SECRET=${OIDC_RP_CLIENT_SECRET}
+      - OIDC_OP_AUTHORIZATION_ENDPOINT=${OIDC_OP_AUTHORIZATION_ENDPOINT}
+      - OIDC_OP_TOKEN_ENDPOINT=${OIDC_OP_TOKEN_ENDPOINT}
+      - OIDC_OP_USER_ENDPOINT=${OIDC_OP_USER_ENDPOINT}
+      - OIDC_OP_JWKS_ENDPOINT=${OIDC_OP_JWKS_ENDPOINT}
+      - OIDC_RP_SIGN_ALGO=${OIDC_RP_SIGN_ALGO}
+      - OIDC_OP_LOGOUT_ENDPOINT=${OIDC_OP_LOGOUT_ENDPOINT}
+  celery:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - connect
+      - redis
+      - database
+    networks:
+      - default
+      - connect
+    command: "celery -A connect worker -l info -B"
+    environment:
+      - SECRET_KEY=${SECRET_KEY:-SK}
+      - DEBUG=${DEBUG:-true}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS:-*}
+      - DEFAULT_DATABASE=${DEFAULT_DATABASE:-postgres://connect:connect@database:5432/connect}
+      - LANGUAGE_CODE=${LANGUAGE_CODE:-en-us}
+      - TIME_ZONE=${TIME_ZONE:-UTC}
+      - STATIC_URL=${TIME_ZONE:-/static/}
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL:-redis://redis:6379/0}
+      - OIDC_RP_CLIENT_ID=${OIDC_RP_CLIENT_ID}
+      - OIDC_RP_CLIENT_SECRET=${OIDC_RP_CLIENT_SECRET}
+      - OIDC_OP_AUTHORIZATION_ENDPOINT=${OIDC_OP_AUTHORIZATION_ENDPOINT}
+      - OIDC_OP_TOKEN_ENDPOINT=${OIDC_OP_TOKEN_ENDPOINT}
+      - OIDC_OP_USER_ENDPOINT=${OIDC_OP_USER_ENDPOINT}
+      - OIDC_OP_JWKS_ENDPOINT=${OIDC_OP_JWKS_ENDPOINT}
+      - OIDC_RP_SIGN_ALGO=${OIDC_RP_SIGN_ALGO}
+      - OIDC_OP_LOGOUT_ENDPOINT=${OIDC_OP_LOGOUT_ENDPOINT}
+
+  redis:
+    image: redis
+    ports:
+      - 6379:6379
+
+networks:
+  connect:
+    external: true

@@ -7,7 +7,7 @@ from connect.api.v1.dashboard.serializers import (
     NewsletterSerializer,
     StatusServiceSerializer,
 )
-from connect.common.models import DashboardNewsletter, ServiceStatus
+from connect.common.models import Newsletter, ServiceStatus
 
 
 class NewsletterViewSet(
@@ -18,7 +18,7 @@ class NewsletterViewSet(
     """
 
     serializer_class = NewsletterSerializer
-    queryset = DashboardNewsletter.objects.all()
+    queryset = Newsletter.objects.all()
     permission_classes = [IsAuthenticated]
 
 

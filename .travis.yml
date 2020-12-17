@@ -12,6 +12,7 @@ services:
 install:
   - pip install pipenv
   - pipenv install --system --dev
+  - pip install coveralls
 
 env:
   global:
@@ -29,3 +30,7 @@ script:
   - python manage.py migrate
   - python manage.py collectstatic --noinput
   - flake8
+  - travis_wait coverage run manage.py test
+
+after_success:
+  - coveralls

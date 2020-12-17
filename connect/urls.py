@@ -14,6 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.urls import path, include
 from drf_yasg2 import openapi
 from drf_yasg2.views import get_schema_view
@@ -37,3 +38,5 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("v1/", include(rookly_api_v1_urls)),
 ]
+
+urlpatterns += staticfiles_urlpatterns()

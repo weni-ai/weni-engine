@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
+import sys
+
 import environ
 
 environ.Env.read_env(env_file=(environ.Path(__file__) - 2)(".env"))
@@ -40,6 +42,8 @@ DEBUG = env.bool("DEBUG")
 
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")
 
+TESTING = len(sys.argv) > 1 and sys.argv[1] == "test"
+
 
 # Application definition
 
@@ -51,6 +55,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
+    "rest_framework.authtoken",
     "drf_yasg2",
     "django_filters",
     "mozilla_django_oidc",
@@ -140,12 +145,17 @@ STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        "mozilla_django_oidc.contrib.drf.OIDCAuthentication"
+        "mozilla_django_oidc.contrib.drf.OIDCAuthentication",
     ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
     "PAGE_SIZE": 20,
     "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
 }
+
+if TESTING:
+    REST_FRAMEWORK["DEFAULT_AUTHENTICATION_CLASSES"].append(
+        "rest_framework.authentication.TokenAuthentication"
+    )
 
 # mozilla-django-oidc
 OIDC_RP_CLIENT_ID = env.str("OIDC_RP_CLIENT_ID")
@@ -158,7 +168,7 @@ OIDC_RP_SIGN_ALGO = env.str("OIDC_RP_SIGN_ALGO", default="RS256")
 OIDC_OP_LOGOUT_ENDPOINT = env.str("OIDC_OP_LOGOUT_ENDPOINT")
 OIDC_DRF_AUTH_BACKEND = env.str(
     "OIDC_DRF_AUTH_BACKEND",
-    default="mozilla_django_oidc.auth.OIDCAuthenticationBackend",
+    default="connect.oidc_authentication.ConnectOIDCAuthenticationBackend",
 )
 
 # Swagger

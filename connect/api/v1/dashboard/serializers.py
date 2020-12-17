@@ -1,11 +1,11 @@
 from rest_framework import serializers
 
-from connect.common.models import DashboardNewsletter, ServiceStatus
+from connect.common.models import Newsletter, ServiceStatus
 
 
 class NewsletterSerializer(serializers.ModelSerializer):
     class Meta:
-        model = DashboardNewsletter
+        model = Newsletter
         fields = ["id", "title", "description"]
         ref_name = None
 

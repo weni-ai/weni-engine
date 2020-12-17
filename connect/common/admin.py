@@ -1,8 +1,8 @@
 from django.contrib import admin
 
-from connect.common.models import DashboardNewsletter
+from connect.common.models import Newsletter
 
 
-@admin.register(DashboardNewsletter)
-class DashboardNewsletterAdmin(admin.ModelAdmin):
+@admin.register(Newsletter)
+class NewsletterAdmin(admin.ModelAdmin):
     pass
