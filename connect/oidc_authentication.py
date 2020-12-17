@@ -16,6 +16,12 @@ class ConnectOIDCAuthenticationBackend(OIDCAuthenticationBackend):
         # is_admin = "admin" in claims.get("roles", [])
         return verified  # and is_admin # not checking for user roles from keycloak at this time
 
+    def get_username(self, claims):
+        username = claims.get("preferred_username")
+        if username:
+            return username
+        return super(ConnectOIDCAuthenticationBackend, self).get_username(claims=claims)
+
     def create_user(self, claims):
         # Override existing create_user method in OIDCAuthenticationBackend
         email = claims.get("email")
