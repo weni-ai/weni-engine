@@ -3,7 +3,7 @@ from rest_framework import routers
 from connect.api.v1.dashboard.views import NewsletterViewSet, StatusServiceViewSet
 
 
-class Router(routers.SimpleRouter):
+class Router(routers.SimpleRouter):  # pragma: no cover
     routes = [
         # Dynamically generated list routes.
         # Generated using @action decorator
@@ -24,7 +24,7 @@ class Router(routers.SimpleRouter):
         ),
     ]
 
-    def get_routes(self, viewset):
+    def get_routes(self, viewset):  # pragma: no cover
         ret = super().get_routes(viewset)
         lookup_field = getattr(viewset, "lookup_field", None)
 
@@ -61,7 +61,7 @@ class Router(routers.SimpleRouter):
 
         return ret
 
-    def get_lookup_regex(self, viewset, lookup_prefix=""):
+    def get_lookup_regex(self, viewset, lookup_prefix=""):  # pragma: no cover
         lookup_fields = getattr(viewset, "lookup_fields", None)
         if lookup_fields:
             base_regex = "(?P<{lookup_prefix}{lookup_url_kwarg}>[^/.]+)"
