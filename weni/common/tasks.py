@@ -1,7 +1,7 @@
 import requests
 
-from connect.celery import app
-from connect.common.models import Service
+from weni.celery import app
+from weni.common.models import Service
 
 
 @app.task()

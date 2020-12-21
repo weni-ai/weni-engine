@@ -1,6 +1,6 @@
 from rest_framework import routers
 
-from connect.api.v1.dashboard.views import NewsletterViewSet, StatusServiceViewSet
+from weni.api.v1.dashboard.views import NewsletterViewSet, StatusServiceViewSet
 
 
 class Router(routers.SimpleRouter):  # pragma: no cover

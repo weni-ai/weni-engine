@@ -3,11 +3,11 @@ from rest_framework import mixins
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
 
-from connect.api.v1.dashboard.serializers import (
+from weni.api.v1.dashboard.serializers import (
     NewsletterSerializer,
     StatusServiceSerializer,
 )
-from connect.common.models import Newsletter, ServiceStatus
+from weni.common.models import Newsletter, ServiceStatus
 
 
 class NewsletterViewSet(

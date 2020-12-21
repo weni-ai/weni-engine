@@ -3,9 +3,9 @@ import json
 from django.test import RequestFactory, TestCase
 from rest_framework import status
 
-from connect.api.v1.dashboard.views import StatusServiceViewSet
-from connect.api.v1.tests.utils import create_user_and_token
-from connect.common.models import Service
+from weni.api.v1.dashboard.views import StatusServiceViewSet
+from weni.api.v1.tests.utils import create_user_and_token
+from weni.common.models import Service
 
 
 class ListStatusServiceTestCase(TestCase):

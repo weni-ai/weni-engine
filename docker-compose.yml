@@ -12,13 +12,13 @@ services:
         - 5432:5432
       networks:
         - default
-        - connect
+        - weni
       environment:
-        - POSTGRES_USER=${POSTGRES_USER:-connect}
-        - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-connect}
-        - POSTGRES_DB=${POSTGRES_DB:-connect}
-  connect:
-    image: ${DOCKER_IMAGE_NAME:-ilha/connect}:${TAG:-latest}
+        - POSTGRES_USER=${POSTGRES_USER:-weni}
+        - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-weni}
+        - POSTGRES_DB=${POSTGRES_DB:-weni}
+  weni:
+    image: ${DOCKER_IMAGE_NAME:-ilha/weni}:${TAG:-latest}
     build:
       context: .
       dockerfile: Dockerfile
@@ -26,12 +26,12 @@ services:
       - ${ENGINE_PORT:-80}:80
     networks:
       - default
-      - connect
+      - weni
     environment:
       - SECRET_KEY=${SECRET_KEY:-SK}
       - DEBUG=${DEBUG:-true}
       - ALLOWED_HOSTS=${ALLOWED_HOSTS:-*}
-      - DEFAULT_DATABASE=${DEFAULT_DATABASE:-postgres://connect:connect@database:5432/connect}
+      - DEFAULT_DATABASE=${DEFAULT_DATABASE:-postgres://weni:weni@database:5432/weni}
       - LANGUAGE_CODE=${LANGUAGE_CODE:-en-us}
       - TIME_ZONE=${TIME_ZONE:-UTC}
       - STATIC_URL=${TIME_ZONE:-/static/}
@@ -49,18 +49,18 @@ services:
       context: .
       dockerfile: Dockerfile
     depends_on:
-      - connect
+      - weni
       - redis
       - database
     networks:
       - default
-      - connect
-    command: "celery -A connect worker -l info -B"
+      - weni
+    command: "celery -A weni worker -l info -B"
     environment:
       - SECRET_KEY=${SECRET_KEY:-SK}
       - DEBUG=${DEBUG:-true}
       - ALLOWED_HOSTS=${ALLOWED_HOSTS:-*}
-      - DEFAULT_DATABASE=${DEFAULT_DATABASE:-postgres://connect:connect@database:5432/connect}
+      - DEFAULT_DATABASE=${DEFAULT_DATABASE:-postgres://weni:weni@database:5432/weni}
       - LANGUAGE_CODE=${LANGUAGE_CODE:-en-us}
       - TIME_ZONE=${TIME_ZONE:-UTC}
       - STATIC_URL=${TIME_ZONE:-/static/}
@@ -80,5 +80,5 @@ services:
       - 6379:6379
 
 networks:
-  connect:
+  weni:
     external: true
