@@ -1,9 +1,9 @@
-# Connect
+# Weni
 
-[![Build Status](https://travis-ci.com/Ilhasoft/connect-engine.svg?branch=main)](https://travis-ci.com/Ilhasoft/connect-engine)
-[![Coverage Status](https://coveralls.io/repos/github/Ilhasoft/connect-engine/badge.svg?branch=main)](https://coveralls.io/github/Ilhasoft/connect-engine?branch=main)
+[![Build Status](https://travis-ci.com/Ilhasoft/weni-engine.svg?branch=main)](https://travis-ci.com/Ilhasoft/weni-engine)
+[![Coverage Status](https://coveralls.io/repos/github/Ilhasoft/weni-engine/badge.svg?branch=main)](https://coveralls.io/github/Ilhasoft/weni-engine?branch=main)
 [![Python Version](https://img.shields.io/badge/python-3.6-blue.svg)](https://www.python.org/)
-[![License GPL-3.0](https://img.shields.io/badge/license-%20GPL--3.0-yellow.svg)](https://github.com/Ilhasoft/connect-engine/blob/master/LICENSE)
+[![License GPL-3.0](https://img.shields.io/badge/license-%20GPL--3.0-yellow.svg)](https://github.com/Ilhasoft/weni-engine/blob/master/LICENSE)
 
 ## Environment Variables
 
