@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.test import TestCase
 
-from connect.common.models import Newsletter, Service, ServiceStatus
+from weni.common.models import Newsletter, Service, ServiceStatus
 
 
 class NewsletterTestCase(TestCase):

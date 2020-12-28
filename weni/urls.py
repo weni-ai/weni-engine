@@ -1,4 +1,4 @@
-"""connect URL Configuration
+"""weni URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/2.2/topics/http/urls/
@@ -20,7 +20,7 @@ from drf_yasg2 import openapi
 from drf_yasg2.views import get_schema_view
 from rest_framework import permissions
 
-from connect.api.v1 import urls as rookly_api_v1_urls
+from weni.api.v1 import urls as rookly_api_v1_urls
 
 
 schema_view = get_schema_view(

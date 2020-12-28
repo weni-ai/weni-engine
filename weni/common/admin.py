@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from connect.common.models import Newsletter
+from weni.common.models import Newsletter
 
 
 @admin.register(Newsletter)

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from connect.common.models import Newsletter, ServiceStatus
+from weni.common.models import Newsletter, ServiceStatus
 
 
 class NewsletterSerializer(serializers.ModelSerializer):
