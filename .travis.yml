@@ -17,6 +17,8 @@ install:
 env:
   global:
     - SECRET_KEY=SK
+    - OIDC_RP_SERVER_URL=
+    - OIDC_RP_REALM_NAME=
     - OIDC_RP_CLIENT_ID=
     - OIDC_RP_CLIENT_SECRET=
     - OIDC_OP_AUTHORIZATION_ENDPOINT=
