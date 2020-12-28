@@ -18,6 +18,8 @@ You can set environment variables in your OS, write on ```.env``` file or pass v
 | LANGUAGE_CODE | ```string``` | ```en-us``` | A string representing the language code for this installation.This should be in standard [language ID format](https://docs.djangoproject.com/en/2.0/topics/i18n/#term-language-code).
 | TIME_ZONE | ```string``` | ```UTC``` | A string representing the time zone for this installation. See the [list of time zones](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
 | STATIC_URL | ```string``` | ```/static/``` | URL to use when referring to static files located in ```STATIC_ROOT```.
+| OIDC_RP_SERVER_URL | ```string``` | ```None``` | Open ID Connect Server URL, example: https://accounts.weni.ai/auth/.
+| OIDC_RP_REALM_NAME | ```string``` | ```None``` | Open ID Connect Realm Name.
 | OIDC_RP_CLIENT_ID | ```string``` | ```None``` | OpenID Connect client ID provided by your OP.
 | OIDC_RP_CLIENT_SECRET | ```string``` | ```None``` | OpenID Connect client secret provided by your OP.
 | OIDC_OP_AUTHORIZATION_ENDPOINT | ```string``` | ```None``` | URL of your OpenID Connect provider authorization endpoint.

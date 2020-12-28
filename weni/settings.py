@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     "drf_yasg2",
     "django_filters",
     "mozilla_django_oidc",
+    "weni.authentication.apps.AuthenticationConfig",
     "weni.common",
     "django_celery_results",
     "django_celery_beat",
@@ -99,6 +100,11 @@ WSGI_APPLICATION = "weni.wsgi.application"
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
 DATABASES = {"default": env.db(var="DEFAULT_DATABASE", default="sqlite:///db.sqlite3")}
+
+
+# Auth
+
+AUTH_USER_MODEL = "authentication.User"
 
 
 # Password validation
@@ -158,6 +164,8 @@ if TESTING:
     )
 
 # mozilla-django-oidc
+OIDC_RP_SERVER_URL = env.str("OIDC_RP_SERVER_URL")
+OIDC_RP_REALM_NAME = env.str("OIDC_RP_REALM_NAME")
 OIDC_RP_CLIENT_ID = env.str("OIDC_RP_CLIENT_ID")
 OIDC_RP_CLIENT_SECRET = env.str("OIDC_RP_CLIENT_SECRET")
 OIDC_OP_AUTHORIZATION_ENDPOINT = env.str("OIDC_OP_AUTHORIZATION_ENDPOINT")
