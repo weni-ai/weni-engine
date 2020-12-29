@@ -1,12 +1,19 @@
 import filetype
+from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
+from keycloak import KeycloakGetError
 from rest_framework import mixins, permissions, parsers
 from rest_framework.decorators import action
-from rest_framework.exceptions import UnsupportedMediaType
+from rest_framework.exceptions import UnsupportedMediaType, ValidationError
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from weni.api.v1.account.serializers import UserSerializer, UserPhotoSerializer
+from weni.api.v1.account.serializers import (
+    UserSerializer,
+    UserPhotoSerializer,
+    ChangePasswordSerializer,
+)
+from weni.api.v1.keycloak import KeycloakControl
 from weni.authentication.models import User
 
 
@@ -73,3 +80,30 @@ class MyUserProfileViewSet(
         self.request.user.photo = None
         self.request.user.save(update_fields=["photo"])
         return Response({})
+
+    @action(
+        detail=True,
+        methods=["POST"],
+        url_name="profile-change-password",
+        serializer_class=ChangePasswordSerializer,
+    )
+    def change_password(self, request, **kwargs):  # pragma: no cover
+        serializer = ChangePasswordSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            keycloak_instance = KeycloakControl()
+
+            user_id = keycloak_instance.get_user_id_by_email(
+                email=self.request.user.email
+            )
+            keycloak_instance.instance.set_user_password(
+                user_id=user_id, password=request.data.get("password"), temporary=False
+            )
+        except KeycloakGetError:
+            if not settings.DEBUG:
+                raise ValidationError(
+                    _("System temporarily unavailable, please try again later.")
+                )
+
+        return Response()
