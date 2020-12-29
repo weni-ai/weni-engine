@@ -13,7 +13,6 @@ def status_service() -> None:
         False.
         """
         try:
-            url = "https://" + url
             response = method_request(url=url, **kwargs)
             if int(response.status_code) == 200:
                 return True

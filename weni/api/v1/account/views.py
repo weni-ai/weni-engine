@@ -15,6 +15,7 @@ from weni.api.v1.account.serializers import (
 )
 from weni.api.v1.keycloak import KeycloakControl
 from weni.authentication.models import User
+from weni.utils import upload_photo_rocket
 
 
 class MyUserProfileViewSet(
@@ -63,6 +64,15 @@ class MyUserProfileViewSet(
         if filetype.is_image(f):
             self.request.user.photo = f
             self.request.user.save(update_fields=["photo"])
+
+            # Update avatar in all rocket chat registered
+            for service in self.request.user.service_status.all():
+                upload_photo_rocket(
+                    server_rocket=service.service.url,
+                    jwt_token=self.request.auth,
+                    avatar_url=self.request.user.photo.url,
+                )
+
             return Response({"photo": self.request.user.photo.url})
         raise UnsupportedMediaType(
             filetype.get_type(f.content_type).extension,
