@@ -25,6 +25,10 @@ env = environ.Env(
     TIME_ZONE=(str, "UTC"),
     STATIC_URL=(str, "/static/"),
     CELERY_BROKER_URL=(str, "redis://localhost:6379/0"),
+    AWS_ACCESS_KEY_ID=(str, None),
+    AWS_SECRET_ACCESS_KEY=(str, None),
+    AWS_STORAGE_BUCKET_NAME=(str, None),
+    AWS_S3_REGION_NAME=(str, None),
 )
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -59,9 +63,11 @@ INSTALLED_APPS = [
     "drf_yasg2",
     "django_filters",
     "mozilla_django_oidc",
+    "weni.authentication.apps.AuthenticationConfig",
     "weni.common",
     "django_celery_results",
     "django_celery_beat",
+    "storages",
 ]
 
 MIDDLEWARE = [
@@ -99,6 +105,11 @@ WSGI_APPLICATION = "weni.wsgi.application"
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
 DATABASES = {"default": env.db(var="DEFAULT_DATABASE", default="sqlite:///db.sqlite3")}
+
+
+# Auth
+
+AUTH_USER_MODEL = "authentication.User"
 
 
 # Password validation
@@ -158,6 +169,8 @@ if TESTING:
     )
 
 # mozilla-django-oidc
+OIDC_RP_SERVER_URL = env.str("OIDC_RP_SERVER_URL")
+OIDC_RP_REALM_NAME = env.str("OIDC_RP_REALM_NAME")
 OIDC_RP_CLIENT_ID = env.str("OIDC_RP_CLIENT_ID")
 OIDC_RP_CLIENT_SECRET = env.str("OIDC_RP_CLIENT_SECRET")
 OIDC_OP_AUTHORIZATION_ENDPOINT = env.str("OIDC_OP_AUTHORIZATION_ENDPOINT")
@@ -188,3 +201,11 @@ CELERY_BROKER_URL = env.str("CELERY_BROKER_URL")
 CELERY_ACCEPT_CONTENT = ["application/json"]
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TASK_SERIALIZER = "json"
+
+# AWS
+
+AWS_ACCESS_KEY_ID = env.str("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = env.str("AWS_SECRET_ACCESS_KEY")
+
+AWS_STORAGE_BUCKET_NAME = env.str("AWS_STORAGE_BUCKET_NAME")
+AWS_S3_REGION_NAME = env.str("AWS_S3_REGION_NAME")

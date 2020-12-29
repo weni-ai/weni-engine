@@ -1,8 +1,9 @@
-from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
+
+from weni.authentication.models import User
 
 
 class Newsletter(models.Model):
@@ -20,6 +21,7 @@ class Service(models.Model):
 
     url = models.URLField(_("service url"), unique=True)
     status = models.BooleanField(_("status service"), default=False)
+    rocket_chat = models.BooleanField(_("rocket chat"), default=False)
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
     default = models.BooleanField(_("service default"), default=False)
 
