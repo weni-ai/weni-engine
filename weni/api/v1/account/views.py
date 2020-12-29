@@ -61,3 +61,15 @@ class MyUserProfileViewSet(
             filetype.get_type(f.content_type).extension,
             detail=_("Unauthorized file type, upload an image file"),
         )
+
+    @action(
+        detail=True,
+        methods=["DELETE"],
+        url_name="profile-upload-photo",
+        parser_classes=[parsers.MultiPartParser],
+    )
+    def delete_photo(self, request, **kwargs):
+        self.request.user.photo.storage.delete(self.request.user.photo.name)
+        self.request.user.photo = None
+        self.request.user.save(update_fields=["photo"])
+        return Response({})
