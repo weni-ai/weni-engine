@@ -1,6 +1,6 @@
-from django.contrib.auth.models import User
 from django.test import TestCase
 
+from weni.authentication.models import User
 from weni.common.models import Newsletter, Service, ServiceStatus
 
 
