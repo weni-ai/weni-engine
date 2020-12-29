@@ -24,6 +24,7 @@ def update_user_keycloak(instance, **kwargs):
                 },
             )
         except exceptions.KeycloakGetError:
-            raise ValidationError(
-                _("System temporarily unavailable, please try again later.")
-            )
+            if not settings.DEBUG:
+                raise ValidationError(
+                    _("System temporarily unavailable, please try again later.")
+                )

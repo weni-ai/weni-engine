@@ -28,6 +28,10 @@ You can set environment variables in your OS, write on ```.env``` file or pass v
 | OIDC_OP_JWKS_ENDPOINT | ```string``` | ```None``` | URL of your OpenID Connect provider JWKS endpoint.
 | OIDC_RP_SIGN_ALGO | ```string``` | ```RS256``` | Sets the algorithm the IdP uses to sign ID tokens.
 | OIDC_DRF_AUTH_BACKEND | ```string``` | ```weni.oidc_authentication.WeniOIDCAuthenticationBackend``` | Define the authentication middleware for the django rest framework.
+| AWS_ACCESS_KEY_ID | ```string``` | ```None``` | Specify Access Key ID S3.
+| AWS_SECRET_ACCESS_KEY | ```string``` | ```None``` | Specify Secret Access Key ID S3.
+| AWS_STORAGE_BUCKET_NAME | ```string``` | ```None``` | Specify Bucket Name S3.
+| AWS_S3_REGION_NAME | ```string``` | ```None``` | Specify the Bucket S3 region.
 
 
 ## License

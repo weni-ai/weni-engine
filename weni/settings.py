@@ -25,6 +25,10 @@ env = environ.Env(
     TIME_ZONE=(str, "UTC"),
     STATIC_URL=(str, "/static/"),
     CELERY_BROKER_URL=(str, "redis://localhost:6379/0"),
+    AWS_ACCESS_KEY_ID=(str, None),
+    AWS_SECRET_ACCESS_KEY=(str, None),
+    AWS_STORAGE_BUCKET_NAME=(str, None),
+    AWS_S3_REGION_NAME=(str, None),
 )
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -63,6 +67,7 @@ INSTALLED_APPS = [
     "weni.common",
     "django_celery_results",
     "django_celery_beat",
+    "storages",
 ]
 
 MIDDLEWARE = [
@@ -196,3 +201,11 @@ CELERY_BROKER_URL = env.str("CELERY_BROKER_URL")
 CELERY_ACCEPT_CONTENT = ["application/json"]
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TASK_SERIALIZER = "json"
+
+# AWS
+
+AWS_ACCESS_KEY_ID = env.str("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = env.str("AWS_SECRET_ACCESS_KEY")
+
+AWS_STORAGE_BUCKET_NAME = env.str("AWS_STORAGE_BUCKET_NAME")
+AWS_S3_REGION_NAME = env.str("AWS_S3_REGION_NAME")

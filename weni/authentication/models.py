@@ -5,6 +5,8 @@ from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+from weni.storages import AvatarUserMediaStorage
+
 
 class UserManager(BaseUserManager):
     def _create_user(self, email, username, password=None, **extra_fields):
@@ -57,6 +59,10 @@ class User(AbstractBaseUser, PermissionsMixin):
         error_messages={
             "unique": _("A user with that username already exists."),
         },
+    )
+
+    photo = models.FileField(
+        _("photo user"), storage=AvatarUserMediaStorage(), null=True
     )
 
     is_staff = models.BooleanField(_("staff status"), default=False)
