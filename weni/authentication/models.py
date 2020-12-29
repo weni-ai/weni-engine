@@ -61,7 +61,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         },
     )
 
-    photo = models.FileField(
+    photo = models.ImageField(
         _("photo user"), storage=AvatarUserMediaStorage(), null=True
     )
 
