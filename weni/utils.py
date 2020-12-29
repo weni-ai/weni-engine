@@ -8,7 +8,7 @@ def upload_photo_rocket(server_rocket: str, jwt_token: str, avatar_url: str) -> 
     ).json()
 
     set_photo = requests.post(
-        url="https://platform-rocket-test.push.al/api/v1/users.setAvatar",
+        url="{}/api/v1/users.setAvatar".format(server_rocket),
         headers={
             "X-Auth-Token": login.get("data", {}).get("authToken"),
             "X-User-Id": login.get("data", {}).get("userId"),
