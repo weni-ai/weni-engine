@@ -47,7 +47,7 @@ class MyUserProfileViewSet(
         parser_classes=[parsers.MultiPartParser],
         serializer_class=UserPhotoSerializer,
     )
-    def upload_photo(self, request, **kwargs):
+    def upload_photo(self, request, **kwargs):  # pragma: no cover
         f = request.FILES.get("file")
 
         serializer = UserPhotoSerializer(data=request.data)
@@ -68,7 +68,7 @@ class MyUserProfileViewSet(
         url_name="profile-upload-photo",
         parser_classes=[parsers.MultiPartParser],
     )
-    def delete_photo(self, request, **kwargs):
+    def delete_photo(self, request, **kwargs):  # pragma: no cover
         self.request.user.photo.storage.delete(self.request.user.photo.name)
         self.request.user.photo = None
         self.request.user.save(update_fields=["photo"])

@@ -2,7 +2,7 @@ from django.conf import settings
 from keycloak import KeycloakAdmin
 
 
-class KeycloakControl:
+class KeycloakControl:  # pragma: no cover
     def __init__(self):
         self.instance = self.get_instance()
 
