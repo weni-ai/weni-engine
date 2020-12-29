@@ -13,3 +13,7 @@ class UserSerializer(serializers.ModelSerializer):
     username = serializers.CharField(label=_("Username"), read_only=True)
     email = serializers.EmailField(label=_("Email"), read_only=True)
     photo = serializers.ImageField(label=_("User photo"), read_only=True)
+
+
+class UserPhotoSerializer(serializers.Serializer):
+    file = serializers.FileField(required=True)
