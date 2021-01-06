@@ -1,4 +1,5 @@
 import requests
+from django.utils import timezone
 
 from weni.celery import app
 from weni.common.models import Service
@@ -24,4 +25,5 @@ def status_service() -> None:
         service.status = is_page_available(
             url=service.url, method_request=requests.get, timeout=10
         )
-        service.save(update_fields=["status"])
+        service.last_updated = timezone.now()
+        service.save(update_fields=["status", "last_updated"])
