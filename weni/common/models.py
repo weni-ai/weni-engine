@@ -21,8 +21,9 @@ class Service(models.Model):
 
     url = models.URLField(_("service url"), unique=True)
     status = models.BooleanField(_("status service"), default=False)
-    rocket_chat = models.BooleanField(_("rocket chat"), default=False)
+    rocket_chat = models.BooleanField(_("is it a rocketchat server?"), default=False)
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
+    last_updated = models.DateTimeField(_("last updated"), auto_now_add=True)
     default = models.BooleanField(_("service default"), default=False)
 
 
