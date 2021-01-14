@@ -31,8 +31,9 @@ class ServiceStatus(models.Model):
     class Meta:
         verbose_name = _("service status")
         ordering = ["created_at"]
+        unique_together = ["service", "user"]
 
-    service = models.OneToOneField(Service, models.CASCADE)
+    service = models.ForeignKey(Service, models.CASCADE)
     user = models.ForeignKey(User, models.CASCADE, related_name="service_status")
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
 
@@ -42,3 +43,10 @@ def create_service_status(sender, instance, created, **kwargs):
     if created:
         for service in Service.objects.filter(default=True):
             instance.service_status.create(service=service)
+
+
+@receiver(post_save, sender=Service)
+def create_service_default_in_all_user(sender, instance, created, **kwargs):
+    if created and instance.default:
+        for user in User.objects.all():
+            user.service_status.create(service=instance)
