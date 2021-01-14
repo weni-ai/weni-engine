@@ -76,10 +76,16 @@ class MyUserProfileViewSet(
                 )
 
             return Response({"photo": self.request.user.photo.url})
-        raise UnsupportedMediaType(
-            filetype.get_type(f.content_type).extension,
-            detail=_("Unauthorized file type, upload an image file"),
-        )
+        try:
+            raise UnsupportedMediaType(
+                filetype.get_type(f.content_type).extension,
+                detail=_("We accept images only in the formats: .png, .jpeg, .gif"),
+            )
+        except Exception:
+            raise UnsupportedMediaType(
+                None,
+                detail=_("We accept images only in the formats: .png, .jpeg, .gif"),
+            )
 
     @action(
         detail=True,
