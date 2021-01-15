@@ -26,6 +26,7 @@ django-storages = "~=1.11.1"
 pillow = "~=8.0.1"
 filetype = "~=1.0.7"
 django-cors-headers = "~=3.6.0"
+whitenoise = "~=5.2.0"
 
 [requires]
 python_version = "3.6"

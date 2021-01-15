@@ -118,6 +118,7 @@ class MyUserProfileViewSet(
             keycloak_instance.instance.set_user_password(
                 user_id=user_id, password=request.data.get("password"), temporary=False
             )
+            self.request.user.send_change_password_email()
         except KeycloakGetError:
             if not settings.DEBUG:
                 raise ValidationError(

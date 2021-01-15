@@ -1,0 +1,49 @@
+{% load staticfiles i18n %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div>
+        <div style="width: 670px; height: 516px">
+          <header style="width: 670px; height: 72px; border-bottom: 1px solid #E2E6ED; display: flex;
+          align-items: center;">
+          {% block logo %}
+            <a style="display: block; padding: 16px;" rel="nofollow" href="https://weni.ai/" target="_blank">
+                <img src="https://weni-media-sp.s3-sa-east-1.amazonaws.com/logo/Logo.png" alt="Weni-Logo" style="margin-left: 24px"/>
+            </a>
+          {% endblock %}
+          </header>
+        {% block main-content %}{% endblock %}
+
+
+          <footer style="width: 670px;height: 192px; border-top: 1px solid #E2E6ED; display: flex; justify-content: space-evenly; align-items: center; flex-direction: column; border-bottom: 8px solid #262626;">
+
+          {% block footer %}
+            <a style="display: block; padding: 16px;" rel="nofollow" href="https://weni.ai/" target="_blank">
+                <img src="https://weni-media-sp.s3-sa-east-1.amazonaws.com/logo/Logo-small.png" style="margin: 15px 0;"/>
+            </a>
+          {% endblock %}
+
+              <div style="text-decoration: underline; display: flex;justify-content: space-around; width: 450px; color: #9CACCC; font-size: 12px;
+line-height: 20px;">
+                <a style="cursor: pointer">{% trans 'Visit our website' %}</a>
+                <a style="cursor: pointer">Facebook</a>
+                <a style="cursor: pointer">Instagram</a>
+                <a style="cursor: pointer">Twitter</a>
+              </div>
+
+            <span style="font-family: Lato;font-style: normal;font-weight: normal;font-size: 12px;line-height: 20px;color: #CCCCCC;text-align: center;margin-top:10px;">{% trans 'Weni © Brazil 2020 - All rights reserved' %}</span>
+
+            <span style="font-family: Lato;font-style: normal;font-weight: normal;font-size: 12px;line-height: 16px;text-align: center;color: #4E5666;width: 385px;height: 32px;margin-top:10px;">{% trans 'If you have not performed this action, ignore this message and change your email password for security. Talk to support if necessary!' %}</span>
+          </footer>
+            </div>
+        </div>
+</body>
+
+</html>
