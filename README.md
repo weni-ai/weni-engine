@@ -32,6 +32,8 @@ You can set environment variables in your OS, write on ```.env``` file or pass v
 | AWS_SECRET_ACCESS_KEY | ```string``` | ```None``` | Specify Secret Access Key ID S3.
 | AWS_STORAGE_BUCKET_NAME | ```string``` | ```None``` | Specify Bucket Name S3.
 | AWS_S3_REGION_NAME | ```string``` | ```None``` | Specify the Bucket S3 region.
+| INTELIGENCE_URL | ```string``` | ```https://bothub.it/``` | Specify the URL of the intelligence service.
+| FLOWS_URL | ```string``` | ```https://new.push.al/``` | Specify the URL of the flows service.
 
 
 ## License
