@@ -29,6 +29,8 @@ env = environ.Env(
     AWS_SECRET_ACCESS_KEY=(str, None),
     AWS_STORAGE_BUCKET_NAME=(str, None),
     AWS_S3_REGION_NAME=(str, None),
+    INTELIGENCE_URL=(str, "https://bothub.it/"),
+    FLOWS_URL=(str, "https://new.push.al/"),
 )
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -215,3 +217,8 @@ AWS_S3_REGION_NAME = env.str("AWS_S3_REGION_NAME")
 # cors headers
 
 CORS_ORIGIN_ALLOW_ALL = True
+
+# Products URL
+
+INTELIGENCE_URL = env.str("INTELIGENCE_URL")
+FLOWS_URL = env.str("FLOWS_URL")
