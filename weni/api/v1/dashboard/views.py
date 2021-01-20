@@ -49,10 +49,6 @@ class DashboardInfoViewSet(mixins.RetrieveModelMixin, GenericViewSet):
     lookup_field = None
     permission_classes = [IsAuthenticated]
 
-    # def get_queryset(self, *args, **kwargs):
-    #     return self.queryset.filter(
-    #         Q(user=self.request.user) | Q(service__default=True)
-    #     )
     def get_object(self, *args, **kwargs):
         request = self.request
         user = request.user
