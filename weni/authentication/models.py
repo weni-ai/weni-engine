@@ -85,10 +85,13 @@ class User(AbstractBaseUser, PermissionsMixin):
     def send_change_password_email(self):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
+        context = {"name": self.first_name}
         send_mail(
             _("Reset your Weni Password"),
             render_to_string("authentication/emails/change_password.txt"),
             None,
             [self.email],
-            html_message=render_to_string("authentication/emails/change_password.html"),
+            html_message=render_to_string(
+                "authentication/emails/change_password.html", context
+            ),
         )

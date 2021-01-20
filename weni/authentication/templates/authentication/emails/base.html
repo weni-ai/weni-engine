@@ -10,37 +10,35 @@
 
 <body>
     <div>
-        <div style="width: 670px; height: 516px">
-          <header style="width: 670px; height: 72px; border-bottom: 1px solid #E2E6ED; display: flex;
-          align-items: center;">
+        <div style="width: 670px; height: 500px">
+          <header style="width: 670px; height: 52px; border-bottom: 1px solid #E2E6ED;">
           {% block logo %}
             <a style="display: block; padding: 16px;" rel="nofollow" href="https://weni.ai/" target="_blank">
-                <img src="https://weni-media-sp.s3-sa-east-1.amazonaws.com/logo/Logo.png" alt="Weni-Logo" style="margin-left: 24px"/>
+                <img src="https://weni-media-sp.s3-sa-east-1.amazonaws.com/logo/Logo.png" alt="Weni-Logo" style="margin-left: 24px; margin-top: 10px;"/>
             </a>
           {% endblock %}
           </header>
         {% block main-content %}{% endblock %}
 
 
-          <footer style="width: 670px;height: 192px; border-top: 1px solid #E2E6ED; display: flex; justify-content: space-evenly; align-items: center; flex-direction: column; border-bottom: 8px solid #262626;">
+          <footer style="width: 670px;height: 150px; border-top: 1px solid #E2E6ED; border-bottom: 8px solid #262626;margin: auto; text-align: center;">
 
           {% block footer %}
-            <a style="display: block; padding: 16px;" rel="nofollow" href="https://weni.ai/" target="_blank">
+            <a rel="nofollow" href="https://weni.ai/" target="_blank">
                 <img src="https://weni-media-sp.s3-sa-east-1.amazonaws.com/logo/Logo-small.png" style="margin: 15px 0;"/>
             </a>
           {% endblock %}
 
-              <div style="text-decoration: underline; display: flex;justify-content: space-around; width: 450px; color: #9CACCC; font-size: 12px;
-line-height: 20px;">
-                <a style="cursor: pointer">{% trans 'Visit our website' %}</a>
-                <a style="cursor: pointer">Facebook</a>
-                <a style="cursor: pointer">Instagram</a>
-                <a style="cursor: pointer">Twitter</a>
+              <div style="width: 450px; font-size: 12px;line-height: 20px;margin: auto;">
+                <a style="cursor: pointer;margin-right: 10px;color: #9CACCC;">{% trans 'Visit our website' %}</a>
+                <a style="cursor: pointer;margin-right: 10px;color: #9CACCC;">Facebook</a>
+                <a style="cursor: pointer;margin-right: 10px;color: #9CACCC;">Instagram</a>
+                <a style="cursor: pointer;margin-right: 10px;color: #9CACCC;">Twitter</a>
               </div>
 
-            <span style="font-family: Lato;font-style: normal;font-weight: normal;font-size: 12px;line-height: 20px;color: #CCCCCC;text-align: center;margin-top:10px;">{% trans 'Weni © Brazil 2020 - All rights reserved' %}</span>
+            <div style="font-family: Lato;font-style: normal;font-weight: normal;font-size: 12px;line-height: 20px;color: #CCCCCC;text-align: center;margin-top:10px;">{% trans 'Weni © Brazil 2020 - All rights reserved' %}</div>
 
-            <span style="font-family: Lato;font-style: normal;font-weight: normal;font-size: 12px;line-height: 16px;text-align: center;color: #4E5666;width: 385px;height: 32px;margin-top:10px;">{% trans 'If you have not performed this action, ignore this message and change your email password for security. Talk to support if necessary!' %}</span>
+            <div style="margin: 5px auto;font-family: Lato;font-style: normal;font-weight: normal;font-size: 12px;line-height: 16px;text-align: center;color: #4E5666;width: 385px;height: 32px;">{% trans 'If you have not performed this action, ignore this message and change your email password for security. Talk to support if necessary!' %}</div>
           </footer>
             </div>
         </div>
