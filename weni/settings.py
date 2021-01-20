@@ -39,6 +39,8 @@ env = environ.Env(
     EMAIL_USE_TLS=(bool, False),
     SEND_EMAILS=(bool, True),
     BASE_URL=(str, "https://api.weni.ai"),
+    INTELIGENCE_URL=(str, "https://bothub.it/"),
+    FLOWS_URL=(str, "https://new.push.al/"),
 )
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -251,3 +253,8 @@ else:
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 SEND_EMAILS = env.bool("SEND_EMAILS")
+
+# Products URL
+
+INTELIGENCE_URL = env.str("INTELIGENCE_URL")
+FLOWS_URL = env.str("FLOWS_URL")

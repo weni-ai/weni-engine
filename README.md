@@ -42,6 +42,8 @@ You can set environment variables in your OS, write on ```.env``` file or pass v
 | EMAIL_USE_SSL | ```boolean``` | ```False``` | Whether to use an implicit TLS (secure) connection when talking to the SMTP server.
 | EMAIL_USE_TLS | ```boolean``` | ```False``` | Whether to use a TLS (secure) connection when talking to the SMTP server.
 | SEND_EMAILS | ```boolean``` | ```False``` | Send emails flag.
+| INTELIGENCE_URL | ```string``` | ```https://bothub.it/``` | Specify the URL of the intelligence service.
+| FLOWS_URL | ```string``` | ```https://new.push.al/``` | Specify the URL of the flows service.
 
 
 ## License
