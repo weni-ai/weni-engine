@@ -47,21 +47,16 @@ class RetrieveDashboardInfoTestCase(TestCase):
 
     def request(self, token):
         authorization_header = {"HTTP_AUTHORIZATION": "Token {}".format(token)}
-        request = self.factory.get(
-            "/v1/dashboard/info/", **authorization_header
-        )
+        request = self.factory.get("/v1/dashboard/info/", **authorization_header)
         response = DashboardInfoViewSet.as_view({"get": "retrieve"})(request)
         response.render()
         content_data = json.loads(response.content)
         return (response, content_data)
 
     def test_okay(self):
-        ServiceStatus.objects.create(
-            service=self.service,
-            user=self.user
-        )
+        ServiceStatus.objects.create(service=self.service, user=self.user)
         response, content_data = self.request(self.token)
-        self.assertIsNotNone(content_data["menu"]['inteligence'])
-        self.assertIsNotNone(content_data["menu"]['flows'])
-        self.assertEqual(len(content_data["menu"]['chat']), 1)
+        self.assertIsNotNone(content_data["menu"]["inteligence"])
+        self.assertIsNotNone(content_data["menu"]["flows"])
+        self.assertEqual(len(content_data["menu"]["chat"]), 1)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
