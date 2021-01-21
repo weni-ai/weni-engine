@@ -29,6 +29,16 @@ env = environ.Env(
     AWS_SECRET_ACCESS_KEY=(str, None),
     AWS_STORAGE_BUCKET_NAME=(str, None),
     AWS_S3_REGION_NAME=(str, None),
+    EMAIL_HOST=(lambda v: v or None, "*"),
+    DEFAULT_FROM_EMAIL=(str, "webmaster@localhost"),
+    SERVER_EMAIL=(str, "root@localhost"),
+    EMAIL_PORT=(int, 25),
+    EMAIL_HOST_USER=(str, ""),
+    EMAIL_HOST_PASSWORD=(str, ""),
+    EMAIL_USE_SSL=(bool, False),
+    EMAIL_USE_TLS=(bool, False),
+    SEND_EMAILS=(bool, True),
+    BASE_URL=(str, "https://api.weni.ai"),
     INTELIGENCE_URL=(str, "https://bothub.it/"),
     FLOWS_URL=(str, "https://new.push.al/"),
 )
@@ -47,6 +57,8 @@ SECRET_KEY = env.str("SECRET_KEY")
 DEBUG = env.bool("DEBUG")
 
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")
+
+BASE_URL = env.str("BASE_URL")
 
 TESTING = len(sys.argv) > 1 and sys.argv[1] == "test"
 
@@ -75,6 +87,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -97,9 +110,10 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
-            ],
+                "django.template.context_processors.i18n",
+            ]
         },
-    },
+    }
 ]
 
 WSGI_APPLICATION = "weni.wsgi.application"
@@ -155,6 +169,8 @@ USE_TZ = True
 STATIC_URL = env.str("STATIC_URL")
 
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # rest framework
 
@@ -217,6 +233,26 @@ AWS_S3_REGION_NAME = env.str("AWS_S3_REGION_NAME")
 # cors headers
 
 CORS_ORIGIN_ALLOW_ALL = True
+
+# mail
+
+envvar_EMAIL_HOST = env.str("EMAIL_HOST")
+
+EMAIL_SUBJECT_PREFIX = "[weni] "
+DEFAULT_FROM_EMAIL = env.str("DEFAULT_FROM_EMAIL")
+SERVER_EMAIL = env.str("SERVER_EMAIL")
+
+if envvar_EMAIL_HOST:
+    EMAIL_HOST = envvar_EMAIL_HOST
+    EMAIL_PORT = env.int("EMAIL_PORT")
+    EMAIL_HOST_USER = env.str("EMAIL_HOST_USER")
+    EMAIL_HOST_PASSWORD = env.str("EMAIL_HOST_PASSWORD")
+    EMAIL_USE_SSL = env.bool("EMAIL_USE_SSL")
+    EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS")
+else:
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+SEND_EMAILS = env.bool("SEND_EMAILS")
 
 # Products URL
 

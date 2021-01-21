@@ -1,8 +1,11 @@
+from django.conf import settings
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.contrib.auth.validators import UnicodeUsernameValidator
+from django.core.mail import send_mail
 from django.db import models
+from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 
 from weni.storages import AvatarUserMediaStorage
@@ -78,3 +81,17 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def check_password_reset_token(self, token):
         return self.token_generator.check_token(self, token)
+
+    def send_change_password_email(self):
+        if not settings.SEND_EMAILS:
+            return False  # pragma: no cover
+        context = {"name": self.first_name}
+        send_mail(
+            _("Reset your Weni Password"),
+            render_to_string("authentication/emails/change_password.txt"),
+            None,
+            [self.email],
+            html_message=render_to_string(
+                "authentication/emails/change_password.html", context
+            ),
+        )
