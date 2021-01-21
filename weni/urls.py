@@ -13,6 +13,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf import settings
 from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.urls import path, include
@@ -40,3 +41,31 @@ urlpatterns = [
 ]
 
 urlpatterns += staticfiles_urlpatterns()
+
+if settings.DEBUG:
+
+    def render_template(template_name, **kwargs):
+        def wrapper(request):
+            from django.shortcuts import render
+
+            return render(request, template_name, kwargs)
+
+        return wrapper
+
+    urlpatterns += [
+        path(
+            "emails/",
+            include(
+                [
+                    path(
+                        "change-password/",
+                        render_template(
+                            "authentication/emails/change_password.html",
+                            name="User",
+                            base_url=settings.BASE_URL,
+                        ),
+                    ),
+                ]
+            ),
+        )
+    ]
