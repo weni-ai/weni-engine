@@ -14,6 +14,9 @@ class Newsletter(models.Model):
     description = models.TextField(_("description"))
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
 
+    def __str__(self):
+        return self.title
+
 
 class Service(models.Model):
     class Meta:
@@ -26,6 +29,9 @@ class Service(models.Model):
     last_updated = models.DateTimeField(_("last updated"), auto_now_add=True)
     default = models.BooleanField(_("service default"), default=False)
 
+    def __str__(self):
+        return self.url
+
 
 class ServiceStatus(models.Model):
     class Meta:
@@ -36,6 +42,9 @@ class ServiceStatus(models.Model):
     service = models.ForeignKey(Service, models.CASCADE)
     user = models.ForeignKey(User, models.CASCADE, related_name="service_status")
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
+
+    def __str__(self):
+        return self.service.url
 
 
 @receiver(post_save, sender=User)
