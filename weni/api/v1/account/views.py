@@ -15,6 +15,7 @@ from weni.api.v1.account.serializers import (
 )
 from weni.api.v1.keycloak import KeycloakControl
 from weni.authentication.models import User
+from weni.common.models import Service
 from weni.utils import upload_photo_rocket
 
 
@@ -67,7 +68,7 @@ class MyUserProfileViewSet(
 
             # Update avatar in all rocket chat registered
             for service in self.request.user.service_status.filter(
-                service__rocket_chat=True
+                service__type_service=Service.TYPE_SERVICE_CHAT
             ):
                 upload_photo_rocket(
                     server_rocket=service.service.url,

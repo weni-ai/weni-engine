@@ -40,7 +40,7 @@ class RetrieveDashboardInfoTestCase(TestCase):
         self.factory = RequestFactory()
 
         self.service = Service.objects.create(
-            url="http://test-rocketchat.com", status=False, rocket_chat=True
+            url="http://test-rocketchat.com", status=False, type_service=Service.TYPE_SERVICE_CHAT
         )
 
         self.user, self.token = create_user_and_token()

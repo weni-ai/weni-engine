@@ -22,9 +22,33 @@ class Service(models.Model):
     class Meta:
         verbose_name = _("service")
 
+    TYPE_SERVICE_FLOWS = "type_service_flows"
+    TYPE_SERVICE_INTELIGENCE = "type_service_inteligence"
+    TYPE_SERVICE_CHAT = "type_service_chat"
+
+    TYPE_SERVICE_CHOICES = [
+        (
+            TYPE_SERVICE_FLOWS,
+            _("Flows service"),
+        ),
+        (
+            TYPE_SERVICE_INTELIGENCE,
+            _("Inteligence Service"),
+        ),
+        (
+            TYPE_SERVICE_CHAT,
+            _("Chat Service"),
+        ),
+    ]
+
     url = models.URLField(_("service url"), unique=True)
     status = models.BooleanField(_("status service"), default=False)
-    rocket_chat = models.BooleanField(_("is it a rocketchat server?"), default=False)
+    type_service = models.CharField(
+        _("type service"),
+        max_length=50,
+        choices=TYPE_SERVICE_CHOICES,
+        default=TYPE_SERVICE_CHAT,
+    )
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
     last_updated = models.DateTimeField(_("last updated"), auto_now_add=True)
     default = models.BooleanField(_("service default"), default=False)
