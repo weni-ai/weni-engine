@@ -19,6 +19,8 @@ You can set environment variables in your OS, write on ```.env``` file or pass v
 | LANGUAGE_CODE | ```string``` | ```en-us``` | A string representing the language code for this installation.This should be in standard [language ID format](https://docs.djangoproject.com/en/2.0/topics/i18n/#term-language-code).
 | TIME_ZONE | ```string``` | ```UTC``` | A string representing the time zone for this installation. See the [list of time zones](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
 | STATIC_URL | ```string``` | ```/static/``` | URL to use when referring to static files located in ```STATIC_ROOT```.
+| CSRF_COOKIE_DOMAIN | ```string``` | ```None``` | The domain to be used when setting the CSRF cookie.
+| CSRF_COOKIE_SECURE | ```boolean``` | ```False``` | Whether to use a secure cookie for the CSRF cookie.
 | OIDC_RP_SERVER_URL | ```string``` | ```None``` | Open ID Connect Server URL, example: https://accounts.weni.ai/auth/.
 | OIDC_RP_REALM_NAME | ```string``` | ```None``` | Open ID Connect Realm Name.
 | OIDC_RP_CLIENT_ID | ```string``` | ```None``` | OpenID Connect client ID provided by your OP.
@@ -44,6 +46,14 @@ You can set environment variables in your OS, write on ```.env``` file or pass v
 | SEND_EMAILS | ```boolean``` | ```False``` | Send emails flag.
 | INTELIGENCE_URL | ```string``` | ```https://bothub.it/``` | Specify the URL of the intelligence service.
 | FLOWS_URL | ```string``` | ```https://new.push.al/``` | Specify the URL of the flows service.
+| USE_SENTRY |  ```bool``` | ```False``` | Enable Support Sentry
+| SENTRY_URL |  ```string``` | ```None``` | URL Sentry
+| APM_DISABLE_SEND |  ```bool``` | ```False``` | Disable sending Elastic APM
+| APM_SERVICE_DEBUG |  ```bool``` | ```False``` | Enable APM debug mode
+| APM_SERVICE_NAME |  ```string``` | ```''``` | APM Service Name
+| APM_SECRET_TOKEN |  ```string``` | ```''``` | APM Secret Token
+| APM_SERVER_URL |  ```string``` | ```''``` | APM URL
+| ENVIRONMENT |  ```string``` | ```production``` | Specify the environment you are going to run, it is also used for sentry
 
 
 ## License
