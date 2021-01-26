@@ -14,11 +14,15 @@ import os
 import sys
 
 import environ
+import sentry_sdk
+from django.utils.log import DEFAULT_LOGGING
+from sentry_sdk.integrations.django import DjangoIntegration
 
 environ.Env.read_env(env_file=(environ.Path(__file__) - 2)(".env"))
 
 env = environ.Env(
     # set casting, default value
+    ENVIRONMENT=(str, "production"),
     DEBUG=(bool, False),
     ALLOWED_HOSTS=(lambda v: [s.strip() for s in v.split(",")], "*"),
     LANGUAGE_CODE=(str, "en-us"),
@@ -29,7 +33,7 @@ env = environ.Env(
     AWS_SECRET_ACCESS_KEY=(str, None),
     AWS_STORAGE_BUCKET_NAME=(str, None),
     AWS_S3_REGION_NAME=(str, None),
-    EMAIL_HOST=(lambda v: v or None, "*"),
+    EMAIL_HOST=(lambda v: v or None, None),
     DEFAULT_FROM_EMAIL=(str, "webmaster@localhost"),
     SERVER_EMAIL=(str, "root@localhost"),
     EMAIL_PORT=(int, 25),
@@ -38,9 +42,18 @@ env = environ.Env(
     EMAIL_USE_SSL=(bool, False),
     EMAIL_USE_TLS=(bool, False),
     SEND_EMAILS=(bool, True),
+    CSRF_COOKIE_DOMAIN=(lambda v: v or None, None),
+    CSRF_COOKIE_SECURE=(bool, False),
     BASE_URL=(str, "https://api.weni.ai"),
     INTELIGENCE_URL=(str, "https://bothub.it/"),
     FLOWS_URL=(str, "https://new.push.al/"),
+    USE_SENTRY=(bool, False),
+    SENTRY_URL=(str, None),
+    APM_DISABLE_SEND=(bool, False),
+    APM_SERVICE_DEBUG=(bool, False),
+    APM_SERVICE_NAME=(str, ""),
+    APM_SECRET_TOKEN=(str, ""),
+    APM_SERVER_URL=(str, ""),
 )
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -77,6 +90,7 @@ INSTALLED_APPS = [
     "drf_yasg2",
     "django_filters",
     "mozilla_django_oidc",
+    "elasticapm.contrib.django",
     "weni.authentication.apps.AuthenticationConfig",
     "weni.common",
     "django_celery_results",
@@ -86,6 +100,8 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "elasticapm.contrib.django.middleware.TracingMiddleware",
+    "elasticapm.contrib.django.middleware.Catch404Middleware",
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -111,6 +127,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "django.template.context_processors.i18n",
+                "elasticapm.contrib.django.context_processors.rum_tracing",
             ]
         },
     }
@@ -172,6 +189,38 @@ STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
+# Logging
+
+LOGGING = DEFAULT_LOGGING
+LOGGING["handlers"]["elasticapm"] = {
+    "level": "WARNING",
+    "class": "elasticapm.contrib.django.handlers.LoggingHandler",
+}
+LOGGING["formatters"]["verbose"] = {
+    "format": "%(levelname)s  %(asctime)s  %(module)s "
+    "%(process)d  %(thread)d  %(message)s"
+}
+LOGGING["handlers"]["console"] = {
+    "level": "DEBUG",
+    "class": "logging.StreamHandler",
+    "formatter": "verbose",
+}
+LOGGING["loggers"]["django.db.backends"] = {
+    "level": "ERROR",
+    "handlers": ["console"],
+    "propagate": False,
+}
+LOGGING["loggers"]["sentry.errors"] = {
+    "level": "DEBUG",
+    "handlers": ["console"],
+    "propagate": False,
+}
+LOGGING["loggers"]["elasticapm.errors"] = {
+    "level": "ERROR",
+    "handlers": ["console"],
+    "propagate": False,
+}
+
 # rest framework
 
 REST_FRAMEWORK = {
@@ -187,6 +236,45 @@ if TESTING:
     REST_FRAMEWORK["DEFAULT_AUTHENTICATION_CLASSES"].append(
         "rest_framework.authentication.TokenAuthentication"
     )
+
+# CSRF
+
+CSRF_COOKIE_DOMAIN = env.str("CSRF_COOKIE_DOMAIN")
+
+CSRF_COOKIE_SECURE = env.bool("CSRF_COOKIE_SECURE")
+
+# Sentry Environment
+
+USE_SENTRY = env.bool("USE_SENTRY")
+
+
+# Sentry
+
+if USE_SENTRY:
+    sentry_sdk.init(
+        dsn=env.str("SENTRY_URL"),
+        integrations=[DjangoIntegration()],
+        environment=env.str("ENVIRONMENT"),
+    )
+
+# Elastic Observability APM
+ELASTIC_APM = {
+    "DISABLE_SEND": env.bool("APM_DISABLE_SEND"),
+    "DEBUG": env.bool("APM_SERVICE_DEBUG"),
+    "SERVICE_NAME": env.str("APM_SERVICE_NAME"),
+    "SECRET_TOKEN": env.str("APM_SECRET_TOKEN"),
+    "SERVER_URL": env.str("APM_SERVER_URL"),
+    "ENVIRONMENT": env.str("ENVIRONMENT"),
+    "DJANGO_TRANSACTION_NAME_FROM_ROUTE": True,
+    "PROCESSORS": (
+        "elasticapm.processors.sanitize_stacktrace_locals",
+        "elasticapm.processors.sanitize_http_request_cookies",
+        "elasticapm.processors.sanitize_http_headers",
+        "elasticapm.processors.sanitize_http_wsgi_env",
+        "elasticapm.processors.sanitize_http_request_querystring",
+        "elasticapm.processors.sanitize_http_request_body",
+    ),
+}
 
 # mozilla-django-oidc
 OIDC_RP_SERVER_URL = env.str("OIDC_RP_SERVER_URL")

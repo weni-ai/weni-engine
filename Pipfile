@@ -27,6 +27,8 @@ pillow = "~=8.0.1"
 filetype = "~=1.0.7"
 django-cors-headers = "~=3.6.0"
 whitenoise = "~=5.2.0"
+sentry-sdk = "~=0.13.2"
+elastic-apm = "~=5.9.0"
 
 [requires]
 python_version = "3.6"
