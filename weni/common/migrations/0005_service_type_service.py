@@ -19,18 +19,27 @@ def migrate(apps, schema_editor):  # pragma: no cover
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('common', '0004_auto_20210114_1405'),
+        ("common", "0004_auto_20210114_1405"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='service',
-            name='type_service',
-            field=models.CharField(choices=[('type_service_flows', 'Flows service'), ('type_service_inteligence', 'Inteligence Service'), ('type_service_chat', 'Chat Service')], default='type_service_chat', max_length=50, verbose_name='type service'),
+            model_name="service",
+            name="type_service",
+            field=models.CharField(
+                choices=[
+                    ("type_service_flows", "Flows service"),
+                    ("type_service_inteligence", "Inteligence Service"),
+                    ("type_service_chat", "Chat Service"),
+                ],
+                default="type_service_chat",
+                max_length=50,
+                verbose_name="type service",
+            ),
         ),
         migrations.RunPython(migrate, noop),
         migrations.RemoveField(
-            model_name='service',
-            name='rocket_chat',
+            model_name="service",
+            name="rocket_chat",
         ),
     ]

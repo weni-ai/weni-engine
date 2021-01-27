@@ -1,5 +1,4 @@
 import filetype
-from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from keycloak import KeycloakGetError
 from rest_framework import mixins, permissions, parsers
@@ -120,10 +119,9 @@ class MyUserProfileViewSet(
                 user_id=user_id, password=request.data.get("password"), temporary=False
             )
             self.request.user.send_change_password_email()
-        except KeycloakGetError:
-            if not settings.DEBUG:
-                raise ValidationError(
-                    _("System temporarily unavailable, please try again later.")
-                )
+        except KeycloakGetError or ValidationError:
+            raise ValidationError(
+                _("System temporarily unavailable, please try again later.")
+            )
 
         return Response()

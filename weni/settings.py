@@ -220,6 +220,11 @@ LOGGING["loggers"]["elasticapm.errors"] = {
     "handlers": ["console"],
     "propagate": False,
 }
+LOGGING["loggers"]["weni.authentication.signals"] = {
+    "level": "ERROR",
+    "handlers": ["console"],
+    "propagate": False,
+}
 
 # rest framework
 
