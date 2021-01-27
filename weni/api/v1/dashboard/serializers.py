@@ -37,7 +37,7 @@ class StatusServiceSerializer(serializers.ModelSerializer):
         default=Service.TYPE_SERVICE_CHAT,
         label=_("Type Service"),
         source="service.type_service",
-        read_only=True
+        read_only=True,
     )
 
 
@@ -54,8 +54,8 @@ class DashboardInfoSerializer(serializers.ModelSerializer):
             "inteligence": settings.INTELIGENCE_URL,
             "flows": settings.FLOWS_URL,
             "chat": list(
-                obj.service_status.filter(service__type_service=Service.TYPE_SERVICE_CHAT).values_list(
-                    "service__url", flat=True
-                )
+                obj.service_status.filter(
+                    service__type_service=Service.TYPE_SERVICE_CHAT
+                ).values_list("service__url", flat=True)
             ),
         }
