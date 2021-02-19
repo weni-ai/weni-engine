@@ -33,10 +33,10 @@ class StatusServiceSerializer(serializers.ModelSerializer):
     service__default = serializers.BooleanField(source="service.default")
     service__last_updated = serializers.DateTimeField(source="service.last_updated")
     service__type_service = serializers.ChoiceField(
-        choices=Service.TYPE_SERVICE_CHOICES,
-        default=Service.TYPE_SERVICE_CHAT,
+        choices=Service.SERVICE_TYPE_CHOICES,
+        default=Service.SERVICE_TYPE_CHAT,
         label=_("Type Service"),
-        source="service.type_service",
+        source="service.service_type",
         read_only=True,
     )
 
