@@ -35,8 +35,8 @@ class StatusServiceViewSet(mixins.ListModelMixin, GenericViewSet):
 
     def get_queryset(self, *args, **kwargs):
         return self.queryset.filter(
-            (Q(user=self.request.user) & Q(service__default=True))
-            | Q(user=self.request.user)
+            (Q(project__organization__owner=self.request.user) & Q(service__default=True))
+            | Q(project__organization__owner=self.request.user)
         )
 
 

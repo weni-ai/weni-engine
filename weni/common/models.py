@@ -29,7 +29,7 @@ class Organization(models.Model):
     )
     name = models.CharField(_("organization name"), max_length=150)
     description = models.TextField(_("organization description"))
-    owner = models.ForeignKey(User, models.CASCADE)
+    owner = models.ForeignKey(User, models.CASCADE, related_name="organization")
     inteligence_organization = models.IntegerField(_("inteligence organization id"))
 
 
@@ -45,7 +45,7 @@ class Project(models.Model):
     )
 
     name = models.CharField(_("project name"), max_length=150)
-    organization = models.ForeignKey(Organization, models.CASCADE)
+    organization = models.ForeignKey(Organization, models.CASCADE, related_name="project")
     timezone = TimeZoneField(verbose_name=_("Timezone"))
     date_format = models.CharField(
         verbose_name=_("Date Format"),
@@ -104,7 +104,7 @@ class Service(models.Model):
     url = models.URLField(_("service url"), unique=True)
     status = models.BooleanField(_("status service"), default=False)
     service_type = models.CharField(
-        _("type service"),
+        _("service type"),
         max_length=50,
         choices=SERVICE_TYPE_CHOICES,
         default=SERVICE_TYPE_CHAT,
@@ -137,10 +137,12 @@ class ServiceStatus(models.Model):
         return self.service.url
 
 
-@receiver(post_save, sender=User)
+@receiver(post_save, sender=Project)
 def create_service_status(sender, instance, created, **kwargs):
     if created:
         for service in Service.objects.filter(default=True):
+            # instance.service_status.create(service=service)
+            print(service)
             instance.service_status.create(service=service)
 
 
