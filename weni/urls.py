@@ -27,7 +27,7 @@ from weni.api.v1 import urls as rookly_api_v1_urls
 schema_view = get_schema_view(
     openapi.Info(
         title="API Documentation",
-        default_version="v1.0.10",
+        default_version="v1.0.11",
         license=openapi.License(name="GPL-3.0 License"),
     ),
     public=True,

@@ -14,7 +14,7 @@ from weni.authentication.models import User
 logger = logging.getLogger("weni.authentication.signals")
 
 
-@receiver(models.signals.pre_save, sender=User)
+@receiver(models.signals.post_save, sender=User)
 def update_user_keycloak(instance, **kwargs):
     if not settings.TESTING:
         try:
