@@ -18,7 +18,7 @@ class StatusServiceSerializer(serializers.ModelSerializer):
         model = ServiceStatus
         fields = [
             "id",
-            "user",
+            "org_project",
             "service__status",
             "service__url",
             "service__default",
@@ -53,9 +53,9 @@ class DashboardInfoSerializer(serializers.ModelSerializer):
         return {
             "inteligence": settings.INTELIGENCE_URL,
             "flows": settings.FLOWS_URL,
-            "chat": list(
-                obj.service_status.filter(
-                    service__type_service=Service.TYPE_SERVICE_CHAT
-                ).values_list("service__url", flat=True)
-            ),
+            # "chat": list(
+            #     obj.service_status.filter(
+            #         service__type_service=Service.TYPE_SERVICE_CHAT
+            #     ).values_list("service__url", flat=True)
+            # ),
         }
