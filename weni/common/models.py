@@ -1,4 +1,6 @@
-import uuid
+import uuid as uuid4
+
+from django.conf import settings
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -25,12 +27,130 @@ class Organization(models.Model):
         verbose_name = _("organization")
 
     uuid = models.UUIDField(
-        _("UUID"), primary_key=True, default=uuid.uuid4, editable=False
+        _("UUID"), primary_key=True, default=uuid4.uuid4, editable=False
     )
     name = models.CharField(_("organization name"), max_length=150)
     description = models.TextField(_("organization description"))
     owner = models.ForeignKey(User, models.CASCADE, related_name="organization")
     inteligence_organization = models.IntegerField(_("inteligence organization id"))
+
+
+class OrganizationAuthorization(models.Model):
+    class Meta:
+        verbose_name = _("organization authorization")
+        verbose_name_plural = _("organization authorizations")
+        unique_together = ["user", "organization"]
+
+    LEVEL_NOTHING = 0
+    LEVEL_VIEWER = 1
+    LEVEL_CONTRIBUTOR = 2
+    LEVEL_ADMIN = 3
+
+    ROLE_NOT_SETTED = 0
+    ROLE_VIEWER = 1
+    ROLE_CONTRIBUTOR = 2
+    ROLE_ADMIN = 3
+
+    ROLE_CHOICES = [
+        (ROLE_NOT_SETTED, _("not set")),
+        (ROLE_VIEWER, _("viewer")),
+        (ROLE_CONTRIBUTOR, _("contributor")),
+        (ROLE_ADMIN, _("admin")),
+    ]
+
+    uuid = models.UUIDField(
+        _("UUID"), primary_key=True, default=uuid4.uuid4, editable=False
+    )
+    user = models.ForeignKey(User, models.CASCADE)
+    organization = models.ForeignKey(
+        Organization, models.CASCADE, related_name="authorizations"
+    )
+    role = models.PositiveIntegerField(
+        _("role"), choices=ROLE_CHOICES, default=ROLE_NOT_SETTED
+    )
+    created_at = models.DateTimeField(_("created at"), auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        if self.is_owner:
+            self.role = OrganizationAuthorization.ROLE_ADMIN
+        super(OrganizationAuthorization, self).save(*args, **kwargs)
+
+    @property
+    def level(self):
+        if self.role == OrganizationAuthorization.ROLE_VIEWER:
+            return OrganizationAuthorization.LEVEL_VIEWER
+
+        if self.role == OrganizationAuthorization.ROLE_CONTRIBUTOR:
+            return OrganizationAuthorization.LEVEL_CONTRIBUTOR
+
+        if self.role == OrganizationAuthorization.ROLE_ADMIN:
+            return OrganizationAuthorization.LEVEL_ADMIN
+
+        return OrganizationAuthorization.LEVEL_NOTHING  # pragma: no cover
+
+    @property
+    def can_read(self):
+        return self.level in [
+            OrganizationAuthorization.LEVEL_VIEWER,
+            OrganizationAuthorization.LEVEL_CONTRIBUTOR,
+            OrganizationAuthorization.LEVEL_ADMIN,
+        ]
+
+    @property
+    def can_contribute(self):
+        return self.level in [
+            OrganizationAuthorization.LEVEL_CONTRIBUTOR,
+            OrganizationAuthorization.LEVEL_ADMIN,
+        ]
+
+    @property
+    def can_write(self):
+        return self.level in [OrganizationAuthorization.LEVEL_ADMIN]
+
+    @property
+    def can_translate(self):
+        return self.level in [
+            OrganizationAuthorization.LEVEL_CONTRIBUTOR,
+            OrganizationAuthorization.LEVEL_ADMIN,
+        ]
+
+    @property
+    def is_admin(self):
+        return self.level == OrganizationAuthorization.LEVEL_ADMIN
+
+    @property
+    def is_owner(self):
+        try:
+            user = self.user
+        except User.DoesNotExist:  # pragma: no cover
+            return False  # pragma: no cover
+        return self.organization.owner == user
+
+    @property
+    def role_verbose(self):
+        return dict(OrganizationAuthorization.ROLE_CHOICES).get(self.role)
+
+    def send_new_role_email(self, responsible=None):
+        if not settings.SEND_EMAILS:
+            return False  # pragma: no cover
+        # responsible_name = (
+        #     responsible and responsible.name or self.organization.owner.first_name
+        # )
+        # context = {
+        #     "base_url": settings.BASE_URL,
+        #     "responsible_name": responsible_name,
+        #     "user_name": self.user.first_name,
+        #     "repository_name": self.organization.name,
+        #     # "repository_url": self.organization.get_absolute_url(),
+        #     "new_role": self.role_verbose,
+        # }
+        # send_mail(
+        #     _("New role in {}").format(self.organization.name),
+        #     render_to_string("common/emails/new_role.txt", context),
+        #     None,
+        #     [self.user.user.email],
+        #     html_message=render_to_string("common/emails/new_role.html", context),
+        # )
 
 
 class Project(models.Model):
@@ -44,6 +164,9 @@ class Project(models.Model):
         (DATE_FORMAT_MONTH_FIRST, "MM-DD-YYYY"),
     )
 
+    uuid = models.UUIDField(
+        _("UUID"), primary_key=True, default=uuid4.uuid4, editable=False
+    )
     name = models.CharField(_("project name"), max_length=150)
     organization = models.ForeignKey(Organization, models.CASCADE, related_name="project")
     timezone = TimeZoneField(verbose_name=_("Timezone"))
@@ -55,7 +178,7 @@ class Project(models.Model):
         help_text=_("Whether day comes first or month comes first in dates"),
     )
     flow_organization = models.UUIDField(
-        _("flow identification UUID"), default=uuid.uuid4, unique=True
+        _("flow identification UUID"), default=uuid4.uuid4, unique=True
     )
 
 

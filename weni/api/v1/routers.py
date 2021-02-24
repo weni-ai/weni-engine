@@ -6,6 +6,7 @@ from weni.api.v1.dashboard.views import (
     StatusServiceViewSet,
     DashboardInfoViewSet,
 )
+from weni.api.v1.organization.views import OrganizationViewSet
 
 
 class Router(routers.SimpleRouter):  # pragma: no cover
@@ -86,3 +87,4 @@ router.register("dashboard/newsletter", NewsletterViewSet)
 router.register("dashboard/status-service", StatusServiceViewSet)
 router.register("dashboard/info", DashboardInfoViewSet)
 router.register("account/my-profile", MyUserProfileViewSet)
+router.register("organization/org", OrganizationViewSet)
