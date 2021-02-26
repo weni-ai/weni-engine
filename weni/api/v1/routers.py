@@ -4,9 +4,9 @@ from weni.api.v1.account.views import MyUserProfileViewSet
 from weni.api.v1.dashboard.views import (
     NewsletterViewSet,
     StatusServiceViewSet,
-    DashboardInfoViewSet,
 )
 from weni.api.v1.organization.views import OrganizationViewSet
+from weni.api.v1.project.views import ProjectViewSet
 
 
 class Router(routers.SimpleRouter):  # pragma: no cover
@@ -85,6 +85,6 @@ class Router(routers.SimpleRouter):  # pragma: no cover
 router = Router()
 router.register("dashboard/newsletter", NewsletterViewSet)
 router.register("dashboard/status-service", StatusServiceViewSet)
-router.register("dashboard/info", DashboardInfoViewSet)
 router.register("account/my-profile", MyUserProfileViewSet)
 router.register("organization/org", OrganizationViewSet)
+router.register("organization/project", ProjectViewSet)

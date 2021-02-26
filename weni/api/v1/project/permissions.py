@@ -3,9 +3,9 @@ from rest_framework import permissions
 from weni.api.v1 import READ_METHODS, WRITE_METHODS
 
 
-class OrganizationHasPermission(permissions.BasePermission):
+class ProjectHasPermission(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
-        authorization = obj.get_user_authorization(request.user)
+        authorization = obj.organization.get_user_authorization(request.user)
         if request.method in READ_METHODS and not request.user.is_authenticated:
             return authorization.can_read
 

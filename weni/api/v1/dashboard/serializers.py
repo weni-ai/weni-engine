@@ -2,8 +2,7 @@ from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from weni.authentication.models import User
-from weni.common.models import Newsletter, ServiceStatus, Service
+from weni.common.models import Newsletter, ServiceStatus, Service, Organization
 
 
 class NewsletterSerializer(serializers.ModelSerializer):
@@ -39,23 +38,3 @@ class StatusServiceSerializer(serializers.ModelSerializer):
         source="service.service_type",
         read_only=True,
     )
-
-
-class DashboardInfoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ["menu"]
-        ref_name = None
-
-    menu = serializers.SerializerMethodField()
-
-    def get_menu(self, obj):
-        return {
-            "inteligence": settings.INTELIGENCE_URL,
-            "flows": settings.FLOWS_URL,
-            # "chat": list(
-            #     obj.organization.project.service_status.filter(
-            #         service__service_type=Service.SERVICE_TYPE_CHAT
-            #     ).values_list("service__url", flat=True)
-            # ),
-        }

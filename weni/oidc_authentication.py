@@ -26,7 +26,7 @@ class WeniOIDCAuthenticationBackend(OIDCAuthenticationBackend):
         # Override existing create_user method in OIDCAuthenticationBackend
         email = claims.get("email")
         username = self.get_username(claims)
-        user = self.UserModel.objects.create_user(username, email)
+        user = self.UserModel.objects.create_user(email, username)
 
         old_username = user.username
         user.username = claims.get("preferred_username", old_username)

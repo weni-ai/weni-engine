@@ -6,9 +6,7 @@ from rest_framework.viewsets import GenericViewSet
 from weni.api.v1.dashboard.serializers import (
     NewsletterSerializer,
     StatusServiceSerializer,
-    DashboardInfoSerializer,
 )
-from weni.authentication.models import User
 from weni.common.models import Newsletter, ServiceStatus
 
 
@@ -35,26 +33,9 @@ class StatusServiceViewSet(mixins.ListModelMixin, GenericViewSet):
 
     def get_queryset(self, *args, **kwargs):
         return self.queryset.filter(
-            (Q(project__organization__owner=self.request.user) & Q(service__default=True))
+            (
+                Q(project__organization__owner=self.request.user)
+                & Q(service__default=True)
+            )
             | Q(project__organization__owner=self.request.user)
         )
-
-
-class DashboardInfoViewSet(mixins.RetrieveModelMixin, GenericViewSet):
-    """
-    Manager Dashboard
-    """
-
-    serializer_class = DashboardInfoSerializer
-    queryset = User.objects
-    lookup_field = None
-    permission_classes = [IsAuthenticated]
-
-    def get_object(self, *args, **kwargs):
-        request = self.request
-        user = request.user
-
-        # May raise a permission denied
-        self.check_object_permissions(self.request, user)
-
-        return user

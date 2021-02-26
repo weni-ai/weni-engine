@@ -34,6 +34,14 @@ class Organization(models.Model):
     owner = models.ForeignKey(User, models.CASCADE, related_name="organization")
     inteligence_organization = models.IntegerField(_("inteligence organization id"))
 
+    def get_user_authorization(self, user):
+        if user.is_anonymous:
+            return OrganizationAuthorization(organization=self)
+        get, created = OrganizationAuthorization.objects.get_or_create(
+            user=user, organization=self
+        )
+        return get
+
 
 class OrganizationAuthorization(models.Model):
     class Meta:
@@ -156,6 +164,7 @@ class OrganizationAuthorization(models.Model):
 class Project(models.Model):
     class Meta:
         verbose_name = _("project")
+        unique_together = ["flow_organization", "flow_organization_id"]
 
     DATE_FORMAT_DAY_FIRST = "D"
     DATE_FORMAT_MONTH_FIRST = "M"
@@ -168,7 +177,9 @@ class Project(models.Model):
         _("UUID"), primary_key=True, default=uuid4.uuid4, editable=False
     )
     name = models.CharField(_("project name"), max_length=150)
-    organization = models.ForeignKey(Organization, models.CASCADE, related_name="project")
+    organization = models.ForeignKey(
+        Organization, models.CASCADE, related_name="project"
+    )
     timezone = TimeZoneField(verbose_name=_("Timezone"))
     date_format = models.CharField(
         verbose_name=_("Date Format"),
@@ -178,8 +189,9 @@ class Project(models.Model):
         help_text=_("Whether day comes first or month comes first in dates"),
     )
     flow_organization = models.UUIDField(
-        _("flow identification UUID"), default=uuid4.uuid4, unique=True
+        _("flow identification UUID"), unique=True
     )
+    flow_organization_id = models.IntegerField(_("flow identification UUID"), null=True)
 
 
 class Service(models.Model):
@@ -264,8 +276,6 @@ class ServiceStatus(models.Model):
 def create_service_status(sender, instance, created, **kwargs):
     if created:
         for service in Service.objects.filter(default=True):
-            # instance.service_status.create(service=service)
-            print(service)
             instance.service_status.create(service=service)
 
 
