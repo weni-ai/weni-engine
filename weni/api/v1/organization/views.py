@@ -1,10 +1,21 @@
 from rest_framework import mixins
+from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
 
 from weni.api.v1.metadata import Metadata
-from weni.api.v1.organization.permissions import OrganizationHasPermission
-from weni.api.v1.organization.serializers import OrganizationSeralizer
+from weni.api.v1.mixins import MultipleFieldLookupMixin
+from weni.api.v1.organization.filters import OrganizationAuthorizationFilter
+from weni.api.v1.organization.permissions import (
+    OrganizationHasPermission,
+    OrganizationAdminManagerAuthorization,
+)
+from weni.api.v1.organization.serializers import (
+    OrganizationSeralizer,
+    OrganizationAuthorizationSerializer,
+    OrganizationAuthorizationRoleSerializer,
+)
+from weni.authentication.models import User
 from weni.common.models import Organization, OrganizationAuthorization
 
 
@@ -32,3 +43,48 @@ class OrganizationViewSet(
             .values("organization")
         )
         return self.queryset.filter(pk__in=auth)
+
+
+class OrganizationAuthorizationViewSet(
+    MultipleFieldLookupMixin,
+    mixins.UpdateModelMixin,
+    mixins.ListModelMixin,
+    GenericViewSet,
+):
+    queryset = OrganizationAuthorization.objects.exclude(
+        role=OrganizationAuthorization.ROLE_NOT_SETTED
+    )
+    serializer_class = OrganizationAuthorizationSerializer
+    filter_class = OrganizationAuthorizationFilter
+    lookup_fields = ["organization__uuid", "user__username"]
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        organization_uuid = self.kwargs.get("organization__uuid")
+        user_username = self.kwargs.get("user__username")
+
+        organization = get_object_or_404(Organization, uuid=organization_uuid)
+        user = get_object_or_404(User, username=user_username)
+        obj = organization.get_user_authorization(user)
+
+        self.check_object_permissions(self.request, obj)
+        return obj
+
+    def update(self, *args, **kwargs):
+        self.lookup_field = "user__username"
+
+        self.filter_class = None
+        self.serializer_class = OrganizationAuthorizationRoleSerializer
+        self.permission_classes = [
+            IsAuthenticated,
+            OrganizationAdminManagerAuthorization,
+        ]
+        response = super().update(*args, **kwargs)
+        instance = self.get_object()
+        if instance.role is not OrganizationAuthorization.ROLE_NOT_SETTED:
+            instance.send_new_role_email(self.request.user)
+        return response
+
+    def list(self, request, *args, **kwargs):
+        self.lookup_fields = []
+        return super().list(request, *args, **kwargs)

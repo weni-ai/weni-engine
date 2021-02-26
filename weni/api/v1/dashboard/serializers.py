@@ -1,8 +1,7 @@
-from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from weni.common.models import Newsletter, ServiceStatus, Service, Organization
+from weni.common.models import Newsletter, ServiceStatus, Service
 
 
 class NewsletterSerializer(serializers.ModelSerializer):

@@ -1,7 +1,6 @@
 from django.test import TestCase
 
-from weni.authentication.models import User
-from weni.common.models import Newsletter, Service, ServiceStatus
+from weni.common.models import Newsletter, Service
 
 
 class NewsletterTestCase(TestCase):

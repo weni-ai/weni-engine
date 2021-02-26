@@ -16,3 +16,9 @@ class OrganizationHasPermission(permissions.BasePermission):
                 return authorization.can_write
             return authorization.is_admin
         return False
+
+
+class OrganizationAdminManagerAuthorization(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        authorization = obj.organization.get_user_authorization(request.user)
+        return authorization.is_admin

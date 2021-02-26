@@ -188,9 +188,7 @@ class Project(models.Model):
         default=DATE_FORMAT_DAY_FIRST,
         help_text=_("Whether day comes first or month comes first in dates"),
     )
-    flow_organization = models.UUIDField(
-        _("flow identification UUID"), unique=True
-    )
+    flow_organization = models.UUIDField(_("flow identification UUID"), unique=True)
     flow_organization_id = models.IntegerField(_("flow identification UUID"), null=True)
 
 

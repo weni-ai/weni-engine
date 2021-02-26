@@ -3,7 +3,6 @@ import uuid as uuid4
 from django.conf import settings
 from rest_framework import serializers
 
-from weni.api.v1.organization.serializers import OrganizationSeralizer
 from weni.api.v1.project.validators import CanContributeInOrganizationValidator
 from weni.common.models import Service, Project, Organization
 
@@ -53,6 +52,7 @@ class ProjectSeralizer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         import random
-        validated_data.update({'flow_organization': uuid4.uuid4()})
-        validated_data.update({'flow_organization_id': random.randint(0, 1000000)})
+
+        validated_data.update({"flow_organization": uuid4.uuid4()})
+        validated_data.update({"flow_organization_id": random.randint(0, 1000000)})
         return super().create(validated_data)
