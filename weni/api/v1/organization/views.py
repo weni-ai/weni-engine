@@ -9,7 +9,7 @@ from weni.common.models import Organization, OrganizationAuthorization
 
 
 class OrganizationViewSet(
-    # mixins.ListModelMixin,
+    mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
     mixins.CreateModelMixin,
     mixins.UpdateModelMixin,
