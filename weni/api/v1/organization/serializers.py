@@ -15,6 +15,7 @@ class OrganizationSeralizer(serializers.ModelSerializer):
             "description",
             "owner",
             "inteligence_organization",
+            "authorizations",
         ]
         ref_name = None
 
@@ -22,6 +23,7 @@ class OrganizationSeralizer(serializers.ModelSerializer):
     name = serializers.CharField(max_length=40, required=True)
     owner = UserSerializer(many=False, read_only=True)
     inteligence_organization = serializers.IntegerField(read_only=True)
+    authorizations = serializers.SerializerMethodField(style={"show": False})
 
     def create(self, validated_data):
         import random
@@ -36,6 +38,17 @@ class OrganizationSeralizer(serializers.ModelSerializer):
         )
 
         return instance
+
+    def get_authorizations(self, obj):
+        auths = obj.authorizations.exclude(
+            role=OrganizationAuthorization.ROLE_NOT_SETTED
+        )
+        return {
+            "count": auths.count(),
+            "users": [
+                {"nickname": i.user.username, "name": i.user.first_name} for i in auths
+            ],
+        }
 
 
 class OrganizationAuthorizationSerializer(serializers.ModelSerializer):
