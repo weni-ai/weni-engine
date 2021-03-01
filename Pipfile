@@ -29,7 +29,7 @@ django-cors-headers = "~=3.6.0"
 whitenoise = "~=5.2.0"
 sentry-sdk = "~=0.13.2"
 elastic-apm = "~=5.9.0"
-django-timezone-field = "~=3.0"
+django-timezone-field = "~=4.1.1"
 
 [requires]
 python_version = "3.6"
