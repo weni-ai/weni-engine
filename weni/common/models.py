@@ -116,13 +116,6 @@ class OrganizationAuthorization(models.Model):
         return self.level in [OrganizationAuthorization.LEVEL_ADMIN]
 
     @property
-    def can_translate(self):
-        return self.level in [
-            OrganizationAuthorization.LEVEL_CONTRIBUTOR,
-            OrganizationAuthorization.LEVEL_ADMIN,
-        ]
-
-    @property
     def is_admin(self):
         return self.level == OrganizationAuthorization.LEVEL_ADMIN
 
@@ -280,5 +273,5 @@ def create_service_status(sender, instance, created, **kwargs):
 @receiver(post_save, sender=Service)
 def create_service_default_in_all_user(sender, instance, created, **kwargs):
     if created and instance.default:
-        for user in User.objects.all():
-            user.service_status.create(service=instance)
+        for project in Project.objects.all():
+            project.service_status.create(service=instance)

@@ -1,3 +1,5 @@
+import uuid as uuid4
+
 from django.test import TestCase
 
 from weni.authentication.models import User
@@ -6,6 +8,7 @@ from weni.common.models import (
     Service,
     Organization,
     OrganizationAuthorization,
+    ServiceStatus,
 )
 
 
@@ -21,32 +24,43 @@ class NewsletterTestCase(TestCase):
 
 class ServiceStatusTestCase(TestCase):
     def setUp(self):
+        self.owner = User.objects.create_user("owner@user.com", "owner")
+
+        self.organization = Organization.objects.create(
+            owner=self.owner, name="Test", inteligence_organization=0
+        )
+        self.project = self.organization.project.create(
+            name="project test",
+            timezone="America/Sao_Paulo",
+            flow_organization=uuid4.uuid4(),
+        )
         self.service = Service.objects.create(
             url="http://test.com", status=False, default=False
         )
 
-    # def test_create_service_status(self):
-    #     user = User.objects.create_user("fake@user.com", "user", "123456")
-    #     status = ServiceStatus.objects.create(
-    #         service=self.service,
-    #         user=user,
-    #     )
-    #     self.assertEqual(status.service.url, "http://test.com")
-    #     self.assertEqual(status.service.status, False)
-    #     self.assertEqual(status.service.default, False)
+    def test_create_service_status(self):
+        status = ServiceStatus.objects.create(
+            service=self.service,
+            project=self.project,
+        )
+        self.assertEqual(status.service.url, "http://test.com")
+        self.assertEqual(status.service.status, False)
+        self.assertEqual(status.service.default, False)
+        self.assertEqual(str(status.service), status.service.url)
 
-    # def test_create_service_default(self):
-    #     service = Service.objects.create(
-    #         url="http://test-default.com", status=True, default=True
-    #     )
-    #     user = User.objects.create_user("fake@user.com", "user", "123456")
-    #     self.assertEqual(user.service_status.all().first().service.url, service.url)
-    #     self.assertEqual(
-    #         user.service_status.all().first().service.status, service.status
-    #     )
-    #     self.assertEqual(
-    #         user.service_status.all().first().service.default, service.default
-    #     )
+    def test_create_service_default(self):
+        service = Service.objects.create(
+            url="http://test-default.com", status=True, default=True
+        )
+        self.assertEqual(
+            self.project.service_status.all().first().service.url, service.url
+        )
+        self.assertEqual(
+            self.project.service_status.all().first().service.status, service.status
+        )
+        self.assertEqual(
+            self.project.service_status.all().first().service.default, service.default
+        )
 
 
 class OrganizationAuthorizationTestCase(TestCase):
