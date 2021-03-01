@@ -3,6 +3,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
 
 from weni.api.v1.metadata import Metadata
+from weni.api.v1.project.filters import ProjectOrgFilter
 from weni.api.v1.project.permissions import ProjectHasPermission
 from weni.api.v1.project.serializers import ProjectSeralizer
 from weni.common.models import OrganizationAuthorization, Project
@@ -19,6 +20,7 @@ class ProjectViewSet(
     queryset = Project.objects.all()
     serializer_class = ProjectSeralizer
     permission_classes = [IsAuthenticated, ProjectHasPermission]
+    filter_class = ProjectOrgFilter
     lookup_field = "uuid"
     metadata_class = Metadata
 
