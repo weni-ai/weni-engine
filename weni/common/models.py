@@ -132,7 +132,7 @@ class OrganizationAuthorization(models.Model):
         return dict(OrganizationAuthorization.ROLE_CHOICES).get(self.role)
 
     def send_new_role_email(self, responsible=None):
-        if not settings.SEND_EMAILS:
+        if not settings.SEND_EMAILS:  # pragma: no cover
             return False  # pragma: no cover
         # responsible_name = (
         #     responsible and responsible.name or self.organization.owner.first_name
@@ -260,7 +260,7 @@ class ServiceStatus(models.Model):
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
 
     def __str__(self):
-        return self.service.url
+        return self.service.url  # pragma: no cover
 
 
 @receiver(post_save, sender=Project)
