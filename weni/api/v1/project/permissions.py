@@ -3,7 +3,7 @@ from rest_framework import permissions
 from weni.api.v1 import READ_METHODS, WRITE_METHODS
 
 
-class ProjectHasPermission(permissions.BasePermission):
+class ProjectHasPermission(permissions.BasePermission):  # pragma: no cover
     def has_object_permission(self, request, view, obj):
         authorization = obj.organization.get_user_authorization(request.user)
         if request.method in READ_METHODS and not request.user.is_authenticated:

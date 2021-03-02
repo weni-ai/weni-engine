@@ -36,7 +36,7 @@ class Organization(models.Model):
 
     def get_user_authorization(self, user):
         if user.is_anonymous:
-            return OrganizationAuthorization(organization=self)
+            return OrganizationAuthorization(organization=self)  # pragma: no cover
         get, created = OrganizationAuthorization.objects.get_or_create(
             user=user, organization=self
         )
@@ -129,7 +129,9 @@ class OrganizationAuthorization(models.Model):
 
     @property
     def role_verbose(self):
-        return dict(OrganizationAuthorization.ROLE_CHOICES).get(self.role)
+        return dict(OrganizationAuthorization.ROLE_CHOICES).get(
+            self.role
+        )  # pragma: no cover
 
     def send_new_role_email(self, responsible=None):
         if not settings.SEND_EMAILS:  # pragma: no cover

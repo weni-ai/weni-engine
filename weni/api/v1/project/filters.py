@@ -18,7 +18,7 @@ class ProjectOrgFilter(filters.FilterSet):
         help_text=_("Organization's UUID"),
     )
 
-    def filter_organization_uuid(self, queryset, name, value):
+    def filter_organization_uuid(self, queryset, name, value):  # pragma: no cover
         request = self.request
         try:
             organization = Organization.objects.get(uuid=value)

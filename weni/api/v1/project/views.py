@@ -27,7 +27,7 @@ class ProjectViewSet(
     def get_queryset(self, *args, **kwargs):
         if getattr(self, "swagger_fake_view", False):
             # queryset just for schema generation metadata
-            return Project.objects.none()
+            return Project.objects.none()  # pragma: no cover
         auth = (
             OrganizationAuthorization.objects.exclude(role=0)
             .filter(user=self.request.user)

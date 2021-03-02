@@ -1,4 +1,5 @@
 import json
+import uuid as uuid4
 
 from django.test import RequestFactory
 from django.test import TestCase
@@ -118,8 +119,7 @@ class ListOrganizationAuthorizationTestCase(TestCase):
     def request(self, organization, token):
         authorization_header = {"HTTP_AUTHORIZATION": "Token {}".format(token.key)}
         request = self.factory.get(
-            "/v1/organization/authorizations/",
-            {"organization": organization.uuid},
+            "/v1/organization/authorizations/?organization={}".format(organization),
             **authorization_header,
         )
         response = OrganizationAuthorizationViewSet.as_view({"get": "list"})(request)
@@ -128,7 +128,7 @@ class ListOrganizationAuthorizationTestCase(TestCase):
         return (response, content_data)
 
     def test_okay(self):
-        response, content_data = self.request(self.organization, self.owner_token)
+        response, content_data = self.request(self.organization.uuid, self.owner_token)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -138,9 +138,19 @@ class ListOrganizationAuthorizationTestCase(TestCase):
         self.assertEqual(content_data.get("results")[1].get("user"), self.user.id)
 
     def test_user_forbidden(self):
-        response, content_data = self.request(self.organization, self.user_token)
+        response, content_data = self.request(self.organization.uuid, self.user_token)
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_organization_not_found(self):
+        response, content_data = self.request(uuid4.uuid4(), self.user_token)
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_organization_invalid_uuid(self):
+        response, content_data = self.request("444-212-2333232", self.user_token)
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
 class UpdateAuthorizationRoleTestCase(TestCase):
