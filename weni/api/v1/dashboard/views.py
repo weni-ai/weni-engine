@@ -1,4 +1,5 @@
 from django.db.models import Q
+from django.utils import timezone
 from rest_framework import mixins
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
@@ -18,7 +19,10 @@ class NewsletterViewSet(
     """
 
     serializer_class = NewsletterSerializer
-    queryset = Newsletter.objects.all()
+    queryset = Newsletter.objects.filter(
+        created_at__gt=timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
+        - timezone.timedelta(days=90)
+    )
     permission_classes = [IsAuthenticated]
 
 
