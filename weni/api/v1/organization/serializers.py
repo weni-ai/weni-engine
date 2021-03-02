@@ -43,10 +43,17 @@ class OrganizationSeralizer(serializers.ModelSerializer):
         auths = obj.authorizations.exclude(
             role=OrganizationAuthorization.ROLE_NOT_SETTED
         )
+
         return {
             "count": auths.count(),
             "users": [
-                {"nickname": i.user.username, "name": i.user.first_name} for i in auths
+                {
+                    "username": i.user.username,
+                    "first_name": i.user.first_name,
+                    "last_name": i.user.last_name,
+                    "photo_user": None if i.user.photo is None else None,
+                }
+                for i in auths
             ],
         }
 

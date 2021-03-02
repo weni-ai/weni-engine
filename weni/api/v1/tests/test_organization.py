@@ -232,3 +232,51 @@ class UpdateAuthorizationRoleTestCase(TestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+class DestroyAuthorizationRoleTestCase(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+
+        self.owner, self.owner_token = create_user_and_token("owner")
+        self.user, self.user_token = create_user_and_token()
+
+        self.organization = self.owner.organization.create(
+            name="test organization", description="", inteligence_organization=1
+        )
+        self.organization_authorization = self.organization.authorizations.create(
+            user=self.owner, role=OrganizationAuthorization.ROLE_ADMIN
+        )
+
+        self.user_organization_authorization = self.organization.authorizations.create(
+            user=self.user, role=OrganizationAuthorization.ROLE_CONTRIBUTOR
+        )
+
+    def request(self, organization, token, user):
+        authorization_header = {"HTTP_AUTHORIZATION": "Token {}".format(token.key)}
+        request = self.factory.delete(
+            "/v1/organization/authorizations/{}/{}/".format(
+                organization.uuid, user.username
+            ),
+            **authorization_header,
+        )
+        view = OrganizationAuthorizationViewSet.as_view({"delete": "destroy"})
+        response = view(
+            request, organization__uuid=organization.uuid, user__username=user.username
+        )
+        response.render()
+        return response
+
+    def test_okay(self):
+        response = self.request(self.organization, self.owner_token, self.user)
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_forbidden(self):
+        response = self.request(
+            self.organization,
+            self.user_token,
+            self.user,
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

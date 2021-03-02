@@ -69,7 +69,7 @@ class MyUserProfileViewSet(
 
             # Update avatar in all rocket chat registered
             for service in self.request.user.service_status.filter(
-                service__type_service=Service.TYPE_SERVICE_CHAT
+                service__type_service=Service.SERVICE_TYPE_CHAT
             ):
                 upload_photo_rocket(
                     server_rocket=service.service.url,
@@ -143,6 +143,9 @@ class SearchUserViewSet(mixins.ListModelMixin, GenericViewSet):  # pragma: no co
         "=last_name",
         "^username",
         "$username",
+        "=email",
+        "^email",
+        "$email",
     ]
     pagination_class = None
     limit = 5

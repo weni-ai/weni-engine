@@ -1,6 +1,8 @@
 from rest_framework import mixins
+from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from weni.api.v1.metadata import Metadata
@@ -49,6 +51,7 @@ class OrganizationAuthorizationViewSet(
     MultipleFieldLookupMixin,
     mixins.UpdateModelMixin,
     mixins.ListModelMixin,
+    mixins.DestroyModelMixin,
     GenericViewSet,
 ):
     queryset = OrganizationAuthorization.objects.exclude(
@@ -88,3 +91,29 @@ class OrganizationAuthorizationViewSet(
     def list(self, request, *args, **kwargs):
         self.lookup_fields = []
         return super().list(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        self.permission_classes = [
+            IsAuthenticated,
+            OrganizationAdminManagerAuthorization,
+        ]
+        self.filter_class = None
+        self.lookup_field = "user__username"
+        return super().destroy(request, *args, **kwargs)
+
+    @action(
+        detail=True,
+        methods=["DELETE"],
+        url_name="organization-remove-my-user",
+        lookup_fields=["organization__uuid", "user__username"],
+    )
+    def remove_my_user(self, request, **kwargs):  # pragma: no cover
+        """
+        Delete my user authorization
+        """
+        if self.lookup_field not in kwargs:
+            return Response(status=405)
+
+        auth = self.get_object()
+        auth.delete()
+        return Response()
