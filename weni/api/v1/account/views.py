@@ -129,7 +129,7 @@ class MyUserProfileViewSet(
         return Response()
 
 
-class SearchUserViewSet(mixins.ListModelMixin, GenericViewSet):
+class SearchUserViewSet(mixins.ListModelMixin, GenericViewSet):  # pragma: no cover
     serializer_class = UserSerializer
     queryset = User.objects.all()
     filter_backends = [DjangoFilterBackend, SearchFilter]

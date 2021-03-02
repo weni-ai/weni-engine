@@ -22,11 +22,11 @@ class OrganizationAuthorizationFilter(filters.FilterSet):
     def filter_organization_uuid(self, queryset, name, value):
         request = self.request
         try:
-            repository = Organization.objects.get(uuid=value)
-            authorization = repository.get_user_authorization(request.user)
+            organization = Organization.objects.get(uuid=value)
+            authorization = organization.get_user_authorization(request.user)
             if not authorization.is_admin:
                 raise PermissionDenied()
-            return queryset.filter(organization=repository)
+            return queryset.filter(organization=organization)
         except Organization.DoesNotExist:
             raise NotFound(_("Organization {} does not exist").format(value))
         except DjangoValidationError:
