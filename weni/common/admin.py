@@ -1,6 +1,13 @@
 from django.contrib import admin
 
-from weni.common.models import Newsletter, Service, ServiceStatus, Organization, Project
+from weni.common.models import (
+    Newsletter,
+    Service,
+    ServiceStatus,
+    Organization,
+    Project,
+    OrganizationAuthorization,
+)
 
 
 @admin.register(Newsletter)
@@ -25,4 +32,9 @@ class OrganizationAdmin(admin.ModelAdmin):
 
 @admin.register(Project)
 class ProjectAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(OrganizationAuthorization)
+class OrganizationAuthorizationAdmin(admin.ModelAdmin):
     pass

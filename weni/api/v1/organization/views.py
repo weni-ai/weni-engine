@@ -1,5 +1,6 @@
 from rest_framework import mixins
 from rest_framework.decorators import action
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -111,9 +112,15 @@ class OrganizationAuthorizationViewSet(
         """
         Delete my user authorization
         """
-        if self.lookup_field not in kwargs:
-            return Response(status=405)
+        organization_uuid = self.kwargs.get("organization__uuid")
 
-        auth = self.get_object()
-        auth.delete()
-        return Response()
+        organization = get_object_or_404(Organization, uuid=organization_uuid)
+        obj = organization.get_user_authorization(self.request.user)
+
+        self.check_object_permissions(self.request, obj)
+
+        if obj.is_owner:
+            raise PermissionDenied()
+
+        obj.delete()
+        return Response(status=204)
