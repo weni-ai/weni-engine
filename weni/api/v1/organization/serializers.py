@@ -51,6 +51,7 @@ class OrganizationSeralizer(serializers.ModelSerializer):
                     "username": i.user.username,
                     "first_name": i.user.first_name,
                     "last_name": i.user.last_name,
+                    "role": i.role,
                     "photo_user": None if i.user.photo is None else None,
                 }
                 for i in auths
@@ -65,6 +66,8 @@ class OrganizationAuthorizationSerializer(serializers.ModelSerializer):
             "uuid",
             "user",
             "user__username",
+            "user__email",
+            "user__photo",
             "organization",
             "role",
             "level",
@@ -79,6 +82,12 @@ class OrganizationAuthorizationSerializer(serializers.ModelSerializer):
 
     user__username = serializers.SlugRelatedField(
         source="user", slug_field="username", read_only=True
+    )
+    user__email = serializers.EmailField(
+        source="user.email", label=_("Email"), read_only=True
+    )
+    user__photo = serializers.ImageField(
+        source="user.photo", label=_("User photo"), read_only=True
     )
 
 

@@ -1,6 +1,8 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import mixins
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
+from rest_framework.filters import SearchFilter
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -61,6 +63,21 @@ class OrganizationAuthorizationViewSet(
     serializer_class = OrganizationAuthorizationSerializer
     filter_class = OrganizationAuthorizationFilter
     lookup_fields = ["organization__uuid", "user__username"]
+    filter_backends = [DjangoFilterBackend, SearchFilter]
+    search_fields = [
+        "=user__first_name",
+        "^user__first_name",
+        "$user__first_name",
+        "=user__last_name",
+        "^user__last_name",
+        "$user__last_name",
+        "=user__last_name",
+        "^user__username",
+        "$user__username",
+        "=user__email",
+        "^user__email",
+        "$user__email",
+    ]
     permission_classes = [IsAuthenticated]
 
     def get_object(self):
