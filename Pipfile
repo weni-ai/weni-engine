@@ -30,6 +30,8 @@ whitenoise = "~=5.2.0"
 sentry-sdk = "~=0.13.2"
 elastic-apm = "~=5.9.0"
 django-timezone-field = "~=4.1.1"
+grpcio = "~=1.34.0"
+grpcio-tools = "~=1.34.0"
 
 [requires]
 python_version = "3.6"
