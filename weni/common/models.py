@@ -1,7 +1,11 @@
+import uuid as uuid4
+
+from django.conf import settings
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
+from timezone_field import TimeZoneField
 
 from weni.authentication.models import User
 
@@ -18,40 +22,230 @@ class Newsletter(models.Model):
         return self.title
 
 
+class Organization(models.Model):
+    class Meta:
+        verbose_name = _("organization")
+
+    uuid = models.UUIDField(
+        _("UUID"), primary_key=True, default=uuid4.uuid4, editable=False
+    )
+    name = models.CharField(_("organization name"), max_length=150)
+    description = models.TextField(_("organization description"))
+    owner = models.ForeignKey(User, models.CASCADE, related_name="organization")
+    inteligence_organization = models.IntegerField(_("inteligence organization id"))
+
+    def get_user_authorization(self, user):
+        if user.is_anonymous:
+            return OrganizationAuthorization(organization=self)  # pragma: no cover
+        get, created = OrganizationAuthorization.objects.get_or_create(
+            user=user, organization=self
+        )
+        return get
+
+
+class OrganizationAuthorization(models.Model):
+    class Meta:
+        verbose_name = _("organization authorization")
+        verbose_name_plural = _("organization authorizations")
+        unique_together = ["user", "organization"]
+
+    LEVEL_NOTHING = 0
+    LEVEL_VIEWER = 1
+    LEVEL_CONTRIBUTOR = 2
+    LEVEL_ADMIN = 3
+
+    ROLE_NOT_SETTED = 0
+    ROLE_VIEWER = 1
+    ROLE_CONTRIBUTOR = 2
+    ROLE_ADMIN = 3
+
+    ROLE_CHOICES = [
+        (ROLE_NOT_SETTED, _("not set")),
+        (ROLE_VIEWER, _("viewer")),
+        (ROLE_CONTRIBUTOR, _("contributor")),
+        (ROLE_ADMIN, _("admin")),
+    ]
+
+    uuid = models.UUIDField(
+        _("UUID"), primary_key=True, default=uuid4.uuid4, editable=False
+    )
+    user = models.ForeignKey(User, models.CASCADE)
+    organization = models.ForeignKey(
+        Organization, models.CASCADE, related_name="authorizations"
+    )
+    role = models.PositiveIntegerField(
+        _("role"), choices=ROLE_CHOICES, default=ROLE_NOT_SETTED
+    )
+    created_at = models.DateTimeField(_("created at"), auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        if self.is_owner:
+            self.role = OrganizationAuthorization.ROLE_ADMIN
+        super(OrganizationAuthorization, self).save(*args, **kwargs)
+
+    @property
+    def level(self):
+        if self.role == OrganizationAuthorization.ROLE_VIEWER:
+            return OrganizationAuthorization.LEVEL_VIEWER
+
+        if self.role == OrganizationAuthorization.ROLE_CONTRIBUTOR:
+            return OrganizationAuthorization.LEVEL_CONTRIBUTOR
+
+        if self.role == OrganizationAuthorization.ROLE_ADMIN:
+            return OrganizationAuthorization.LEVEL_ADMIN
+
+        return OrganizationAuthorization.LEVEL_NOTHING  # pragma: no cover
+
+    @property
+    def can_read(self):
+        return self.level in [
+            OrganizationAuthorization.LEVEL_VIEWER,
+            OrganizationAuthorization.LEVEL_CONTRIBUTOR,
+            OrganizationAuthorization.LEVEL_ADMIN,
+        ]
+
+    @property
+    def can_contribute(self):
+        return self.level in [
+            OrganizationAuthorization.LEVEL_CONTRIBUTOR,
+            OrganizationAuthorization.LEVEL_ADMIN,
+        ]
+
+    @property
+    def can_write(self):
+        return self.level in [OrganizationAuthorization.LEVEL_ADMIN]
+
+    @property
+    def is_admin(self):
+        return self.level == OrganizationAuthorization.LEVEL_ADMIN
+
+    @property
+    def is_owner(self):
+        try:
+            user = self.user
+        except User.DoesNotExist:  # pragma: no cover
+            return False  # pragma: no cover
+        return self.organization.owner == user
+
+    @property
+    def role_verbose(self):
+        return dict(OrganizationAuthorization.ROLE_CHOICES).get(
+            self.role
+        )  # pragma: no cover
+
+    def send_new_role_email(self, responsible=None):
+        if not settings.SEND_EMAILS:  # pragma: no cover
+            return False  # pragma: no cover
+        # responsible_name = (
+        #     responsible and responsible.name or self.organization.owner.first_name
+        # )
+        # context = {
+        #     "base_url": settings.BASE_URL,
+        #     "responsible_name": responsible_name,
+        #     "user_name": self.user.first_name,
+        #     "repository_name": self.organization.name,
+        #     # "repository_url": self.organization.get_absolute_url(),
+        #     "new_role": self.role_verbose,
+        # }
+        # send_mail(
+        #     _("New role in {}").format(self.organization.name),
+        #     render_to_string("common/emails/new_role.txt", context),
+        #     None,
+        #     [self.user.user.email],
+        #     html_message=render_to_string("common/emails/new_role.html", context),
+        # )
+
+
+class Project(models.Model):
+    class Meta:
+        verbose_name = _("project")
+        unique_together = ["flow_organization", "flow_organization_id"]
+
+    DATE_FORMAT_DAY_FIRST = "D"
+    DATE_FORMAT_MONTH_FIRST = "M"
+    DATE_FORMATS = (
+        (DATE_FORMAT_DAY_FIRST, "DD-MM-YYYY"),
+        (DATE_FORMAT_MONTH_FIRST, "MM-DD-YYYY"),
+    )
+
+    uuid = models.UUIDField(
+        _("UUID"), primary_key=True, default=uuid4.uuid4, editable=False
+    )
+    name = models.CharField(_("project name"), max_length=150)
+    organization = models.ForeignKey(
+        Organization, models.CASCADE, related_name="project"
+    )
+    timezone = TimeZoneField(verbose_name=_("Timezone"))
+    date_format = models.CharField(
+        verbose_name=_("Date Format"),
+        max_length=1,
+        choices=DATE_FORMATS,
+        default=DATE_FORMAT_DAY_FIRST,
+        help_text=_("Whether day comes first or month comes first in dates"),
+    )
+    flow_organization = models.UUIDField(_("flow identification UUID"), unique=True)
+    flow_organization_id = models.IntegerField(_("flow identification UUID"), null=True)
+
+
 class Service(models.Model):
     class Meta:
         verbose_name = _("service")
 
-    TYPE_SERVICE_FLOWS = "type_service_flows"
-    TYPE_SERVICE_INTELIGENCE = "type_service_inteligence"
-    TYPE_SERVICE_CHAT = "type_service_chat"
+    SERVICE_TYPE_FLOWS = "type_service_flows"
+    SERVICE_TYPE_INTELIGENCE = "type_service_inteligence"
+    SERVICE_TYPE_CHAT = "type_service_chat"
 
-    TYPE_SERVICE_CHOICES = [
+    SERVICE_TYPE_CHOICES = [
         (
-            TYPE_SERVICE_FLOWS,
+            SERVICE_TYPE_FLOWS,
             _("Flows service"),
         ),
         (
-            TYPE_SERVICE_INTELIGENCE,
+            SERVICE_TYPE_INTELIGENCE,
             _("Inteligence Service"),
         ),
         (
-            TYPE_SERVICE_CHAT,
+            SERVICE_TYPE_CHAT,
             _("Chat Service"),
+        ),
+    ]
+
+    REGION_IRELAND = "region_ireland"
+    REGION_VIRGINIA = "region_virginia"
+    REGION_SAO_PAULO = "region_sao_paulo"
+
+    REGION_CHOICES = [
+        (
+            REGION_IRELAND,
+            _("Region Ireland"),
+        ),
+        (
+            REGION_VIRGINIA,
+            _("Region Virginia"),
+        ),
+        (
+            REGION_SAO_PAULO,
+            _("Region São Paulo"),
         ),
     ]
 
     url = models.URLField(_("service url"), unique=True)
     status = models.BooleanField(_("status service"), default=False)
-    type_service = models.CharField(
-        _("type service"),
+    service_type = models.CharField(
+        _("service type"),
         max_length=50,
-        choices=TYPE_SERVICE_CHOICES,
-        default=TYPE_SERVICE_CHAT,
+        choices=SERVICE_TYPE_CHOICES,
+        default=SERVICE_TYPE_CHAT,
     )
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
     last_updated = models.DateTimeField(_("last updated"), auto_now_add=True)
-    default = models.BooleanField(_("service default"), default=False)
+    default = models.BooleanField(_("standard service for all projects"), default=False)
+    region = models.CharField(
+        _("service region"),
+        max_length=50,
+        choices=REGION_CHOICES,
+        default=REGION_SAO_PAULO,
+    )
 
     def __str__(self):
         return self.url
@@ -61,17 +255,17 @@ class ServiceStatus(models.Model):
     class Meta:
         verbose_name = _("service status")
         ordering = ["created_at"]
-        unique_together = ["service", "user"]
+        unique_together = ["service", "project"]
 
     service = models.ForeignKey(Service, models.CASCADE)
-    user = models.ForeignKey(User, models.CASCADE, related_name="service_status")
+    project = models.ForeignKey(Project, models.CASCADE, related_name="service_status")
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
 
     def __str__(self):
-        return self.service.url
+        return self.service.url  # pragma: no cover
 
 
-@receiver(post_save, sender=User)
+@receiver(post_save, sender=Project)
 def create_service_status(sender, instance, created, **kwargs):
     if created:
         for service in Service.objects.filter(default=True):
@@ -81,5 +275,5 @@ def create_service_status(sender, instance, created, **kwargs):
 @receiver(post_save, sender=Service)
 def create_service_default_in_all_user(sender, instance, created, **kwargs):
     if created and instance.default:
-        for user in User.objects.all():
-            user.service_status.create(service=instance)
+        for project in Project.objects.all():
+            project.service_status.create(service=instance)

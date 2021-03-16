@@ -1,4 +1,5 @@
 from django.db.models import Q
+from django.utils import timezone
 from rest_framework import mixins
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
@@ -6,9 +7,7 @@ from rest_framework.viewsets import GenericViewSet
 from weni.api.v1.dashboard.serializers import (
     NewsletterSerializer,
     StatusServiceSerializer,
-    DashboardInfoSerializer,
 )
-from weni.authentication.models import User
 from weni.common.models import Newsletter, ServiceStatus
 
 
@@ -20,7 +19,10 @@ class NewsletterViewSet(
     """
 
     serializer_class = NewsletterSerializer
-    queryset = Newsletter.objects.all()
+    queryset = Newsletter.objects.filter(
+        created_at__gt=timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
+        - timezone.timedelta(days=90)
+    )
     permission_classes = [IsAuthenticated]
 
 
@@ -35,26 +37,9 @@ class StatusServiceViewSet(mixins.ListModelMixin, GenericViewSet):
 
     def get_queryset(self, *args, **kwargs):
         return self.queryset.filter(
-            (Q(user=self.request.user) & Q(service__default=True))
-            | Q(user=self.request.user)
+            (
+                Q(project__organization__owner=self.request.user)
+                & Q(service__default=True)
+            )
+            | Q(project__organization__owner=self.request.user)
         )
-
-
-class DashboardInfoViewSet(mixins.RetrieveModelMixin, GenericViewSet):
-    """
-    Manager Dashboard
-    """
-
-    serializer_class = DashboardInfoSerializer
-    queryset = User.objects
-    lookup_field = None
-    permission_classes = [IsAuthenticated]
-
-    def get_object(self, *args, **kwargs):
-        request = self.request
-        user = request.user
-
-        # May raise a permission denied
-        self.check_object_permissions(self.request, user)
-
-        return user

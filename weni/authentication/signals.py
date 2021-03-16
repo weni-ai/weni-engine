@@ -3,13 +3,10 @@ import logging
 from django.conf import settings
 from django.db import models
 from django.dispatch import receiver
-from django.utils.translation import ugettext_lazy as _
 from keycloak import exceptions
-from rest_framework.exceptions import ValidationError
 
 from weni.api.v1.keycloak import KeycloakControl
 from weni.authentication.models import User
-
 
 logger = logging.getLogger("weni.authentication.signals")
 
@@ -30,6 +27,6 @@ def update_user_keycloak(instance, **kwargs):
             )
         except exceptions.KeycloakGetError as e:
             logger.error(e)
-            raise ValidationError(
-                _("System temporarily unavailable, please try again later.")
-            )
+            # raise ValidationError(
+            #     _("System temporarily unavailable, please try again later.")
+            # )

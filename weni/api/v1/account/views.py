@@ -1,9 +1,11 @@
 import filetype
 from django.utils.translation import ugettext_lazy as _
+from django_filters.rest_framework import DjangoFilterBackend
 from keycloak import KeycloakGetError
 from rest_framework import mixins, permissions, parsers
 from rest_framework.decorators import action
 from rest_framework.exceptions import UnsupportedMediaType, ValidationError
+from rest_framework.filters import SearchFilter
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
@@ -67,7 +69,7 @@ class MyUserProfileViewSet(
 
             # Update avatar in all rocket chat registered
             for service in self.request.user.service_status.filter(
-                service__type_service=Service.TYPE_SERVICE_CHAT
+                service__type_service=Service.SERVICE_TYPE_CHAT
             ):
                 upload_photo_rocket(
                     server_rocket=service.service.url,
@@ -125,3 +127,30 @@ class MyUserProfileViewSet(
             )
 
         return Response()
+
+
+class SearchUserViewSet(mixins.ListModelMixin, GenericViewSet):  # pragma: no cover
+    serializer_class = UserSerializer
+    queryset = User.objects.all()
+    filter_backends = [DjangoFilterBackend, SearchFilter]
+    search_fields = [
+        "=first_name",
+        "^first_name",
+        "$first_name",
+        "=last_name",
+        "^last_name",
+        "$last_name",
+        "=last_name",
+        "^username",
+        "$username",
+        "=email",
+        "^email",
+        "$email",
+    ]
+    pagination_class = None
+    limit = 5
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())[: self.limit]
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)

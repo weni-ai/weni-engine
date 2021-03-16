@@ -2,6 +2,9 @@ import logging
 
 from mozilla_django_oidc.auth import OIDCAuthenticationBackend
 
+from weni import utils
+from weni.common.models import Organization
+
 LOGGER = logging.getLogger("weni_django_oidc")
 
 
@@ -34,6 +37,31 @@ class WeniOIDCAuthenticationBackend(OIDCAuthenticationBackend):
         user.last_name = claims.get("family_name", "")
         user.email = claims.get("email", "")
         user.save()
+
+        if False:
+            grpc_instance = utils.get_grpc_types().get("inteligence")
+
+            organizations = grpc_instance.list_organizations(user_email=user.email)
+
+            for organization in organizations:
+                obj = Organization.objects.filter(
+                    inteligence_organization=organization.get("id")
+                )
+                if not obj.exists():
+                    org = Organization.objects.create(
+                        name=organization.get("name"),
+                        description="",
+                        owner=user,
+                        inteligence_organization=organization.get("id"),
+                    )
+                else:
+                    org = obj.first()
+
+                role = grpc_instance.get_user_organization_permission_role(
+                    user_email=user.email, organization_id=organization.get("id")
+                )
+
+                org.authorizations.create(user=user, role=role)
 
         return user
 

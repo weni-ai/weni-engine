@@ -133,3 +133,6 @@ dmypy.json
 
 # Staticfile
 staticfiles/
+
+# gRPC
+weni/protos/inteligence/*.py
