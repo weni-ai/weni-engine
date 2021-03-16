@@ -3,13 +3,10 @@ import logging
 from django.conf import settings
 from django.db import models
 from django.dispatch import receiver
-from django.utils.translation import ugettext_lazy as _
 from keycloak import exceptions
-from rest_framework.exceptions import ValidationError
 
 from weni.api.v1.keycloak import KeycloakControl
 from weni.authentication.models import User
-
 
 logger = logging.getLogger("weni.authentication.signals")
 
