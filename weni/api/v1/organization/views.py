@@ -66,9 +66,7 @@ class OrganizationAuthorizationViewSet(
     mixins.DestroyModelMixin,
     GenericViewSet,
 ):
-    queryset = OrganizationAuthorization.objects.exclude(
-        role=OrganizationAuthorization.ROLE_NOT_SETTED
-    )
+    queryset = OrganizationAuthorization.objects
     serializer_class = OrganizationAuthorizationSerializer
     filter_class = OrganizationAuthorizationFilter
     lookup_fields = ["organization__uuid", "user__username"]
@@ -111,8 +109,7 @@ class OrganizationAuthorizationViewSet(
         ]
         response = super().update(*args, **kwargs)
         instance = self.get_object()
-        if instance.role is not OrganizationAuthorization.ROLE_NOT_SETTED:
-            instance.send_new_role_email(self.request.user)
+        instance.send_new_role_email(self.request.user)
         return response
 
     def list(self, request, *args, **kwargs):

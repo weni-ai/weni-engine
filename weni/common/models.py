@@ -50,18 +50,15 @@ class OrganizationAuthorization(models.Model):
         verbose_name_plural = _("organization authorizations")
         unique_together = ["user", "organization"]
 
-    LEVEL_NOTHING = 0
     LEVEL_VIEWER = 1
     LEVEL_CONTRIBUTOR = 2
     LEVEL_ADMIN = 3
 
-    ROLE_NOT_SETTED = 0
     ROLE_VIEWER = 1
     ROLE_CONTRIBUTOR = 2
     ROLE_ADMIN = 3
 
     ROLE_CHOICES = [
-        (ROLE_NOT_SETTED, _("not set")),
         (ROLE_VIEWER, _("viewer")),
         (ROLE_CONTRIBUTOR, _("contributor")),
         (ROLE_ADMIN, _("admin")),
@@ -75,7 +72,7 @@ class OrganizationAuthorization(models.Model):
         Organization, models.CASCADE, related_name="authorizations"
     )
     role = models.PositiveIntegerField(
-        _("role"), choices=ROLE_CHOICES, default=ROLE_NOT_SETTED
+        _("role"), choices=ROLE_CHOICES, default=ROLE_VIEWER
     )
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
 
@@ -89,8 +86,6 @@ class OrganizationAuthorization(models.Model):
 
         if self.role == OrganizationAuthorization.ROLE_ADMIN:
             return OrganizationAuthorization.LEVEL_ADMIN
-
-        return OrganizationAuthorization.LEVEL_NOTHING  # pragma: no cover
 
     @property
     def can_read(self):
@@ -272,4 +267,12 @@ def update_organization(sender, instance, **kwargs):
     celery_app.send_task(
         "update_organization",
         args=[instance.inteligence_organization, instance.name],
+    )
+
+
+@receiver(post_save, sender=OrganizationAuthorization)
+def org_authorizations(sender, instance, **kwargs):
+    celery_app.send_task(
+        'update_user_permission_organization',
+        args=[instance.organization.inteligence_organization, instance.user.email, instance.role]
     )

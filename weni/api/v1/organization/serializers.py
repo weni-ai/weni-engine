@@ -44,12 +44,8 @@ class OrganizationSeralizer(serializers.ModelSerializer):
         return instance
 
     def get_authorizations(self, obj):
-        auths = obj.authorizations.exclude(
-            role=OrganizationAuthorization.ROLE_NOT_SETTED
-        )
-
         return {
-            "count": auths.count(),
+            "count": obj.authorizations.count(),
             "users": [
                 {
                     "username": i.user.username,
@@ -58,7 +54,7 @@ class OrganizationSeralizer(serializers.ModelSerializer):
                     "role": i.role,
                     "photo_user": None if i.user.photo is None else None,
                 }
-                for i in auths
+                for i in obj.authorizations.all()
             ],
         }
 
@@ -100,8 +96,3 @@ class OrganizationAuthorizationRoleSerializer(serializers.ModelSerializer):
         model = OrganizationAuthorization
         fields = ["role"]
         ref_name = None
-
-    def validate(self, data):
-        if data.get("role") == OrganizationAuthorization.LEVEL_NOTHING:
-            raise PermissionDenied(_("You cannot set user role 0"))
-        return data

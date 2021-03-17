@@ -32,3 +32,6 @@ class GRPCType(metaclass=ABCMeta):
 
     def update_organization(self, organization_id: int, organization_name: str):
         raise NotImplementedError()
+
+    def update_user_permission_organization(self, organization_id: int, user_email: str, permission: int):
+        raise NotImplementedError()

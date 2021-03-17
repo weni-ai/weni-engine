@@ -85,3 +85,14 @@ class InteligenceType(GRPCType):
             )
         )
         return response
+
+    def update_user_permission_organization(self, organization_id: int, user_email: str, permission: int):
+        stub = authentication_pb2_grpc.UserPermissionControllerStub(self.channel)
+        response = stub.Update(
+            authentication_pb2.UserPermissionUpdateRequest(
+                org_id=organization_id,
+                user_email=user_email,
+                permission=permission
+            )
+        )
+        return response

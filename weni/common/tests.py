@@ -83,10 +83,6 @@ class OrganizationAuthorizationTestCase(TestCase):
         authorization = self.organization.get_user_authorization(self.user)
         self.assertNotEqual(authorization.level, OrganizationAuthorization.LEVEL_VIEWER)
 
-    def test_nothing_level(self):
-        authorization = self.organization.get_user_authorization(self.user)
-        self.assertEqual(authorization.level, OrganizationAuthorization.LEVEL_NOTHING)
-
     def test_can_read(self):
         # organization owner
         authorization_owner = self.organization.get_user_authorization(self.owner)
