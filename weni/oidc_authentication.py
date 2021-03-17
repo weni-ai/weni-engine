@@ -43,17 +43,11 @@ class WeniOIDCAuthenticationBackend(OIDCAuthenticationBackend):
         organizations = grpc_instance.list_organizations(user_email=user.email)
 
         for organization in organizations:
-            obj = Organization.objects.filter(
-                inteligence_organization=organization.get("id")
+
+            org, created = Organization.objects.get_or_create(
+                inteligence_organization=organization.get("id"),
+                defaults={"name": organization.get("name"), "description": ""},
             )
-            if not obj.exists():
-                org = Organization.objects.create(
-                    name=organization.get("name"),
-                    description="",
-                    inteligence_organization=organization.get("id"),
-                )
-            else:
-                org = obj.first()
 
             role = grpc_instance.get_user_organization_permission_role(
                 user_email=user.email, organization_id=organization.get("id")

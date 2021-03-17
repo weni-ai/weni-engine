@@ -2,6 +2,7 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 from rest_framework.exceptions import PermissionDenied
 
+from weni import utils
 from weni.api.v1.account.serializers import UserSerializer
 from weni.common.models import Organization, OrganizationAuthorization
 
@@ -24,9 +25,15 @@ class OrganizationSeralizer(serializers.ModelSerializer):
     authorizations = serializers.SerializerMethodField(style={"show": False})
 
     def create(self, validated_data):
-        import random
+        grpc_instance = utils.get_grpc_types().get("inteligence")
 
-        validated_data.update({"inteligence_organization": random.randint(0, 1000000)})
+        organization = grpc_instance.create_organization(
+            organization_name=validated_data.get("name"),
+            user_email=self.context["request"].user.email,
+            user_nickname=self.context["request"].user.username,
+        )
+
+        validated_data.update({"inteligence_organization": organization.id})
 
         instance = super().create(validated_data)
 

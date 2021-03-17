@@ -48,3 +48,16 @@ class InteligenceType(GRPCType):
             )
         )
         return response.role
+
+    def create_organization(
+        self, organization_name: str, user_email: str, user_nickname: str
+    ):
+        stub = organization_pb2_grpc.OrgControllerStub(self.channel)
+        response = stub.Create(
+            organization_pb2.OrgCreateRequest(
+                name=organization_name,
+                user_email=user_email,
+                user_nickname=user_nickname,
+            )
+        )
+        print(response)
