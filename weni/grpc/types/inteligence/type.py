@@ -21,21 +21,26 @@ class InteligenceType(GRPCType):
         return grpc.insecure_channel("localhost:50051")
 
     def list_organizations(self, user_email: str):
-        stub = organization_pb2_grpc.OrgControllerStub(self.channel)
         result = []
-        for org in stub.List(organization_pb2.OrgListRequest(user_email=user_email)):
-            result.append(
-                {
-                    "id": org.id,
-                    "name": org.name,
-                    "users": {
-                        "user_id": org.users[0].org_user_id,
-                        "user_email": org.users[0].org_user_email,
-                        "user_nickname": org.users[0].org_user_nickname,
-                        "user_name": org.users[0].org_user_name,
-                    },
-                }
-            )
+        try:
+            stub = organization_pb2_grpc.OrgControllerStub(self.channel)
+
+            for org in stub.List(organization_pb2.OrgListRequest(user_email=user_email)):
+                result.append(
+                    {
+                        "id": org.id,
+                        "name": org.name,
+                        "users": {
+                            "user_id": org.users[0].org_user_id,
+                            "user_email": org.users[0].org_user_email,
+                            "user_nickname": org.users[0].org_user_nickname,
+                            "user_name": org.users[0].org_user_name,
+                        },
+                    }
+                )
+        except grpc.RpcError as e:
+            if e.code() is not grpc.StatusCode.NOT_FOUND:
+                raise e
         return result
 
     def get_user_organization_permission_role(
@@ -60,4 +65,4 @@ class InteligenceType(GRPCType):
                 user_nickname=user_nickname,
             )
         )
-        print(response)
+        return response
