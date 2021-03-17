@@ -31,7 +31,6 @@ class Organization(models.Model):
     )
     name = models.CharField(_("organization name"), max_length=150)
     description = models.TextField(_("organization description"))
-    owner = models.ForeignKey(User, models.CASCADE, related_name="organization")
     inteligence_organization = models.IntegerField(_("inteligence organization id"))
 
     def get_user_authorization(self, user):
@@ -78,11 +77,6 @@ class OrganizationAuthorization(models.Model):
     )
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
 
-    def save(self, *args, **kwargs):
-        if self.is_owner:
-            self.role = OrganizationAuthorization.ROLE_ADMIN
-        super(OrganizationAuthorization, self).save(*args, **kwargs)
-
     @property
     def level(self):
         if self.role == OrganizationAuthorization.ROLE_VIEWER:
@@ -118,14 +112,6 @@ class OrganizationAuthorization(models.Model):
     @property
     def is_admin(self):
         return self.level == OrganizationAuthorization.LEVEL_ADMIN
-
-    @property
-    def is_owner(self):
-        try:
-            user = self.user
-        except User.DoesNotExist:  # pragma: no cover
-            return False  # pragma: no cover
-        return self.organization.owner == user
 
     @property
     def role_verbose(self):

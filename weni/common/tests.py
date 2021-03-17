@@ -27,7 +27,7 @@ class ServiceStatusTestCase(TestCase):
         self.owner = User.objects.create_user("owner@user.com", "owner")
 
         self.organization = Organization.objects.create(
-            owner=self.owner, name="Test", inteligence_organization=0
+            name="Test", inteligence_organization=0
         )
         self.project = self.organization.project.create(
             name="project test",
@@ -69,7 +69,10 @@ class OrganizationAuthorizationTestCase(TestCase):
         self.user = User.objects.create_user("fake@user.com", "user")
 
         self.organization = Organization.objects.create(
-            owner=self.owner, name="Test", inteligence_organization=0
+            name="Test", inteligence_organization=0
+        )
+        self.organization_authorization = self.organization.authorizations.create(
+            user=self.owner, role=OrganizationAuthorization.ROLE_ADMIN
         )
 
     def test_admin_level(self):

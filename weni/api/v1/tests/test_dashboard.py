@@ -6,7 +6,7 @@ from rest_framework import status
 
 from weni.api.v1.dashboard.views import StatusServiceViewSet
 from weni.api.v1.tests.utils import create_user_and_token
-from weni.common.models import Service
+from weni.common.models import Service, Organization, OrganizationAuthorization
 
 
 class ListStatusServiceTestCase(TestCase):
@@ -19,9 +19,14 @@ class ListStatusServiceTestCase(TestCase):
 
         self.user, self.token = create_user_and_token()
 
-        self.organization = self.user.organization.create(
+        self.organization = Organization.objects.create(
             name="test organization", description="", inteligence_organization=1
         )
+
+        self.organization_authorization = self.organization.authorizations.create(
+            user=self.user, role=OrganizationAuthorization.ROLE_ADMIN
+        )
+
         self.project = self.organization.project.create(
             name="project test",
             timezone="America/Sao_Paulo",

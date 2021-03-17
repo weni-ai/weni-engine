@@ -65,7 +65,7 @@ class ListOrganizationAPITestCase(TestCase):
         self.factory = RequestFactory()
         self.owner, self.owner_token = create_user_and_token("owner")
 
-        self.organization = self.owner.organization.create(
+        self.organization = Organization.objects.create(
             name="test organization", description="", inteligence_organization=1
         )
         self.organization_authorization = self.organization.authorizations.create(
@@ -105,7 +105,7 @@ class ListOrganizationAuthorizationTestCase(TestCase):
         self.owner, self.owner_token = create_user_and_token("owner")
         self.user, self.user_token = create_user_and_token()
 
-        self.organization = self.owner.organization.create(
+        self.organization = Organization.objects.create(
             name="test organization", description="", inteligence_organization=1
         )
         self.organization_authorization = self.organization.authorizations.create(
@@ -160,7 +160,7 @@ class UpdateAuthorizationRoleTestCase(TestCase):
         self.owner, self.owner_token = create_user_and_token("owner")
         self.user, self.user_token = create_user_and_token()
 
-        self.organization = self.owner.organization.create(
+        self.organization = Organization.objects.create(
             name="test organization", description="", inteligence_organization=1
         )
         self.organization_authorization = self.organization.authorizations.create(
@@ -241,7 +241,7 @@ class DestroyAuthorizationRoleTestCase(TestCase):
         self.owner, self.owner_token = create_user_and_token("owner")
         self.user, self.user_token = create_user_and_token()
 
-        self.organization = self.owner.organization.create(
+        self.organization = Organization.objects.create(
             name="test organization", description="", inteligence_organization=1
         )
         self.organization_authorization = self.organization.authorizations.create(

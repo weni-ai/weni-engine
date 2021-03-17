@@ -136,8 +136,5 @@ class OrganizationAuthorizationViewSet(
 
         self.check_object_permissions(self.request, obj)
 
-        if obj.is_owner:
-            raise PermissionDenied()
-
         obj.delete()
         return Response(status=204)

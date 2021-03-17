@@ -13,7 +13,6 @@ class OrganizationSeralizer(serializers.ModelSerializer):
             "uuid",
             "name",
             "description",
-            "owner",
             "inteligence_organization",
             "authorizations",
         ]
@@ -21,14 +20,12 @@ class OrganizationSeralizer(serializers.ModelSerializer):
 
     uuid = serializers.UUIDField(style={"show": False}, read_only=True)
     name = serializers.CharField(max_length=40, required=True)
-    owner = UserSerializer(many=False, read_only=True)
     inteligence_organization = serializers.IntegerField(read_only=True)
     authorizations = serializers.SerializerMethodField(style={"show": False})
 
     def create(self, validated_data):
         import random
 
-        validated_data.update({"owner": self.context["request"].user})
         validated_data.update({"inteligence_organization": random.randint(0, 1000000)})
 
         instance = super().create(validated_data)
@@ -98,8 +95,6 @@ class OrganizationAuthorizationRoleSerializer(serializers.ModelSerializer):
         ref_name = None
 
     def validate(self, data):
-        if self.instance.user == self.instance.organization.owner:
-            raise PermissionDenied(_("The owner role can't be changed."))
         if data.get("role") == OrganizationAuthorization.LEVEL_NOTHING:
             raise PermissionDenied(_("You cannot set user role 0"))
         return data
