@@ -1,6 +1,7 @@
 import requests
 from django.utils import timezone
 
+from weni import utils
 from weni.celery import app
 from weni.common.models import Service
 
@@ -27,3 +28,23 @@ def status_service() -> None:
         )
         service.last_updated = timezone.now()
         service.save(update_fields=["status", "last_updated"])
+
+
+@app.task(name="delete_organization")
+def delete_organization(inteligence_organization: int, user_email):
+    grpc_instance = utils.get_grpc_types().get("inteligence")
+    grpc_instance.delete_organization(
+        organization_id=inteligence_organization,
+        user_email=user_email,
+    )
+    return True
+
+
+@app.task(name="update_organization")
+def update_organization(inteligence_organization: int, organization_name: str):
+    grpc_instance = utils.get_grpc_types().get("inteligence")
+    grpc_instance.update_organization(
+        organization_id=inteligence_organization,
+        organization_name=organization_name,
+    )
+    return True

@@ -26,3 +26,9 @@ class GRPCType(metaclass=ABCMeta):
         self, organization_name: str, user_email: str, user_nickname: str
     ):
         raise NotImplementedError()
+
+    def delete_organization(self, organization_id: int, user_email: str):
+        raise NotImplementedError()
+
+    def update_organization(self, organization_id: int, organization_name: str):
+        raise NotImplementedError()

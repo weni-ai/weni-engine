@@ -7,6 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
+from weni.celery import app as celery_app
 from weni.api.v1.metadata import Metadata
 from weni.api.v1.mixins import MultipleFieldLookupMixin
 from weni.api.v1.organization.filters import OrganizationAuthorizationFilter
@@ -47,6 +48,15 @@ class OrganizationViewSet(
             .values("organization")
         )
         return self.queryset.filter(pk__in=auth)
+
+    def perform_destroy(self, instance):
+        inteligence_organization = instance.inteligence_organization
+        instance.delete()
+
+        celery_app.send_task(
+            "delete_organization",
+            args=[inteligence_organization, self.request.user.email],
+        )
 
 
 class OrganizationAuthorizationViewSet(

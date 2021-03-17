@@ -13,12 +13,29 @@ class Command(BaseCommand):
         #         user_email="daniel.yohan@ilhasoft.com.br", organization_id=779
         #     )
         # )
+        # print(
+        #     get_grpc_types()
+        #     .get("inteligence")
+        #     .create_organization(
+        #         organization_name="Test Org",
+        #         user_email="user@test.com",
+        #         user_nickname="testuser",
+        #     )
+        # )
+        # print(
+        #     get_grpc_types()
+        #         .get("inteligence")
+        #         .create_organization(
+        #         organization_name="Test Org",
+        #         user_email="user@test.com",
+        #         user_nickname="testuser",
+        #     )
+        # )
         print(
             get_grpc_types()
             .get("inteligence")
-            .create_organization(
-                organization_name="Test Org",
-                user_email="user@test.com",
-                user_nickname="testuser",
+            .update_organization(
+                organization_id=7,
+                organization_name="testee23",
             )
         )

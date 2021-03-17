@@ -8,6 +8,7 @@ from django.utils.translation import ugettext_lazy as _
 from timezone_field import TimeZoneField
 
 from weni.authentication.models import User
+from weni.celery import app as celery_app
 
 
 class Newsletter(models.Model):
@@ -264,3 +265,11 @@ def create_service_default_in_all_user(sender, instance, created, **kwargs):
     if created and instance.default:
         for project in Project.objects.all():
             project.service_status.create(service=instance)
+
+
+@receiver(post_save, sender=Organization)
+def update_organization(sender, instance, **kwargs):
+    celery_app.send_task(
+        "update_organization",
+        args=[instance.inteligence_organization, instance.name],
+    )

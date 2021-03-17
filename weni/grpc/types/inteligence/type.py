@@ -25,7 +25,9 @@ class InteligenceType(GRPCType):
         try:
             stub = organization_pb2_grpc.OrgControllerStub(self.channel)
 
-            for org in stub.List(organization_pb2.OrgListRequest(user_email=user_email)):
+            for org in stub.List(
+                organization_pb2.OrgListRequest(user_email=user_email)
+            ):
                 result.append(
                     {
                         "id": org.id,
@@ -63,6 +65,23 @@ class InteligenceType(GRPCType):
                 name=organization_name,
                 user_email=user_email,
                 user_nickname=user_nickname,
+            )
+        )
+        return response
+
+    def delete_organization(self, organization_id: int, user_email: str):
+        stub = organization_pb2_grpc.OrgControllerStub(self.channel)
+        stub.Destroy(
+            organization_pb2.OrgDestroyRequest(
+                id=organization_id, user_email=user_email
+            )
+        )
+
+    def update_organization(self, organization_id: int, organization_name: str):
+        stub = organization_pb2_grpc.OrgControllerStub(self.channel)
+        response = stub.Update(
+            organization_pb2.OrgUpdateRequest(
+                id=organization_id, name=organization_name
             )
         )
         return response
