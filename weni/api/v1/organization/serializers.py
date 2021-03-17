@@ -3,7 +3,6 @@ from rest_framework import serializers
 from rest_framework.exceptions import PermissionDenied
 
 from weni import utils
-from weni.api.v1.account.serializers import UserSerializer
 from weni.common.models import Organization, OrganizationAuthorization
 
 
@@ -16,6 +15,7 @@ class OrganizationSeralizer(serializers.ModelSerializer):
             "description",
             "inteligence_organization",
             "authorizations",
+            "created_at",
         ]
         ref_name = None
 

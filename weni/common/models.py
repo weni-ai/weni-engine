@@ -32,6 +32,7 @@ class Organization(models.Model):
     name = models.CharField(_("organization name"), max_length=150)
     description = models.TextField(_("organization description"))
     inteligence_organization = models.IntegerField(_("inteligence organization id"))
+    created_at = models.DateTimeField(_("created at"), auto_now_add=True)
 
     def get_user_authorization(self, user):
         if user.is_anonymous:
