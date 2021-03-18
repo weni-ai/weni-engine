@@ -6,13 +6,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('common', '0003_organization_created_at'),
+        ("common", "0003_organization_created_at"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='organizationauthorization',
-            name='role',
-            field=models.PositiveIntegerField(choices=[(1, 'viewer'), (2, 'contributor'), (3, 'admin')], default=1, verbose_name='role'),
+            model_name="organizationauthorization",
+            name="role",
+            field=models.PositiveIntegerField(
+                choices=[(1, "viewer"), (2, "contributor"), (3, "admin")],
+                default=1,
+                verbose_name="role",
+            ),
         ),
     ]

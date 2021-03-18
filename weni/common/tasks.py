@@ -51,11 +51,13 @@ def update_organization(inteligence_organization: int, organization_name: str):
 
 
 @app.task(name="update_user_permission_organization")
-def update_user_permission_organization(inteligence_organization: int, user_email: str, permission: int):
+def update_user_permission_organization(
+    inteligence_organization: int, user_email: str, permission: int
+):
     grpc_instance = utils.get_grpc_types().get("inteligence")
     grpc_instance.update_user_permission_organization(
         organization_id=inteligence_organization,
         user_email=user_email,
-        permission=permission
+        permission=permission,
     )
     return True

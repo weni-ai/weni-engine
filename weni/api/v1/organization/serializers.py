@@ -1,6 +1,5 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
-from rest_framework.exceptions import PermissionDenied
 
 from weni import utils
 from weni.common.models import Organization, OrganizationAuthorization
@@ -57,6 +56,16 @@ class OrganizationSeralizer(serializers.ModelSerializer):
                 for i in obj.authorizations.all()
             ],
         }
+
+    def get_authorization(self, obj):
+        request = self.context.get("request")
+        if not request or not request.user.is_authenticated:
+            return None
+
+        data = OrganizationAuthorizationSerializer(
+            obj.get_user_authorization(request.user)
+        ).data
+        return data
 
 
 class OrganizationAuthorizationSerializer(serializers.ModelSerializer):

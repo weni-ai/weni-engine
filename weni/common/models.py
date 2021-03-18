@@ -273,6 +273,10 @@ def update_organization(sender, instance, **kwargs):
 @receiver(post_save, sender=OrganizationAuthorization)
 def org_authorizations(sender, instance, **kwargs):
     celery_app.send_task(
-        'update_user_permission_organization',
-        args=[instance.organization.inteligence_organization, instance.user.email, instance.role]
+        "update_user_permission_organization",
+        args=[
+            instance.organization.inteligence_organization,
+            instance.user.email,
+            instance.role,
+        ],
     )
