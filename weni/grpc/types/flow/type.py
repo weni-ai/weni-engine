@@ -45,3 +45,9 @@ class FlowType(GRPCType):
             )
         )
         return response
+
+    def delete_project(self, project_uuid: int, user_email: str):
+        stub = org_pb2_grpc.OrgControllerStub(self.channel)
+        stub.Destroy(
+            org_pb2.OrgDestroyRequest(uuid=project_uuid, user_email=user_email)
+        )

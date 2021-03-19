@@ -72,3 +72,13 @@ def update_project(organization_uuid: str, user_email: str, organization_name: s
         organization_name=organization_name,
     )
     return True
+
+
+@app.task(name="delete_project")
+def delete_project(inteligence_organization: int, user_email):
+    grpc_instance = utils.get_grpc_types().get("flow")
+    grpc_instance.delete_project(
+        project_uuid=inteligence_organization,
+        user_email=user_email,
+    )
+    return True
