@@ -3,6 +3,7 @@ import uuid as uuid4
 from django.conf import settings
 from rest_framework import serializers
 
+from weni import utils
 from weni.api.v1.project.validators import CanContributeInOrganizationValidator
 from weni.common.models import Service, Project, Organization
 
@@ -51,8 +52,15 @@ class ProjectSeralizer(serializers.ModelSerializer):
         }
 
     def create(self, validated_data):
-        import random
+        grpc_instance = utils.get_grpc_types().get("flow")
 
-        validated_data.update({"flow_organization": uuid4.uuid4()})
-        validated_data.update({"flow_organization_id": random.randint(0, 1000000)})
+        project = grpc_instance.create_project(
+            project_name=validated_data.get("name"),
+            user_email=self.context["request"].user.email,
+            user_username=self.context["request"].user.username,
+            project_timezone='America/Sao_Paulo',
+        )
+
+        validated_data.update({"flow_organization": project.uuid})
+        validated_data.update({"flow_organization_id": project.id})
         return super().create(validated_data)

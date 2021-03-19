@@ -31,11 +31,19 @@ class Command(BaseCommand):
         #         user_nickname="testuser",
         #     )
         # )
-        print(
-            get_grpc_types()
-            .get("inteligence")
-            .update_organization(
-                organization_id=7,
-                organization_name="testee23",
-            )
-        )
+        # print(
+        #     get_grpc_types()
+        #     .get("inteligence")
+        #     .update_organization(
+        #         organization_id=7,
+        #         organization_name="testee23",
+        #     )
+        # )
+
+        print(get_grpc_types().get("flow").create_project(
+            project_name='teste project',
+            user_email='daniel.yohan@ilhasoft.com.br',
+            user_username='danielyohan',
+            project_timezone='America/Sao_Paulo',
+        ))
+

@@ -167,7 +167,7 @@ class Project(models.Model):
         help_text=_("Whether day comes first or month comes first in dates"),
     )
     flow_organization = models.UUIDField(_("flow identification UUID"), unique=True)
-    flow_organization_id = models.IntegerField(_("flow identification UUID"), null=True)
+    flow_organization_id = models.IntegerField(_("flow identification ID"), null=True)
 
 
 class Service(models.Model):
@@ -266,6 +266,14 @@ def create_service_default_in_all_user(sender, instance, created, **kwargs):
 def update_organization(sender, instance, **kwargs):
     celery_app.send_task(
         "update_organization",
+        args=[instance.inteligence_organization, instance.name],
+    )
+
+
+@receiver(post_save, sender=Project)
+def update_project(sender, instance, **kwargs):
+    celery_app.send_task(
+        "update_project",
         args=[instance.inteligence_organization, instance.name],
     )
 

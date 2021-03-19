@@ -29,7 +29,8 @@ def reload_classifier_types():
 
     TYPES = OrderedDict({})
     for class_name in [
-        "weni.grpc.types.inteligence.InteligenceType"
+        "weni.grpc.types.inteligence.InteligenceType",
+        "weni.grpc.types.flow.FlowType",
     ]:  # settings.BASE_MIGRATIONS_TYPES:
         register_classifier_type(import_string(class_name))
 

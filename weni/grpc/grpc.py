@@ -37,3 +37,8 @@ class GRPCType(metaclass=ABCMeta):
         self, organization_id: int, user_email: str, permission: int
     ):
         raise NotImplementedError()
+
+    def create_project(
+        self, project_name: str, user_email: str, user_username: str, project_timezone: str
+    ):
+        raise NotImplementedError()

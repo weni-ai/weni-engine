@@ -14,6 +14,7 @@ class OrganizationSeralizer(serializers.ModelSerializer):
             "description",
             "inteligence_organization",
             "authorizations",
+            "authorization",
             "created_at",
         ]
         ref_name = None
@@ -22,6 +23,7 @@ class OrganizationSeralizer(serializers.ModelSerializer):
     name = serializers.CharField(max_length=40, required=True)
     inteligence_organization = serializers.IntegerField(read_only=True)
     authorizations = serializers.SerializerMethodField(style={"show": False})
+    authorization = serializers.SerializerMethodField(style={"show": False})
 
     def create(self, validated_data):
         grpc_instance = utils.get_grpc_types().get("inteligence")
@@ -79,7 +81,6 @@ class OrganizationAuthorizationSerializer(serializers.ModelSerializer):
             "user__photo",
             "organization",
             "role",
-            "level",
             "can_read",
             "can_contribute",
             "can_write",
