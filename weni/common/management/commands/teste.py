@@ -40,10 +40,13 @@ class Command(BaseCommand):
         #     )
         # )
 
-        print(get_grpc_types().get("flow").create_project(
-            project_name='teste project',
-            user_email='daniel.yohan@ilhasoft.com.br',
-            user_username='danielyohan',
-            project_timezone='America/Sao_Paulo',
-        ))
-
+        print(
+            get_grpc_types()
+            .get("flow")
+            .create_project(
+                project_name="teste project",
+                user_email="daniel.yohan@ilhasoft.com.br",
+                user_username="danielyohan",
+                project_timezone="America/Sao_Paulo",
+            )
+        )

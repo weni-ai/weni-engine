@@ -61,3 +61,16 @@ def update_user_permission_organization(
         permission=permission,
     )
     return True
+
+
+@app.task(name="update_project")
+def update_organization(
+    organization_uuid: str, user_email: str, organization_name: str
+):
+    grpc_instance = utils.get_grpc_types().get("flow")
+    grpc_instance.update_project(
+        organization_uuid=organization_uuid,
+        user_email=user_email,
+        organization_name=organization_name,
+    )
+    return True

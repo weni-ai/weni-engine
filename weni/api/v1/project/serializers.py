@@ -4,6 +4,7 @@ from django.conf import settings
 from rest_framework import serializers
 
 from weni import utils
+from weni.celery import app as celery_app
 from weni.api.v1.project.validators import CanContributeInOrganizationValidator
 from weni.common.models import Service, Project, Organization
 
@@ -58,9 +59,17 @@ class ProjectSeralizer(serializers.ModelSerializer):
             project_name=validated_data.get("name"),
             user_email=self.context["request"].user.email,
             user_username=self.context["request"].user.username,
-            project_timezone='America/Sao_Paulo',
+            project_timezone="America/Sao_Paulo",
         )
 
         validated_data.update({"flow_organization": project.uuid})
         validated_data.update({"flow_organization_id": project.id})
         return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        name = validated_data.get("name", instance.name)
+        celery_app.send_task(
+            "update_project",
+            args=[instance.flow_organization, self.request.user, name],
+        )
+        return super().update(instance, validated_data)

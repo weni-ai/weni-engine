@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('common', '0004_auto_20210317_2002'),
+        ("common", "0004_auto_20210317_2002"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='project',
-            name='flow_organization_id',
-            field=models.IntegerField(null=True, verbose_name='flow identification ID'),
+            model_name="project",
+            name="flow_organization_id",
+            field=models.IntegerField(null=True, verbose_name="flow identification ID"),
         ),
     ]

@@ -270,14 +270,6 @@ def update_organization(sender, instance, **kwargs):
     )
 
 
-@receiver(post_save, sender=Project)
-def update_project(sender, instance, **kwargs):
-    celery_app.send_task(
-        "update_project",
-        args=[instance.inteligence_organization, instance.name],
-    )
-
-
 @receiver(post_save, sender=OrganizationAuthorization)
 def org_authorizations(sender, instance, **kwargs):
     celery_app.send_task(
