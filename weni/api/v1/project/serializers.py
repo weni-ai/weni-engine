@@ -1,5 +1,3 @@
-import uuid as uuid4
-
 from django.conf import settings
 from rest_framework import serializers
 
@@ -70,6 +68,6 @@ class ProjectSeralizer(serializers.ModelSerializer):
         name = validated_data.get("name", instance.name)
         celery_app.send_task(
             "update_project",
-            args=[instance.flow_organization, self.request.user, name],
+            args=[instance.flow_organization, self.context["request"].user.email, name],
         )
         return super().update(instance, validated_data)
