@@ -12,10 +12,10 @@ app.config_from_object("django.conf:settings", namespace="CELERY")
 app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 
 app.conf.beat_schedule = {
-    # "check-status-services": {
-    #     "task": "weni.common.tasks.status_service",
-    #     "schedule": 60.0,
-    # },
+    "check-status-services": {
+        "task": "weni.common.tasks.status_service",
+        "schedule": 60.0,
+    },
 }
 
 
