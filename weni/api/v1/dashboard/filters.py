@@ -26,7 +26,7 @@ class StatusServiceFilter(filters.FilterSet):
             authorization = project.organization.get_user_authorization(request.user)
             if not authorization.can_read:
                 raise PermissionDenied()
-            return queryset.filter(uuid=project)
+            return queryset.filter(uuid=value)
         except Project.DoesNotExist:
             raise NotFound(_("Project {} does not exist").format(value))
         except DjangoValidationError:
