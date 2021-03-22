@@ -2,6 +2,7 @@ import grpc
 
 from weni.grpc.grpc import GRPCType
 from weni.protos.flow.rapidpro_org import org_pb2_grpc, org_pb2
+from weni.protos.flow.rapidpro_user import user_pb2_grpc, user_pb2
 
 
 class FlowType(GRPCType):
@@ -51,3 +52,14 @@ class FlowType(GRPCType):
         stub.Destroy(
             org_pb2.OrgDestroyRequest(uuid=project_uuid, user_email=user_email)
         )
+
+    def update_user_permission_project(
+        self, organization_uuid: str, user_email: str, permission: int
+    ):
+        stub = user_pb2_grpc.UserPermissionControllerStub(self.channel)
+        response = stub.Update(
+            user_pb2.UserPermissionUpdateRequest(
+                org_uuid=organization_uuid, user_email=user_email, permission=permission
+            )
+        )
+        return response

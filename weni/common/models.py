@@ -280,3 +280,12 @@ def org_authorizations(sender, instance, **kwargs):
             instance.role,
         ],
     )
+    for project in instance.organization.project.all():
+        celery_app.send_task(
+            "update_user_permission_project",
+            args=[
+                project.flow_organization,
+                instance.user.email,
+                instance.role,
+            ],
+        )

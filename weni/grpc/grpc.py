@@ -54,3 +54,8 @@ class GRPCType(metaclass=ABCMeta):
 
     def delete_project(self, project_uuid: int, user_email: str):
         raise NotImplementedError()
+
+    def update_user_permission_project(
+        self, organization_uuid: str, user_email: str, permission: int
+    ):
+        raise NotImplementedError()

@@ -82,3 +82,16 @@ def delete_project(inteligence_organization: int, user_email):
         user_email=user_email,
     )
     return True
+
+
+@app.task(name="update_user_permission_project")
+def update_user_permission_project(
+    flow_organization: str, user_email: str, permission: int
+):
+    grpc_instance = utils.get_grpc_types().get("flow")
+    grpc_instance.update_user_permission_project(
+        organization_uuid=flow_organization,
+        user_email=user_email,
+        permission=permission,
+    )
+    return True
