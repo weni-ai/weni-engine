@@ -2,8 +2,7 @@ import logging
 
 from mozilla_django_oidc.auth import OIDCAuthenticationBackend
 
-from weni import utils
-from weni.common.models import Organization
+from weni.celery import app as celery_app
 
 LOGGER = logging.getLogger("weni_django_oidc")
 
@@ -38,21 +37,11 @@ class WeniOIDCAuthenticationBackend(OIDCAuthenticationBackend):
         user.email = claims.get("email", "")
         user.save()
 
-        grpc_instance = utils.get_grpc_types().get("inteligence")
-
-        organizations = grpc_instance.list_organizations(user_email=user.email)
-
-        for organization in organizations:
-            org, created = Organization.objects.get_or_create(
-                inteligence_organization=organization.get("id"),
-                defaults={"name": organization.get("name"), "description": ""},
-            )
-
-            role = grpc_instance.get_user_organization_permission_role(
-                user_email=user.email, organization_id=organization.get("id")
-            )
-
-            org.authorizations.create(user=user, role=role)
+        task = celery_app.send_task(  # pragma: no cover
+            name="migrate_organization",
+            args=[str(user.email)],
+        )
+        task.wait()  # pragma: no cover
 
         return user
 

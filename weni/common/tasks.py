@@ -2,8 +2,9 @@ import requests
 from django.utils import timezone
 
 from weni import utils
+from weni.authentication.models import User
 from weni.celery import app
-from weni.common.models import Service
+from weni.common.models import Service, Organization
 
 
 @app.task()
@@ -95,3 +96,23 @@ def update_user_permission_project(
         permission=permission,
     )
     return True
+
+
+@app.task(name="migrate_organization")
+def migrate_organization(user_email: str):
+    user = User.objects.get(email=user_email)
+    grpc_instance = utils.get_grpc_types().get("inteligence")
+
+    organizations = grpc_instance.list_organizations(user_email=user_email)
+
+    for organization in organizations:
+        org, created = Organization.objects.get_or_create(
+            inteligence_organization=organization.get("id"),
+            defaults={"name": organization.get("name"), "description": ""},
+        )
+
+        role = grpc_instance.get_user_organization_permission_role(
+            user_email=user_email, organization_id=organization.get("id")
+        )
+
+        org.authorizations.create(user=user, role=role)
