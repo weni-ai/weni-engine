@@ -1,4 +1,5 @@
 import grpc
+from django.conf import settings
 
 from weni.grpc.grpc import GRPCType
 from weni.protos.flow.rapidpro_org import org_pb2_grpc, org_pb2
@@ -12,10 +13,7 @@ class FlowType(GRPCType):
         self.channel = self.get_channel()
 
     def get_channel(self):
-        # return grpc.insecure_channel("localhost:50051")
-        return grpc.insecure_channel(
-            "ac89eabd7753b4776bfc4b0db1c6d9b3-466500662.sa-east-1.elb.amazonaws.com:8002"
-        )
+        return grpc.insecure_channel(settings.FLOW_GRPC_ENDPOINT)
 
     def create_project(
         self,

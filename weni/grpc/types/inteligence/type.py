@@ -1,6 +1,7 @@
 from typing import Any
 
 import grpc
+from django.conf import settings
 
 from weni.grpc.grpc import GRPCType
 from weni.protos.inteligence import (
@@ -18,7 +19,7 @@ class InteligenceType(GRPCType):
         self.channel = self.get_channel()
 
     def get_channel(self):
-        return grpc.insecure_channel("localhost:50051")
+        return grpc.insecure_channel(settings.INTELIGENCE_GRPC_ENDPOINT)
 
     def list_organizations(self, user_email: str):
         result = []
