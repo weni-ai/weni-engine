@@ -42,4 +42,4 @@ class StatusServiceViewSet(mixins.ListModelMixin, GenericViewSet):
                 & Q(service__default=True)
             )
             | Q(project__organization__authorizations__user=self.request.user)
-        )
+        ).distinct()
