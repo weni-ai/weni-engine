@@ -4,12 +4,12 @@ from django_filters import rest_framework as filters
 from rest_framework.exceptions import NotFound
 from rest_framework.exceptions import PermissionDenied
 
-from weni.common.models import Project
+from weni.common.models import Project, ServiceStatus
 
 
 class StatusServiceFilter(filters.FilterSet):
     class Meta:
-        model = Project
+        model = ServiceStatus
         fields = ["project_uuid"]
 
     project_uuid = filters.UUIDFilter(
@@ -26,7 +26,7 @@ class StatusServiceFilter(filters.FilterSet):
             authorization = project.organization.get_user_authorization(request.user)
             if not authorization.can_read:
                 raise PermissionDenied()
-            return queryset.filter(uuid=value)
+            return queryset.filter(project__uuid=value)
         except Project.DoesNotExist:
             raise NotFound(_("Project {} does not exist").format(value))
         except DjangoValidationError:
