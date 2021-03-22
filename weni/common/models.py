@@ -15,7 +15,7 @@ class Newsletter(models.Model):
     class Meta:
         verbose_name = _("dashboard newsletter")
 
-    title = models.CharField(_("title"), max_length=36)
+    title = models.CharField(_("title"), max_length=50)
     description = models.TextField(_("description"))
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
 
