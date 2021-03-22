@@ -54,10 +54,14 @@ class FlowType(GRPCType):
     def update_user_permission_project(
         self, organization_uuid: str, user_email: str, permission: int
     ):
+        permissions = {1: "viewer", 2: "editor", 3: "administrator"}
+
         stub = user_pb2_grpc.UserPermissionControllerStub(self.channel)
         response = stub.Update(
             user_pb2.UserPermissionUpdateRequest(
-                org_uuid=organization_uuid, user_email=user_email, permission=permission
+                org_uuid=organization_uuid,
+                user_email=user_email,
+                permission=permissions.get(permission),
             )
         )
         return response
