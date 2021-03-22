@@ -137,4 +137,4 @@ staticfiles/
 
 # gRPC
 weni/protos/inteligence/*.py
-weni/protos/flow/*.py
+weni/protos/flow/
