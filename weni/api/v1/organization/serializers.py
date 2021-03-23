@@ -1,7 +1,7 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from weni import utils
+from weni.celery import app as celery_app
 from weni.common.models import Organization, OrganizationAuthorization
 
 
@@ -26,15 +26,19 @@ class OrganizationSeralizer(serializers.ModelSerializer):
     authorization = serializers.SerializerMethodField(style={"show": False})
 
     def create(self, validated_data):
-        grpc_instance = utils.get_grpc_types().get("inteligence")
-
-        organization = grpc_instance.create_organization(
-            organization_name=validated_data.get("name"),
-            user_email=self.context["request"].user.email,
-            user_nickname=self.context["request"].user.username,
+        task = celery_app.send_task(  # pragma: no cover
+            name="create_organization",
+            args=[
+                validated_data.get("name"),
+                self.context["request"].user.email,
+                self.context["request"].user.username,
+            ],
         )
+        task.wait()  # pragma: no cover
 
-        validated_data.update({"inteligence_organization": organization.id})
+        organization = task.result
+
+        validated_data.update({"inteligence_organization": organization.get("id")})
 
         instance = super().create(validated_data)
 
