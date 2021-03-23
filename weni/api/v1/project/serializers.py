@@ -51,7 +51,7 @@ class ProjectSeralizer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         task = celery_app.send_task(  # pragma: no cover
-            name="create_organization",
+            name="create_project",
             args=[
                 validated_data.get("name"),
                 self.context["request"].user.email,
