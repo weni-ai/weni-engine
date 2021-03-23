@@ -31,11 +31,7 @@ class ProjectSeralizer(serializers.ModelSerializer):
     )
     timezone = serializers.CharField(read_only=True)
     menu = serializers.SerializerMethodField()
-    flow_organization = serializers.UUIDField(
-        style={"show": False},
-        read_only=True,
-        source="flow_organization",
-    )
+    flow_organization = serializers.UUIDField(style={"show": False}, read_only=True)
     flow_organization_id = serializers.IntegerField(read_only=True)
 
     def get_menu(self, obj):
