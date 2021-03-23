@@ -34,7 +34,7 @@ class ProjectSeralizer(serializers.ModelSerializer):
     flow_organization = serializers.UUIDField(
         style={"show": False},
         read_only=True,
-        source="organization.flow_organization",
+        source="flow_organization",
     )
     flow_organization_id = serializers.IntegerField(read_only=True)
 
