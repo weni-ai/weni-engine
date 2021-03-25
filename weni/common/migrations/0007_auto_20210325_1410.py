@@ -7,28 +7,49 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('common', '0006_auto_20210322_2351'),
+        ("common", "0006_auto_20210322_2351"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='service',
-            name='last_updated',
+            model_name="service",
+            name="last_updated",
         ),
         migrations.RemoveField(
-            model_name='service',
-            name='status',
+            model_name="service",
+            name="status",
         ),
         migrations.CreateModel(
-            name='LogService',
+            name="LogService",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('status', models.BooleanField(default=False, verbose_name='status service')),
-                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='created at')),
-                ('service', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='log_service', to='common.Service')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "status",
+                    models.BooleanField(default=False, verbose_name="status service"),
+                ),
+                (
+                    "created_at",
+                    models.DateTimeField(auto_now_add=True, verbose_name="created at"),
+                ),
+                (
+                    "service",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="log_service",
+                        to="common.Service",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'log service',
+                "verbose_name": "log service",
             },
         ),
     ]

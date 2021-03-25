@@ -236,7 +236,7 @@ class LogService(models.Model):
     class Meta:
         verbose_name = _("log service")
 
-    service = models.ForeignKey(Service, models.CASCADE, related_name='log_service')
+    service = models.ForeignKey(Service, models.CASCADE, related_name="log_service")
     status = models.BooleanField(_("status service"), default=False)
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
 

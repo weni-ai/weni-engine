@@ -14,7 +14,7 @@ app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 app.conf.beat_schedule = {
     "check-status-services": {
         "task": "weni.common.tasks.status_service",
-        "schedule": 5.0,
+        "schedule": 10.0,
     },
 }
 

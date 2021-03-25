@@ -1,5 +1,4 @@
 import requests
-from django.utils import timezone
 
 from weni import utils
 from weni.authentication.models import User
