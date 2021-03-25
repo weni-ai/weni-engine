@@ -213,7 +213,6 @@ class Service(models.Model):
     ]
 
     url = models.URLField(_("service url"), unique=True)
-    status = models.BooleanField(_("status service"), default=False)
     service_type = models.CharField(
         _("service type"),
         max_length=50,
@@ -221,7 +220,6 @@ class Service(models.Model):
         default=SERVICE_TYPE_CHAT,
     )
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
-    last_updated = models.DateTimeField(_("last updated"), auto_now_add=True)
     default = models.BooleanField(_("standard service for all projects"), default=False)
     region = models.CharField(
         _("service region"),
@@ -232,6 +230,15 @@ class Service(models.Model):
 
     def __str__(self):
         return self.url
+
+
+class LogService(models.Model):
+    class Meta:
+        verbose_name = _("log service")
+
+    service = models.ForeignKey(Service, models.CASCADE, related_name='log_service')
+    status = models.BooleanField(_("status service"), default=False)
+    created_at = models.DateTimeField(_("created at"), auto_now_add=True)
 
 
 class ServiceStatus(models.Model):
