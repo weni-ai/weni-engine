@@ -67,4 +67,6 @@ class StatusServiceSerializer(serializers.ModelSerializer):
         return "online"
 
     def get_service__last_updated(self, obj):
-        return obj.service.log_service.latest("created_at").created_at
+        if obj.service.log_service.all().exists():
+            return obj.service.log_service.latest("created_at").created_at
+        return None
