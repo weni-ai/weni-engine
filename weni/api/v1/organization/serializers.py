@@ -57,7 +57,7 @@ class OrganizationSeralizer(serializers.ModelSerializer):
                     "first_name": i.user.first_name,
                     "last_name": i.user.last_name,
                     "role": i.role,
-                    "photo_user": None if i.user.photo is None else None,
+                    "photo_user": None if i.user.photo is None else i.user.photo,
                 }
                 for i in obj.authorizations.all()
             ],
