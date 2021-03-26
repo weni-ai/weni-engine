@@ -53,6 +53,8 @@ You can set environment variables in your OS, write on ```.env``` file or pass v
 | APM_SERVICE_NAME |  ```string``` | ```''``` | APM Service Name
 | APM_SECRET_TOKEN |  ```string``` | ```''``` | APM Secret Token
 | APM_SERVER_URL |  ```string``` | ```''``` | APM URL
+| FLOW_GRPC_ENDPOINT |  ```string``` | ```'localhost:8002'``` | gRPC Endpoint URL
+| INTELIGENCE_GRPC_ENDPOINT |  ```string``` | ```'localhost:8003'``` | gRPC Endpoint URL
 | ENVIRONMENT |  ```string``` | ```production``` | Specify the environment you are going to run, it is also used for sentry
 
 

@@ -6,22 +6,29 @@ from rest_framework import status
 
 from weni.api.v1.dashboard.views import StatusServiceViewSet
 from weni.api.v1.tests.utils import create_user_and_token
-from weni.common.models import Service
+from weni.common.models import (
+    Service,
+    Organization,
+    OrganizationAuthorization,
+)
 
 
 class ListStatusServiceTestCase(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
 
-        self.service = Service.objects.create(
-            url="http://test.com", status=False, default=True
-        )
+        self.service = Service.objects.create(url="http://test.com", default=True)
 
         self.user, self.token = create_user_and_token()
 
-        self.organization = self.user.organization.create(
+        self.organization = Organization.objects.create(
             name="test organization", description="", inteligence_organization=1
         )
+
+        self.organization_authorization = self.organization.authorizations.create(
+            user=self.user, role=OrganizationAuthorization.ROLE_ADMIN
+        )
+
         self.project = self.organization.project.create(
             name="project test",
             timezone="America/Sao_Paulo",
@@ -31,7 +38,8 @@ class ListStatusServiceTestCase(TestCase):
     def request(self, token):
         authorization_header = {"HTTP_AUTHORIZATION": "Token {}".format(token)}
         request = self.factory.get(
-            "/v1/dashboard/status-service/", **authorization_header
+            f"/v1/dashboard/status-service/?project_uuid={str(self.project.uuid)}",
+            **authorization_header,
         )
         response = StatusServiceViewSet.as_view({"get": "list"})(request)
         response.render()

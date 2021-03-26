@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package org;
+package weni.bothub.org;
 
 import "google/protobuf/empty.proto";
 
@@ -31,6 +31,7 @@ message OrgListRequest {
 message OrgCreateRequest {
     string name = 1;
     string user_email = 2;
+    string user_nickname = 3;
 }
 
 message OrgDestroyRequest {
@@ -40,6 +41,5 @@ message OrgDestroyRequest {
 
 message OrgUpdateRequest {
     int32 id = 1;
-    string user_email = 2;
-    optional string name = 3;
+    optional string name = 2;
 }

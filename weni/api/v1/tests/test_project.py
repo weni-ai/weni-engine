@@ -8,7 +8,7 @@ from rest_framework import status
 
 from weni.api.v1.project.views import ProjectViewSet
 from weni.api.v1.tests.utils import create_user_and_token
-from weni.common.models import OrganizationAuthorization, Project
+from weni.common.models import OrganizationAuthorization, Project, Organization
 
 
 class CreateProjectAPITestCase(TestCase):
@@ -16,7 +16,7 @@ class CreateProjectAPITestCase(TestCase):
         self.factory = RequestFactory()
         self.owner, self.owner_token = create_user_and_token("owner")
 
-        self.organization = self.owner.organization.create(
+        self.organization = Organization.objects.create(
             name="test organization", description="", inteligence_organization=1
         )
         self.organization_authorization = self.organization.authorizations.create(
@@ -59,7 +59,7 @@ class ListProjectAPITestCase(TestCase):
         self.factory = RequestFactory()
         self.owner, self.owner_token = create_user_and_token("owner")
 
-        self.organization = self.owner.organization.create(
+        self.organization = Organization.objects.create(
             name="test organization", description="", inteligence_organization=1
         )
         self.organization_authorization = self.organization.authorizations.create(
@@ -105,7 +105,8 @@ class UpdateProjectTestCase(TestCase):
 
         self.owner, self.owner_token = create_user_and_token("owner")
         self.user, self.user_token = create_user_and_token("user")
-        self.organization = self.owner.organization.create(
+
+        self.organization = Organization.objects.create(
             name="test organization", description="", inteligence_organization=1
         )
         self.organization_authorization = self.organization.authorizations.create(

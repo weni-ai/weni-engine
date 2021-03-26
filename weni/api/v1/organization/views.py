@@ -1,13 +1,13 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import mixins
 from rest_framework.decorators import action
-from rest_framework.exceptions import PermissionDenied
 from rest_framework.filters import SearchFilter
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
+from weni.celery import app as celery_app
 from weni.api.v1.metadata import Metadata
 from weni.api.v1.mixins import MultipleFieldLookupMixin
 from weni.api.v1.organization.filters import OrganizationAuthorizationFilter
@@ -49,6 +49,15 @@ class OrganizationViewSet(
         )
         return self.queryset.filter(pk__in=auth)
 
+    def perform_destroy(self, instance):
+        inteligence_organization = instance.inteligence_organization
+        instance.delete()
+
+        celery_app.send_task(
+            "delete_organization",
+            args=[inteligence_organization, self.request.user.email],
+        )
+
 
 class OrganizationAuthorizationViewSet(
     MultipleFieldLookupMixin,
@@ -57,9 +66,7 @@ class OrganizationAuthorizationViewSet(
     mixins.DestroyModelMixin,
     GenericViewSet,
 ):
-    queryset = OrganizationAuthorization.objects.exclude(
-        role=OrganizationAuthorization.ROLE_NOT_SETTED
-    )
+    queryset = OrganizationAuthorization.objects
     serializer_class = OrganizationAuthorizationSerializer
     filter_class = OrganizationAuthorizationFilter
     lookup_fields = ["organization__uuid", "user__username"]
@@ -102,8 +109,7 @@ class OrganizationAuthorizationViewSet(
         ]
         response = super().update(*args, **kwargs)
         instance = self.get_object()
-        if instance.role is not OrganizationAuthorization.ROLE_NOT_SETTED:
-            instance.send_new_role_email(self.request.user)
+        instance.send_new_role_email(self.request.user)
         return response
 
     def list(self, request, *args, **kwargs):
@@ -135,9 +141,6 @@ class OrganizationAuthorizationViewSet(
         obj = organization.get_user_authorization(self.request.user)
 
         self.check_object_permissions(self.request, obj)
-
-        if obj.is_owner:
-            raise PermissionDenied()
 
         obj.delete()
         return Response(status=204)

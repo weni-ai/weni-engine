@@ -65,7 +65,7 @@ class ListOrganizationAPITestCase(TestCase):
         self.factory = RequestFactory()
         self.owner, self.owner_token = create_user_and_token("owner")
 
-        self.organization = self.owner.organization.create(
+        self.organization = Organization.objects.create(
             name="test organization", description="", inteligence_organization=1
         )
         self.organization_authorization = self.organization.authorizations.create(
@@ -105,7 +105,7 @@ class ListOrganizationAuthorizationTestCase(TestCase):
         self.owner, self.owner_token = create_user_and_token("owner")
         self.user, self.user_token = create_user_and_token()
 
-        self.organization = self.owner.organization.create(
+        self.organization = Organization.objects.create(
             name="test organization", description="", inteligence_organization=1
         )
         self.organization_authorization = self.organization.authorizations.create(
@@ -160,7 +160,7 @@ class UpdateAuthorizationRoleTestCase(TestCase):
         self.owner, self.owner_token = create_user_and_token("owner")
         self.user, self.user_token = create_user_and_token()
 
-        self.organization = self.owner.organization.create(
+        self.organization = Organization.objects.create(
             name="test organization", description="", inteligence_organization=1
         )
         self.organization_authorization = self.organization.authorizations.create(
@@ -223,16 +223,6 @@ class UpdateAuthorizationRoleTestCase(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_owner_cannot_define_the_level_nothing(self):
-        response, content_data = self.request(
-            self.organization,
-            self.owner_token,
-            self.user,
-            {"role": OrganizationAuthorization.ROLE_NOT_SETTED},
-        )
-
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-
 
 class DestroyAuthorizationRoleTestCase(TestCase):
     def setUp(self):
@@ -241,7 +231,7 @@ class DestroyAuthorizationRoleTestCase(TestCase):
         self.owner, self.owner_token = create_user_and_token("owner")
         self.user, self.user_token = create_user_and_token()
 
-        self.organization = self.owner.organization.create(
+        self.organization = Organization.objects.create(
             name="test organization", description="", inteligence_organization=1
         )
         self.organization_authorization = self.organization.authorizations.create(

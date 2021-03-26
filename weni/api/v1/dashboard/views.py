@@ -1,9 +1,9 @@
-from django.db.models import Q
 from django.utils import timezone
 from rest_framework import mixins
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
 
+from weni.api.v1.dashboard.filters import StatusServiceFilter
 from weni.api.v1.dashboard.serializers import (
     NewsletterSerializer,
     StatusServiceSerializer,
@@ -33,13 +33,5 @@ class StatusServiceViewSet(mixins.ListModelMixin, GenericViewSet):
 
     serializer_class = StatusServiceSerializer
     queryset = ServiceStatus.objects.all()
+    filter_class = StatusServiceFilter
     permission_classes = [IsAuthenticated]
-
-    def get_queryset(self, *args, **kwargs):
-        return self.queryset.filter(
-            (
-                Q(project__organization__owner=self.request.user)
-                & Q(service__default=True)
-            )
-            | Q(project__organization__owner=self.request.user)
-        )

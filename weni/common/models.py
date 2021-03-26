@@ -8,13 +8,14 @@ from django.utils.translation import ugettext_lazy as _
 from timezone_field import TimeZoneField
 
 from weni.authentication.models import User
+from weni.celery import app as celery_app
 
 
 class Newsletter(models.Model):
     class Meta:
         verbose_name = _("dashboard newsletter")
 
-    title = models.CharField(_("title"), max_length=36)
+    title = models.CharField(_("title"), max_length=50)
     description = models.TextField(_("description"))
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
 
@@ -31,8 +32,8 @@ class Organization(models.Model):
     )
     name = models.CharField(_("organization name"), max_length=150)
     description = models.TextField(_("organization description"))
-    owner = models.ForeignKey(User, models.CASCADE, related_name="organization")
     inteligence_organization = models.IntegerField(_("inteligence organization id"))
+    created_at = models.DateTimeField(_("created at"), auto_now_add=True)
 
     def get_user_authorization(self, user):
         if user.is_anonymous:
@@ -49,18 +50,15 @@ class OrganizationAuthorization(models.Model):
         verbose_name_plural = _("organization authorizations")
         unique_together = ["user", "organization"]
 
-    LEVEL_NOTHING = 0
     LEVEL_VIEWER = 1
     LEVEL_CONTRIBUTOR = 2
     LEVEL_ADMIN = 3
 
-    ROLE_NOT_SETTED = 0
     ROLE_VIEWER = 1
     ROLE_CONTRIBUTOR = 2
     ROLE_ADMIN = 3
 
     ROLE_CHOICES = [
-        (ROLE_NOT_SETTED, _("not set")),
         (ROLE_VIEWER, _("viewer")),
         (ROLE_CONTRIBUTOR, _("contributor")),
         (ROLE_ADMIN, _("admin")),
@@ -74,14 +72,9 @@ class OrganizationAuthorization(models.Model):
         Organization, models.CASCADE, related_name="authorizations"
     )
     role = models.PositiveIntegerField(
-        _("role"), choices=ROLE_CHOICES, default=ROLE_NOT_SETTED
+        _("role"), choices=ROLE_CHOICES, default=ROLE_VIEWER
     )
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
-
-    def save(self, *args, **kwargs):
-        if self.is_owner:
-            self.role = OrganizationAuthorization.ROLE_ADMIN
-        super(OrganizationAuthorization, self).save(*args, **kwargs)
 
     @property
     def level(self):
@@ -93,8 +86,6 @@ class OrganizationAuthorization(models.Model):
 
         if self.role == OrganizationAuthorization.ROLE_ADMIN:
             return OrganizationAuthorization.LEVEL_ADMIN
-
-        return OrganizationAuthorization.LEVEL_NOTHING  # pragma: no cover
 
     @property
     def can_read(self):
@@ -118,14 +109,6 @@ class OrganizationAuthorization(models.Model):
     @property
     def is_admin(self):
         return self.level == OrganizationAuthorization.LEVEL_ADMIN
-
-    @property
-    def is_owner(self):
-        try:
-            user = self.user
-        except User.DoesNotExist:  # pragma: no cover
-            return False  # pragma: no cover
-        return self.organization.owner == user
 
     @property
     def role_verbose(self):
@@ -184,7 +167,7 @@ class Project(models.Model):
         help_text=_("Whether day comes first or month comes first in dates"),
     )
     flow_organization = models.UUIDField(_("flow identification UUID"), unique=True)
-    flow_organization_id = models.IntegerField(_("flow identification UUID"), null=True)
+    flow_organization_id = models.IntegerField(_("flow identification ID"), null=True)
 
 
 class Service(models.Model):
@@ -230,7 +213,6 @@ class Service(models.Model):
     ]
 
     url = models.URLField(_("service url"), unique=True)
-    status = models.BooleanField(_("status service"), default=False)
     service_type = models.CharField(
         _("service type"),
         max_length=50,
@@ -238,7 +220,6 @@ class Service(models.Model):
         default=SERVICE_TYPE_CHAT,
     )
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
-    last_updated = models.DateTimeField(_("last updated"), auto_now_add=True)
     default = models.BooleanField(_("standard service for all projects"), default=False)
     region = models.CharField(
         _("service region"),
@@ -246,9 +227,21 @@ class Service(models.Model):
         choices=REGION_CHOICES,
         default=REGION_SAO_PAULO,
     )
+    maintenance = models.BooleanField(
+        _("Define if the service is under maintenance"), default=False
+    )
 
     def __str__(self):
         return self.url
+
+
+class LogService(models.Model):
+    class Meta:
+        verbose_name = _("log service")
+
+    service = models.ForeignKey(Service, models.CASCADE, related_name="log_service")
+    status = models.BooleanField(_("status service"), default=False)
+    created_at = models.DateTimeField(_("created at"), auto_now_add=True)
 
 
 class ServiceStatus(models.Model):
@@ -277,3 +270,32 @@ def create_service_default_in_all_user(sender, instance, created, **kwargs):
     if created and instance.default:
         for project in Project.objects.all():
             project.service_status.create(service=instance)
+
+
+@receiver(post_save, sender=Organization)
+def update_organization(sender, instance, **kwargs):
+    celery_app.send_task(
+        "update_organization",
+        args=[instance.inteligence_organization, instance.name],
+    )
+
+
+@receiver(post_save, sender=OrganizationAuthorization)
+def org_authorizations(sender, instance, **kwargs):
+    celery_app.send_task(
+        "update_user_permission_organization",
+        args=[
+            instance.organization.inteligence_organization,
+            instance.user.email,
+            instance.role,
+        ],
+    )
+    for project in instance.organization.project.all():
+        celery_app.send_task(
+            "update_user_permission_project",
+            args=[
+                project.flow_organization,
+                instance.user.email,
+                instance.role,
+            ],
+        )

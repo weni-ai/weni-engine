@@ -23,5 +23,14 @@ RUN pipenv install --system
 
 COPY . .
 
+RUN git clone https://github.com/Ilhasoft/weni-protobuffers weni/protos/flow/
+RUN python -m grpc_tools.protoc --experimental_allow_proto3_optional --proto_path=./ --python_out=./ --grpc_python_out=./ ./weni/protos/inteligence/authentication.proto
+RUN python -m grpc_tools.protoc --experimental_allow_proto3_optional --proto_path=./ --python_out=./ --grpc_python_out=./ ./weni/protos/inteligence/organization.proto
+RUN python -m grpc_tools.protoc --experimental_allow_proto3_optional --proto_path=./ --python_out=./ --grpc_python_out=./ ./weni/protos/flow/rapidpro_billing/billing.proto
+RUN python -m grpc_tools.protoc --experimental_allow_proto3_optional --proto_path=./ --python_out=./ --grpc_python_out=./ ./weni/protos/flow/rapidpro_flow/flow.proto
+RUN python -m grpc_tools.protoc --experimental_allow_proto3_optional --proto_path=./ --python_out=./ --grpc_python_out=./ ./weni/protos/flow/rapidpro_org/org.proto
+RUN python -m grpc_tools.protoc --experimental_allow_proto3_optional --proto_path=./ --python_out=./ --grpc_python_out=./ ./weni/protos/flow/rapidpro_statistic/statistic.proto
+RUN python -m grpc_tools.protoc --experimental_allow_proto3_optional --proto_path=./ --python_out=./ --grpc_python_out=./ ./weni/protos/flow/rapidpro_user/user.proto
+
 RUN chmod +x ./entrypoint.sh
 ENTRYPOINT [ "./entrypoint.sh" ]

@@ -1,8 +1,7 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
-from rest_framework.exceptions import PermissionDenied
 
-from weni.api.v1.account.serializers import UserSerializer
+from weni.celery import app as celery_app
 from weni.common.models import Organization, OrganizationAuthorization
 
 
@@ -13,23 +12,33 @@ class OrganizationSeralizer(serializers.ModelSerializer):
             "uuid",
             "name",
             "description",
-            "owner",
             "inteligence_organization",
             "authorizations",
+            "authorization",
+            "created_at",
         ]
         ref_name = None
 
     uuid = serializers.UUIDField(style={"show": False}, read_only=True)
     name = serializers.CharField(max_length=40, required=True)
-    owner = UserSerializer(many=False, read_only=True)
     inteligence_organization = serializers.IntegerField(read_only=True)
     authorizations = serializers.SerializerMethodField(style={"show": False})
+    authorization = serializers.SerializerMethodField(style={"show": False})
 
     def create(self, validated_data):
-        import random
+        task = celery_app.send_task(  # pragma: no cover
+            name="create_organization",
+            args=[
+                validated_data.get("name"),
+                self.context["request"].user.email,
+                self.context["request"].user.username,
+            ],
+        )
+        task.wait()  # pragma: no cover
 
-        validated_data.update({"owner": self.context["request"].user})
-        validated_data.update({"inteligence_organization": random.randint(0, 1000000)})
+        organization = task.result
+
+        validated_data.update({"inteligence_organization": organization.get("id")})
 
         instance = super().create(validated_data)
 
@@ -40,12 +49,8 @@ class OrganizationSeralizer(serializers.ModelSerializer):
         return instance
 
     def get_authorizations(self, obj):
-        auths = obj.authorizations.exclude(
-            role=OrganizationAuthorization.ROLE_NOT_SETTED
-        )
-
         return {
-            "count": auths.count(),
+            "count": obj.authorizations.count(),
             "users": [
                 {
                     "username": i.user.username,
@@ -54,9 +59,19 @@ class OrganizationSeralizer(serializers.ModelSerializer):
                     "role": i.role,
                     "photo_user": None if i.user.photo is None else None,
                 }
-                for i in auths
+                for i in obj.authorizations.all()
             ],
         }
+
+    def get_authorization(self, obj):
+        request = self.context.get("request")
+        if not request or not request.user.is_authenticated:
+            return None
+
+        data = OrganizationAuthorizationSerializer(
+            obj.get_user_authorization(request.user)
+        ).data
+        return data
 
 
 class OrganizationAuthorizationSerializer(serializers.ModelSerializer):
@@ -70,7 +85,6 @@ class OrganizationAuthorizationSerializer(serializers.ModelSerializer):
             "user__photo",
             "organization",
             "role",
-            "level",
             "can_read",
             "can_contribute",
             "can_write",
@@ -96,10 +110,3 @@ class OrganizationAuthorizationRoleSerializer(serializers.ModelSerializer):
         model = OrganizationAuthorization
         fields = ["role"]
         ref_name = None
-
-    def validate(self, data):
-        if self.instance.user == self.instance.organization.owner:
-            raise PermissionDenied(_("The owner role can't be changed."))
-        if data.get("role") == OrganizationAuthorization.LEVEL_NOTHING:
-            raise PermissionDenied(_("You cannot set user role 0"))
-        return data

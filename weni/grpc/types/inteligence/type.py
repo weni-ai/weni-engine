@@ -1,6 +1,7 @@
 from typing import Any
 
 import grpc
+from django.conf import settings
 
 from weni.grpc.grpc import GRPCType
 from weni.protos.inteligence import (
@@ -18,24 +19,31 @@ class InteligenceType(GRPCType):
         self.channel = self.get_channel()
 
     def get_channel(self):
-        return grpc.insecure_channel("localhost:50051")
+        return grpc.insecure_channel(settings.INTELIGENCE_GRPC_ENDPOINT)
 
     def list_organizations(self, user_email: str):
-        stub = organization_pb2_grpc.OrgControllerStub(self.channel)
         result = []
-        for org in stub.List(organization_pb2.OrgListRequest(user_email=user_email)):
-            result.append(
-                {
-                    "id": org.id,
-                    "name": org.name,
-                    "users": {
-                        "user_id": org.users[0].org_user_id,
-                        "user_email": org.users[0].org_user_email,
-                        "user_nickname": org.users[0].org_user_nickname,
-                        "user_name": org.users[0].org_user_name,
-                    },
-                }
-            )
+        try:
+            stub = organization_pb2_grpc.OrgControllerStub(self.channel)
+
+            for org in stub.List(
+                organization_pb2.OrgListRequest(user_email=user_email)
+            ):
+                result.append(
+                    {
+                        "id": org.id,
+                        "name": org.name,
+                        "users": {
+                            "user_id": org.users[0].org_user_id,
+                            "user_email": org.users[0].org_user_email,
+                            "user_nickname": org.users[0].org_user_nickname,
+                            "user_name": org.users[0].org_user_name,
+                        },
+                    }
+                )
+        except grpc.RpcError as e:
+            if e.code() is not grpc.StatusCode.NOT_FOUND:
+                raise e
         return result
 
     def get_user_organization_permission_role(
@@ -48,3 +56,46 @@ class InteligenceType(GRPCType):
             )
         )
         return response.role
+
+    def create_organization(
+        self, organization_name: str, user_email: str, user_nickname: str
+    ):
+        stub = organization_pb2_grpc.OrgControllerStub(self.channel)
+        response = stub.Create(
+            organization_pb2.OrgCreateRequest(
+                name=organization_name,
+                user_email=user_email,
+                user_nickname=user_nickname,
+            )
+        )
+        return response
+
+    def delete_organization(self, organization_id: int, user_email: str):
+        stub = organization_pb2_grpc.OrgControllerStub(self.channel)
+        stub.Destroy(
+            organization_pb2.OrgDestroyRequest(
+                id=organization_id, user_email=user_email
+            )
+        )
+
+    def update_organization(self, organization_id: int, organization_name: str):
+        stub = organization_pb2_grpc.OrgControllerStub(self.channel)
+        response = stub.Update(
+            organization_pb2.OrgUpdateRequest(
+                id=organization_id, name=organization_name
+            )
+        )
+        return response
+
+    def update_user_permission_organization(
+        self, organization_id: int, user_email: str, permission: int
+    ):
+        stub = authentication_pb2_grpc.UserPermissionControllerStub(self.channel)
+        response = stub.Update(
+            authentication_pb2.UserPermissionUpdateRequest(
+                org_id=organization_id,
+                user_email=user_email,
+                permission=permission,
+            )
+        )
+        return response

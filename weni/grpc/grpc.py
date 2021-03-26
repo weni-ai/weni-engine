@@ -21,3 +21,41 @@ class GRPCType(metaclass=ABCMeta):
         self, user_email: str, organization_id: Any
     ):
         raise NotImplementedError()
+
+    def create_organization(
+        self, organization_name: str, user_email: str, user_nickname: str
+    ):
+        raise NotImplementedError()
+
+    def delete_organization(self, organization_id: int, user_email: str):
+        raise NotImplementedError()
+
+    def update_organization(self, organization_id: int, organization_name: str):
+        raise NotImplementedError()
+
+    def update_user_permission_organization(
+        self, organization_id: int, user_email: str, permission: int
+    ):
+        raise NotImplementedError()
+
+    def create_project(
+        self,
+        project_name: str,
+        user_email: str,
+        user_username: str,
+        project_timezone: str,
+    ):
+        raise NotImplementedError()
+
+    def update_project(
+        self, organization_uuid: int, user_email: str, organization_name: str
+    ):
+        raise NotImplementedError()
+
+    def delete_project(self, project_uuid: int, user_email: str):
+        raise NotImplementedError()
+
+    def update_user_permission_project(
+        self, organization_uuid: str, user_email: str, permission: int
+    ):
+        raise NotImplementedError()

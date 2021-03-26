@@ -1,9 +1,8 @@
-import uuid as uuid4
-
 from django.conf import settings
 from rest_framework import serializers
 
 from weni.api.v1.project.validators import CanContributeInOrganizationValidator
+from weni.celery import app as celery_app
 from weni.common.models import Service, Project, Organization
 
 
@@ -32,11 +31,7 @@ class ProjectSeralizer(serializers.ModelSerializer):
     )
     timezone = serializers.CharField(read_only=True)
     menu = serializers.SerializerMethodField()
-    flow_organization = serializers.UUIDField(
-        style={"show": False},
-        read_only=True,
-        source="organization.flow_organization",
-    )
+    flow_organization = serializers.UUIDField(style={"show": False}, read_only=True)
     flow_organization_id = serializers.IntegerField(read_only=True)
 
     def get_menu(self, obj):
@@ -51,8 +46,26 @@ class ProjectSeralizer(serializers.ModelSerializer):
         }
 
     def create(self, validated_data):
-        import random
+        task = celery_app.send_task(  # pragma: no cover
+            name="create_project",
+            args=[
+                validated_data.get("name"),
+                self.context["request"].user.email,
+                self.context["request"].user.username,
+            ],
+        )
+        task.wait()  # pragma: no cover
 
-        validated_data.update({"flow_organization": uuid4.uuid4()})
-        validated_data.update({"flow_organization_id": random.randint(0, 1000000)})
+        project = task.result
+
+        validated_data.update({"flow_organization": project.get("uuid")})
+        validated_data.update({"flow_organization_id": project.get("id")})
         return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        name = validated_data.get("name", instance.name)
+        celery_app.send_task(
+            "update_project",
+            args=[instance.flow_organization, self.context["request"].user.email, name],
+        )
+        return super().update(instance, validated_data)

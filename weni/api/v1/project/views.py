@@ -2,6 +2,7 @@ from rest_framework import mixins
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
 
+from weni.celery import app as celery_app
 from weni.api.v1.metadata import Metadata
 from weni.api.v1.project.filters import ProjectOrgFilter
 from weni.api.v1.project.permissions import ProjectHasPermission
@@ -34,3 +35,12 @@ class ProjectViewSet(
             .values("organization")
         )
         return self.queryset.filter(organization__pk__in=auth)
+
+    def perform_destroy(self, instance):
+        flow_organization = instance.flow_organization
+        instance.delete()
+
+        celery_app.send_task(
+            "delete_project",
+            args=[flow_organization, self.request.user.email],
+        )
