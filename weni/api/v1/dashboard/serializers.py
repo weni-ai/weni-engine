@@ -44,6 +44,9 @@ class StatusServiceSerializer(serializers.ModelSerializer):
         def percentage(total_requests: int, percentage: int):
             return int(total_requests * (percentage / 100))
 
+        if obj.service.maintenance:
+            return "maintenance"
+
         query = obj.service.log_service.filter(
             created_at__range=[
                 timezone.now() - timedelta(minutes=30),

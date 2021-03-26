@@ -227,6 +227,9 @@ class Service(models.Model):
         choices=REGION_CHOICES,
         default=REGION_SAO_PAULO,
     )
+    maintenance = models.BooleanField(
+        _("Define if the service is under maintenance"), default=False
+    )
 
     def __str__(self):
         return self.url
