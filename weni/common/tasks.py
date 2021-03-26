@@ -1,5 +1,4 @@
 import requests
-from django.utils import timezone
 
 from weni import utils
 from weni.authentication.models import User
@@ -24,11 +23,11 @@ def status_service() -> None:
             return False
 
     for service in Service.objects.all():
-        service.status = is_page_available(
-            url=service.url, method_request=requests.get, timeout=10
+        service.log_service.create(
+            status=is_page_available(
+                url=service.url, method_request=requests.get, timeout=10
+            )
         )
-        service.last_updated = timezone.now()
-        service.save(update_fields=["status", "last_updated"])
 
 
 @app.task(name="delete_organization")
