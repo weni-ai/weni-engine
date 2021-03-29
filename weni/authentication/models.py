@@ -95,3 +95,8 @@ class User(AbstractBaseUser, PermissionsMixin):
                 "authentication/emails/change_password.html", context
             ),
         )
+
+    @property
+    def photo_url(self):
+        if self.photo and hasattr(self.photo, 'url'):
+            return self.photo.url
