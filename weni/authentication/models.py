@@ -98,5 +98,5 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     @property
     def photo_url(self):
-        if self.photo and hasattr(self.photo, 'url'):
+        if self.photo and hasattr(self.photo, "url"):
             return self.photo.url

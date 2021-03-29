@@ -4,6 +4,7 @@ from django.conf import settings
 from weni.grpc.grpc import GRPCType
 from weni.protos.flow.rapidpro_org import org_pb2_grpc, org_pb2
 from weni.protos.flow.rapidpro_user import user_pb2_grpc, user_pb2
+from weni.protos.flow.rapidpro_classifier import classifier_pb2_grpc, classifier_pb2
 
 
 class FlowType(GRPCType):
@@ -65,3 +66,24 @@ class FlowType(GRPCType):
             )
         )
         return response
+
+    def get_classifiers(self, organization_uuid: str, classifier_type: str):
+        result = []
+        try:
+            stub = classifier_pb2_grpc.ClassifierControllerStub(self.channel)
+            for classifier in stub.List(
+                classifier_pb2.ClassifierListRequest(
+                    org_uuid=organization_uuid, classifier_type=classifier_type
+                )
+            ):
+                result.append(
+                    {
+                        "authorization_uuid": classifier.uuid,
+                        "classifier_type": classifier.classifier_type,
+                        "name": classifier.name,
+                    }
+                )
+        except grpc.RpcError as e:
+            if e.code() is not grpc.StatusCode.NOT_FOUND:
+                raise e
+        return result
