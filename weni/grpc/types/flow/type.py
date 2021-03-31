@@ -67,13 +67,13 @@ class FlowType(GRPCType):
         )
         return response
 
-    def get_classifiers(self, organization_uuid: str, classifier_type: str):
+    def get_classifiers(self, project_uuid: str, classifier_type: str):
         result = []
         try:
             stub = classifier_pb2_grpc.ClassifierControllerStub(self.channel)
             for classifier in stub.List(
                 classifier_pb2.ClassifierListRequest(
-                    org_uuid=organization_uuid, classifier_type=classifier_type
+                    org_uuid=project_uuid, classifier_type=classifier_type
                 )
             ):
                 result.append(

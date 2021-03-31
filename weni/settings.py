@@ -99,6 +99,7 @@ INSTALLED_APPS = [
     "django_celery_beat",
     "storages",
     "corsheaders",
+    "django_grpc_framework",
 ]
 
 MIDDLEWARE = [
