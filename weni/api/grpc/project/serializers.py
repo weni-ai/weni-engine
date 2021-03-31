@@ -1,25 +1,19 @@
-from django_grpc_framework import proto_serializers
 from django_grpc_framework.proto_serializers import ProtoSerializer
 from rest_framework import serializers
 
 from weni.common.models import Project
-from weni.protos.weni import classifier_pb2
+from weni.protos.weni import project_pb2
 
 
 class ClassifierRequestSerializer(ProtoSerializer):
-    authorization_uuid = serializers.UUIDField()
-    # before = serializers.DateTimeField()
-    # after = serializers.DateTimeField()
+    project_uuid = serializers.UUIDField()
 
-    # def validate(self, data):
-    #     if data["after"] > data["before"]:
-    #         raise serializers.ValidationError('"after" should be earlier then "before"')
-    #     return data
-
-    # def validate_after(self, value):
-    #     if value > tz.now():
-    #         raise serializers.ValidationError("Cannot search after this date.")
-    #     return value
+    def validate_project_uuid(self, value):
+        try:
+            Project.objects.get(uuid=value)
+        except Project.DoesNotExist:
+            raise serializers.ValidationError("This project does not exist")
+        return value
 
     class Meta:
-        proto_class = classifier_pb2.Classifier
+        proto_class = project_pb2.ClassifierResponse
