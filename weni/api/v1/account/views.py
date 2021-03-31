@@ -13,11 +13,13 @@ from weni.api.v1.account.serializers import (
     UserSerializer,
     UserPhotoSerializer,
     ChangePasswordSerializer,
+    ChangeLanguageSerializer,
 )
 from weni.api.v1.keycloak import KeycloakControl
 from weni.authentication.models import User
 from weni.common.models import Service
 from weni.utils import upload_photo_rocket
+from weni.celery import app as celery_app
 
 
 class MyUserProfileViewSet(
@@ -125,6 +127,30 @@ class MyUserProfileViewSet(
             raise ValidationError(
                 _("System temporarily unavailable, please try again later.")
             )
+
+        return Response()
+
+    @action(
+        detail=True,
+        methods=["PUT", "PATCH"],
+        url_name="profile-change-language",
+        serializer_class=ChangeLanguageSerializer,
+    )
+    def change_language(self, request, **kwargs):  # pragma: no cover
+        serializer = ChangeLanguageSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        user = request.user
+        user.language = serializer.data.get("language")
+        user.save(update_fields=["language"])
+
+        celery_app.send_task(
+            "update_user_language",
+            args=[
+                user.email,
+                user.language,
+            ],
+        )
 
         return Response()
 

@@ -140,3 +140,12 @@ def create_project(project_name: str, user_email: str, user_username: str):
         project_timezone="America/Sao_Paulo",
     )
     return {"id": project.id, "uuid": project.uuid}
+
+
+@app.task(name="update_user_language")
+def update_user_language(user_email: str, language: str):
+    utils.get_grpc_types().get("flow").update_language(
+        user_email=user_email,
+        language=language,
+    )
+    return True

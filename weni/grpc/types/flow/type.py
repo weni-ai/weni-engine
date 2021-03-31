@@ -87,3 +87,10 @@ class FlowType(GRPCType):
             if e.code() is not grpc.StatusCode.NOT_FOUND:
                 raise e
         return result
+
+    def update_language(self, user_email: str, language: str):
+        stub = user_pb2_grpc.UserControllerStub(self.channel)
+        response = stub.Update(
+            user_pb2.UpdateUserLang(email=user_email, language=language)
+        )
+        return response
