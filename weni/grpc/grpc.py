@@ -60,5 +60,5 @@ class GRPCType(metaclass=ABCMeta):
     ):
         raise NotImplementedError()
 
-    def get_classifiers(self, organization_uuid: str, classifier_type: str):
+    def get_classifiers(self, project_uuid: str, classifier_type: str):
         raise NotImplementedError()
