@@ -32,6 +32,7 @@ RUN python -m grpc_tools.protoc --experimental_allow_proto3_optional --proto_pat
 RUN python -m grpc_tools.protoc --experimental_allow_proto3_optional --proto_path=./ --python_out=./ --grpc_python_out=./ ./weni/protos/flow/rapidpro_org/org.proto
 RUN python -m grpc_tools.protoc --experimental_allow_proto3_optional --proto_path=./ --python_out=./ --grpc_python_out=./ ./weni/protos/flow/rapidpro_statistic/statistic.proto
 RUN python -m grpc_tools.protoc --experimental_allow_proto3_optional --proto_path=./ --python_out=./ --grpc_python_out=./ ./weni/protos/flow/rapidpro_user/user.proto
+RUN python -m grpc_tools.protoc --experimental_allow_proto3_optional --proto_path=./ --python_out=./ --grpc_python_out=./ ./weni/protos/weni/project.proto
 
 RUN chmod +x ./entrypoint.sh
 ENTRYPOINT [ "./entrypoint.sh" ]
