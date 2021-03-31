@@ -16,7 +16,6 @@ class ProjectSeralizer(serializers.ModelSerializer):
             "timezone",
             "date_format",
             "flow_organization",
-            "flow_organization_id",
             "menu",
         ]
         ref_name = None
@@ -32,7 +31,6 @@ class ProjectSeralizer(serializers.ModelSerializer):
     timezone = serializers.CharField(read_only=True)
     menu = serializers.SerializerMethodField()
     flow_organization = serializers.UUIDField(style={"show": False}, read_only=True)
-    flow_organization_id = serializers.IntegerField(read_only=True)
 
     def get_menu(self, obj):
         return {
@@ -59,7 +57,6 @@ class ProjectSeralizer(serializers.ModelSerializer):
         project = task.result
 
         validated_data.update({"flow_organization": project.get("uuid")})
-        validated_data.update({"flow_organization_id": project.get("id")})
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
