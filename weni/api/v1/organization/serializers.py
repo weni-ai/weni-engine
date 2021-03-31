@@ -80,6 +80,7 @@ class OrganizationAuthorizationSerializer(serializers.ModelSerializer):
         fields = [
             "uuid",
             "user",
+            "user__id",
             "user__username",
             "user__email",
             "user__photo",
@@ -94,6 +95,9 @@ class OrganizationAuthorizationSerializer(serializers.ModelSerializer):
         read_only = ["user", "user__username", "organization", "role", "created_at"]
         ref_name = None
 
+    user__id = serializers.IntegerField(
+        source="user.id", read_only=True
+    )
     user__username = serializers.SlugRelatedField(
         source="user", slug_field="username", read_only=True
     )

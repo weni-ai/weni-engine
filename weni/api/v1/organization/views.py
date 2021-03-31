@@ -69,7 +69,7 @@ class OrganizationAuthorizationViewSet(
     queryset = OrganizationAuthorization.objects
     serializer_class = OrganizationAuthorizationSerializer
     filter_class = OrganizationAuthorizationFilter
-    lookup_fields = ["organization__uuid", "user__username"]
+    lookup_fields = ["organization__uuid", "user__id"]
     filter_backends = [DjangoFilterBackend, SearchFilter]
     search_fields = [
         "=user__first_name",
@@ -89,17 +89,17 @@ class OrganizationAuthorizationViewSet(
 
     def get_object(self):
         organization_uuid = self.kwargs.get("organization__uuid")
-        user_username = self.kwargs.get("user__username")
+        user_id = self.kwargs.get("user__id")
 
         organization = get_object_or_404(Organization, uuid=organization_uuid)
-        user = get_object_or_404(User, username=user_username)
+        user = get_object_or_404(User, pk=user_id)
         obj = organization.get_user_authorization(user)
 
         self.check_object_permissions(self.request, obj)
         return obj
 
     def update(self, *args, **kwargs):
-        self.lookup_field = "user__username"
+        self.lookup_field = "user__id"
 
         self.filter_class = None
         self.serializer_class = OrganizationAuthorizationRoleSerializer
@@ -122,7 +122,7 @@ class OrganizationAuthorizationViewSet(
             OrganizationAdminManagerAuthorization,
         ]
         self.filter_class = None
-        self.lookup_field = "user__username"
+        self.lookup_field = "user__id"
         return super().destroy(request, *args, **kwargs)
 
     @action(
