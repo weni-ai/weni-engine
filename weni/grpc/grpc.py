@@ -65,3 +65,6 @@ class GRPCType(metaclass=ABCMeta):
 
     def update_language(self, user_email: str, language: str):
         raise NotImplementedError()
+
+    def get_project_flows(self, project_uuid: str, flow_name: str):
+        raise NotImplementedError()

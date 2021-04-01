@@ -1,6 +1,8 @@
 from django.conf import settings
+from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
+from weni.api.v1.fields import TextField
 from weni.api.v1.project.validators import CanContributeInOrganizationValidator
 from weni.celery import app as celery_app
 from weni.common.models import Service, Project, Organization
@@ -66,3 +68,13 @@ class ProjectSeralizer(serializers.ModelSerializer):
             args=[instance.flow_organization, self.context["request"].user.email, name],
         )
         return super().update(instance, validated_data)
+
+
+class ProjectSearchSerializer(serializers.Serializer):
+    text = TextField(label=_("Text Search"), max_length=600)
+    project_uuid = serializers.PrimaryKeyRelatedField(
+        label=_("Project UUID"),
+        queryset=Project.objects,
+        required=True,
+        style={"show": False},
+    )

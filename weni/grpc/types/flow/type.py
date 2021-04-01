@@ -2,6 +2,7 @@ import grpc
 from django.conf import settings
 
 from weni.grpc.grpc import GRPCType
+from weni.protos.flow.rapidpro_flow import flow_pb2_grpc, flow_pb2
 from weni.protos.flow.rapidpro_org import org_pb2_grpc, org_pb2
 from weni.protos.flow.rapidpro_user import user_pb2_grpc, user_pb2
 from weni.protos.flow.rapidpro_classifier import classifier_pb2_grpc, classifier_pb2
@@ -94,3 +95,21 @@ class FlowType(GRPCType):
             user_pb2.UpdateUserLang(email=user_email, language=language)
         )
         return response
+
+    def get_project_flows(self, project_uuid: str, flow_name: str):
+        result = []
+        try:
+            stub = flow_pb2_grpc.FlowControllerStub(self.channel)
+            for flow in stub.List(
+                flow_pb2.FlowListRequest(flow_name=flow_name, org_uuid=project_uuid)
+            ):
+                result.append(
+                    {
+                        "flow_uuid": flow.uuid,
+                        "flow_name": flow.name,
+                    }
+                )
+        except grpc.RpcError as e:
+            if e.code() is not grpc.StatusCode.NOT_FOUND:
+                raise e
+        return result
