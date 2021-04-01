@@ -101,9 +101,7 @@ class FlowType(GRPCType):
         try:
             stub = flow_pb2_grpc.FlowControllerStub(self.channel)
             for flow in stub.List(
-                    flow_pb2.FlowListRequest(
-                        flow_name=flow_name, org_uuid=project_uuid
-                    )
+                flow_pb2.FlowListRequest(flow_name=flow_name, org_uuid=project_uuid)
             ):
                 result.append(
                     {

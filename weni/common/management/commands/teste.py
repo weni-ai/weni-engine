@@ -71,8 +71,8 @@ class Command(BaseCommand):
 
         print(
             get_grpc_types()
-                .get("flow")
-                .get_project_flows(
+            .get("flow")
+            .get_project_flows(
                 project_uuid="9a18c7a9-ab46-413d-88d4-90c04a5bb84e",
                 flow_name="te",
             )
