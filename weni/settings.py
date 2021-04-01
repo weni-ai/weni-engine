@@ -16,6 +16,7 @@ import sys
 import environ
 import sentry_sdk
 from django.utils.log import DEFAULT_LOGGING
+from django.utils.translation import ugettext_lazy as _
 from sentry_sdk.integrations.django import DjangoIntegration
 
 environ.Env.read_env(env_file=(environ.Path(__file__) - 2)(".env"))
@@ -173,6 +174,16 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
 
 LANGUAGE_CODE = env.str("LANGUAGE_CODE")
+
+# -----------------------------------------------------------------------------------
+# Available languages for translation
+# -----------------------------------------------------------------------------------
+LANGUAGES = (
+    ("en-us", _("English")),
+    ("pt-br", _("Portuguese")),
+)
+
+DEFAULT_LANGUAGE = "en-us"
 
 TIME_ZONE = env.str("TIME_ZONE")
 

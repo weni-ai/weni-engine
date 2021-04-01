@@ -68,6 +68,14 @@ class User(AbstractBaseUser, PermissionsMixin):
         _("photo user"), storage=AvatarUserMediaStorage(), null=True
     )
 
+    language = models.CharField(
+        verbose_name=_("Language"),
+        max_length=64,
+        choices=settings.LANGUAGES,
+        default=settings.DEFAULT_LANGUAGE,
+        help_text=_("The primary language used by this user"),
+    )
+
     is_staff = models.BooleanField(_("staff status"), default=False)
     is_active = models.BooleanField(_("active"), default=True)
 

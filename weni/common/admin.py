@@ -7,6 +7,7 @@ from weni.common.models import (
     Organization,
     Project,
     OrganizationAuthorization,
+    LogService,
 )
 
 
@@ -37,4 +38,9 @@ class ProjectAdmin(admin.ModelAdmin):
 
 @admin.register(OrganizationAuthorization)
 class OrganizationAuthorizationAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(LogService)
+class LogServiceAdmin(admin.ModelAdmin):
     pass

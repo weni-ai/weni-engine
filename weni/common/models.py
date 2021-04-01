@@ -142,7 +142,7 @@ class OrganizationAuthorization(models.Model):
 class Project(models.Model):
     class Meta:
         verbose_name = _("project")
-        unique_together = ["flow_organization", "flow_organization_id"]
+        unique_together = ["flow_organization"]
 
     DATE_FORMAT_DAY_FIRST = "D"
     DATE_FORMAT_MONTH_FIRST = "M"
@@ -167,7 +167,6 @@ class Project(models.Model):
         help_text=_("Whether day comes first or month comes first in dates"),
     )
     flow_organization = models.UUIDField(_("flow identification UUID"), unique=True)
-    flow_organization_id = models.IntegerField(_("flow identification ID"), null=True)
 
 
 class Service(models.Model):

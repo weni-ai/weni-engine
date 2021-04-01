@@ -51,11 +51,20 @@ class Command(BaseCommand):
         #     )
         # )
 
+        # print(
+        #     get_grpc_types()
+        #     .get("flow")
+        #     .get_classifiers(
+        #         organization_uuid="b0c8641b-7382-467d-8b64-25e6229fea7d",
+        #         classifier_type="bothub",
+        #     )
+        # )
+
         print(
             get_grpc_types()
             .get("flow")
-            .get_classifiers(
-                organization_uuid="b0c8641b-7382-467d-8b64-25e6229fea7d",
-                classifier_type="bothub",
+            .update_language(
+                user_email="daniel.yohan@ilhasoft.com.br",
+                language="en-us",
             )
         )
