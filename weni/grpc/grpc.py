@@ -68,3 +68,8 @@ class GRPCType(metaclass=ABCMeta):
 
     def get_project_flows(self, project_uuid: str, flow_name: str):
         raise NotImplementedError()
+
+    def get_organization_inteligences(
+        self, organization_id: int, inteligence_name: str
+    ):
+        raise NotImplementedError()

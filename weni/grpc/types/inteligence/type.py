@@ -9,6 +9,8 @@ from weni.protos.inteligence import (
     organization_pb2,
     authentication_pb2_grpc,
     authentication_pb2,
+    repository_pb2_grpc,
+    repository_pb2,
 )
 
 
@@ -96,6 +98,37 @@ class InteligenceType(GRPCType):
                 org_id=organization_id,
                 user_email=user_email,
                 permission=permission,
+            )
+        )
+        return response
+
+    def get_organization_inteligences(
+        self, organization_id: int, inteligence_name: str
+    ):
+        result = []
+        try:
+            stub = repository_pb2_grpc.RepositoryControllerStub(self.channel)
+            for inteligence in stub.List(
+                repository_pb2.RepositoryListRequest(
+                    name=inteligence_name, org_id=organization_id
+                )
+            ):
+                result.append(
+                    {
+                        "inteligence_uuid": inteligence.uuid,
+                        "inteligence_name": inteligence.name,
+                    }
+                )
+        except grpc.RpcError as e:
+            if e.code() is not grpc.StatusCode.NOT_FOUND:
+                raise e
+        return result
+
+    def update_language(self, user_email: str, language: str):
+        stub = authentication_pb2_grpc.UserLanguageControllerStub(self.channel)
+        response = stub.Update(
+            authentication_pb2.UserLanguageUpdateRequest(
+                email=user_email, language=language
             )
         )
         return response

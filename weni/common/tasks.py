@@ -148,6 +148,10 @@ def update_user_language(user_email: str, language: str):
         user_email=user_email,
         language=language,
     )
+    utils.get_grpc_types().get("inteligence").update_language(
+        user_email=user_email,
+        language=language,
+    )
     return True
 
 
@@ -161,7 +165,15 @@ def search_project(organization_id: int, project_uuid: str, text: str):
             flow_name=text,
         )
     )
+    inteligence_result = (
+        utils.get_grpc_types()
+        .get("inteligence")
+        .get_organization_inteligences(
+            organization_id=organization_id,
+            inteligence_name=text,
+        )
+    )
     return {
         "flow": flow_result,
-        "inteligence": [],
+        "inteligence": inteligence_result,
     }
