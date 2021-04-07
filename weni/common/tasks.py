@@ -149,3 +149,19 @@ def update_user_language(user_email: str, language: str):
         language=language,
     )
     return True
+
+
+@app.task(name="search_project")
+def search_project(organization_id: int, project_uuid: str, text: str):
+    flow_result = (
+        utils.get_grpc_types()
+        .get("flow")
+        .get_project_flows(
+            project_uuid=project_uuid,
+            flow_name=text,
+        )
+    )
+    return {
+        "flow": flow_result,
+        "inteligence": [],
+    }
