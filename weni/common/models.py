@@ -50,15 +50,18 @@ class OrganizationAuthorization(models.Model):
         verbose_name_plural = _("organization authorizations")
         unique_together = ["user", "organization"]
 
+    LEVEL_NOTHING = 0
     LEVEL_VIEWER = 1
     LEVEL_CONTRIBUTOR = 2
     LEVEL_ADMIN = 3
 
+    ROLE_NOT_SETTED = 0
     ROLE_VIEWER = 1
     ROLE_CONTRIBUTOR = 2
     ROLE_ADMIN = 3
 
     ROLE_CHOICES = [
+        (ROLE_NOT_SETTED, _("not set")),
         (ROLE_VIEWER, _("viewer")),
         (ROLE_CONTRIBUTOR, _("contributor")),
         (ROLE_ADMIN, _("admin")),
@@ -72,7 +75,7 @@ class OrganizationAuthorization(models.Model):
         Organization, models.CASCADE, related_name="authorizations"
     )
     role = models.PositiveIntegerField(
-        _("role"), choices=ROLE_CHOICES, default=ROLE_VIEWER
+        _("role"), choices=ROLE_CHOICES, default=ROLE_NOT_SETTED
     )
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
 

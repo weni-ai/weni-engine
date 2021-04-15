@@ -2,9 +2,11 @@ from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
+from weni.api.v1 import fields
 from weni.api.v1.fields import TextField
 from weni.api.v1.project.validators import CanContributeInOrganizationValidator
 from weni.celery import app as celery_app
+from weni.common import tasks
 from weni.common.models import Service, Project, Organization
 
 
@@ -30,7 +32,7 @@ class ProjectSeralizer(serializers.ModelSerializer):
         required=True,
         style={"show": False},
     )
-    timezone = serializers.CharField(read_only=True)
+    timezone = fields.TimezoneField(required=True)
     menu = serializers.SerializerMethodField()
     flow_organization = serializers.UUIDField(style={"show": False}, read_only=True)
 
@@ -46,15 +48,14 @@ class ProjectSeralizer(serializers.ModelSerializer):
         }
 
     def create(self, validated_data):
-        task = celery_app.send_task(  # pragma: no cover
-            name="create_project",
-            args=[
-                validated_data.get("name"),
-                self.context["request"].user.email,
-                self.context["request"].user.username,
-            ],
+        task = tasks.create_project.delay(  # pragma: no cover
+            validated_data.get("name"),
+            self.context["request"].user.email,
+            self.context["request"].user.username,
+            str(validated_data.get("timezone")),
         )
-        task.wait()  # pragma: no cover
+        if not settings.TESTING:
+            task.wait()  # pragma: no cover
 
         project = task.result
 

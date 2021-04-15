@@ -1,5 +1,6 @@
 import json
 import uuid as uuid4
+from unittest.mock import patch
 
 from django.test import RequestFactory
 from django.test import TestCase
@@ -37,12 +38,15 @@ class CreateProjectAPITestCase(TestCase):
         content_data = json.loads(response.content)
         return (response, content_data)
 
-    def test_okay(self):
+    @patch("weni.common.tasks.create_project.delay")
+    def test_okay(self, task_create_project):
+        task_create_project.return_value.result = {"uuid": uuid4.uuid4()}
         response, content_data = self.request(
             {
                 "name": "Project 1",
                 "organization": self.organization.uuid,
                 "date_format": "D",
+                "timezone": "America/Sao_Paulo",
             },
             self.owner_token,
         )
