@@ -130,7 +130,9 @@ def create_organization(organization_name: str, user_email: str, user_nickname: 
 
 
 @app.task(name="create_project")
-def create_project(project_name: str, user_email: str, user_username: str):
+def create_project(
+    project_name: str, user_email: str, user_username: str, project_timezone: str
+):
     grpc_instance = utils.get_grpc_types().get("flow")
 
     project = grpc_instance.create_project(

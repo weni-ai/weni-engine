@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
+from timezone_field import TimeZoneField
 
 from weni.api.v1.fields import TextField
 from weni.api.v1.project.validators import CanContributeInOrganizationValidator
@@ -30,7 +31,7 @@ class ProjectSeralizer(serializers.ModelSerializer):
         required=True,
         style={"show": False},
     )
-    timezone = serializers.CharField(read_only=True)
+    timezone = TimeZoneField(required=True)
     menu = serializers.SerializerMethodField()
     flow_organization = serializers.UUIDField(style={"show": False}, read_only=True)
 
