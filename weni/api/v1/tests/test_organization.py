@@ -1,7 +1,6 @@
 import json
 import uuid as uuid4
-from unittest import mock
-from unittest.mock import patch, Mock
+from unittest.mock import patch
 
 from django.test import RequestFactory
 from django.test import TestCase
@@ -35,9 +34,9 @@ class CreateOrganizationAPITestCase(TestCase):
         content_data = json.loads(response.content)
         return (response, content_data)
 
-    @patch('weni.common.tasks.create_organization.delay')
+    @patch("weni.common.tasks.create_organization.delay")
     def test_okay(self, task_create_organization):
-        task_create_organization.return_value.result = {'id': 1}
+        task_create_organization.return_value.result = {"id": 1}
         response, content_data = self.request(
             {
                 "name": "Organization 1",
@@ -174,17 +173,13 @@ class UpdateAuthorizationRoleTestCase(TestCase):
     def request(self, repository, token, user, data):
         authorization_header = {"HTTP_AUTHORIZATION": "Token {}".format(token.key)}
         request = self.factory.patch(
-            "/v1/organization/authorizations/{}/{}/".format(
-                repository.uuid, user.pk
-            ),
+            "/v1/organization/authorizations/{}/{}/".format(repository.uuid, user.pk),
             self.factory._encode_data(data, MULTIPART_CONTENT),
             MULTIPART_CONTENT,
             **authorization_header,
         )
         view = OrganizationAuthorizationViewSet.as_view({"patch": "update"})
-        response = view(
-            request, organization__uuid=repository.uuid, user__id=user.pk
-        )
+        response = view(request, organization__uuid=repository.uuid, user__id=user.pk)
         response.render()
         content_data = json.loads(response.content)
         return (response, content_data)
@@ -249,15 +244,11 @@ class DestroyAuthorizationRoleTestCase(TestCase):
     def request(self, organization, token, user):
         authorization_header = {"HTTP_AUTHORIZATION": "Token {}".format(token.key)}
         request = self.factory.delete(
-            "/v1/organization/authorizations/{}/{}/".format(
-                organization.uuid, user.pk
-            ),
+            "/v1/organization/authorizations/{}/{}/".format(organization.uuid, user.pk),
             **authorization_header,
         )
         view = OrganizationAuthorizationViewSet.as_view({"delete": "destroy"})
-        response = view(
-            request, organization__uuid=organization.uuid, user__id=user.pk
-        )
+        response = view(request, organization__uuid=organization.uuid, user__id=user.pk)
         response.render()
         return response
 

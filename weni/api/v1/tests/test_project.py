@@ -43,7 +43,7 @@ class CreateProjectAPITestCase(TestCase):
                 "name": "Project 1",
                 "organization": self.organization.uuid,
                 "date_format": "D",
-                "timezone": "America/Sao_Paulo"
+                "timezone": "America/Sao_Paulo",
             },
             self.owner_token,
         )

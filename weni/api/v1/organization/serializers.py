@@ -1,7 +1,6 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from weni.celery import app as celery_app
 from weni.common import tasks
 from weni.common.models import Organization, OrganizationAuthorization
 

@@ -34,35 +34,31 @@ class ServiceStatusTestCase(TestCase):
             timezone="America/Sao_Paulo",
             flow_organization=uuid4.uuid4(),
         )
-        self.service = Service.objects.create(
-            url="http://test.com", default=False
-        )
+        self.service = Service.objects.create(url="http://test.com", default=False)
 
     def test_create_service_status(self):
         status = ServiceStatus.objects.create(
             service=self.service,
             project=self.project,
         )
-        self.service.log_service.create(
-            status=False
-        )
+        self.service.log_service.create(status=False)
         self.assertEqual(status.service.url, "http://test.com")
         self.assertEqual(self.service.log_service.first().status, False)
         self.assertEqual(status.service.default, False)
         self.assertEqual(str(status.service), status.service.url)
 
     def test_create_service_default(self):
-        service = Service.objects.create(
-            url="http://test-default.com", default=True
-        )
-        log_service = service.log_service.create(
-            status=True
-        )
+        service = Service.objects.create(url="http://test-default.com", default=True)
+        log_service = service.log_service.create(status=True)
         self.assertEqual(
             self.project.service_status.all().first().service.url, service.url
         )
         self.assertEqual(
-            self.project.service_status.all().first().service.log_service.first().status, log_service.status
+            self.project.service_status.all()
+            .first()
+            .service.log_service.first()
+            .status,
+            log_service.status,
         )
         self.assertEqual(
             self.project.service_status.all().first().service.default, service.default
