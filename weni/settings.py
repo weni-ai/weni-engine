@@ -16,6 +16,7 @@ import sys
 import environ
 import sentry_sdk
 from django.utils.log import DEFAULT_LOGGING
+from django.utils.translation import ugettext_lazy as _
 from sentry_sdk.integrations.django import DjangoIntegration
 
 environ.Env.read_env(env_file=(environ.Path(__file__) - 2)(".env"))
@@ -54,6 +55,8 @@ env = environ.Env(
     APM_SERVICE_NAME=(str, ""),
     APM_SECRET_TOKEN=(str, ""),
     APM_SERVER_URL=(str, ""),
+    FLOW_GRPC_ENDPOINT=(str, "localhost:8002"),
+    INTELIGENCE_GRPC_ENDPOINT=(str, "localhost:8003"),
 )
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -97,6 +100,7 @@ INSTALLED_APPS = [
     "django_celery_beat",
     "storages",
     "corsheaders",
+    "django_grpc_framework",
 ]
 
 MIDDLEWARE = [
@@ -170,6 +174,16 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
 
 LANGUAGE_CODE = env.str("LANGUAGE_CODE")
+
+# -----------------------------------------------------------------------------------
+# Available languages for translation
+# -----------------------------------------------------------------------------------
+LANGUAGES = (
+    ("en-us", _("English")),
+    ("pt-br", _("Portuguese")),
+)
+
+DEFAULT_LANGUAGE = "en-us"
 
 TIME_ZONE = env.str("TIME_ZONE")
 
@@ -351,3 +365,6 @@ SEND_EMAILS = env.bool("SEND_EMAILS")
 
 INTELIGENCE_URL = env.str("INTELIGENCE_URL")
 FLOWS_URL = env.str("FLOWS_URL")
+
+FLOW_GRPC_ENDPOINT = env.str("FLOW_GRPC_ENDPOINT")
+INTELIGENCE_GRPC_ENDPOINT = env.str("INTELIGENCE_GRPC_ENDPOINT")

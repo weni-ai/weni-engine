@@ -22,6 +22,7 @@ from drf_yasg2.views import get_schema_view
 from rest_framework import permissions
 
 from weni.api.v1 import urls as rookly_api_v1_urls
+from weni.api.grpc.project.handlers import grpc_handlers as grpc_project_handlers
 
 
 schema_view = get_schema_view(
@@ -41,6 +42,11 @@ urlpatterns = [
 ]
 
 urlpatterns += staticfiles_urlpatterns()
+
+
+def grpc_handlers(server):
+    grpc_project_handlers(server)
+
 
 if settings.DEBUG:
 

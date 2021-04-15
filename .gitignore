@@ -96,6 +96,7 @@ __pypackages__/
 
 # Celery stuff
 celerybeat-schedule
+celerybeat-schedule.db
 celerybeat.pid
 
 # SageMath parsed files
@@ -133,3 +134,8 @@ dmypy.json
 
 # Staticfile
 staticfiles/
+
+# gRPC
+weni/protos/inteligence/*.py
+weni/protos/flow/
+weni/protos/weni/*.py

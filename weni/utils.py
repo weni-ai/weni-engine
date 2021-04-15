@@ -16,3 +16,13 @@ def upload_photo_rocket(server_rocket: str, jwt_token: str, avatar_url: str) -> 
         json={"avatarUrl": avatar_url},
     )
     return True if set_photo.status_code == 200 else False
+
+
+def get_grpc_types():
+    """
+    Returns the possible types available for classifiers
+    :return:
+    """
+    from weni.grpc import TYPES
+
+    return TYPES

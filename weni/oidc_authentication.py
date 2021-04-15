@@ -2,6 +2,8 @@ import logging
 
 from mozilla_django_oidc.auth import OIDCAuthenticationBackend
 
+from weni.celery import app as celery_app
+
 LOGGER = logging.getLogger("weni_django_oidc")
 
 
@@ -34,6 +36,12 @@ class WeniOIDCAuthenticationBackend(OIDCAuthenticationBackend):
         user.last_name = claims.get("family_name", "")
         user.email = claims.get("email", "")
         user.save()
+
+        task = celery_app.send_task(  # pragma: no cover
+            name="migrate_organization",
+            args=[str(user.email)],
+        )
+        task.wait()  # pragma: no cover
 
         return user
 

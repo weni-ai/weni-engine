@@ -68,6 +68,14 @@ class User(AbstractBaseUser, PermissionsMixin):
         _("photo user"), storage=AvatarUserMediaStorage(), null=True
     )
 
+    language = models.CharField(
+        verbose_name=_("Language"),
+        max_length=64,
+        choices=settings.LANGUAGES,
+        default=settings.DEFAULT_LANGUAGE,
+        help_text=_("The primary language used by this user"),
+    )
+
     is_staff = models.BooleanField(_("staff status"), default=False)
     is_active = models.BooleanField(_("active"), default=True)
 
@@ -95,3 +103,8 @@ class User(AbstractBaseUser, PermissionsMixin):
                 "authentication/emails/change_password.html", context
             ),
         )
+
+    @property
+    def photo_url(self):
+        if self.photo and hasattr(self.photo, "url"):
+            return self.photo.url

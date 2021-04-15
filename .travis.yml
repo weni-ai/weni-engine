@@ -29,6 +29,7 @@ env:
     - OIDC_OP_LOGOUT_ENDPOINT=
 
 script:
+  - make createproto
   - python manage.py migrate
   - python manage.py collectstatic --noinput
   - flake8
