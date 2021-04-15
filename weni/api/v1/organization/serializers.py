@@ -2,6 +2,7 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
 from weni.celery import app as celery_app
+from weni.common import tasks
 from weni.common.models import Organization, OrganizationAuthorization
 
 
@@ -26,7 +27,7 @@ class OrganizationSeralizer(serializers.ModelSerializer):
     authorization = serializers.SerializerMethodField(style={"show": False})
 
     def create(self, validated_data):
-        task = celery_app.send_task(  # pragma: no cover
+        task = tasks.create_organization.delay(  # pragma: no cover
             name="create_organization",
             args=[
                 validated_data.get("name"),

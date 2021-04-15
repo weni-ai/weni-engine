@@ -1,5 +1,7 @@
 import json
 import uuid as uuid4
+from unittest import mock
+from unittest.mock import patch, Mock
 
 from django.test import RequestFactory
 from django.test import TestCase
@@ -33,7 +35,9 @@ class CreateOrganizationAPITestCase(TestCase):
         content_data = json.loads(response.content)
         return (response, content_data)
 
-    def test_okay(self):
+    @patch('weni.common.tasks.create_organization.delay')
+    def test_okay(self, task_create_organization):
+        task_create_organization.return_value.result = {'id': 1}
         response, content_data = self.request(
             {
                 "name": "Organization 1",
@@ -171,7 +175,7 @@ class UpdateAuthorizationRoleTestCase(TestCase):
         authorization_header = {"HTTP_AUTHORIZATION": "Token {}".format(token.key)}
         request = self.factory.patch(
             "/v1/organization/authorizations/{}/{}/".format(
-                repository.uuid, user.username
+                repository.uuid, user.pk
             ),
             self.factory._encode_data(data, MULTIPART_CONTENT),
             MULTIPART_CONTENT,
@@ -179,7 +183,7 @@ class UpdateAuthorizationRoleTestCase(TestCase):
         )
         view = OrganizationAuthorizationViewSet.as_view({"patch": "update"})
         response = view(
-            request, organization__uuid=repository.uuid, user__username=user.username
+            request, organization__uuid=repository.uuid, user__id=user.pk
         )
         response.render()
         content_data = json.loads(response.content)
@@ -246,13 +250,13 @@ class DestroyAuthorizationRoleTestCase(TestCase):
         authorization_header = {"HTTP_AUTHORIZATION": "Token {}".format(token.key)}
         request = self.factory.delete(
             "/v1/organization/authorizations/{}/{}/".format(
-                organization.uuid, user.username
+                organization.uuid, user.pk
             ),
             **authorization_header,
         )
         view = OrganizationAuthorizationViewSet.as_view({"delete": "destroy"})
         response = view(
-            request, organization__uuid=organization.uuid, user__username=user.username
+            request, organization__uuid=organization.uuid, user__id=user.pk
         )
         response.render()
         return response

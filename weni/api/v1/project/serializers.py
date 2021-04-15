@@ -53,6 +53,7 @@ class ProjectSeralizer(serializers.ModelSerializer):
                 validated_data.get("name"),
                 self.context["request"].user.email,
                 self.context["request"].user.username,
+                validated_data.get('timezone')
             ],
         )
         task.wait()  # pragma: no cover
