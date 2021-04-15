@@ -139,7 +139,7 @@ def create_project(
         project_name=project_name,
         user_email=user_email,
         user_username=user_username,
-        project_timezone="America/Sao_Paulo",
+        project_timezone=project_timezone,
     )
     return {"id": project.id, "uuid": project.uuid}
 

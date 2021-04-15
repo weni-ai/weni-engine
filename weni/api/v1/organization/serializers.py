@@ -27,12 +27,9 @@ class OrganizationSeralizer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         task = tasks.create_organization.delay(  # pragma: no cover
-            name="create_organization",
-            args=[
-                validated_data.get("name"),
-                self.context["request"].user.email,
-                self.context["request"].user.username,
-            ],
+            validated_data.get("name"),
+            self.context["request"].user.email,
+            self.context["request"].user.username,
         )
         task.wait()  # pragma: no cover
 
