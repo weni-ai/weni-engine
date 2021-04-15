@@ -1,7 +1,9 @@
 from django.utils.translation import ugettext_lazy as _
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import mixins
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
+from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
@@ -26,6 +28,7 @@ class ProjectViewSet(
     serializer_class = ProjectSeralizer
     permission_classes = [IsAuthenticated, ProjectHasPermission]
     filter_class = ProjectOrgFilter
+    filter_backends = [OrderingFilter, SearchFilter, DjangoFilterBackend]
     lookup_field = "uuid"
     metadata_class = Metadata
 
