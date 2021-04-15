@@ -38,7 +38,7 @@ class CreateProjectAPITestCase(TestCase):
         content_data = json.loads(response.content)
         return (response, content_data)
 
-    @patch("weni.common.tasks.create_organization.delay")
+    @patch("weni.common.tasks.create_project.delay")
     def test_okay(self, task_create_project):
         task_create_project.return_value.result = {"uuid": uuid4.uuid4()}
         response, content_data = self.request(
