@@ -54,7 +54,8 @@ class ProjectSeralizer(serializers.ModelSerializer):
             self.context["request"].user.username,
             str(validated_data.get("timezone")),
         )
-        task.wait()  # pragma: no cover
+        if not settings.TESTING:
+            task.wait()  # pragma: no cover
 
         project = task.result
 

@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
@@ -31,7 +32,8 @@ class OrganizationSeralizer(serializers.ModelSerializer):
             self.context["request"].user.email,
             self.context["request"].user.username,
         )
-        task.wait()  # pragma: no cover
+        if not settings.TESTING:
+            task.wait()  # pragma: no cover
 
         organization = task.result
 
