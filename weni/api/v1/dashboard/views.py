@@ -19,11 +19,20 @@ class NewsletterViewSet(
     """
 
     serializer_class = NewsletterSerializer
-    queryset = Newsletter.objects.filter(
-        created_at__gt=timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
-        - timezone.timedelta(days=90)
-    )
+    queryset = Newsletter.objects
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self, *args, **kwargs):
+        if getattr(self, "swagger_fake_view", False):
+            # queryset just for schema generation metadata
+            return Newsletter.objects.none()
+
+        return self.queryset.filter(
+            created_at__gt=timezone.now().replace(
+                hour=0, minute=0, second=0, microsecond=0
+            )
+            - timezone.timedelta(days=90)
+        ).filter(newsletter_language__language=self.request.user.language)
 
 
 class StatusServiceViewSet(mixins.ListModelMixin, GenericViewSet):

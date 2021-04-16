@@ -9,8 +9,12 @@ from weni.common.models import Newsletter, ServiceStatus, Service
 class NewsletterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Newsletter
-        fields = ["id", "title", "description", "created_at"]
+        fields = ["id", "title", "description", "language", "created_at"]
         ref_name = None
+
+    title = serializers.CharField(source="newsletter_language.title")
+    language = serializers.CharField(source="newsletter_language.language")
+    description = serializers.CharField(source="newsletter_language.description")
 
 
 class StatusServiceSerializer(serializers.ModelSerializer):
