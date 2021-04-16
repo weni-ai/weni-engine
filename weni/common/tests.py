@@ -23,7 +23,6 @@ class NewsletterTestCase(TestCase):
         newsletter = Newsletter.objects.create(newsletter_language=newsletter_language)
         self.assertEqual(newsletter.newsletter_language.title, title)
         self.assertEqual(newsletter.newsletter_language.description, description)
-        self.assertEqual(str(newsletter), newsletter.newsletter_language.title)
 
 
 class ServiceStatusTestCase(TestCase):
