@@ -11,16 +11,33 @@ from weni.authentication.models import User
 from weni.celery import app as celery_app
 
 
-class Newsletter(models.Model):
+class NewsletterLanguage(models.Model):
     class Meta:
         verbose_name = _("dashboard newsletter")
 
+    language = models.CharField(
+        _("language"),
+        max_length=10,
+        choices=settings.LANGUAGES,
+        default=settings.DEFAULT_LANGUAGE,
+    )
     title = models.CharField(_("title"), max_length=50)
     description = models.TextField(_("description"))
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
 
     def __str__(self):
-        return self.title
+        return f"{self.language} - {self.title}"
+
+
+class Newsletter(models.Model):
+    class Meta:
+        verbose_name = _("dashboard newsletter")
+
+    newsletter_language = models.ForeignKey(NewsletterLanguage, models.CASCADE)
+    created_at = models.DateTimeField(_("created at"), auto_now_add=True)
+
+    def __str__(self):
+        return f"PK: {self.newsletter_language.pk} - {self.newsletter_language.language} - {self.newsletter_language.title}"
 
 
 class Organization(models.Model):
