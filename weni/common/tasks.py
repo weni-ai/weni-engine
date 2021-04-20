@@ -181,7 +181,7 @@ def search_project(organization_id: int, project_uuid: str, text: str):
     }
 
 
-@app.task(name="sync_updates_projects")
+@app.task()
 def sync_updates_projects():
     for project in Project.objects.all():
         flow_result = (
