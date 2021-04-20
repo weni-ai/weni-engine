@@ -113,3 +113,14 @@ class FlowType(GRPCType):
             if e.code() is not grpc.StatusCode.NOT_FOUND:
                 raise e
         return result
+
+    def get_project_info(self, project_uuid: str):
+        stub = org_pb2_grpc.OrgControllerStub(self.channel)
+        response = stub.Retrieve(org_pb2.OrgRetrieveRequest(uuid=project_uuid))
+        return {
+            "id": response.id,
+            "name": response.name,
+            "uuid": response.uuid,
+            "timezone": response.timezone,
+            "date_format": response.date_format,
+        }

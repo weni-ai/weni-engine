@@ -57,6 +57,7 @@ env = environ.Env(
     APM_SERVER_URL=(str, ""),
     FLOW_GRPC_ENDPOINT=(str, "localhost:8002"),
     INTELIGENCE_GRPC_ENDPOINT=(str, "localhost:8003"),
+    SYNC_ORGANIZATION_INTELIGENCE=(bool, False),
 )
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -368,3 +369,5 @@ FLOWS_URL = env.str("FLOWS_URL")
 
 FLOW_GRPC_ENDPOINT = env.str("FLOW_GRPC_ENDPOINT")
 INTELIGENCE_GRPC_ENDPOINT = env.str("INTELIGENCE_GRPC_ENDPOINT")
+
+SYNC_ORGANIZATION_INTELIGENCE = env.bool("SYNC_ORGANIZATION_INTELIGENCE")
