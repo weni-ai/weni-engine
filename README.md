@@ -55,6 +55,7 @@ You can set environment variables in your OS, write on ```.env``` file or pass v
 | APM_SERVER_URL |  ```string``` | ```''``` | APM URL
 | FLOW_GRPC_ENDPOINT |  ```string``` | ```'localhost:8002'``` | gRPC Endpoint URL
 | INTELIGENCE_GRPC_ENDPOINT |  ```string``` | ```'localhost:8003'``` | gRPC Endpoint URL
+| SYNC_ORGANIZATION_INTELIGENCE |  ```bool``` | ```False``` | Enable or Disable sync organization inteligences service
 | ENVIRONMENT |  ```string``` | ```production``` | Specify the environment you are going to run, it is also used for sentry
 
 

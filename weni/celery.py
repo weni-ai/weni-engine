@@ -18,6 +18,10 @@ app.conf.beat_schedule = {
         "task": "weni.common.tasks.status_service",
         "schedule": 10.0,
     },
+    "sync-project-flows-organization-info": {
+        "task": "weni.common.tasks.sync_updates_projects",
+        "schedule": 30.0,
+    },
 }
 
 

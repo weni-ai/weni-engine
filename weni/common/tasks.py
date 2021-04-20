@@ -3,7 +3,7 @@ import requests
 from weni import utils
 from weni.authentication.models import User
 from weni.celery import app
-from weni.common.models import Service, Organization
+from weni.common.models import Service, Organization, Project
 
 
 @app.task()
@@ -179,3 +179,22 @@ def search_project(organization_id: int, project_uuid: str, text: str):
         "flow": flow_result,
         "inteligence": inteligence_result,
     }
+
+
+@app.task(name="sync_updates_projects")
+def sync_updates_projects():
+    for project in Project.objects.all():
+        flow_result = (
+            utils.get_grpc_types()
+            .get("flow")
+            .get_project_info(
+                project_uuid=str(project.flow_organization),
+            )
+        )
+
+        project.name = str(flow_result.get("name"))
+        project.timezone = str(flow_result.get("timezone"))
+        project.date_format = str(flow_result.get("date_format"))
+        project.save(update_fields=["name", "timezone", "date_format"])
+
+    return True

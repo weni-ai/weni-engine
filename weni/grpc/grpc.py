@@ -73,3 +73,6 @@ class GRPCType(metaclass=ABCMeta):
         self, organization_id: int, inteligence_name: str
     ):
         raise NotImplementedError()
+
+    def get_project_info(self, project_uuid: str):
+        raise NotImplementedError()
