@@ -187,6 +187,9 @@ class Project(models.Model):
         help_text=_("Whether day comes first or month comes first in dates"),
     )
     flow_organization = models.UUIDField(_("flow identification UUID"), unique=True)
+    inteligence_count = models.IntegerField(_("Intelligence count"), default=0)
+    flow_count = models.IntegerField(_("Flows count"), default=0)
+    contact_count = models.IntegerField(_("Contacts count"), default=0)
 
 
 class Service(models.Model):

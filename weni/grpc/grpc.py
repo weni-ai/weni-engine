@@ -76,3 +76,6 @@ class GRPCType(metaclass=ABCMeta):
 
     def get_project_info(self, project_uuid: str):
         raise NotImplementedError()
+
+    def get_project_statistic(self, project_uuid: str):
+        raise NotImplementedError()
