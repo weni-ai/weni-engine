@@ -134,3 +134,10 @@ class InteligenceType(GRPCType):
             )
         )
         return response
+
+    def get_organization_statistic(self, organization_id: str):
+        stub = organization_pb2_grpc.OrgControllerStub(self.channel)
+        response = stub.Retrieve(
+            organization_pb2.OrgStatisticRetrieveRequest(org_iid=organization_id)
+        )
+        return {"repositories_count": response.repositories_count}
