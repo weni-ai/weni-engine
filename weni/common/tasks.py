@@ -1,9 +1,11 @@
 import requests
+from django.db import transaction
+from django.utils import timezone
 
 from weni import utils
 from weni.authentication.models import User
 from weni.celery import app
-from weni.common.models import Service, Organization, Project
+from weni.common.models import Service, Organization, Project, LogService
 
 
 @app.task()
@@ -220,3 +222,28 @@ def sync_updates_projects():
         )
 
     return True
+
+
+@app.task()
+def delete_status_logs():
+    BATCH_SIZE = 5000
+    logs = LogService.objects.filter(
+        created_at__lt=timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
+        - timezone.timedelta(hours=2)
+    )
+
+    num_updated = 0
+    max_id = -1
+    while True:
+        batch = list(logs.filter(id__gt=max_id).order_by("id")[:BATCH_SIZE])
+
+        if not batch:
+            break
+
+        max_id = batch[-1].id
+        with transaction.atomic():
+            for log in batch:
+                log.delete()
+
+        num_updated += len(batch)
+        print(f" > deleted {num_updated} status logs")
