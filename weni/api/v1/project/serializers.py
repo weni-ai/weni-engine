@@ -20,6 +20,9 @@ class ProjectSeralizer(serializers.ModelSerializer):
             "timezone",
             "date_format",
             "flow_organization",
+            "inteligence_count",
+            "flow_count",
+            "contact_count",
             "menu",
         ]
         ref_name = None
@@ -35,6 +38,9 @@ class ProjectSeralizer(serializers.ModelSerializer):
     timezone = fields.TimezoneField(required=True)
     menu = serializers.SerializerMethodField()
     flow_organization = serializers.UUIDField(style={"show": False}, read_only=True)
+    inteligence_count = serializers.IntegerField(read_only=True)
+    flow_count = serializers.IntegerField(read_only=True)
+    contact_count = serializers.IntegerField(read_only=True)
 
     def get_menu(self, obj):
         return {

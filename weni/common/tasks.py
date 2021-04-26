@@ -184,17 +184,43 @@ def search_project(organization_id: int, project_uuid: str, text: str):
 @app.task()
 def sync_updates_projects():
     for project in Project.objects.all():
-        flow_result = (
-            utils.get_grpc_types()
-            .get("flow")
-            .get_project_info(
-                project_uuid=str(project.flow_organization),
-            )
+        flow_instance = utils.get_grpc_types().get("flow")
+        inteligence_instance = utils.get_grpc_types().get("inteligence")
+
+        flow_result = flow_instance.get_project_info(
+            project_uuid=str(project.flow_organization),
+        )
+
+        statistic_project_result = flow_instance.get_project_statistic(
+            project_uuid=str(project.flow_organization),
+        )
+
+        statistic_organization_result = inteligence_instance.get_organization_statistic(
+            organization_id=int(project.organization.inteligence_organization),
         )
 
         project.name = str(flow_result.get("name"))
         project.timezone = str(flow_result.get("timezone"))
         project.date_format = str(flow_result.get("date_format"))
-        project.save(update_fields=["name", "timezone", "date_format"])
+        project.inteligence_count = int(
+            statistic_organization_result.get("repositories_count", default=0)
+        )
+        project.flow_count = int(
+            statistic_project_result.get("active_flows", default=0)
+        )
+        project.contact_count = int(
+            statistic_project_result.get("active_contacts", default=0)
+        )
+
+        project.save(
+            update_fields=[
+                "name",
+                "timezone",
+                "date_format",
+                "inteligence_count",
+                "flow_count",
+                "contact_count",
+            ]
+        )
 
     return True

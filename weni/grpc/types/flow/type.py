@@ -4,6 +4,7 @@ from django.conf import settings
 from weni.grpc.grpc import GRPCType
 from weni.protos.flow.rapidpro_flow import flow_pb2_grpc, flow_pb2
 from weni.protos.flow.rapidpro_org import org_pb2_grpc, org_pb2
+from weni.protos.flow.rapidpro_statistic import statistic_pb2_grpc, statistic_pb2
 from weni.protos.flow.rapidpro_user import user_pb2_grpc, user_pb2
 from weni.protos.flow.rapidpro_classifier import classifier_pb2_grpc, classifier_pb2
 
@@ -123,4 +124,15 @@ class FlowType(GRPCType):
             "uuid": response.uuid,
             "timezone": response.timezone,
             "date_format": response.date_format,
+        }
+
+    def get_project_statistic(self, project_uuid: str):
+        stub = statistic_pb2_grpc.OrgStatisticControllerStub(self.channel)
+        response = stub.Retrieve(
+            statistic_pb2.OrgStatisticRetrieveRequest(org_uuid=project_uuid)
+        )
+        return {
+            "active_flows": response.active_flows,
+            "active_classifiers": response.active_classifiers,
+            "active_contacts": response.active_contacts,
         }

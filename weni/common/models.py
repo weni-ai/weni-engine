@@ -52,6 +52,9 @@ class Organization(models.Model):
     inteligence_organization = models.IntegerField(_("inteligence organization id"))
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
 
+    def __str__(self):
+        return f"{self.uuid} - {self.name}"
+
     def get_user_authorization(self, user):
         if user.is_anonymous:
             return OrganizationAuthorization(organization=self)  # pragma: no cover
@@ -95,6 +98,9 @@ class OrganizationAuthorization(models.Model):
         _("role"), choices=ROLE_CHOICES, default=ROLE_NOT_SETTED
     )
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.organization.name} - {self.user.email}"
 
     @property
     def level(self):
@@ -187,6 +193,12 @@ class Project(models.Model):
         help_text=_("Whether day comes first or month comes first in dates"),
     )
     flow_organization = models.UUIDField(_("flow identification UUID"), unique=True)
+    inteligence_count = models.IntegerField(_("Intelligence count"), default=0)
+    flow_count = models.IntegerField(_("Flows count"), default=0)
+    contact_count = models.IntegerField(_("Contacts count"), default=0)
+
+    def __str__(self):
+        return f"{self.uuid} - Project: {self.name} - Org: {self.organization.name}"
 
 
 class Service(models.Model):
