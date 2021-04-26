@@ -13,7 +13,7 @@ from weni.celery import app as celery_app
 
 class NewsletterLanguage(models.Model):
     class Meta:
-        verbose_name = _("dashboard newsletter")
+        verbose_name = _("dashboard newsletter language")
 
     language = models.CharField(
         _("language"),
