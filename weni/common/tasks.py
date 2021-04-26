@@ -203,14 +203,10 @@ def sync_updates_projects():
         project.timezone = str(flow_result.get("timezone"))
         project.date_format = str(flow_result.get("date_format"))
         project.inteligence_count = int(
-            statistic_organization_result.get("repositories_count", default=0)
+            statistic_organization_result.get("repositories_count")
         )
-        project.flow_count = int(
-            statistic_project_result.get("active_flows", default=0)
-        )
-        project.contact_count = int(
-            statistic_project_result.get("active_contacts", default=0)
-        )
+        project.flow_count = int(statistic_project_result.get("active_flows"))
+        project.contact_count = int(statistic_project_result.get("active_contacts"))
 
         project.save(
             update_fields=[
