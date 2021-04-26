@@ -135,7 +135,7 @@ class InteligenceType(GRPCType):
         )
         return response
 
-    def get_organization_statistic(self, organization_id: str):
+    def get_organization_statistic(self, organization_id: int):
         stub = organization_pb2_grpc.OrgControllerStub(self.channel)
         response = stub.Retrieve(
             organization_pb2.OrgStatisticRetrieveRequest(org_id=organization_id)
