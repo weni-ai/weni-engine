@@ -65,7 +65,7 @@ class InteligenceType(GRPCType):
         stub = organization_pb2_grpc.OrgControllerStub(self.channel)
         response = stub.Create(
             organization_pb2.OrgCreateRequest(
-                name=organization_name,
+                organization_name=organization_name,
                 user_email=user_email,
                 user_nickname=user_nickname,
             )
