@@ -173,7 +173,6 @@ def search_project(organization_id: int, project_uuid: str, text: str):
         utils.get_grpc_types()
         .get("inteligence")
         .get_organization_inteligences(
-            organization_id=organization_id,
             inteligence_name=text,
         )
     )
