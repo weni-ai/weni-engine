@@ -102,16 +102,12 @@ class InteligenceType(GRPCType):
         )
         return response
 
-    def get_organization_inteligences(
-        self, organization_id: int, inteligence_name: str
-    ):
+    def get_organization_inteligences(self, inteligence_name: str):
         result = []
         try:
             stub = repository_pb2_grpc.RepositoryControllerStub(self.channel)
             for inteligence in stub.List(
-                repository_pb2.RepositoryListRequest(
-                    name=inteligence_name, org_id=organization_id
-                )
+                repository_pb2.RepositoryListRequest(name=inteligence_name)
             ):
                 result.append(
                     {
