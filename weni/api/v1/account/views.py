@@ -70,14 +70,16 @@ class MyUserProfileViewSet(
             self.request.user.save(update_fields=["photo"])
 
             # Update avatar in all rocket chat registered
-            for service in self.request.user.service_status.filter(
-                service__type_service=Service.SERVICE_TYPE_CHAT
-            ):
-                upload_photo_rocket(
-                    server_rocket=service.service.url,
-                    jwt_token=self.request.auth,
-                    avatar_url=self.request.user.photo.url,
-                )
+            for authorization in self.request.user.authorizations_user.all():
+                for project in authorization.organization.project.all():
+                    for service_status in project.service_status.filter(
+                        service__service_type=Service.SERVICE_TYPE_CHAT
+                    ):
+                        upload_photo_rocket(
+                            server_rocket=service_status.service.url,
+                            jwt_token=self.request.auth,
+                            avatar_url=self.request.user.photo.url,
+                        )
 
             return Response({"photo": self.request.user.photo.url})
         try:

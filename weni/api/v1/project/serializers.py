@@ -24,6 +24,7 @@ class ProjectSeralizer(serializers.ModelSerializer):
             "flow_count",
             "contact_count",
             "menu",
+            "created_at",
         ]
         ref_name = None
 
@@ -41,6 +42,9 @@ class ProjectSeralizer(serializers.ModelSerializer):
     inteligence_count = serializers.IntegerField(read_only=True)
     flow_count = serializers.IntegerField(read_only=True)
     contact_count = serializers.IntegerField(read_only=True)
+    created_at = serializers.DateTimeField(
+        required=False, read_only=True, style={"show": False}
+    )
 
     def get_menu(self, obj):
         return {

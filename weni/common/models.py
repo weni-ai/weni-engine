@@ -93,7 +93,7 @@ class OrganizationAuthorization(models.Model):
     uuid = models.UUIDField(
         _("UUID"), primary_key=True, default=uuid4.uuid4, editable=False
     )
-    user = models.ForeignKey(User, models.CASCADE)
+    user = models.ForeignKey(User, models.CASCADE, related_name="authorizations_user")
     organization = models.ForeignKey(
         Organization, models.CASCADE, related_name="authorizations"
     )
@@ -199,6 +199,7 @@ class Project(models.Model):
     inteligence_count = models.IntegerField(_("Intelligence count"), default=0)
     flow_count = models.IntegerField(_("Flows count"), default=0)
     contact_count = models.IntegerField(_("Contacts count"), default=0)
+    created_at = models.DateTimeField(_("created at"), auto_now_add=True)
 
     def __str__(self):
         return f"{self.uuid} - Project: {self.name} - Org: {self.organization.name}"
