@@ -34,7 +34,7 @@ class OrganizationAuthorizationFilter(filters.FilterSet):
         except Organization.DoesNotExist:
             raise NotFound(_("Organization {} does not exist").format(value))
         except DjangoValidationError:
-            raise NotFound(_("Invalid repository UUID"))
+            raise NotFound(_("Invalid Organization UUID"))
 
 
 class RequestPermissionOrganizationFilter(filters.FilterSet):
@@ -61,4 +61,4 @@ class RequestPermissionOrganizationFilter(filters.FilterSet):
         except Organization.DoesNotExist:
             raise NotFound(_("Organization {} does not exist").format(value))
         except DjangoValidationError:
-            raise NotFound(_("Invalid repository UUID"))
+            raise NotFound(_("Invalid Organization UUID"))

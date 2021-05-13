@@ -145,24 +145,6 @@ class OrganizationAuthorization(models.Model):
     def send_new_role_email(self, responsible=None):
         if not settings.SEND_EMAILS:  # pragma: no cover
             return False  # pragma: no cover
-        # responsible_name = (
-        #     responsible and responsible.name or self.organization.owner.first_name
-        # )
-        # context = {
-        #     "base_url": settings.BASE_URL,
-        #     "responsible_name": responsible_name,
-        #     "user_name": self.user.first_name,
-        #     "repository_name": self.organization.name,
-        #     # "repository_url": self.organization.get_absolute_url(),
-        #     "new_role": self.role_verbose,
-        # }
-        # send_mail(
-        #     _("New role in {}").format(self.organization.name),
-        #     render_to_string("common/emails/new_role.txt", context),
-        #     None,
-        #     [self.user.user.email],
-        #     html_message=render_to_string("common/emails/new_role.html", context),
-        # )
 
 
 class Project(models.Model):

@@ -170,16 +170,16 @@ class UpdateAuthorizationRoleTestCase(TestCase):
             user=self.owner, role=OrganizationAuthorization.ROLE_ADMIN
         )
 
-    def request(self, repository, token, user, data):
+    def request(self, organization, token, user, data):
         authorization_header = {"HTTP_AUTHORIZATION": "Token {}".format(token.key)}
         request = self.factory.patch(
-            "/v1/organization/authorizations/{}/{}/".format(repository.uuid, user.pk),
+            "/v1/organization/authorizations/{}/{}/".format(organization.uuid, user.pk),
             self.factory._encode_data(data, MULTIPART_CONTENT),
             MULTIPART_CONTENT,
             **authorization_header,
         )
         view = OrganizationAuthorizationViewSet.as_view({"patch": "update"})
-        response = view(request, organization__uuid=repository.uuid, user__id=user.pk)
+        response = view(request, organization__uuid=organization.uuid, user__id=user.pk)
         response.render()
         content_data = json.loads(response.content)
         return (response, content_data)
