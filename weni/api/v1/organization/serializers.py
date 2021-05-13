@@ -121,7 +121,7 @@ class OrganizationAuthorizationRoleSerializer(serializers.ModelSerializer):
 class RequestPermissionOrganizationSerializer(serializers.ModelSerializer):
     class Meta:
         model = RequestPermissionOrganization
-        fields = ["email", "organization", "role", "created_by"]
+        fields = ["id", "email", "organization", "role", "created_by"]
         ref_name = None
 
     email = serializers.EmailField(max_length=254, required=True)

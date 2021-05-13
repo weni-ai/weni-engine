@@ -10,7 +10,10 @@ from rest_framework.viewsets import GenericViewSet
 from weni.celery import app as celery_app
 from weni.api.v1.metadata import Metadata
 from weni.api.v1.mixins import MultipleFieldLookupMixin
-from weni.api.v1.organization.filters import OrganizationAuthorizationFilter
+from weni.api.v1.organization.filters import (
+    OrganizationAuthorizationFilter,
+    RequestPermissionOrganizationFilter,
+)
 from weni.api.v1.organization.permissions import (
     OrganizationHasPermission,
     OrganizationAdminManagerAuthorization,
@@ -151,8 +154,14 @@ class OrganizationAuthorizationViewSet(
         return Response(status=204)
 
 
-class RequestPermissionOrganizationViewSet(mixins.CreateModelMixin, GenericViewSet):
+class RequestPermissionOrganizationViewSet(
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    mixins.DestroyModelMixin,
+    GenericViewSet,
+):
     queryset = RequestPermissionOrganization.objects
     serializer_class = RequestPermissionOrganizationSerializer
     permission_classes = [IsAuthenticated, OrganizationAdminManagerAuthorization]
+    filter_class = RequestPermissionOrganizationFilter
     metadata_class = Metadata
