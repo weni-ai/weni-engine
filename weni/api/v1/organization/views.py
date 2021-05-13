@@ -19,9 +19,14 @@ from weni.api.v1.organization.serializers import (
     OrganizationSeralizer,
     OrganizationAuthorizationSerializer,
     OrganizationAuthorizationRoleSerializer,
+    RequestPermissionOrganizationSerializer,
 )
 from weni.authentication.models import User
-from weni.common.models import Organization, OrganizationAuthorization
+from weni.common.models import (
+    Organization,
+    OrganizationAuthorization,
+    RequestPermissionOrganization,
+)
 
 
 class OrganizationViewSet(
@@ -144,3 +149,10 @@ class OrganizationAuthorizationViewSet(
 
         obj.delete()
         return Response(status=204)
+
+
+class RequestPermissionOrganizationViewSet(mixins.CreateModelMixin, GenericViewSet):
+    queryset = RequestPermissionOrganization.objects
+    serializer_class = RequestPermissionOrganizationSerializer
+    permission_classes = [IsAuthenticated, OrganizationAdminManagerAuthorization]
+    metadata_class = Metadata

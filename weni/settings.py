@@ -96,7 +96,7 @@ INSTALLED_APPS = [
     "mozilla_django_oidc",
     "elasticapm.contrib.django",
     "weni.authentication.apps.AuthenticationConfig",
-    "weni.common",
+    "weni.common.apps.CommonConfig",
     "django_celery_results",
     "django_celery_beat",
     "storages",

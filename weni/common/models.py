@@ -2,13 +2,10 @@ import uuid as uuid4
 
 from django.conf import settings
 from django.db import models
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
 from timezone_field import TimeZoneField
 
 from weni.authentication.models import User
-from weni.celery import app as celery_app
 
 
 class Newsletter(models.Model):
@@ -293,44 +290,16 @@ class ServiceStatus(models.Model):
         return self.service.url  # pragma: no cover
 
 
-@receiver(post_save, sender=Project)
-def create_service_status(sender, instance, created, **kwargs):
-    if created:
-        for service in Service.objects.filter(default=True):
-            instance.service_status.create(service=service)
+class RequestPermissionOrganization(models.Model):
+    class Meta:
+        verbose_name = _("request permission organization")
+        unique_together = ["email", "organization"]
 
-
-@receiver(post_save, sender=Service)
-def create_service_default_in_all_user(sender, instance, created, **kwargs):
-    if created and instance.default:
-        for project in Project.objects.all():
-            project.service_status.create(service=instance)
-
-
-@receiver(post_save, sender=Organization)
-def update_organization(sender, instance, **kwargs):
-    celery_app.send_task(
-        "update_organization",
-        args=[instance.inteligence_organization, instance.name],
+    email = models.EmailField(_("email"))
+    organization = models.ForeignKey(Organization, models.CASCADE)
+    role = models.PositiveIntegerField(
+        _("role"),
+        choices=OrganizationAuthorization.ROLE_CHOICES,
+        default=OrganizationAuthorization.ROLE_NOT_SETTED,
     )
-
-
-@receiver(post_save, sender=OrganizationAuthorization)
-def org_authorizations(sender, instance, **kwargs):
-    celery_app.send_task(
-        "update_user_permission_organization",
-        args=[
-            instance.organization.inteligence_organization,
-            instance.user.email,
-            instance.role,
-        ],
-    )
-    for project in instance.organization.project.all():
-        celery_app.send_task(
-            "update_user_permission_project",
-            args=[
-                project.flow_organization,
-                instance.user.email,
-                instance.role,
-            ],
-        )
+    created_by = models.ForeignKey(User, models.CASCADE)
