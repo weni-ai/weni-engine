@@ -16,6 +16,10 @@ class FlowType(GRPCType):
         self.channel = self.get_channel()
 
     def get_channel(self):
+        if settings.FLOW_CERTIFICATE_GRPC_CRT:
+            with open(settings.FLOW_CERTIFICATE_GRPC_CRT, "rb") as f:
+                credentials = grpc.ssl_channel_credentials(f.read())
+            return grpc.secure_channel(settings.FLOW_GRPC_ENDPOINT, credentials)
         return grpc.insecure_channel(settings.FLOW_GRPC_ENDPOINT)
 
     def create_project(
