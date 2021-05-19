@@ -26,7 +26,6 @@ class FlowType(GRPCType):
         self,
         project_name: str,
         user_email: str,
-        user_username: str,
         project_timezone: str,
     ):
         # Create Organization
@@ -36,7 +35,6 @@ class FlowType(GRPCType):
                 name=project_name,
                 timezone=project_timezone,
                 user_email=user_email,
-                username=user_username,
             )
         )
         return response
