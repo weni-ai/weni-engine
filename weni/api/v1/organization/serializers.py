@@ -2,8 +2,13 @@ from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
+from weni.api.v1.project.validators import CanContributeInOrganizationValidator
 from weni.common import tasks
-from weni.common.models import Organization, OrganizationAuthorization
+from weni.common.models import (
+    Organization,
+    OrganizationAuthorization,
+    RequestPermissionOrganization,
+)
 
 
 class OrganizationSeralizer(serializers.ModelSerializer):
@@ -111,3 +116,21 @@ class OrganizationAuthorizationRoleSerializer(serializers.ModelSerializer):
         model = OrganizationAuthorization
         fields = ["role"]
         ref_name = None
+
+
+class RequestPermissionOrganizationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RequestPermissionOrganization
+        fields = ["id", "email", "organization", "role", "created_by"]
+        ref_name = None
+
+    email = serializers.EmailField(max_length=254, required=True)
+    organization = serializers.PrimaryKeyRelatedField(
+        queryset=Organization.objects,
+        style={"show": False},
+        required=True,
+        validators=[CanContributeInOrganizationValidator()],
+    )
+    created_by = serializers.HiddenField(
+        default=serializers.CurrentUserDefault(), style={"show": False}
+    )

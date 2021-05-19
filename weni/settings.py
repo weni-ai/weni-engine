@@ -98,7 +98,7 @@ INSTALLED_APPS = [
     "mozilla_django_oidc",
     "elasticapm.contrib.django",
     "weni.authentication.apps.AuthenticationConfig",
-    "weni.common",
+    "weni.common.apps.CommonConfig",
     "django_celery_results",
     "django_celery_beat",
     "storages",
@@ -373,7 +373,6 @@ FLOW_GRPC_ENDPOINT = env.str("FLOW_GRPC_ENDPOINT")
 INTELIGENCE_GRPC_ENDPOINT = env.str("INTELIGENCE_GRPC_ENDPOINT")
 
 SYNC_ORGANIZATION_INTELIGENCE = env.bool("SYNC_ORGANIZATION_INTELIGENCE")
-
 
 INTELIGENCE_CERTIFICATE_GRPC_CRT = env.str("INTELIGENCE_CERTIFICATE_GRPC_CRT")
 FLOW_CERTIFICATE_GRPC_CRT = env.bool("FLOW_CERTIFICATE_GRPC_CRT")

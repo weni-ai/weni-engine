@@ -1,14 +1,13 @@
 import uuid as uuid4
 
 from django.conf import settings
+from django.core.mail import send_mail
 from django.db import models
-from django.db.models.signals import post_save
-from django.dispatch import receiver
+from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 from timezone_field import TimeZoneField
 
 from weni.authentication.models import User
-from weni.celery import app as celery_app
 
 
 class Newsletter(models.Model):
@@ -65,6 +64,20 @@ class Organization(models.Model):
             user=user, organization=self
         )
         return get
+
+    def send_email_invite_organization(self, email):
+        if not settings.SEND_EMAILS:
+            return False  # pragma: no cover
+        context = {"base_url": settings.BASE_URL, "organization_name": self.name}
+        send_mail(
+            _(f"You have been invited to join the {self.name} organization"),
+            render_to_string("authentication/emails/invite_organization.txt"),
+            None,
+            [email],
+            html_message=render_to_string(
+                "authentication/emails/invite_organization.html", context
+            ),
+        )
 
 
 class OrganizationAuthorization(models.Model):
@@ -148,24 +161,6 @@ class OrganizationAuthorization(models.Model):
     def send_new_role_email(self, responsible=None):
         if not settings.SEND_EMAILS:  # pragma: no cover
             return False  # pragma: no cover
-        # responsible_name = (
-        #     responsible and responsible.name or self.organization.owner.first_name
-        # )
-        # context = {
-        #     "base_url": settings.BASE_URL,
-        #     "responsible_name": responsible_name,
-        #     "user_name": self.user.first_name,
-        #     "repository_name": self.organization.name,
-        #     # "repository_url": self.organization.get_absolute_url(),
-        #     "new_role": self.role_verbose,
-        # }
-        # send_mail(
-        #     _("New role in {}").format(self.organization.name),
-        #     render_to_string("common/emails/new_role.txt", context),
-        #     None,
-        #     [self.user.user.email],
-        #     html_message=render_to_string("common/emails/new_role.html", context),
-        # )
 
 
 class Project(models.Model):
@@ -203,6 +198,25 @@ class Project(models.Model):
 
     def __str__(self):
         return f"{self.uuid} - Project: {self.name} - Org: {self.organization.name}"
+
+    def send_email_create_project(self, first_name: str, email: str):
+        if not settings.SEND_EMAILS:
+            return False  # pragma: no cover
+        context = {
+            "base_url": settings.BASE_URL,
+            "organization_name": self.organization.name,
+            "project_name": self.name,
+            "first_name": first_name,
+        }
+        send_mail(
+            _(f"You have been invited to join the {self.name} organization"),
+            render_to_string("authentication/emails/project_create.txt"),
+            None,
+            [email],
+            html_message=render_to_string(
+                "authentication/emails/project_create.html", context
+            ),
+        )
 
 
 class Service(models.Model):
@@ -293,44 +307,16 @@ class ServiceStatus(models.Model):
         return self.service.url  # pragma: no cover
 
 
-@receiver(post_save, sender=Project)
-def create_service_status(sender, instance, created, **kwargs):
-    if created:
-        for service in Service.objects.filter(default=True):
-            instance.service_status.create(service=service)
+class RequestPermissionOrganization(models.Model):
+    class Meta:
+        verbose_name = _("request permission organization")
+        unique_together = ["email", "organization"]
 
-
-@receiver(post_save, sender=Service)
-def create_service_default_in_all_user(sender, instance, created, **kwargs):
-    if created and instance.default:
-        for project in Project.objects.all():
-            project.service_status.create(service=instance)
-
-
-@receiver(post_save, sender=Organization)
-def update_organization(sender, instance, **kwargs):
-    celery_app.send_task(
-        "update_organization",
-        args=[instance.inteligence_organization, instance.name],
+    email = models.EmailField(_("email"))
+    organization = models.ForeignKey(Organization, models.CASCADE)
+    role = models.PositiveIntegerField(
+        _("role"),
+        choices=OrganizationAuthorization.ROLE_CHOICES,
+        default=OrganizationAuthorization.ROLE_NOT_SETTED,
     )
-
-
-@receiver(post_save, sender=OrganizationAuthorization)
-def org_authorizations(sender, instance, **kwargs):
-    celery_app.send_task(
-        "update_user_permission_organization",
-        args=[
-            instance.organization.inteligence_organization,
-            instance.user.email,
-            instance.role,
-        ],
-    )
-    for project in instance.organization.project.all():
-        celery_app.send_task(
-            "update_user_permission_project",
-            args=[
-                project.flow_organization,
-                instance.user.email,
-                instance.role,
-            ],
-        )
+    created_by = models.ForeignKey(User, models.CASCADE)
