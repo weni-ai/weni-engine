@@ -23,7 +23,6 @@ class Command(BaseCommand):
         #     .create_organization(
         #         organization_name="Test Org",
         #         user_email="user@test.com",
-        #         user_nickname="testuser",
         #     )
         # )
         # print(
@@ -32,7 +31,6 @@ class Command(BaseCommand):
         #         .create_organization(
         #         organization_name="xxxx",
         #         user_email="suporte@ilhasoft.com.br",
-        #         user_nickname="suporte",
         #     )
         # )
         # print(
@@ -50,7 +48,6 @@ class Command(BaseCommand):
         #     .create_project(
         #         project_name="teste project",
         #         user_email="daniel.yohan@ilhasoft.com.br",
-        #         user_username="danielyohan",
         #         project_timezone="America/Sao_Paulo",
         #     )
         # )

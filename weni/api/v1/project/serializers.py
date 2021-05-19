@@ -61,7 +61,6 @@ class ProjectSeralizer(serializers.ModelSerializer):
         task = tasks.create_project.delay(  # pragma: no cover
             validated_data.get("name"),
             self.context["request"].user.email,
-            self.context["request"].user.username,
             str(validated_data.get("timezone")),
         )
         if not settings.TESTING:

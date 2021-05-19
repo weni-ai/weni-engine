@@ -120,27 +120,25 @@ def migrate_organization(user_email: str):
 
 
 @app.task(name="create_organization")
-def create_organization(organization_name: str, user_email: str, user_nickname: str):
+def create_organization(organization_name: str, user_email: str):
     grpc_instance = utils.get_grpc_types().get("inteligence")
 
     organization = grpc_instance.create_organization(
         organization_name=organization_name,
         user_email=user_email,
-        user_nickname=user_nickname,
     )
     return {"id": organization.id}
 
 
 @app.task(name="create_project")
 def create_project(
-    project_name: str, user_email: str, user_username: str, project_timezone: str
+    project_name: str, user_email: str, project_timezone: str
 ):
     grpc_instance = utils.get_grpc_types().get("flow")
 
     project = grpc_instance.create_project(
         project_name=project_name,
         user_email=user_email,
-        user_username=user_username,
         project_timezone=project_timezone,
     )
     return {"id": project.id, "uuid": project.uuid}
