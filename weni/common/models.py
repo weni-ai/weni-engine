@@ -1,7 +1,9 @@
 import uuid as uuid4
 
 from django.conf import settings
+from django.core.mail import send_mail
 from django.db import models
+from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 from timezone_field import TimeZoneField
 
@@ -62,6 +64,20 @@ class Organization(models.Model):
             user=user, organization=self
         )
         return get
+
+    def send_email_invite_organization(self, email):
+        if not settings.SEND_EMAILS:
+            return False  # pragma: no cover
+        context = {"base_url": settings.BASE_URL, "organization_name": self.name}
+        send_mail(
+            _(f"You have been invited to join the {self.name} organization"),
+            render_to_string("authentication/emails/invite_organization.txt"),
+            None,
+            [email],
+            html_message=render_to_string(
+                "authentication/emails/invite_organization.html", context
+            ),
+        )
 
 
 class OrganizationAuthorization(models.Model):
@@ -182,6 +198,25 @@ class Project(models.Model):
 
     def __str__(self):
         return f"{self.uuid} - Project: {self.name} - Org: {self.organization.name}"
+
+    def send_email_create_project(self, first_name: str, email: str):
+        if not settings.SEND_EMAILS:
+            return False  # pragma: no cover
+        context = {
+            "base_url": settings.BASE_URL,
+            "organization_name": self.organization.name,
+            "project_name": self.name,
+            "first_name": first_name,
+        }
+        send_mail(
+            _(f"You have been invited to join the {self.name} organization"),
+            render_to_string("authentication/emails/project_create.txt"),
+            None,
+            [email],
+            html_message=render_to_string(
+                "authentication/emails/project_create.html", context
+            ),
+        )
 
 
 class Service(models.Model):

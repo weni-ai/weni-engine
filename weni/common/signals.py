@@ -68,6 +68,4 @@ def request_permission_organization(sender, instance, created, **kwargs):
             perm.role = instance.role
             perm.save(update_fields=["role"])
             instance.delete()
-        else:
-            # TODO: send email
-            pass
+        instance.organization.send_email_invite_organization(email=instance.email)

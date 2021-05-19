@@ -10,7 +10,15 @@ from weni.authentication.models import User
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["id", "username", "email", "first_name", "last_name", "photo"]
+        fields = [
+            "id",
+            "username",
+            "email",
+            "first_name",
+            "last_name",
+            "photo",
+            "language",
+        ]
         ref_name = None
 
     id = serializers.IntegerField(label=_("ID"), read_only=True)
