@@ -23,7 +23,7 @@ class GRPCType(metaclass=ABCMeta):
         raise NotImplementedError()
 
     def create_organization(
-        self, organization_name: str, user_email: str, user_nickname: str
+        self, organization_name: str, user_email: str
     ):
         raise NotImplementedError()
 
@@ -42,7 +42,6 @@ class GRPCType(metaclass=ABCMeta):
         self,
         project_name: str,
         user_email: str,
-        user_username: str,
         project_timezone: str,
     ):
         raise NotImplementedError()

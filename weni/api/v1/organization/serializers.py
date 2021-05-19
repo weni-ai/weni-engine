@@ -35,7 +35,6 @@ class OrganizationSeralizer(serializers.ModelSerializer):
         task = tasks.create_organization.delay(  # pragma: no cover
             validated_data.get("name"),
             self.context["request"].user.email,
-            self.context["request"].user.username,
         )
         if not settings.TESTING:
             task.wait()  # pragma: no cover
