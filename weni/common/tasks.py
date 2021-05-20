@@ -1,6 +1,7 @@
 import requests
 from django.db import transaction
 from django.utils import timezone
+from grpc._channel import _InactiveRpcError
 
 from weni import utils
 from weni.authentication.models import User
@@ -52,7 +53,12 @@ def update_organization(inteligence_organization: int, organization_name: str):
     return True
 
 
-@app.task(name="update_user_permission_organization")
+@app.task(
+    name="update_user_permission_organization",
+    autoretry_for=(_InactiveRpcError, Exception),
+    retry_kwargs={"max_retries": 5},
+    retry_backoff=True,
+)
 def update_user_permission_organization(
     inteligence_organization: int, user_email: str, permission: int
 ):
@@ -65,7 +71,12 @@ def update_user_permission_organization(
     return True
 
 
-@app.task(name="update_project")
+@app.task(
+    name="update_project",
+    autoretry_for=(_InactiveRpcError, Exception),
+    retry_kwargs={"max_retries": 5},
+    retry_backoff=True,
+)
 def update_project(organization_uuid: str, user_email: str, organization_name: str):
     grpc_instance = utils.get_grpc_types().get("flow")
     grpc_instance.update_project(
@@ -86,7 +97,12 @@ def delete_project(inteligence_organization: int, user_email):
     return True
 
 
-@app.task(name="update_user_permission_project")
+@app.task(
+    name="update_user_permission_project",
+    autoretry_for=(_InactiveRpcError, Exception),
+    retry_kwargs={"max_retries": 5},
+    retry_backoff=True,
+)
 def update_user_permission_project(
     flow_organization: str, user_email: str, permission: int
 ):
@@ -131,9 +147,7 @@ def create_organization(organization_name: str, user_email: str):
 
 
 @app.task(name="create_project")
-def create_project(
-    project_name: str, user_email: str, project_timezone: str
-):
+def create_project(project_name: str, user_email: str, project_timezone: str):
     grpc_instance = utils.get_grpc_types().get("flow")
 
     project = grpc_instance.create_project(
@@ -144,7 +158,12 @@ def create_project(
     return {"id": project.id, "uuid": project.uuid}
 
 
-@app.task(name="update_user_language")
+@app.task(
+    name="update_user_language",
+    autoretry_for=(_InactiveRpcError, Exception),
+    retry_kwargs={"max_retries": 5},
+    retry_backoff=True,
+)
 def update_user_language(user_email: str, language: str):
     utils.get_grpc_types().get("flow").update_language(
         user_email=user_email,
