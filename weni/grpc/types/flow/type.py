@@ -82,7 +82,7 @@ class FlowType(GRPCType):
             ):
                 result.append(
                     {
-                        "authorization_uuid": classifier.uuid,
+                        "authorization_uuid": classifier.access_token,
                         "classifier_type": classifier.classifier_type,
                         "name": classifier.name,
                     }
