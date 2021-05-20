@@ -5,7 +5,11 @@ from weni.utils import get_grpc_types
 
 class Command(BaseCommand):
     def handle(self, *args, **kwargs):
-        # print(get_grpc_types().get('inteligence').list_organizations(user_email='daniel.yohan@ilhasoft.com.br'))
+        print(
+            get_grpc_types()
+            .get("inteligence")
+            .list_organizations(user_email="daniel.yohan@ilhasoft.com.br")
+        )
         # print(
         #     get_grpc_types()
         #     .get("inteligence")
@@ -19,16 +23,14 @@ class Command(BaseCommand):
         #     .create_organization(
         #         organization_name="Test Org",
         #         user_email="user@test.com",
-        #         user_nickname="testuser",
         #     )
         # )
         # print(
         #     get_grpc_types()
         #         .get("inteligence")
         #         .create_organization(
-        #         organization_name="Test Org",
-        #         user_email="user@test.com",
-        #         user_nickname="testuser",
+        #         organization_name="xxxx",
+        #         user_email="suporte@ilhasoft.com.br",
         #     )
         # )
         # print(
@@ -46,7 +48,6 @@ class Command(BaseCommand):
         #     .create_project(
         #         project_name="teste project",
         #         user_email="daniel.yohan@ilhasoft.com.br",
-        #         user_username="danielyohan",
         #         project_timezone="America/Sao_Paulo",
         #     )
         # )
@@ -69,11 +70,11 @@ class Command(BaseCommand):
         #     )
         # )
 
-        print(
-            get_grpc_types()
-            .get("flow")
-            .get_project_flows(
-                project_uuid="9a18c7a9-ab46-413d-88d4-90c04a5bb84e",
-                flow_name="te",
-            )
-        )
+        # print(
+        #     get_grpc_types()
+        #     .get("flow")
+        #     .get_project_flows(
+        #         project_uuid="9a18c7a9-ab46-413d-88d4-90c04a5bb84e",
+        #         flow_name="te",
+        #     )
+        # )

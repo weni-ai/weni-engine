@@ -20,7 +20,11 @@ class ProjectSeralizer(serializers.ModelSerializer):
             "timezone",
             "date_format",
             "flow_organization",
+            "inteligence_count",
+            "flow_count",
+            "contact_count",
             "menu",
+            "created_at",
         ]
         ref_name = None
 
@@ -35,6 +39,12 @@ class ProjectSeralizer(serializers.ModelSerializer):
     timezone = fields.TimezoneField(required=True)
     menu = serializers.SerializerMethodField()
     flow_organization = serializers.UUIDField(style={"show": False}, read_only=True)
+    inteligence_count = serializers.IntegerField(read_only=True)
+    flow_count = serializers.IntegerField(read_only=True)
+    contact_count = serializers.IntegerField(read_only=True)
+    created_at = serializers.DateTimeField(
+        required=False, read_only=True, style={"show": False}
+    )
 
     def get_menu(self, obj):
         return {
@@ -51,7 +61,6 @@ class ProjectSeralizer(serializers.ModelSerializer):
         task = tasks.create_project.delay(  # pragma: no cover
             validated_data.get("name"),
             self.context["request"].user.email,
-            self.context["request"].user.username,
             str(validated_data.get("timezone")),
         )
         if not settings.TESTING:
@@ -60,7 +69,14 @@ class ProjectSeralizer(serializers.ModelSerializer):
         project = task.result
 
         validated_data.update({"flow_organization": project.get("uuid")})
-        return super().create(validated_data)
+        instance = super().create(validated_data)
+
+        instance.send_email_create_project(
+            first_name=self.context["request"].user.first_name,
+            email=self.context["request"].user.email,
+        )
+
+        return instance
 
     def update(self, instance, validated_data):
         name = validated_data.get("name", instance.name)

@@ -57,6 +57,9 @@ env = environ.Env(
     APM_SERVER_URL=(str, ""),
     FLOW_GRPC_ENDPOINT=(str, "localhost:8002"),
     INTELIGENCE_GRPC_ENDPOINT=(str, "localhost:8003"),
+    SYNC_ORGANIZATION_INTELIGENCE=(bool, False),
+    INTELIGENCE_CERTIFICATE_GRPC_CRT=(str, None),
+    FLOW_CERTIFICATE_GRPC_CRT=(str, None),
 )
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -95,7 +98,7 @@ INSTALLED_APPS = [
     "mozilla_django_oidc",
     "elasticapm.contrib.django",
     "weni.authentication.apps.AuthenticationConfig",
-    "weni.common",
+    "weni.common.apps.CommonConfig",
     "django_celery_results",
     "django_celery_beat",
     "storages",
@@ -368,3 +371,8 @@ FLOWS_URL = env.str("FLOWS_URL")
 
 FLOW_GRPC_ENDPOINT = env.str("FLOW_GRPC_ENDPOINT")
 INTELIGENCE_GRPC_ENDPOINT = env.str("INTELIGENCE_GRPC_ENDPOINT")
+
+SYNC_ORGANIZATION_INTELIGENCE = env.bool("SYNC_ORGANIZATION_INTELIGENCE")
+
+INTELIGENCE_CERTIFICATE_GRPC_CRT = env.str("INTELIGENCE_CERTIFICATE_GRPC_CRT")
+FLOW_CERTIFICATE_GRPC_CRT = env.bool("FLOW_CERTIFICATE_GRPC_CRT")

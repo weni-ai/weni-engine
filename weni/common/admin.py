@@ -8,7 +8,13 @@ from weni.common.models import (
     Project,
     OrganizationAuthorization,
     LogService,
+    NewsletterLanguage,
 )
+
+
+@admin.register(NewsletterLanguage)
+class NewsletterLanguageAdmin(admin.ModelAdmin):
+    pass
 
 
 @admin.register(Newsletter)

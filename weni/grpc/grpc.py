@@ -23,7 +23,7 @@ class GRPCType(metaclass=ABCMeta):
         raise NotImplementedError()
 
     def create_organization(
-        self, organization_name: str, user_email: str, user_nickname: str
+        self, organization_name: str, user_email: str
     ):
         raise NotImplementedError()
 
@@ -42,7 +42,6 @@ class GRPCType(metaclass=ABCMeta):
         self,
         project_name: str,
         user_email: str,
-        user_username: str,
         project_timezone: str,
     ):
         raise NotImplementedError()
@@ -69,7 +68,14 @@ class GRPCType(metaclass=ABCMeta):
     def get_project_flows(self, project_uuid: str, flow_name: str):
         raise NotImplementedError()
 
-    def get_organization_inteligences(
-        self, organization_id: int, inteligence_name: str
-    ):
+    def get_organization_inteligences(self, inteligence_name: str):
+        raise NotImplementedError()
+
+    def get_project_info(self, project_uuid: str):
+        raise NotImplementedError()
+
+    def get_project_statistic(self, project_uuid: str):
+        raise NotImplementedError()
+
+    def get_organization_statistic(self, organization_id: int):
         raise NotImplementedError()

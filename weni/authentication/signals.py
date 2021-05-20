@@ -12,7 +12,7 @@ logger = logging.getLogger("weni.authentication.signals")
 
 
 @receiver(models.signals.post_save, sender=User)
-def update_user_keycloak(instance, **kwargs):
+def signal_user(instance, created, **kwargs):
     if not settings.TESTING:
         try:
             keycloak_instance = KeycloakControl()
@@ -27,6 +27,16 @@ def update_user_keycloak(instance, **kwargs):
             )
         except exceptions.KeycloakGetError as e:
             logger.error(e)
-            # raise ValidationError(
-            #     _("System temporarily unavailable, please try again later.")
-            # )
+
+    if created:
+        from weni.common.models import RequestPermissionOrganization
+
+        requests_perm = RequestPermissionOrganization.objects.filter(
+            email=instance.email
+        )
+        for perm in requests_perm:
+            permission = perm.organization.get_user_authorization(user=instance)
+            permission.role = perm.role
+            permission.save(update_fields=["role"])
+
+        requests_perm.delete()

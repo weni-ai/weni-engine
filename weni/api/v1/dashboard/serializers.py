@@ -3,13 +3,13 @@ from django.utils.timezone import timedelta
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from weni.common.models import Newsletter, ServiceStatus, Service
+from weni.common.models import ServiceStatus, Service, NewsletterLanguage
 
 
 class NewsletterSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Newsletter
-        fields = ["id", "title", "description", "created_at"]
+        model = NewsletterLanguage
+        fields = ["id", "title", "description", "language", "created_at"]
         ref_name = None
 
 

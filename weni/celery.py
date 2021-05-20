@@ -2,7 +2,7 @@ from __future__ import absolute_import, unicode_literals
 import os
 import sys
 
-from celery import Celery
+from celery import Celery, schedules
 
 from weni import settings
 
@@ -17,6 +17,14 @@ app.conf.beat_schedule = {
     "check-status-services": {
         "task": "weni.common.tasks.status_service",
         "schedule": 10.0,
+    },
+    "sync-project-flows-organization-info": {
+        "task": "weni.common.tasks.sync_updates_projects",
+        "schedule": 30.0,
+    },
+    "delete-status-logs": {
+        "task": "weni.common.tasks.delete_status_logs",
+        "schedule": schedules.crontab(hour="22", minute=0),
     },
 }
 

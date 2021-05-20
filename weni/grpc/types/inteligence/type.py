@@ -21,6 +21,10 @@ class InteligenceType(GRPCType):
         self.channel = self.get_channel()
 
     def get_channel(self):
+        if settings.INTELIGENCE_CERTIFICATE_GRPC_CRT:
+            with open(settings.INTELIGENCE_CERTIFICATE_GRPC_CRT, "rb") as f:
+                credentials = grpc.ssl_channel_credentials(f.read())
+            return grpc.secure_channel(settings.INTELIGENCE_GRPC_ENDPOINT, credentials)
         return grpc.insecure_channel(settings.INTELIGENCE_GRPC_ENDPOINT)
 
     def list_organizations(self, user_email: str):
@@ -60,14 +64,13 @@ class InteligenceType(GRPCType):
         return response.role
 
     def create_organization(
-        self, organization_name: str, user_email: str, user_nickname: str
+        self, organization_name: str, user_email: str
     ):
         stub = organization_pb2_grpc.OrgControllerStub(self.channel)
         response = stub.Create(
             organization_pb2.OrgCreateRequest(
-                name=organization_name,
+                organization_name=organization_name,
                 user_email=user_email,
-                user_nickname=user_nickname,
             )
         )
         return response
@@ -102,21 +105,19 @@ class InteligenceType(GRPCType):
         )
         return response
 
-    def get_organization_inteligences(
-        self, organization_id: int, inteligence_name: str
-    ):
+    def get_organization_inteligences(self, inteligence_name: str):
         result = []
         try:
             stub = repository_pb2_grpc.RepositoryControllerStub(self.channel)
             for inteligence in stub.List(
-                repository_pb2.RepositoryListRequest(
-                    name=inteligence_name, org_id=organization_id
-                )
+                repository_pb2.RepositoryListRequest(name=inteligence_name)
             ):
                 result.append(
                     {
                         "inteligence_uuid": inteligence.uuid,
                         "inteligence_name": inteligence.name,
+                        "inteligence_slug": inteligence.slug,
+                        "inteligence_owner": inteligence.owner__nickname,
                     }
                 )
         except grpc.RpcError as e:
@@ -132,3 +133,10 @@ class InteligenceType(GRPCType):
             )
         )
         return response
+
+    def get_organization_statistic(self, organization_id: int):
+        stub = organization_pb2_grpc.OrgControllerStub(self.channel)
+        response = stub.Retrieve(
+            organization_pb2.OrgStatisticRetrieveRequest(org_id=organization_id)
+        )
+        return {"repositories_count": response.repositories_count}

@@ -1,9 +1,11 @@
 import requests
+from django.db import transaction
+from django.utils import timezone
 
 from weni import utils
 from weni.authentication.models import User
 from weni.celery import app
-from weni.common.models import Service, Organization
+from weni.common.models import Service, Organization, Project, LogService
 
 
 @app.task()
@@ -118,27 +120,25 @@ def migrate_organization(user_email: str):
 
 
 @app.task(name="create_organization")
-def create_organization(organization_name: str, user_email: str, user_nickname: str):
+def create_organization(organization_name: str, user_email: str):
     grpc_instance = utils.get_grpc_types().get("inteligence")
 
     organization = grpc_instance.create_organization(
         organization_name=organization_name,
         user_email=user_email,
-        user_nickname=user_nickname,
     )
     return {"id": organization.id}
 
 
 @app.task(name="create_project")
 def create_project(
-    project_name: str, user_email: str, user_username: str, project_timezone: str
+    project_name: str, user_email: str, project_timezone: str
 ):
     grpc_instance = utils.get_grpc_types().get("flow")
 
     project = grpc_instance.create_project(
         project_name=project_name,
         user_email=user_email,
-        user_username=user_username,
         project_timezone=project_timezone,
     )
     return {"id": project.id, "uuid": project.uuid}
@@ -171,7 +171,6 @@ def search_project(organization_id: int, project_uuid: str, text: str):
         utils.get_grpc_types()
         .get("inteligence")
         .get_organization_inteligences(
-            organization_id=organization_id,
             inteligence_name=text,
         )
     )
@@ -179,3 +178,69 @@ def search_project(organization_id: int, project_uuid: str, text: str):
         "flow": flow_result,
         "inteligence": inteligence_result,
     }
+
+
+@app.task()
+def sync_updates_projects():
+    for project in Project.objects.all():
+        flow_instance = utils.get_grpc_types().get("flow")
+        inteligence_instance = utils.get_grpc_types().get("inteligence")
+
+        flow_result = flow_instance.get_project_info(
+            project_uuid=str(project.flow_organization),
+        )
+
+        statistic_project_result = flow_instance.get_project_statistic(
+            project_uuid=str(project.flow_organization),
+        )
+
+        statistic_organization_result = inteligence_instance.get_organization_statistic(
+            organization_id=int(project.organization.inteligence_organization),
+        )
+
+        project.name = str(flow_result.get("name"))
+        project.timezone = str(flow_result.get("timezone"))
+        project.date_format = str(flow_result.get("date_format"))
+        project.inteligence_count = int(
+            statistic_organization_result.get("repositories_count")
+        )
+        project.flow_count = int(statistic_project_result.get("active_flows"))
+        project.contact_count = int(statistic_project_result.get("active_contacts"))
+
+        project.save(
+            update_fields=[
+                "name",
+                "timezone",
+                "date_format",
+                "inteligence_count",
+                "flow_count",
+                "contact_count",
+            ]
+        )
+
+    return True
+
+
+@app.task()
+def delete_status_logs():
+    BATCH_SIZE = 5000
+    logs = LogService.objects.filter(
+        created_at__lt=timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
+        - timezone.timedelta(hours=2)
+    )
+
+    num_updated = 0
+    max_id = -1
+    while True:
+        batch = list(logs.filter(id__gt=max_id).order_by("id")[:BATCH_SIZE])
+
+        if not batch:
+            break
+
+        max_id = batch[-1].id
+        with transaction.atomic():
+            for log in batch:
+                log.delete()
+
+        num_updated += len(batch)
+        print(f" > deleted {num_updated} status logs")

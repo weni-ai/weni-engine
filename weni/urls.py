@@ -71,6 +71,24 @@ if settings.DEBUG:
                             base_url=settings.BASE_URL,
                         ),
                     ),
+                    path(
+                        "invite-organization/",
+                        render_template(
+                            "authentication/emails/invite_organization.html",
+                            base_url=settings.BASE_URL,
+                            organization_name="Org Test",
+                        ),
+                    ),
+                    path(
+                        "project-create/",
+                        render_template(
+                            "authentication/emails/project_create.html",
+                            base_url=settings.BASE_URL,
+                            first_name="Daniel Yohan",
+                            project_name="Project Test",
+                            organization_name="Org Test",
+                        ),
+                    ),
                 ]
             ),
         )

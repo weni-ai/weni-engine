@@ -8,6 +8,7 @@ from weni.api.v1.dashboard.views import (
 from weni.api.v1.organization.views import (
     OrganizationViewSet,
     OrganizationAuthorizationViewSet,
+    RequestPermissionOrganizationViewSet,
 )
 from weni.api.v1.project.views import ProjectViewSet
 
@@ -93,3 +94,4 @@ router.register("account/search-user", SearchUserViewSet)
 router.register("organization/org", OrganizationViewSet)
 router.register("organization/project", ProjectViewSet)
 router.register("organization/authorizations", OrganizationAuthorizationViewSet)
+router.register("organization/request-permission", RequestPermissionOrganizationViewSet)
