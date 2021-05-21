@@ -61,12 +61,21 @@ class ListNewsletterTestCase(TestCase):
 
         self.user, self.token = create_user_and_token()
 
+        self.newsletter_en = Newsletter.objects.create()
+        self.newsletter_pt_br = Newsletter.objects.create()
+
         self.newsletter_language_en = NewsletterLanguage.objects.create(
-            language="en-us", title="Test", description="Test description"
+            language="en-us",
+            title="Test",
+            description="Test description",
+            newsletter=self.newsletter_en,
         )
 
         self.newsletter_language_ptbr = NewsletterLanguage.objects.create(
-            language="pt-br", title="Teste", description="Teste descrição"
+            language="pt-br",
+            title="Teste",
+            description="Teste descrição",
+            newsletter=self.newsletter_pt_br,
         )
 
     def request(self, token):
@@ -81,9 +90,6 @@ class ListNewsletterTestCase(TestCase):
         return (response, content_data)
 
     def test_status_okay(self):
-        Newsletter.objects.create(newsletter_language=self.newsletter_language_en)
-        Newsletter.objects.create(newsletter_language=self.newsletter_language_ptbr)
-
         response, content_data = self.request(self.token)
         self.assertEqual(content_data["count"], 1)
         self.assertEqual(len(content_data["results"]), 1)
@@ -91,8 +97,7 @@ class ListNewsletterTestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_does_not_exist(self):
-        Newsletter.objects.create(newsletter_language=self.newsletter_language_ptbr)
-
+        self.newsletter_language_en.delete()
         response, content_data = self.request(self.token)
         self.assertEqual(content_data["count"], 0)
         self.assertEqual(len(content_data["results"]), 0)
