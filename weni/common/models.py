@@ -79,6 +79,44 @@ class Organization(models.Model):
             ),
         )
 
+    def send_email_remove_permission_organization(self, first_name: str, email: str):
+        if not settings.SEND_EMAILS:
+            return False  # pragma: no cover
+        context = {
+            "base_url": settings.BASE_URL,
+            "organization_name": self.name,
+            "first_name": first_name,
+        }
+        send_mail(
+            _(f"You left the {self.name}"),
+            render_to_string(
+                "authentication/emails/remove_permission_organization.txt"
+            ),
+            None,
+            [email],
+            html_message=render_to_string(
+                "authentication/emails/remove_permission_organization.html", context
+            ),
+        )
+
+    def send_email_delete_organization(self, first_name: str, email: str):
+        if not settings.SEND_EMAILS:
+            return False  # pragma: no cover
+        context = {
+            "base_url": settings.BASE_URL,
+            "organization_name": self.name,
+            "first_name": first_name,
+        }
+        send_mail(
+            _(f"You have been removed from {self.name}"),
+            render_to_string("authentication/emails/delete_organization.txt"),
+            None,
+            [email],
+            html_message=render_to_string(
+                "authentication/emails/delete_organization.html", context
+            ),
+        )
+
 
 class OrganizationAuthorization(models.Model):
     class Meta:
