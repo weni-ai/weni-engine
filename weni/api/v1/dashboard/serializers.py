@@ -45,7 +45,10 @@ class StatusServiceSerializer(serializers.ModelSerializer):
             return int(total_requests * (percentage / 100))
 
         if obj.service.maintenance:
-            return "maintenance"
+            return {
+                "status": "maintenance",
+                "intercurrence": obj.service.start_maintenance,
+            }
 
         query = obj.service.log_service.filter(
             created_at__range=[
@@ -57,14 +60,40 @@ class StatusServiceSerializer(serializers.ModelSerializer):
         total_fail = int(query.filter(status=False).count())
         total_success = int(query.filter(status=True).count())
 
+        intercurrence = query.filter(status=False).first()
+
         if (
             percentage(total_requests=total_requests, percentage=30) <= total_fail
             and total_success >= 1
         ):
-            return "intermittent"
+            return {
+                "status": "intermittent",
+                "intercurrence": None
+                if intercurrence is None
+                else intercurrence.created_at,
+            }
         elif percentage(total_requests=total_requests, percentage=100) <= total_fail:
-            return "offline"
-        return "online"
+            return {
+                "status": "offline",
+                "intercurrence": None
+                if intercurrence is None
+                else intercurrence.created_at,
+            }
+
+        intercurrence = obj.service.log_service.filter(
+            created_at__range=[
+                timezone.now() - timedelta(days=10),
+                timezone.now(),
+            ],
+            status=False,
+        ).first()
+
+        return {
+            "status": "online",
+            "intercurrence": None
+            if intercurrence is None
+            else intercurrence.created_at,
+        }
 
     def get_service__last_updated(self, obj):
         if obj.service.log_service.all().exists():

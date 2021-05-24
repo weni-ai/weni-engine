@@ -317,6 +317,9 @@ class Service(models.Model):
     maintenance = models.BooleanField(
         _("Define if the service is under maintenance"), default=False
     )
+    start_maintenance = models.DateTimeField(
+        _("date start maintenance"), auto_now_add=True
+    )
 
     def __str__(self):
         return self.url
