@@ -14,6 +14,7 @@ You can set environment variables in your OS, write on ```.env``` file or pass v
 | SECRET_KEY | ```string```|  ```None``` | A secret key for a particular Django installation. This is used to provide cryptographic signing, and should be set to a unique, unpredictable value.
 | DEBUG | ```boolean``` | ```False``` | A boolean that turns on/off debug mode.
 | BASE_URL | ```string``` | ```https://api.weni.ai``` | URL Base Weni Engine Backend.
+| WEBAPP_BASE_URL | ```string``` | ```https://dash.weni.ai``` | URL Base Weni Webapp.
 | ALLOWED_HOSTS | ```string``` | ```*``` | A list of strings representing the host/domain names that this Django site can serve.
 | DEFAULT_DATABASE | ```string``` | ```sqlite:///db.sqlite3``` | Read [django-environ](https://django-environ.readthedocs.io/en/latest/) to configure the database connection.
 | LANGUAGE_CODE | ```string``` | ```en-us``` | A string representing the language code for this installation.This should be in standard [language ID format](https://docs.djangoproject.com/en/2.0/topics/i18n/#term-language-code).
