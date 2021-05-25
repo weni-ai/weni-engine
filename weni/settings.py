@@ -46,6 +46,7 @@ env = environ.Env(
     CSRF_COOKIE_DOMAIN=(lambda v: v or None, None),
     CSRF_COOKIE_SECURE=(bool, False),
     BASE_URL=(str, "https://api.weni.ai"),
+    WEBAPP_BASE_URL=(str, "https://dash.weni.ai"),
     INTELIGENCE_URL=(str, "https://bothub.it/"),
     FLOWS_URL=(str, "https://new.push.al/"),
     USE_SENTRY=(bool, False),
@@ -78,6 +79,8 @@ DEBUG = env.bool("DEBUG")
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")
 
 BASE_URL = env.str("BASE_URL")
+
+WEBAPP_BASE_URL = env.str("WEBAPP_BASE_URL")
 
 TESTING = len(sys.argv) > 1 and sys.argv[1] == "test"
 

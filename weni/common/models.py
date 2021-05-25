@@ -68,7 +68,11 @@ class Organization(models.Model):
     def send_email_invite_organization(self, email):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
-        context = {"base_url": settings.BASE_URL, "organization_name": self.name}
+        context = {
+            "base_url": settings.BASE_URL,
+            "webapp_base_url": settings.WEBAPP_BASE_URL,
+            "organization_name": self.name,
+        }
         send_mail(
             _(f"You have been invited to join the {self.name} organization"),
             render_to_string("authentication/emails/invite_organization.txt"),
