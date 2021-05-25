@@ -68,7 +68,11 @@ class Organization(models.Model):
     def send_email_invite_organization(self, email):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
-        context = {"base_url": settings.BASE_URL, "organization_name": self.name}
+        context = {
+            "base_url": settings.BASE_URL,
+            "webapp_base_url": settings.WEBAPP_BASE_URL,
+            "organization_name": self.name,
+        }
         send_mail(
             _(f"You have been invited to join the {self.name} organization"),
             render_to_string("authentication/emails/invite_organization.txt"),
@@ -76,6 +80,44 @@ class Organization(models.Model):
             [email],
             html_message=render_to_string(
                 "authentication/emails/invite_organization.html", context
+            ),
+        )
+
+    def send_email_remove_permission_organization(self, first_name: str, email: str):
+        if not settings.SEND_EMAILS:
+            return False  # pragma: no cover
+        context = {
+            "base_url": settings.BASE_URL,
+            "organization_name": self.name,
+            "first_name": first_name,
+        }
+        send_mail(
+            _(f"You left the {self.name}"),
+            render_to_string(
+                "authentication/emails/remove_permission_organization.txt"
+            ),
+            None,
+            [email],
+            html_message=render_to_string(
+                "authentication/emails/remove_permission_organization.html", context
+            ),
+        )
+
+    def send_email_delete_organization(self, first_name: str, email: str):
+        if not settings.SEND_EMAILS:
+            return False  # pragma: no cover
+        context = {
+            "base_url": settings.BASE_URL,
+            "organization_name": self.name,
+            "first_name": first_name,
+        }
+        send_mail(
+            _(f"You have been removed from {self.name}"),
+            render_to_string("authentication/emails/delete_organization.txt"),
+            None,
+            [email],
+            html_message=render_to_string(
+                "authentication/emails/delete_organization.html", context
             ),
         )
 
@@ -278,6 +320,9 @@ class Service(models.Model):
     )
     maintenance = models.BooleanField(
         _("Define if the service is under maintenance"), default=False
+    )
+    start_maintenance = models.DateTimeField(
+        _("date start maintenance"), auto_now_add=True
     )
 
     def __str__(self):

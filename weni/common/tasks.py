@@ -26,11 +26,12 @@ def status_service() -> None:
             return False
 
     for service in Service.objects.all():
-        service.log_service.create(
-            status=is_page_available(
-                url=service.url, method_request=requests.get, timeout=10
+        if not service.maintenance:
+            service.log_service.create(
+                status=is_page_available(
+                    url=service.url, method_request=requests.get, timeout=10
+                )
             )
-        )
 
 
 @app.task(name="delete_organization")
@@ -245,7 +246,7 @@ def delete_status_logs():
     BATCH_SIZE = 5000
     logs = LogService.objects.filter(
         created_at__lt=timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
-        - timezone.timedelta(hours=2)
+        - timezone.timedelta(days=10)
     )
 
     num_updated = 0

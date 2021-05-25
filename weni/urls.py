@@ -89,6 +89,24 @@ if settings.DEBUG:
                             organization_name="Org Test",
                         ),
                     ),
+                    path(
+                        "remove-permission-organization/",
+                        render_template(
+                            "authentication/emails/remove_permission_organization.html",
+                            base_url=settings.BASE_URL,
+                            first_name="Daniel Yohan",
+                            organization_name="Org Test",
+                        ),
+                    ),
+                    path(
+                        "delete-organization/",
+                        render_template(
+                            "authentication/emails/delete_organization.html",
+                            base_url=settings.BASE_URL,
+                            first_name="Daniel Yohan",
+                            organization_name="Org Test",
+                        ),
+                    ),
                 ]
             ),
         )
