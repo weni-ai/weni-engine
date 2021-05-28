@@ -151,6 +151,6 @@ class InteligenceType(GRPCType):
                 )
             )
             if response.uuid not in result:
-                result.append(i.uuid)
+                result.append(response.uuid)
 
         return {"repositories_count": len(result)}
