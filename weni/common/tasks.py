@@ -214,16 +214,19 @@ def sync_updates_projects():
             project_uuid=str(project.flow_organization),
         )
 
-        statistic_organization_result = inteligence_instance.get_organization_statistic(
-            organization_id=int(project.organization.inteligence_organization),
+        classifiers_project = flow_instance.get_classifiers(
+            project_uuid=str(project.flow_organization),
+            classifier_type="bothub",
+        )
+
+        inteligences_org = inteligence_instance.get_count_inteligences_project(
+            classifiers=classifiers_project,
         )
 
         project.name = str(flow_result.get("name"))
         project.timezone = str(flow_result.get("timezone"))
         project.date_format = str(flow_result.get("date_format"))
-        project.inteligence_count = int(
-            statistic_organization_result.get("repositories_count")
-        )
+        project.inteligence_count = int(inteligences_org.get("repositories_count"))
         project.flow_count = int(statistic_project_result.get("active_flows"))
         project.contact_count = int(statistic_project_result.get("active_contacts"))
 
