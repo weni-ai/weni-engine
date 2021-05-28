@@ -77,3 +77,6 @@ class GRPCType(metaclass=ABCMeta):
 
     def get_organization_statistic(self, organization_id: int):
         raise NotImplementedError()
+
+    def get_count_inteligences_project(self, classifiers: list):
+        raise NotImplementedError()

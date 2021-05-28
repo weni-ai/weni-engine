@@ -138,3 +138,19 @@ class InteligenceType(GRPCType):
             organization_pb2.OrgStatisticRetrieveRequest(org_id=organization_id)
         )
         return {"repositories_count": response.repositories_count}
+
+    def get_count_inteligences_project(self, classifiers: list):
+        stub = repository_pb2_grpc.RepositoryControllerStub(self.channel)
+
+        result = []
+
+        for i in classifiers:
+            response = stub.RetrieveAuthorization(
+                repository_pb2.RepositoryAuthorizationRetrieveRequest(
+                    repository_authorization=i.get("authorization_uuid")
+                )
+            )
+            if response.uuid not in result:
+                result.append(response.uuid)
+
+        return {"repositories_count": len(result)}
