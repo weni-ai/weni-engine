@@ -40,7 +40,7 @@ def update_organization(sender, instance, **kwargs):
 
 @receiver(post_delete, sender=Organization)
 def delete_organization(instance, **kwargs):
-    instance.organization.send_email_remove_permission_organization(
+    instance.send_email_remove_permission_organization(
         first_name=instance.user.first_name, email=instance.user.email
     )
 
