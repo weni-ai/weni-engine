@@ -115,6 +115,7 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.locale.LocaleMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -179,6 +180,8 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
 
+DEFAULT_ERROR_MESSAGE = _("An error has occurred")
+
 LANGUAGE_CODE = env.str("LANGUAGE_CODE")
 
 # -----------------------------------------------------------------------------------
@@ -188,6 +191,10 @@ LANGUAGES = (
     ("en-us", _("English")),
     ("pt-br", _("Portuguese")),
 )
+
+MODELTRANSLATION_DEFAULT_LANGUAGE = "en-us"
+
+LOCALE_PATHS = (os.path.join(os.path.dirname(__file__), "locale"),)
 
 DEFAULT_LANGUAGE = "en-us"
 
@@ -250,7 +257,7 @@ LOGGING["loggers"]["weni.authentication.signals"] = {
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        "mozilla_django_oidc.contrib.drf.OIDCAuthentication",
+        "weni.middleware.WeniOIDCAuthentication",
     ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
     "PAGE_SIZE": 20,
@@ -313,7 +320,7 @@ OIDC_OP_JWKS_ENDPOINT = env.str("OIDC_OP_JWKS_ENDPOINT")
 OIDC_RP_SIGN_ALGO = env.str("OIDC_RP_SIGN_ALGO", default="RS256")
 OIDC_DRF_AUTH_BACKEND = env.str(
     "OIDC_DRF_AUTH_BACKEND",
-    default="weni.oidc_authentication.WeniOIDCAuthenticationBackend",
+    default="weni.middleware.WeniOIDCAuthenticationBackend",
 )
 OIDC_RP_SCOPES = env.str("OIDC_RP_SCOPES", default='openid email')
 
