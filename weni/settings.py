@@ -252,6 +252,11 @@ LOGGING["loggers"]["weni.authentication.signals"] = {
     "handlers": ["console"],
     "propagate": False,
 }
+LOGGING["loggers"]["mozilla_django_oidc"] = {
+    "level": "DEBUG",
+    "handlers": ["console"],
+    "propagate": False,
+}
 
 # rest framework
 
@@ -322,7 +327,7 @@ OIDC_DRF_AUTH_BACKEND = env.str(
     "OIDC_DRF_AUTH_BACKEND",
     default="weni.middleware.WeniOIDCAuthenticationBackend",
 )
-OIDC_RP_SCOPES = env.str("OIDC_RP_SCOPES", default='openid email')
+OIDC_RP_SCOPES = env.str("OIDC_RP_SCOPES", default="openid email")
 
 # Swagger
 
