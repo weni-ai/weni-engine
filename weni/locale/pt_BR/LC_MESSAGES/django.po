@@ -1,0 +1,536 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Daniel Yohan <dyohan9@gmail.com>, 2021.
+#
+# Translators:
+# Daniel Yohan <dyohan9@gmail.com>, 2021
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-06-11 14:51+0000\n"
+"PO-Revision-Date: 2021-06-10 13:36+0000\n"
+"Last-Translator: Daniel Yohan <dyohan9@gmail.com>, 2021\n"
+"Language-Team: Portuguese (Brazil) (https://www.transifex.com/bothub/teams/121632/pt_BR/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: pt_BR\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: weni/api/v1/account/serializers.py:24
+msgid "ID"
+msgstr "Identificador"
+
+#: weni/api/v1/account/serializers.py:25
+msgid "Username"
+msgstr "Nome do usuário"
+
+#: weni/api/v1/account/serializers.py:26
+#: weni/api/v1/organization/serializers.py:107
+msgid "Email"
+msgstr "E-mail"
+
+#: weni/api/v1/account/serializers.py:27
+#: weni/api/v1/organization/serializers.py:110
+msgid "User photo"
+msgstr "Foto do usuário"
+
+#: weni/api/v1/account/serializers.py:36
+msgid "Password"
+msgstr "Senha"
+
+#: weni/api/v1/account/serializers.py:41 weni/authentication/models.py:72
+msgid "Language"
+msgstr "Idioma"
+
+#: weni/api/v1/account/views.py:88 weni/api/v1/account/views.py:93
+msgid "We accept images only in the formats: .png, .jpeg, .gif"
+msgstr "Aceitamos imagens apenas nos formatos: .png, .jpeg, .gif"
+
+#: weni/api/v1/account/views.py:130
+msgid "System temporarily unavailable, please try again later."
+msgstr "Sistema temporariamente indisponível, tente novamente mais tarde."
+
+#: weni/api/v1/dashboard/filters.py:19
+msgid "Project's UUID"
+msgstr "UUID do projeto"
+
+#: weni/api/v1/dashboard/filters.py:31
+msgid "Project {} does not exist"
+msgstr "Projeto {} não existe"
+
+#: weni/api/v1/dashboard/filters.py:33
+msgid "Invalid project UUID"
+msgstr "UUID de projeto inválido"
+
+#: weni/api/v1/dashboard/serializers.py:38
+msgid "Type Service"
+msgstr "Tipo de serviço"
+
+#: weni/api/v1/organization/filters.py:22
+#: weni/api/v1/organization/filters.py:48 weni/api/v1/project/filters.py:18
+msgid "Organization's UUID"
+msgstr "UUID da organização"
+
+#: weni/api/v1/organization/filters.py:35
+#: weni/api/v1/organization/filters.py:62 weni/api/v1/project/filters.py:30
+msgid "Organization {} does not exist"
+msgstr "Organização {} não existe"
+
+#: weni/api/v1/organization/filters.py:37
+#: weni/api/v1/organization/filters.py:64
+msgid "Invalid Organization UUID"
+msgstr "UUID de organização inválido"
+
+#: weni/api/v1/organization/serializers.py:122
+#: weni/api/v1/organization/serializers.py:145
+msgid "You cannot set user role 0"
+msgstr "Você não pode definir o papel do usuário 0"
+
+#: weni/api/v1/project/filters.py:32
+msgid "Invalid organization UUID"
+msgstr "UUID de organização inválido"
+
+#: weni/api/v1/project/serializers.py:91
+msgid "Text Search"
+msgstr "Pesquisa de texto"
+
+#: weni/api/v1/project/serializers.py:93
+msgid "Project UUID"
+msgstr "UUID do Projeto"
+
+#: weni/api/v1/project/validators.py:10 weni/api/v1/project/views.py:72
+msgid "You can't contribute in this organization"
+msgstr "Você não pode contribuir nesta organização"
+
+#: weni/authentication/models.py:44
+msgid "user"
+msgstr "usuário"
+
+#: weni/authentication/models.py:45
+msgid "users"
+msgstr "usuários"
+
+#: weni/authentication/models.py:50
+msgid "first name"
+msgstr "primeiro nome"
+
+#: weni/authentication/models.py:51
+msgid "last name"
+msgstr "sobrenome"
+
+#: weni/authentication/models.py:52 weni/common/models.py:362
+msgid "email"
+msgstr "email"
+
+#: weni/authentication/models.py:52
+msgid "User's email."
+msgstr "Email do usuário."
+
+#: weni/authentication/models.py:55
+msgid "username"
+msgstr "nome do usuário"
+
+#: weni/authentication/models.py:59
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr ""
+"Obrigatório. 150 caracteres ou menos. Letras, dígitos e @ /. / + / - / _ "
+"apenas."
+
+#: weni/authentication/models.py:63
+msgid "A user with that username already exists."
+msgstr "Um usuário com esse nome já existe."
+
+#: weni/authentication/models.py:68
+msgid "photo user"
+msgstr "foto do usuário"
+
+#: weni/authentication/models.py:76
+msgid "The primary language used by this user"
+msgstr "O idioma principal usado por este usuário"
+
+#: weni/authentication/models.py:79
+msgid "staff status"
+msgstr "status da equipe"
+
+#: weni/authentication/models.py:80
+msgid "active"
+msgstr "ativo"
+
+#: weni/authentication/models.py:82
+msgid "joined at"
+msgstr "juntou-se a"
+
+#: weni/authentication/models.py:98
+msgid "Password changed"
+msgstr "Senha alterada"
+
+#: weni/authentication/templates/authentication/emails/base.html:33
+msgid "Visit our website"
+msgstr "Visite o nosso site"
+
+#: weni/authentication/templates/authentication/emails/base.html:39
+msgid "Weni © Brazil 2020 - All rights reserved"
+msgstr "Weni © Brasil 2020 - Todos os direitos reservados"
+
+#: weni/authentication/templates/authentication/emails/base.html:41
+msgid ""
+"If you have not performed this action, ignore this message and change your "
+"email password for security. Talk to support if necessary!"
+msgstr ""
+"Se você não executou esta ação, ignore esta mensagem e altere sua senha de "
+"e-mail para segurança. Fale com o suporte se necessário!"
+
+#: weni/authentication/templates/authentication/emails/change_password.html:6
+#: weni/authentication/templates/authentication/emails/change_password.txt:2
+#: weni/authentication/templates/authentication/emails/delete_organization.html:16
+#: weni/authentication/templates/authentication/emails/remove_permission_organization.html:16
+msgid "Hi"
+msgstr "Oi"
+
+#: weni/authentication/templates/authentication/emails/change_password.html:8
+#: weni/authentication/templates/authentication/emails/change_password.txt:3
+msgid "Your password has been successfully changed 😉"
+msgstr "Sua senha foi alterada com sucesso 😉"
+
+#: weni/authentication/templates/authentication/emails/change_password.html:10
+#: weni/authentication/templates/authentication/emails/change_password.txt:4
+msgid ""
+"Your password has been changed. Remember not to share it with anyone to "
+"maintain your security and privacy."
+msgstr ""
+"Sua senha foi mudada. Lembre-se de não compartilhar com ninguém para manter "
+"sua segurança e privacidade."
+
+#: weni/authentication/templates/authentication/emails/delete_organization.html:39
+msgid "The"
+msgstr "A"
+
+#: weni/authentication/templates/authentication/emails/delete_organization.html:39
+msgid "no longer exists"
+msgstr "não existe mais"
+
+#: weni/authentication/templates/authentication/emails/delete_organization.html:60
+msgid "One of the administrators deleted the organization"
+msgstr "Um dos administradores excluiu a organização"
+
+#: weni/authentication/templates/authentication/emails/delete_organization.html:61
+msgid ""
+"so you can no longer access it through your account. We are saddened by his "
+"departure, but we understand that life passes and things change"
+msgstr ""
+"então você não pode mais acessá-lo através de sua conta. Ficamos tristes com"
+" sua partida, mas entendemos que a vida passa e as coisas mudam"
+
+#: weni/authentication/templates/authentication/emails/delete_organization.html:70
+#: weni/authentication/templates/authentication/emails/remove_permission_organization.html:62
+msgid ""
+"You can still create other organizations and projects if you want to "
+"continue with us!"
+msgstr ""
+"Você ainda pode criar outras organizações e projetos se quiser continuar "
+"conosco!"
+
+#: weni/authentication/templates/authentication/emails/invite_organization.html:17
+msgid "You have been invited to join the"
+msgstr "Você foi convidado para participar do"
+
+#: weni/authentication/templates/authentication/emails/invite_organization.html:17
+#: weni/common/models.py:47
+msgid "organization"
+msgstr "organização"
+
+#: weni/authentication/templates/authentication/emails/invite_organization.html:38
+#: weni/authentication/templates/authentication/emails/invite_organization.txt:3
+msgid "Uhuuul, now you can be one of us!"
+msgstr "Uhuuul, agora você pode ser um de nós!"
+
+#: weni/authentication/templates/authentication/emails/invite_organization.html:41
+msgid "A"
+msgstr "UM"
+
+#: weni/authentication/templates/authentication/emails/invite_organization.html:41
+msgid ""
+"member just sent you an invitation to join the organization. To enter, just "
+"click on the button down and you will be redirected to a registration page. "
+"Case already have registration, just login"
+msgstr ""
+"membro acaba de lhe enviar um convite para ingressar na organização. Para "
+"entrar, basta clicar no botão abaixo e você será redirecionado para uma "
+"página de cadastro. Caso já tenha cadastro, basta fazer o login"
+
+#: weni/authentication/templates/authentication/emails/invite_organization.html:77
+#: weni/authentication/templates/authentication/emails/invite_organization.txt:5
+msgid "Click here to join the organization"
+msgstr "Clique aqui para ingressar na organização"
+
+#: weni/authentication/templates/authentication/emails/invite_organization.txt:2
+msgid "You have been invited to join the {{ organization_name }} organization"
+msgstr "Você foi convidado a ingressar na organização {{ organization_name }}"
+
+#: weni/authentication/templates/authentication/emails/invite_organization.txt:4
+msgid ""
+"A {{ organization_name }} member just sent you an invitation to join the "
+"organization. To enter, just click on the button down and you will be "
+"redirected to a registration page. Case already have registration, just "
+"login"
+msgstr ""
+"Um membro da {{ organization_name }} acaba de enviar a você um convite para "
+"ingressar na organização. Para entrar, basta clicar no botão abaixo e você "
+"será redirecionado para uma página de cadastro. Caso já tenha cadastro, "
+"basta fazer o login"
+
+#: weni/authentication/templates/authentication/emails/project_create.html:16
+msgid "Hi,"
+msgstr "Oi,"
+
+#: weni/authentication/templates/authentication/emails/project_create.html:39
+msgid "Your project has been successfully created!"
+msgstr "Seu projeto foi criado com sucesso!"
+
+#: weni/authentication/templates/authentication/emails/project_create.html:53
+msgid "The project"
+msgstr "O projeto"
+
+#: weni/authentication/templates/authentication/emails/project_create.html:53
+msgid ""
+"was created and you can now start the creation of Intelligences and Flows to"
+" transform the way you work"
+msgstr ""
+"foi criado e agora você pode iniciar a criação de Inteligências e Fluxos "
+"para transformar a maneira como você trabalha"
+
+#: weni/authentication/templates/authentication/emails/project_create.html:62
+msgid "Remember that everyone in the organization"
+msgstr "Lembre-se de que todos na organização"
+
+#: weni/authentication/templates/authentication/emails/project_create.html:62
+msgid "on what you created the project can view it, ok ?!"
+msgstr "sobre o que você criou o projeto pode visualizar, ok ?!"
+
+#: weni/authentication/templates/authentication/emails/remove_permission_organization.html:39
+msgid "You left the"
+msgstr "Você deixou o"
+
+#: weni/authentication/templates/authentication/emails/remove_permission_organization.html:53
+msgid "His departure from the"
+msgstr "Sua partida da"
+
+#: weni/authentication/templates/authentication/emails/remove_permission_organization.html:53
+msgid ""
+"was accomplished. We were sad about your departure, but we understand that "
+"life goes by and things change"
+msgstr ""
+"foi realizado. Ficamos tristes com sua saída, mas entendemos que a vida "
+"passa e as coisas mudam"
+
+#: weni/common/models.py:15
+msgid "dashboard newsletter"
+msgstr "boletim informativo do painel"
+
+#: weni/common/models.py:17 weni/common/models.py:39 weni/common/models.py:55
+#: weni/common/models.py:160 weni/common/models.py:241
+#: weni/common/models.py:315 weni/common/models.py:340
+#: weni/common/models.py:351
+msgid "created at"
+msgstr "criado em"
+
+#: weni/common/models.py:25
+msgid "dashboard newsletter language"
+msgstr "linguagem do boletim informativo do painel"
+
+#: weni/common/models.py:29
+msgid "language"
+msgstr "língua"
+
+#: weni/common/models.py:34
+msgid "title"
+msgstr "título"
+
+#: weni/common/models.py:35
+msgid "description"
+msgstr "descrição"
+
+#: weni/common/models.py:50 weni/common/models.py:151
+#: weni/common/models.py:223
+msgid "UUID"
+msgstr "UUID"
+
+#: weni/common/models.py:52
+msgid "organization name"
+msgstr "nome da organização"
+
+#: weni/common/models.py:53
+msgid "organization description"
+msgstr "descrição da organização"
+
+#: weni/common/models.py:54
+msgid "inteligence organization id"
+msgstr "ID da organização de inteligência"
+
+#: weni/common/models.py:79
+msgid "Invitation to join organization"
+msgstr "Convite para participar de organização"
+
+#: weni/common/models.py:97
+#, python-brace-format
+msgid "You have been removed from the {self.name}"
+msgstr "Você foi removido de {self.name}"
+
+#: weni/common/models.py:117
+#, python-brace-format
+msgid "{self.name} no longer exists!"
+msgstr "{self.name} não existe mais!"
+
+#: weni/common/models.py:129
+msgid "organization authorization"
+msgstr "autorização da organização"
+
+#: weni/common/models.py:130
+msgid "organization authorizations"
+msgstr "autorizações de organização"
+
+#: weni/common/models.py:144
+msgid "not set"
+msgstr "não configurado"
+
+#: weni/common/models.py:145
+msgid "viewer"
+msgstr "visualizador"
+
+#: weni/common/models.py:146
+msgid "contributor"
+msgstr "contribuinte"
+
+#: weni/common/models.py:147
+msgid "admin"
+msgstr "administrador"
+
+#: weni/common/models.py:158 weni/common/models.py:365
+msgid "role"
+msgstr "função"
+
+#: weni/common/models.py:212
+msgid "project"
+msgstr "projeto"
+
+#: weni/common/models.py:225
+msgid "project name"
+msgstr "Nome do Projeto"
+
+#: weni/common/models.py:229
+msgid "Timezone"
+msgstr "Fuso horário"
+
+#: weni/common/models.py:231
+msgid "Date Format"
+msgstr "Formato de data"
+
+#: weni/common/models.py:235
+msgid "Whether day comes first or month comes first in dates"
+msgstr "Se o dia vem primeiro ou o mês vem primeiro nas datas"
+
+#: weni/common/models.py:237
+msgid "flow identification UUID"
+msgstr "UUID de identificação de fluxo"
+
+#: weni/common/models.py:238
+msgid "Intelligence count"
+msgstr "Contagem de inteligência"
+
+#: weni/common/models.py:239
+msgid "Flows count"
+msgstr "Contagem de fluxos"
+
+#: weni/common/models.py:240
+msgid "Contacts count"
+msgstr "Contagem de contatos"
+
+#: weni/common/models.py:256
+#, python-brace-format
+msgid "You have been invited to join the {self.name} organization"
+msgstr "Você foi convidado a ingressar na organização {self.name}"
+
+#: weni/common/models.py:268
+msgid "service"
+msgstr "serviço"
+
+#: weni/common/models.py:277
+msgid "Flows service"
+msgstr "Serviço de fluxos"
+
+#: weni/common/models.py:281
+msgid "Inteligence Service"
+msgstr "Serviço de inteligência"
+
+#: weni/common/models.py:285
+msgid "Chat Service"
+msgstr "Serviço de chat"
+
+#: weni/common/models.py:296
+msgid "Region Ireland"
+msgstr "Região Irlanda"
+
+#: weni/common/models.py:300
+msgid "Region Virginia"
+msgstr "Região Virgínia"
+
+#: weni/common/models.py:304
+msgid "Region São Paulo"
+msgstr "Região São Paulo"
+
+#: weni/common/models.py:308
+msgid "service url"
+msgstr "url de serviço"
+
+#: weni/common/models.py:310
+msgid "service type"
+msgstr "tipo de serviço"
+
+#: weni/common/models.py:316
+msgid "standard service for all projects"
+msgstr "serviço padrão para todos os projetos"
+
+#: weni/common/models.py:318
+msgid "service region"
+msgstr "região de serviço"
+
+#: weni/common/models.py:324
+msgid "Define if the service is under maintenance"
+msgstr "Defina se o serviço está em manutenção"
+
+#: weni/common/models.py:327
+msgid "date start maintenance"
+msgstr "data de início da manutenção"
+
+#: weni/common/models.py:336
+msgid "log service"
+msgstr "serviço de log"
+
+#: weni/common/models.py:339
+msgid "status service"
+msgstr "serviço de status"
+
+#: weni/common/models.py:345
+msgid "service status"
+msgstr "status do serviço"
+
+#: weni/common/models.py:359
+msgid "request permission organization"
+msgstr "solicitar permissão organização"
+
+#: weni/settings.py:183
+msgid "An error has occurred"
+msgstr "ocorreu um erro"
+
+#: weni/settings.py:191
+msgid "English"
+msgstr "Inglês"
+
+#: weni/settings.py:192
+msgid "Portuguese"
+msgstr "Português"

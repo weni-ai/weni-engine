@@ -35,8 +35,7 @@ def signal_user(instance, created, **kwargs):
             email=instance.email
         )
         for perm in requests_perm:
-            permission = perm.organization.get_user_authorization(user=instance)
-            permission.role = perm.role
-            permission.save(update_fields=["role"])
-
+            perm.organization.get_user_authorization(
+                user=instance, defaults={"role": perm.role}
+            )
         requests_perm.delete()
