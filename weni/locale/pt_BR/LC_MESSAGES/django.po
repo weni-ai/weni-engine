@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-10 14:01+0000\n"
+"POT-Creation-Date: 2021-06-11 14:51+0000\n"
 "PO-Revision-Date: 2021-06-10 13:36+0000\n"
 "Last-Translator: Daniel Yohan <dyohan9@gmail.com>, 2021\n"
 "Language-Team: Portuguese (Brazil) (https://www.transifex.com/bothub/teams/121632/pt_BR/)\n"
@@ -30,12 +30,12 @@ msgid "Username"
 msgstr "Nome do usuário"
 
 #: weni/api/v1/account/serializers.py:26
-#: weni/api/v1/organization/serializers.py:106
+#: weni/api/v1/organization/serializers.py:107
 msgid "Email"
 msgstr "E-mail"
 
 #: weni/api/v1/account/serializers.py:27
-#: weni/api/v1/organization/serializers.py:109
+#: weni/api/v1/organization/serializers.py:110
 msgid "User photo"
 msgstr "Foto do usuário"
 
@@ -86,6 +86,11 @@ msgstr "Organização {} não existe"
 msgid "Invalid Organization UUID"
 msgstr "UUID de organização inválido"
 
+#: weni/api/v1/organization/serializers.py:122
+#: weni/api/v1/organization/serializers.py:145
+msgid "You cannot set user role 0"
+msgstr "Você não pode definir o papel do usuário 0"
+
 #: weni/api/v1/project/filters.py:32
 msgid "Invalid organization UUID"
 msgstr "UUID de organização inválido"
@@ -118,7 +123,7 @@ msgstr "primeiro nome"
 msgid "last name"
 msgstr "sobrenome"
 
-#: weni/authentication/models.py:52 weni/common/models.py:360
+#: weni/authentication/models.py:52 weni/common/models.py:362
 msgid "email"
 msgstr "email"
 
@@ -161,8 +166,8 @@ msgid "joined at"
 msgstr "juntou-se a"
 
 #: weni/authentication/models.py:98
-msgid "Reset your Weni Password"
-msgstr "Redefina sua senha Weni"
+msgid "Password changed"
+msgstr "Senha alterada"
 
 #: weni/authentication/templates/authentication/emails/base.html:33
 msgid "Visit our website"
@@ -202,8 +207,12 @@ msgstr ""
 "sua segurança e privacidade."
 
 #: weni/authentication/templates/authentication/emails/delete_organization.html:39
-msgid "You have been removed from"
-msgstr "Você foi removido de"
+msgid "The"
+msgstr "A"
+
+#: weni/authentication/templates/authentication/emails/delete_organization.html:39
+msgid "no longer exists"
+msgstr "não existe mais"
 
 #: weni/authentication/templates/authentication/emails/delete_organization.html:60
 msgid "One of the administrators deleted the organization"
@@ -324,9 +333,9 @@ msgid "dashboard newsletter"
 msgstr "boletim informativo do painel"
 
 #: weni/common/models.py:17 weni/common/models.py:39 weni/common/models.py:55
-#: weni/common/models.py:158 weni/common/models.py:239
-#: weni/common/models.py:313 weni/common/models.py:338
-#: weni/common/models.py:349
+#: weni/common/models.py:160 weni/common/models.py:241
+#: weni/common/models.py:315 weni/common/models.py:340
+#: weni/common/models.py:351
 msgid "created at"
 msgstr "criado em"
 
@@ -346,8 +355,8 @@ msgstr "título"
 msgid "description"
 msgstr "descrição"
 
-#: weni/common/models.py:50 weni/common/models.py:149
-#: weni/common/models.py:221
+#: weni/common/models.py:50 weni/common/models.py:151
+#: weni/common/models.py:223
 msgid "UUID"
 msgstr "UUID"
 
@@ -363,157 +372,165 @@ msgstr "descrição da organização"
 msgid "inteligence organization id"
 msgstr "ID da organização de inteligência"
 
-#: weni/common/models.py:77 weni/common/models.py:254
+#: weni/common/models.py:79
+msgid "Invitation to join organization"
+msgstr "Convite para participar de organização"
+
+#: weni/common/models.py:97
+#, python-brace-format
+msgid "You have been removed from the {self.name}"
+msgstr "Você foi removido de {self.name}"
+
+#: weni/common/models.py:117
+#, python-brace-format
+msgid "{self.name} no longer exists!"
+msgstr "{self.name} não existe mais!"
+
+#: weni/common/models.py:129
+msgid "organization authorization"
+msgstr "autorização da organização"
+
+#: weni/common/models.py:130
+msgid "organization authorizations"
+msgstr "autorizações de organização"
+
+#: weni/common/models.py:144
+msgid "not set"
+msgstr "não configurado"
+
+#: weni/common/models.py:145
+msgid "viewer"
+msgstr "visualizador"
+
+#: weni/common/models.py:146
+msgid "contributor"
+msgstr "contribuinte"
+
+#: weni/common/models.py:147
+msgid "admin"
+msgstr "administrador"
+
+#: weni/common/models.py:158 weni/common/models.py:365
+msgid "role"
+msgstr "função"
+
+#: weni/common/models.py:212
+msgid "project"
+msgstr "projeto"
+
+#: weni/common/models.py:225
+msgid "project name"
+msgstr "Nome do Projeto"
+
+#: weni/common/models.py:229
+msgid "Timezone"
+msgstr "Fuso horário"
+
+#: weni/common/models.py:231
+msgid "Date Format"
+msgstr "Formato de data"
+
+#: weni/common/models.py:235
+msgid "Whether day comes first or month comes first in dates"
+msgstr "Se o dia vem primeiro ou o mês vem primeiro nas datas"
+
+#: weni/common/models.py:237
+msgid "flow identification UUID"
+msgstr "UUID de identificação de fluxo"
+
+#: weni/common/models.py:238
+msgid "Intelligence count"
+msgstr "Contagem de inteligência"
+
+#: weni/common/models.py:239
+msgid "Flows count"
+msgstr "Contagem de fluxos"
+
+#: weni/common/models.py:240
+msgid "Contacts count"
+msgstr "Contagem de contatos"
+
+#: weni/common/models.py:256
 #, python-brace-format
 msgid "You have been invited to join the {self.name} organization"
 msgstr "Você foi convidado a ingressar na organização {self.name}"
 
-#: weni/common/models.py:95
-#, python-brace-format
-msgid "You left the {self.name}"
-msgstr "Você saiu de {self.name}"
-
-#: weni/common/models.py:115
-#, python-brace-format
-msgid "You have been removed from {self.name}"
-msgstr "Você foi removido de {self.name}"
-
-#: weni/common/models.py:127
-msgid "organization authorization"
-msgstr "autorização da organização"
-
-#: weni/common/models.py:128
-msgid "organization authorizations"
-msgstr "autorizações de organização"
-
-#: weni/common/models.py:142
-msgid "not set"
-msgstr "não configurado"
-
-#: weni/common/models.py:143
-msgid "viewer"
-msgstr "visualizador"
-
-#: weni/common/models.py:144
-msgid "contributor"
-msgstr "contribuinte"
-
-#: weni/common/models.py:145
-msgid "admin"
-msgstr "administrador"
-
-#: weni/common/models.py:156 weni/common/models.py:363
-msgid "role"
-msgstr "função"
-
-#: weni/common/models.py:210
-msgid "project"
-msgstr "projeto"
-
-#: weni/common/models.py:223
-msgid "project name"
-msgstr "Nome do Projeto"
-
-#: weni/common/models.py:227
-msgid "Timezone"
-msgstr "Fuso horário"
-
-#: weni/common/models.py:229
-msgid "Date Format"
-msgstr "Formato de data"
-
-#: weni/common/models.py:233
-msgid "Whether day comes first or month comes first in dates"
-msgstr "Se o dia vem primeiro ou o mês vem primeiro nas datas"
-
-#: weni/common/models.py:235
-msgid "flow identification UUID"
-msgstr "UUID de identificação de fluxo"
-
-#: weni/common/models.py:236
-msgid "Intelligence count"
-msgstr "Contagem de inteligência"
-
-#: weni/common/models.py:237
-msgid "Flows count"
-msgstr "Contagem de fluxos"
-
-#: weni/common/models.py:238
-msgid "Contacts count"
-msgstr "Contagem de contatos"
-
-#: weni/common/models.py:266
+#: weni/common/models.py:268
 msgid "service"
 msgstr "serviço"
 
-#: weni/common/models.py:275
+#: weni/common/models.py:277
 msgid "Flows service"
 msgstr "Serviço de fluxos"
 
-#: weni/common/models.py:279
+#: weni/common/models.py:281
 msgid "Inteligence Service"
 msgstr "Serviço de inteligência"
 
-#: weni/common/models.py:283
+#: weni/common/models.py:285
 msgid "Chat Service"
 msgstr "Serviço de chat"
 
-#: weni/common/models.py:294
+#: weni/common/models.py:296
 msgid "Region Ireland"
 msgstr "Região Irlanda"
 
-#: weni/common/models.py:298
+#: weni/common/models.py:300
 msgid "Region Virginia"
 msgstr "Região Virgínia"
 
-#: weni/common/models.py:302
+#: weni/common/models.py:304
 msgid "Region São Paulo"
 msgstr "Região São Paulo"
 
-#: weni/common/models.py:306
+#: weni/common/models.py:308
 msgid "service url"
 msgstr "url de serviço"
 
-#: weni/common/models.py:308
+#: weni/common/models.py:310
 msgid "service type"
 msgstr "tipo de serviço"
 
-#: weni/common/models.py:314
+#: weni/common/models.py:316
 msgid "standard service for all projects"
 msgstr "serviço padrão para todos os projetos"
 
-#: weni/common/models.py:316
+#: weni/common/models.py:318
 msgid "service region"
 msgstr "região de serviço"
 
-#: weni/common/models.py:322
+#: weni/common/models.py:324
 msgid "Define if the service is under maintenance"
 msgstr "Defina se o serviço está em manutenção"
 
-#: weni/common/models.py:325
+#: weni/common/models.py:327
 msgid "date start maintenance"
 msgstr "data de início da manutenção"
 
-#: weni/common/models.py:334
+#: weni/common/models.py:336
 msgid "log service"
 msgstr "serviço de log"
 
-#: weni/common/models.py:337
+#: weni/common/models.py:339
 msgid "status service"
 msgstr "serviço de status"
 
-#: weni/common/models.py:343
+#: weni/common/models.py:345
 msgid "service status"
 msgstr "status do serviço"
 
-#: weni/common/models.py:357
+#: weni/common/models.py:359
 msgid "request permission organization"
 msgstr "solicitar permissão organização"
 
-#: weni/settings.py:188
+#: weni/settings.py:183
+msgid "An error has occurred"
+msgstr "ocorreu um erro"
+
+#: weni/settings.py:191
 msgid "English"
 msgstr "Inglês"
 
-#: weni/settings.py:189
+#: weni/settings.py:192
 msgid "Portuguese"
 msgstr "Português"
