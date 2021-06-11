@@ -57,11 +57,13 @@ class Organization(models.Model):
     def __str__(self):
         return f"{self.uuid} - {self.name}"
 
-    def get_user_authorization(self, user):
+    def get_user_authorization(self, user, **kwargs):
         if user.is_anonymous:
             return OrganizationAuthorization(organization=self)  # pragma: no cover
         get, created = OrganizationAuthorization.objects.get_or_create(
-            user=user, organization=self
+            user=user,
+            organization=self,
+            **kwargs,
         )
         return get
 

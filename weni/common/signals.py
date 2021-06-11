@@ -47,23 +47,24 @@ def delete_organization(instance, **kwargs):
 
 @receiver(post_save, sender=OrganizationAuthorization)
 def org_authorizations(sender, instance, **kwargs):
-    celery_app.send_task(
-        "update_user_permission_organization",
-        args=[
-            instance.organization.inteligence_organization,
-            instance.user.email,
-            instance.role,
-        ],
-    )
-    for project in instance.organization.project.all():
+    if instance.role is not OrganizationAuthorization.LEVEL_NOTHING:
         celery_app.send_task(
-            "update_user_permission_project",
+            "update_user_permission_organization",
             args=[
-                project.flow_organization,
+                instance.organization.inteligence_organization,
                 instance.user.email,
                 instance.role,
             ],
         )
+        for project in instance.organization.project.all():
+            celery_app.send_task(
+                "update_user_permission_project",
+                args=[
+                    project.flow_organization,
+                    instance.user.email,
+                    instance.role,
+                ],
+            )
 
 
 @receiver(post_delete, sender=OrganizationAuthorization)
