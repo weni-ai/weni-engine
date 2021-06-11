@@ -76,7 +76,7 @@ class Organization(models.Model):
             "organization_name": self.name,
         }
         send_mail(
-            _(f"You have been invited to join the {self.name} organization"),
+            _("Invitation to join organization"),
             render_to_string("authentication/emails/invite_organization.txt"),
             None,
             [email],
@@ -94,7 +94,7 @@ class Organization(models.Model):
             "first_name": first_name,
         }
         send_mail(
-            _(f"You left the {self.name}"),
+            _(f"You have been removed from the {self.name}"),
             render_to_string(
                 "authentication/emails/remove_permission_organization.txt"
             ),
@@ -114,7 +114,7 @@ class Organization(models.Model):
             "first_name": first_name,
         }
         send_mail(
-            _(f"You have been removed from {self.name}"),
+            _(f"{self.name} no longer exists!"),
             render_to_string("authentication/emails/delete_organization.txt"),
             None,
             [email],
