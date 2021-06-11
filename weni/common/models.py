@@ -95,7 +95,7 @@ class Organization(models.Model):
             "first_name": first_name,
         }
         send_mail(
-            _("Invitation to join organization"),
+            _("Organization created!"),
             render_to_string("authentication/emails/organization_create.txt"),
             None,
             [email],

@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-11 18:34+0000\n"
+"POT-Creation-Date: 2021-06-11 18:50+0000\n"
 "PO-Revision-Date: 2021-06-10 13:36+0000\n"
 "Last-Translator: Daniel Yohan <dyohan9@gmail.com>, 2021\n"
 "Language-Team: Portuguese (Brazil) (https://www.transifex.com/bothub/teams/121632/pt_BR/)\n"
@@ -387,9 +387,13 @@ msgstr "descrição da organização"
 msgid "inteligence organization id"
 msgstr "ID da organização de inteligência"
 
-#: weni/common/models.py:79 weni/common/models.py:98
+#: weni/common/models.py:79
 msgid "Invitation to join organization"
 msgstr "Convite para participar de organização"
+
+#: weni/common/models.py:98
+msgid "Organization created!"
+msgstr "Organização criada!"
 
 #: weni/common/models.py:116
 #, python-brace-format
