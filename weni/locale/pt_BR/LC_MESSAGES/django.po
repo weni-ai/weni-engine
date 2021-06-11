@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# Daniel Yohan <dyohan9@gmail.com>, 2021.
+# Daniel Yohan <dyohan9@gmail.com>, 2021
 #
 # Translators:
 # Daniel Yohan <dyohan9@gmail.com>, 2021
@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-11 14:51+0000\n"
+"POT-Creation-Date: 2021-06-11 18:34+0000\n"
 "PO-Revision-Date: 2021-06-10 13:36+0000\n"
 "Last-Translator: Daniel Yohan <dyohan9@gmail.com>, 2021\n"
 "Language-Team: Portuguese (Brazil) (https://www.transifex.com/bothub/teams/121632/pt_BR/)\n"
@@ -30,12 +30,12 @@ msgid "Username"
 msgstr "Nome do usuário"
 
 #: weni/api/v1/account/serializers.py:26
-#: weni/api/v1/organization/serializers.py:107
+#: weni/api/v1/organization/serializers.py:112
 msgid "Email"
 msgstr "E-mail"
 
 #: weni/api/v1/account/serializers.py:27
-#: weni/api/v1/organization/serializers.py:110
+#: weni/api/v1/organization/serializers.py:115
 msgid "User photo"
 msgstr "Foto do usuário"
 
@@ -86,8 +86,8 @@ msgstr "Organização {} não existe"
 msgid "Invalid Organization UUID"
 msgstr "UUID de organização inválido"
 
-#: weni/api/v1/organization/serializers.py:122
-#: weni/api/v1/organization/serializers.py:145
+#: weni/api/v1/organization/serializers.py:127
+#: weni/api/v1/organization/serializers.py:150
 msgid "You cannot set user role 0"
 msgstr "Você não pode definir o papel do usuário 0"
 
@@ -123,7 +123,7 @@ msgstr "primeiro nome"
 msgid "last name"
 msgstr "sobrenome"
 
-#: weni/authentication/models.py:52 weni/common/models.py:362
+#: weni/authentication/models.py:52 weni/common/models.py:381
 msgid "email"
 msgstr "email"
 
@@ -284,9 +284,24 @@ msgstr ""
 "será redirecionado para uma página de cadastro. Caso já tenha cadastro, "
 "basta fazer o login"
 
+#: weni/authentication/templates/authentication/emails/organization_create.html:16
 #: weni/authentication/templates/authentication/emails/project_create.html:16
 msgid "Hi,"
 msgstr "Oi,"
+
+#: weni/authentication/templates/authentication/emails/organization_create.html:39
+msgid "You just gave life to"
+msgstr "Você acaba de dar vida à"
+
+#: weni/authentication/templates/authentication/emails/organization_create.html:60
+msgid ""
+"Your organization was successfully created! Now you can invite members to "
+"help you build projects and increasingly increase the way you automate your "
+"life with our Intelligences and Flows"
+msgstr ""
+"Sua organização foi criada com sucesso! Agora você já pode convidar membros "
+"para te ajudar na construção de projetos e aumentar cada vez mais a maneira "
+"como você automatiza sua vida com nossas Inteligências e Fluxos"
 
 #: weni/authentication/templates/authentication/emails/project_create.html:39
 msgid "Your project has been successfully created!"
@@ -333,9 +348,9 @@ msgid "dashboard newsletter"
 msgstr "boletim informativo do painel"
 
 #: weni/common/models.py:17 weni/common/models.py:39 weni/common/models.py:55
-#: weni/common/models.py:160 weni/common/models.py:241
-#: weni/common/models.py:315 weni/common/models.py:340
-#: weni/common/models.py:351
+#: weni/common/models.py:179 weni/common/models.py:260
+#: weni/common/models.py:334 weni/common/models.py:359
+#: weni/common/models.py:370
 msgid "created at"
 msgstr "criado em"
 
@@ -355,8 +370,8 @@ msgstr "título"
 msgid "description"
 msgstr "descrição"
 
-#: weni/common/models.py:50 weni/common/models.py:151
-#: weni/common/models.py:223
+#: weni/common/models.py:50 weni/common/models.py:170
+#: weni/common/models.py:242
 msgid "UUID"
 msgstr "UUID"
 
@@ -372,154 +387,154 @@ msgstr "descrição da organização"
 msgid "inteligence organization id"
 msgstr "ID da organização de inteligência"
 
-#: weni/common/models.py:79
+#: weni/common/models.py:79 weni/common/models.py:98
 msgid "Invitation to join organization"
 msgstr "Convite para participar de organização"
 
-#: weni/common/models.py:97
+#: weni/common/models.py:116
 #, python-brace-format
 msgid "You have been removed from the {self.name}"
 msgstr "Você foi removido de {self.name}"
 
-#: weni/common/models.py:117
+#: weni/common/models.py:136
 #, python-brace-format
 msgid "{self.name} no longer exists!"
 msgstr "{self.name} não existe mais!"
 
-#: weni/common/models.py:129
+#: weni/common/models.py:148
 msgid "organization authorization"
 msgstr "autorização da organização"
 
-#: weni/common/models.py:130
+#: weni/common/models.py:149
 msgid "organization authorizations"
 msgstr "autorizações de organização"
 
-#: weni/common/models.py:144
+#: weni/common/models.py:163
 msgid "not set"
 msgstr "não configurado"
 
-#: weni/common/models.py:145
+#: weni/common/models.py:164
 msgid "viewer"
 msgstr "visualizador"
 
-#: weni/common/models.py:146
+#: weni/common/models.py:165
 msgid "contributor"
 msgstr "contribuinte"
 
-#: weni/common/models.py:147
+#: weni/common/models.py:166
 msgid "admin"
 msgstr "administrador"
 
-#: weni/common/models.py:158 weni/common/models.py:365
+#: weni/common/models.py:177 weni/common/models.py:384
 msgid "role"
 msgstr "função"
 
-#: weni/common/models.py:212
+#: weni/common/models.py:231
 msgid "project"
 msgstr "projeto"
 
-#: weni/common/models.py:225
+#: weni/common/models.py:244
 msgid "project name"
 msgstr "Nome do Projeto"
 
-#: weni/common/models.py:229
+#: weni/common/models.py:248
 msgid "Timezone"
 msgstr "Fuso horário"
 
-#: weni/common/models.py:231
+#: weni/common/models.py:250
 msgid "Date Format"
 msgstr "Formato de data"
 
-#: weni/common/models.py:235
+#: weni/common/models.py:254
 msgid "Whether day comes first or month comes first in dates"
 msgstr "Se o dia vem primeiro ou o mês vem primeiro nas datas"
 
-#: weni/common/models.py:237
+#: weni/common/models.py:256
 msgid "flow identification UUID"
 msgstr "UUID de identificação de fluxo"
 
-#: weni/common/models.py:238
+#: weni/common/models.py:257
 msgid "Intelligence count"
 msgstr "Contagem de inteligência"
 
-#: weni/common/models.py:239
+#: weni/common/models.py:258
 msgid "Flows count"
 msgstr "Contagem de fluxos"
 
-#: weni/common/models.py:240
+#: weni/common/models.py:259
 msgid "Contacts count"
 msgstr "Contagem de contatos"
 
-#: weni/common/models.py:256
+#: weni/common/models.py:275
 #, python-brace-format
 msgid "You have been invited to join the {self.name} organization"
 msgstr "Você foi convidado a ingressar na organização {self.name}"
 
-#: weni/common/models.py:268
+#: weni/common/models.py:287
 msgid "service"
 msgstr "serviço"
 
-#: weni/common/models.py:277
+#: weni/common/models.py:296
 msgid "Flows service"
 msgstr "Serviço de fluxos"
 
-#: weni/common/models.py:281
+#: weni/common/models.py:300
 msgid "Inteligence Service"
 msgstr "Serviço de inteligência"
 
-#: weni/common/models.py:285
+#: weni/common/models.py:304
 msgid "Chat Service"
 msgstr "Serviço de chat"
 
-#: weni/common/models.py:296
+#: weni/common/models.py:315
 msgid "Region Ireland"
 msgstr "Região Irlanda"
 
-#: weni/common/models.py:300
+#: weni/common/models.py:319
 msgid "Region Virginia"
 msgstr "Região Virgínia"
 
-#: weni/common/models.py:304
+#: weni/common/models.py:323
 msgid "Region São Paulo"
 msgstr "Região São Paulo"
 
-#: weni/common/models.py:308
+#: weni/common/models.py:327
 msgid "service url"
 msgstr "url de serviço"
 
-#: weni/common/models.py:310
+#: weni/common/models.py:329
 msgid "service type"
 msgstr "tipo de serviço"
 
-#: weni/common/models.py:316
+#: weni/common/models.py:335
 msgid "standard service for all projects"
 msgstr "serviço padrão para todos os projetos"
 
-#: weni/common/models.py:318
+#: weni/common/models.py:337
 msgid "service region"
 msgstr "região de serviço"
 
-#: weni/common/models.py:324
+#: weni/common/models.py:343
 msgid "Define if the service is under maintenance"
 msgstr "Defina se o serviço está em manutenção"
 
-#: weni/common/models.py:327
+#: weni/common/models.py:346
 msgid "date start maintenance"
 msgstr "data de início da manutenção"
 
-#: weni/common/models.py:336
+#: weni/common/models.py:355
 msgid "log service"
 msgstr "serviço de log"
 
-#: weni/common/models.py:339
+#: weni/common/models.py:358
 msgid "status service"
 msgstr "serviço de status"
 
-#: weni/common/models.py:345
+#: weni/common/models.py:364
 msgid "service status"
 msgstr "status do serviço"
 
-#: weni/common/models.py:359
+#: weni/common/models.py:378
 msgid "request permission organization"
 msgstr "solicitar permissão organização"
 

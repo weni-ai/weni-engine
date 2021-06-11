@@ -85,6 +85,25 @@ class Organization(models.Model):
             ),
         )
 
+    def send_email_organization_create(self, email: str, first_name: str):
+        if not settings.SEND_EMAILS:
+            return False  # pragma: no cover
+        context = {
+            "base_url": settings.BASE_URL,
+            "webapp_base_url": settings.WEBAPP_BASE_URL,
+            "organization_name": self.name,
+            "first_name": first_name,
+        }
+        send_mail(
+            _("Invitation to join organization"),
+            render_to_string("authentication/emails/organization_create.txt"),
+            None,
+            [email],
+            html_message=render_to_string(
+                "authentication/emails/organization_create.html", context
+            ),
+        )
+
     def send_email_remove_permission_organization(self, first_name: str, email: str):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
