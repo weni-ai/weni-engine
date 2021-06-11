@@ -95,7 +95,7 @@ class User(AbstractBaseUser, PermissionsMixin):
             return False  # pragma: no cover
         context = {"name": self.first_name}
         send_mail(
-            _("Reset your Weni Password"),
+            _("Password changed"),
             render_to_string("authentication/emails/change_password.txt"),
             None,
             [self.email],
