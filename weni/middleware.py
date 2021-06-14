@@ -1,7 +1,9 @@
 import logging
 
 from django.conf import settings
+from django.utils import translation
 from mozilla_django_oidc.auth import OIDCAuthenticationBackend
+from mozilla_django_oidc.contrib.drf import OIDCAuthentication
 
 from weni.celery import app as celery_app
 
@@ -53,3 +55,22 @@ class WeniOIDCAuthenticationBackend(OIDCAuthenticationBackend):
         user.save()
 
         return user
+
+
+class WeniOIDCAuthentication(OIDCAuthentication):
+    def authenticate(self, request):
+        instance = super().authenticate(request=request)
+
+        if instance is None:
+            return instance
+
+        if not instance[0] or instance[0].is_anonymous:
+            return instance
+
+        user_language = getattr(instance[0], "language", None)
+        if not user_language:
+            return instance
+
+        translation.activate(user_language)
+
+        return instance

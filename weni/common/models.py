@@ -57,11 +57,13 @@ class Organization(models.Model):
     def __str__(self):
         return f"{self.uuid} - {self.name}"
 
-    def get_user_authorization(self, user):
+    def get_user_authorization(self, user, **kwargs):
         if user.is_anonymous:
             return OrganizationAuthorization(organization=self)  # pragma: no cover
         get, created = OrganizationAuthorization.objects.get_or_create(
-            user=user, organization=self
+            user=user,
+            organization=self,
+            **kwargs,
         )
         return get
 
@@ -74,12 +76,31 @@ class Organization(models.Model):
             "organization_name": self.name,
         }
         send_mail(
-            _(f"You have been invited to join the {self.name} organization"),
+            _("Invitation to join organization"),
             render_to_string("authentication/emails/invite_organization.txt"),
             None,
             [email],
             html_message=render_to_string(
                 "authentication/emails/invite_organization.html", context
+            ),
+        )
+
+    def send_email_organization_create(self, email: str, first_name: str):
+        if not settings.SEND_EMAILS:
+            return False  # pragma: no cover
+        context = {
+            "base_url": settings.BASE_URL,
+            "webapp_base_url": settings.WEBAPP_BASE_URL,
+            "organization_name": self.name,
+            "first_name": first_name,
+        }
+        send_mail(
+            _("Organization created!"),
+            render_to_string("authentication/emails/organization_create.txt"),
+            None,
+            [email],
+            html_message=render_to_string(
+                "authentication/emails/organization_create.html", context
             ),
         )
 
@@ -92,7 +113,7 @@ class Organization(models.Model):
             "first_name": first_name,
         }
         send_mail(
-            _(f"You left the {self.name}"),
+            _(f"You have been removed from the {self.name}"),
             render_to_string(
                 "authentication/emails/remove_permission_organization.txt"
             ),
@@ -112,7 +133,7 @@ class Organization(models.Model):
             "first_name": first_name,
         }
         send_mail(
-            _(f"You have been removed from {self.name}"),
+            _(f"{self.name} no longer exists!"),
             render_to_string("authentication/emails/delete_organization.txt"),
             None,
             [email],

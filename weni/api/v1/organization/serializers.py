@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
+from rest_framework.exceptions import PermissionDenied
 
 from weni.api.v1.project.validators import CanContributeInOrganizationValidator
 from weni.common import tasks
@@ -44,6 +45,11 @@ class OrganizationSeralizer(serializers.ModelSerializer):
         validated_data.update({"inteligence_organization": organization.get("id")})
 
         instance = super().create(validated_data)
+
+        instance.send_email_organization_create(
+            email=self.context["request"].user.email,
+            first_name=self.context["request"].user.first_name,
+        )
 
         instance.authorizations.create(
             user=self.context["request"].user, role=OrganizationAuthorization.ROLE_ADMIN
@@ -116,6 +122,11 @@ class OrganizationAuthorizationRoleSerializer(serializers.ModelSerializer):
         fields = ["role"]
         ref_name = None
 
+    def validate(self, attrs):
+        if attrs.get("role") == OrganizationAuthorization.LEVEL_NOTHING:
+            raise PermissionDenied(_("You cannot set user role 0"))
+        return attrs
+
 
 class RequestPermissionOrganizationSerializer(serializers.ModelSerializer):
     class Meta:
@@ -133,3 +144,8 @@ class RequestPermissionOrganizationSerializer(serializers.ModelSerializer):
     created_by = serializers.HiddenField(
         default=serializers.CurrentUserDefault(), style={"show": False}
     )
+
+    def validate(self, attrs):
+        if attrs.get("role") == OrganizationAuthorization.LEVEL_NOTHING:
+            raise PermissionDenied(_("You cannot set user role 0"))
+        return attrs
