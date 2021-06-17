@@ -57,7 +57,23 @@ class GRPCType(metaclass=ABCMeta):
     ):
         raise NotImplementedError()
 
-    def get_classifiers(self, project_uuid: str, classifier_type: str):
+    def get_classifiers(self, project_uuid: str, classifier_type: str, is_active: bool):
+        raise NotImplementedError()
+
+    def create_classifier(
+        self,
+        project_uuid: str,
+        user_email: str,
+        classifier_type: str,
+        classifier_name: str,
+        access_token: str,
+    ):
+        raise NotImplementedError()
+
+    def delete_classifier(self, classifier_uuid: str):
+        raise NotImplementedError()
+
+    def get_classifier(self, classifier_uuid: str):
         raise NotImplementedError()
 
     def update_language(self, user_email: str, language: str):

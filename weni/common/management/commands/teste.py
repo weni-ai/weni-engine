@@ -58,6 +58,7 @@ class Command(BaseCommand):
         #     .get_classifiers(
         #         organization_uuid="b0c8641b-7382-467d-8b64-25e6229fea7d",
         #         classifier_type="bothub",
+        #         is_active = True
         #     )
         # )
 
