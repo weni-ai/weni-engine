@@ -71,13 +71,15 @@ class FlowType(GRPCType):
         )
         return response
 
-    def get_classifiers(self, project_uuid: str, classifier_type: str):
+    def get_classifiers(self, project_uuid: str, classifier_type: str, is_active: bool):
         result = []
         try:
             stub = classifier_pb2_grpc.ClassifierControllerStub(self.channel)
             for classifier in stub.List(
                 classifier_pb2.ClassifierListRequest(
-                    org_uuid=project_uuid, classifier_type=classifier_type
+                    org_uuid=project_uuid,
+                    classifier_type=classifier_type,
+                    is_active=is_active,
                 )
             ):
                 result.append(
@@ -85,12 +87,52 @@ class FlowType(GRPCType):
                         "authorization_uuid": classifier.access_token,
                         "classifier_type": classifier.classifier_type,
                         "name": classifier.name,
+                        "is_active": classifier.is_active,
+                        "uuid": classifier.uuid,
                     }
                 )
         except grpc.RpcError as e:
             if e.code() is not grpc.StatusCode.NOT_FOUND:
                 raise e
         return result
+
+    def create_classifier(
+        self,
+        project_uuid: str,
+        user_email: str,
+        classifier_type: str,
+        classifier_name: str,
+        access_token: str,
+    ):
+        # Create Classifier
+        stub = classifier_pb2_grpc.ClassifierControllerStub(self.channel)
+        response = stub.Create(
+            classifier_pb2.ClassifierCreateRequest(
+                org=project_uuid,
+                user=user_email,
+                classifier_type=classifier_type,
+                name=classifier_name,
+                access_token=access_token,
+            )
+        )
+        return response
+
+    def delete_classifier(self, classifier_uuid: str):
+        stub = classifier_pb2_grpc.ClassifierControllerStub(self.channel)
+        stub.Destroy(classifier_pb2.ClassifierDestroyRequest(uuid=classifier_uuid))
+
+    def get_classifier(self, classifier_uuid: str):
+        stub = classifier_pb2_grpc.ClassifierControllerStub(self.channel)
+        response = stub.Retrieve(
+            classifier_pb2.ClassifierRetrieveRequest(uuid=classifier_uuid)
+        )
+        return {
+            "uuid": response.uuid,
+            "classifier_type": response.classifier_type,
+            "name": response.name,
+            "access_token": response.access_token,
+            "is_active": response.is_active,
+        }
 
     def update_language(self, user_email: str, language: str):
         stub = user_pb2_grpc.UserControllerStub(self.channel)
