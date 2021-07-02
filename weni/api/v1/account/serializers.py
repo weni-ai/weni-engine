@@ -38,6 +38,20 @@ class UserSerializer(serializers.ModelSerializer):
         help_text=_("Phone number of the user; include area code"),
     )
 
+    def update(self, instance, validated_data):
+        print(validated_data)
+        user_phone = instance.phone
+        update_instance = super().update(
+            instance=instance, validated_data=validated_data
+        )
+        print(user_phone)
+        if (
+            "phone" in validated_data or "short_phone_prefix" in validated_data
+        ) and user_phone is None:
+            print("aa")
+            instance.send_request_flow_user_info()
+        return update_instance
+
 
 class UserPhotoSerializer(serializers.Serializer):
     file = serializers.FileField(required=True)
