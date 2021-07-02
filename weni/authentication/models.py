@@ -87,7 +87,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         null=True,
     )
 
-    phone = models.IntegerField(
+    phone = models.BigIntegerField(
         verbose_name=_("Telephone Number"),
         help_text=_("Phone number of the user; include area code"),
         null=True,
