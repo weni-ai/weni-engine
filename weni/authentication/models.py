@@ -81,6 +81,18 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     joined_at = models.DateField(_("joined at"), auto_now_add=True)
 
+    short_phone_prefix = models.IntegerField(
+        verbose_name=_("Phone Prefix Country"),
+        help_text=_("Phone prefix of the user"),
+        null=True,
+    )
+
+    phone = models.BigIntegerField(
+        verbose_name=_("Telephone Number"),
+        help_text=_("Phone number of the user; include area code"),
+        null=True,
+    )
+
     objects = UserManager()
 
     @property

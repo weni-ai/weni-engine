@@ -18,6 +18,8 @@ class UserSerializer(serializers.ModelSerializer):
             "last_name",
             "photo",
             "language",
+            "short_phone_prefix",
+            "phone",
         ]
         ref_name = None
 
@@ -25,6 +27,16 @@ class UserSerializer(serializers.ModelSerializer):
     username = serializers.CharField(label=_("Username"), read_only=True)
     email = serializers.EmailField(label=_("Email"), read_only=True)
     photo = serializers.ImageField(label=_("User photo"), read_only=True)
+    short_phone_prefix = serializers.IntegerField(
+        required=False,
+        label=_("Phone Prefix Country"),
+        help_text=_("Phone prefix of the user"),
+    )
+    phone = serializers.IntegerField(
+        required=False,
+        label=_("Telephone Number"),
+        help_text=_("Phone number of the user; include area code"),
+    )
 
 
 class UserPhotoSerializer(serializers.Serializer):
