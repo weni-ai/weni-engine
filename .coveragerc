@@ -1,12 +1,18 @@
 [run]
 source =
     ./weni/api
+    ./weni/authentication
     ./weni/common
 omit =
+    ./weni/api/apps.py
     ./weni/common/apps.py
+    ./weni/authentication/apps.py
     ./weni/api/v1/tests/*
+    ./weni/api/v1/swagger.py
+    ./weni/authentication/tests.py
     ./weni/common/tests.py
     ./weni/common/tasks.py
+    ./weni/common/management/*
     ./weni/common/migrations/*
 
 [report]
