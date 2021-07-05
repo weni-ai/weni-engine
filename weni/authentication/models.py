@@ -1,3 +1,4 @@
+import requests
 from django.conf import settings
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
@@ -114,6 +115,26 @@ class User(AbstractBaseUser, PermissionsMixin):
             html_message=render_to_string(
                 "authentication/emails/change_password.html", context
             ),
+        )
+
+    def send_request_flow_user_info(self):
+        if not settings.SEND_REQUEST_FLOW:
+            return False  # pragma: no cover
+        requests.post(
+            url=f"{settings.FLOWS_URL}api/v2/flow_starts.json",
+            json={
+                "flow": "cf0bca76-eeed-4d36-ad3e-4b80b06c6d21",
+                "params": {
+                    "first_name": self.first_name,
+                    "last_name": self.last_name,
+                    "email": self.email,
+                    "language": self.language,
+                    "short_phone_prefix": self.short_phone_prefix,
+                    "phone": self.phone,
+                },
+                "urns": [f"mailto:{self.email}"],
+            },
+            headers={"Authorization": "Token 3a5987a13a9ce0960d1b4d25521f060a9c68026b"},
         )
 
     @property
