@@ -54,3 +54,20 @@ class UserUpdateTestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(content_data.get("phone"), 996498826)
         self.assertEqual(content_data.get("short_phone_prefix"), 55)
+
+
+class DestroyMyProfileTestCase(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.user, self.user_token = create_user_and_token()
+
+    def request(self, token):
+        authorization_header = {"HTTP_AUTHORIZATION": "Token {}".format(token.key)}
+        request = self.factory.delete("/v1/account/my-profile/", **authorization_header)
+        response = MyUserProfileViewSet.as_view({"delete": "destroy"})(request)
+        response.render()
+        return response
+
+    def test_okay(self):
+        response = self.request(self.user_token)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
