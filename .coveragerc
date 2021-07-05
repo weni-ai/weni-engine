@@ -8,10 +8,13 @@ omit =
     ./weni/common/apps.py
     ./weni/authentication/apps.py
     ./weni/api/v1/tests/*
+    ./weni/api/grpc/*
     ./weni/api/v1/swagger.py
     ./weni/authentication/tests.py
+    ./weni/authentication/signals.py
     ./weni/common/tests.py
     ./weni/common/tasks.py
+    ./weni/common/signals.py
     ./weni/common/management/*
     ./weni/common/migrations/*
 
