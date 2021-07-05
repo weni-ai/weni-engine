@@ -94,6 +94,11 @@ class User(AbstractBaseUser, PermissionsMixin):
         null=True,
     )
 
+    last_update_profile = models.DateTimeField(
+        verbose_name=_("Last Updated Profile"),
+        null=True,
+    )
+
     objects = UserManager()
 
     @property

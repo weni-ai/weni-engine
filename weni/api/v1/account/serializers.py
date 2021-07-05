@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.contrib.auth.password_validation import validate_password
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
@@ -20,6 +21,7 @@ class UserSerializer(serializers.ModelSerializer):
             "language",
             "short_phone_prefix",
             "phone",
+            "last_update_profile",
         ]
         ref_name = None
 
@@ -37,19 +39,18 @@ class UserSerializer(serializers.ModelSerializer):
         label=_("Telephone Number"),
         help_text=_("Phone number of the user; include area code"),
     )
+    last_update_profile = serializers.DateTimeField(read_only=True)
 
     def update(self, instance, validated_data):
-        print(validated_data)
         user_phone = instance.phone
         update_instance = super().update(
             instance=instance, validated_data=validated_data
         )
-        print(user_phone)
         if (
             "phone" in validated_data or "short_phone_prefix" in validated_data
         ) and user_phone is None:
-            print("aa")
             instance.send_request_flow_user_info()
+        instance.last_update_profile = timezone.now()
         return update_instance
 
 
