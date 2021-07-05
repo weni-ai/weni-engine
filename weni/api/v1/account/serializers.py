@@ -43,6 +43,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         user_phone = instance.phone
+        instance.last_update_profile = timezone.now()
         update_instance = super().update(
             instance=instance, validated_data=validated_data
         )
@@ -50,7 +51,6 @@ class UserSerializer(serializers.ModelSerializer):
             "phone" in validated_data or "short_phone_prefix" in validated_data
         ) and user_phone is None:
             instance.send_request_flow_user_info()
-        instance.last_update_profile = timezone.now()
         return update_instance
 
 
