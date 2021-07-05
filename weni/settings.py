@@ -61,6 +61,9 @@ env = environ.Env(
     SYNC_ORGANIZATION_INTELIGENCE=(bool, False),
     INTELIGENCE_CERTIFICATE_GRPC_CRT=(str, None),
     FLOW_CERTIFICATE_GRPC_CRT=(str, None),
+    SEND_REQUEST_FLOW=(bool, False),
+    FLOW_MARKETING_UUID=(str, None),
+    TOKEN_AUTHORIZATION_FLOW_MARKETING=(str, None),
 )
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
