@@ -128,7 +128,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         requests.post(
             url=f"{settings.FLOWS_URL}api/v2/flow_starts.json",
             json={
-                "flow": "cf0bca76-eeed-4d36-ad3e-4b80b06c6d21",
+                "flow": settings.FLOW_MARKETING_UUID,
                 "params": {
                     "first_name": self.first_name,
                     "last_name": self.last_name,
@@ -139,7 +139,7 @@ class User(AbstractBaseUser, PermissionsMixin):
                 },
                 "urns": [f"mailto:{self.email}"],
             },
-            headers={"Authorization": "Token 3a5987a13a9ce0960d1b4d25521f060a9c68026b"},
+            headers={"Authorization": f"Token {settings.TOKEN_AUTHORIZATION_FLOW_MARKETING}"},
         )
 
     @property
