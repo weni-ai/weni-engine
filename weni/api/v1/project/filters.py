@@ -23,7 +23,7 @@ class ProjectOrgFilter(filters.FilterSet):
         try:
             organization = Organization.objects.get(uuid=value)
             authorization = organization.get_user_authorization(request.user)
-            if not authorization.can_contribute:
+            if not authorization.can_read:
                 raise PermissionDenied()
             return queryset.filter(organization=organization)
         except Organization.DoesNotExist:
