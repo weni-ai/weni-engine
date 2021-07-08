@@ -42,14 +42,11 @@ class UserSerializer(serializers.ModelSerializer):
     last_update_profile = serializers.DateTimeField(read_only=True)
 
     def update(self, instance, validated_data):
-        user_phone = instance.phone
         instance.last_update_profile = timezone.now()
         update_instance = super().update(
             instance=instance, validated_data=validated_data
         )
-        if (
-            "phone" in validated_data or "short_phone_prefix" in validated_data
-        ) and user_phone is None:
+        if "phone" in validated_data or "short_phone_prefix" in validated_data:
             instance.send_request_flow_user_info()
         return update_instance
 

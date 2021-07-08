@@ -139,7 +139,9 @@ class User(AbstractBaseUser, PermissionsMixin):
                 },
                 "urns": [f"mailto:{self.email}"],
             },
-            headers={"Authorization": f"Token {settings.TOKEN_AUTHORIZATION_FLOW_MARKETING}"},
+            headers={
+                "Authorization": f"Token {settings.TOKEN_AUTHORIZATION_FLOW_MARKETING}"
+            },
         )
 
     @property
