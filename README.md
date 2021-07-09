@@ -59,6 +59,9 @@ You can set environment variables in your OS, write on ```.env``` file or pass v
 | SYNC_ORGANIZATION_INTELIGENCE |  ```bool``` | ```False``` | Enable or Disable sync organization inteligences service
 | INTELIGENCE_CERTIFICATE_GRPC_CRT |  ```string``` | ```None``` | Absolute certificate path for secure grpc communication
 | FLOW_CERTIFICATE_GRPC_CRT |  ```string``` | ```None``` | Absolute certificate path for secure grpc communication
+| SEND_REQUEST_FLOW |  ```boolean``` | ```False``` | Enables or disables sending user information to flows
+| FLOW_MARKETING_UUID |  ```string``` | ```None``` | UUID Flow
+| TOKEN_AUTHORIZATION_FLOW_MARKETING |  ```string``` | ```None``` | Token Authorization API Flow
 | ENVIRONMENT |  ```string``` | ```production``` | Specify the environment you are going to run, it is also used for sentry
 
 
