@@ -1,3 +1,4 @@
+import requests
 from django.conf import settings
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
@@ -81,6 +82,23 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     joined_at = models.DateField(_("joined at"), auto_now_add=True)
 
+    short_phone_prefix = models.IntegerField(
+        verbose_name=_("Phone Prefix Country"),
+        help_text=_("Phone prefix of the user"),
+        null=True,
+    )
+
+    phone = models.BigIntegerField(
+        verbose_name=_("Telephone Number"),
+        help_text=_("Phone number of the user; include area code"),
+        null=True,
+    )
+
+    last_update_profile = models.DateTimeField(
+        verbose_name=_("Last Updated Profile"),
+        null=True,
+    )
+
     objects = UserManager()
 
     @property
@@ -102,6 +120,28 @@ class User(AbstractBaseUser, PermissionsMixin):
             html_message=render_to_string(
                 "authentication/emails/change_password.html", context
             ),
+        )
+
+    def send_request_flow_user_info(self):
+        if not settings.SEND_REQUEST_FLOW:
+            return False  # pragma: no cover
+        requests.post(
+            url=f"{settings.FLOWS_URL}api/v2/flow_starts.json",
+            json={
+                "flow": settings.FLOW_MARKETING_UUID,
+                "params": {
+                    "first_name": self.first_name,
+                    "last_name": self.last_name,
+                    "email": self.email,
+                    "language": self.language,
+                    "short_phone_prefix": self.short_phone_prefix,
+                    "phone": self.phone,
+                },
+                "urns": [f"mailto:{self.email}"],
+            },
+            headers={
+                "Authorization": f"Token {settings.TOKEN_AUTHORIZATION_FLOW_MARKETING}"
+            },
         )
 
     @property

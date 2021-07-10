@@ -217,6 +217,7 @@ def sync_updates_projects():
         classifiers_project = flow_instance.get_classifiers(
             project_uuid=str(project.flow_organization),
             classifier_type="bothub",
+            is_active=True,
         )
 
         inteligences_org = inteligence_instance.get_count_inteligences_project(

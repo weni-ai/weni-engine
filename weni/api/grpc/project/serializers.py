@@ -17,3 +17,28 @@ class ClassifierRequestSerializer(ProtoSerializer):
 
     class Meta:
         proto_class = project_pb2.ClassifierResponse
+
+
+class CreateClassifierRequestSerializer(ProtoSerializer):
+    classifier_type = serializers.CharField(required=True)
+    name = serializers.CharField(required=True)
+    access_token = serializers.CharField(required=True)
+    user = serializers.CharField(write_only=True)
+    project_uuid = serializers.UUIDField(write_only=True)
+
+    class Meta:
+        proto_class = project_pb2.ClassifierResponse
+
+
+class RetrieveClassifierRequestSerializer(ProtoSerializer):
+    uuid = serializers.CharField(required=True)
+
+    class Meta:
+        proto_class = project_pb2.ClassifierResponse
+
+
+class DestroyClassifierRequestSerializer(ProtoSerializer):
+    uuid = serializers.CharField(required=True)
+
+    class Meta:
+        proto_class = project_pb2.ClassifierResponse
