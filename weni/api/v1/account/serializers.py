@@ -23,6 +23,7 @@ class UserSerializer(serializers.ModelSerializer):
             "phone",
             "last_update_profile",
             "utm",
+            "email_marketing",
         ]
         ref_name = None
 
@@ -42,6 +43,7 @@ class UserSerializer(serializers.ModelSerializer):
     )
     last_update_profile = serializers.DateTimeField(read_only=True)
     utm = serializers.JSONField(required=False, initial=dict)
+    email_marketing = serializers.BooleanField(required=False)
 
     def update(self, instance, validated_data):
         instance.last_update_profile = timezone.now()
