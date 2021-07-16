@@ -101,6 +101,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     )
 
     utm = JSONField(verbose_name=_("UTM Marketing"), default=dict)
+    email_marketing = models.BooleanField(
+        verbose_name=_("Allows receiving marketing emails"), default=True
+    )
 
     objects = UserManager()
 
@@ -139,6 +142,8 @@ class User(AbstractBaseUser, PermissionsMixin):
                     "language": self.language,
                     "short_phone_prefix": self.short_phone_prefix,
                     "phone": self.phone,
+                    "utm": self.utm,
+                    "email_marketing": self.email_marketing,
                 },
                 "urns": [f"mailto:{self.email}"],
             },
