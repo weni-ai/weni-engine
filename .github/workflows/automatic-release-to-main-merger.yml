@@ -50,19 +50,19 @@ jobs:
           else
             echo "::set-output name=labels::${LABEL_TYPE}"
           fi
-#      - name: Close outdated release-merge PRs 🧹
-#        run: |
-#          # fetch all open merge-PRs that have been opened from the current release branch
-#          gh pr list -S "is:open label:${LABEL_TYPE} head:merge-${{ steps.get-branch-name.outputs.release_branch }}-main" > prs.txt
-#          less prs.txt
-#          # extract the PR ids
-#          awk '{print $1}' prs.txt > pr_ids.txt
-#          # close all outdated PRs
-#          while read id; do
-#            gh pr close $id -d
-#          done <pr_ids.txt
-#        env:
-#            GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      - name: Close outdated release-merge PRs 🧹
+        run: |
+          # fetch all open merge-PRs that have been opened from the current release branch
+          gh pr list -S "is:open label:${LABEL_TYPE} head:merge-${{ steps.get-branch-name.outputs.release_branch }}-main" > prs.txt
+          less prs.txt
+          # extract the PR ids
+          awk '{print $1}' prs.txt > pr_ids.txt
+          # close all outdated PRs
+          while read id; do
+            gh pr close $id -d
+          done <pr_ids.txt
+        env:
+            GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
       - name: Create new branch 🐣
         if: always()
