@@ -62,13 +62,13 @@ jobs:
             gh pr close $id -d
           done <pr_ids.txt
         env:
-            GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+            GITHUB_TOKEN: ${{secrets.USER_TOKEN}}
 
       - name: Create new branch 🐣
         if: always()
         uses: peterjgrainger/action-create-branch@385b67cce679227d7470f00ce18d7a64405a18f1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.USER_TOKEN }}
         with:
           branch: ${{ steps.get-branch-name.outputs.new_branch }}
 
@@ -77,7 +77,7 @@ jobs:
         uses: repo-sync/pull-request@d80b305e358ef8131f270608735c72e2c913f2af
         with:
           # using this token to make sure it triggers other actions
-          github_token: ${{ secrets.RASABOT_GITHUB_TOKEN }}
+          github_token: ${{ secrets.USER_TOKEN }}
           source_branch: ${{ steps.get-branch-name.outputs.new_branch }}
           destination_branch: main
           pr_title: Merge ${{ steps.get-branch-name.outputs.release_branch }} into main
