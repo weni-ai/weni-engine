@@ -26,3 +26,22 @@ def get_grpc_types():
     from weni.grpc import TYPES
 
     return TYPES
+
+
+def calculate_active_contacts(value: int):
+    base_value = {
+        1000: 1.20,
+        10000: 0.75,
+        50000: 0.65,
+        250000: 0.60,
+    }
+    if value < 1000:
+        return 1000 * base_value.get(1000)
+    elif value < 10000:
+        return value * base_value.get(1000)
+    elif 10000 <= value < 50000:
+        return value * base_value.get(10000)
+    elif 50000 <= value < 250000:
+        return value * base_value.get(50000)
+    elif value >= 250000:
+        return value * base_value.get(250000)

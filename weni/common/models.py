@@ -3,6 +3,7 @@ import uuid as uuid4
 from django.conf import settings
 from django.core.mail import send_mail
 from django.db import models
+from django.db.models import Sum
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 from timezone_field import TimeZoneField
@@ -494,6 +495,12 @@ class Invoice(models.Model):
     tax_rate = models.DecimalField(
         _("tax rate"), decimal_places=2, max_digits=2, default=0
     )
+
+    @property
+    def total_invoice_amount(self):
+        return self.organization_billing_invoice_project.aggregate(
+            total_amount=Sum("amount")
+        ).get("total_amount")
 
 
 class InvoiceProject(models.Model):

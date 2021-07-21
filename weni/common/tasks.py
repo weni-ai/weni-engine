@@ -1,7 +1,7 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
+from decimal import Decimal
 
 import requests
-from decimal import Decimal
 from django.db import transaction
 from django.db.models import F
 from django.utils import timezone
@@ -256,11 +256,15 @@ def generate_project_invoice():
     ):
         invoice = org.organization_billing_invoice.create(
             due_date=timezone.now() + timedelta(days=10),
-            invoice_random_id=1 if org.organization_billing_invoice.last() is None else org.organization_billing_invoice.last().invoice_random_id + 1
+            invoice_random_id=1
+            if org.organization_billing_invoice.last() is None
+            else org.organization_billing_invoice.last().invoice_random_id + 1,
         )
         for project in org.project.all():
             invoice.organization_billing_invoice_project.create(
-                project=project, contact_count=10, amount=Decimal("10.99")
+                project=project,
+                contact_count=10,
+                amount=Decimal(str(utils.calculate_active_contacts(value=10))),
             )
         org.organization_billing.update(
             next_due_date=F("next_due_date")
