@@ -386,3 +386,125 @@ class RequestPermissionOrganization(models.Model):
         default=OrganizationAuthorization.ROLE_NOT_SETTED,
     )
     created_by = models.ForeignKey(User, models.CASCADE)
+
+
+class BillingPlan(models.Model):
+    class Meta:
+        verbose_name = _("organization billing plan")
+        unique_together = ["organization"]
+
+    BILLING_CYCLE_FREE = "billing_free"
+    BILLING_CYCLE_SINGLE = "billing_single"
+    BILLING_CYCLE_MONTHLY = "billing_monthly"
+    BILLING_CYCLE_QUARTERLY = "billing_quarterly"
+    BILLING_CYCLE_SEMESTER = "billing_semester"
+    BILLING_CYCLE_ANNUAL = "billing_annual"
+    BILLING_CYCLE_BIENAL = "billing_bienal"
+    BILLING_CYCLE_TRIENAL = "billing_trienal"
+
+    BILLING_CHOICES = [
+        (BILLING_CYCLE_FREE, _("free")),
+        (BILLING_CYCLE_SINGLE, _("single")),
+        (BILLING_CYCLE_MONTHLY, _("monthly")),
+        (BILLING_CYCLE_QUARTERLY, _("quarterly")),
+        (BILLING_CYCLE_SEMESTER, _("semester")),
+        (BILLING_CYCLE_ANNUAL, _("annual")),
+        (BILLING_CYCLE_BIENAL, _("bienal")),
+        (BILLING_CYCLE_TRIENAL, _("trienal")),
+    ]
+
+    BILLING_CYCLE_DAYS = {
+        BILLING_CYCLE_FREE: None,
+        BILLING_CYCLE_SINGLE: None,
+        BILLING_CYCLE_MONTHLY: 30,
+        BILLING_CYCLE_QUARTERLY: 90,
+        BILLING_CYCLE_SEMESTER: 180,
+        BILLING_CYCLE_ANNUAL: 365,
+        BILLING_CYCLE_BIENAL: 730,
+        BILLING_CYCLE_TRIENAL: 1095,
+    }
+
+    PAYMENT_METHOD_CREDIT_CARD = "credit_card"
+    PAYMENT_METHOD_PAYMENT_SLIP = "payment_slip"
+
+    PAYMENT_METHOD_CHOICES = [
+        (PAYMENT_METHOD_CREDIT_CARD, _("credit card")),
+        (PAYMENT_METHOD_PAYMENT_SLIP, _("payment slip")),
+    ]
+
+    organization = models.ForeignKey(
+        Organization, models.CASCADE, related_name="organization_billing"
+    )
+    cycle = models.CharField(
+        _("billing cycle"),
+        max_length=20,
+        choices=BILLING_CHOICES,
+        default=BILLING_CYCLE_MONTHLY,
+    )
+    payment_method = models.CharField(
+        _("payment method"), max_length=12, choices=PAYMENT_METHOD_CHOICES, null=True
+    )
+    next_due_date = models.DateField(_("next due date"), null=True)
+    termination_date = models.DateField(_("termination date"), null=True)
+    credit = models.DecimalField(_("credit"), decimal_places=2, max_digits=2, default=0)
+    notes_administration = models.TextField(
+        _("notes administration"), null=True, blank=True
+    )
+    fixed_discount = models.DecimalField(
+        _("fixed discount"), decimal_places=2, max_digits=2, default=0
+    )
+
+
+class Invoice(models.Model):
+    class Meta:
+        verbose_name = _("organization billing invoice")
+
+    PAYMENT_STATUS_PENDING = "pending"
+    PAYMENT_STATUS_PAID = "paid"
+    PAYMENT_STATUS_CANCELED = "canceled"
+    PAYMENT_STATUS_FRAUD = "fraud"
+
+    PAYMENT_STATUS_CHOICES = [
+        (PAYMENT_STATUS_PENDING, _("pending")),
+        (PAYMENT_STATUS_PAID, _("paid")),
+        (PAYMENT_STATUS_CANCELED, _("canceled")),
+        (PAYMENT_STATUS_FRAUD, _("fraud")),
+    ]
+
+    organization = models.ForeignKey(
+        Organization, models.CASCADE, related_name="organization_billing_invoice"
+    )
+    invoice_random_id = models.IntegerField(_("incremental invoice amount"), default=1)
+    due_date = models.DateField(_("due date"), null=True)
+    paid_date = models.DateField(_("paid date"), null=True)
+    credit = models.DecimalField(_("credit"), decimal_places=2, max_digits=2, null=True)
+    payment_status = models.CharField(
+        _("payment status"),
+        max_length=8,
+        choices=PAYMENT_STATUS_CHOICES,
+        default=PAYMENT_STATUS_PENDING,
+    )
+    payment_method = models.CharField(
+        _("payment method"),
+        max_length=12,
+        choices=BillingPlan.PAYMENT_METHOD_CHOICES,
+        null=True,
+    )
+    notes = models.TextField(_("notes"), null=True, blank=True)
+    tax_rate = models.DecimalField(
+        _("tax rate"), decimal_places=2, max_digits=2, default=0
+    )
+
+
+class InvoiceProject(models.Model):
+    class Meta:
+        verbose_name = _("organization billing invoice project")
+
+    invoice = models.ForeignKey(
+        Invoice, models.CASCADE, related_name="organization_billing_invoice_project"
+    )
+    project = models.ForeignKey(Project, models.CASCADE)
+    amount = models.DecimalField(
+        _("amount"), decimal_places=2, max_digits=11, default=0
+    )
+    contact_count = models.IntegerField(_("active contact count"), default=0)

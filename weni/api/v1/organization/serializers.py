@@ -9,7 +9,48 @@ from weni.common.models import (
     Organization,
     OrganizationAuthorization,
     RequestPermissionOrganization,
+    BillingPlan,
 )
+
+
+class BillingPlanSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BillingPlan
+        fields = [
+            "id",
+            "cycle",
+            "payment_method",
+        ]
+        ref_name = None
+
+    id = serializers.PrimaryKeyRelatedField(read_only=True, source="pk")
+    cycle = serializers.ChoiceField(
+        BillingPlan.BILLING_CHOICES,
+        label=_("billing cycle"),
+        default=BillingPlan.BILLING_CYCLE_MONTHLY,
+    )
+    payment_method = serializers.ChoiceField(
+        BillingPlan.PAYMENT_METHOD_CHOICES,
+        label=_("payment method"),
+        default=BillingPlan.PAYMENT_METHOD_CREDIT_CARD,
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # self.validators.append(EntityNotEqualGroupValidator())
+
+    # def get_group(self, obj):
+    #     if not obj.entity.group:
+    #         return None
+    #     return obj.entity.group.value
+
+    # def create(self, validated_data):
+    #     repository_example = validated_data.pop("repository_example", None)
+    #     assert repository_example
+    #     example_entity = self.Meta.model.objects.create(
+    #         repository_example=repository_example, **validated_data
+    #     )
+    #     return example_entity
 
 
 class OrganizationSeralizer(serializers.ModelSerializer):
@@ -23,6 +64,7 @@ class OrganizationSeralizer(serializers.ModelSerializer):
             "authorizations",
             "authorization",
             "created_at",
+            "organization_billing",
         ]
         ref_name = None
 
@@ -31,6 +73,9 @@ class OrganizationSeralizer(serializers.ModelSerializer):
     inteligence_organization = serializers.IntegerField(read_only=True)
     authorizations = serializers.SerializerMethodField(style={"show": False})
     authorization = serializers.SerializerMethodField(style={"show": False})
+    organization_billing = BillingPlanSerializer(
+        required=True,
+    )
 
     def create(self, validated_data):
         task = tasks.create_organization.delay(  # pragma: no cover
@@ -42,9 +87,13 @@ class OrganizationSeralizer(serializers.ModelSerializer):
 
         organization = task.result
 
+        billing = validated_data.pop("organization_billing")
+
         validated_data.update({"inteligence_organization": organization.get("id")})
 
         instance = super().create(validated_data)
+
+        instance.organization_billing.create(**billing)
 
         instance.send_email_organization_create(
             email=self.context["request"].user.email,
