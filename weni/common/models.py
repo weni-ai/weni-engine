@@ -1,4 +1,5 @@
 import uuid as uuid4
+from decimal import Decimal
 
 from django.conf import settings
 from django.core.mail import send_mail
@@ -8,6 +9,7 @@ from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 from timezone_field import TimeZoneField
 
+from weni import utils
 from weni.authentication.models import User
 
 
@@ -451,9 +453,7 @@ class BillingPlan(models.Model):
     notes_administration = models.TextField(
         _("notes administration"), null=True, blank=True
     )
-    fixed_discount = models.DecimalField(
-        _("fixed discount"), decimal_places=2, max_digits=2, default=0
-    )
+    fixed_discount = models.FloatField(_("fixed discount"), default=0)
 
 
 class Invoice(models.Model):
@@ -492,15 +492,23 @@ class Invoice(models.Model):
         null=True,
     )
     notes = models.TextField(_("notes"), null=True, blank=True)
-    tax_rate = models.DecimalField(
-        _("tax rate"), decimal_places=2, max_digits=2, default=0
-    )
 
     @property
     def total_invoice_amount(self):
         return self.organization_billing_invoice_project.aggregate(
             total_amount=Sum("amount")
         ).get("total_amount")
+
+    def calculate_amount(self, contact_count: int):
+        return Decimal(
+            str(
+                utils.calculate_active_contacts(value=contact_count)
+                * float(
+                    1
+                    - self.organization.organization_billing.get().fixed_discount / 100
+                )
+            )
+        )
 
 
 class InvoiceProject(models.Model):

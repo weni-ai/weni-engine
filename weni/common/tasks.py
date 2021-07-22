@@ -1,5 +1,4 @@
 from datetime import timedelta
-from decimal import Decimal
 
 import requests
 from django.db import transaction
@@ -264,7 +263,7 @@ def generate_project_invoice():
             invoice.organization_billing_invoice_project.create(
                 project=project,
                 contact_count=10,
-                amount=Decimal(str(utils.calculate_active_contacts(value=10))),
+                amount=invoice.calculate_amount(contact_count=10),
             )
         org.organization_billing.update(
             next_due_date=F("next_due_date")

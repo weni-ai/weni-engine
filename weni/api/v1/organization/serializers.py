@@ -37,20 +37,6 @@ class BillingPlanSerializer(serializers.ModelSerializer):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # self.validators.append(EntityNotEqualGroupValidator())
-
-    # def get_group(self, obj):
-    #     if not obj.entity.group:
-    #         return None
-    #     return obj.entity.group.value
-
-    # def create(self, validated_data):
-    #     repository_example = validated_data.pop("repository_example", None)
-    #     assert repository_example
-    #     example_entity = self.Meta.model.objects.create(
-    #         repository_example=repository_example, **validated_data
-    #     )
-    #     return example_entity
 
 
 class OrganizationSeralizer(serializers.ModelSerializer):

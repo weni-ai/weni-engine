@@ -29,7 +29,6 @@ class InvoiceSerializer(serializers.ModelSerializer):
             "credit",
             "payment_status",
             "payment_method",
-            "tax_rate",
             "invoice_details",
             "total_invoice_amount",
         ]
