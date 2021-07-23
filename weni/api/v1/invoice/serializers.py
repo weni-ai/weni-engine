@@ -26,11 +26,12 @@ class InvoiceSerializer(serializers.ModelSerializer):
             "invoice_random_id",
             "due_date",
             "paid_date",
-            "credit",
+            "discount",
             "payment_status",
             "payment_method",
             "invoice_details",
             "total_invoice_amount",
+            "notes",
         ]
         ref_name = None
 

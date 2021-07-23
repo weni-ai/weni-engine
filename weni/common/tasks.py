@@ -258,6 +258,7 @@ def generate_project_invoice():
             invoice_random_id=1
             if org.organization_billing_invoice.last() is None
             else org.organization_billing_invoice.last().invoice_random_id + 1,
+            discount=org.organization_billing.get().fixed_discount,
         )
         for project in org.project.all():
             invoice.organization_billing_invoice_project.create(

@@ -449,7 +449,6 @@ class BillingPlan(models.Model):
     )
     next_due_date = models.DateField(_("next due date"), null=True)
     termination_date = models.DateField(_("termination date"), null=True)
-    credit = models.DecimalField(_("credit"), decimal_places=2, max_digits=2, default=0)
     notes_administration = models.TextField(
         _("notes administration"), null=True, blank=True
     )
@@ -478,7 +477,6 @@ class Invoice(models.Model):
     invoice_random_id = models.IntegerField(_("incremental invoice amount"), default=1)
     due_date = models.DateField(_("due date"), null=True)
     paid_date = models.DateField(_("paid date"), null=True)
-    credit = models.DecimalField(_("credit"), decimal_places=2, max_digits=2, null=True)
     payment_status = models.CharField(
         _("payment status"),
         max_length=8,
@@ -491,6 +489,7 @@ class Invoice(models.Model):
         choices=BillingPlan.PAYMENT_METHOD_CHOICES,
         null=True,
     )
+    discount = models.FloatField(_("discount"), default=0)
     notes = models.TextField(_("notes"), null=True, blank=True)
 
     @property
@@ -503,10 +502,7 @@ class Invoice(models.Model):
         return Decimal(
             str(
                 utils.calculate_active_contacts(value=contact_count)
-                * float(
-                    1
-                    - self.organization.organization_billing.get().fixed_discount / 100
-                )
+                * float(1 - self.discount / 100)
             )
         )
 

@@ -20,6 +20,10 @@ class BillingPlanSerializer(serializers.ModelSerializer):
             "id",
             "cycle",
             "payment_method",
+            "next_due_date",
+            "termination_date",
+            "fixed_discount",
+            "payment_method",
         ]
         ref_name = None
 
@@ -34,6 +38,9 @@ class BillingPlanSerializer(serializers.ModelSerializer):
         label=_("payment method"),
         default=BillingPlan.PAYMENT_METHOD_CREDIT_CARD,
     )
+    fixed_discount = serializers.FloatField(read_only=True)
+    termination_date = serializers.DateField(read_only=True)
+    next_due_date = serializers.DateField(read_only=True)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
