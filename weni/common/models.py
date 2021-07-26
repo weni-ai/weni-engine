@@ -435,6 +435,14 @@ class BillingPlan(models.Model):
         (PAYMENT_METHOD_PAYMENT_SLIP, _("payment slip")),
     ]
 
+    PLAN_FREE = "free"
+    PLAN_ENTERPRISE = "enterprise"
+
+    PLAN_CHOICES = [
+        (PLAN_FREE, _("free")),
+        (PLAN_ENTERPRISE, _("enterprise")),
+    ]
+
     organization = models.ForeignKey(
         Organization, models.CASCADE, related_name="organization_billing"
     )
@@ -453,6 +461,11 @@ class BillingPlan(models.Model):
         _("notes administration"), null=True, blank=True
     )
     fixed_discount = models.FloatField(_("fixed discount"), default=0)
+    plan = models.CharField(
+        _("plan"),
+        max_length=10,
+        choices=PLAN_CHOICES
+    )
 
 
 class Invoice(models.Model):

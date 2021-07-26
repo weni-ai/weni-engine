@@ -24,6 +24,7 @@ class BillingPlanSerializer(serializers.ModelSerializer):
             "termination_date",
             "fixed_discount",
             "payment_method",
+            "plan",
         ]
         ref_name = None
 
@@ -41,6 +42,11 @@ class BillingPlanSerializer(serializers.ModelSerializer):
     fixed_discount = serializers.FloatField(read_only=True)
     termination_date = serializers.DateField(read_only=True)
     next_due_date = serializers.DateField(read_only=True)
+    plan = serializers.ChoiceField(
+        BillingPlan.PLAN_CHOICES,
+        label=_("plan"),
+        required=True
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
