@@ -6,14 +6,19 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('common', '0027_remove_billingplan_credit'),
+        ("common", "0027_remove_billingplan_credit"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='billingplan',
-            name='plan',
-            field=models.CharField(choices=[('free', 'free'), ('enterprise', 'enterprise')], default='free', max_length=10, verbose_name='plan'),
+            model_name="billingplan",
+            name="plan",
+            field=models.CharField(
+                choices=[("free", "free"), ("enterprise", "enterprise")],
+                default="free",
+                max_length=10,
+                verbose_name="plan",
+            ),
             preserve_default=False,
         ),
     ]

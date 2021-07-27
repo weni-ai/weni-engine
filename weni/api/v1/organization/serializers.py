@@ -43,9 +43,7 @@ class BillingPlanSerializer(serializers.ModelSerializer):
     termination_date = serializers.DateField(read_only=True)
     next_due_date = serializers.DateField(read_only=True)
     plan = serializers.ChoiceField(
-        BillingPlan.PLAN_CHOICES,
-        label=_("plan"),
-        required=True
+        BillingPlan.PLAN_CHOICES, label=_("plan"), required=True
     )
 
     def __init__(self, *args, **kwargs):

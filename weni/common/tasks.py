@@ -251,7 +251,7 @@ def sync_updates_projects():
 @app.task()
 def generate_project_invoice():
     for org in Organization.objects.filter(
-        organization_billing__next_due_date=timezone.now().date()
+        organization_billing__next_due_date__lte=timezone.now().date()
     ):
         invoice = org.organization_billing_invoice.create(
             due_date=timezone.now() + timedelta(days=10),

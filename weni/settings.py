@@ -64,6 +64,7 @@ env = environ.Env(
     SEND_REQUEST_FLOW=(bool, False),
     FLOW_MARKETING_UUID=(str, None),
     TOKEN_AUTHORIZATION_FLOW_MARKETING=(str, None),
+    BILLING_TEST_MODE=(bool, False),
 )
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -105,11 +106,13 @@ INSTALLED_APPS = [
     "elasticapm.contrib.django",
     "weni.authentication.apps.AuthenticationConfig",
     "weni.common.apps.CommonConfig",
+    "weni.billing",
     "django_celery_results",
     "django_celery_beat",
     "storages",
     "corsheaders",
     "django_grpc_framework",
+    "stripe",
 ]
 
 MIDDLEWARE = [
@@ -401,3 +404,12 @@ FLOW_CERTIFICATE_GRPC_CRT = env.bool("FLOW_CERTIFICATE_GRPC_CRT")
 SEND_REQUEST_FLOW = env.bool("SEND_REQUEST_FLOW")
 FLOW_MARKETING_UUID = env.str("FLOW_MARKETING_UUID")
 TOKEN_AUTHORIZATION_FLOW_MARKETING = env.str("TOKEN_AUTHORIZATION_FLOW_MARKETING")
+
+
+BILLING_TEST_MODE = env.bool('BILLING_TEST_MODE')
+BILLING_SETTINGS = {
+    "stripe": {
+        "API_KEY": "",
+        "PUBLISHABLE_KEY": "",
+    }
+}

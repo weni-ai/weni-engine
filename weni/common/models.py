@@ -461,11 +461,7 @@ class BillingPlan(models.Model):
         _("notes administration"), null=True, blank=True
     )
     fixed_discount = models.FloatField(_("fixed discount"), default=0)
-    plan = models.CharField(
-        _("plan"),
-        max_length=10,
-        choices=PLAN_CHOICES
-    )
+    plan = models.CharField(_("plan"), max_length=10, choices=PLAN_CHOICES)
 
 
 class Invoice(models.Model):
