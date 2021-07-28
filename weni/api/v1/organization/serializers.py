@@ -1,4 +1,7 @@
+from datetime import timedelta
+
 from django.conf import settings
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 from rest_framework.exceptions import PermissionDenied
@@ -43,11 +46,11 @@ class BillingPlanSerializer(serializers.ModelSerializer):
     termination_date = serializers.DateField(read_only=True)
     next_due_date = serializers.DateField(read_only=True)
     plan = serializers.ChoiceField(
-        BillingPlan.PLAN_CHOICES, label=_("plan"), required=True
+        BillingPlan.PLAN_CHOICES,
+        label=_("plan"),
+        default=BillingPlan.PLAN_FREE,
+        # source='plan'
     )
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class OrganizationSeralizer(serializers.ModelSerializer):
@@ -62,6 +65,7 @@ class OrganizationSeralizer(serializers.ModelSerializer):
             "authorization",
             "created_at",
             "organization_billing",
+            "is_suspended",
         ]
         ref_name = None
 
@@ -73,6 +77,7 @@ class OrganizationSeralizer(serializers.ModelSerializer):
     organization_billing = BillingPlanSerializer(
         required=True,
     )
+    is_suspended = serializers.BooleanField(read_only=True)
 
     def create(self, validated_data):
         task = tasks.create_organization.delay(  # pragma: no cover
@@ -87,6 +92,12 @@ class OrganizationSeralizer(serializers.ModelSerializer):
         billing = validated_data.pop("organization_billing")
 
         validated_data.update({"inteligence_organization": organization.get("id")})
+        billing.update(
+            {
+                "next_due_date": timezone.now()
+                + timedelta(BillingPlan.BILLING_CYCLE_DAYS.get(billing.get("cycle")))
+            }
+        )
 
         instance = super().create(validated_data)
 
