@@ -6,10 +6,17 @@ from django.db.models import F
 from django.utils import timezone
 from grpc._channel import _InactiveRpcError
 
-from weni import utils
+from weni import utils, billing
 from weni.authentication.models import User
 from weni.celery import app
-from weni.common.models import Service, Organization, Project, LogService, BillingPlan
+from weni.common.models import (
+    Service,
+    Organization,
+    Project,
+    LogService,
+    BillingPlan,
+    Invoice,
+)
 
 
 @app.task()
@@ -271,6 +278,19 @@ def generate_project_invoice():
             + timedelta(
                 BillingPlan.BILLING_CYCLE_DAYS.get(org.organization_billing.get().cycle)
             )
+        )
+
+
+@app.task()
+def capture_invoice():
+    for invoice in Invoice.objects.filter(
+        payment_status=Invoice.PAYMENT_STATUS_PENDING
+    ):
+        gateway = billing.get_gateway("stripe")
+        gateway.purchase(
+            money=invoice.total_invoice_amount,
+            identification=invoice.organization.organization_billing.get().stripe_customer,
+            options={"id": invoice.pk},
         )
 
 

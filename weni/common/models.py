@@ -1,3 +1,4 @@
+import logging
 import uuid as uuid4
 from decimal import Decimal
 
@@ -11,6 +12,9 @@ from timezone_field import TimeZoneField
 
 from weni import utils
 from weni.authentication.models import User
+
+
+logger = logging.getLogger(__name__)
 
 
 class Newsletter(models.Model):
@@ -462,6 +466,34 @@ class BillingPlan(models.Model):
     )
     fixed_discount = models.FloatField(_("fixed discount"), default=0)
     plan = models.CharField(_("plan"), max_length=10, choices=PLAN_CHOICES)
+    stripe_customer = models.CharField(
+        verbose_name=_("Stripe Customer"),
+        max_length=32,
+        null=True,
+        blank=True,
+        help_text=_("Our Stripe customer id for your organization"),
+    )
+
+    @property
+    def get_stripe_customer(self):
+        import stripe
+
+        stripe.api_key = settings.BILLING_SETTINGS.get("stripe", {}).get("API_KEY")
+        if not self.stripe_customer:
+            customer = stripe.Customer.create(
+                name=self.organization.name,
+                description="{ org: %d }" % self.organization.pk,
+            )
+            self.stripe_customer = customer.id
+            self.save(update_fields=["stripe_customer"])
+            return customer
+
+        try:
+            customer = stripe.Customer.retrieve(self.stripe_customer)
+            return customer
+        except Exception as e:
+            logger.error(f"Could not get Stripe customer: {str(e)}", exc_info=True)
+            return None
 
 
 class Invoice(models.Model):
@@ -500,6 +532,13 @@ class Invoice(models.Model):
     )
     discount = models.FloatField(_("discount"), default=0)
     notes = models.TextField(_("notes"), null=True, blank=True)
+    stripe_charge = models.CharField(
+        verbose_name=_("Stripe Charge Id"),
+        max_length=32,
+        null=True,
+        blank=True,
+        help_text=_("The Stripe charge id for this charge"),
+    )
 
     @property
     def total_invoice_amount(self):

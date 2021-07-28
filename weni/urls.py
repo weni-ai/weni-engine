@@ -14,6 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.conf import settings
+from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.urls import path, include
@@ -23,7 +24,7 @@ from rest_framework import permissions
 
 from weni.api.v1 import urls as rookly_api_v1_urls
 from weni.api.grpc.project.handlers import grpc_handlers as grpc_project_handlers
-
+from weni.billing.views import StripeHandler
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -39,6 +40,7 @@ urlpatterns = [
     path("", schema_view.with_ui("redoc")),
     path("admin/", admin.site.urls),
     path("v1/", include(rookly_api_v1_urls)),
+    url(r"^handlers/stripe/$", StripeHandler.as_view(), name="handlers.stripe_handler"),
 ]
 
 urlpatterns += staticfiles_urlpatterns()

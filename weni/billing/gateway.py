@@ -1,5 +1,4 @@
 from importlib import import_module
-from typing import Any
 
 from django.conf import settings
 
@@ -27,35 +26,35 @@ class Gateway(object):
     # Name of the gateway.
     display_name = ""
 
-    def purchase(self, money: float, identification: Any, options: dict = None):
+    def purchase(self, money: float, identification, options: dict = None):
         """
         One go authorize and capture transaction
         :return: {'status': 'SUCCESS', 'response': response}
         """
         raise NotImplementedError
 
-    def authorize(self, money: float, identification: Any, options: dict = None):
+    def authorize(self, identification, options: dict = None):
         """
         Authorization for a future capture transaction
         :return: {'status': "SUCCESS", "response": response}
         """
         raise NotImplementedError
 
-    def capture(self, money: float, authorization: Any, options: dict = None):
+    def capture(self, money: float, authorization, options: dict = None):
         """
         Capture funds from a previously authorized transaction
         :return: {'status': "SUCCESS", "response": response}
         """
         raise NotImplementedError
 
-    def credit(self, money: float, identification: Any, options: dict = None):
+    def credit(self, money: float, identification, options: dict = None):
         """
         Refund a previously 'settled' transaction
         :return: {'status': "SUCCESS", "response": response}
         """
         raise NotImplementedError
 
-    def unstore(self, identification: Any, options: dict = None):
+    def unstore(self, identification, options: dict = None):
         """
         Delete the previously stored credit card and user
         profile information on the gateway

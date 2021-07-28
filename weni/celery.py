@@ -30,6 +30,10 @@ app.conf.beat_schedule = {
         "task": "weni.common.tasks.generate_project_invoice",
         "schedule": 5,
     },
+    "capture_invoice": {
+        "task": "weni.common.tasks.capture_invoice",
+        "schedule": 5,
+    },
 }
 
 
