@@ -73,7 +73,6 @@ class OrganizationViewSet(
         methods=["GET"],
         url_name="invoice-setup-intent",
         url_path="invoice/setup_intent/(?P<organization_uuid>[^/.]+)",
-        permission_classes=[AllowAny],
     )
     def setup_intent(self, request, organization_uuid, **kwargs):  # pragma: no cover
         import stripe
