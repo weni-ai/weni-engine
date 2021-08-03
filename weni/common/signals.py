@@ -26,7 +26,7 @@ def create_service_status(sender, instance, created, **kwargs):
             celery_app.send_task(
                 "update_user_permission_project",
                 args=[
-                    instance,
+                    instance.flow_organization,
                     permission.user.email,
                     permission.role,
                 ],
