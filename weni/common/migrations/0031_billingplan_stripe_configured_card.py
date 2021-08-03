@@ -6,13 +6,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('common', '0030_invoice_stripe_charge'),
+        ("common", "0030_invoice_stripe_charge"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='billingplan',
-            name='stripe_configured_card',
-            field=models.BooleanField(default=False, verbose_name='Stripe Customer Configured Card'),
+            model_name="billingplan",
+            name="stripe_configured_card",
+            field=models.BooleanField(
+                default=False, verbose_name="Stripe Customer Configured Card"
+            ),
         ),
     ]

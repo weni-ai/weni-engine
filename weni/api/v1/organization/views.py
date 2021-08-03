@@ -72,11 +72,12 @@ class OrganizationViewSet(
         detail=True,
         methods=["GET"],
         url_name="invoice-setup-intent",
-        url_path='invoice/setup_intent/(?P<organization_uuid>[^/.]+)',
+        url_path="invoice/setup_intent/(?P<organization_uuid>[^/.]+)",
         permission_classes=[AllowAny],
     )
     def setup_intent(self, request, organization_uuid, **kwargs):  # pragma: no cover
         import stripe
+
         organization = get_object_or_404(Organization, uuid=organization_uuid)
 
         self.check_object_permissions(self.request, organization)

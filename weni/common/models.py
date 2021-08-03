@@ -476,7 +476,9 @@ class BillingPlan(models.Model):
         blank=True,
         help_text=_("Our Stripe customer id for your organization"),
     )
-    stripe_configured_card = models.BooleanField(verbose_name=_('Stripe Customer Configured Card'), default=False)
+    stripe_configured_card = models.BooleanField(
+        verbose_name=_("Stripe Customer Configured Card"), default=False
+    )
 
     @property
     def get_stripe_customer(self):

@@ -37,8 +37,8 @@ class StripeHandler(View):  # pragma: no cover
         if not event:
             return HttpResponse("Ignored, no event")
 
-        # if not event.livemode:
-        #     return HttpResponse("Ignored, test event")
+        if not event.livemode and settings.BILLING_TEST_MODE:
+            return HttpResponse("Ignored, test event")
 
         # we only care about invoices being paid or failing
         if event.type == "charge.succeeded" or event.type == "charge.failed":
@@ -55,8 +55,6 @@ class StripeHandler(View):  # pragma: no cover
             ).first()
             if not org:
                 return HttpResponse("Ignored, no org for customer")
-
-            print(event.type)
 
             # look up the topup that matches this charge
             invoice = Invoice.objects.filter(pk=invoice_id).first()
@@ -79,16 +77,11 @@ class StripeHandler(View):  # pragma: no cover
                 ]
             )
             return HttpResponse()
-        elif event.type == 'setup_intent.created':
-            # print('setup_intent.created')
-            pass
-        elif event.type == 'payment_method.attached':
-            customer = stripe_data.get('data', {}).get('object', {}).get('customer')
-            card_id = stripe_data.get('data', {}).get('object', {}).get('id')
+        elif event.type == "payment_method.attached":
+            customer = stripe_data.get("data", {}).get("object", {}).get("customer")
+            card_id = stripe_data.get("data", {}).get("object", {}).get("id")
 
-            org = BillingPlan.objects.filter(
-                stripe_customer=customer
-            ).first()
+            org = BillingPlan.objects.filter(stripe_customer=customer).first()
             if not org:
                 return HttpResponse("Ignored, no org for customer")
 
@@ -98,20 +91,17 @@ class StripeHandler(View):  # pragma: no cover
                 type="card",
             )
 
-            for card in existing_cards.get('data'):
-                if str(card['id']) == str(card_id):
+            for card in existing_cards.get("data"):
+                if str(card["id"]) == str(card_id):
                     continue
                 stripe.PaymentMethod.detach(
-                    card.get('id'),
+                    card.get("id"),
                 )
 
             ###############################################################
 
             org.stripe_configured_card = True
-            org.save(update_fields=['stripe_configured_card'])
-
-        print(event.type)
-        print(stripe_data)
+            org.save(update_fields=["stripe_configured_card"])
 
         # empty response, 200 lets Stripe know we handled it
         return HttpResponse("Ignored, uninteresting event")
