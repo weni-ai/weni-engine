@@ -56,11 +56,15 @@ class StripeHandler(View):  # pragma: no cover
             if not org:
                 return HttpResponse("Ignored, no org for customer")
 
+            print(event.type)
+
             # look up the topup that matches this charge
             invoice = Invoice.objects.filter(pk=invoice_id).first()
-            if invoice and event.type == "charge.failed":
-                invoice.rollback()
-                invoice.save()
+            if event.type == "charge.failed":
+                if invoice:
+                    invoice.rollback()
+                    invoice.save()
+                return HttpResponse("Ignored, charge failed")
 
             invoice.stripe_charge = charge.id
             invoice.paid_date = charge_date
@@ -75,6 +79,39 @@ class StripeHandler(View):  # pragma: no cover
                 ]
             )
             return HttpResponse()
+        elif event.type == 'setup_intent.created':
+            # print('setup_intent.created')
+            pass
+        elif event.type == 'payment_method.attached':
+            customer = stripe_data.get('data', {}).get('object', {}).get('customer')
+            card_id = stripe_data.get('data', {}).get('object', {}).get('id')
+
+            org = BillingPlan.objects.filter(
+                stripe_customer=customer
+            ).first()
+            if not org:
+                return HttpResponse("Ignored, no org for customer")
+
+            # Remove old registered cards and leave only the new card added
+            existing_cards = stripe.PaymentMethod.list(
+                customer=customer,
+                type="card",
+            )
+
+            for card in existing_cards.get('data'):
+                if str(card['id']) == str(card_id):
+                    continue
+                stripe.PaymentMethod.detach(
+                    card.get('id'),
+                )
+
+            ###############################################################
+
+            org.stripe_configured_card = True
+            org.save(update_fields=['stripe_configured_card'])
+
+        print(event.type)
+        print(stripe_data)
 
         # empty response, 200 lets Stripe know we handled it
         return HttpResponse("Ignored, uninteresting event")

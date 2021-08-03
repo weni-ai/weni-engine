@@ -39,8 +39,6 @@ class StripeGateway(Gateway):
                 confirm=True,
                 metadata=options,
             )
-            print(response)
-            print(response.get("charges").get("data")[0].get("id"))
         except self.stripe.error.CardError as error:
             return {"status": "FAILURE", "response": error}
         return {"status": "SUCCESS", "response": response}

@@ -1,9 +1,11 @@
+from django.conf import settings
+from django.http import JsonResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import mixins
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter
 from rest_framework.generics import get_object_or_404
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
@@ -65,6 +67,26 @@ class OrganizationViewSet(
             "delete_organization",
             args=[inteligence_organization, self.request.user.email],
         )
+
+    @action(
+        detail=True,
+        methods=["GET"],
+        url_name="invoice-setup-intent",
+        url_path='invoice/setup_intent/(?P<organization_uuid>[^/.]+)',
+        permission_classes=[AllowAny],
+    )
+    def setup_intent(self, request, organization_uuid, **kwargs):  # pragma: no cover
+        import stripe
+        organization = get_object_or_404(Organization, uuid=organization_uuid)
+
+        self.check_object_permissions(self.request, organization)
+
+        stripe.api_key = settings.BILLING_SETTINGS.get("stripe", {}).get("API_KEY")
+        setup_intent = stripe.SetupIntent.create(
+            customer=organization.organization_billing.get().stripe_customer
+        )
+
+        return JsonResponse(data=setup_intent)
 
 
 class OrganizationAuthorizationViewSet(
