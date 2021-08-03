@@ -43,8 +43,11 @@ class StripeHandler(View):  # pragma: no cover
         # we only care about invoices being paid or failing
         if event.type == "charge.succeeded" or event.type == "charge.failed":
             charge = event.data.object
+            print(charge)
+            print(stripe_data)
             charge_date = datetime.fromtimestamp(charge.created).date()
             invoice_id = charge.metadata.get("id")
+            print(invoice_id)
 
             # look up our customer
             customer = stripe.Customer.retrieve(charge.customer)
@@ -64,17 +67,21 @@ class StripeHandler(View):  # pragma: no cover
                     invoice.save()
                 return HttpResponse("Ignored, charge failed")
 
-            invoice.stripe_charge = charge.id
-            invoice.paid_date = charge_date
-            invoice.payment_status = Invoice.PAYMENT_STATUS_PAID
+            update_fields = [
+                "payment_status",
+                "payment_method",
+            ]
             invoice.payment_method = BillingPlan.PAYMENT_METHOD_CREDIT_CARD
+            if not charge.disputed:
+                invoice.paid_date = charge_date
+                invoice.payment_status = Invoice.PAYMENT_STATUS_PAID
+                invoice.stripe_charge = charge.id
+                update_fields.append('paid_date')
+                update_fields.append('stripe_charge')
+            else:
+                invoice.payment_status = Invoice.PAYMENT_STATUS_FRAUD
             invoice.save(
-                update_fields=[
-                    "stripe_charge",
-                    "paid_date",
-                    "payment_status",
-                    "payment_method",
-                ]
+                update_fields=update_fields
             )
             return HttpResponse()
         elif event.type == "payment_method.attached":
@@ -105,3 +112,9 @@ class StripeHandler(View):  # pragma: no cover
 
         # empty response, 200 lets Stripe know we handled it
         return HttpResponse("Ignored, uninteresting event")
+
+
+
+
+
+
