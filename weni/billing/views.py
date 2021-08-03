@@ -43,11 +43,8 @@ class StripeHandler(View):  # pragma: no cover
         # we only care about invoices being paid or failing
         if event.type == "charge.succeeded" or event.type == "charge.failed":
             charge = event.data.object
-            print(charge)
-            print(stripe_data)
             charge_date = datetime.fromtimestamp(charge.created).date()
             invoice_id = charge.metadata.get("id")
-            print(invoice_id)
 
             # look up our customer
             customer = stripe.Customer.retrieve(charge.customer)
