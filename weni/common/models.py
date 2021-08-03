@@ -60,6 +60,9 @@ class Organization(models.Model):
     description = models.TextField(_("organization description"))
     inteligence_organization = models.IntegerField(_("inteligence organization id"))
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
+    is_suspended = models.BooleanField(
+        default=False, help_text=_("Whether this organization is currently suspended.")
+    )
 
     def __str__(self):
         return f"{self.uuid} - {self.name}"

@@ -258,7 +258,8 @@ def sync_updates_projects():
 @app.task()
 def generate_project_invoice():
     for org in Organization.objects.filter(
-        organization_billing__next_due_date__lte=timezone.now().date()
+        organization_billing__next_due_date__lte=timezone.now().date(),
+        is_suspended=False,
     ):
         invoice = org.organization_billing_invoice.create(
             due_date=timezone.now() + timedelta(days=10),
@@ -268,10 +269,15 @@ def generate_project_invoice():
             discount=org.organization_billing.get().fixed_discount,
         )
         for project in org.project.all():
+            flow_instance = utils.get_grpc_types().get("flow")
+            contact_count = flow_instance.get_project_statistic(
+                project_uuid=str(project.flow_organization),
+            ).get("active_contacts")
+
             invoice.organization_billing_invoice_project.create(
                 project=project,
-                contact_count=10,
-                amount=invoice.calculate_amount(contact_count=10),
+                contact_count=contact_count,
+                amount=invoice.calculate_amount(contact_count=contact_count),
             )
         org.organization_billing.update(
             next_due_date=F("next_due_date")
