@@ -55,6 +55,13 @@ class UserUpdateTestCase(TestCase):
         self.assertEqual(content_data.get("phone"), 996498826)
         self.assertEqual(content_data.get("short_phone_prefix"), 55)
 
+    def test_update_utm(self):
+        response, content_data = self.request(
+            self.user, {"utm": json.dumps("{'utm_source': 'weni'}")}, self.user_token
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(content_data.get("utm"), "{'utm_source': 'weni'}")
+
 
 class DestroyMyProfileTestCase(TestCase):
     def setUp(self):

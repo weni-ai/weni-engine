@@ -4,6 +4,7 @@ from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.contrib.auth.validators import UnicodeUsernameValidator
+from django.contrib.postgres.fields import JSONField
 from django.core.mail import send_mail
 from django.db import models
 from django.template.loader import render_to_string
@@ -99,6 +100,11 @@ class User(AbstractBaseUser, PermissionsMixin):
         null=True,
     )
 
+    utm = JSONField(verbose_name=_("UTM Marketing"), default=dict)
+    email_marketing = models.BooleanField(
+        verbose_name=_("Allows receiving marketing emails"), default=True
+    )
+
     objects = UserManager()
 
     @property
@@ -136,6 +142,8 @@ class User(AbstractBaseUser, PermissionsMixin):
                     "language": self.language,
                     "short_phone_prefix": self.short_phone_prefix,
                     "phone": self.phone,
+                    "utm": self.utm,
+                    "email_marketing": self.email_marketing,
                 },
                 "urns": [f"mailto:{self.email}"],
             },
