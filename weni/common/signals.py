@@ -22,6 +22,16 @@ def create_service_status(sender, instance, created, **kwargs):
         for service in Service.objects.filter(default=True):
             instance.service_status.create(service=service)
 
+        for permission in instance.organization.authorizations.all():
+            celery_app.send_task(
+                "update_user_permission_project",
+                args=[
+                    instance,
+                    permission.user.email,
+                    permission.role,
+                ],
+            )
+
 
 @receiver(post_save, sender=Service)
 def create_service_default_in_all_user(sender, instance, created, **kwargs):
