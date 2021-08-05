@@ -219,6 +219,11 @@ STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
+# Default primary key field type
+# https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
+
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
 # Logging
 
 LOGGING = DEFAULT_LOGGING
@@ -306,14 +311,13 @@ ELASTIC_APM = {
     "SERVER_URL": env.str("APM_SERVER_URL"),
     "ENVIRONMENT": env.str("ENVIRONMENT"),
     "DJANGO_TRANSACTION_NAME_FROM_ROUTE": True,
-    "PROCESSORS": (
+    "PROCESSORS": [
         "elasticapm.processors.sanitize_stacktrace_locals",
         "elasticapm.processors.sanitize_http_request_cookies",
         "elasticapm.processors.sanitize_http_headers",
         "elasticapm.processors.sanitize_http_wsgi_env",
-        "elasticapm.processors.sanitize_http_request_querystring",
         "elasticapm.processors.sanitize_http_request_body",
-    ),
+    ],
 }
 
 # mozilla-django-oidc
