@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import mixins
 from rest_framework.decorators import action
-from rest_framework.filters import SearchFilter
+from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -100,7 +100,7 @@ class OrganizationAuthorizationViewSet(
     serializer_class = OrganizationAuthorizationSerializer
     filter_class = OrganizationAuthorizationFilter
     lookup_fields = ["organization__uuid", "user__id"]
-    filter_backends = [DjangoFilterBackend, SearchFilter]
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     search_fields = [
         "=user__first_name",
         "^user__first_name",
@@ -115,6 +115,8 @@ class OrganizationAuthorizationViewSet(
         "^user__email",
         "$user__email",
     ]
+    ordering = ["-user__first_name"]
+
     permission_classes = [IsAuthenticated]
 
     def get_object(self):
