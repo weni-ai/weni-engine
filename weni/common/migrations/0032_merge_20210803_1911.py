@@ -6,9 +6,8 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('common', '0031_billingplan_stripe_configured_card'),
-        ('common', '0031_organization_is_suspended'),
+        ("common", "0031_billingplan_stripe_configured_card"),
+        ("common", "0031_organization_is_suspended"),
     ]
 
-    operations = [
-    ]
+    operations = []

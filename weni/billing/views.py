@@ -73,13 +73,11 @@ class StripeHandler(View):  # pragma: no cover
                 invoice.paid_date = charge_date
                 invoice.payment_status = Invoice.PAYMENT_STATUS_PAID
                 invoice.stripe_charge = charge.id
-                update_fields.append('paid_date')
-                update_fields.append('stripe_charge')
+                update_fields.append("paid_date")
+                update_fields.append("stripe_charge")
             else:
                 invoice.payment_status = Invoice.PAYMENT_STATUS_FRAUD
-            invoice.save(
-                update_fields=update_fields
-            )
+            invoice.save(update_fields=update_fields)
             return HttpResponse()
         elif event.type == "payment_method.attached":
             customer = stripe_data.get("data", {}).get("object", {}).get("customer")
@@ -109,9 +107,3 @@ class StripeHandler(View):  # pragma: no cover
 
         # empty response, 200 lets Stripe know we handled it
         return HttpResponse("Ignored, uninteresting event")
-
-
-
-
-
-

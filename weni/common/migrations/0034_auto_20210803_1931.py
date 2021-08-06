@@ -6,13 +6,23 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('common', '0033_auto_20210803_1927'),
+        ("common", "0033_auto_20210803_1927"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='invoice',
-            name='payment_status',
-            field=models.CharField(choices=[('pending', 'pending'), ('paid', 'paid'), ('canceled', 'canceled'), ('fraud', 'fraud')], default='pending', max_length=8, verbose_name='payment status'),
+            model_name="invoice",
+            name="payment_status",
+            field=models.CharField(
+                choices=[
+                    ("pending", "pending"),
+                    ("paid", "paid"),
+                    ("canceled", "canceled"),
+                    ("fraud", "fraud"),
+                ],
+                default="pending",
+                max_length=8,
+                verbose_name="payment status",
+            ),
         ),
     ]

@@ -41,9 +41,16 @@ class CreateOrganizationAPITestCase(TestCase):
             {
                 "name": "Organization 1",
                 "description": "This organization is very good",
+                "organization_billing": {
+                    "cycle": "billing_monthly",
+                    "payment_method": "credit_card",
+                    "plan": "free",
+                },
             },
             self.owner_token,
         )
+
+        print(content_data)
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 

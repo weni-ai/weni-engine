@@ -60,11 +60,11 @@ class OrganizationSeralizer(serializers.ModelSerializer):
             "uuid",
             "name",
             "description",
+            "organization_billing",
             "inteligence_organization",
             "authorizations",
             "authorization",
             "created_at",
-            "organization_billing",
             "is_suspended",
         ]
         ref_name = None
@@ -75,7 +75,7 @@ class OrganizationSeralizer(serializers.ModelSerializer):
     authorizations = serializers.SerializerMethodField(style={"show": False})
     authorization = serializers.SerializerMethodField(style={"show": False})
     organization_billing = BillingPlanSerializer(
-        required=True,
+        read_only=True,
     )
     is_suspended = serializers.BooleanField(read_only=True)
 
@@ -89,15 +89,13 @@ class OrganizationSeralizer(serializers.ModelSerializer):
 
         organization = task.result
 
-        billing = validated_data.pop("organization_billing")
-
         validated_data.update({"inteligence_organization": organization.get("id")})
-        billing.update(
-            {
-                "next_due_date": timezone.now()
-                + timedelta(BillingPlan.BILLING_CYCLE_DAYS.get(billing.get("cycle")))
-            }
-        )
+        billing = {
+            "cycle": "billing_monthly",
+            "payment_method": "credit_card",
+            "next_due_date": timezone.now()
+            + timedelta(BillingPlan.BILLING_CYCLE_DAYS.get("billing_monthly")),
+        }
 
         instance = super().create(validated_data)
 
