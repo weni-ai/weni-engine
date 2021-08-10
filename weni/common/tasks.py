@@ -266,7 +266,7 @@ def generate_project_invoice():
             invoice_random_id=1
             if org.organization_billing_invoice.last() is None
             else org.organization_billing_invoice.last().invoice_random_id + 1,
-            discount=org.organization_billing.get().fixed_discount,
+            discount=org.organization_billing.fixed_discount,
         )
         for project in org.project.all():
             flow_instance = utils.get_grpc_types().get("flow")
@@ -282,7 +282,7 @@ def generate_project_invoice():
         org.organization_billing.update(
             next_due_date=F("next_due_date")
             + timedelta(
-                BillingPlan.BILLING_CYCLE_DAYS.get(org.organization_billing.get().cycle)
+                BillingPlan.BILLING_CYCLE_DAYS.get(org.organization_billing.cycle)
             )
         )
 
@@ -295,7 +295,7 @@ def capture_invoice():
         gateway = billing.get_gateway("stripe")
         gateway.purchase(
             money=invoice.total_invoice_amount,
-            identification=invoice.organization.organization_billing.get().stripe_customer,
+            identification=invoice.organization.organization_billing.stripe_customer,
             options={"id": invoice.pk},
         )
 

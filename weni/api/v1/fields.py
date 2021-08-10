@@ -31,3 +31,12 @@ class TimezoneField(serializers.Field):
             return pytz.timezone(str(data))
         except pytz.exceptions.UnknownTimeZoneError:
             raise ValidationError("Unknown timezone")
+
+
+# class OrganizationBillingRelatedField(serializers.ModelSerializer):
+#     def to_representation(self, value):
+#         print(value)
+#         # version = BillingPlan.objects.get(
+#         #     pk=int(value.pk)
+#         # ).repository_version.pk
+#         # return version

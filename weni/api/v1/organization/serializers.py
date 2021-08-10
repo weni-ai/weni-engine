@@ -1,7 +1,4 @@
-from datetime import timedelta
-
 from django.conf import settings
-from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 from rest_framework.exceptions import PermissionDenied
@@ -35,7 +32,7 @@ class BillingPlanSerializer(serializers.ModelSerializer):
     cycle = serializers.ChoiceField(
         BillingPlan.BILLING_CHOICES,
         label=_("billing cycle"),
-        default=BillingPlan.BILLING_CYCLE_MONTHLY,
+        # default=BillingPlan.BILLING_CYCLE_MONTHLY,
     )
     payment_method = serializers.ChoiceField(
         BillingPlan.PAYMENT_METHOD_CHOICES,
@@ -53,7 +50,7 @@ class BillingPlanSerializer(serializers.ModelSerializer):
     )
 
 
-class OrganizationSeralizer(serializers.ModelSerializer):
+class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Organization
         fields = [
@@ -61,6 +58,9 @@ class OrganizationSeralizer(serializers.ModelSerializer):
             "name",
             "description",
             "organization_billing",
+            "organization_billing_cycle",
+            "organization_billing_payment_method",
+            "organization_billing_plan",
             "inteligence_organization",
             "authorizations",
             "authorization",
@@ -74,8 +74,27 @@ class OrganizationSeralizer(serializers.ModelSerializer):
     inteligence_organization = serializers.IntegerField(read_only=True)
     authorizations = serializers.SerializerMethodField(style={"show": False})
     authorization = serializers.SerializerMethodField(style={"show": False})
-    organization_billing = BillingPlanSerializer(
-        read_only=True,
+    organization_billing = BillingPlanSerializer(read_only=True)
+    organization_billing_cycle = serializers.ChoiceField(
+        BillingPlan.BILLING_CHOICES,
+        label=_("billing cycle"),
+        source="organization_billing__cycle",
+        write_only=True,
+        required=True,
+    )
+    organization_billing_payment_method = serializers.ChoiceField(
+        BillingPlan.PAYMENT_METHOD_CHOICES,
+        label=_("payment method"),
+        source="organization_billing__payment_method",
+        write_only=True,
+        required=True,
+    )
+    organization_billing_plan = serializers.ChoiceField(
+        BillingPlan.PLAN_CHOICES,
+        label=_("plan"),
+        source="organization_billing__plan",
+        write_only=True,
+        required=True,
     )
     is_suspended = serializers.BooleanField(read_only=True)
 
@@ -90,16 +109,8 @@ class OrganizationSeralizer(serializers.ModelSerializer):
         organization = task.result
 
         validated_data.update({"inteligence_organization": organization.get("id")})
-        billing = {
-            "cycle": "billing_monthly",
-            "payment_method": "credit_card",
-            "next_due_date": timezone.now()
-            + timedelta(BillingPlan.BILLING_CYCLE_DAYS.get("billing_monthly")),
-        }
 
-        instance = super().create(validated_data)
-
-        instance.organization_billing.create(**billing)
+        instance = super(OrganizationSeralizer, self).create(validated_data)
 
         instance.send_email_organization_create(
             email=self.context["request"].user.email,
