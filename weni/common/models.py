@@ -500,7 +500,7 @@ class BillingPlan(models.Model):
         if not self.stripe_customer:
             customer = stripe.Customer.create(
                 name=self.organization.name,
-                description="{ org: %d }" % self.organization.pk,
+                description=f"ORG: {self.organization.pk}",
             )
             self.stripe_customer = customer.id
             self.save(update_fields=["stripe_customer"])
