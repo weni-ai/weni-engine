@@ -50,8 +50,6 @@ class CreateOrganizationAPITestCase(TestCase):
             self.owner_token,
         )
 
-        print(content_data)
-
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         organization = Organization.objects.get(pk=content_data.get("uuid"))
