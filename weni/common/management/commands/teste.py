@@ -4,7 +4,6 @@ from django.core.management.base import BaseCommand
 from google.protobuf.timestamp_pb2 import Timestamp
 
 from weni import utils
-from weni.billing import get_gateway
 
 
 class Command(BaseCommand):
@@ -16,8 +15,10 @@ class Command(BaseCommand):
 
         flow_instance = utils.get_grpc_types().get("flow")
         x = flow_instance.get_billing_total_statistics(
-            project_uuid='459997b6-22d8-4885-818a-665801ba8aff',
-            before=timestamp.FromDatetime(datetime.datetime.strptime('2020-08-01', "%Y-%m-%d")),
+            project_uuid="459997b6-22d8-4885-818a-665801ba8aff",
+            before=timestamp.FromDatetime(
+                datetime.datetime.strptime("2020-08-01", "%Y-%m-%d")
+            ),
             after=timestamp.FromDatetime(datetime.datetime.now()),
         )
         print(x)

@@ -191,8 +191,8 @@ class FlowType(GRPCType):
     def get_billing_total_statistics(self, project_uuid: str, before: str, after: str):
         stub = billing_pb2_grpc.BillingStub(self.channel)
         response = stub.Total(
-            billing_pb2.BillingRequest(org_uuid=project_uuid, before=before, after=after)
+            billing_pb2.BillingRequest(
+                org_uuid=project_uuid, before=before, after=after
+            )
         )
-        return {
-            "active_contacts": response.active_contacts
-        }
+        return {"active_contacts": response.active_contacts}

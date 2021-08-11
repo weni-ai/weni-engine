@@ -6,13 +6,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('common', '0035_auto_20210811_1828'),
+        ("common", "0035_auto_20210811_1828"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='billingplan',
-            name='card_brand',
-            field=models.CharField(blank=True, max_length=24, null=True, verbose_name='Card Brand'),
+            model_name="billingplan",
+            name="card_brand",
+            field=models.CharField(
+                blank=True, max_length=24, null=True, verbose_name="Card Brand"
+            ),
         ),
     ]

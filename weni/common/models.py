@@ -479,10 +479,18 @@ class BillingPlan(models.Model):
     stripe_configured_card = models.BooleanField(
         verbose_name=_("Stripe Customer Configured Card"), default=False
     )
-    final_card_number = models.IntegerField(verbose_name=_("Final Card Number"), null=True, blank=True)
-    card_expiration_date = models.CharField(verbose_name=_("Card Expiration Date"), null=True, blank=True, max_length=6)
-    cardholder_name = models.TextField(verbose_name=_("Cardholder Name"), null=True, blank=True)
-    card_brand = models.CharField(verbose_name=_("Card Brand"), null=True, blank=True, max_length=24)
+    final_card_number = models.IntegerField(
+        verbose_name=_("Final Card Number"), null=True, blank=True
+    )
+    card_expiration_date = models.CharField(
+        verbose_name=_("Card Expiration Date"), null=True, blank=True, max_length=6
+    )
+    cardholder_name = models.TextField(
+        verbose_name=_("Cardholder Name"), null=True, blank=True
+    )
+    card_brand = models.CharField(
+        verbose_name=_("Card Brand"), null=True, blank=True, max_length=24
+    )
 
     @property
     def get_stripe_customer(self):
