@@ -82,6 +82,8 @@ class StripeHandler(View):  # pragma: no cover
         elif event.type == "payment_method.attached":
             customer = stripe_data.get("data", {}).get("object", {}).get("customer")
             card_id = stripe_data.get("data", {}).get("object", {}).get("id")
+            card_info = stripe_data.get("data", {}).get("object", {}).get('card', {})
+            billing_details = stripe_data.get("data", {}).get("object", {}).get('billing_details', {})
 
             org = BillingPlan.objects.filter(stripe_customer=customer).first()
             if not org:
@@ -103,7 +105,11 @@ class StripeHandler(View):  # pragma: no cover
             ###############################################################
 
             org.stripe_configured_card = True
-            org.save(update_fields=["stripe_configured_card"])
+            org.final_card_number = card_info.get('last4')
+            org.card_expiration_date = f"{card_info.get('exp_month')}/{card_info.get('exp_year')}"
+            org.cardholder_name = billing_details.get('name')
+            org.card_brand = card_info.get('brand')
+            org.save(update_fields=["stripe_configured_card", 'final_card_number', 'card_expiration_date', 'cardholder_name', 'card_brand'])
 
         # empty response, 200 lets Stripe know we handled it
         return HttpResponse("Ignored, uninteresting event")

@@ -5,7 +5,7 @@ from rest_framework import mixins
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.generics import get_object_or_404
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
@@ -73,6 +73,7 @@ class OrganizationViewSet(
         methods=["GET"],
         url_name="invoice-setup-intent",
         url_path="invoice/setup_intent/(?P<organization_uuid>[^/.]+)",
+        permission_classes=[AllowAny]
     )
     def setup_intent(self, request, organization_uuid, **kwargs):  # pragma: no cover
         import stripe
@@ -83,7 +84,7 @@ class OrganizationViewSet(
 
         stripe.api_key = settings.BILLING_SETTINGS.get("stripe", {}).get("API_KEY")
         setup_intent = stripe.SetupIntent.create(
-            customer=organization.organization_billing.get().stripe_customer
+            customer=organization.organization_billing.get().get_stripe_customer.id
         )
 
         return JsonResponse(data=setup_intent)
