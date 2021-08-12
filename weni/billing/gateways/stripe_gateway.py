@@ -4,7 +4,7 @@ from django.conf import settings
 
 
 class StripeGateway(Gateway):
-    default_currency = "BRL"
+    default_currency = "USD"
     display_name = "Stripe"
 
     def __init__(self):
