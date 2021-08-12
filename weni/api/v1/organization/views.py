@@ -83,7 +83,7 @@ class OrganizationViewSet(
 
         stripe.api_key = settings.BILLING_SETTINGS.get("stripe", {}).get("API_KEY")
         setup_intent = stripe.SetupIntent.create(
-            customer=organization.organization_billing.get().get_stripe_customer.id
+            customer=organization.organization_billing.get_stripe_customer.id
         )
 
         return JsonResponse(data=setup_intent)

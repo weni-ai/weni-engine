@@ -1,5 +1,6 @@
 import logging
 import uuid as uuid4
+from datetime import timedelta
 from decimal import Decimal
 
 from django.conf import settings
@@ -7,12 +8,12 @@ from django.core.mail import send_mail
 from django.db import models
 from django.db.models import Sum
 from django.template.loader import render_to_string
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from timezone_field import TimeZoneField
 
 from weni import utils
 from weni.authentication.models import User
-
 
 logger = logging.getLogger(__name__)
 
@@ -49,6 +50,50 @@ class NewsletterLanguage(models.Model):
         return f"Newsletter PK: {self.newsletter.pk} - {self.language} - {self.title}"
 
 
+class OrganizationManager(models.Manager):
+    def create(
+        self,
+        organization_billing__cycle=None,
+        organization_billing__payment_method=None,
+        organization_billing__plan=None,
+        *args,
+        **kwargs,
+    ):
+        instance = super().create(*args, **kwargs)
+        new_kwargs = {}
+
+        if organization_billing__cycle:
+            new_kwargs.update(
+                {
+                    "cycle": organization_billing__cycle,
+                }
+            )
+
+            if (
+                BillingPlan.BILLING_CYCLE_DAYS.get(organization_billing__cycle)
+                is not None
+            ):
+                new_kwargs.update(
+                    {
+                        "next_due_date": timezone.localtime(
+                            timezone.now()
+                            + timedelta(
+                                BillingPlan.BILLING_CYCLE_DAYS.get(
+                                    organization_billing__cycle
+                                )
+                            )
+                        ).date()
+                    }
+                )
+        if organization_billing__payment_method:
+            new_kwargs.update({"payment_method": organization_billing__payment_method})
+        if organization_billing__plan:
+            new_kwargs.update({"plan": organization_billing__plan})
+
+        BillingPlan.objects.create(organization=instance, **new_kwargs)
+        return instance
+
+
 class Organization(models.Model):
     class Meta:
         verbose_name = _("organization")
@@ -63,6 +108,8 @@ class Organization(models.Model):
     is_suspended = models.BooleanField(
         default=False, help_text=_("Whether this organization is currently suspended.")
     )
+
+    objects = OrganizationManager()
 
     def __str__(self):
         return f"{self.uuid} - {self.name}"
@@ -450,7 +497,7 @@ class BillingPlan(models.Model):
         (PLAN_ENTERPRISE, _("enterprise")),
     ]
 
-    organization = models.ForeignKey(
+    organization = models.OneToOneField(
         Organization, models.CASCADE, related_name="organization_billing"
     )
     cycle = models.CharField(
