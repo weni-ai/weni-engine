@@ -1,5 +1,5 @@
 from weni.api.grpc.project.services import ProjectService
-from weni.protos.weni import project_pb2_grpc
+from weni.protos.connect import project_pb2_grpc
 
 
 def grpc_handlers(server):

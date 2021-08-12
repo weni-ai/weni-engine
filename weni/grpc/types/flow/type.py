@@ -2,12 +2,12 @@ import grpc
 from django.conf import settings
 
 from weni.grpc.grpc import GRPCType
-from weni.protos.flow.rapidpro_billing import billing_pb2_grpc, billing_pb2
-from weni.protos.flow.rapidpro_flow import flow_pb2_grpc, flow_pb2
-from weni.protos.flow.rapidpro_org import org_pb2_grpc, org_pb2
-from weni.protos.flow.rapidpro_statistic import statistic_pb2_grpc, statistic_pb2
-from weni.protos.flow.rapidpro_user import user_pb2_grpc, user_pb2
-from weni.protos.flow.rapidpro_classifier import classifier_pb2_grpc, classifier_pb2
+from weni.protos.flow import billing_pb2_grpc, billing_pb2
+from weni.protos.flow import flow_pb2_grpc, flow_pb2
+from weni.protos.flow import org_pb2_grpc, org_pb2
+from weni.protos.flow import statistic_pb2_grpc, statistic_pb2
+from weni.protos.flow import user_pb2_grpc, user_pb2
+from weni.protos.flow import classifier_pb2_grpc, classifier_pb2
 
 
 class FlowType(GRPCType):
