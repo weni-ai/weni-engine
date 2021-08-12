@@ -96,3 +96,6 @@ class GRPCType(metaclass=ABCMeta):
 
     def get_count_inteligences_project(self, classifiers: list):
         raise NotImplementedError()
+
+    def get_billing_total_statistics(self, project_uuid: str, before: str, after: str):
+        raise NotImplementedError()
