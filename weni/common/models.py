@@ -560,6 +560,31 @@ class BillingPlan(models.Model):
             logger.error(f"Could not get Stripe customer: {str(e)}", exc_info=True)
             return None
 
+    @property
+    def invoice_warning(self):
+        invoice = self.organization.organization_billing_invoice.filter(
+            models.Q(payment_status=Invoice.PAYMENT_STATUS_PENDING)
+            & models.Q(capture_payment=False)
+        )
+        return invoice.distinct()
+
+    def allow_payments(self):
+        self.organization.organization_billing_invoice.filter(
+            models.Q(payment_status=Invoice.PAYMENT_STATUS_PENDING)
+            & models.Q(capture_payment=False)
+        ).update(capture_payment=True)
+
+    @property
+    def problem_capture_invoice(self):
+        return True if 0 < len(self.invoice_warning) else False
+
+    @property
+    def payment_warnings(self):
+        w = []
+        if 0 < len(self.invoice_warning):
+            w.append(_("Unable to make payment"))
+        return w
+
 
 class Invoice(models.Model):
     class Meta:
@@ -603,6 +628,13 @@ class Invoice(models.Model):
         null=True,
         blank=True,
         help_text=_("The Stripe charge id for this charge"),
+    )
+    capture_payment = models.BooleanField(
+        default=True,
+        help_text=_(
+            "Controls whether the system will capture the payment, "
+            "if not successful, the user will receive an alert to adjust the payment data"
+        ),
     )
 
     @property

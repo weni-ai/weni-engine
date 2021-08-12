@@ -30,6 +30,8 @@ class BillingPlanSerializer(serializers.ModelSerializer):
             "card_expiration_date",
             "cardholder_name",
             "card_brand",
+            "payment_warnings",
+            "problem_capture_invoice",
         ]
         ref_name = None
 
@@ -69,6 +71,8 @@ class BillingPlanSerializer(serializers.ModelSerializer):
         allow_null=True,
         allow_blank=True,
     )
+    payment_warnings = serializers.ListField()
+    problem_capture_invoice = serializers.BooleanField()
 
 
 class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):

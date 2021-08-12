@@ -2,7 +2,6 @@ from datetime import timedelta
 
 import requests
 from django.db import transaction
-from django.db.models import F
 from django.utils import timezone
 from grpc._channel import _InactiveRpcError
 
@@ -279,25 +278,29 @@ def generate_project_invoice():
                 contact_count=contact_count,
                 amount=invoice.calculate_amount(contact_count=contact_count),
             )
-        org.organization_billing.update(
-            next_due_date=F("next_due_date")
-            + timedelta(
-                BillingPlan.BILLING_CYCLE_DAYS.get(org.organization_billing.cycle)
-            )
+
+        obj = BillingPlan.objects.get(id=org.organization_billing.pk)
+        obj.next_due_date = org.organization_billing.next_due_date + timedelta(
+            BillingPlan.BILLING_CYCLE_DAYS.get(org.organization_billing.cycle)
         )
+        obj.save(update_fields=["next_due_date"])
 
 
 @app.task()
 def capture_invoice():
     for invoice in Invoice.objects.filter(
-        payment_status=Invoice.PAYMENT_STATUS_PENDING
+        payment_status=Invoice.PAYMENT_STATUS_PENDING, capture_payment=True
     ):
         gateway = billing.get_gateway("stripe")
-        gateway.purchase(
+        result = gateway.purchase(
             money=invoice.total_invoice_amount,
             identification=invoice.organization.organization_billing.stripe_customer,
             options={"id": invoice.pk},
         )
+        if result.get("status") == "FAILURE":
+            invoice.capture_payment = False
+            invoice.save(update_fields=["capture_payment"])
+            # add send email
 
 
 @app.task()

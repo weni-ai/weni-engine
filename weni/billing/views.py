@@ -122,6 +122,7 @@ class StripeHandler(View):  # pragma: no cover
                     "card_brand",
                 ]
             )
+            org.allow_payments()
 
         # empty response, 200 lets Stripe know we handled it
         return HttpResponse("Ignored, uninteresting event")

@@ -88,6 +88,23 @@ class OrganizationViewSet(
 
         return JsonResponse(data=setup_intent)
 
+    @action(
+        detail=True,
+        methods=["GET"],
+        url_name="invoice-setup-intent",
+        url_path="retry-capture-payment/(?P<organization_uuid>[^/.]+)",
+    )
+    def retry_capture_payment(
+        self, request, organization_uuid, **kwargs
+    ):  # pragma: no cover
+        organization = get_object_or_404(Organization, uuid=organization_uuid)
+
+        self.check_object_permissions(self.request, organization)
+
+        organization.organization_billing.allow_payments()
+
+        return JsonResponse(data={"status": True})
+
 
 class OrganizationAuthorizationViewSet(
     MultipleFieldLookupMixin,
