@@ -3,6 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 from rest_framework.exceptions import PermissionDenied
 
+from weni.api.v1.fields import TextField
 from weni.api.v1.project.validators import CanContributeInOrganizationValidator
 from weni.common import tasks
 from weni.common.models import (
@@ -25,6 +26,10 @@ class BillingPlanSerializer(serializers.ModelSerializer):
             "fixed_discount",
             "payment_method",
             "plan",
+            "final_card_number",
+            "card_expiration_date",
+            "cardholder_name",
+            "card_brand",
         ]
         ref_name = None
 
@@ -32,7 +37,6 @@ class BillingPlanSerializer(serializers.ModelSerializer):
     cycle = serializers.ChoiceField(
         BillingPlan.BILLING_CHOICES,
         label=_("billing cycle"),
-        # default=BillingPlan.BILLING_CYCLE_MONTHLY,
     )
     payment_method = serializers.ChoiceField(
         BillingPlan.PAYMENT_METHOD_CHOICES,
@@ -43,10 +47,27 @@ class BillingPlanSerializer(serializers.ModelSerializer):
     termination_date = serializers.DateField(read_only=True)
     next_due_date = serializers.DateField(read_only=True)
     plan = serializers.ChoiceField(
-        BillingPlan.PLAN_CHOICES,
-        label=_("plan"),
-        default=BillingPlan.PLAN_FREE,
-        # source='plan'
+        BillingPlan.PLAN_CHOICES, label=_("plan"), default=BillingPlan.PLAN_FREE
+    )
+    final_card_number = serializers.CharField(
+        read_only=True,
+        allow_null=True,
+        allow_blank=True,
+    )
+    card_expiration_date = serializers.CharField(
+        read_only=True,
+        allow_null=True,
+        allow_blank=True,
+    )
+    cardholder_name = TextField(
+        read_only=True,
+        allow_null=True,
+        allow_blank=True,
+    )
+    card_brand = serializers.CharField(
+        read_only=True,
+        allow_null=True,
+        allow_blank=True,
     )
 
 
