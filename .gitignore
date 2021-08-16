@@ -135,6 +135,4 @@ dmypy.json
 staticfiles/
 
 # gRPC
-weni/protos/inteligence/*.py
-weni/protos/flow/
-weni/protos/weni/*.py
+weni/protos/

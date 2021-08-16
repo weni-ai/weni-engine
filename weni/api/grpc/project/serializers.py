@@ -39,6 +39,7 @@ class RetrieveClassifierRequestSerializer(ProtoSerializer):
 
 class DestroyClassifierRequestSerializer(ProtoSerializer):
     uuid = serializers.CharField(required=True)
+    user_email = serializers.CharField(required=True)
 
     class Meta:
         proto_class = project_pb2.ClassifierResponse
