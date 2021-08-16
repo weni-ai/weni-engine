@@ -329,3 +329,18 @@ def delete_status_logs():
 
         num_updated += len(batch)
         print(f" > deleted {num_updated} status logs")
+
+
+@app.task(
+    name="update_suspend_project",
+    autoretry_for=(_InactiveRpcError, Exception),
+    retry_kwargs={"max_retries": 5},
+    retry_backoff=True,
+)
+def update_suspend_project(project_uuid: str, user_email: str, is_suspended: bool):
+    utils.get_grpc_types().get("flow").suspend_project(
+        project_uuid=project_uuid,
+        user_email=user_email,
+        is_suspended=is_suspended,
+    )
+    return True

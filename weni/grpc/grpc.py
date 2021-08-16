@@ -99,3 +99,6 @@ class GRPCType(metaclass=ABCMeta):
 
     def get_billing_total_statistics(self, project_uuid: str, before: str, after: str):
         raise NotImplementedError()
+
+    def suspend_project(self, project_uuid: str, user_email: str, is_suspended: bool):
+        raise NotImplementedError()

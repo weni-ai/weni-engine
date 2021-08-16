@@ -48,6 +48,18 @@ def delete_organization(instance, **kwargs):
         )
 
 
+@receiver(post_save, sender=Organization)
+def update_organization(instance, created, **kwargs):
+    if not created:
+        update_fields = kwargs.get('update_fields') or set()
+
+        if 'is_suspended' in update_fields:
+            for project in instance.project.all():
+
+
+
+
+
 @receiver(post_save, sender=OrganizationAuthorization)
 def org_authorizations(sender, instance, **kwargs):
     if instance.role is not OrganizationAuthorization.LEVEL_NOTHING:

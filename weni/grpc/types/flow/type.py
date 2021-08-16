@@ -196,3 +196,10 @@ class FlowType(GRPCType):
             )
         )
         return {"active_contacts": response.active_contacts}
+
+    def suspend_or_unsuspend_project(self, project_uuid: str, user_email: str, is_suspended: bool):
+        stub = org_pb2_grpc.OrgControllerStub(self.channel)
+        response = stub.Update(
+            org_pb2.OrgUpdateRequest(uuid=project_uuid, user_email=user_email, is_suspended=is_suspended)
+        )
+        return response
