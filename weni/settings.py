@@ -65,6 +65,7 @@ env = environ.Env(
     FLOW_MARKETING_UUID=(str, None),
     TOKEN_AUTHORIZATION_FLOW_MARKETING=(str, None),
     BILLING_TEST_MODE=(bool, False),
+    BILLING_SETTINGS=(dict, {}),
 )
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -410,10 +411,19 @@ FLOW_MARKETING_UUID = env.str("FLOW_MARKETING_UUID")
 TOKEN_AUTHORIZATION_FLOW_MARKETING = env.str("TOKEN_AUTHORIZATION_FLOW_MARKETING")
 
 
-BILLING_TEST_MODE = env.bool("BILLING_TEST_MODE")
-BILLING_SETTINGS = {
+# Billing
+"""
+Set gateway payment setting
+
+example:
+{
     "stripe": {
-        "API_KEY": "sk_test_5eVcwbzie9VRwHATMRRncqrR00x1yFwT3a",
-        "PUBLISHABLE_KEY": "pk_test_swApzrxK2K7euK0hDCykGfk600vMN1Uot0",
+        "API_KEY": "",
+        "PUBLISHABLE_KEY": "",
     }
 }
+
+"""
+
+BILLING_TEST_MODE = env.bool("BILLING_TEST_MODE")
+BILLING_SETTINGS = env.json("BILLING_SETTINGS")

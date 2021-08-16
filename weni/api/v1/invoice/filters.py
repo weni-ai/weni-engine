@@ -18,9 +18,11 @@ class InvoiceFilter(filters.FilterSet):
         help_text=_("Organization's UUID"),
         required=True,
     )
-    start_due_date = filters.DateFilter(lookup_expr="gte", field_name='due_date')
-    end_due_date = filters.DateFilter(lookup_expr="lte", field_name='due_date')
-    payment_status = filters.ChoiceFilter(choices=Invoice.PAYMENT_STATUS_CHOICES, field_name='payment_status')
+    start_due_date = filters.DateFilter(lookup_expr="gte", field_name="due_date")
+    end_due_date = filters.DateFilter(lookup_expr="lte", field_name="due_date")
+    payment_status = filters.ChoiceFilter(
+        choices=Invoice.PAYMENT_STATUS_CHOICES, field_name="payment_status"
+    )
 
     def filter_organization_uuid(self, queryset, name, value):  # pragma: no cover
         request = self.request
