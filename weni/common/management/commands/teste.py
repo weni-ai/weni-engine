@@ -4,7 +4,7 @@ from django.core.management.base import BaseCommand
 from google.protobuf.timestamp_pb2 import Timestamp
 
 from weni import utils
-from weni.common.models import Invoice
+from weni.common.models import Invoice, BillingPlan
 
 
 class Command(BaseCommand):
@@ -23,5 +23,6 @@ class Command(BaseCommand):
         #     after=timestamp.FromDatetime(datetime.datetime.now()),
         # )
         # x = Invoice.objects.get(pk=7).calculate_amount(1)
-        x = Invoice.objects.get(pk=8).total_invoice_amount
-        print(x)
+        # x = Invoice.objects.get(pk=8).total_invoice_amount
+        # print(x)
+        x = BillingPlan.objects.get(pk=2).remove_credit_card

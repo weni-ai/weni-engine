@@ -6,6 +6,7 @@ from django.http import HttpResponse
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 
+from weni import billing
 from weni.common.models import Organization, Invoice, BillingPlan
 
 
@@ -92,17 +93,8 @@ class StripeHandler(View):  # pragma: no cover
                 return HttpResponse("Ignored, no org for customer")
 
             # Remove old registered cards and leave only the new card added
-            existing_cards = stripe.PaymentMethod.list(
-                customer=customer,
-                type="card",
-            )
-
-            for card in existing_cards.get("data"):
-                if str(card["id"]) == str(card_id):
-                    continue
-                stripe.PaymentMethod.detach(
-                    card.get("id"),
-                )
+            gateway = billing.get_gateway("stripe")
+            gateway.unstore(identification=customer, options={"card_id": card_id})
 
             ###############################################################
 

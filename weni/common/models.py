@@ -13,7 +13,7 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from timezone_field import TimeZoneField
 
-from weni import utils
+from weni import utils, billing
 from weni.authentication.models import User
 
 logger = logging.getLogger(__name__)
@@ -586,6 +586,11 @@ class BillingPlan(models.Model):
         if 0 < len(self.invoice_warning):
             w.append(_("Unable to make payment"))
         return w
+
+    @property
+    def remove_credit_card(self):
+        gateway = billing.get_gateway("stripe")
+        return gateway.unstore(identification=self.stripe_customer)
 
 
 class Invoice(models.Model):

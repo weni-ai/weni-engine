@@ -105,6 +105,23 @@ class OrganizationViewSet(
 
         return JsonResponse(data={"status": True})
 
+    @action(
+        detail=True,
+        methods=["GET"],
+        url_name="remove-card-setup",
+        url_path="remove-card-setup/(?P<organization_uuid>[^/.]+)",
+    )
+    def remove_card_setup(
+        self, request, organization_uuid, **kwargs
+    ):  # pragma: no cover
+        organization = get_object_or_404(Organization, uuid=organization_uuid)
+
+        self.check_object_permissions(self.request, organization)
+
+        organization.organization_billing.remove_credit_card()
+
+        return JsonResponse(data={"status": True})
+
 
 class OrganizationAuthorizationViewSet(
     MultipleFieldLookupMixin,

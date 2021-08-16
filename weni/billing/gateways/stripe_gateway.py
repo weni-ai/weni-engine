@@ -42,3 +42,22 @@ class StripeGateway(Gateway):
         except self.stripe.error.CardError as error:
             return {"status": "FAILURE", "response": error}
         return {"status": "SUCCESS", "response": response}
+
+    def unstore(self, identification, options: dict = None):
+        response = []
+        existing_cards = stripe.PaymentMethod.list(
+            customer=identification,
+            type="card",
+        )
+
+        for card in existing_cards.get("data"):
+            if options.get("card_id") and str(card["id"]) == str(
+                options.get("card_id")
+            ):
+                continue
+            response.append(
+                stripe.PaymentMethod.detach(
+                    card.get("id"),
+                )
+            )
+        return {"status": "SUCCESS", "response": response}

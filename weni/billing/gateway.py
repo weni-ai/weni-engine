@@ -56,7 +56,7 @@ class Gateway(object):
 
     def unstore(self, identification, options: dict = None):
         """
-        Delete the previously stored credit card and user
+        Delete the previously stored credit card
         profile information on the gateway
         :return: {'status': "SUCCESS", "response": response}
         """
