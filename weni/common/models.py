@@ -1,3 +1,4 @@
+import decimal
 import logging
 import uuid as uuid4
 from datetime import timedelta
@@ -108,6 +109,7 @@ class Organization(models.Model):
     is_suspended = models.BooleanField(
         default=False, help_text=_("Whether this organization is currently suspended.")
     )
+    extra_integration = models.IntegerField(_("Whatsapp Extra Integration"), default=0)
 
     objects = OrganizationManager()
 
@@ -636,20 +638,26 @@ class Invoice(models.Model):
             "if not successful, the user will receive an alert to adjust the payment data"
         ),
     )
+    extra_integration = models.IntegerField(_("Whatsapp Extra Integration"), default=0)
+    cost_per_whatsapp = models.DecimalField(
+        _("cost per whatsapp"), decimal_places=2, max_digits=11, default=0
+    )
 
     @property
     def total_invoice_amount(self):
-        return self.organization_billing_invoice_project.aggregate(
+        amount = self.organization_billing_invoice_project.aggregate(
             total_amount=Sum("amount")
         ).get("total_amount")
 
+        return Decimal(
+            float(amount + self.cost_per_whatsapp * self.extra_integration)
+            * float(1 - self.discount / 100)
+        ).quantize(Decimal(".01"), decimal.ROUND_HALF_UP)
+
     def calculate_amount(self, contact_count: int):
         return Decimal(
-            str(
-                utils.calculate_active_contacts(value=contact_count)
-                * float(1 - self.discount / 100)
-            )
-        )
+            str(utils.calculate_active_contacts(value=contact_count))
+        ).quantize(Decimal(".01"), decimal.ROUND_HALF_UP)
 
 
 class InvoiceProject(models.Model):

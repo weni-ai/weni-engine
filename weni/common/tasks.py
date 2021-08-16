@@ -1,6 +1,7 @@
 from datetime import timedelta
 
 import requests
+from django.conf import settings
 from django.db import transaction
 from django.utils import timezone
 from grpc._channel import _InactiveRpcError
@@ -266,6 +267,8 @@ def generate_project_invoice():
             if org.organization_billing_invoice.last() is None
             else org.organization_billing_invoice.last().invoice_random_id + 1,
             discount=org.organization_billing.fixed_discount,
+            extra_integration=org.extra_integration,
+            cost_per_whatsapp=settings.BILLING_COST_PER_WHATSAPP,
         )
         for project in org.project.all():
             flow_instance = utils.get_grpc_types().get("flow")
