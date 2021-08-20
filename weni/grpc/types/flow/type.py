@@ -202,7 +202,6 @@ class FlowType(GRPCType):
         response = stub.Update(
             org_pb2.OrgUpdateRequest(
                 uuid=project_uuid,
-                user_email="daniel.yohan@ilhasoft.com.br",
                 is_suspended=is_suspended,
             )
         )

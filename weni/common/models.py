@@ -511,6 +511,7 @@ class BillingPlan(models.Model):
     payment_method = models.CharField(
         _("payment method"), max_length=12, choices=PAYMENT_METHOD_CHOICES, null=True
     )
+    last_invoice_date = models.DateField(_("last invoice"), null=True)
     next_due_date = models.DateField(_("next due date"), null=True)
     termination_date = models.DateField(_("termination date"), null=True)
     notes_administration = models.TextField(

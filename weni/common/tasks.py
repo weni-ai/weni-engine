@@ -1,9 +1,10 @@
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 import requests
 from django.conf import settings
 from django.db import transaction
 from django.utils import timezone
+from google.protobuf.timestamp_pb2 import Timestamp
 from grpc._channel import _InactiveRpcError
 
 from weni import utils, billing
@@ -272,8 +273,25 @@ def generate_project_invoice():
         )
         for project in org.project.all():
             flow_instance = utils.get_grpc_types().get("flow")
-            contact_count = flow_instance.get_project_statistic(
-                project_uuid=str(project.flow_organization),
+            # contact_count = flow_instance.get_project_statistic(
+            #     project_uuid=str(project.flow_organization),
+            # ).get("active_contacts")
+            timestamp = Timestamp()
+
+            contact_count = flow_instance.get_billing_total_statistics(
+                project_uuid="5a9c22c3-d31d-47d2-99bc-03c09f271e21",
+                before=timestamp.FromDatetime(
+                    org.created_at
+                    if org.organization_billing.last_invoice_date is None
+                    else datetime.strptime(
+                        str(org.organization_billing.last_invoice_date), "%Y-%m-%d"
+                    )
+                ),
+                after=timestamp.FromDatetime(
+                    datetime.strptime(
+                        str(org.organization_billing.next_due_date), "%Y-%m-%d"
+                    )
+                ),
             ).get("active_contacts")
 
             invoice.organization_billing_invoice_project.create(
@@ -286,7 +304,8 @@ def generate_project_invoice():
         obj.next_due_date = org.organization_billing.next_due_date + timedelta(
             BillingPlan.BILLING_CYCLE_DAYS.get(org.organization_billing.cycle)
         )
-        obj.save(update_fields=["next_due_date"])
+        obj.last_invoice_date = timezone.now().date()
+        obj.save(update_fields=["next_due_date", "last_invoice_date"])
 
 
 @app.task()

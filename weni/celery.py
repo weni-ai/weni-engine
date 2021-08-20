@@ -32,8 +32,8 @@ app.conf.beat_schedule = {
     },
     "capture_invoice": {
         "task": "weni.common.tasks.capture_invoice",
-        # "schedule": schedules.crontab(hour="8,10,13,15,17", minute=0),
-        "schedule": 30,
+        "schedule": schedules.crontab(hour="8,10,13,15,17", minute=0),
+        # "schedule": 30,
     },
 }
 
