@@ -121,7 +121,12 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
         write_only=True,
         required=True,
     )
-    is_suspended = serializers.BooleanField(read_only=True)
+    is_suspended = serializers.BooleanField(
+        label=_("is suspended"),
+        default=False,
+        required=False,
+        help_text=_("Whether this organization is currently suspended."),
+    )
 
     def create(self, validated_data):
         task = tasks.create_organization.delay(  # pragma: no cover

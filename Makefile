@@ -7,7 +7,7 @@ CHECK_ENVIRONMENT := true
 
 createproto:
 	@rm -rf ./weni/protos/
-	@git clone --depth 1 --branch v1.0.1 https://github.com/Ilhasoft/weni-protobuffers ./weni/protos/
+	@git clone --depth 1 --branch main https://github.com/Ilhasoft/weni-protobuffers ./weni/protos/
 	@python -m grpc_tools.protoc --experimental_allow_proto3_optional --proto_path=./ --python_out=./ --grpc_python_out=./ ./weni/protos/inteligence/authentication.proto
 	@python -m grpc_tools.protoc --experimental_allow_proto3_optional --proto_path=./ --python_out=./ --grpc_python_out=./ ./weni/protos/inteligence/organization.proto
 	@python -m grpc_tools.protoc --experimental_allow_proto3_optional --proto_path=./ --python_out=./ --grpc_python_out=./ ./weni/protos/inteligence/repository.proto

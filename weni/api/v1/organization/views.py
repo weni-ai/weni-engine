@@ -121,7 +121,7 @@ class OrganizationViewSet(
         organization.organization_billing.remove_credit_card()
 
         organization.is_suspended = True
-        organization.save(update_fields=['is_suspended'])
+        organization.save(update_fields=["is_suspended"])
 
         return JsonResponse(data={"status": True})
 

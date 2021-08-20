@@ -27,8 +27,6 @@ class Command(BaseCommand):
         # print(x)
         # x = BillingPlan.objects.get(pk=2).remove_credit_card
         x = flow_instance.suspend_or_unsuspend_project(
-            project_uuid='e24a0ff9-c759-4dcd-a9e0-d7fba6c28346',
-            user_email='daniel.yohan@ilhasoft.com.br',
-            is_suspended=True
+            project_uuid="5a9c22c3-d31d-47d2-99bc-03c09f271e21", is_suspended=True
         ).is_suspended
         print(x)
