@@ -13,15 +13,13 @@ class Command(BaseCommand):
         # gateway = get_gateway("stripe")
         # gateway.purchase(5, "cus_Jvmmq0P9aEP8Fw", {"id": 26})
 
-        timestamp = Timestamp()
-
         flow_instance = utils.get_grpc_types().get("flow")
         x = flow_instance.get_billing_total_statistics(
             project_uuid="5a9c22c3-d31d-47d2-99bc-03c09f271e21",
-            before=timestamp.FromDatetime(
+            before=Timestamp().FromDatetime(
                 datetime.datetime.strptime("2020-08-01", "%Y-%m-%d")
             ),
-            after=timestamp.FromDatetime(datetime.datetime.now()),
+            after=Timestamp().FromDatetime(datetime.datetime.now()),
         )
         # x = Invoice.objects.get(pk=7).calculate_amount(1)
         # x = Invoice.objects.get(pk=8).total_invoice_amount
