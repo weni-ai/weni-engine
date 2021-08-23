@@ -2,7 +2,7 @@ from django_grpc_framework.proto_serializers import ProtoSerializer
 from rest_framework import serializers
 
 from weni.common.models import Project
-from weni.protos.weni import project_pb2
+from weni.protos.connect import project_pb2
 
 
 class ClassifierRequestSerializer(ProtoSerializer):
