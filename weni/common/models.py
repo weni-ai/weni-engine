@@ -1,3 +1,4 @@
+import decimal
 import logging
 import uuid as uuid4
 from datetime import timedelta
@@ -12,7 +13,7 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from timezone_field import TimeZoneField
 
-from weni import utils
+from weni import utils, billing
 from weni.authentication.models import User
 
 logger = logging.getLogger(__name__)
@@ -108,6 +109,7 @@ class Organization(models.Model):
     is_suspended = models.BooleanField(
         default=False, help_text=_("Whether this organization is currently suspended.")
     )
+    extra_integration = models.IntegerField(_("Whatsapp Extra Integration"), default=0)
 
     objects = OrganizationManager()
 
@@ -509,6 +511,7 @@ class BillingPlan(models.Model):
     payment_method = models.CharField(
         _("payment method"), max_length=12, choices=PAYMENT_METHOD_CHOICES, null=True
     )
+    last_invoice_date = models.DateField(_("last invoice"), null=True)
     next_due_date = models.DateField(_("next due date"), null=True)
     termination_date = models.DateField(_("termination date"), null=True)
     notes_administration = models.TextField(
@@ -526,6 +529,18 @@ class BillingPlan(models.Model):
     stripe_configured_card = models.BooleanField(
         verbose_name=_("Stripe Customer Configured Card"), default=False
     )
+    final_card_number = models.IntegerField(
+        verbose_name=_("Final Card Number"), null=True, blank=True
+    )
+    card_expiration_date = models.CharField(
+        verbose_name=_("Card Expiration Date"), null=True, blank=True, max_length=6
+    )
+    cardholder_name = models.TextField(
+        verbose_name=_("Cardholder Name"), null=True, blank=True
+    )
+    card_brand = models.CharField(
+        verbose_name=_("Card Brand"), null=True, blank=True, max_length=24
+    )
 
     @property
     def get_stripe_customer(self):
@@ -535,7 +550,7 @@ class BillingPlan(models.Model):
         if not self.stripe_customer:
             customer = stripe.Customer.create(
                 name=self.organization.name,
-                description="{ org: %d }" % self.organization.pk,
+                description=f"ORG: {self.organization.pk}",
             )
             self.stripe_customer = customer.id
             self.save(update_fields=["stripe_customer"])
@@ -547,6 +562,36 @@ class BillingPlan(models.Model):
         except Exception as e:
             logger.error(f"Could not get Stripe customer: {str(e)}", exc_info=True)
             return None
+
+    @property
+    def invoice_warning(self):
+        invoice = self.organization.organization_billing_invoice.filter(
+            models.Q(payment_status=Invoice.PAYMENT_STATUS_PENDING)
+            & models.Q(capture_payment=False)
+        )
+        return invoice.distinct()
+
+    def allow_payments(self):
+        self.organization.organization_billing_invoice.filter(
+            models.Q(payment_status=Invoice.PAYMENT_STATUS_PENDING)
+            & models.Q(capture_payment=False)
+        ).update(capture_payment=True)
+
+    @property
+    def problem_capture_invoice(self):
+        return True if 0 < len(self.invoice_warning) else False
+
+    @property
+    def payment_warnings(self):
+        w = []
+        if 0 < len(self.invoice_warning):
+            w.append(_("Unable to make payment"))
+        return w
+
+    @property
+    def remove_credit_card(self):
+        gateway = billing.get_gateway("stripe")
+        return gateway.unstore(identification=self.stripe_customer)
 
 
 class Invoice(models.Model):
@@ -592,20 +637,37 @@ class Invoice(models.Model):
         blank=True,
         help_text=_("The Stripe charge id for this charge"),
     )
+    capture_payment = models.BooleanField(
+        default=True,
+        help_text=_(
+            "Controls whether the system will capture the payment, "
+            "if not successful, the user will receive an alert to adjust the payment data"
+        ),
+    )
+    extra_integration = models.IntegerField(_("Whatsapp Extra Integration"), default=0)
+    cost_per_whatsapp = models.DecimalField(
+        _("cost per whatsapp"), decimal_places=2, max_digits=11, default=0
+    )
 
     @property
     def total_invoice_amount(self):
-        return self.organization_billing_invoice_project.aggregate(
+        amount = self.organization_billing_invoice_project.aggregate(
             total_amount=Sum("amount")
         ).get("total_amount")
 
+        return Decimal(
+            float(
+                0
+                if amount is None
+                else amount + self.cost_per_whatsapp * self.extra_integration
+            )
+            * float(1 - self.discount / 100)
+        ).quantize(Decimal(".01"), decimal.ROUND_HALF_UP)
+
     def calculate_amount(self, contact_count: int):
         return Decimal(
-            str(
-                utils.calculate_active_contacts(value=contact_count)
-                * float(1 - self.discount / 100)
-            )
-        )
+            str(utils.calculate_active_contacts(value=contact_count))
+        ).quantize(Decimal(".01"), decimal.ROUND_HALF_UP)
 
 
 class InvoiceProject(models.Model):

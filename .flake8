@@ -4,3 +4,4 @@ ignore = E501,W503,E203
 exclude =
   ./manage.py
   ./weni/protos/*.py
+  ./weni/common/management/commands/*.py

@@ -6,6 +6,7 @@ from django.http import HttpResponse
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 
+from weni import billing
 from weni.common.models import Organization, Invoice, BillingPlan
 
 
@@ -82,28 +83,38 @@ class StripeHandler(View):  # pragma: no cover
         elif event.type == "payment_method.attached":
             customer = stripe_data.get("data", {}).get("object", {}).get("customer")
             card_id = stripe_data.get("data", {}).get("object", {}).get("id")
+            card_info = stripe_data.get("data", {}).get("object", {}).get("card", {})
+            billing_details = (
+                stripe_data.get("data", {}).get("object", {}).get("billing_details", {})
+            )
 
             org = BillingPlan.objects.filter(stripe_customer=customer).first()
             if not org:
                 return HttpResponse("Ignored, no org for customer")
 
             # Remove old registered cards and leave only the new card added
-            existing_cards = stripe.PaymentMethod.list(
-                customer=customer,
-                type="card",
-            )
-
-            for card in existing_cards.get("data"):
-                if str(card["id"]) == str(card_id):
-                    continue
-                stripe.PaymentMethod.detach(
-                    card.get("id"),
-                )
+            gateway = billing.get_gateway("stripe")
+            gateway.unstore(identification=customer, options={"card_id": card_id})
 
             ###############################################################
 
             org.stripe_configured_card = True
-            org.save(update_fields=["stripe_configured_card"])
+            org.final_card_number = card_info.get("last4")
+            org.card_expiration_date = (
+                f"{card_info.get('exp_month')}/{card_info.get('exp_year')}"
+            )
+            org.cardholder_name = billing_details.get("name")
+            org.card_brand = card_info.get("brand")
+            org.save(
+                update_fields=[
+                    "stripe_configured_card",
+                    "final_card_number",
+                    "card_expiration_date",
+                    "cardholder_name",
+                    "card_brand",
+                ]
+            )
+            org.allow_payments()
 
         # empty response, 200 lets Stripe know we handled it
         return HttpResponse("Ignored, uninteresting event")

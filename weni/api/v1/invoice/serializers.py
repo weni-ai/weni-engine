@@ -32,6 +32,8 @@ class InvoiceSerializer(serializers.ModelSerializer):
             "invoice_details",
             "total_invoice_amount",
             "notes",
+            "extra_integration",
+            "cost_per_whatsapp",
         ]
         ref_name = None
 
