@@ -6,7 +6,7 @@ WORKDIR $WORKDIR
 RUN apt-get update \
  && apt-get install --no-install-recommends --no-install-suggests -y apt-utils \
  && apt-get install --no-install-recommends --no-install-suggests -y gcc bzip2 git curl nginx libpq-dev gettext \
-    libgdal-dev python3-cffi python3-gdal vim
+    libgdal-dev python3-cffi python3-gdal vim build-essential
 
 RUN pip install -U pip==21.2.2 setuptools==57.4.0
 RUN pip install pipenv==2021.5.29
