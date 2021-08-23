@@ -10,5 +10,10 @@ class CanContributeInOrganizationValidator(object):
                 _("You can't contribute in this organization")
             )  # pragma: no cover
 
+        if value.is_suspended:
+            raise PermissionDenied(
+                _("Your organization is suspended")
+            )  # pragma: no cover
+
     def set_context(self, serializer):
         self.request = serializer.context.get("request")

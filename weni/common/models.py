@@ -1,13 +1,22 @@
+import decimal
+import logging
 import uuid as uuid4
+from datetime import timedelta
+from decimal import Decimal
 
 from django.conf import settings
 from django.core.mail import send_mail
 from django.db import models
+from django.db.models import Sum
 from django.template.loader import render_to_string
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from timezone_field import TimeZoneField
 
+from weni import utils, billing
 from weni.authentication.models import User
+
+logger = logging.getLogger(__name__)
 
 
 class Newsletter(models.Model):
@@ -42,6 +51,50 @@ class NewsletterLanguage(models.Model):
         return f"Newsletter PK: {self.newsletter.pk} - {self.language} - {self.title}"
 
 
+class OrganizationManager(models.Manager):
+    def create(
+        self,
+        organization_billing__cycle=None,
+        organization_billing__payment_method=None,
+        organization_billing__plan=None,
+        *args,
+        **kwargs,
+    ):
+        instance = super().create(*args, **kwargs)
+        new_kwargs = {}
+
+        if organization_billing__cycle:
+            new_kwargs.update(
+                {
+                    "cycle": organization_billing__cycle,
+                }
+            )
+
+            if (
+                BillingPlan.BILLING_CYCLE_DAYS.get(organization_billing__cycle)
+                is not None
+            ):
+                new_kwargs.update(
+                    {
+                        "next_due_date": timezone.localtime(
+                            timezone.now()
+                            + timedelta(
+                                BillingPlan.BILLING_CYCLE_DAYS.get(
+                                    organization_billing__cycle
+                                )
+                            )
+                        ).date()
+                    }
+                )
+        if organization_billing__payment_method:
+            new_kwargs.update({"payment_method": organization_billing__payment_method})
+        if organization_billing__plan:
+            new_kwargs.update({"plan": organization_billing__plan})
+
+        BillingPlan.objects.create(organization=instance, **new_kwargs)
+        return instance
+
+
 class Organization(models.Model):
     class Meta:
         verbose_name = _("organization")
@@ -53,6 +106,12 @@ class Organization(models.Model):
     description = models.TextField(_("organization description"))
     inteligence_organization = models.IntegerField(_("inteligence organization id"))
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
+    is_suspended = models.BooleanField(
+        default=False, help_text=_("Whether this organization is currently suspended.")
+    )
+    extra_integration = models.IntegerField(_("Whatsapp Extra Integration"), default=0)
+
+    objects = OrganizationManager()
 
     def __str__(self):
         return f"{self.uuid} - {self.name}"
@@ -386,3 +445,240 @@ class RequestPermissionOrganization(models.Model):
         default=OrganizationAuthorization.ROLE_NOT_SETTED,
     )
     created_by = models.ForeignKey(User, models.CASCADE)
+
+
+class BillingPlan(models.Model):
+    class Meta:
+        verbose_name = _("organization billing plan")
+        unique_together = ["organization"]
+
+    BILLING_CYCLE_FREE = "billing_free"
+    BILLING_CYCLE_SINGLE = "billing_single"
+    BILLING_CYCLE_MONTHLY = "billing_monthly"
+    BILLING_CYCLE_QUARTERLY = "billing_quarterly"
+    BILLING_CYCLE_SEMESTER = "billing_semester"
+    BILLING_CYCLE_ANNUAL = "billing_annual"
+    BILLING_CYCLE_BIENAL = "billing_bienal"
+    BILLING_CYCLE_TRIENAL = "billing_trienal"
+
+    BILLING_CHOICES = [
+        (BILLING_CYCLE_FREE, _("free")),
+        (BILLING_CYCLE_SINGLE, _("single")),
+        (BILLING_CYCLE_MONTHLY, _("monthly")),
+        (BILLING_CYCLE_QUARTERLY, _("quarterly")),
+        (BILLING_CYCLE_SEMESTER, _("semester")),
+        (BILLING_CYCLE_ANNUAL, _("annual")),
+        (BILLING_CYCLE_BIENAL, _("bienal")),
+        (BILLING_CYCLE_TRIENAL, _("trienal")),
+    ]
+
+    BILLING_CYCLE_DAYS = {
+        BILLING_CYCLE_FREE: None,
+        BILLING_CYCLE_SINGLE: None,
+        BILLING_CYCLE_MONTHLY: 30,
+        BILLING_CYCLE_QUARTERLY: 90,
+        BILLING_CYCLE_SEMESTER: 180,
+        BILLING_CYCLE_ANNUAL: 365,
+        BILLING_CYCLE_BIENAL: 730,
+        BILLING_CYCLE_TRIENAL: 1095,
+    }
+
+    PAYMENT_METHOD_CREDIT_CARD = "credit_card"
+    PAYMENT_METHOD_PAYMENT_SLIP = "payment_slip"
+
+    PAYMENT_METHOD_CHOICES = [
+        (PAYMENT_METHOD_CREDIT_CARD, _("credit card")),
+        (PAYMENT_METHOD_PAYMENT_SLIP, _("payment slip")),
+    ]
+
+    PLAN_FREE = "free"
+    PLAN_ENTERPRISE = "enterprise"
+
+    PLAN_CHOICES = [
+        (PLAN_FREE, _("free")),
+        (PLAN_ENTERPRISE, _("enterprise")),
+    ]
+
+    organization = models.OneToOneField(
+        Organization, models.CASCADE, related_name="organization_billing"
+    )
+    cycle = models.CharField(
+        _("billing cycle"),
+        max_length=20,
+        choices=BILLING_CHOICES,
+        default=BILLING_CYCLE_MONTHLY,
+    )
+    payment_method = models.CharField(
+        _("payment method"), max_length=12, choices=PAYMENT_METHOD_CHOICES, null=True
+    )
+    last_invoice_date = models.DateField(_("last invoice"), null=True)
+    next_due_date = models.DateField(_("next due date"), null=True)
+    termination_date = models.DateField(_("termination date"), null=True)
+    notes_administration = models.TextField(
+        _("notes administration"), null=True, blank=True
+    )
+    fixed_discount = models.FloatField(_("fixed discount"), default=0)
+    plan = models.CharField(_("plan"), max_length=10, choices=PLAN_CHOICES)
+    stripe_customer = models.CharField(
+        verbose_name=_("Stripe Customer"),
+        max_length=32,
+        null=True,
+        blank=True,
+        help_text=_("Our Stripe customer id for your organization"),
+    )
+    stripe_configured_card = models.BooleanField(
+        verbose_name=_("Stripe Customer Configured Card"), default=False
+    )
+    final_card_number = models.IntegerField(
+        verbose_name=_("Final Card Number"), null=True, blank=True
+    )
+    card_expiration_date = models.CharField(
+        verbose_name=_("Card Expiration Date"), null=True, blank=True, max_length=6
+    )
+    cardholder_name = models.TextField(
+        verbose_name=_("Cardholder Name"), null=True, blank=True
+    )
+    card_brand = models.CharField(
+        verbose_name=_("Card Brand"), null=True, blank=True, max_length=24
+    )
+
+    @property
+    def get_stripe_customer(self):
+        import stripe
+
+        stripe.api_key = settings.BILLING_SETTINGS.get("stripe", {}).get("API_KEY")
+        if not self.stripe_customer:
+            customer = stripe.Customer.create(
+                name=self.organization.name,
+                description=f"ORG: {self.organization.pk}",
+            )
+            self.stripe_customer = customer.id
+            self.save(update_fields=["stripe_customer"])
+            return customer
+
+        try:
+            customer = stripe.Customer.retrieve(self.stripe_customer)
+            return customer
+        except Exception as e:
+            logger.error(f"Could not get Stripe customer: {str(e)}", exc_info=True)
+            return None
+
+    @property
+    def invoice_warning(self):
+        invoice = self.organization.organization_billing_invoice.filter(
+            models.Q(payment_status=Invoice.PAYMENT_STATUS_PENDING)
+            & models.Q(capture_payment=False)
+        )
+        return invoice.distinct()
+
+    def allow_payments(self):
+        self.organization.organization_billing_invoice.filter(
+            models.Q(payment_status=Invoice.PAYMENT_STATUS_PENDING)
+            & models.Q(capture_payment=False)
+        ).update(capture_payment=True)
+
+    @property
+    def problem_capture_invoice(self):
+        return True if 0 < len(self.invoice_warning) else False
+
+    @property
+    def payment_warnings(self):
+        w = []
+        if 0 < len(self.invoice_warning):
+            w.append(_("Unable to make payment"))
+        return w
+
+    @property
+    def remove_credit_card(self):
+        gateway = billing.get_gateway("stripe")
+        return gateway.unstore(identification=self.stripe_customer)
+
+
+class Invoice(models.Model):
+    class Meta:
+        verbose_name = _("organization billing invoice")
+
+    PAYMENT_STATUS_PENDING = "pending"
+    PAYMENT_STATUS_PAID = "paid"
+    PAYMENT_STATUS_CANCELED = "canceled"
+    PAYMENT_STATUS_FRAUD = "fraud"
+
+    PAYMENT_STATUS_CHOICES = [
+        (PAYMENT_STATUS_PENDING, _("pending")),
+        (PAYMENT_STATUS_PAID, _("paid")),
+        (PAYMENT_STATUS_CANCELED, _("canceled")),
+        (PAYMENT_STATUS_FRAUD, _("fraud")),
+    ]
+
+    organization = models.ForeignKey(
+        Organization, models.CASCADE, related_name="organization_billing_invoice"
+    )
+    invoice_random_id = models.IntegerField(_("incremental invoice amount"), default=1)
+    due_date = models.DateField(_("due date"), null=True)
+    paid_date = models.DateField(_("paid date"), null=True)
+    payment_status = models.CharField(
+        _("payment status"),
+        max_length=8,
+        choices=PAYMENT_STATUS_CHOICES,
+        default=PAYMENT_STATUS_PENDING,
+    )
+    payment_method = models.CharField(
+        _("payment method"),
+        max_length=12,
+        choices=BillingPlan.PAYMENT_METHOD_CHOICES,
+        null=True,
+    )
+    discount = models.FloatField(_("discount"), default=0)
+    notes = models.TextField(_("notes"), null=True, blank=True)
+    stripe_charge = models.CharField(
+        verbose_name=_("Stripe Charge Id"),
+        max_length=32,
+        null=True,
+        blank=True,
+        help_text=_("The Stripe charge id for this charge"),
+    )
+    capture_payment = models.BooleanField(
+        default=True,
+        help_text=_(
+            "Controls whether the system will capture the payment, "
+            "if not successful, the user will receive an alert to adjust the payment data"
+        ),
+    )
+    extra_integration = models.IntegerField(_("Whatsapp Extra Integration"), default=0)
+    cost_per_whatsapp = models.DecimalField(
+        _("cost per whatsapp"), decimal_places=2, max_digits=11, default=0
+    )
+
+    @property
+    def total_invoice_amount(self):
+        amount = self.organization_billing_invoice_project.aggregate(
+            total_amount=Sum("amount")
+        ).get("total_amount")
+
+        return Decimal(
+            float(
+                0
+                if amount is None
+                else amount + self.cost_per_whatsapp * self.extra_integration
+            )
+            * float(1 - self.discount / 100)
+        ).quantize(Decimal(".01"), decimal.ROUND_HALF_UP)
+
+    def calculate_amount(self, contact_count: int):
+        return Decimal(
+            str(utils.calculate_active_contacts(value=contact_count))
+        ).quantize(Decimal(".01"), decimal.ROUND_HALF_UP)
+
+
+class InvoiceProject(models.Model):
+    class Meta:
+        verbose_name = _("organization billing invoice project")
+
+    invoice = models.ForeignKey(
+        Invoice, models.CASCADE, related_name="organization_billing_invoice_project"
+    )
+    project = models.ForeignKey(Project, models.CASCADE)
+    amount = models.DecimalField(
+        _("amount"), decimal_places=2, max_digits=11, default=0
+    )
+    contact_count = models.IntegerField(_("active contact count"), default=0)

@@ -1,12 +1,23 @@
+from datetime import timedelta, datetime
+
 import requests
+from django.conf import settings
 from django.db import transaction
 from django.utils import timezone
+from google.protobuf.timestamp_pb2 import Timestamp
 from grpc._channel import _InactiveRpcError
 
-from weni import utils
+from weni import utils, billing
 from weni.authentication.models import User
 from weni.celery import app
-from weni.common.models import Service, Organization, Project, LogService
+from weni.common.models import (
+    Service,
+    Organization,
+    Project,
+    LogService,
+    BillingPlan,
+    Invoice,
+)
 
 
 @app.task()
@@ -246,6 +257,71 @@ def sync_updates_projects():
 
 
 @app.task()
+def generate_project_invoice():
+    for org in Organization.objects.filter(
+        organization_billing__next_due_date__lte=timezone.now().date(),
+        is_suspended=False,
+    ):
+        invoice = org.organization_billing_invoice.create(
+            due_date=timezone.now() + timedelta(days=10),
+            invoice_random_id=1
+            if org.organization_billing_invoice.last() is None
+            else org.organization_billing_invoice.last().invoice_random_id + 1,
+            discount=org.organization_billing.fixed_discount,
+            extra_integration=org.extra_integration,
+            cost_per_whatsapp=settings.BILLING_COST_PER_WHATSAPP,
+        )
+        for project in org.project.all():
+            flow_instance = utils.get_grpc_types().get("flow")
+
+            contact_count = flow_instance.get_billing_total_statistics(
+                project_uuid="5a9c22c3-d31d-47d2-99bc-03c09f271e21",
+                before=Timestamp().FromDatetime(
+                    org.created_at
+                    if org.organization_billing.last_invoice_date is None
+                    else datetime.strptime(
+                        str(org.organization_billing.last_invoice_date), "%Y-%m-%d"
+                    )
+                ),
+                after=Timestamp().FromDatetime(
+                    datetime.strptime(
+                        str(org.organization_billing.next_due_date), "%Y-%m-%d"
+                    )
+                ),
+            ).get("active_contacts")
+
+            invoice.organization_billing_invoice_project.create(
+                project=project,
+                contact_count=contact_count,
+                amount=invoice.calculate_amount(contact_count=contact_count),
+            )
+
+        obj = BillingPlan.objects.get(id=org.organization_billing.pk)
+        obj.next_due_date = org.organization_billing.next_due_date + timedelta(
+            BillingPlan.BILLING_CYCLE_DAYS.get(org.organization_billing.cycle)
+        )
+        obj.last_invoice_date = timezone.now().date()
+        obj.save(update_fields=["next_due_date", "last_invoice_date"])
+
+
+@app.task()
+def capture_invoice():
+    for invoice in Invoice.objects.filter(
+        payment_status=Invoice.PAYMENT_STATUS_PENDING, capture_payment=True
+    ):
+        gateway = billing.get_gateway("stripe")
+        result = gateway.purchase(
+            money=invoice.total_invoice_amount,
+            identification=invoice.organization.organization_billing.stripe_customer,
+            options={"id": invoice.pk},
+        )
+        if result.get("status") == "FAILURE":
+            invoice.capture_payment = False
+            invoice.save(update_fields=["capture_payment"])
+            # add send email
+
+
+@app.task()
 def delete_status_logs():
     BATCH_SIZE = 5000
     logs = LogService.objects.filter(
@@ -268,3 +344,17 @@ def delete_status_logs():
 
         num_updated += len(batch)
         print(f" > deleted {num_updated} status logs")
+
+
+@app.task(
+    name="update_suspend_project",
+    autoretry_for=(_InactiveRpcError, Exception),
+    retry_kwargs={"max_retries": 5},
+    retry_backoff=True,
+)
+def update_suspend_project(project_uuid: str, is_suspended: bool):
+    utils.get_grpc_types().get("flow").suspend_project(
+        project_uuid=project_uuid,
+        is_suspended=is_suspended,
+    )
+    return True

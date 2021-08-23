@@ -1,3 +1,5 @@
+from django.conf import settings
+from django.http import JsonResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import mixins
 from rest_framework.decorators import action
@@ -7,7 +9,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from weni.celery import app as celery_app
 from weni.api.v1.metadata import Metadata
 from weni.api.v1.mixins import MultipleFieldLookupMixin
 from weni.api.v1.organization.filters import (
@@ -25,6 +26,7 @@ from weni.api.v1.organization.serializers import (
     RequestPermissionOrganizationSerializer,
 )
 from weni.authentication.models import User
+from weni.celery import app as celery_app
 from weni.common.models import (
     Organization,
     OrganizationAuthorization,
@@ -65,6 +67,63 @@ class OrganizationViewSet(
             "delete_organization",
             args=[inteligence_organization, self.request.user.email],
         )
+
+    @action(
+        detail=True,
+        methods=["GET"],
+        url_name="invoice-setup-intent",
+        url_path="invoice/setup_intent/(?P<organization_uuid>[^/.]+)",
+    )
+    def setup_intent(self, request, organization_uuid, **kwargs):  # pragma: no cover
+        import stripe
+
+        organization = get_object_or_404(Organization, uuid=organization_uuid)
+
+        self.check_object_permissions(self.request, organization)
+
+        stripe.api_key = settings.BILLING_SETTINGS.get("stripe", {}).get("API_KEY")
+        setup_intent = stripe.SetupIntent.create(
+            customer=organization.organization_billing.get_stripe_customer.id
+        )
+
+        return JsonResponse(data=setup_intent)
+
+    @action(
+        detail=True,
+        methods=["GET"],
+        url_name="invoice-setup-intent",
+        url_path="retry-capture-payment/(?P<organization_uuid>[^/.]+)",
+    )
+    def retry_capture_payment(
+        self, request, organization_uuid, **kwargs
+    ):  # pragma: no cover
+        organization = get_object_or_404(Organization, uuid=organization_uuid)
+
+        self.check_object_permissions(self.request, organization)
+
+        organization.organization_billing.allow_payments()
+
+        return JsonResponse(data={"status": True})
+
+    @action(
+        detail=True,
+        methods=["GET"],
+        url_name="remove-card-setup",
+        url_path="remove-card-setup/(?P<organization_uuid>[^/.]+)",
+    )
+    def remove_card_setup(
+        self, request, organization_uuid, **kwargs
+    ):  # pragma: no cover
+        organization = get_object_or_404(Organization, uuid=organization_uuid)
+
+        self.check_object_permissions(self.request, organization)
+
+        organization.organization_billing.remove_credit_card()
+
+        organization.is_suspended = True
+        organization.save(update_fields=["is_suspended"])
+
+        return JsonResponse(data={"status": True})
 
 
 class OrganizationAuthorizationViewSet(

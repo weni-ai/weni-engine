@@ -11,7 +11,7 @@ from rest_framework.viewsets import GenericViewSet
 from weni.api.v1.metadata import Metadata
 from weni.api.v1.project.filters import ProjectOrgFilter
 from weni.api.v1.project.permissions import ProjectHasPermission
-from weni.api.v1.project.serializers import ProjectSeralizer, ProjectSearchSerializer
+from weni.api.v1.project.serializers import ProjectSerializer, ProjectSearchSerializer
 from weni.celery import app as celery_app
 from weni.common.models import OrganizationAuthorization, Project
 
@@ -25,7 +25,7 @@ class ProjectViewSet(
     GenericViewSet,
 ):
     queryset = Project.objects.all()
-    serializer_class = ProjectSeralizer
+    serializer_class = ProjectSerializer
     permission_classes = [IsAuthenticated, ProjectHasPermission]
     filter_class = ProjectOrgFilter
     filter_backends = [OrderingFilter, SearchFilter, DjangoFilterBackend]

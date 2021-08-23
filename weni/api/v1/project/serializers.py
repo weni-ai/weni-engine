@@ -10,7 +10,7 @@ from weni.common import tasks
 from weni.common.models import Service, Project, Organization
 
 
-class ProjectSeralizer(serializers.ModelSerializer):
+class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
         fields = [
