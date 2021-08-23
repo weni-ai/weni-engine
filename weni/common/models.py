@@ -656,7 +656,7 @@ class Invoice(models.Model):
         ).get("total_amount")
 
         return Decimal(
-            float(amount + self.cost_per_whatsapp * self.extra_integration)
+            float(0 if amount is None else amount + self.cost_per_whatsapp * self.extra_integration)
             * float(1 - self.discount / 100)
         ).quantize(Decimal(".01"), decimal.ROUND_HALF_UP)
 
