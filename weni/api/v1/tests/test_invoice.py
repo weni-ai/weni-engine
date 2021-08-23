@@ -5,12 +5,10 @@ from datetime import timedelta
 from django.conf import settings
 from django.test import RequestFactory
 from django.test import TestCase
-from django.test.client import MULTIPART_CONTENT
 from django.utils import timezone
 from rest_framework import status
 
 from weni.api.v1.invoice.views import InvoiceViewSet
-from weni.api.v1.project.views import ProjectViewSet
 from weni.api.v1.tests.utils import create_user_and_token
 from weni.common.models import (
     OrganizationAuthorization,
@@ -63,7 +61,8 @@ class ListInvoiceAPITestCase(TestCase):
             due_date=timezone.now() + timedelta(days=10),
             invoice_random_id=1
             if self.organization.organization_billing_invoice.last() is None
-            else self.organization.organization_billing_invoice.last().invoice_random_id + 1,
+            else self.organization.organization_billing_invoice.last().invoice_random_id
+            + 1,
             discount=self.organization.organization_billing.fixed_discount,
             extra_integration=self.organization.extra_integration,
             cost_per_whatsapp=settings.BILLING_COST_PER_WHATSAPP,
