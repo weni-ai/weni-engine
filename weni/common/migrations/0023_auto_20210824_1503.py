@@ -11,9 +11,15 @@ def noop(apps, schema_editor):  # pragma: no cover
 
 def migrate(apps, schema_editor):  # pragma: no cover
     Organization = apps.get_model("common", "Organization")
+    BillingPlan = apps.get_model("common", "BillingPlan")
 
     for org in Organization.objects.all():
-        org.organization_billing.create(next_due_date=timezone.now().date())
+        BillingPlan.objects.create(
+            organization=org,
+            next_due_date=timezone.now().date(),
+            cycle=30,
+            plan="enterprise",
+        )
 
 
 class Migration(migrations.Migration):
