@@ -39,11 +39,13 @@ class BillingPlanSerializer(serializers.ModelSerializer):
     cycle = serializers.ChoiceField(
         BillingPlan.BILLING_CHOICES,
         label=_("billing cycle"),
+        default=BillingPlan._meta.get_field("cycle").default,
+        read_only=True
     )
     payment_method = serializers.ChoiceField(
         BillingPlan.PAYMENT_METHOD_CHOICES,
         label=_("payment method"),
-        default=BillingPlan.PAYMENT_METHOD_CREDIT_CARD,
+        read_only=True
     )
     fixed_discount = serializers.FloatField(read_only=True)
     termination_date = serializers.DateField(read_only=True)
@@ -83,8 +85,6 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
             "name",
             "description",
             "organization_billing",
-            "organization_billing_cycle",
-            "organization_billing_payment_method",
             "organization_billing_plan",
             "inteligence_organization",
             "authorizations",
@@ -100,20 +100,6 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
     authorizations = serializers.SerializerMethodField(style={"show": False})
     authorization = serializers.SerializerMethodField(style={"show": False})
     organization_billing = BillingPlanSerializer(read_only=True)
-    organization_billing_cycle = serializers.ChoiceField(
-        BillingPlan.BILLING_CHOICES,
-        label=_("billing cycle"),
-        source="organization_billing__cycle",
-        write_only=True,
-        required=True,
-    )
-    organization_billing_payment_method = serializers.ChoiceField(
-        BillingPlan.PAYMENT_METHOD_CHOICES,
-        label=_("payment method"),
-        source="organization_billing__payment_method",
-        write_only=True,
-        required=True,
-    )
     organization_billing_plan = serializers.ChoiceField(
         BillingPlan.PLAN_CHOICES,
         label=_("plan"),
@@ -139,6 +125,9 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
         organization = task.result
 
         validated_data.update({"inteligence_organization": organization.get("id")})
+
+        # Added for the manager to set the date when the next invoice will be generated
+        validated_data.update({"organization_billing__cycle": BillingPlan._meta.get_field("cycle").default})
 
         instance = super(OrganizationSeralizer, self).create(validated_data)
 

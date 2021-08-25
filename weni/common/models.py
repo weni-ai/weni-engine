@@ -54,9 +54,9 @@ class NewsletterLanguage(models.Model):
 class OrganizationManager(models.Manager):
     def create(
         self,
-        organization_billing__cycle=None,
+        organization_billing__cycle,
+        organization_billing__plan,
         organization_billing__payment_method=None,
-        organization_billing__plan=None,
         *args,
         **kwargs,
     ):

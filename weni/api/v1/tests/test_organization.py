@@ -41,8 +41,6 @@ class CreateOrganizationAPITestCase(TestCase):
             {
                 "name": "Organization 1",
                 "description": "This organization is very good",
-                "organization_billing_cycle": "billing_single",
-                "organization_billing_payment_method": "credit_card",
                 "organization_billing_plan": "enterprise",
             },
             self.owner_token,
