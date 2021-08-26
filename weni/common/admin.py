@@ -64,4 +64,3 @@ admin.site.register(Newsletter, NewsletterAdmin)
 admin.site.register(Service)
 admin.site.register(Project, ProjectAdmin)
 admin.site.register(Organization, OrganizationAdmin)
-

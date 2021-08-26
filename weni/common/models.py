@@ -597,6 +597,34 @@ class BillingPlan(models.Model):
         gateway = billing.get_gateway("stripe")
         return gateway.unstore(identification=self.stripe_customer)
 
+    @staticmethod
+    def calculate_amount(contact_count: int):
+        return Decimal(
+            str(utils.calculate_active_contacts(value=contact_count))
+        ).quantize(Decimal(".01"), decimal.ROUND_HALF_UP)
+
+    @property
+    def currenty_invoice(self):
+        contact_count = self.organization.project.aggregate(
+            total_contact_count=Sum("contact_count")
+        ).get("total_contact_count")
+
+        return {
+            "total_contact": contact_count,
+            "amount_currenty": Decimal(
+                float(
+                    float(
+                        self.organization.organization_billing.calculate_amount(
+                            contact_count=0 if contact_count is None else contact_count
+                        )
+                    )
+                    + settings.BILLING_COST_PER_WHATSAPP
+                    * self.organization.extra_integration
+                )
+                * float(1 - self.fixed_discount / 100)
+            ).quantize(Decimal(".01"), decimal.ROUND_HALF_UP),
+        }
+
 
 class Invoice(models.Model):
     class Meta:
@@ -666,11 +694,6 @@ class Invoice(models.Model):
                 else amount + self.cost_per_whatsapp * self.extra_integration
             )
             * float(1 - self.discount / 100)
-        ).quantize(Decimal(".01"), decimal.ROUND_HALF_UP)
-
-    def calculate_amount(self, contact_count: int):
-        return Decimal(
-            str(utils.calculate_active_contacts(value=contact_count))
         ).quantize(Decimal(".01"), decimal.ROUND_HALF_UP)
 
 

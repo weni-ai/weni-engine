@@ -32,6 +32,7 @@ class BillingPlanSerializer(serializers.ModelSerializer):
             "card_brand",
             "payment_warnings",
             "problem_capture_invoice",
+            "currenty_invoice",
         ]
         ref_name = None
 
@@ -73,6 +74,12 @@ class BillingPlanSerializer(serializers.ModelSerializer):
     )
     payment_warnings = serializers.ListField()
     problem_capture_invoice = serializers.BooleanField()
+    currenty_invoice = serializers.DictField(
+        read_only=True,
+        help_text=_(
+            "Total active contacts and current invoice amount before closing"
+        ),
+    )
 
 
 class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):

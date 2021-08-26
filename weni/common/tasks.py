@@ -235,12 +235,30 @@ def sync_updates_projects():
             classifiers=classifiers_project,
         )
 
+        contact_count = flow_instance.get_billing_total_statistics(
+            project_uuid=str(project.flow_organization),
+            before=Timestamp().FromDatetime(
+                project.organization.created_at
+                if project.organization.organization_billing.last_invoice_date is None
+                else datetime.strptime(
+                    str(project.organization.organization_billing.last_invoice_date),
+                    "%Y-%m-%d",
+                )
+            ),
+            after=Timestamp().FromDatetime(
+                datetime.strptime(
+                    str(project.organization.organization_billing.next_due_date),
+                    "%Y-%m-%d",
+                )
+            ),
+        ).get("active_contacts")
+
         project.name = str(flow_result.get("name"))
         project.timezone = str(flow_result.get("timezone"))
         project.date_format = str(flow_result.get("date_format"))
         project.inteligence_count = int(inteligences_org.get("repositories_count"))
         project.flow_count = int(statistic_project_result.get("active_flows"))
-        project.contact_count = int(statistic_project_result.get("active_contacts"))
+        project.contact_count = int(contact_count)
 
         project.save(
             update_fields=[
@@ -293,7 +311,9 @@ def generate_project_invoice():
             invoice.organization_billing_invoice_project.create(
                 project=project,
                 contact_count=contact_count,
-                amount=invoice.calculate_amount(contact_count=contact_count),
+                amount=org.organization_billing.calculate_amount(
+                    contact_count=contact_count
+                ),
             )
 
         obj = BillingPlan.objects.get(id=org.organization_billing.pk)

@@ -6,24 +6,36 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('common', '0023_auto_20210824_1503'),
+        ("common", "0023_auto_20210824_1503"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='logservice',
-            options={'verbose_name': 'log service', 'verbose_name_plural': 'log services'},
+            name="logservice",
+            options={
+                "verbose_name": "log service",
+                "verbose_name_plural": "log services",
+            },
         ),
         migrations.AlterModelOptions(
-            name='newsletter',
-            options={'verbose_name': 'newsletter', 'verbose_name_plural': 'newsletters'},
+            name="newsletter",
+            options={
+                "verbose_name": "newsletter",
+                "verbose_name_plural": "newsletters",
+            },
         ),
         migrations.AlterModelOptions(
-            name='newsletterlanguage',
-            options={'verbose_name': 'dashboard newsletter language', 'verbose_name_plural': 'newsletter languages'},
+            name="newsletterlanguage",
+            options={
+                "verbose_name": "dashboard newsletter language",
+                "verbose_name_plural": "newsletter languages",
+            },
         ),
         migrations.AlterModelOptions(
-            name='organization',
-            options={'verbose_name': 'organization', 'verbose_name_plural': 'organizations'},
+            name="organization",
+            options={
+                "verbose_name": "organization",
+                "verbose_name_plural": "organizations",
+            },
         ),
     ]
