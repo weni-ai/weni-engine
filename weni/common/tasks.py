@@ -275,7 +275,7 @@ def generate_project_invoice():
             flow_instance = utils.get_grpc_types().get("flow")
 
             contact_count = flow_instance.get_billing_total_statistics(
-                project_uuid="5a9c22c3-d31d-47d2-99bc-03c09f271e21",
+                project_uuid=str(project.flow_organization),
                 before=Timestamp().FromDatetime(
                     org.created_at
                     if org.organization_billing.last_invoice_date is None
