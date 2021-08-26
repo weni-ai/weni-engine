@@ -17,7 +17,7 @@ def migrate(apps, schema_editor):  # pragma: no cover
         BillingPlan.objects.create(
             organization=org,
             next_due_date=timezone.now().date(),
-            cycle='billing_monthly',
+            cycle="billing_monthly",
             plan="enterprise",
         )
 

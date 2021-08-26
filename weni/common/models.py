@@ -21,7 +21,8 @@ logger = logging.getLogger(__name__)
 
 class Newsletter(models.Model):
     class Meta:
-        verbose_name = _("dashboard newsletter")
+        verbose_name = _("newsletter")
+        verbose_name_plural = _("newsletters")
 
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
 
@@ -32,6 +33,7 @@ class Newsletter(models.Model):
 class NewsletterLanguage(models.Model):
     class Meta:
         verbose_name = _("dashboard newsletter language")
+        verbose_name_plural = _("newsletter languages")
         unique_together = ["language", "newsletter"]
 
     language = models.CharField(
@@ -98,6 +100,7 @@ class OrganizationManager(models.Manager):
 class Organization(models.Model):
     class Meta:
         verbose_name = _("organization")
+        verbose_name_plural = _("organizations")
 
     uuid = models.UUIDField(
         _("UUID"), primary_key=True, default=uuid4.uuid4, editable=False
@@ -412,6 +415,7 @@ class Service(models.Model):
 class LogService(models.Model):
     class Meta:
         verbose_name = _("log service")
+        verbose_name_plural = _("log services")
 
     service = models.ForeignKey(Service, models.CASCADE, related_name="log_service")
     status = models.BooleanField(_("status service"), default=False)

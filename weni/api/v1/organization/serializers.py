@@ -40,12 +40,10 @@ class BillingPlanSerializer(serializers.ModelSerializer):
         BillingPlan.BILLING_CHOICES,
         label=_("billing cycle"),
         default=BillingPlan._meta.get_field("cycle").default,
-        read_only=True
+        read_only=True,
     )
     payment_method = serializers.ChoiceField(
-        BillingPlan.PAYMENT_METHOD_CHOICES,
-        label=_("payment method"),
-        read_only=True
+        BillingPlan.PAYMENT_METHOD_CHOICES, label=_("payment method"), read_only=True
     )
     fixed_discount = serializers.FloatField(read_only=True)
     termination_date = serializers.DateField(read_only=True)
@@ -127,7 +125,13 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
         validated_data.update({"inteligence_organization": organization.get("id")})
 
         # Added for the manager to set the date when the next invoice will be generated
-        validated_data.update({"organization_billing__cycle": BillingPlan._meta.get_field("cycle").default})
+        validated_data.update(
+            {
+                "organization_billing__cycle": BillingPlan._meta.get_field(
+                    "cycle"
+                ).default
+            }
+        )
 
         instance = super(OrganizationSeralizer, self).create(validated_data)
 
