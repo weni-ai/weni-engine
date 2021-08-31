@@ -76,9 +76,7 @@ class BillingPlanSerializer(serializers.ModelSerializer):
     problem_capture_invoice = serializers.BooleanField()
     currenty_invoice = serializers.DictField(
         read_only=True,
-        help_text=_(
-            "Total active contacts and current invoice amount before closing"
-        ),
+        help_text=_("Total active contacts and current invoice amount before closing"),
     )
 
 
