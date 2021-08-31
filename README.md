@@ -47,6 +47,7 @@ You can set environment variables in your OS, write on ```.env``` file or pass v
 | SEND_EMAILS | ```boolean``` | ```True``` | Send emails flag.
 | INTELIGENCE_URL | ```string``` | ```https://bothub.it/``` | Specify the URL of the intelligence service.
 | FLOWS_URL | ```string``` | ```https://new.push.al/``` | Specify the URL of the flows service.
+| INTEGRATIONS_URL | ```string``` | ```None``` | Specify the URL of the integration service.
 | USE_SENTRY |  ```bool``` | ```False``` | Enable Support Sentry
 | SENTRY_URL |  ```string``` | ```None``` | URL Sentry
 | APM_DISABLE_SEND |  ```bool``` | ```False``` | Disable sending Elastic APM
