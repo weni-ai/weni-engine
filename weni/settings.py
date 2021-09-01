@@ -67,6 +67,7 @@ env = environ.Env(
     TOKEN_AUTHORIZATION_FLOW_MARKETING=(str, None),
     BILLING_TEST_MODE=(bool, False),
     BILLING_SETTINGS=(dict, {}),
+    TOKEN_EXTERNAL_AUTHENTICATION=(str, None),
 )
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -430,3 +431,5 @@ example:
 BILLING_TEST_MODE = env.bool("BILLING_TEST_MODE")
 BILLING_SETTINGS = env.json("BILLING_SETTINGS")
 BILLING_COST_PER_WHATSAPP = env.float("BILLING_COST_PER_WHATSAPP")
+
+TOKEN_EXTERNAL_AUTHENTICATION = env.str("TOKEN_EXTERNAL_AUTHENTICATION")

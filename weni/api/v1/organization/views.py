@@ -1,14 +1,19 @@
+from datetime import datetime
+
 from django.conf import settings
+from django.utils.translation import ugettext_lazy as _
 from django.http import JsonResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import mixins
 from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.generics import get_object_or_404
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
+from weni import utils
 from weni.api.v1.metadata import Metadata
 from weni.api.v1.mixins import MultipleFieldLookupMixin
 from weni.api.v1.organization.filters import (
@@ -32,6 +37,7 @@ from weni.common.models import (
     OrganizationAuthorization,
     RequestPermissionOrganization,
 )
+from weni.middleware import ExternalAuthentication
 
 
 class OrganizationViewSet(
@@ -124,6 +130,58 @@ class OrganizationViewSet(
         organization.save(update_fields=["is_suspended"])
 
         return JsonResponse(data={"status": True})
+
+    @action(
+        detail=True,
+        methods=["GET"],
+        url_name="get-contact-active",
+        url_path="grpc/contact-active/(?P<organization_uuid>[^/.]+)",
+        authentication_classes=[ExternalAuthentication],
+        permission_classes=[AllowAny],
+    )
+    def get_contact_active(
+            self, request, organization_uuid, **kwargs
+    ):  # pragma: no cover
+
+        from google.protobuf.timestamp_pb2 import Timestamp
+
+        organization = get_object_or_404(Organization, uuid=organization_uuid)
+
+        self.check_object_permissions(self.request, organization)
+
+        before = request.query_params.get("before")
+        after = request.query_params.get("after")
+
+        if not before or not after:
+            raise ValidationError(
+                _("Need to pass 'before' and 'after' in query params")
+            )
+
+        flow_instance = utils.get_grpc_types().get("flow")
+
+        result = {"projects": []}
+
+        for project in organization.project.all():
+            contact_count = flow_instance.get_billing_total_statistics(
+                project_uuid=str(project.flow_organization),
+                before=Timestamp().FromDatetime(
+                    datetime.strptime(str(before), "%Y-%m-%d")
+                ),
+                after=Timestamp().FromDatetime(
+                    datetime.strptime(str(after), "%Y-%m-%d")
+                ),
+            ).get("active_contacts")
+
+            result["projects"].append(
+                {
+                    "uuid": project.uuid,
+                    "name": project.name,
+                    "flow_organization": project.flow_organization,
+                    "active_contacts": contact_count,
+                }
+            )
+
+        return JsonResponse(data=result)
 
 
 class OrganizationAuthorizationViewSet(
