@@ -2,7 +2,7 @@ import grpc
 from django.conf import settings
 
 from weni.grpc.grpc import GRPCType
-from weni.protos.flow import flow_pb2_grpc, flow_pb2
+from weni.protos.flow import flow_pb2_grpc, flow_pb2, billing_pb2_grpc, billing_pb2
 from weni.protos.flow import org_pb2_grpc, org_pb2
 from weni.protos.flow import statistic_pb2_grpc, statistic_pb2
 from weni.protos.flow import user_pb2_grpc, user_pb2
@@ -186,3 +186,12 @@ class FlowType(GRPCType):
             "active_classifiers": response.active_classifiers,
             "active_contacts": response.active_contacts,
         }
+
+    def get_billing_total_statistics(self, project_uuid: str, before: str, after: str):
+        stub = billing_pb2_grpc.BillingStub(self.channel)
+        response = stub.Total(
+            billing_pb2.BillingRequest(
+                org_uuid=project_uuid, before=before, after=after
+            )
+        )
+        return {"active_contacts": response.active_contacts}
