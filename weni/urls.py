@@ -29,7 +29,7 @@ from weni.billing.views import StripeHandler
 schema_view = get_schema_view(
     openapi.Info(
         title="API Documentation",
-        default_version="v1.0.11",
+        default_version="v1.0.12",
         license=openapi.License(name="GPL-3.0 License"),
     ),
     public=True,
