@@ -9,7 +9,7 @@ from weni.api.grpc.project.serializers import (
     RetrieveClassifierRequestSerializer,
 )
 from weni.common.models import Project
-from weni.protos.weni.project_pb2 import ClassifierResponse
+from weni.protos.connect.project_pb2 import ClassifierResponse
 
 
 class ProjectService(

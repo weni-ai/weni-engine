@@ -64,6 +64,7 @@ env = environ.Env(
     SEND_REQUEST_FLOW=(bool, False),
     FLOW_MARKETING_UUID=(str, None),
     TOKEN_AUTHORIZATION_FLOW_MARKETING=(str, None),
+    TOKEN_EXTERNAL_AUTHENTICATION=(str, None),
 )
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -219,6 +220,11 @@ STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
+# Default primary key field type
+# https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
+
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+
 # Logging
 
 LOGGING = DEFAULT_LOGGING
@@ -306,14 +312,13 @@ ELASTIC_APM = {
     "SERVER_URL": env.str("APM_SERVER_URL"),
     "ENVIRONMENT": env.str("ENVIRONMENT"),
     "DJANGO_TRANSACTION_NAME_FROM_ROUTE": True,
-    "PROCESSORS": (
+    "PROCESSORS": [
         "elasticapm.processors.sanitize_stacktrace_locals",
         "elasticapm.processors.sanitize_http_request_cookies",
         "elasticapm.processors.sanitize_http_headers",
         "elasticapm.processors.sanitize_http_wsgi_env",
-        "elasticapm.processors.sanitize_http_request_querystring",
         "elasticapm.processors.sanitize_http_request_body",
-    ),
+    ],
 }
 
 # mozilla-django-oidc
@@ -401,3 +406,5 @@ FLOW_CERTIFICATE_GRPC_CRT = env.bool("FLOW_CERTIFICATE_GRPC_CRT")
 SEND_REQUEST_FLOW = env.bool("SEND_REQUEST_FLOW")
 FLOW_MARKETING_UUID = env.str("FLOW_MARKETING_UUID")
 TOKEN_AUTHORIZATION_FLOW_MARKETING = env.str("TOKEN_AUTHORIZATION_FLOW_MARKETING")
+
+TOKEN_EXTERNAL_AUTHENTICATION = env.str("TOKEN_EXTERNAL_AUTHENTICATION")

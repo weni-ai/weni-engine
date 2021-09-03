@@ -16,11 +16,11 @@ app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 app.conf.beat_schedule = {
     "check-status-services": {
         "task": "weni.common.tasks.status_service",
-        "schedule": 10.0,
+        "schedule": schedules.crontab(minute="*/3"),
     },
     "sync-project-flows-organization-info": {
         "task": "weni.common.tasks.sync_updates_projects",
-        "schedule": 30.0,
+        "schedule": schedules.crontab(minute="*/5"),
     },
     "delete-status-logs": {
         "task": "weni.common.tasks.delete_status_logs",

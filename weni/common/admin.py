@@ -7,46 +7,41 @@ from weni.common.models import (
     Organization,
     Project,
     OrganizationAuthorization,
-    LogService,
     NewsletterLanguage,
 )
 
 
-@admin.register(NewsletterLanguage)
-class NewsletterLanguageAdmin(admin.ModelAdmin):
-    pass
+class OrganizationAuthorizationInline(admin.TabularInline):
+    model = OrganizationAuthorization
+    extra = 1
+    min_num = 1
+    can_delete = False
 
 
-@admin.register(Newsletter)
-class NewsletterAdmin(admin.ModelAdmin):
-    pass
-
-
-@admin.register(Service)
-class ServiceAdmin(admin.ModelAdmin):
-    pass
-
-
-@admin.register(ServiceStatus)
-class ServiceStatusAdmin(admin.ModelAdmin):
-    pass
-
-
-@admin.register(Organization)
 class OrganizationAdmin(admin.ModelAdmin):
-    pass
+    inlines = [OrganizationAuthorizationInline]
+    search_fields = ["name", "inteligence_organization"]
 
 
-@admin.register(Project)
+class ServiceStatusInline(admin.TabularInline):
+    model = ServiceStatus
+
+
 class ProjectAdmin(admin.ModelAdmin):
-    pass
+    inlines = [ServiceStatusInline]
 
 
-@admin.register(OrganizationAuthorization)
-class OrganizationAuthorizationAdmin(admin.ModelAdmin):
-    pass
+class NewsletterLanguageInline(admin.TabularInline):
+    model = NewsletterLanguage
+    min_num = 2
+    can_delete = False
 
 
-@admin.register(LogService)
-class LogServiceAdmin(admin.ModelAdmin):
-    pass
+class NewsletterAdmin(admin.ModelAdmin):
+    inlines = [NewsletterLanguageInline]
+
+
+admin.site.register(Newsletter, NewsletterAdmin)
+admin.site.register(Service)
+admin.site.register(Project, ProjectAdmin)
+admin.site.register(Organization, OrganizationAdmin)
