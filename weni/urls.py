@@ -28,7 +28,7 @@ from weni.api.grpc.project.handlers import grpc_handlers as grpc_project_handler
 schema_view = get_schema_view(
     openapi.Info(
         title="API Documentation",
-        default_version="v1.0.11",
+        default_version="v1.0.12",
         license=openapi.License(name="GPL-3.0 License"),
     ),
     public=True,
