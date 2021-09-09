@@ -2,7 +2,12 @@ import grpc
 from django.conf import settings
 
 from weni.grpc.grpc import GRPCType
-from weni.protos.flow import billing_pb2_grpc, billing_pb2
+from weni.protos.flow import (
+    billing_pb2_grpc,
+    billing_pb2,
+    channel_pb2_grpc,
+    channel_pb2,
+)
 from weni.protos.flow import flow_pb2_grpc, flow_pb2
 from weni.protos.flow import org_pb2_grpc, org_pb2
 from weni.protos.flow import statistic_pb2_grpc, statistic_pb2
@@ -203,6 +208,18 @@ class FlowType(GRPCType):
             org_pb2.OrgUpdateRequest(
                 uuid=project_uuid,
                 is_suspended=is_suspended,
+            )
+        )
+        return response
+
+    def create_channel(self, name: str, user: str, base_url: str):
+        # Create Channel
+        stub = channel_pb2_grpc.WeniWebChatControllerStub(self.channel)
+        response = stub.Create(
+            channel_pb2.WeniWebChatCreateRequest(
+                name=name,
+                user=user,
+                base_url=base_url,
             )
         )
         return response

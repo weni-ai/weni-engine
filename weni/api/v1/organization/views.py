@@ -140,7 +140,7 @@ class OrganizationViewSet(
         permission_classes=[AllowAny],
     )
     def get_contact_active(
-            self, request, organization_uuid, **kwargs
+        self, request, organization_uuid, **kwargs
     ):  # pragma: no cover
 
         from google.protobuf.timestamp_pb2 import Timestamp

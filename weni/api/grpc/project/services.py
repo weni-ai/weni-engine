@@ -7,9 +7,10 @@ from weni.api.grpc.project.serializers import (
     CreateClassifierRequestSerializer,
     DestroyClassifierRequestSerializer,
     RetrieveClassifierRequestSerializer,
+    CreateChannelRequestSerializer,
 )
 from weni.common.models import Project
-from weni.protos.connect.project_pb2 import ClassifierResponse
+from weni.protos.connect.project_pb2 import ClassifierResponse, CreateChannelResponse
 
 
 class ProjectService(
@@ -97,3 +98,18 @@ class ProjectService(
             )
 
             return empty_pb2.Empty()
+
+    def CreateChannel(self, request, context):
+        serializer = CreateChannelRequestSerializer(message=request)
+
+        if serializer.is_valid(raise_exception=True):
+            grpc_instance = utils.get_grpc_types().get("flow")
+            response = grpc_instance.create_channel(
+                name=serializer.validated_data.get("name"),
+                user=serializer.validated_data.get("user"),
+                base_url=serializer.validated_data.get("base_url"),
+            )
+
+            return CreateChannelResponse(
+                name=response.get("name"),
+            )

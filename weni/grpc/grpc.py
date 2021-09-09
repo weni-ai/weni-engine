@@ -102,3 +102,6 @@ class GRPCType(metaclass=ABCMeta):
 
     def suspend_project(self, project_uuid: str, is_suspended: bool):
         raise NotImplementedError()
+
+    def create_channel(self, name: str, user: str, base_url: str):
+        raise NotImplementedError()
