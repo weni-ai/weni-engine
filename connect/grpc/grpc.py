@@ -99,3 +99,6 @@ class GRPCType(metaclass=ABCMeta):
 
     def get_billing_total_statistics(self, project_uuid: str, before: str, after: str):
         raise NotImplementedError()
+
+    def create_channel(self, name: str, user: str, base_url: str):
+        raise NotImplementedError()
