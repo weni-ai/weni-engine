@@ -105,14 +105,21 @@ def delete_project(inteligence_organization: int, user_email):
     retry_backoff=True,
 )
 def update_user_permission_project(
-    flow_organization: str, user_email: str, permission: int
+    flow_organization: str, project_uuid: str, user_email: str, permission: int
 ):
-    grpc_instance = utils.get_grpc_types().get("flow")
-    grpc_instance.update_user_permission_project(
+    flow_instance = utils.get_grpc_types().get("flow")
+    integrations_instance = utils.get_grpc_types().get("integrations")
+    flow_instance.update_user_permission_project(
         organization_uuid=flow_organization,
         user_email=user_email,
         permission=permission,
     )
+    integrations_instance.update_user_permission_project(
+        project_uuid=project_uuid,
+        user_email=user_email,
+        permission=permission,
+    )
+
     return True
 
 
