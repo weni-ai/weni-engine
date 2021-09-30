@@ -31,6 +31,7 @@ def reload_classifier_types():
     for class_name in [
         "connect.grpc.types.inteligence.InteligenceType",
         "connect.grpc.types.flow.FlowType",
+        "connect.grpc.types.integrations.IntegrationsType",
     ]:  # settings.BASE_MIGRATIONS_TYPES:
         register_classifier_type(import_string(class_name))
 
