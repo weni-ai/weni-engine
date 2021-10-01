@@ -1,8 +1,8 @@
 import grpc
 from django.conf import settings
 
-from weni.grpc.grpc import GRPCType
-from weni.protos.integrations import user_pb2_grpc, user_pb2
+from connect.grpc.grpc import GRPCType
+from weni.protobuf.integrations import user_pb2_grpc, user_pb2
 
 
 class IntegrationsType(GRPCType):
@@ -18,9 +18,7 @@ class IntegrationsType(GRPCType):
             return grpc.secure_channel(settings.INTEGRATIONS_GRPC_ENDPOINT, credentials)
         return grpc.insecure_channel(settings.INTEGRATIONS_GRPC_ENDPOINT)
 
-    def update_user_permission_project(
-        self, project_uuid: str, user_email: str, permission: int
-    ):
+    def update_user_permission_project(self, project_uuid: str, user_email: str, permission: int):
         stub = user_pb2_grpc.UserPermissionControllerStub(self.channel)
         response = stub.Update(
             user_pb2.UserPermissionUpdateRequest(
@@ -29,4 +27,14 @@ class IntegrationsType(GRPCType):
                 role=permission,
             )
         )
+        return response
+
+    def update_user(self, user_email: str, photo_url: str = None, first_name: str = None, last_name: str = None):
+        stub = user_pb2_grpc.UserControllerStub(self.channel)
+        response = stub.Update(user_pb2.UserUpdateRequest(
+            user=user_email,
+            photo_url=photo_url,
+            first_name=first_name,
+            last_name=last_name,
+        ))
         return response

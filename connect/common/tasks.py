@@ -275,3 +275,11 @@ def delete_status_logs():
 
         num_updated += len(batch)
         print(f" > deleted {num_updated} status logs")
+
+
+@app.task(name="update_user_photo")
+def update_user_photo(user_email: str, photo_url: str):
+    integrations_instance = utils.get_grpc_types().get("integrations")
+    integrations_instance.update_user(user_email, photo_url=photo_url)
+
+    return True
