@@ -7,6 +7,8 @@ from rest_framework import serializers
 from connect.api.v1.fields import PasswordField
 from connect.authentication.models import User
 
+from connect.celery import app as celery_app
+
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -52,6 +54,13 @@ class UserSerializer(serializers.ModelSerializer):
         )
         if "phone" in validated_data or "short_phone_prefix" in validated_data:
             instance.send_request_flow_user_info()
+
+        first_name = validated_data.get("first_name")
+        last_name = validated_data.get("last_name")
+
+        if first_name or last_name:
+            celery_app.send_task("update_user_name", args=[instance.email, first_name, last_name])
+
         return update_instance
 
 

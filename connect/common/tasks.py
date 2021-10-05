@@ -283,3 +283,11 @@ def update_user_photo(user_email: str, photo_url: str):
     integrations_instance.update_user(user_email, photo_url=photo_url)
 
     return True
+
+
+@app.task(name="update_user_name")
+def update_user_name(user_email: str, first_name: str, last_name: str):
+    integrations_instance = utils.get_grpc_types().get("integrations")
+    integrations_instance.update_user(user_email, first_name=first_name, last_name=last_name)
+
+    return True
