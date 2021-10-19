@@ -109,5 +109,5 @@ class ProjectService(
             )
 
             return CreateChannelResponse(
-                name=response.get("name"),
+                uuid=response.uuid,
             )
