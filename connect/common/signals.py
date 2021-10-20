@@ -64,8 +64,8 @@ def org_authorizations(sender, instance, **kwargs):
             celery_app.send_task(
                 "update_user_permission_project",
                 args=[
-                    project.uuid,
                     project.flow_organization,
+                    project.uuid,
                     instance.user.email,
                     instance.role,
                 ],
