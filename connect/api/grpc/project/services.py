@@ -101,8 +101,13 @@ class ProjectService(
         serializer = CreateChannelRequestSerializer(message=request)
 
         if serializer.is_valid(raise_exception=True):
+            project_uuid = serializer.validated_data.get("project_uuid")
+
+            project = Project.objects.get(uuid=project_uuid)
+
             grpc_instance = utils.get_grpc_types().get("flow")
             response = grpc_instance.create_channel(
+                project_uuid=str(project.flow_organization),
                 name=serializer.validated_data.get("name"),
                 user=serializer.validated_data.get("user"),
                 base_url=serializer.validated_data.get("base_url"),
