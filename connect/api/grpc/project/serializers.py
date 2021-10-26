@@ -45,6 +45,7 @@ class DestroyClassifierRequestSerializer(ProtoSerializer):
 
 
 class CreateChannelRequestSerializer(ProtoSerializer):
+    project_uuid = serializers.CharField(required=True)
     name = serializers.CharField(required=True)
     user = serializers.CharField(required=True)
     base_url = serializers.CharField(required=True)
