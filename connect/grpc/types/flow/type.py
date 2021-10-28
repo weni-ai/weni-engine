@@ -210,3 +210,13 @@ class FlowType(GRPCType):
             )
         )
         return response
+
+    def release_channel(self, channel_uuid: str, user: str):
+        stub = channel_pb2_grpc.ChannelControllerStub(self.channel)
+        response = stub.Destroy(
+            channel_pb2.ChannelDestroyRequest(
+                user=user,
+                uuid=channel_uuid,
+            )
+        )
+        return response
