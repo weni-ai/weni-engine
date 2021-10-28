@@ -777,11 +777,11 @@
         },
         "pyparsing": {
             "hashes": [
-                "sha256:84196357aa3566d64ad123d7a3c67b0e597a115c4934b097580e5ce220b91531",
-                "sha256:fd93fc45c47893c300bd98f5dd1b41c0e783eaeb727e7cea210dcc09d64ce7c3"
+                "sha256:9e3511118010f112a4b4b435ae50e1eaa610cda191acb9e421d60cf5fde83455",
+                "sha256:f8d3fe9fc404576c5164f0f0c4e382c96b85265e023c409c43d48f65da9d60d0"
             ],
             "markers": "python_version >= '3.6'",
-            "version": "==3.0.1"
+            "version": "==3.0.3"
         },
         "python-crontab": {
             "hashes": [
@@ -951,11 +951,11 @@
         },
         "weni-protobuffers": {
             "hashes": [
-                "sha256:023df4df157979573153c83d8c13ecfca6a5aa0b4d23363636f7dbf20bfe7a98",
-                "sha256:df240ee1be50f81c7d6bf34db003a6554d7562444d0b996c8a219dc44aa9ee8c"
+                "sha256:97ab25a573b8194c34cfdaaf8e1f791a4c42126922cbd23746806b69dcfae289",
+                "sha256:a09844bc888a5a061872000160192694e9237d40b409fb60eba4ef2a225379d8"
             ],
             "index": "pypi",
-            "version": "==1.2.0"
+            "version": "==1.2.1"
         },
         "whitenoise": {
             "hashes": [
