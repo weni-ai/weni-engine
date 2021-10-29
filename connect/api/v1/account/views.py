@@ -1,4 +1,5 @@
 import filetype
+from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django_filters.rest_framework import DjangoFilterBackend
 from keycloak import KeycloakGetError
@@ -52,6 +53,12 @@ class MyUserProfileViewSet(
 
         return user
 
+    def _get_photo_url(self, user: User) -> str:
+        photo = user.photo
+        domain = f"https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/"
+        endpoint = photo.storage.location + photo.name
+        return domain + endpoint
+
     @action(
         detail=True,
         methods=["POST"],
@@ -71,7 +78,7 @@ class MyUserProfileViewSet(
             user.save(update_fields=["photo"])
 
             # Update avatar on integrations
-            celery_app.send_task("update_user_photo", args=[user.email, user.photo.url])
+            celery_app.send_task("update_user_photo", args=[user.email, self._get_photo_url(user)])
 
             # Update avatar in all rocket chat registered
             for authorization in user.authorizations_user.all():
