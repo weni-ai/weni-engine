@@ -12,7 +12,7 @@ class StripeGatewayTestCase(TestCase):
         self.merchant = get_gateway("stripe")
         stripe.api_key = self.merchant.stripe.api_key
         self.stripe = stripe
-        self.customer = "cus_Jvmmq0P9aEP8Fw"
+        self.customer = "cus_KUcb4t9fIpXqqr"
 
     def testPurchase(self):
         resp = self.merchant.purchase(10, self.customer)
@@ -21,3 +21,15 @@ class StripeGatewayTestCase(TestCase):
     def testPurchaseDecimalAmount(self):
         resp = self.merchant.purchase(10.99, self.customer)
         self.assertEquals(resp["status"], "SUCCESS")
+
+    def test_last_2(self):
+        resp = self.merchant.get_card_data(self.customer)
+        self.assertEquals(resp['response'][0]['last2'], '42')
+
+    def test_brand(self):
+        resp = self.merchant.get_card_data(self.customer)
+        self.assertEquals(resp['response'][0]['brand'], 'visa')
+
+    def test_get_card_data(self):
+        resp = self.merchant.get_card_data(self.customer)
+        self.assertEquals(resp['status'], 'SUCCESS')
