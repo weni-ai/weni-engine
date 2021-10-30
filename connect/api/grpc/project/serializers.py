@@ -1,5 +1,6 @@
 from django_grpc_framework.proto_serializers import ProtoSerializer
 from rest_framework import serializers
+from google.protobuf import empty_pb2
 
 from connect.common.models import Project
 from weni.protobuf.connect import project_pb2
@@ -42,3 +43,21 @@ class DestroyClassifierRequestSerializer(ProtoSerializer):
 
     class Meta:
         proto_class = project_pb2.ClassifierResponse
+
+
+class CreateChannelRequestSerializer(ProtoSerializer):
+    project_uuid = serializers.CharField(required=True)
+    name = serializers.CharField(required=True)
+    user = serializers.CharField(required=True)
+    base_url = serializers.CharField(required=True)
+
+    class Meta:
+        proto_class = project_pb2.CreateChannelResponse
+
+
+class ReleaseChannelRequestSerializer(ProtoSerializer):
+    channel_uuid = serializers.CharField(required=True)
+    user = serializers.CharField(required=True)
+
+    class Meta:
+        proto_class = empty_pb2.Empty

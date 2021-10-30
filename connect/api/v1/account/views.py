@@ -1,4 +1,5 @@
 import filetype
+from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django_filters.rest_framework import DjangoFilterBackend
 from keycloak import KeycloakGetError
@@ -52,6 +53,12 @@ class MyUserProfileViewSet(
 
         return user
 
+    def _get_photo_url(self, user: User) -> str:
+        photo = user.photo
+        domain = f"https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/"
+        endpoint = photo.storage.location + photo.name
+        return domain + endpoint
+
     @action(
         detail=True,
         methods=["POST"],
@@ -60,17 +67,21 @@ class MyUserProfileViewSet(
         serializer_class=UserPhotoSerializer,
     )
     def upload_photo(self, request, **kwargs):  # pragma: no cover
-        f = request.FILES.get("file")
+        file = request.FILES.get("file")
 
         serializer = UserPhotoSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        if filetype.is_image(f):
-            self.request.user.photo = f
-            self.request.user.save(update_fields=["photo"])
+        if filetype.is_image(file):
+            user = self.request.user
+            user.photo = file
+            user.save(update_fields=["photo"])
+
+            # Update avatar on integrations
+            celery_app.send_task("update_user_photo", args=[user.email, self._get_photo_url(user)])
 
             # Update avatar in all rocket chat registered
-            for authorization in self.request.user.authorizations_user.all():
+            for authorization in user.authorizations_user.all():
                 for project in authorization.organization.project.all():
                     for service_status in project.service_status.filter(
                         service__service_type=Service.SERVICE_TYPE_CHAT
@@ -78,13 +89,13 @@ class MyUserProfileViewSet(
                         upload_photo_rocket(
                             server_rocket=service_status.service.url,
                             jwt_token=self.request.auth,
-                            avatar_url=self.request.user.photo.url,
+                            avatar_url=user.photo.url,
                         )
 
-            return Response({"photo": self.request.user.photo.url})
+            return Response({"photo": user.photo.url})
         try:
             raise UnsupportedMediaType(
-                filetype.get_type(f.content_type).extension,
+                filetype.get_type(file.content_type).extension,
                 detail=_("We accept images only in the formats: .png, .jpeg, .gif"),
             )
         except Exception:

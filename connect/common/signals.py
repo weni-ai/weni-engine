@@ -27,6 +27,7 @@ def create_service_status(sender, instance, created, **kwargs):
                 "update_user_permission_project",
                 args=[
                     instance.flow_organization,
+                    instance.uuid,
                     permission.user.email,
                     permission.role,
                 ],
@@ -64,6 +65,7 @@ def org_authorizations(sender, instance, **kwargs):
                 "update_user_permission_project",
                 args=[
                     project.flow_organization,
+                    project.uuid,
                     instance.user.email,
                     instance.role,
                 ],

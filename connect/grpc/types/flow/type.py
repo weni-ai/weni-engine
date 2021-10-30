@@ -2,7 +2,9 @@ import grpc
 from django.conf import settings
 
 from connect.grpc.grpc import GRPCType
-from weni.protobuf.flows import flow_pb2_grpc, flow_pb2, billing_pb2_grpc, billing_pb2
+from weni.protobuf.flows import billing_pb2_grpc, billing_pb2
+from weni.protobuf.flows import channel_pb2_grpc, channel_pb2
+from weni.protobuf.flows import flow_pb2_grpc, flow_pb2
 from weni.protobuf.flows import org_pb2_grpc, org_pb2
 from weni.protobuf.flows import statistic_pb2_grpc, statistic_pb2
 from weni.protobuf.flows import user_pb2_grpc, user_pb2
@@ -195,3 +197,26 @@ class FlowType(GRPCType):
             )
         )
         return {"active_contacts": response.active_contacts}
+
+    def create_channel(self, project_uuid: str, name: str, user: str, base_url: str):
+        # Create Channel
+        stub = channel_pb2_grpc.WeniWebChatControllerStub(self.channel)
+        response = stub.Create(
+            channel_pb2.WeniWebChatCreateRequest(
+                org=project_uuid,
+                name=name,
+                user=user,
+                base_url=base_url,
+            )
+        )
+        return response
+
+    def release_channel(self, channel_uuid: str, user: str):
+        stub = channel_pb2_grpc.ChannelControllerStub(self.channel)
+        response = stub.Destroy(
+            channel_pb2.ChannelDestroyRequest(
+                user=user,
+                uuid=channel_uuid,
+            )
+        )
+        return response

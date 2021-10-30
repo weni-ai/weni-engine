@@ -7,9 +7,11 @@ from connect.api.grpc.project.serializers import (
     CreateClassifierRequestSerializer,
     DestroyClassifierRequestSerializer,
     RetrieveClassifierRequestSerializer,
+    CreateChannelRequestSerializer,
+    ReleaseChannelRequestSerializer,
 )
 from connect.common.models import Project
-from weni.protobuf.connect.project_pb2 import ClassifierResponse
+from weni.protobuf.connect.project_pb2 import ClassifierResponse, CreateChannelResponse
 
 
 class ProjectService(
@@ -95,3 +97,35 @@ class ProjectService(
             )
 
             return empty_pb2.Empty()
+
+    def CreateChannel(self, request, context):
+        serializer = CreateChannelRequestSerializer(message=request)
+
+        if serializer.is_valid(raise_exception=True):
+            project_uuid = serializer.validated_data.get("project_uuid")
+
+            project = Project.objects.get(uuid=project_uuid)
+
+            grpc_instance = utils.get_grpc_types().get("flow")
+            response = grpc_instance.create_channel(
+                project_uuid=str(project.flow_organization),
+                name=serializer.validated_data.get("name"),
+                user=serializer.validated_data.get("user"),
+                base_url=serializer.validated_data.get("base_url"),
+            )
+
+            return CreateChannelResponse(
+                uuid=response.uuid,
+            )
+
+    def ReleaseChannel(self, request, context):
+        serializer = ReleaseChannelRequestSerializer(message=request)
+        serializer.is_valid(raise_exception=True)
+
+        grpc_instance = utils.get_grpc_types().get("flow")
+        grpc_instance.release_channel(
+            channel_uuid=serializer.validated_data.get("channel_uuid"),
+            user=serializer.validated_data.get("user"),
+        )
+
+        return empty_pb2.Empty()
