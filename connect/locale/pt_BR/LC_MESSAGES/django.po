@@ -112,7 +112,7 @@ msgstr "Você não pode definir o papel do usuário 0"
 
 #: connect/api/v1/organization/views.py:99
 msgid "Need to pass 'before' and 'after' in query params"
-msgstr ""
+msgstr "É necessário passar os campos 'before' e 'after' nos query params"
 
 #: connect/api/v1/project/filters.py:32
 msgid "Invalid organization UUID"
