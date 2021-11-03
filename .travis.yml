@@ -55,7 +55,9 @@ env:
     - OIDC_OP_JWKS_ENDPOINT=
     - OIDC_RP_SIGN_ALGO=
     - OIDC_OP_LOGOUT_ENDPOINT=
-
+    - BILLING_COST_PER_WHATSAPP=
+    - BILLING_TEST_MODE=
+    - BILLING_SETTINGS=
 script:
   - python manage.py migrate
   - python manage.py collectstatic --noinput
