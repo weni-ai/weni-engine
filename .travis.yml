@@ -55,9 +55,11 @@ env:
     - OIDC_OP_JWKS_ENDPOINT=
     - OIDC_RP_SIGN_ALGO=
     - OIDC_OP_LOGOUT_ENDPOINT=
-    - BILLING_COST_PER_WHATSAPP=
-    - BILLING_TEST_MODE=
-    - BILLING_SETTINGS=
+    - BILLING_COST_PER_WHATSAPP=0.0
+    - BILLING_TEST_MODE=True
+    - BILLING_SETINGS={stripe:{API_KEY:"sk_test_placeholder123",PUBLISHABLE_KEY:"pk_test_placeholder123"}}
+
+
 script:
   - python manage.py migrate
   - python manage.py collectstatic --noinput
