@@ -12,7 +12,7 @@ from connect.api.v1.organization.views import (
     OrganizationAuthorizationViewSet,
 )
 from connect.api.v1.tests.utils import create_user_and_token
-from connect.common.models import Organization, OrganizationAuthorization
+from connect.common.models import Organization, OrganizationAuthorization, BillingPlan
 
 
 class CreateOrganizationAPITestCase(TestCase):
@@ -70,7 +70,9 @@ class ListOrganizationAPITestCase(TestCase):
         self.owner, self.owner_token = create_user_and_token("owner")
 
         self.organization = Organization.objects.create(
-            name="test organization", description="", inteligence_organization=1
+            name="test organization", description="", inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan="free",
         )
         self.organization_authorization = self.organization.authorizations.create(
             user=self.owner, role=OrganizationAuthorization.ROLE_ADMIN
@@ -110,7 +112,9 @@ class ListOrganizationAuthorizationTestCase(TestCase):
         self.user, self.user_token = create_user_and_token()
 
         self.organization = Organization.objects.create(
-            name="test organization", description="", inteligence_organization=1
+            name="test organization", description="", inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan="free",
         )
         self.organization_authorization = self.organization.authorizations.create(
             user=self.owner, role=OrganizationAuthorization.ROLE_ADMIN
@@ -165,7 +169,9 @@ class UpdateAuthorizationRoleTestCase(TestCase):
         self.user, self.user_token = create_user_and_token()
 
         self.organization = Organization.objects.create(
-            name="test organization", description="", inteligence_organization=1
+            name="test organization", description="", inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan="free",
         )
         self.organization_authorization = self.organization.authorizations.create(
             user=self.owner, role=OrganizationAuthorization.ROLE_ADMIN
@@ -232,7 +238,9 @@ class DestroyAuthorizationRoleTestCase(TestCase):
         self.user, self.user_token = create_user_and_token()
 
         self.organization = Organization.objects.create(
-            name="test organization", description="", inteligence_organization=1
+            name="test organization", description="", inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan="free",
         )
         self.organization_authorization = self.organization.authorizations.create(
             user=self.owner, role=OrganizationAuthorization.ROLE_ADMIN

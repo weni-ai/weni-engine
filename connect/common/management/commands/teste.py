@@ -1,11 +1,11 @@
 import datetime
 
-from dateutil.relativedelta import relativedelta
+# from dateutil.relativedelta import relativedelta
 from django.core.management.base import BaseCommand
 from google.protobuf.timestamp_pb2 import Timestamp
 
 from connect import utils
-from connect.common.models import Invoice, BillingPlan
+# from connect.common.models import Invoice, BillingPlan
 
 
 class Command(BaseCommand):
