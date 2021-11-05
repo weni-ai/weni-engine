@@ -183,6 +183,28 @@ class OrganizationViewSet(
 
         return JsonResponse(data=result)
 
+    @action(
+        detail=True,
+        methods=["GET"],
+        url_name="get-contact-active-per-project",
+        url_path="contact-active-per-project/(?P<organization_uuid>[^/.]+)",
+        authentication_classes=[ExternalAuthentication],
+        permission_classes=[AllowAny],
+    )
+    def get_contacts_active_per_project(self, request, organization_uuid):
+        org = get_object_or_404(Organization, uuid=organization_uuid)
+        self.check_object_permissions(self.request, org)
+        response = {"projects": []}
+        for project in org.project.all():
+            response["projects"].append(
+                {
+                    'project_uuid': project.uuid,
+                    'project_name': project.name,
+                    "active_contacts": project.contact_count
+                }
+            )
+        return JsonResponse(data=response)
+
 
 class OrganizationAuthorizationViewSet(
     MultipleFieldLookupMixin,
