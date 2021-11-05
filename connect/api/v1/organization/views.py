@@ -39,7 +39,7 @@ from connect.common.models import (
 )
 from connect.middleware import ExternalAuthentication
 
-from weni.billing.gateways.stripe_gateway import StripeGateway
+from connect.billing.gateways.stripe_gateway import StripeGateway
 
 
 class OrganizationViewSet(
