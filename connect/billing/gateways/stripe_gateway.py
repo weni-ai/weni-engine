@@ -61,3 +61,18 @@ class StripeGateway(Gateway):
                 )
             )
         return {"status": "SUCCESS", "response": response}
+
+    def get_card_data(self, identification, options: dict = None):
+        try:
+            cards = stripe.PaymentMethod.list(
+                customer=identification,
+                type='card'
+            )
+            response = []
+            for card in cards.get('data'):
+                response.append({'last2': card['card']['last4'][2:], 'brand': card['card']['brand']})
+        except self.stripe.error.CardError as error:
+            return {"status": "FAILURE", "response": error}
+        except self.stripe.error.InvalidRequestError as invalid_request:
+            return {"status": "FAILURE", "response": f"No such customer: {identification}"}
+        return {"status": "SUCCESS", "response": response}

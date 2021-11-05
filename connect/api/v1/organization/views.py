@@ -39,6 +39,8 @@ from connect.common.models import (
 )
 from connect.middleware import ExternalAuthentication
 
+from weni.billing.gateways.stripe_gateway import StripeGateway
+
 
 class OrganizationViewSet(
     mixins.ListModelMixin,
@@ -182,6 +184,20 @@ class OrganizationViewSet(
             )
 
         return JsonResponse(data=result)
+
+    @action(
+        detail=True,
+        methods=["GET"],
+        url_name='get-card-data',
+        url_path='get-card-data'
+    )
+    def get_card_data(self, request):
+        identification = request.query_params.get("identification")
+        if not identification:
+            raise ValidationError(
+                _("Need to pass 'identification' in query params")
+            )
+        return JsonResponse(data=StripeGateway().get_card_data(identification))
 
 
 class OrganizationAuthorizationViewSet(
