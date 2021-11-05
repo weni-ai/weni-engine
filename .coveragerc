@@ -1,22 +1,22 @@
 [run]
 source =
-    ./weni/api
-    ./weni/authentication
-    ./weni/common
+    ./connect/api
+    ./connect/authentication
+    ./connect/common
 omit =
-    ./weni/api/apps.py
-    ./weni/common/apps.py
-    ./weni/authentication/apps.py
-    ./weni/api/v1/tests/*
-    ./weni/api/grpc/*
-    ./weni/api/v1/swagger.py
-    ./weni/authentication/tests.py
-    ./weni/authentication/signals.py
-    ./weni/common/tests.py
-    ./weni/common/tasks.py
-    ./weni/common/signals.py
-    ./weni/common/management/*
-    ./weni/common/migrations/*
+    ./connect/api/apps.py
+    ./connect/common/apps.py
+    ./connect/authentication/apps.py
+    ./connect/api/v1/tests/*
+    ./connect/api/grpc/*
+    ./connect/api/v1/swagger.py
+    ./connect/authentication/tests.py
+    ./connect/authentication/signals.py
+    ./connect/common/tests.py
+    ./connect/common/tasks.py
+    ./connect/common/signals.py
+    ./connect/common/management/*
+    ./connect/common/migrations/*
 
 [report]
 fail_under = 90
