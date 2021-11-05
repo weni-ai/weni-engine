@@ -73,6 +73,6 @@ class StripeGateway(Gateway):
                 response.append({'last2': card['card']['last4'][2:], 'brand': card['card']['brand']})
         except self.stripe.error.CardError as error:
             return {"status": "FAILURE", "response": error}
-        except self.stripe.error.InvalidRequestError as invalid_request:
+        except self.stripe.error.InvalidRequestError:
             return {"status": "FAILURE", "response": f"No such customer: {identification}"}
         return {"status": "SUCCESS", "response": response}
