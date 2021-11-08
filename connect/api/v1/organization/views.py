@@ -201,11 +201,9 @@ class OrganizationViewSet(
         for project in organization.project.all():
             contact_count += project.contact_count
         result["active-contacts"] = {
-            "organization_active_contacts":contact_count,
+            "organization_active_contacts": contact_count,
         }
         return JsonResponse(data=result)
-
-
 
 
 class OrganizationAuthorizationViewSet(

@@ -120,13 +120,13 @@ class GetOrganizationContactsAPITestCase(TestCase):
 
         self.project1 = Project.objects.create(
             name="project 1", flow_organization=uuid4.uuid4(), organization=self.organization,
-            contact_count = 25,
-            )
+            contact_count=25,
+        )
 
         self.project2 = Project.objects.create(
             name="project 2", flow_organization=uuid4.uuid4(), organization=self.organization,
-            contact_count = 5,
-            )
+            contact_count=5,
+        )
 
     def request(self, param, value, token=None):
         authorization_header = (
