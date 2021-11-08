@@ -12,7 +12,7 @@ from connect.api.v1.organization.views import (
     OrganizationAuthorizationViewSet,
 )
 from connect.api.v1.tests.utils import create_user_and_token
-from connect.common.models import Organization, OrganizationAuthorization, BillingPlan
+from connect.common.models import Organization, OrganizationAuthorization, BillingPlan, Project
 
 
 class CreateOrganizationAPITestCase(TestCase):
@@ -104,6 +104,57 @@ class ListOrganizationAPITestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 
+class GetOrganizationContactsAPITestCase(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.owner, self.owner_token = create_user_and_token("owner")
+
+        self.organization = Organization.objects.create(
+            name="test organization", description="", inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan="free",
+        )
+        self.organization_authorization = self.organization.authorizations.create(
+            user=self.owner, role=OrganizationAuthorization.ROLE_ADMIN
+        )
+        
+        self.project1 = Project.objects.create(
+            name="project 1", flow_organization=uuid4.uuid4(), organization=self.organization,
+            contact_count = 25,
+            )
+
+        self.project2 = Project.objects.create(
+            name="project 2", flow_organization=uuid4.uuid4(), organization=self.organization,
+            contact_count = 5,
+            )
+    
+    def request(self, param, value, token=None):
+        authorization_header = (
+            {"HTTP_AUTHORIZATION": "Token {}".format(token.key)} if token else {}
+        )
+
+        request = self.factory.get(
+            f"/v1/organization/org/{param}/{value}", **authorization_header
+        )
+
+        response = OrganizationViewSet.as_view({"get": "get_active_org_contacts"})(
+            request, organization_uuid=self.organization.uuid
+        )
+        
+        content_data = json.loads(response.content)
+        return (response, content_data)
+    
+    def test_okay(self):
+        response, content_data = self.request(
+            "organization",
+            self.organization.uuid,
+            self.owner_token,
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(content_data['active-contacts']['organization_active_contacts'], 30)
+
+        
 class ListOrganizationAuthorizationTestCase(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
