@@ -117,7 +117,7 @@ class GetOrganizationContactsAPITestCase(TestCase):
         self.organization_authorization = self.organization.authorizations.create(
             user=self.owner, role=OrganizationAuthorization.ROLE_ADMIN
         )
-        
+
         self.project1 = Project.objects.create(
             name="project 1", flow_organization=uuid4.uuid4(), organization=self.organization,
             contact_count = 25,
@@ -127,7 +127,7 @@ class GetOrganizationContactsAPITestCase(TestCase):
             name="project 2", flow_organization=uuid4.uuid4(), organization=self.organization,
             contact_count = 5,
             )
-    
+
     def request(self, param, value, token=None):
         authorization_header = (
             {"HTTP_AUTHORIZATION": "Token {}".format(token.key)} if token else {}
@@ -140,10 +140,10 @@ class GetOrganizationContactsAPITestCase(TestCase):
         response = OrganizationViewSet.as_view({"get": "get_active_org_contacts"})(
             request, organization_uuid=self.organization.uuid
         )
-        
+
         content_data = json.loads(response.content)
         return (response, content_data)
-    
+
     def test_okay(self):
         response, content_data = self.request(
             "organization",
@@ -154,7 +154,7 @@ class GetOrganizationContactsAPITestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(content_data['active-contacts']['organization_active_contacts'], 30)
 
-        
+
 class ListOrganizationAuthorizationTestCase(TestCase):
     def setUp(self):
         self.factory = RequestFactory()

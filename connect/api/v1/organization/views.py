@@ -182,7 +182,7 @@ class OrganizationViewSet(
             )
 
         return JsonResponse(data=result)
-    
+
     @action(
         detail=True,
         methods=["GET"],
@@ -192,13 +192,12 @@ class OrganizationViewSet(
         permission_classes=[AllowAny],
     )
     def get_active_org_contacts(self, request, organization_uuid):
-        
         organization = get_object_or_404(Organization, uuid=organization_uuid)
         self.check_object_permissions(self.request, organization)
-        
+
         contact_count = 0
         result = {"active-contacts": {}}
-        
+
         for project in organization.project.all():
             contact_count += project.contact_count
         result["active-contacts"] = {
@@ -206,8 +205,8 @@ class OrganizationViewSet(
         }
         return JsonResponse(data=result)
 
-    
-    
+
+
 
 class OrganizationAuthorizationViewSet(
     MultipleFieldLookupMixin,
