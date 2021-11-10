@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.http import JsonResponse
@@ -143,14 +141,12 @@ class OrganizationViewSet(
             self, request, organization_uuid, **kwargs
     ):  # pragma: no cover
 
-        from google.protobuf.timestamp_pb2 import Timestamp
-
         organization = get_object_or_404(Organization, uuid=organization_uuid)
 
         self.check_object_permissions(self.request, organization)
 
-        before = request.query_params.get("before")
-        after = request.query_params.get("after")
+        before = str(request.query_params.get("before") + " 00:00")
+        after = str(request.query_params.get("after") + " 00:00")
 
         if not before or not after:
             raise ValidationError(
@@ -164,12 +160,8 @@ class OrganizationViewSet(
         for project in organization.project.all():
             contact_count = flow_instance.get_billing_total_statistics(
                 project_uuid=str(project.flow_organization),
-                before=Timestamp().FromDatetime(
-                    datetime.strptime(str(before), "%Y-%m-%d")
-                ),
-                after=Timestamp().FromDatetime(
-                    datetime.strptime(str(after), "%Y-%m-%d")
-                ),
+                before=before,
+                after=after,
             ).get("active_contacts")
 
             result["projects"].append(
