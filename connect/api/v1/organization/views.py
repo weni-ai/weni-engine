@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.http import JsonResponse
@@ -36,6 +38,8 @@ from connect.common.models import (
     RequestPermissionOrganization,
 )
 from connect.middleware import ExternalAuthentication
+
+from connect.billing.gateways.stripe_gateway import StripeGateway
 
 
 class OrganizationViewSet(
@@ -218,6 +222,24 @@ class OrganizationViewSet(
             "organization_active_contacts": contact_count,
         }
         return JsonResponse(data=result)
+
+    @action(
+        detail=True,
+        methods=["GET"],
+        url_name='get-stripe-card-data',
+        url_path='get-stripe-card-data/(?P<organization_uuid>[^/.]+)',
+        authentication_classes=[ExternalAuthentication],
+        permission_classes=[AllowAny],
+    )
+    def get_stripe_card_data(self, request, organization_uuid):
+        if not organization_uuid:
+            raise ValidationError(
+                _("Need to pass 'organization_uuid'")
+            )
+        organization = get_object_or_404(Organization, uuid=organization_uuid)
+        self.check_object_permissions(self.request, organization)
+        costomer = organization.organization_billing.get_stripe_customer
+        return JsonResponse(data=StripeGateway().get_card_data(costomer.id))
 
 
 class OrganizationAuthorizationViewSet(
