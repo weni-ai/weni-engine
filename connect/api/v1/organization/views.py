@@ -188,16 +188,20 @@ class OrganizationViewSet(
     @action(
         detail=True,
         methods=["GET"],
-        url_name='get-card-data',
-        url_path='get-card-data'
+        url_name='get-stripe-card-data',
+        url_path='get-stripe-card-data/(?P<organization_uuid>[^/.]+)',
+        authentication_classes=[ExternalAuthentication],
+        permission_classes=[AllowAny],
     )
-    def get_card_data(self, request):
-        identification = request.query_params.get("identification")
-        if not identification:
+    def get_stripe_card_data(self, request, organization_uuid):
+        if not organization_uuid:
             raise ValidationError(
-                _("Need to pass 'identification' in query params")
+                _("Need to pass 'organization_uuid'")
             )
-        return JsonResponse(data=StripeGateway().get_card_data(identification))
+        organization = get_object_or_404(Organization, uuid=organization_uuid)
+        self.check_object_permissions(self.request, organization)
+        costomer = organization.organization_billing.get_stripe_customer
+        return JsonResponse(data=StripeGateway().get_card_data(costomer.id))
 
 
 class OrganizationAuthorizationViewSet(
