@@ -38,6 +38,7 @@ from connect.common.models import (
     RequestPermissionOrganization,
 )
 from connect.middleware import ExternalAuthentication
+from connect.billing.gateways.stripe_gateway import StripeGateway
 
 
 class OrganizationViewSet(
