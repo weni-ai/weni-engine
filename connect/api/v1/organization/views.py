@@ -241,6 +241,88 @@ class OrganizationViewSet(
         costomer = organization.organization_billing.get_stripe_customer
         return JsonResponse(data=StripeGateway().get_card_data(costomer.id))
 
+    @action(
+        detail=True,
+        methods=["POST"],
+        url_name="billing-closing-plan",
+        url_path="billing/closing-plan/(?P<organization_uuid>[^/.]+)",
+        authentication_classes=[ExternalAuthentication],
+        permission_classes=[AllowAny],
+    )
+    def closing_plan(self, request, organization_uuid):
+        result = {}
+        organization = get_object_or_404(Organization, uuid=organization_uuid)
+
+        org_billing = organization.organization_billing
+        org_billing.termination_date = datetime.now().date()
+        org_billing.is_active = False
+        org_billing.save()
+        # suspends the organization's projects
+        flow_instance = utils.get_grpc_types().get("flow")
+        suspended_projects = []
+        for project in organization.project.all():
+            suspended_project = flow_instance.suspend_or_unsuspend_project(
+                project_uuid=str(project.flow_organization),
+                is_suspended=True
+            )
+            suspended_projects.append(suspended_project)
+            # celery_app.send_task(
+            #     "update_suspend_project",
+            #     args=[
+            #         str(project.flow_organization),
+            #         True
+            #     ],
+            # )
+        # print(suspended_projects)
+        result = {
+            "plan": org_billing.plan,
+            "is_active": org_billing.is_active,
+            "termination_date": org_billing.termination_date,
+        }
+        return JsonResponse(data=result)
+
+    @action(
+        detail=True,
+        methods=["POST"],
+        url_name="billing-reactivate-plan",
+        url_path="billing/reactivate-plan/(?P<organization_uuid>[^/.]+)",
+        authentication_classes=[ExternalAuthentication],
+        permission_classes=[AllowAny],
+    )
+    def reactivate_plan(self, request, organization_uuid):
+        result = {}
+
+        organization = get_object_or_404(Organization, uuid=organization_uuid)
+        org_billing = organization.organization_billing
+        org_billing.termination_date = None
+        org_billing.is_active = True
+        org_billing.save()
+
+        flow_instance = utils.get_grpc_types().get("flow")
+
+        suspended_projects = []
+        for project in organization.project.all():
+            print(project)
+            suspended_project = flow_instance.suspend_or_unsuspend_project(
+                project_uuid=str(project.flow_organization),
+                is_suspended=False
+            )
+            suspended_projects.append(suspended_project)
+            # celery_app.send_task(
+            #     "update_suspend_project",
+            #     args=[
+            #         str(project.flow_organization),
+            #         False
+            #     ],
+            # )
+
+        result = {
+            "plan": org_billing.plan,
+            "is_active": org_billing.is_active,
+            "termination_date": org_billing.termination_date,
+        }
+        return JsonResponse(data=result)
+
 
 class OrganizationAuthorizationViewSet(
     MultipleFieldLookupMixin,

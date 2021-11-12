@@ -155,6 +155,70 @@ class GetOrganizationContactsAPITestCase(TestCase):
         self.assertEqual(content_data['active-contacts']['organization_active_contacts'], 30)
 
 
+class OrgBillingPlan(TestCase):
+    def setUp(self):
+
+        from connect.grpc.types.flow import FlowType
+        self.flows = FlowType()
+
+        self.factory = RequestFactory()
+        self.owner, self.owner_token = create_user_and_token("owner")
+
+        self.flows_project = self.flows.create_project(project_name='Unit Test', user_email=self.owner.email, project_timezone='America/Maceio')
+
+        self.organization = Organization.objects.create(
+            name="test organization", description="", inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan="enterprise",
+        )
+        self.project = Project.objects.create(
+            name="Unit Test Project", flow_organization=self.flows_project.uuid,
+            organization_id=self.organization.uuid)
+
+    def request(self, param, value, token=None):
+        authorization_header = (
+            {"HTTP_AUTHORIZATION": "Token {}".format(token.key)} if token else {}
+        )
+
+        request = self.factory.post(
+            f"/v1/organization/org/billing/{param}/{value}/", **authorization_header
+        )
+        if param == 'closing-plan':
+            response = OrganizationViewSet.as_view({"post": "closing_plan"})(
+                request, organization_uuid=self.organization.uuid
+            )
+        elif param == 'reactivate-plan':
+            response = OrganizationViewSet.as_view({"post": "reactivate_plan"})(
+                request, organization_uuid=self.organization.uuid
+            )
+
+        content_data = json.loads(response.content)
+        return (response, content_data)
+
+    def test_closing_plan(self):
+        response, content_data = self.request(
+            "closing-plan",
+            self.organization.uuid,
+            self.owner_token,
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(content_data['is_active'], False)
+
+    def test_reactivate_plan(self):
+        response, content_data = self.request(
+            "reactivate-plan",
+            self.organization.uuid,
+            self.owner_token,
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(content_data['is_active'], True)
+
+    def tearDown(self):
+        self.flows.delete_project(project_uuid=self.flows_project.uuid, user_email=self.owner.email)
+        self.project.delete()
+        self.organization.delete()
+
+
 class ListOrganizationAuthorizationTestCase(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
