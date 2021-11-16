@@ -100,7 +100,7 @@ class GRPCType(metaclass=ABCMeta):
     def get_billing_total_statistics(self, project_uuid: str, before: str, after: str):
         raise NotImplementedError()
 
-    def suspend_project(self, project_uuid: str, is_suspended: bool):
+    def suspend_or_unsuspend_project(self, project_uuid: str, is_suspended: bool):
         raise NotImplementedError()
 
     def create_channel(self, name: str, user: str, base_url: str):
