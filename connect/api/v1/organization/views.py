@@ -1,6 +1,5 @@
-from datetime import datetime
-
 from django.conf import settings
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.http import JsonResponse
 from django_filters.rest_framework import DjangoFilterBackend
@@ -12,7 +11,6 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
-
 from connect import utils
 from connect.api.v1.metadata import Metadata
 from connect.api.v1.mixins import MultipleFieldLookupMixin
@@ -254,7 +252,7 @@ class OrganizationViewSet(
         organization = get_object_or_404(Organization, uuid=organization_uuid)
 
         org_billing = organization.organization_billing
-        org_billing.termination_date = datetime.now().date()
+        org_billing.termination_date = timezone.now().date()
         org_billing.is_active = False
         org_billing.save()
         # suspends the organization's projects
