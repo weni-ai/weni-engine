@@ -204,6 +204,23 @@ class Organization(models.Model):
             ),
         )
 
+    def send_email_weni_unicef(self, user_name: str, email: str):
+        if not settings.SEND_EMAILS:
+            return False
+        context = {
+            "base_url": settings.BASE_URL,
+            "user_name": user_name,
+        }
+        send_mail(
+            _("Weni now it's Unicef"),
+            render_to_string("authentication/emails/weni-unicef.txt"),
+            None,
+            [email],
+            html_message=render_to_string(
+                "authentication/emails/weni-unicef.html", context
+            ),
+        )
+
 
 class OrganizationAuthorization(models.Model):
     class Meta:
