@@ -204,20 +204,28 @@ class Organization(models.Model):
             ),
         )
 
-    def send_email_weni_unicef(self, user_name: str, email: str):
+    def send_email_weni_unicef(
+            self,
+            user_name: str,
+            email: str,
+            organization_previous_name: str,
+            organization_new_name: str
+    ):
         if not settings.SEND_EMAILS:
             return False
         context = {
             "base_url": settings.BASE_URL,
             "user_name": user_name,
+            "organization_previous_name": organization_previous_name,
+            "organization_new_name": organization_new_name
         }
         send_mail(
             _("Weni now it's Unicef"),
-            render_to_string("authentication/emails/weni-unicef.txt"),
+            render_to_string("authentication/emails/change_organization_name.txt"),
             None,
             [email],
             html_message=render_to_string(
-                "authentication/emails/weni-unicef.html", context
+                "authentication/emails/change_organization_name.html", context
             ),
         )
 

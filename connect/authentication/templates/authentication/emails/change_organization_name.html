@@ -11,7 +11,7 @@
           </div>
 
           <div style="font-family: 'Lato', sans-serif;font-weight: bold;font-size: 20px;line-height: 28px;color: #262626;margin-top: 24px;">
-            {% trans "Weni now it's Unicef" %}!
+              {{ organization_previous_name }}{% trans " now it's " %}{{ organization_new_name }}!
             <span style="margin-left: 2px">
               <img style="max-height: 20px" src="./emojis/beaming-face.png" alt=""/>
             </span>
@@ -19,9 +19,9 @@
 
           <div style="font-family: 'Lato', sans-serif;font-style: normal;font-weight: normal;font-size: 16px;line-height: 24px;color: #808080;margin-top: 24px;">
                 {% trans "A administrator of " %}
-                <strong>Weni</strong>
+                <strong>{{ organization_previous_name }}</strong>
                 {% trans "changed the name of organization to " %}
-                <strong>Unicef</strong>,
+                <strong>{{ organization_new_name }}</strong>,
                 {% trans " stay tuned when you search him on your organization list" %}.
             <p style="margin-top: 24px; margin-bottom: 0">
                 {% trans "to learn more about the change, contact a person responsible for your organization" %}.
