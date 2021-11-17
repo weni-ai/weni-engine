@@ -147,6 +147,22 @@ class Organization(models.Model):
             ),
         )
 
+    def send_email_organization_going_out(self, user_name: str, email: str):
+        if not settings.SEND_EMAILS:
+            return False
+        context = {
+            "base_url": settings.BASE_URL,
+            "user_name": user_name,
+            "organization_name": self.name
+        }
+        send_mail(
+            _(f"You going out of {self.name}"),
+            render_to_string("authentication/emails/org-going-out.txt"),
+            None,
+            [email],
+            html_message=render_to_string("authentication/emails/org-going-out.html", context)
+        )
+
     def send_email_organization_create(self, email: str, first_name: str):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
@@ -204,7 +220,7 @@ class Organization(models.Model):
             ),
         )
 
-    def send_email_weni_unicef(
+    def send_email_change_organization_name(
             self,
             user_name: str,
             email: str,
@@ -220,7 +236,7 @@ class Organization(models.Model):
             "organization_new_name": organization_new_name
         }
         send_mail(
-            _("Weni now it's Unicef"),
+            _(f"{organization_previous_name} now it's {organization_new_name}"),
             render_to_string("authentication/emails/change_organization_name.txt"),
             None,
             [email],
