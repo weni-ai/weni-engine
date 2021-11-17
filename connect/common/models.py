@@ -163,6 +163,22 @@ class Organization(models.Model):
             html_message=render_to_string("authentication/emails/org_going_out.html", context)
         )
 
+    def send_email_organization_removed(self, email:str, user_name: str):
+        if not settings.SEND_EMAILS:
+            return False
+        context = {
+            "base_url": settings.BASE_URL,
+            "user_name": user_name,
+            "orgaization_name": self.name
+        }
+        send_mail(
+            _(f"You have been removed from {self.name}"),
+            render_to_string("authentication/emails/org_removed.txt"),
+            None,
+            [email],
+            html_message=render_to_string("authentication/emails/org_removed.html", context)
+        )
+
     def send_email_organization_create(self, email: str, first_name: str):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
