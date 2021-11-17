@@ -380,7 +380,7 @@ def delete_status_logs():
     retry_backoff=True,
 )
 def update_suspend_project(project_uuid: str, is_suspended: bool):
-    utils.get_grpc_types().get("flow").suspend_project(
+    utils.get_grpc_types().get("flow").suspend_or_unsuspend_project(
         project_uuid=project_uuid,
         is_suspended=is_suspended,
     )

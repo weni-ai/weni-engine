@@ -26,6 +26,7 @@ class BillingPlanSerializer(serializers.ModelSerializer):
             "fixed_discount",
             "payment_method",
             "plan",
+            "is_active",
             "final_card_number",
             "card_expiration_date",
             "cardholder_name",
@@ -52,6 +53,7 @@ class BillingPlanSerializer(serializers.ModelSerializer):
     plan = serializers.ChoiceField(
         BillingPlan.PLAN_CHOICES, label=_("plan"), default=BillingPlan.PLAN_FREE
     )
+    is_active = serializers.BooleanField()
     final_card_number = serializers.CharField(
         read_only=True,
         allow_null=True,
