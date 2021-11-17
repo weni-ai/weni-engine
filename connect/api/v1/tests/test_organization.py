@@ -137,7 +137,7 @@ class GetOrganizationContactsAPITestCase(TestCase):
             f"/v1/organization/org/{param}/{value}", **authorization_header
         )
 
-        response = OrganizationViewSet.as_view({"get": "get_active_org_contacts"})(
+        response = OrganizationViewSet.as_view({"get": "get_active_contacts"})(
             request, organization_uuid=self.organization.uuid
         )
 
@@ -152,7 +152,7 @@ class GetOrganizationContactsAPITestCase(TestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(content_data['active-contacts']['organization_active_contacts'], 30)
+        self.assertEqual(content_data['active_contacts']['organization_active_contacts'], 30)
 
 
 class ListOrganizationAuthorizationTestCase(TestCase):
