@@ -157,10 +157,10 @@ class Organization(models.Model):
         }
         send_mail(
             _(f"You going out of {self.name}"),
-            render_to_string("authentication/emails/org-going-out.txt"),
+            render_to_string("authentication/emails/org_going_out.txt"),
             None,
             [email],
-            html_message=render_to_string("authentication/emails/org-going-out.html", context)
+            html_message=render_to_string("authentication/emails/org_going_out.html", context)
         )
 
     def send_email_organization_create(self, email: str, first_name: str):
