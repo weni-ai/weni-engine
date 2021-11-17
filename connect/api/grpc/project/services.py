@@ -110,10 +110,10 @@ class ProjectService(
 
             grpc_instance = utils.get_grpc_types().get("flow")
             response = grpc_instance.create_channel(
-                project_uuid=str(project.flow_organization),
-                name=serializer.validated_data.get("name"),
                 user=serializer.validated_data.get("user"),
-                base_url=serializer.validated_data.get("base_url"),
+                project_uuid=str(project.flow_organization),
+                data=serializer.validated_data.get("data"),
+                channeltype_code=serializer.validated_data.get("channeltype_code"),
             )
 
             return CreateChannelResponse(
