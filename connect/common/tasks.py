@@ -1,5 +1,5 @@
 from datetime import timedelta, datetime
-
+from django.utils import timezone
 import requests
 from django.conf import settings
 from django.db import transaction
@@ -242,22 +242,20 @@ def sync_updates_projects():
             classifiers=classifiers_project,
         )
 
+        if project.organization.organization_billing.last_invoice_date is None:
+            before = str(project.organization.created_at.date()) + " 00:00"
+        else:
+            before = str(project.organization.organization_billing.last_invoice_date.date()) + " 00:00"
+
+        if project.organization.organization_billing.next_due_date is None:
+            after = str(timezone.now().date()) + " 00:00"
+        else:
+            after = str(project.organization.organization_billing.next_due_date.date()) + " 00:00"
+
         contact_count = flow_instance.get_billing_total_statistics(
             project_uuid=str(project.flow_organization),
-            before=Timestamp().FromDatetime(
-                project.organization.created_at
-                if project.organization.organization_billing.last_invoice_date is None
-                else datetime.strptime(
-                    str(project.organization.organization_billing.last_invoice_date),
-                    "%Y-%m-%d",
-                )
-            ),
-            after=Timestamp().FromDatetime(
-                datetime.strptime(
-                    str(project.organization.organization_billing.next_due_date),
-                    "%Y-%m-%d",
-                )
-            ),
+            before=before,
+            after=after
         ).get("active_contacts")
 
         project.name = str(flow_result.get("name"))
