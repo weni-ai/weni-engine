@@ -42,12 +42,12 @@ class FlowType(GRPCType):
         return response
 
     def update_project(
-        self, organization_uuid: int, user_email: str, organization_name: str
+        self, organization_uuid: int, organization_name: str
     ):
         stub = org_pb2_grpc.OrgControllerStub(self.channel)
         response = stub.Update(
             org_pb2.OrgUpdateRequest(
-                uuid=organization_uuid, user_email=user_email, name=organization_name
+                uuid=organization_uuid, name=organization_name
             )
         )
         return response

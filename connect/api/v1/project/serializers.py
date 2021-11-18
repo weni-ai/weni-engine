@@ -83,7 +83,7 @@ class ProjectSerializer(serializers.ModelSerializer):
         name = validated_data.get("name", instance.name)
         celery_app.send_task(
             "update_project",
-            args=[instance.flow_organization, self.context["request"].user.email, name],
+            args=[instance.flow_organization, name],
         )
         return super().update(instance, validated_data)
 

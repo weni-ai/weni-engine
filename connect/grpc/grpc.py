@@ -45,7 +45,7 @@ class GRPCType(metaclass=ABCMeta):
         raise NotImplementedError()
 
     def update_project(
-        self, organization_uuid: int, user_email: str, organization_name: str
+        self, organization_uuid: int, organization_name: str
     ):
         raise NotImplementedError()
 
