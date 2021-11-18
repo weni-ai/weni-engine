@@ -3,7 +3,6 @@ from django.utils import timezone
 import requests
 from django.conf import settings
 from django.db import transaction
-from django.utils import timezone
 from google.protobuf.timestamp_pb2 import Timestamp
 from grpc._channel import _InactiveRpcError
 
