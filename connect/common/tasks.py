@@ -242,14 +242,14 @@ def sync_updates_projects():
         )
 
         if project.organization.organization_billing.last_invoice_date is None:
-            after = str(project.organization.created_at)
+            after = project.organization.created_at.strftime("%Y-%m-%d %H:%M")
         else:
-            after = str(project.organization.organization_billing.last_invoice_date)
+            after = project.organization.organization_billing.last_invoice_date.strftime("%Y-%m-%d %H:%M")
 
         if project.organization.organization_billing.next_due_date is None:
-            before = str(timezone.now())
+            before = timezone.now().strftime("%Y-%m-%d %H:%M")
         else:
-            before = str(project.organization.organization_billing.next_due_date)
+            before = project.organization.organization_billing.next_due_date.strftime("%Y-%m-%d %H:%M")
 
         contact_count = flow_instance.get_billing_total_statistics(
             project_uuid=str(project.flow_organization),
