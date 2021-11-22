@@ -1,0 +1,71 @@
+{% extends 'authentication/emails/base.html' %}
+{% load static i18n %}
+
+{% block main-content %}
+
+<section style="width: 574px; margin: 48px">
+  <div style="
+              font-family: 'Lato', sans-serif;
+              font-style: normal;
+              font-weight: normal;
+              font-size: 20px;
+              line-height: 28px;
+              color: #808080;
+            ">
+    Olá,
+    <span style="
+                font-family: 'Lato', sans-serif;
+                color: #262626;
+                font-size: 20px;
+                font-weight: bold;
+                line-height: 28px;
+                font-style: normal;
+              ">João!</span>
+  </div>
+
+  <div style="
+              font-family: 'Lato', sans-serif;
+              font-weight: bold;
+              font-size: 20px;
+              line-height: 28px;
+              color: #262626;
+              margin-top: 24px;
+            ">
+    {% trans "Your" %} {{organization_name}} {% trans "organization's plan has ended" %}
+  </div>
+
+  <div style="
+              font-family: 'Lato', sans-serif;
+              font-style: normal;
+              font-weight: normal;
+              font-size: 16px;
+              line-height: 24px;
+              color: #808080;
+              margin-top: 24px;
+            ">
+    {% trans "An Adminstrator has terminated the organization plan" %}.
+    <strong>{{organization_name}}</strong>. {% trans "At the moment" %}, {% trans "the functioning of your" %}
+    {% trans "Intelligences" %},
+    {% trans "created Flows" %} {% trans "and the Chat module are paralyzed" %}.
+  </div>
+
+  <div style="
+              font-family: 'Lato', sans-serif;
+              font-style: normal;
+              font-weight: normal;
+              font-size: 16px;
+              line-height: 24px;
+              color: #808080;
+              margin-top: 24px;
+            ">
+    {% trans "To continue using the Weni Plataform ask your" %}
+    {% trans "organization's administrator" %}
+    {% trans "to reactivate or choose a new plan that makes sense for your projects" %},
+    {% trans "we want you to stay with us" %}
+    <span style="margin-left: 1px">
+      <img style="max-height: 16px" src="./emojis/winking-face.png" alt="" />
+    </span>
+  </div>
+</section>
+
+{% endblock main-content %}
