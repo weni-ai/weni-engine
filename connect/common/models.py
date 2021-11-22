@@ -698,6 +698,22 @@ class BillingPlan(models.Model):
             html_message=render_to_string("authentication/emails/added_card.html", context)
         )
 
+    def send_email_changed_card(self, user_name: str, email: str):
+        if not settings.SEND_EMAILS:
+            return False
+        context = {
+            "base_url": settings.BASE_URL,
+            "organization_name": self.organization.name,
+            "user_name": user_name
+        }
+        send_mail(
+            _(f"A credit card has been changed to the organization {self.organization.name}",
+              render_to_string("authentication/emails/changed_card.txt"),
+              None,
+              [email],
+              html_message=render_to_string("authentication/emails/changed_card.html"))
+        )
+
 
 class Invoice(models.Model):
     class Meta:
