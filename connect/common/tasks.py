@@ -1,9 +1,8 @@
 from datetime import timedelta, datetime
-
+from django.utils import timezone
 import requests
 from django.conf import settings
 from django.db import transaction
-from django.utils import timezone
 from google.protobuf.timestamp_pb2 import Timestamp
 from grpc._channel import _InactiveRpcError
 
@@ -241,22 +240,20 @@ def sync_updates_projects():
             classifiers=classifiers_project,
         )
 
+        if project.organization.organization_billing.last_invoice_date is None:
+            after = project.organization.created_at.strftime("%Y-%m-%d %H:%M")
+        else:
+            after = project.organization.organization_billing.last_invoice_date.strftime("%Y-%m-%d %H:%M")
+
+        if project.organization.organization_billing.next_due_date is None:
+            before = timezone.now().strftime("%Y-%m-%d %H:%M")
+        else:
+            before = project.organization.organization_billing.next_due_date.strftime("%Y-%m-%d %H:%M")
+
         contact_count = flow_instance.get_billing_total_statistics(
             project_uuid=str(project.flow_organization),
-            before=Timestamp().FromDatetime(
-                project.organization.created_at
-                if project.organization.organization_billing.last_invoice_date is None
-                else datetime.strptime(
-                    str(project.organization.organization_billing.last_invoice_date),
-                    "%Y-%m-%d",
-                )
-            ),
-            after=Timestamp().FromDatetime(
-                datetime.strptime(
-                    str(project.organization.organization_billing.next_due_date),
-                    "%Y-%m-%d",
-                )
-            ),
+            before=before,
+            after=after
         ).get("active_contacts")
 
         project.name = str(flow_result.get("name"))
