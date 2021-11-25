@@ -3,7 +3,7 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.http import JsonResponse
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import mixins
+from rest_framework import mixins, status
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.filters import SearchFilter, OrderingFilter
@@ -302,7 +302,23 @@ class OrganizationViewSet(
             "termination_date": org_billing.termination_date,
         }
         return JsonResponse(data=result)
-
+    
+    @action(
+        detail=True,
+        methods=["POST"],
+        url_name="billing-change-plan",
+        url_path="billing/change-plan/(?P<organization_uuid>[^/.]+)",
+        authentication_classes=[ExternalAuthentication],
+        permission_classes=[AllowAny],
+    )
+    def change_plan(self, request, organization_uuid):
+        plan = request.data.get("organization_billing_plan")
+        organization = get_object_or_404(Organization, uuid=organization_uuid)
+        org_billing = organization.organization_billing
+        change_plan = org_billing.change_plan(plan)
+        if change_plan:
+            return JsonResponse(data={"status":"true", "plan": org_billing.plan})
+        return JsonResponse(data={"status":"false", "message":"Invalid plan choice"}, status=status.HTTP_400_BAD_REQUEST)
 
 class OrganizationAuthorizationViewSet(
     MultipleFieldLookupMixin,
