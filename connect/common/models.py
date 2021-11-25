@@ -713,6 +713,7 @@ class BillingPlan(models.Model):
             [email],
             html_message=render_to_string("billing/emails/finished-plan.html", context)
         )
+
     def send_email_reactivated_plan(self, user_name: str, email: str):
         if not settings.SEND_EMAILS:
             return False
@@ -728,6 +729,7 @@ class BillingPlan(models.Model):
             [email],
             html_message=render_to_string("billing/emails/reactived-plan.html", context)
         )
+
 
 class Invoice(models.Model):
     class Meta:
