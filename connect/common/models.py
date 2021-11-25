@@ -713,7 +713,21 @@ class BillingPlan(models.Model):
             [email],
             html_message=render_to_string("billing/emails/finished-plan.html", context)
         )
-
+    def send_email_reactivated_plan(self, user_name: str, email: str):
+        if not settings.SEND_EMAILS:
+            return False
+        context = {
+            "base_url": settings.BASE_URL,
+            "organization_name": self.organization.name,
+            "user_name": user_name
+        }
+        send_mail(
+            _(f" Your {self.organization.name} organization's plan has been reactivated."),
+            render_to_string("billing/emails/reactived-plan.txt"),
+            None,
+            [email],
+            html_message=render_to_string("billing/emails/reactived-plan.html", context)
+        )
 
 class Invoice(models.Model):
     class Meta:
