@@ -302,7 +302,7 @@ class OrganizationViewSet(
             "termination_date": org_billing.termination_date,
         }
         return JsonResponse(data=result)
-    
+
     @action(
         detail=True,
         methods=["POST"],
@@ -317,8 +317,9 @@ class OrganizationViewSet(
         org_billing = organization.organization_billing
         change_plan = org_billing.change_plan(plan)
         if change_plan:
-            return JsonResponse(data={"status":"true", "plan": org_billing.plan})
-        return JsonResponse(data={"status":"false", "message":"Invalid plan choice"}, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse(data={"status": "true", "plan": org_billing.plan})
+        return JsonResponse(data={"status": "false", "message": "Invalid plan choice"}, status=status.HTTP_400_BAD_REQUEST)
+
 
 class OrganizationAuthorizationViewSet(
     MultipleFieldLookupMixin,

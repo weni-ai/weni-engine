@@ -625,7 +625,7 @@ class BillingPlan(models.Model):
                 * float(1 - self.fixed_discount / 100)
             ).quantize(Decimal(".01"), decimal.ROUND_HALF_UP),
         }
-    
+
     def change_plan(self, plan):
         _is_valid = False
         for choice in self.PLAN_CHOICES:
@@ -636,6 +636,7 @@ class BillingPlan(models.Model):
                 # send mail here
                 break
         return _is_valid
+
 
 class Invoice(models.Model):
     class Meta:
