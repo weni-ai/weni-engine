@@ -1,0 +1,66 @@
+{% extends 'authentication/emails/base.html' %}
+{% load static i18n %}
+
+{% block main-content %}
+        <section style="width: 574px; margin: 48px">
+          <div
+            style="
+              font-family: 'Lato', sans-serif;
+              font-style: normal;
+              font-weight: normal;
+              font-size: 20px;
+              line-height: 28px;
+              color: #808080;
+            "
+          >
+            {% trans "Hi" %},
+            <span
+              style="
+                font-family: 'Lato', sans-serif;
+                color: #262626;
+                font-size: 20px;
+                font-weight: bold;
+                line-height: 28px;
+                font-style: normal;
+              "
+              >{{user_name}}!</span
+            >
+          </div>
+
+          <div
+            style="
+              font-family: 'Lato', sans-serif;
+              font-weight: bold;
+              font-size: 20px;
+              line-height: 28px;
+              color: #262626;
+              margin-top: 24px;
+            "
+          >
+            {% trans "Your" %} {{organization_name}} {% trans "plan has been changed" %}.
+          </div>
+
+          <div
+            style="
+              font-family: 'Lato', sans-serif;
+              font-style: normal;
+              font-weight: normal;
+              font-size: 16px;
+              line-height: 24px;
+              color: #808080;
+              margin-top: 24px;
+            "
+          >
+            {% trans "An administrator updated the" %}
+            <strong>{{organization_name}}</strong> {% trans "organization's plan"  %} {% trans "from" %} {{old_plan}} {% trans "to" %} {{actual_plan}}, 
+            {% trans "the plataform is ready to receive and use our resources" %}
+            <span style="margin-left: 1px">
+              <img
+                style="max-height: 16px"
+                src="./emojis/blue-heart.png"
+                alt=""
+              />
+            </span>
+          </div>
+        </section>
+{% endblock main-content %}

@@ -728,6 +728,23 @@ class BillingPlan(models.Model):
             [email],
             html_message=render_to_string("billing/emails/reactived-plan.html", context)
         )
+    def send_email_changed_plan(self, user_name: str, email: str, old_plan: str):
+        if not settings.SEND_EMAILS:
+            return False
+        context = {
+            "base_url": settings.BASE_URL,
+            "organization_name": self.organization.name,
+            "user_name": user_name,
+            "old_plan": old_plan,
+            "actual_plan": self.plan
+        }
+        send_mail(
+            _(f" Your {self.organization.name} organization's plan has been changed."),
+            render_to_string("billing/emails/changed-plan.txt"),
+            None,
+            [email],
+            html_message=render_to_string("billing/emails/changed-plan.html", context)
+        )
 
 class Invoice(models.Model):
     class Meta:
