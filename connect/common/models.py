@@ -2,7 +2,7 @@ import decimal
 import logging
 import uuid as uuid4
 from datetime import timedelta
-from decimal import Decimal
+from decimal import Context, Decimal
 
 from django.conf import settings
 from django.core.mail import send_mail
@@ -397,6 +397,34 @@ class Project(models.Model):
             [email],
             html_message=render_to_string(
                 "authentication/emails/project_create.html", context
+            ),
+        )
+    
+    def send_email_change_project(self, first_name: str, email: str, old_info: dict):
+        if not settings.SEND_EMAILS:
+            return False
+        
+        date_before = old_info.get("date_before")
+        old_timezone = old_info.get("old_timezone")
+
+        context = {
+            "base_url": settings.BASE_URL,
+            "organization_name": self.organization.name,
+            "project_name": self.name,
+            "old_project_name": 'Projeto antigo',
+            "user": "Filipe Estev",
+            "date_before": {{date_before}},
+            "date_now": self.date_format,
+            "timezone_before": old_timezone,
+            "timezone_now": self.timezone
+        }
+        send_mail(
+            _(f"You have been invited to join the {self.name} organization"),
+            render_to_string("common/emails/project_changed.txt"),
+            None,
+            [email],
+            html_message=render_to_string(
+                "common/emails/project_create.changed", context
             ),
         )
 
