@@ -546,6 +546,12 @@ class BillingPlan(models.Model):
     card_brand = models.CharField(
         verbose_name=_("Card Brand"), null=True, blank=True, max_length=24
     )
+    cpf = models.CharField(
+        verbose_name="CPF", null=True, blank=True, max_length=14
+    )
+    cnpj = models.CharField(
+        verbose_name="CNPJ", null=True, blank=True, max_length=20
+    )
 
     @property
     def get_stripe_customer(self):
