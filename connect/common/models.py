@@ -721,3 +721,19 @@ class InvoiceProject(models.Model):
         _("amount"), decimal_places=2, max_digits=11, default=0
     )
     contact_count = models.IntegerField(_("active contact count"), default=0)
+
+
+class GenericBillingData(models.Model):
+    _free_active_contacts_limit = models.PositiveIntegerField(_("Free active contacts limit"), default=200)
+
+    def __str__(self):
+        return f'{self.free_active_contacts_limit}'
+    
+    @property
+    def free_active_contacts_limit(self):
+        return self._free_active_contacts_limit
+        
+    @free_active_contacts_limit.setter
+    def free_active_contacts_limit(self, value):
+        self._free_active_contacts_limit = value
+        self.save()

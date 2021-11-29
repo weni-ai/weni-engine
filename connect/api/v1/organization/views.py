@@ -320,6 +320,15 @@ class OrganizationViewSet(
             return JsonResponse(data={"status": "true", "plan": org_billing.plan})
         return JsonResponse(data={"status": "false", "message": "Invalid plan choice"}, status=status.HTTP_400_BAD_REQUEST)
 
+    @action(
+        detail=True,
+        methods=["GET", "POST"],
+        url_name="active-contacts-limit",
+        url_path="billing/active-contacts-limit/",
+        )
+    def active_contacts_limit():
+        ...
+
 
 class OrganizationAuthorizationViewSet(
     MultipleFieldLookupMixin,
