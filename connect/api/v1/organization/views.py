@@ -320,6 +320,45 @@ class OrganizationViewSet(
             return JsonResponse(data={"status": "true", "plan": org_billing.plan})
         return JsonResponse(data={"status": "false", "message": "Invalid plan choice"}, status=status.HTTP_400_BAD_REQUEST)
 
+    @action(
+        detail=True,
+        methods=["POST"],
+        url_name='additional-billing-information',
+        url_path='billing/add-additional-information/(?P<organization_uuid>[^/.]+)',
+        authentication_classes=[ExternalAuthentication],
+        permission_classes=[AllowAny]
+    )
+    def add_additional_billing_information(self, request, organization_uuid):
+        organization = get_object_or_404(Organization, uuid=organization_uuid)
+        cpf = request.data.get('cpf') if 'cpf' in request.data else None
+        cnpj = request.data.get('cnpj') if 'cnpj' in request.data else None
+        additional_info = request.data.get('additional_billing_info') if 'additional_billing_info' in request.data else None
+        response = [
+            {
+                'status': 'SUCESS',
+                'response': {
+                    'CPF': cpf,
+                    'CNPJ': cnpj,
+                    'additional_information': additional_info
+                }
+            },
+            {
+                'status': 'NO CHANGES',
+                'message': _('No changes received')
+            }
+        ]
+        billing = organization.organization_billing
+        result = billing.add_additional_information(
+            {
+                'additional_info': additional_info,
+                'cpf': cpf,
+                'cnpj': cnpj
+            }
+        )
+        return JsonResponse(data=response[result])
+
+
+
 
 class OrganizationAuthorizationViewSet(
     MultipleFieldLookupMixin,

@@ -220,6 +220,57 @@ class OrgBillingPlan(TestCase):
         self.organization.delete()
 
 
+class OrgBillingAdditionalInformation(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.owner, self.owner_token = create_user_and_token("owner")
+
+        self.organization = Organization.objects.create(
+            name="test organization", description="", inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan="enterprise",
+        )
+
+    def request(self, value, data={}, token=None):
+        authorization_header = (
+            {"HTTP_AUTHORIZATION": "Token {}".format(token.key)} if token else {}
+        )
+        request = self.factory.post(
+            f"/v1/organization/org/billing/add-additional-information/{value}/", **authorization_header,
+            data=data,
+        )
+        response = OrganizationViewSet.as_view({"post": "add_additional_billing_information"})(
+            request, organization_uuid=self.organization.uuid
+        )
+        content_data = json.loads(response.content)
+
+        return response, content_data
+
+    def test_add_aditional_info_with_cpf(self):
+        data = {
+            'cpf': '111.111.111-11',
+            'additional_data': 'data'
+        }
+        response, content_data = self.request(self.organization.uuid, data, self.owner_token)
+        self.assertEqual(content_data['status'], 'SUCESS')
+
+    def test_add_additional_info_with_cpnj(self):
+        data = {
+            'cnpj': 'XX.XXX.XXX/0001-XX',
+        }
+        response, content_data = self.request(self.organization.uuid, data, self.owner_token)
+        self.assertEqual(content_data['status'], 'SUCESS')
+
+    def test_add_additional_info_void_fields(self):
+        data = {
+        }
+        response, content_data = self.request(self.organization.uuid, data, self.owner_token)
+        self.assertEqual(content_data['status'], 'NO CHANGES')
+
+    def tearDown(self):
+        self.organization.delete()
+
+
 class ListOrganizationAuthorizationTestCase(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
