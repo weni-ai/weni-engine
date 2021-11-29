@@ -358,8 +358,6 @@ class OrganizationViewSet(
         return JsonResponse(data=response[result])
 
 
-
-
 class OrganizationAuthorizationViewSet(
     MultipleFieldLookupMixin,
     mixins.UpdateModelMixin,
