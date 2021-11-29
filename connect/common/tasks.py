@@ -297,20 +297,12 @@ def generate_project_invoice():
 
             contact_count = flow_instance.get_billing_total_statistics(
                 project_uuid=str(project.flow_organization),
-                before=Timestamp().FromDatetime(
-                    org.created_at
+                before=(org.created_at.strftime("%Y-%m-%d %H:%M")
                     if org.organization_billing.last_invoice_date is None
-                    else datetime.strptime(
-                        str(org.organization_billing.last_invoice_date), "%Y-%m-%d"
-                    )
-                ),
-                after=Timestamp().FromDatetime(
-                    datetime.strptime(
-                        str(org.organization_billing.next_due_date), "%Y-%m-%d"
-                    )
-                ),
+                    else org.organization_billing.last_invoice_date.strftime("%Y-%m-%d %H:%M")
+                    ),
+                after=org.organization_billing.next_due_date.strftime("%Y-%m-%d %H:%M"),
             ).get("active_contacts")
-
             invoice.organization_billing_invoice_project.create(
                 project=project,
                 contact_count=contact_count,
