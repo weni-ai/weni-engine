@@ -1,9 +1,8 @@
-from datetime import timedelta, datetime
+from datetime import timedelta
 from django.utils import timezone
 import requests
 from django.conf import settings
 from django.db import transaction
-from google.protobuf.timestamp_pb2 import Timestamp
 from grpc._channel import _InactiveRpcError
 
 from connect import utils, billing
@@ -297,10 +296,10 @@ def generate_project_invoice():
 
             contact_count = flow_instance.get_billing_total_statistics(
                 project_uuid=str(project.flow_organization),
-                before=(org.created_at.strftime("%Y-%m-%d %H:%M")
+                before=(
+                    org.created_at.strftime("%Y-%m-%d %H:%M")
                     if org.organization_billing.last_invoice_date is None
-                    else org.organization_billing.last_invoice_date.strftime("%Y-%m-%d %H:%M")
-                    ),
+                    else org.organization_billing.last_invoice_date.strftime("%Y-%m-%d %H:%M")),
                 after=org.organization_billing.next_due_date.strftime("%Y-%m-%d %H:%M"),
             ).get("active_contacts")
             invoice.organization_billing_invoice_project.create(
