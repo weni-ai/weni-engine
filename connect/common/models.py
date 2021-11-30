@@ -546,6 +546,16 @@ class BillingPlan(models.Model):
     card_brand = models.CharField(
         verbose_name=_("Card Brand"), null=True, blank=True, max_length=24
     )
+    cpf = models.CharField(
+        verbose_name="CPF", null=True, blank=True, max_length=14
+    )
+    cnpj = models.CharField(
+        verbose_name="CNPJ", null=True, blank=True, max_length=20
+    )
+    additional_billing_information = models.CharField(
+        verbose_name=_("Additional billing information"),
+        null=True, blank=True, max_length=250
+    )
 
     @property
     def get_stripe_customer(self):
@@ -636,6 +646,23 @@ class BillingPlan(models.Model):
                 # send mail here
                 break
         return _is_valid
+
+    def add_additional_information(self, data: dict):
+        count = 0
+        if data['additional_info']:
+            self.additional_billing_information = data['additional_info']
+            count += 1
+        if data['cpf']:
+            self.cpf = data['cpf']
+            count += 1
+        if data['cnpj']:
+            self.cnpj = data['cnpj']
+            count += 1
+        if count > 0:
+            self.save()
+            return 0
+        elif count == 0:
+            return 1
 
 
 class Invoice(models.Model):
