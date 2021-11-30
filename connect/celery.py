@@ -35,6 +35,10 @@ app.conf.beat_schedule = {
         "schedule": schedules.crontab(hour="8,10,13,15,17", minute=0),
         # "schedule": 30,
     },
+    "check-organization-free-plan": {
+        "task": "connect.common.tasks.check_organization_free_plan",
+        "schedule": schedules.crontab(minute="*/6"),
+    },
 }
 
 

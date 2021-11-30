@@ -4,6 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.http import JsonResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import mixins, status
+from rest_framework import response
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.filters import SearchFilter, OrderingFilter
@@ -328,9 +329,10 @@ class OrganizationViewSet(
         authentication_classes=[ExternalAuthentication],
         permission_classes=[AllowAny],
     )
-    def organization_on_limit(self, organization_uuid):
-        organization = get_object_or_404(Organization, organization_uuid=organization_uuid)
-        limits = GenericBillingData()
+    def organization_on_limit(self, request, organization_uuid):
+        organization = get_object_or_404(Organization, uuid=organization_uuid)
+        self.check_object_permissions(self.request, organization)
+        limits = GenericBillingData.objects.first() if GenericBillingData.objects.all().exists() else GenericBillingData.objects.create()
         billing = organization.organization_billing
         current_active_contacts = 0
 
@@ -344,13 +346,15 @@ class OrganizationViewSet(
                 response = {
                     'status': 'OK',
                     'message': 'free plan is valid yet',
-                    'missing_quantity': limits.free_active_contacts_limit - current_active_contacts
+                    'missing_quantity': limits.free_active_contacts_limit - current_active_contacts,
+                    'limit': limits.free_active_contacts_limit,
                 }
             else:
                 response = {
                     'status': "FAIL",
                     'message': "free plan isn't longer valid",
-                    'excess_quantity': current_active_contacts - limits.free_active_contacts_limit
+                    'excess_quantity': current_active_contacts - limits.free_active_contacts_limit,
+                    'limit': limits.free_active_contacts_limit,
                 }
         else:
             response = {
@@ -359,15 +363,26 @@ class OrganizationViewSet(
             }
         return JsonResponse(data=response)
 
-
     @action(
         detail=True,
-        methods=["GET", "POST"],
+        methods=["GET", "PATCH"],
         url_name="active-contacts-limit",
         url_path="billing/active-contacts-limit",
-        )
-    def active_contacts_limit(self):
-        pass
+        authentication_classes=[ExternalAuthentication],
+        permission_classes=[AllowAny],
+    )
+    def active_contacts_limit(self, request): # pragma: no cover
+        limit = GenericBillingData.objects.first() if GenericBillingData.objects.all().exists() else GenericBillingData.objects.create()
+        response = {
+            "active_contacts_limit": limit.free_active_contacts_limit
+        }
+        if request.method == 'PATCH':
+            new_limit = request.data.get("active_contacts_limit")
+            limit.free_active_contacts_limit = new_limit
+            response = {
+                "active_contacts_limit": limit.free_active_contacts_limit
+            }
+        return JsonResponse(data=response)
 
 
 class OrganizationAuthorizationViewSet(

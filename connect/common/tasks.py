@@ -5,7 +5,6 @@ from django.conf import settings
 from django.db import transaction
 from google.protobuf.timestamp_pb2 import Timestamp
 from grpc._channel import _InactiveRpcError
-
 from connect import utils, billing
 from connect.authentication.models import User
 from connect.celery import app
@@ -16,6 +15,7 @@ from connect.common.models import (
     LogService,
     BillingPlan,
     Invoice,
+    GenericBillingData,
 )
 
 
@@ -214,6 +214,31 @@ def search_project(organization_id: int, project_uuid: str, text: str):
         "flow": flow_result,
         "inteligence": inteligence_result,
     }
+
+
+@app.task()
+def check_organization_free_plan():
+    limits = GenericBillingData.objects.first() if GenericBillingData.objects.all().exists() else GenericBillingData.objects.create()
+    for organization in Organization.objects.filter(organization_billing__plan='free'):
+        current_active_contacts = 0
+        print(current_active_contacts)
+        for project in organization.project.all():
+            print(project.contact_count)
+            current_active_contacts += project.contact_count
+        print(current_active_contacts)
+        if current_active_contacts > limits.free_active_contacts_limit:
+            organization.is_suspended = True
+            for project in organization.project.all():
+                app.send_task(
+                    "update_suspend_project",
+                    args=[
+                        str(project.flow_organization),
+                        True
+                    ],
+                )
+    return True
+
+
 
 
 @app.task()
