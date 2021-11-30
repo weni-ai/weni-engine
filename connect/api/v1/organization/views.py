@@ -4,7 +4,6 @@ from django.utils.translation import ugettext_lazy as _
 from django.http import JsonResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import mixins, status
-from rest_framework import response
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.filters import SearchFilter, OrderingFilter
@@ -371,7 +370,7 @@ class OrganizationViewSet(
         authentication_classes=[ExternalAuthentication],
         permission_classes=[AllowAny],
     )
-    def active_contacts_limit(self, request): # pragma: no cover
+    def active_contacts_limit(self, request):  # pragma: no cover
         limit = GenericBillingData.objects.first() if GenericBillingData.objects.all().exists() else GenericBillingData.objects.create()
         response = {
             "active_contacts_limit": limit.free_active_contacts_limit

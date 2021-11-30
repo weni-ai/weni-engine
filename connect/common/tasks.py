@@ -239,8 +239,6 @@ def check_organization_free_plan():
     return True
 
 
-
-
 @app.task()
 def sync_updates_projects():
     for project in Project.objects.all():

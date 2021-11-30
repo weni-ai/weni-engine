@@ -728,11 +728,11 @@ class GenericBillingData(models.Model):
 
     def __str__(self):
         return f'{self.free_active_contacts_limit}'
-    
+
     @property
     def free_active_contacts_limit(self):
         return self._free_active_contacts_limit
-        
+
     @free_active_contacts_limit.setter
     def free_active_contacts_limit(self, value):
         self._free_active_contacts_limit = value
