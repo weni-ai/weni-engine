@@ -185,11 +185,11 @@ class OrgBillingPlan(TestCase):
             f"/v1/organization/org/billing/{param}/{value}/", **authorization_header
         )
         if param == 'closing-plan':
-            response = OrganizationViewSet.as_view({"post": "closing_plan"})(
+            response = OrganizationViewSet.as_view({"patch": "closing_plan"})(
                 request, organization_uuid=self.organization.uuid
             )
         elif param == 'reactivate-plan':
-            response = OrganizationViewSet.as_view({"post": "reactivate_plan"})(
+            response = OrganizationViewSet.as_view({"patch": "reactivate_plan"})(
                 request, organization_uuid=self.organization.uuid
             )
 
@@ -390,3 +390,80 @@ class DestroyAuthorizationRoleTestCase(TestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+class ActiveContactsLimitTestCase(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.owner, self.owner_token = create_user_and_token("owner")
+        self.organization = Organization.objects.create(
+            name="test organization", description="", inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan="enterprise",
+        )
+        self.project = Project.objects.create(
+            name="Unit Test Project", flow_organization=uuid4.uuid4(),
+            organization_id=self.organization.uuid)
+        self.organization_authorization = self.organization.authorizations.create(
+            user=self.owner, role=OrganizationAuthorization.ROLE_ADMIN
+        )
+
+    def request(self, param, value, token=None):
+        authorization_header = (
+            {"HTTP_AUTHORIZATION": "Token {}".format(token.key)} if token else {}
+        )
+
+        request = self.factory.get(
+            f"/v1/organization/org/billing/{param}/{value}/", **authorization_header
+        )
+        response = OrganizationViewSet.as_view({"get": "organization_on_limit"})(
+            request, organization_uuid=self.organization.uuid
+        )
+
+        content_data = json.loads(response.content)
+        return (response, content_data)
+
+    def request2(self, param, method, token=None):
+        authorization_header = (
+            {"HTTP_AUTHORIZATION": "Token {}".format(token.key)} if token else {}
+        )
+        if method == 'GET':
+            request = self.factory.get(
+                f"/v1/organization/org/billing/{param}/", **authorization_header
+            )
+
+            response = OrganizationViewSet.as_view({"get": "active_contacts_limit"})(
+                request
+            )
+        else:
+            request = self.factory.patch(
+                f"/v1/organization/org/billing/{param}/", **authorization_header,
+            )
+
+            response = OrganizationViewSet.as_view({"patch": "active_contacts_limit"})(
+                request
+            )
+
+        content_data = json.loads(response.content)
+        return (response, content_data)
+
+    def test_organization_on_limit(self):
+        response, content_data = self.request(
+            "organization-on-limit",
+            self.organization.uuid,
+            self.owner_token,
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_get_active_contacts_limit(self):
+        response, content_data = self.request2(
+            "active-contacts-limit",
+            'GET',
+            self.owner_token,
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(content_data['active_contacts_limit'], 200)
+
+    def tearDown(self):
+        self.project.delete()
+        self.organization.delete()

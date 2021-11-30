@@ -33,7 +33,7 @@ from connect.celery import app as celery_app
 from connect.common.models import (
     Organization,
     OrganizationAuthorization,
-    RequestPermissionOrganization,
+    RequestPermissionOrganization, GenericBillingData,
 )
 from connect.middleware import ExternalAuthentication
 
@@ -319,6 +319,69 @@ class OrganizationViewSet(
         if change_plan:
             return JsonResponse(data={"status": "true", "plan": org_billing.plan})
         return JsonResponse(data={"status": "false", "message": "Invalid plan choice"}, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(
+        detail=True,
+        methods=["GET"],
+        url_name='organization-on-limit',
+        url_path='billing/organization-on-limit/(?P<organization_uuid>[^/.]+)',
+        authentication_classes=[ExternalAuthentication],
+        permission_classes=[AllowAny],
+    )
+    def organization_on_limit(self, request, organization_uuid):
+        organization = get_object_or_404(Organization, uuid=organization_uuid)
+        self.check_object_permissions(self.request, organization)
+        limits = GenericBillingData.objects.first() if GenericBillingData.objects.all().exists() else GenericBillingData.objects.create()
+        billing = organization.organization_billing
+        current_active_contacts = 0
+
+        for project in organization.project.all():
+            current_active_contacts += project.contact_count
+
+        response = {}
+
+        if billing.plan == billing.PLAN_FREE:
+            if limits.free_active_contacts_limit >= current_active_contacts:
+                response = {
+                    'status': 'OK',
+                    'message': 'free plan is valid yet',
+                    'missing_quantity': limits.free_active_contacts_limit - current_active_contacts,
+                    'limit': limits.free_active_contacts_limit,
+                }
+            else:
+                response = {
+                    'status': "FAIL",
+                    'message': "free plan isn't longer valid",
+                    'excess_quantity': current_active_contacts - limits.free_active_contacts_limit,
+                    'limit': limits.free_active_contacts_limit,
+                }
+        else:
+            response = {
+                'status': 'OK',
+                'message': "Your plan don't have a contact active limit"
+            }
+        return JsonResponse(data=response)
+
+    @action(
+        detail=True,
+        methods=["GET", "PATCH"],
+        url_name="active-contacts-limit",
+        url_path="billing/active-contacts-limit",
+        authentication_classes=[ExternalAuthentication],
+        permission_classes=[AllowAny],
+    )
+    def active_contacts_limit(self, request):  # pragma: no cover
+        limit = GenericBillingData.objects.first() if GenericBillingData.objects.all().exists() else GenericBillingData.objects.create()
+        response = {
+            "active_contacts_limit": limit.free_active_contacts_limit
+        }
+        if request.method == 'PATCH':
+            new_limit = request.data.get("active_contacts_limit")
+            limit.free_active_contacts_limit = new_limit
+            response = {
+                "active_contacts_limit": limit.free_active_contacts_limit
+            }
+        return JsonResponse(data=response)
 
 
 class OrganizationAuthorizationViewSet(
