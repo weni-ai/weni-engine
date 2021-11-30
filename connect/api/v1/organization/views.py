@@ -241,7 +241,7 @@ class OrganizationViewSet(
 
     @action(
         detail=True,
-        methods=["POST"],
+        methods=["PATCH"],
         url_name="billing-closing-plan",
         url_path="billing/closing-plan/(?P<organization_uuid>[^/.]+)",
         authentication_classes=[ExternalAuthentication],
@@ -273,7 +273,7 @@ class OrganizationViewSet(
 
     @action(
         detail=True,
-        methods=["POST"],
+        methods=["PATCH"],
         url_name="billing-reactivate-plan",
         url_path="billing/reactivate-plan/(?P<organization_uuid>[^/.]+)",
         authentication_classes=[ExternalAuthentication],
@@ -305,7 +305,7 @@ class OrganizationViewSet(
 
     @action(
         detail=True,
-        methods=["POST"],
+        methods=["PATCH"],
         url_name="billing-change-plan",
         url_path="billing/change-plan/(?P<organization_uuid>[^/.]+)",
         authentication_classes=[ExternalAuthentication],
