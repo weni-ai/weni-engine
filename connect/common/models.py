@@ -163,7 +163,7 @@ class Organization(models.Model):
             html_message=render_to_string("authentication/emails/org_going_out.html", context)
         )
 
-    def send_email_organization_removed(self, email:str, user_name: str):
+    def send_email_organization_removed(self, email: str, user_name: str):
         if not settings.SEND_EMAILS:
             return False
         context = {
@@ -691,11 +691,43 @@ class BillingPlan(models.Model):
             "user_name": user_name
         }
         send_mail(
-            _(f"A credit card has been added to the organization {self.organization.name}"),
+            _(f"Your {self.organization.name} organization's plan has ended "),
             render_to_string("authentication/emails/added_card.txt"),
             None,
             [email],
             html_message=render_to_string("authentication/emails/added_card.html", context)
+        )
+
+    def send_email_finished_plan(self, user_name: str, email: str):
+        if not settings.SEND_EMAILS:
+            return False
+        context = {
+            "base_url": settings.BASE_URL,
+            "organization_name": self.organization.name,
+            "user_name": user_name
+        }
+        send_mail(
+            _(f"Your {self.organization.name} organization's plan has ended"),
+            render_to_string("billing/emails/finished-plan.txt"),
+            None,
+            [email],
+            html_message=render_to_string("billing/emails/finished-plan.html", context)
+        )
+
+    def send_email_reactivated_plan(self, user_name: str, email: str):
+        if not settings.SEND_EMAILS:
+            return False
+        context = {
+            "base_url": settings.BASE_URL,
+            "organization_name": self.organization.name,
+            "user_name": user_name
+        }
+        send_mail(
+            _(f" Your {self.organization.name} organization's plan has been reactivated."),
+            render_to_string("billing/emails/reactived-plan.txt"),
+            None,
+            [email],
+            html_message=render_to_string("billing/emails/reactived-plan.html", context)
         )
 
 
