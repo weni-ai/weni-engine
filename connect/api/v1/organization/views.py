@@ -211,14 +211,7 @@ class OrganizationViewSet(
         organization = get_object_or_404(Organization, uuid=organization_uuid)
         self.check_object_permissions(self.request, organization)
 
-        contact_count = 0
-        result = {"active-contacts": {}}
-
-        for project in organization.project.all():
-            contact_count += project.contact_count
-        result["active-contacts"] = {
-            "organization_active_contacts": contact_count,
-        }
+        result = {"active-contacts": {"organization_active_contacts": organization.active_contacts}}
         return JsonResponse(data=result)
 
     @action(
@@ -236,8 +229,8 @@ class OrganizationViewSet(
             )
         organization = get_object_or_404(Organization, uuid=organization_uuid)
         self.check_object_permissions(self.request, organization)
-        costomer = organization.organization_billing.get_stripe_customer
-        return JsonResponse(data=StripeGateway().get_card_data(costomer.id))
+        customer = organization.organization_billing.get_stripe_customer
+        return JsonResponse(data=StripeGateway().get_card_data(customer.id))
 
     @action(
         detail=True,
@@ -333,10 +326,7 @@ class OrganizationViewSet(
         self.check_object_permissions(self.request, organization)
         limits = GenericBillingData.objects.first() if GenericBillingData.objects.all().exists() else GenericBillingData.objects.create()
         billing = organization.organization_billing
-        current_active_contacts = 0
-
-        for project in organization.project.all():
-            current_active_contacts += project.contact_count
+        current_active_contacts = organization.active_contacts
 
         response = {}
 
