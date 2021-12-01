@@ -204,6 +204,13 @@ class Organization(models.Model):
             ),
         )
 
+    @property
+    def active_contacts(self):
+        active_contact_counter = 0
+        for project in self.project.all():
+            active_contact_counter += project.contact_count
+        return active_contact_counter
+
 
 class OrganizationAuthorization(models.Model):
     class Meta:

@@ -92,7 +92,7 @@ class OrganizationViewSet(
             customer=organization.organization_billing.get_stripe_customer.id
         )
 
-        return JsonResponse(data=setup_intent)
+        return JsonResponse(data=setup_intent, status=status.HTTP_200_OK)
 
     @action(
         detail=True,
@@ -109,7 +109,7 @@ class OrganizationViewSet(
 
         organization.organization_billing.allow_payments()
 
-        return JsonResponse(data={"status": True})
+        return JsonResponse(data={"status": True}, status=status.HTTP_200_OK)
 
     @action(
         detail=True,
@@ -129,7 +129,7 @@ class OrganizationViewSet(
         organization.is_suspended = True
         organization.save(update_fields=["is_suspended"])
 
-        return JsonResponse(data={"status": True})
+        return JsonResponse(data={"status": True}, status=status.HTTP_200_OK)
 
     @action(
         detail=True,
@@ -175,7 +175,7 @@ class OrganizationViewSet(
                 }
             )
 
-        return JsonResponse(data=result)
+        return JsonResponse(data=result, status=status.HTTP_200_OK)
 
     @action(
         detail=True,
@@ -197,7 +197,7 @@ class OrganizationViewSet(
                     "active_contacts": project.contact_count
                 }
             )
-        return JsonResponse(data=response)
+        return JsonResponse(data=response, status=status.HTTP_200_OK)
 
     @action(
         detail=True,
@@ -210,16 +210,9 @@ class OrganizationViewSet(
     def get_active_org_contacts(self, request, organization_uuid):
         organization = get_object_or_404(Organization, uuid=organization_uuid)
         self.check_object_permissions(self.request, organization)
-
-        contact_count = 0
-        result = {"active-contacts": {}}
-
-        for project in organization.project.all():
-            contact_count += project.contact_count
-        result["active-contacts"] = {
-            "organization_active_contacts": contact_count,
-        }
-        return JsonResponse(data=result)
+        st = status.HTTP_200_OK
+        result = {"active-contacts": {"organization_active_contacts": organization.active_contacts}}
+        return JsonResponse(data=result, status=st)
 
     @action(
         detail=True,
@@ -236,8 +229,8 @@ class OrganizationViewSet(
             )
         organization = get_object_or_404(Organization, uuid=organization_uuid)
         self.check_object_permissions(self.request, organization)
-        costomer = organization.organization_billing.get_stripe_customer
-        return JsonResponse(data=StripeGateway().get_card_data(costomer.id))
+        customer = organization.organization_billing.get_stripe_customer
+        return JsonResponse(data=StripeGateway().get_card_data(customer.id), status=status.HTTP_200_OK)
 
     @action(
         detail=True,
@@ -269,7 +262,7 @@ class OrganizationViewSet(
             "is_active": org_billing.is_active,
             "termination_date": org_billing.termination_date,
         }
-        return JsonResponse(data=result)
+        return JsonResponse(data=result, status=status.HTTP_200_OK)
 
     @action(
         detail=True,
@@ -301,7 +294,7 @@ class OrganizationViewSet(
             "is_active": org_billing.is_active,
             "termination_date": org_billing.termination_date,
         }
-        return JsonResponse(data=result)
+        return JsonResponse(data=result, status=status.HTTP_200_OK)
 
     @action(
         detail=True,
@@ -317,8 +310,8 @@ class OrganizationViewSet(
         org_billing = organization.organization_billing
         change_plan = org_billing.change_plan(plan)
         if change_plan:
-            return JsonResponse(data={"status": "true", "plan": org_billing.plan})
-        return JsonResponse(data={"status": "false", "message": "Invalid plan choice"}, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse(data={"plan": org_billing.plan}, status=status.HTTP_200_OK)
+        return JsonResponse(data={"message": "Invalid plan choice"}, status=status.HTTP_400_BAD_REQUEST)
 
     @action(
         detail=True,
@@ -333,12 +326,10 @@ class OrganizationViewSet(
         self.check_object_permissions(self.request, organization)
         limits = GenericBillingData.objects.first() if GenericBillingData.objects.all().exists() else GenericBillingData.objects.create()
         billing = organization.organization_billing
-        current_active_contacts = 0
-
-        for project in organization.project.all():
-            current_active_contacts += project.contact_count
+        current_active_contacts = organization.active_contacts
 
         response = {}
+        st = status.HTTP_200_OK
 
         if billing.plan == billing.PLAN_FREE:
             if limits.free_active_contacts_limit >= current_active_contacts:
@@ -355,12 +346,13 @@ class OrganizationViewSet(
                     'excess_quantity': current_active_contacts - limits.free_active_contacts_limit,
                     'limit': limits.free_active_contacts_limit,
                 }
+                st = status.HTTP_402_PAYMENT_REQUIRED
         else:
             response = {
                 'status': 'OK',
                 'message': "Your plan don't have a contact active limit"
             }
-        return JsonResponse(data=response)
+        return JsonResponse(data=response, status=st)
 
     @action(
         detail=True,
@@ -381,7 +373,7 @@ class OrganizationViewSet(
             response = {
                 "active_contacts_limit": limit.free_active_contacts_limit
             }
-        return JsonResponse(data=response)
+        return JsonResponse(data=response, status=status.HTTP_200_OK)
 
     @action(
         detail=True,
@@ -418,7 +410,7 @@ class OrganizationViewSet(
                 'cnpj': cnpj
             }
         )
-        return JsonResponse(data=response[result])
+        return JsonResponse(data=response[result], status=status.HTTP_200_OK)
 
 
 class OrganizationAuthorizationViewSet(

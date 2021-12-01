@@ -219,12 +219,7 @@ def search_project(organization_id: int, project_uuid: str, text: str):
 def check_organization_free_plan():
     limits = GenericBillingData.objects.first() if GenericBillingData.objects.all().exists() else GenericBillingData.objects.create()
     for organization in Organization.objects.filter(organization_billing__plan='free'):
-        current_active_contacts = 0
-        print(current_active_contacts)
-        for project in organization.project.all():
-            print(project.contact_count)
-            current_active_contacts += project.contact_count
-        print(current_active_contacts)
+        current_active_contacts = organization.active_contacts
         if current_active_contacts > limits.free_active_contacts_limit:
             organization.is_suspended = True
             for project in organization.project.all():
