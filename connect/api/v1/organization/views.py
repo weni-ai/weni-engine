@@ -124,12 +124,13 @@ class OrganizationViewSet(
 
         self.check_object_permissions(self.request, organization)
 
-        organization.organization_billing.remove_credit_card()
+        if organization.organization_billing.remove_credit_card:
 
-        organization.is_suspended = True
-        organization.save(update_fields=["is_suspended"])
+            organization.is_suspended = True
+            organization.save(update_fields=["is_suspended"])
 
-        return JsonResponse(data={"status": True}, status=status.HTTP_200_OK)
+            return JsonResponse(data={"status": True}, status=status.HTTP_200_OK)
+        return JsonResponse(data={"status": False}, status=status.HTTP_304_NOT_MODIFIED)
 
     @action(
         detail=True,

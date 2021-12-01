@@ -613,7 +613,10 @@ class BillingPlan(models.Model):
     @property
     def remove_credit_card(self):
         gateway = billing.get_gateway("stripe")
-        return gateway.unstore(identification=self.stripe_customer)
+        unstore = gateway.unstore(identification=self.stripe_customer)
+        if unstore['status'] == 'SUCCESS':
+            return True
+        return False
 
     @staticmethod
     def calculate_amount(contact_count: int):
