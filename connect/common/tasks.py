@@ -303,8 +303,7 @@ def generate_project_invoice():
         invoice = org.organization_billing_invoice.create(
             due_date=timezone.now() + timedelta(days=10),
             invoice_random_id=1
-            if org.organization_billing_invoice.last() is None
-            else org.organization_billing_invoice.last().invoice_random_id + 1,
+            if org.organization_billing_invoice.last() is None else org.organization_billing_invoice.last().invoice_random_id + 1,
             discount=org.organization_billing.fixed_discount,
             extra_integration=org.extra_integration,
             cost_per_whatsapp=settings.BILLING_COST_PER_WHATSAPP,

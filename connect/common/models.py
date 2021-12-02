@@ -13,7 +13,7 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from timezone_field import TimeZoneField
 
-from connect import utils, billing
+from connect import billing
 from connect.authentication.models import User
 
 logger = logging.getLogger(__name__)
@@ -620,8 +620,9 @@ class BillingPlan(models.Model):
 
     @staticmethod
     def calculate_amount(contact_count: int):
+        precification = GenericBillingData.objects.first() if GenericBillingData.objects.all().exists() else GenericBillingData.objects.create()
         return Decimal(
-            str(utils.calculate_active_contacts(value=contact_count))
+            str(precification.calculate_active_contacts(contact_count=contact_count))
         ).quantize(Decimal(".01"), decimal.ROUND_HALF_UP)
 
     @property
@@ -762,6 +763,14 @@ class InvoiceProject(models.Model):
 
 class GenericBillingData(models.Model):
     _free_active_contacts_limit = models.PositiveIntegerField(_("Free active contacts limit"), default=200)
+    _from_1_to_1000 = models.DecimalField(_("From 1 to 1000 active contacts"), decimal_places=3, max_digits=11, default=0.267)
+    _from_1001_to_5000 = models.DecimalField(_("From 1001 to 5000 active contacts"), decimal_places=3, max_digits=11, default=0.178)
+    _from_5001_to_10000 = models.DecimalField(_("From 5001 to 10000 active contacts"), decimal_places=3, max_digits=11, default=0.167)
+    _from_10001_to_30000 = models.DecimalField(_("From 10001 to 30000 active contacts"), decimal_places=3, max_digits=11, default=0.156)
+    _from_30001_to_50000 = models.DecimalField(_("From 30001 to 50000 active contacts"), decimal_places=3, max_digits=11, default=0.144)
+    _from_50001_to_100000 = models.DecimalField(_("From 50001 to 100000 active contacts"), decimal_places=3, max_digits=11, default=0.140)
+    _from_100001_to_250000 = models.DecimalField(_("From 100001 to 250000 active contacts"), decimal_places=3, max_digits=11, default=0.133)
+    _from_2500001 = models.DecimalField(_("From 100001 to 250000 active contacts"), decimal_places=3, max_digits=11, default=0.133)
 
     def __str__(self):
         return f'{self.free_active_contacts_limit}'
@@ -774,3 +783,70 @@ class GenericBillingData(models.Model):
     def free_active_contacts_limit(self, value):
         self._free_active_contacts_limit = value
         self.save()
+
+    @property
+    def precification(self):
+        return {
+            "currency": "USD",
+            "range": [
+                {
+                    "from": 1,
+                    "to": 1000,
+                    "value_per_contact": self._from_1_to_1000,
+                },
+                {
+                    "from": 1001,
+                    "to": 5000,
+                    "value_per_contact": self._from_1001_to_5000,
+                },
+                {
+                    "from": 5001,
+                    "to": 10000,
+                    "value_per_contact": self._from_5001_to_10000,
+                },
+                {
+                    "from": 10001,
+                    "to": 30000,
+                    "value_per_contact": self._from_10001_to_30000,
+                },
+                {
+                    "from": 30001,
+                    "to": 50000,
+                    "value_per_contact": self._from_30001_to_50000,
+                },
+                {
+                    "from": 50001,
+                    "to": 100000,
+                    "value_per_contact": self._from_50001_to_100000,
+                },
+                {
+                    "from": 100001,
+                    "to": 250000,
+                    "value_per_contact": self._from_100001_to_250000,
+                },
+                {
+                    "from": 250001,
+                    "to": "infinite",
+                    "value_per_contact": self._from_100001_to_250000,
+                },
+            ]
+        }
+
+    def calculate_active_contacts(self, contact_count):
+
+        if contact_count <= 1000:
+            return 1000 * self._from_1_to_1000
+        elif contact_count <= 5000:
+            return contact_count * self._from_1001_to_5000
+        elif contact_count <= 10000:
+            return contact_count * self._from_5001_to_10000
+        elif contact_count <= 30000:
+            return contact_count * self._from_10001_to_30000
+        elif contact_count <= 50000:
+            return contact_count * self._from_30001_to_50000
+        elif contact_count <= 100000:
+            return contact_count * self._from_50001_to_100000
+        elif contact_count <= 250000:
+            return contact_count * self._from_100001_to_250000
+        elif contact_count >= 250000:
+            return contact_count * self._from_2500001
