@@ -391,6 +391,7 @@ class OrganizationViewSet(
         organization = get_object_or_404(Organization, uuid=organization_uuid)
         cpf = request.data.get('cpf') if 'cpf' in request.data else None
         cnpj = request.data.get('cnpj') if 'cnpj' in request.data else None
+        extra_integration = request.data.get('extra_integration') if 'extra_integration'in request.data else None
         additional_info = request.data.get('additional_billing_info') if 'additional_billing_info' in request.data else None
         response = [
             {
@@ -398,7 +399,8 @@ class OrganizationViewSet(
                 'response': {
                     'CPF': cpf,
                     'CNPJ': cnpj,
-                    'additional_information': additional_info
+                    'additional_information': additional_info,
+                    'extra_integration': extra_integration
                 }
             },
             {
@@ -411,7 +413,8 @@ class OrganizationViewSet(
             {
                 'additional_info': additional_info,
                 'cpf': cpf,
-                'cnpj': cnpj
+                'cnpj': cnpj,
+                'extra_integration': extra_integration
             }
         )
         return JsonResponse(data=response[result], status=status.HTTP_200_OK)
@@ -428,7 +431,22 @@ class OrganizationViewSet(
         billing_data = GenericBillingData.objects.first() if GenericBillingData.objects.all().exists() else GenericBillingData.objects.create()
         return JsonResponse(data=billing_data.precification, status=status.HTTP_200_OK)
 
-
+    @action(
+        detail=True,
+        methods=["GET"],
+        url_name='extra-integrations',
+        url_path='billing/extra-integrations/(?P<organization_uuid>[^/.]+)',
+        authentication_classes=[ExternalAuthentication],
+        permission_classes=[AllowAny]
+    )
+    def get_extra_active_integrations(self, request, organization_uuid):
+        organization = get_object_or_404(Organization, uuid=organization_uuid)
+        self.check_object_permissions(self.request, organization)
+        response = {
+            "extra_active_integrations": organization.extra_active_integrations,
+            "limit_extra_integrations": organization.extra_integration
+        }
+        return JsonResponse(data=response, status=status.HTTP_200_OK)
 class OrganizationAuthorizationViewSet(
     MultipleFieldLookupMixin,
     mixins.UpdateModelMixin,

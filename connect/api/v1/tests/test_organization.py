@@ -518,3 +518,45 @@ class ActiveContactsLimitTestCase(TestCase):
     def tearDown(self):
         self.project.delete()
         self.organization.delete()
+
+class ExtraIntegrationsTestCase(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+
+        self.owner, self.owner_token = create_user_and_token("owner")
+        self.user, self.user_token = create_user_and_token()
+        self.organization = Organization.objects.create(
+            name="test organization", description="", inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan="free", extra_integration=4,
+        )
+
+        self.project = Project.objects.create(
+            name="Unit Test Project", flow_organization="57257d94-e54b-4ec1-8952-113a81610465",
+            organization_id=self.organization.uuid)
+    
+        self.organization_authorization = self.organization.authorizations.create(
+            user=self.owner, role=OrganizationAuthorization.ROLE_ADMIN
+        )
+    def request(self, value, param, token=None):
+        authorization_header = (
+            {"HTTP_AUTHORIZATION": "Token {}".format(token.key)} if token else {}
+        )
+        request = self.factory.get(
+            f"/v1/organization/org/billing/{value}/{param}", **authorization_header
+        )
+        response = OrganizationViewSet.as_view({"get": "get_extra_active_integrations"})(
+            request, organization_uuid=self.organization.uuid
+        )
+
+        content_data = json.loads(response.content)
+
+        return response, content_data
+    
+    def test_extra_integration(self):
+        response, content_data = self.request(
+            "extra-integrations",
+            self.organization.uuid,
+            self.owner_token,
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
