@@ -339,6 +339,7 @@ class OrganizationViewSet(
                     'message': 'free plan is valid yet',
                     'missing_quantity': limits.free_active_contacts_limit - current_active_contacts,
                     'limit': limits.free_active_contacts_limit,
+                    'current_active_contacts': current_active_contacts,
                 }
             else:
                 response = {
@@ -346,12 +347,14 @@ class OrganizationViewSet(
                     'message': "free plan isn't longer valid",
                     'excess_quantity': current_active_contacts - limits.free_active_contacts_limit,
                     'limit': limits.free_active_contacts_limit,
+                    'current_active_contacts': current_active_contacts,
                 }
                 st = status.HTTP_402_PAYMENT_REQUIRED
         else:
             response = {
                 'status': 'OK',
-                'message': "Your plan don't have a contact active limit"
+                'message': "Your plan don't have a contact active limit",
+                'current_active_contacts': current_active_contacts,
             }
         return JsonResponse(data=response, status=st)
 
@@ -412,6 +415,18 @@ class OrganizationViewSet(
             }
         )
         return JsonResponse(data=response[result], status=status.HTTP_200_OK)
+
+    @action(
+        detail=True,
+        methods=["GET"],
+        url_name='billing-precification',
+        url_path='billing/precification',
+        authentication_classes=[ExternalAuthentication],
+        permission_classes=[AllowAny]
+    )
+    def get_billing_precification(self, request):
+        billing_data = GenericBillingData.objects.first() if GenericBillingData.objects.all().exists() else GenericBillingData.objects.create()
+        return JsonResponse(data=billing_data.precification, status=status.HTTP_200_OK)
 
 
 class OrganizationAuthorizationViewSet(

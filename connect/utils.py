@@ -26,31 +26,3 @@ def get_grpc_types():
     from connect.grpc import TYPES
 
     return TYPES
-
-
-def calculate_active_contacts(value: int):
-    base_value = {
-        1000: 0.267,
-        5000: 0.178,
-        10000: 0.167,
-        30000: 0.156,
-        50000: 0.144,
-        100000: 0.140,
-        250000: 0.133,
-    }
-    if value < 1000:
-        return 1000 * base_value.get(1000)
-    elif value < 5000:
-        return value * base_value.get(1000)
-    elif 5000 <= value < 10000:
-        return value * base_value.get(5000)
-    elif 10000 <= value < 30000:
-        return value * base_value.get(10000)
-    elif 30000 <= value < 50000:
-        return value * base_value.get(30000)
-    elif 50000 <= value < 100000:
-        return value * base_value.get(50000)
-    elif 100000 <= value < 250000:
-        return value * base_value.get(100000)
-    elif value >= 250000:
-        return value * base_value.get(250000)
