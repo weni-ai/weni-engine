@@ -273,6 +273,9 @@ def sync_updates_projects():
             after=after
         ).get("active_contacts")
 
+        integrations = len(list(flow_instance.list_channel(project_uuid=str(project.flow_organization))))
+        project.extra_active_integration = integrations
+
         project.name = str(flow_result.get("name"))
         project.timezone = str(flow_result.get("timezone"))
         project.date_format = str(flow_result.get("date_format"))
@@ -288,6 +291,7 @@ def sync_updates_projects():
                 "inteligence_count",
                 "flow_count",
                 "contact_count",
+                "extra_active_integration",
             ]
         )
 
