@@ -217,6 +217,7 @@ class Organization(models.Model):
             active_integrations_counter += project.extra_active_integration
         return 0 if active_integrations_counter <= 1 else active_integrations_counter - 1
 
+
 class OrganizationAuthorization(models.Model):
     class Meta:
         verbose_name = _("organization authorization")
@@ -333,7 +334,7 @@ class Project(models.Model):
     contact_count = models.IntegerField(_("Contacts count"), default=0)
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
     extra_active_integration = models.IntegerField(_("Whatsapp Integrations"), default=0)
-    
+
     def __str__(self):
         return f"{self.uuid} - Project: {self.name} - Org: {self.organization.name}"
 
@@ -666,6 +667,7 @@ class BillingPlan(models.Model):
 
     def add_additional_information(self, data: dict):
         count = 0
+        print(type(data['extra_integration']))
         if data['additional_info']:
             self.additional_billing_information = data['additional_info']
             count += 1
@@ -676,7 +678,8 @@ class BillingPlan(models.Model):
             self.cnpj = data['cnpj']
             count += 1
         if data['extra_integration']:
-            self.organization.extra_integration = int(data['extra_integration'])
+            self.organization.extra_integration = data['extra_integration']
+            self.organization.save()
             count += 1
         if count > 0:
             self.save()

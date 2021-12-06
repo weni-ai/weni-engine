@@ -391,7 +391,7 @@ class OrganizationViewSet(
         organization = get_object_or_404(Organization, uuid=organization_uuid)
         cpf = request.data.get('cpf') if 'cpf' in request.data else None
         cnpj = request.data.get('cnpj') if 'cnpj' in request.data else None
-        extra_integration = request.data.get('extra_integration') if 'extra_integration'in request.data else None
+        extra_integration = request.data.get('extra_integration') if 'extra_integration' in request.data else None
         additional_info = request.data.get('additional_billing_info') if 'additional_billing_info' in request.data else None
         response = [
             {
@@ -447,6 +447,8 @@ class OrganizationViewSet(
             "limit_extra_integrations": organization.extra_integration
         }
         return JsonResponse(data=response, status=status.HTTP_200_OK)
+
+
 class OrganizationAuthorizationViewSet(
     MultipleFieldLookupMixin,
     mixins.UpdateModelMixin,

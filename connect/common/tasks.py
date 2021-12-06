@@ -272,7 +272,7 @@ def sync_updates_projects():
             before=before,
             after=after
         ).get("active_contacts")
-        
+
         integrations = len(list(flow_instance.list_channel(project_uuid=str(project.flow_organization))))
         project.extra_active_integration = integrations
 

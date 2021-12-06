@@ -519,6 +519,7 @@ class ActiveContactsLimitTestCase(TestCase):
         self.project.delete()
         self.organization.delete()
 
+
 class ExtraIntegrationsTestCase(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
@@ -534,10 +535,11 @@ class ExtraIntegrationsTestCase(TestCase):
         self.project = Project.objects.create(
             name="Unit Test Project", flow_organization="57257d94-e54b-4ec1-8952-113a81610465",
             organization_id=self.organization.uuid)
-    
+
         self.organization_authorization = self.organization.authorizations.create(
             user=self.owner, role=OrganizationAuthorization.ROLE_ADMIN
         )
+
     def request(self, value, param, token=None):
         authorization_header = (
             {"HTTP_AUTHORIZATION": "Token {}".format(token.key)} if token else {}
@@ -552,7 +554,7 @@ class ExtraIntegrationsTestCase(TestCase):
         content_data = json.loads(response.content)
 
         return response, content_data
-    
+
     def test_extra_integration(self):
         response, content_data = self.request(
             "extra-integrations",
