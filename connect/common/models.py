@@ -622,6 +622,12 @@ class BillingPlan(models.Model):
         gateway = billing.get_gateway("stripe")
         unstore = gateway.unstore(identification=self.stripe_customer)
         if unstore['status'] == 'SUCCESS':
+            self.card_brand = None
+            self.card_expiration_date = None
+            self.final_card_number = None
+            self.cardholder_name = None
+            self.stripe_configured_card = False
+            self.save()
             return True
         return False
 
@@ -800,6 +806,7 @@ class GenericBillingData(models.Model):
     def precification(self):
         return {
             "currency": "USD",
+            "extra_whatsapp_integration": settings.BILLING_COST_PER_WHATSAPP,
             "range": [
                 {
                     "from": 1,
