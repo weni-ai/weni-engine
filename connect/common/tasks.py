@@ -305,7 +305,7 @@ def generate_project_invoice():
         is_suspended=False,
     ):
         invoice = org.organization_billing_invoice.create(
-            due_date=timezone.now() + timedelta(days=10),
+            due_date=timezone.now() + timedelta(days=30),
             invoice_random_id=1
             if org.organization_billing_invoice.last() is None else org.organization_billing_invoice.last().invoice_random_id + 1,
             discount=org.organization_billing.fixed_discount,

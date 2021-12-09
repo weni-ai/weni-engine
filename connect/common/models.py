@@ -537,6 +537,7 @@ class BillingPlan(models.Model):
     )
     fixed_discount = models.FloatField(_("fixed discount"), default=0)
     plan = models.CharField(_("plan"), max_length=10, choices=PLAN_CHOICES)
+    contract_on = models.DateField(_("date of contract plan"), auto_now_add=True)
     is_active = models.BooleanField(_("active plan"), default=True)
     stripe_customer = models.CharField(
         verbose_name=_("Stripe Customer"),
@@ -646,15 +647,14 @@ class BillingPlan(models.Model):
 
         return {
             "total_contact": contact_count,
-            "amount_currenty": Decimal(
+            "amount_currenty": 0 if self.plan == BillingPlan.PLAN_FREE
+            else Decimal(
                 float(
                     float(
                         self.organization.organization_billing.calculate_amount(
                             contact_count=0 if contact_count is None else contact_count
                         )
-                    )
-                    + settings.BILLING_COST_PER_WHATSAPP
-                    * self.organization.extra_integration
+                    ) + (settings.BILLING_COST_PER_WHATSAPP * self.organization.extra_integration)
                 )
                 * float(1 - self.fixed_discount / 100)
             ).quantize(Decimal(".01"), decimal.ROUND_HALF_UP),
@@ -673,7 +673,6 @@ class BillingPlan(models.Model):
 
     def add_additional_information(self, data: dict):
         count = 0
-        print(type(data['extra_integration']))
         if data['additional_info']:
             self.additional_billing_information = data['additional_info']
             count += 1
