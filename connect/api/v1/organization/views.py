@@ -125,8 +125,9 @@ class OrganizationViewSet(
         self.check_object_permissions(self.request, organization)
 
         if organization.organization_billing.remove_credit_card:
-
             organization.is_suspended = True
+            organization.organization_billing.is_active = False
+            organization.organization_billing.save(update_fields=["is_active"])
             organization.save(update_fields=["is_suspended"])
 
             return JsonResponse(data={"status": True}, status=status.HTTP_200_OK)
@@ -274,12 +275,12 @@ class OrganizationViewSet(
         permission_classes=[AllowAny],
     )
     def reactivate_plan(self, request, organization_uuid):  # pragma: no cover
-        result = {}
 
         organization = get_object_or_404(Organization, uuid=organization_uuid)
         org_billing = organization.organization_billing
         org_billing.termination_date = None
         org_billing.is_active = True
+        org_billing.contract_on = timezone.now().date()
         org_billing.save()
 
         for project in organization.project.all():
@@ -294,6 +295,7 @@ class OrganizationViewSet(
             "plan": org_billing.plan,
             "is_active": org_billing.is_active,
             "termination_date": org_billing.termination_date,
+            "contract_on": org_billing.contract_on,
         }
         return JsonResponse(data=result, status=status.HTTP_200_OK)
 

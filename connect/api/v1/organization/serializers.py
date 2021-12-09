@@ -34,6 +34,7 @@ class BillingPlanSerializer(serializers.ModelSerializer):
             "payment_warnings",
             "problem_capture_invoice",
             "currenty_invoice",
+            "contract_on",
         ]
         ref_name = None
 
@@ -54,6 +55,7 @@ class BillingPlanSerializer(serializers.ModelSerializer):
         BillingPlan.PLAN_CHOICES, label=_("plan"), default=BillingPlan.PLAN_FREE
     )
     is_active = serializers.BooleanField()
+    contract_on = serializers.DateField()
     final_card_number = serializers.CharField(
         read_only=True,
         allow_null=True,
@@ -96,6 +98,7 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
             "authorization",
             "created_at",
             "is_suspended",
+            "extra_integration",
         ]
         ref_name = None
 
@@ -118,6 +121,7 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
         required=False,
         help_text=_("Whether this organization is currently suspended."),
     )
+    extra_integration = serializers.IntegerField(read_only=True)
 
     def create(self, validated_data):
         task = tasks.create_organization.delay(  # pragma: no cover
