@@ -115,7 +115,7 @@ class ProjectService(
             )
 
             return CreateChannelResponse(
-                uuid=response.uuid,
+                uuid=response.uuid, name=response.name, config=response.config, address=response.address
             )
 
     def ReleaseChannel(self, request, context):

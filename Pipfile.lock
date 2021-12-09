@@ -211,11 +211,19 @@
         },
         "django": {
             "hashes": [
+<<<<<<< HEAD
                 "sha256:42573831292029639b798fe4d3812996bfe4ff3275f04566da90764daec011a5",
                 "sha256:f6d2c4069c9b9bfac03bedff927ea1f9e0d29e34525cec8a68fd28eb2a8df7af"
             ],
             "index": "pypi",
             "version": "==3.2.8"
+=======
+                "sha256:074e8818b4b40acdc2369e67dcd6555d558329785408dcd25340ee98f1f1d5c4",
+                "sha256:df6f5eb3c797b27c096d61494507b7634526d4ce8d7c8ca1e57a4fb19c0738a3"
+            ],
+            "index": "pypi",
+            "version": "==3.2.10"
+>>>>>>> 38e7e89 (feat: Returns new fields when creating a channel)
         },
         "django-celery-beat": {
             "hashes": [
@@ -951,11 +959,19 @@
         },
         "weni-protobuffers": {
             "hashes": [
+<<<<<<< HEAD
                 "sha256:97ab25a573b8194c34cfdaaf8e1f791a4c42126922cbd23746806b69dcfae289",
                 "sha256:a09844bc888a5a061872000160192694e9237d40b409fb60eba4ef2a225379d8"
             ],
             "index": "pypi",
             "version": "==1.2.1"
+=======
+                "sha256:6b1d1e34b64093e0b547d55d1165eb763f93815d04a10750a4b6f88ad25c0c03",
+                "sha256:c10169636e2cadcc38bbc5e9c7505c8f06d374ae9e1459385fedb766077e2944"
+            ],
+            "index": "pypi",
+            "version": "==1.2.5"
+>>>>>>> 38e7e89 (feat: Returns new fields when creating a channel)
         },
         "whitenoise": {
             "hashes": [
@@ -1168,6 +1184,7 @@
         },
         "typed-ast": {
             "hashes": [
+<<<<<<< HEAD
                 "sha256:01ae5f73431d21eead5015997ab41afa53aa1fbe252f9da060be5dad2c730ace",
                 "sha256:067a74454df670dcaa4e59349a2e5c81e567d8d65458d480a5b3dfecec08c5ff",
                 "sha256:0fb71b8c643187d7492c1f8352f2c15b4c4af3f6338f21681d3681b3dc31a266",
@@ -1201,6 +1218,30 @@
             ],
             "markers": "python_version < '3.8'",
             "version": "==1.4.3"
+=======
+                "sha256:24058827d8f5d633f97223f5148a7d22628099a3d2efe06654ce872f46f07cdb",
+                "sha256:256115a5bc7ea9e665c6314ed6671ee2c08ca380f9d5f130bd4d2c1f5848d695",
+                "sha256:38cf5c642fa808300bae1281460d4f9b7617cf864d4e383054a5ef336e344d32",
+                "sha256:484137cab8ecf47e137260daa20bafbba5f4e3ec7fda1c1e69ab299b75fa81c5",
+                "sha256:4f30a2bcd8e68adbb791ce1567fdb897357506f7ea6716f6bbdd3053ac4d9471",
+                "sha256:591bc04e507595887160ed7aa8d6785867fb86c5793911be79ccede61ae96f4d",
+                "sha256:5b6ab14c56bc9c7e3c30228a0a0b54b915b1579613f6e463ba6f4eb1382e7fd4",
+                "sha256:5d8314c92414ce7481eee7ad42b353943679cf6f30237b5ecbf7d835519e1212",
+                "sha256:71dcda943a471d826ea930dd449ac7e76db7be778fcd722deb63642bab32ea3f",
+                "sha256:7c42707ab981b6cf4b73490c16e9d17fcd5227039720ca14abe415d39a173a30",
+                "sha256:9caaf2b440efb39ecbc45e2fabde809cbe56272719131a6318fd9bf08b58e2cb",
+                "sha256:a2b8d7007f6280e36fa42652df47087ac7b0a7d7f09f9468f07792ba646aac2d",
+                "sha256:a6d495c1ef572519a7bac9534dbf6d94c40e5b6a608ef41136133377bba4aa08",
+                "sha256:a80d84f535642420dd17e16ae25bb46c7f4c16ee231105e7f3eb43976a89670a",
+                "sha256:b53ae5de5500529c76225d18eeb060efbcec90ad5e030713fe8dab0fb4531631",
+                "sha256:b6d17f37f6edd879141e64a5db17b67488cfeffeedad8c5cec0392305e9bc775",
+                "sha256:c9bcad65d66d594bffab8575f39420fe0ee96f66e23c4d927ebb4e24354ec1af",
+                "sha256:ca9e8300d8ba0b66d140820cf463438c8e7b4cdc6fd710c059bfcfb1531d03fb",
+                "sha256:de4ecae89c7d8b56169473e08f6bfd2df7f95015591f43126e4ea7865928677e"
+            ],
+            "markers": "python_version < '3.8'",
+            "version": "==1.5.1"
+>>>>>>> 38e7e89 (feat: Returns new fields when creating a channel)
         },
         "typing-extensions": {
             "hashes": [
