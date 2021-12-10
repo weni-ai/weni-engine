@@ -673,16 +673,16 @@ class BillingPlan(models.Model):
 
     def add_additional_information(self, data: dict):
         count = 0
-        if data['additional_info']:
+        if not (data['additional_info'] is None):
             self.additional_billing_information = data['additional_info']
             count += 1
-        if data['cpf']:
+        if not (data['cpf'] is None):
             self.cpf = data['cpf']
             count += 1
-        if data['cnpj']:
+        if not (data['cnpj'] is None):
             self.cnpj = data['cnpj']
             count += 1
-        if data['extra_integration']:
+        if not (data['extra_integration'] is None):
             self.organization.extra_integration = data['extra_integration']
             self.organization.save()
             count += 1
