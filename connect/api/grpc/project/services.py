@@ -1,3 +1,4 @@
+import grpc
 from django_grpc_framework import generics
 from google.protobuf import empty_pb2
 
@@ -107,15 +108,22 @@ class ProjectService(
             project = Project.objects.get(uuid=project_uuid)
 
             grpc_instance = utils.get_grpc_types().get("flow")
-            response = grpc_instance.create_channel(
-                project_uuid=str(project.flow_organization),
-                name=serializer.validated_data.get("name"),
-                user=serializer.validated_data.get("user"),
-                base_url=serializer.validated_data.get("base_url"),
-            )
+
+            try:
+                response = grpc_instance.create_channel(
+                    user=serializer.validated_data.get("user"),
+                    project_uuid=str(project.flow_organization),
+                    data=serializer.validated_data.get("data"),
+                    channeltype_code=serializer.validated_data.get("channeltype_code"),
+                )
+
+            except grpc.RpcError as error:
+                if error.code() is grpc.StatusCode.INVALID_ARGUMENT:
+                    self.context.abort(grpc.StatusCode.INVALID_ARGUMENT, "Bad Request")
+                raise error
 
             return CreateChannelResponse(
-                uuid=response.uuid,
+                uuid=response.uuid, name=response.name, config=response.config, address=response.address
             )
 
     def ReleaseChannel(self, request, context):

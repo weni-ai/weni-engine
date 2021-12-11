@@ -198,15 +198,15 @@ class FlowType(GRPCType):
         )
         return {"active_contacts": response.active_contacts}
 
-    def create_channel(self, project_uuid: str, name: str, user: str, base_url: str):
+    def create_channel(self, user: str, project_uuid: str, data: str, channeltype_code: str):
         # Create Channel
-        stub = channel_pb2_grpc.WeniWebChatControllerStub(self.channel)
+        stub = channel_pb2_grpc.ChannelControllerStub(self.channel)
         response = stub.Create(
-            channel_pb2.WeniWebChatCreateRequest(
-                org=project_uuid,
-                name=name,
+            channel_pb2.ChannelCreateRequest(
                 user=user,
-                base_url=base_url,
+                org=project_uuid,
+                data=data,
+                channeltype_code=channeltype_code,
             )
         )
         return response
