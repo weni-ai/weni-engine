@@ -235,10 +235,10 @@ def check_organization_free_plan():
 
 @app.task()
 def sync_updates_projects():
-    for project in Project.objects.all():
-        flow_instance = utils.get_grpc_types().get("flow")
-        inteligence_instance = utils.get_grpc_types().get("inteligence")
+    flow_instance = utils.get_grpc_types().get("flow")
+    inteligence_instance = utils.get_grpc_types().get("inteligence")
 
+    for project in Project.objects.all():
         flow_result = flow_instance.get_project_info(
             project_uuid=str(project.flow_organization),
         )
@@ -252,10 +252,12 @@ def sync_updates_projects():
             classifier_type="bothub",
             is_active=True,
         )
-        if classifiers_project:
-            inteligences_org = inteligence_instance.get_count_inteligences_project(
+        try:
+            intelligence_count = int(inteligence_instance.get_count_inteligences_project(
                 classifiers=classifiers_project,
-            )
+            ).get("repositories_count"))
+        except Exception:
+            intelligence_count = 0
 
         if project.organization.organization_billing.last_invoice_date is None:
             after = project.organization.created_at.strftime("%Y-%m-%d %H:%M")
@@ -279,7 +281,7 @@ def sync_updates_projects():
         project.name = str(flow_result.get("name"))
         project.timezone = str(flow_result.get("timezone"))
         project.date_format = str(flow_result.get("date_format"))
-        project.inteligence_count = 0 if not classifiers_project else int(inteligences_org.get("repositories_count"))
+        project.inteligence_count = intelligence_count
         project.flow_count = int(statistic_project_result.get("active_flows"))
         project.contact_count = int(contact_count)
 
