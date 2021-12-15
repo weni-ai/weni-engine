@@ -403,7 +403,8 @@ class Project(models.Model):
     def send_email_change_project(self, first_name: str, email: str, old_info: dict):
         if not settings.SEND_EMAILS:
             return False
-        
+
+        old_project_name = old_info.get("old_project_name")
         date_before = old_info.get("date_before")
         old_timezone = old_info.get("old_timezone")
 
@@ -411,12 +412,12 @@ class Project(models.Model):
             "base_url": settings.BASE_URL,
             "organization_name": self.organization.name,
             "project_name": self.name,
-            "old_project_name": 'Projeto antigo',
-            "user": "Filipe Estev",
-            "date_before": {{date_before}},
+            "old_project_name": old_project_name,
+            "user": first_name,
+            "date_before": date_before,
             "date_now": self.date_format,
             "timezone_before": old_timezone,
-            "timezone_now": self.timezone
+            "timezone_now": str(self.timezone),
         }
         send_mail(
             _(f"You have been invited to join the {self.name} organization"),

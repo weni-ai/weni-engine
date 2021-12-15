@@ -76,8 +76,8 @@
           "
         >
           <tr style="width: 100%; font-size: 12px; color: #808080">
-            <td style="width: 50%">Antes</td>
-            <td style="width: 50%">Agora</td>
+            <td style="width: 50%">{% trans "Before" %}</td>
+            <td style="width: 50%">{% trans "Now" %}</td>
           </tr>
           <tr
             style="
@@ -146,8 +146,8 @@
           "
         >
           <tr style="width: 100%; font-size: 12px; color: #808080">
-            <td style="width: 50%">Antes</td>
-            <td style="width: 50%">Agora</td>
+            <td style="width: 50%">{% trans "Before" %}</td>
+            <td style="width: 50%">{% trans "Now" %}</td>
           </tr>
           <tr
             style="
@@ -158,10 +158,10 @@
             "
           >
             <td style="width: 50%; padding-top: 4px; padding-right: 8px">
-              (GMT -03:00) America / Argentina / Buenos Aires
+              (GMT -03:00) {{timezone_before}}
             </td>
             <td style="width: 50%; padding-top: 4px">
-              (GMT -03:00) America / Recife
+              (GMT -03:00) {{timezone_now}}
             </td>
           </tr>
         </table>
@@ -204,7 +204,7 @@
       <tr>
         <td>
           <p style="color: #808080; margin-top: 24px; margin-bottom: 8px">
-            Idioma padrão dos fluxos
+            {% trans "Flow Default Language" %}
           </p>
         </td>
       </tr>
@@ -218,8 +218,8 @@
           "
         >
           <tr style="width: 100%; font-size: 12px; color: #808080">
-            <td style="width: 50%">Antes</td>
-            <td style="width: 50%">Agora</td>
+            <td style="width: 50%">{% trans 'Before' %}</td>
+            <td style="width: 50%">{% trans 'Now' %}</td>
           </tr>
           <tr
             style="
