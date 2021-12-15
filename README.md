@@ -47,6 +47,7 @@ You can set environment variables in your OS, write on ```.env``` file or pass v
 | SEND_EMAILS | ```boolean``` | ```True``` | Send emails flag.
 | INTELIGENCE_URL | ```string``` | ```https://bothub.it/``` | Specify the URL of the intelligence service.
 | FLOWS_URL | ```string``` | ```https://new.push.al/``` | Specify the URL of the flows service.
+| INTEGRATIONS_URL | ```string``` | ```None``` | Specify the URL of the integration service.
 | USE_SENTRY |  ```bool``` | ```False``` | Enable Support Sentry
 | SENTRY_URL |  ```string``` | ```None``` | URL Sentry
 | APM_DISABLE_SEND |  ```bool``` | ```False``` | Disable sending Elastic APM
@@ -56,12 +57,17 @@ You can set environment variables in your OS, write on ```.env``` file or pass v
 | APM_SERVER_URL |  ```string``` | ```''``` | APM URL
 | FLOW_GRPC_ENDPOINT |  ```string``` | ```'localhost:8002'``` | gRPC Endpoint URL
 | INTELIGENCE_GRPC_ENDPOINT |  ```string``` | ```'localhost:8003'``` | gRPC Endpoint URL
+| INTEGRATIONS_GRPC_ENDPOINT |  ```string``` | ```'localhost:8004'``` | gRPC Endpoint URL
 | SYNC_ORGANIZATION_INTELIGENCE |  ```bool``` | ```False``` | Enable or Disable sync organization inteligences service
 | INTELIGENCE_CERTIFICATE_GRPC_CRT |  ```string``` | ```None``` | Absolute certificate path for secure grpc communication
 | FLOW_CERTIFICATE_GRPC_CRT |  ```string``` | ```None``` | Absolute certificate path for secure grpc communication
+| INTEGRATIONS_CERTIFICATE_GRPC_CRT |  ```string``` | ```None``` | Absolute certificate path for secure grpc communication
 | SEND_REQUEST_FLOW |  ```boolean``` | ```False``` | Enables or disables sending user information to flows
 | FLOW_MARKETING_UUID |  ```string``` | ```None``` | UUID Flow
 | TOKEN_AUTHORIZATION_FLOW_MARKETING |  ```string``` | ```None``` | Token Authorization API Flow
+| BILLING_TEST_MODE |  ```boolean``` | ```False``` | Configure Test mode Billing
+| BILLING_SETTINGS |  ```json``` | ```{}``` | Set configuration for gateways payment billing
+| BILLING_COST_PER_WHATSAPP |  ```float``` | ```None``` | Set cost for extra whatsapp
 | TOKEN_EXTERNAL_AUTHENTICATION |  ```string``` | ```None``` | Token External Authorization API
 | ENVIRONMENT |  ```string``` | ```production``` | Specify the environment you are going to run, it is also used for sentry
 
