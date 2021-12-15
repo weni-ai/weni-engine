@@ -698,6 +698,22 @@ class BillingPlan(models.Model):
             html_message=render_to_string("authentication/emails/added_card.html", context)
         )
 
+    def send_email_changed_card(self, user_name: str, email: str):
+        if not settings.SEND_EMAILS:
+            return False
+        context = {
+            "base_url": settings.BASE_URL,
+            "organization_name": self.organization.name,
+            "user_name": user_name
+        }
+        send_mail(
+            _(f"A credit card has been changed to the organization {self.organization.name}"),
+            render_to_string("authentication/emails/changed_card.txt"),
+            None,
+            [email],
+            html_message=render_to_string("authentication/emails/changed_card.html", context)
+        )
+
     def send_email_finished_plan(self, user_name: str, email: str):
         if not settings.SEND_EMAILS:
             return False
@@ -728,6 +744,22 @@ class BillingPlan(models.Model):
             None,
             [email],
             html_message=render_to_string("billing/emails/reactived-plan.html", context)
+        )
+
+    def send_email_removed_credit_card(self, user_name: str, email: str):
+        if not settings.SEND_EMAILS:
+            return False
+        context = {
+            "base_url": settings.BASE_URL,
+            "user_name": user_name,
+            "org_name": self.organization.name
+        }
+        send_mail(
+            _(f"Your {self.organization.name} organization credit card its removed"),
+            render_to_string("billing/emails/removed_card.txt"),
+            None,
+            [email],
+            html_message=render_to_string("billing/emails/removed-card.html", context)
         )
 
 
