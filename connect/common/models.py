@@ -237,8 +237,7 @@ class Organization(models.Model):
         )
 
     def send_email_change_organization_name(self, user_name: str, email: str, organization_previous_name: str,
-                                            organization_new_name: str
-    ):
+                                            organization_new_name: str):
         if not settings.SEND_EMAILS:
             return False
         context = {
@@ -274,6 +273,7 @@ class Organization(models.Model):
                 "authentication/emails/access_code.html", context
             ),
         )
+
 
 class OrganizationAuthorization(models.Model):
     class Meta:
