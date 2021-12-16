@@ -163,7 +163,7 @@ class Organization(models.Model):
             html_message=render_to_string("authentication/emails/org_going_out.html", context)
         )
 
-    def send_email_organization_removed(self, email:str, user_name: str):
+    def send_email_organization_removed(self, email: str, user_name: str):
         if not settings.SEND_EMAILS:
             return False
         context = {
@@ -697,7 +697,7 @@ class BillingPlan(models.Model):
             [email],
             html_message=render_to_string("authentication/emails/added_card.html", context)
         )
-    
+
     def send_email_expired_free_plan(self, user_name: str, email: str):
         if not settings.SEND_EMAILS:
             return False
