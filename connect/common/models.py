@@ -236,12 +236,8 @@ class Organization(models.Model):
             ),
         )
 
-    def send_email_change_organization_name(
-            self,
-            user_name: str,
-            email: str,
-            organization_previous_name: str,
-            organization_new_name: str
+    def send_email_change_organization_name(self, user_name: str, email: str, organization_previous_name: str,
+                                            organization_new_name: str
     ):
         if not settings.SEND_EMAILS:
             return False
@@ -261,6 +257,23 @@ class Organization(models.Model):
             ),
         )
 
+    def send_email_access_code(self, email: str, user_name: str, access_code: str):
+        if not settings.SEND_EMAILS:
+            return False  # pragma: no cover
+        context = {
+            "base_url": settings.BASE_URL,
+            "access_code": access_code,
+            "user_name": user_name,
+        }
+        send_mail(
+            _("You receive an access code to Weni Platform"),
+            render_to_string("authentication/emails/access_code.txt"),
+            None,
+            [email],
+            html_message=render_to_string(
+                "authentication/emails/access_code.html", context
+            ),
+        )
 
 class OrganizationAuthorization(models.Model):
     class Meta:
