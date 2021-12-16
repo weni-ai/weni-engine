@@ -2,7 +2,7 @@ import decimal
 import logging
 import uuid as uuid4
 from datetime import timedelta
-from decimal import Context, Decimal
+from decimal import Decimal
 
 from django.conf import settings
 from django.core.mail import send_mail
@@ -163,7 +163,7 @@ class Organization(models.Model):
             html_message=render_to_string("authentication/emails/org_going_out.html", context)
         )
 
-    def send_email_organization_removed(self, email:str, user_name: str):
+    def send_email_organization_removed(self, email: str, user_name: str):
         if not settings.SEND_EMAILS:
             return False
         context = {
@@ -399,33 +399,47 @@ class Project(models.Model):
                 "authentication/emails/project_create.html", context
             ),
         )
-    
-    def send_email_change_project(self, first_name: str, email: str, old_info: dict):
+
+    def send_email_change_project(self, first_name: str, email: str, info: dict):
         if not settings.SEND_EMAILS:
             return False
 
-        old_project_name = old_info.get("old_project_name")
-        date_before = old_info.get("date_before")
-        old_timezone = old_info.get("old_timezone")
+        old_project_name = info.get("old_project_name")
+        date_before = info.get("date_before")
+        timezone_before = info.get("old_timezone")
+        country_loc_suport_before = info.get("country_loc_suport_before")
+        country_loc_suport_now = info.get("country_loc_suport_now")
+        default_lang_before = info.get("default_lang_before")
+        default_lang_now = info.get("default_lang_now")
+        secondary_lang_before = info.get("secondary_lang_before")
+        secondary_lang_now = info.get("secondary_lang_now")
+        user = info.get("user")
 
         context = {
             "base_url": settings.BASE_URL,
             "organization_name": self.organization.name,
             "project_name": self.name,
             "old_project_name": old_project_name,
-            "user": first_name,
+            "first_name": first_name,
+            "user": user,
             "date_before": date_before,
             "date_now": self.date_format,
-            "timezone_before": old_timezone,
+            "timezone_before": timezone_before,
             "timezone_now": str(self.timezone),
+            "country_loc_suport_before": country_loc_suport_before,
+            "country_loc_suport_now": country_loc_suport_now,
+            "default_lang_before": default_lang_before,
+            "default_lang_now": default_lang_now,
+            "secondary_lang_before": secondary_lang_before,
+            "secondary_lang_now": secondary_lang_now,
         }
         send_mail(
             _(f"You have been invited to join the {self.name} organization"),
-            render_to_string("common/emails/project_changed.txt"),
+            render_to_string("common/emails/project-changed.txt"),
             None,
             [email],
             html_message=render_to_string(
-                "common/emails/project_create.changed", context
+                "common/emails/project-changed.html", context
             ),
         )
 

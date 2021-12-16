@@ -36,7 +36,7 @@
         margin-top: 24px;
       "
     >
-      {% trans "Information from the project" %} {{old_project_name}} {% trans "has changed" %}.
+      {% trans "Information from the project" %} {{info.old_project_name}} {% trans "has changed" %}.
     </div>
 
     <div
@@ -132,7 +132,7 @@
       <tr>
         <td>
           <p style="color: #808080; margin-top: 24px; margin-bottom: 8px">
-            Fuso horário
+            {% trans "Timezone"  %}
           </p>
         </td>
       </tr>
@@ -169,7 +169,7 @@
       <tr>
         <td>
           <p style="color: #808080; margin-top: 24px; margin-bottom: 8px">
-            País para suporte de localização nos fluxos
+            {% trans 'Country for location support in Flows' %}
           </p>
         </td>
       </tr>
@@ -183,8 +183,8 @@
           "
         >
           <tr style="width: 100%; font-size: 12px; color: #808080">
-            <td style="width: 50%">Antes</td>
-            <td style="width: 50%">Agora</td>
+            <td style="width: 50%">{% trans "Before" %}</td>
+            <td style="width: 50%">{% trans "Now" %}</td>
           </tr>
           <tr
             style="
@@ -195,9 +195,9 @@
             "
           >
             <td style="width: 50%; padding-top: 4px; padding-right: 8px">
-              Brazil
+              {{country_loc_suport_before}}
             </td>
-            <td style="width: 50%; padding-top: 4px">Canada</td>
+            <td style="width: 50%; padding-top: 4px">{{country_loc_suport_now}}</td>
           </tr>
         </table>
       </tr>
@@ -230,16 +230,16 @@
             "
           >
             <td style="width: 50%; padding-top: 4px; padding-right: 8px">
-              Português do Brasil
+              {{default_lang_before}}
             </td>
-            <td style="width: 50%; padding-top: 4px">Francês</td>
+            <td style="width: 50%; padding-top: 4px">{{default_lang_now}}</td>
           </tr>
         </table>
       </tr>
       <tr>
         <td>
           <p style="color: #808080; margin-top: 24px; margin-bottom: 8px">
-            Idioma secundário dos fluxos
+            {% trans "Secondary Language of Flows" %}
           </p>
         </td>
       </tr>
@@ -253,8 +253,8 @@
           "
         >
           <tr style="width: 100%; font-size: 12px; color: #808080">
-            <td style="width: 50%">Antes</td>
-            <td style="width: 50%">Agora</td>
+            <td style="width: 50%">{% trans 'Before' %}</td>
+            <td style="width: 50%">{% trans 'Now' %}</td>
           </tr>
           <tr
             style="
@@ -265,9 +265,9 @@
             "
           >
             <td style="width: 50%; padding-top: 4px; padding-right: 8px">
-              Português do Brasil, Inglês, Tibetano
+              {{secondary_lang_before}}
             </td>
-            <td style="width: 50%; padding-top: 4px">Português de Portugal, Espanhol</td>
+            <td style="width: 50%; padding-top: 4px">{{secondary_lang_now}}</td>
           </tr>
         </table>
       </tr>
