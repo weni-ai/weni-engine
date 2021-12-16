@@ -1,0 +1,7 @@
+{% load i18n %}
+<p>{%trans "Hi"}, {{user_name}}</p>
+<p>{% trans "The credit card of organization " %} {{ org_name }} {% trans " has been removed" %}</p>
+<p>{% trans "An admistrator removed the register data from credit card " %}
+{% trans "to perform billing of organization plan" %} <strong>{{ org_name }}</strong>.
+{% trans "at the moment the operation of yours " %}
+{% trans "Intelligences and Flows created and the chat module is freeze." %}</p>
