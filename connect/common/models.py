@@ -888,7 +888,6 @@ class BillingPlan(models.Model):
             html_message=render_to_string("authentication/emails/free_plan.html", context)
         )
 
-
     def send_email_changed_plan(self, user_name: str, email: str, old_plan: str):
         if not settings.SEND_EMAILS:
             return False
