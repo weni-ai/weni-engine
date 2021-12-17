@@ -274,6 +274,24 @@ class Organization(models.Model):
             ),
         )
 
+    def send_email_permission_change(self, user_name: str, old_permission: str, new_permission: str, email: str):
+        if not settings.SEND_EMAILS:
+            return False  # pragma: no cover
+        context = {
+            "base_url": settings.BASE_URL,
+            "user_name": user_name,
+            "old_permission": old_permission,
+            "new_permission": new_permission
+        }
+        send_mail(
+            _("A new permission has been assigned to you"),
+            render_to_string("authentication/emails/permission_change.txt"),
+            None,
+            [email],
+            html_message=render_to_string(
+                "authentication/emails/permission_change.html", context
+            ),
+        )
 
 class OrganizationAuthorization(models.Model):
     class Meta:
