@@ -791,6 +791,22 @@ class BillingPlan(models.Model):
             html_message=render_to_string("authentication/emails/free-plan-expired.html", context)
         )
 
+    def send_email_free_plan(self, user_name: str, email: str):
+        if not settings.SEND_EMAILS:
+            return False
+        context = {
+            "base_url": settings.BASE_URL,
+            "user_name": user_name,
+            "org_name": self.organization.name
+        }
+        send_mail(
+            _(f"Your {self.organization.name} organization has the Free Plan"),
+            render_to_string("authentication/emails/free_plan.txt"),
+            None,
+            [email],
+            html_message=render_to_string("authentication/emails/free_plan.html", context)
+        )
+
 
 class Invoice(models.Model):
     class Meta:
