@@ -170,13 +170,15 @@ class FlowType(GRPCType):
         try:
             stub = org_pb2_grpc.OrgControllerStub(self.channel)
             response = stub.Retrieve(org_pb2.OrgRetrieveRequest(uuid=project_uuid))
-            return {
+            return (
+                {
                     "id": response.id,
                     "name": response.name,
                     "uuid": response.uuid,
                     "timezone": response.timezone,
                     "date_format": response.date_format,
                 }
+            )
         except grpc.RpcError as e:
             if e.code() is not grpc.StatusCode.NOT_FOUND:
                 raise e
@@ -189,7 +191,7 @@ class FlowType(GRPCType):
             response = stub.Retrieve(
                 statistic_pb2.OrgStatisticRetrieveRequest(org_uuid=project_uuid)
             )
-            return( 
+            return(
                 {
                     "active_flows": response.active_flows,
                     "active_classifiers": response.active_classifiers,

@@ -289,9 +289,9 @@ def sync_updates_projects():
         if len(statistic_project_result) > 0:
             project.flow_count = int(statistic_project_result.get("active_flows"))
             update_fields.append("flow_count")
-        
+
         project.contact_count = int(contact_count)
-        
+
         if len(update_fields) > 0:
             project.save(
                 update_fields=[
