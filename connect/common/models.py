@@ -432,6 +432,68 @@ class Project(models.Model):
             ),
         )
 
+    def send_email_change_project(self, first_name: str, email: str, info: dict):
+        if not settings.SEND_EMAILS:
+            return False
+
+        old_project_name = info.get("old_project_name")
+        date_before = info.get("date_before")
+        timezone_before = info.get("old_timezone")
+        country_loc_suport_before = info.get("country_loc_suport_before")
+        country_loc_suport_now = info.get("country_loc_suport_now")
+        default_lang_before = info.get("default_lang_before")
+        default_lang_now = info.get("default_lang_now")
+        secondary_lang_before = info.get("secondary_lang_before")
+        secondary_lang_now = info.get("secondary_lang_now")
+        user = info.get("user")
+
+        context = {
+            "base_url": settings.BASE_URL,
+            "organization_name": self.organization.name,
+            "project_name": self.name,
+            "old_project_name": old_project_name,
+            "first_name": first_name,
+            "user": user,
+            "date_before": date_before,
+            "date_now": self.date_format,
+            "timezone_before": timezone_before,
+            "timezone_now": str(self.timezone),
+            "country_loc_suport_before": country_loc_suport_before,
+            "country_loc_suport_now": country_loc_suport_now,
+            "default_lang_before": default_lang_before,
+            "default_lang_now": default_lang_now,
+            "secondary_lang_before": secondary_lang_before,
+            "secondary_lang_now": secondary_lang_now,
+        }
+        send_mail(
+            _(f"You have been invited to join the {self.name} organization"),
+            render_to_string("common/emails/project-changed.txt"),
+            None,
+            [email],
+            html_message=render_to_string(
+                "common/emails/project-changed.html", context
+            ),
+        )
+
+    def send_email_deleted_project(self, first_name: str, email: str):
+        if not settings.SEND_EMAILS:
+            return False  # pragma: no cover
+        context = {
+            "base_url": settings.BASE_URL,
+            "organization_name": self.organization.name,
+            "project_name": self.name,
+            "first_name": first_name,
+        }
+        send_mail(
+            _("A project was deleted..."),
+            render_to_string("common/emails/project-delete.txt"),
+            None,
+            [email],
+            html_message=render_to_string(
+                "common/emails/project-delete.html", context
+            ),
+        )
+
 
 class Service(models.Model):
     class Meta:
@@ -824,6 +886,25 @@ class BillingPlan(models.Model):
             None,
             [email],
             html_message=render_to_string("authentication/emails/free_plan.html", context)
+        )
+
+
+    def send_email_changed_plan(self, user_name: str, email: str, old_plan: str):
+        if not settings.SEND_EMAILS:
+            return False
+        context = {
+            "base_url": settings.BASE_URL,
+            "organization_name": self.organization.name,
+            "user_name": user_name,
+            "old_plan": old_plan,
+            "actual_plan": self.plan
+        }
+        send_mail(
+            _(f" Your {self.organization.name} organization's plan has been changed."),
+            render_to_string("billing/emails/changed-plan.txt"),
+            None,
+            [email],
+            html_message=render_to_string("billing/emails/changed-plan.html", context)
         )
 
 
