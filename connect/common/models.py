@@ -293,6 +293,7 @@ class Organization(models.Model):
             ),
         )
 
+
 class OrganizationAuthorization(models.Model):
     class Meta:
         verbose_name = _("organization authorization")
