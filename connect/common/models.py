@@ -456,6 +456,25 @@ class Project(models.Model):
             ),
         )
 
+    def send_email_deleted_project(self, first_name: str, email: str):
+        if not settings.SEND_EMAILS:
+            return False  # pragma: no cover
+        context = {
+            "base_url": settings.BASE_URL,
+            "organization_name": self.organization.name,
+            "project_name": self.name,
+            "first_name": first_name,
+        }
+        send_mail(
+            _("A project was deleted..."),
+            render_to_string("common/emails/project-delete.txt"),
+            None,
+            [email],
+            html_message=render_to_string(
+                "common/emails/project-delete.html", context
+            ),
+        )
+
 
 class Service(models.Model):
     class Meta:
