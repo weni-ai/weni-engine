@@ -156,10 +156,12 @@ class FlowType(GRPCType):
             for flow in stub.List(
                 flow_pb2.FlowListRequest(flow_name=flow_name, org_uuid=project_uuid)
             ):
-                return {
-                    "flow_uuid": flow.uuid,
-                    "flow_name": flow.name,
-                }
+                result.append(
+                    {
+                        "flow_uuid": flow.uuid,
+                        "flow_name": flow.name,
+                    }
+                )
         except grpc.RpcError as e:
             if e.code() is not grpc.StatusCode.NOT_FOUND:
                 raise e
