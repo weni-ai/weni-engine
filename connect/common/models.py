@@ -511,10 +511,12 @@ class BillingPlan(models.Model):
 
     PLAN_FREE = "free"
     PLAN_ENTERPRISE = "enterprise"
+    PLAN_CUSTOM = "custom"
 
     PLAN_CHOICES = [
         (PLAN_FREE, _("free")),
         (PLAN_ENTERPRISE, _("enterprise")),
+        (PLAN_CUSTOM, _("custom"))
     ]
 
     organization = models.OneToOneField(
