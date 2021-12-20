@@ -6,8 +6,8 @@ from django_grpc_framework import generics
 class OrganizationService(generics.GenericService):
     def Retrieve(self, request, context):
 
-        organization_uuid = request.uuid
-        organization = Organization.objects.get(uuid=organization_uuid)
+        flow_organization_uuid = request.uuid
+        organization = Organization.objects.get(project__flow_organization=flow_organization_uuid)
 
         return OrganizationResponse(
             uuid=str(organization.uuid),
