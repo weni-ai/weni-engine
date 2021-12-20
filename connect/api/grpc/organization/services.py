@@ -1,7 +1,5 @@
-from connect import utils
-from connect.api.grpc.organization.serializers import OrganizationSerializer
 from connect.common.models import Organization
-from connect.protos.organization_pb2 import OrganizationResponse
+from weni.protobuf.connect.organization_pb2 import OrganizationResponse
 from django_grpc_framework import generics
 
 

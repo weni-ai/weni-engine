@@ -1,5 +1,5 @@
 from connect.api.grpc.organization.services import OrganizationService
-from connect.protos import organization_pb2_grpc
+from weni.protobuf.connect import organization_pb2_grpc
 
 
 def grpc_handlers(server):
