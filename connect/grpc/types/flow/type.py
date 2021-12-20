@@ -168,26 +168,42 @@ class FlowType(GRPCType):
         return result
 
     def get_project_info(self, project_uuid: str):
-        stub = org_pb2_grpc.OrgControllerStub(self.channel)
-        response = stub.Retrieve(org_pb2.OrgRetrieveRequest(uuid=project_uuid))
-        return {
-            "id": response.id,
-            "name": response.name,
-            "uuid": response.uuid,
-            "timezone": response.timezone,
-            "date_format": response.date_format,
-        }
+        result = []
+        try:
+            stub = org_pb2_grpc.OrgControllerStub(self.channel)
+            response = stub.Retrieve(org_pb2.OrgRetrieveRequest(uuid=project_uuid))
+            return (
+                {
+                    "id": response.id,
+                    "name": response.name,
+                    "uuid": response.uuid,
+                    "timezone": response.timezone,
+                    "date_format": response.date_format,
+                }
+            )
+        except grpc.RpcError as e:
+            if e.code() is not grpc.StatusCode.NOT_FOUND:
+                raise e
+        return result
 
     def get_project_statistic(self, project_uuid: str):
-        stub = statistic_pb2_grpc.OrgStatisticControllerStub(self.channel)
-        response = stub.Retrieve(
-            statistic_pb2.OrgStatisticRetrieveRequest(org_uuid=project_uuid)
-        )
-        return {
-            "active_flows": response.active_flows,
-            "active_classifiers": response.active_classifiers,
-            "active_contacts": response.active_contacts,
-        }
+        result = []
+        try:
+            stub = statistic_pb2_grpc.OrgStatisticControllerStub(self.channel)
+            response = stub.Retrieve(
+                statistic_pb2.OrgStatisticRetrieveRequest(org_uuid=project_uuid)
+            )
+            return(
+                {
+                    "active_flows": response.active_flows,
+                    "active_classifiers": response.active_classifiers,
+                    "active_contacts": response.active_contacts,
+                }
+            )
+        except grpc.RpcError as e:
+            if e.code() is not grpc.StatusCode.NOT_FOUND:
+                raise e
+        return result
 
     def get_billing_total_statistics(self, project_uuid: str, before: str, after: str):
         stub = billing_pb2_grpc.BillingStub(self.channel)
