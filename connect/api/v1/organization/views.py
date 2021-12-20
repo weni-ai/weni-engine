@@ -124,7 +124,8 @@ class OrganizationViewSet(
 
         self.check_object_permissions(self.request, organization)
 
-        if organization.organization_billing.remove_credit_card:
+        if organization.organization_billing.plan != organization.organization_billing.PLAN_CUSTOM \
+                and organization.organization_billing.remove_credit_card:
             organization.is_suspended = True
             organization.organization_billing.is_active = False
             organization.organization_billing.save(update_fields=["is_active"])

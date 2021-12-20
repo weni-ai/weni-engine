@@ -511,10 +511,12 @@ class BillingPlan(models.Model):
 
     PLAN_FREE = "free"
     PLAN_ENTERPRISE = "enterprise"
+    PLAN_CUSTOM = "custom"
 
     PLAN_CHOICES = [
         (PLAN_FREE, _("free")),
         (PLAN_ENTERPRISE, _("enterprise")),
+        (PLAN_CUSTOM, _("custom"))
     ]
 
     organization = models.OneToOneField(
@@ -645,10 +647,10 @@ class BillingPlan(models.Model):
             total_contact_count=Sum("contact_count")
         ).get("total_contact_count")
 
-        return {
-            "total_contact": contact_count,
-            "amount_currenty": 0 if self.plan == BillingPlan.PLAN_FREE
-            else Decimal(
+        amount_currenty = 0
+
+        if self.plan == BillingPlan.PLAN_ENTERPRISE:
+            amount_currenty = Decimal(
                 float(
                     float(
                         self.organization.organization_billing.calculate_amount(
@@ -657,7 +659,11 @@ class BillingPlan(models.Model):
                     ) + (settings.BILLING_COST_PER_WHATSAPP * self.organization.extra_integration)
                 )
                 * float(1 - self.fixed_discount / 100)
-            ).quantize(Decimal(".01"), decimal.ROUND_HALF_UP),
+            ).quantize(Decimal(".01"), decimal.ROUND_HALF_UP)
+
+        return {
+            "total_contact": contact_count,
+            "amount_currenty": amount_currenty
         }
 
     def change_plan(self, plan):
