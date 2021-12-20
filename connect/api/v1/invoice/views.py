@@ -22,3 +22,14 @@ class InvoiceViewSet(
     filter_backends = [OrderingFilter, SearchFilter, DjangoFilterBackend]
     lookup_field = "pk"
     metadata_class = Metadata
+
+    @action(
+        detail=True,
+        methods=["GET"],
+        url_name="remove-card-setup",
+        url_path="remove-card-setup/(?P<organization_uuid>[^/.]+)",
+    )
+    def remove_card_setup(
+            self, request, organization_uuid
+    ):
+        pass
