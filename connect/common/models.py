@@ -511,10 +511,12 @@ class BillingPlan(models.Model):
 
     PLAN_FREE = "free"
     PLAN_ENTERPRISE = "enterprise"
+    PLAN_CUSTOM = "custom"
 
     PLAN_CHOICES = [
         (PLAN_FREE, _("free")),
         (PLAN_ENTERPRISE, _("enterprise")),
+        (PLAN_CUSTOM, _("custom"))
     ]
 
     organization = models.OneToOneField(
@@ -537,6 +539,7 @@ class BillingPlan(models.Model):
     )
     fixed_discount = models.FloatField(_("fixed discount"), default=0)
     plan = models.CharField(_("plan"), max_length=10, choices=PLAN_CHOICES)
+    contract_on = models.DateField(_("date of contract plan"), auto_now_add=True)
     is_active = models.BooleanField(_("active plan"), default=True)
     stripe_customer = models.CharField(
         verbose_name=_("Stripe Customer"),
@@ -622,6 +625,12 @@ class BillingPlan(models.Model):
         gateway = billing.get_gateway("stripe")
         unstore = gateway.unstore(identification=self.stripe_customer)
         if unstore['status'] == 'SUCCESS':
+            self.card_brand = None
+            self.card_expiration_date = None
+            self.final_card_number = None
+            self.cardholder_name = None
+            self.stripe_configured_card = False
+            self.save()
             return True
         return False
 
@@ -638,20 +647,23 @@ class BillingPlan(models.Model):
             total_contact_count=Sum("contact_count")
         ).get("total_contact_count")
 
-        return {
-            "total_contact": contact_count,
-            "amount_currenty": Decimal(
+        amount_currenty = 0
+
+        if self.plan == BillingPlan.PLAN_ENTERPRISE:
+            amount_currenty = Decimal(
                 float(
                     float(
                         self.organization.organization_billing.calculate_amount(
                             contact_count=0 if contact_count is None else contact_count
                         )
-                    )
-                    + settings.BILLING_COST_PER_WHATSAPP
-                    * self.organization.extra_integration
+                    ) + (settings.BILLING_COST_PER_WHATSAPP * self.organization.extra_integration)
                 )
                 * float(1 - self.fixed_discount / 100)
-            ).quantize(Decimal(".01"), decimal.ROUND_HALF_UP),
+            ).quantize(Decimal(".01"), decimal.ROUND_HALF_UP)
+
+        return {
+            "total_contact": contact_count,
+            "amount_currenty": amount_currenty
         }
 
     def change_plan(self, plan):
@@ -667,17 +679,16 @@ class BillingPlan(models.Model):
 
     def add_additional_information(self, data: dict):
         count = 0
-        print(type(data['extra_integration']))
-        if data['additional_info']:
+        if not (data['additional_info'] is None):
             self.additional_billing_information = data['additional_info']
             count += 1
-        if data['cpf']:
+        if not (data['cpf'] is None):
             self.cpf = data['cpf']
             count += 1
-        if data['cnpj']:
+        if not (data['cnpj'] is None):
             self.cnpj = data['cnpj']
             count += 1
-        if data['extra_integration']:
+        if not (data['extra_integration'] is None):
             self.organization.extra_integration = data['extra_integration']
             self.organization.save()
             count += 1
@@ -800,6 +811,7 @@ class GenericBillingData(models.Model):
     def precification(self):
         return {
             "currency": "USD",
+            "extra_whatsapp_integration": settings.BILLING_COST_PER_WHATSAPP,
             "range": [
                 {
                     "from": 1,

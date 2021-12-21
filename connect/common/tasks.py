@@ -235,65 +235,75 @@ def check_organization_free_plan():
 
 @app.task()
 def sync_updates_projects():
-    for project in Project.objects.all():
-        flow_instance = utils.get_grpc_types().get("flow")
-        inteligence_instance = utils.get_grpc_types().get("inteligence")
+    flow_instance = utils.get_grpc_types().get("flow")
+    inteligence_instance = utils.get_grpc_types().get("inteligence")
 
+    for project in Project.objects.all():
         flow_result = flow_instance.get_project_info(
             project_uuid=str(project.flow_organization),
         )
-
         statistic_project_result = flow_instance.get_project_statistic(
             project_uuid=str(project.flow_organization),
         )
-
         classifiers_project = flow_instance.get_classifiers(
             project_uuid=str(project.flow_organization),
             classifier_type="bothub",
             is_active=True,
         )
 
-        inteligences_org = inteligence_instance.get_count_inteligences_project(
-            classifiers=classifiers_project,
-        )
-
-        if project.organization.organization_billing.last_invoice_date is None:
-            after = project.organization.created_at.strftime("%Y-%m-%d %H:%M")
-        else:
-            after = project.organization.organization_billing.last_invoice_date.strftime("%Y-%m-%d %H:%M")
-
-        if project.organization.organization_billing.next_due_date is None:
-            before = timezone.now().strftime("%Y-%m-%d %H:%M")
-        else:
-            before = project.organization.organization_billing.next_due_date.strftime("%Y-%m-%d %H:%M")
+        try:
+            intelligence_count = int(inteligence_instance.get_count_inteligences_project(
+                classifiers=classifiers_project,
+            ).get("repositories_count"))
+        except Exception:
+            intelligence_count = 0
 
         contact_count = flow_instance.get_billing_total_statistics(
             project_uuid=str(project.flow_organization),
-            before=before,
-            after=after
+            before=(
+                timezone.now().strftime("%Y-%m-%d %H:%M")
+                if project.organization.organization_billing.next_due_date is None
+                else project.organization.organization_billing.next_due_date.strftime("%Y-%m-%d %H:%M")
+            ),
+            after=(
+                project.organization.created_at.strftime("%Y-%m-%d %H:%M")
+                if project.organization.organization_billing.last_invoice_date is None
+                else project.organization.organization_billing.last_invoice_date.strftime("%Y-%m-%d %H:%M")
+            )
         ).get("active_contacts")
 
         integrations = len(list(flow_instance.list_channel(project_uuid=str(project.flow_organization))))
         project.extra_active_integration = integrations
+        project.inteligence_count = intelligence_count
 
-        project.name = str(flow_result.get("name"))
-        project.timezone = str(flow_result.get("timezone"))
-        project.date_format = str(flow_result.get("date_format"))
-        project.inteligence_count = int(inteligences_org.get("repositories_count"))
-        project.flow_count = int(statistic_project_result.get("active_flows"))
+        update_fields = []
+
+        if len(flow_result) > 0:
+            project.name = str(flow_result.get("name"))
+            project.timezone = str(flow_result.get("timezone"))
+            project.date_format = str(flow_result.get("date_format"))
+            update_fields.append("name")
+            update_fields.append("timezone")
+            update_fields.append("date_format")
+
+        if len(statistic_project_result) > 0:
+            project.flow_count = int(statistic_project_result.get("active_flows"))
+            update_fields.append("flow_count")
+
         project.contact_count = int(contact_count)
 
-        project.save(
-            update_fields=[
-                "name",
-                "timezone",
-                "date_format",
-                "inteligence_count",
-                "flow_count",
-                "contact_count",
-                "extra_active_integration",
-            ]
-        )
+        if len(update_fields) > 0:
+            project.save(
+                update_fields=[
+                    "name",
+                    "timezone",
+                    "date_format",
+                    "inteligence_count",
+                    "flow_count",
+                    "contact_count",
+                    "extra_active_integration",
+                ]
+            )
 
     return True
 
@@ -305,7 +315,7 @@ def generate_project_invoice():
         is_suspended=False,
     ):
         invoice = org.organization_billing_invoice.create(
-            due_date=timezone.now() + timedelta(days=10),
+            due_date=timezone.now() + timedelta(days=30),
             invoice_random_id=1
             if org.organization_billing_invoice.last() is None else org.organization_billing_invoice.last().invoice_random_id + 1,
             discount=org.organization_billing.fixed_discount,
@@ -318,10 +328,13 @@ def generate_project_invoice():
             contact_count = flow_instance.get_billing_total_statistics(
                 project_uuid=str(project.flow_organization),
                 before=(
+                    timezone.now().strftime("%Y-%m-%d %H:%M")
+                    if org.organization_billing.next_due_date is None
+                    else org.organization_billing.next_due_date.strftime("%Y-%m-%d %H:%M")),
+                after=(
                     org.created_at.strftime("%Y-%m-%d %H:%M")
                     if org.organization_billing.last_invoice_date is None
                     else org.organization_billing.last_invoice_date.strftime("%Y-%m-%d %H:%M")),
-                after=org.organization_billing.next_due_date.strftime("%Y-%m-%d %H:%M"),
             ).get("active_contacts")
             invoice.organization_billing_invoice_project.create(
                 project=project,
