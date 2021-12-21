@@ -35,7 +35,7 @@ grpcio-tools = "~=1.39.0"
 djangogrpcframework = "~=0.2.1"
 stripe = "~=2.60.0"
 psutil = "~=5.8.0"
-weni-protobuffers = "~=1.2.0"
+weni-protobuffers = "==1.2.7"
 
 [requires]
 python_version = "3.6"
