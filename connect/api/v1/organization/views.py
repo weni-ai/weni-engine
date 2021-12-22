@@ -352,7 +352,6 @@ class OrganizationViewSet(
                     'limit': limits.free_active_contacts_limit,
                     'current_active_contacts': current_active_contacts,
                 }
-                st = status.HTTP_402_PAYMENT_REQUIRED
         else:
             response = {
                 'status': 'OK',
