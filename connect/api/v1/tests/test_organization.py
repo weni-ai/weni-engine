@@ -246,20 +246,14 @@ class OrgBillingAdditionalInformation(TestCase):
 
         return response, content_data
 
-    def test_add_aditional_info_with_cpf(self):
+    def test_add_aditional_info(self):
         data = {
-            'cpf': '111.111.111-11',
+            'personal_identification_number': '111.111.111-11',
             'additional_data': 'data'
         }
         response, content_data = self.request(self.organization.uuid, data, self.owner_token)
-        self.assertEqual(content_data['status'], 'SUCESS')
-
-    def test_add_additional_info_with_cpnj(self):
-        data = {
-            'cnpj': 'XX.XXX.XXX/0001-XX',
-        }
-        response, content_data = self.request(self.organization.uuid, data, self.owner_token)
-        self.assertEqual(content_data['status'], 'SUCESS')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(content_data['status'], 'SUCCESS')
 
     def test_add_additional_info_void_fields(self):
         data = {
