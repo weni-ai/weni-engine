@@ -391,16 +391,14 @@ class OrganizationViewSet(
     )
     def add_additional_billing_information(self, request, organization_uuid):
         organization = get_object_or_404(Organization, uuid=organization_uuid)
-        cpf = request.data.get('cpf') if 'cpf' in request.data else None
-        cnpj = request.data.get('cnpj') if 'cnpj' in request.data else None
+        personal_identification_number = request.data.get('personal_identification_number') if 'personal_identification_number' in request.data else None
         extra_integration = request.data.get('extra_integration') if 'extra_integration' in request.data else None
         additional_info = request.data.get('additional_billing_info') if 'additional_billing_info' in request.data else None
         response = [
             {
-                'status': 'SUCESS',
+                'status': 'SUCCESS',
                 'response': {
-                    'CPF': cpf,
-                    'CNPJ': cnpj,
+                    'personal_identification_number': personal_identification_number,
                     'additional_information': additional_info,
                     'extra_integration': extra_integration
                 }
@@ -414,8 +412,7 @@ class OrganizationViewSet(
         result = billing.add_additional_information(
             {
                 'additional_info': additional_info,
-                'cpf': cpf,
-                'cnpj': cnpj,
+                'personal_identification_number': personal_identification_number,
                 'extra_integration': extra_integration
             }
         )

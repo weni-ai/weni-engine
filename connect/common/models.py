@@ -563,12 +563,12 @@ class BillingPlan(models.Model):
     card_brand = models.CharField(
         verbose_name=_("Card Brand"), null=True, blank=True, max_length=24
     )
-    cpf = models.CharField(
-        verbose_name="CPF", null=True, blank=True, max_length=14
+
+    personal_identification_number = models.CharField(
+        verbose_name="Personal Identification Number", null=True, blank=True,
+        max_length=50
     )
-    cnpj = models.CharField(
-        verbose_name="CNPJ", null=True, blank=True, max_length=20
-    )
+
     additional_billing_information = models.CharField(
         verbose_name=_("Additional billing information"),
         null=True, blank=True, max_length=250
@@ -682,11 +682,8 @@ class BillingPlan(models.Model):
         if not (data['additional_info'] is None):
             self.additional_billing_information = data['additional_info']
             count += 1
-        if not (data['cpf'] is None):
-            self.cpf = data['cpf']
-            count += 1
-        if not (data['cnpj'] is None):
-            self.cnpj = data['cnpj']
+        if not (data['personal_identification_number'] is None):
+            self.personal_identification_number = data['personal_identification_number']
             count += 1
         if not (data['extra_integration'] is None):
             self.organization.extra_integration = data['extra_integration']
