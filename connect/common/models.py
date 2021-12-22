@@ -139,11 +139,11 @@ class Organization(models.Model):
         }
         send_mail(
             _("Invitation to join organization"),
-            render_to_string("authentication/emails/invite_organization.txt"),
+            render_to_string("common/emails/organization/invite_organization.txt", context),
             None,
             [email],
             html_message=render_to_string(
-                "authentication/emails/invite_organization.html", context
+                "common/emails/organization/invite_organization.html", context
             ),
         )
 
@@ -157,10 +157,10 @@ class Organization(models.Model):
         }
         send_mail(
             _(f"You going out of {self.name}"),
-            render_to_string("authentication/emails/org_going_out.txt"),
+            render_to_string("common/emails/organization/org_going_out.txt", context),
             None,
             [email],
-            html_message=render_to_string("authentication/emails/org_going_out.html", context)
+            html_message=render_to_string("common/emails/organization/org_going_out.html", context)
         )
 
     def send_email_organization_removed(self, email: str, user_name: str):
@@ -169,14 +169,14 @@ class Organization(models.Model):
         context = {
             "base_url": settings.BASE_URL,
             "user_name": user_name,
-            "orgaization_name": self.name
+            "organization_name": self.name
         }
         send_mail(
             _(f"You have been removed from {self.name}"),
-            render_to_string("authentication/emails/org_removed.txt"),
+            render_to_string("common/emails/organization/org_removed.txt", context),
             None,
             [email],
-            html_message=render_to_string("authentication/emails/org_removed.html", context)
+            html_message=render_to_string("common/emails/organization/org_removed.html", context)
         )
 
     def send_email_organization_create(self, email: str, first_name: str):
@@ -190,11 +190,11 @@ class Organization(models.Model):
         }
         send_mail(
             _("Organization created!"),
-            render_to_string("authentication/emails/organization_create.txt"),
+            render_to_string("common/emails/organization/organization_create.txt", context),
             None,
             [email],
             html_message=render_to_string(
-                "authentication/emails/organization_create.html", context
+                "common/emails/organization/organization_create.html", context
             ),
         )
 
@@ -209,12 +209,12 @@ class Organization(models.Model):
         send_mail(
             _(f"You have been removed from the {self.name}"),
             render_to_string(
-                "authentication/emails/remove_permission_organization.txt"
+                "common/emails/organization/remove_permission_organization.txt"
             ),
             None,
             [email],
             html_message=render_to_string(
-                "authentication/emails/remove_permission_organization.html", context
+                "common/emails/organization/remove_permission_organization.html", context
             ),
         )
 
@@ -228,11 +228,11 @@ class Organization(models.Model):
         }
         send_mail(
             _(f"{self.name} no longer exists!"),
-            render_to_string("authentication/emails/delete_organization.txt"),
+            render_to_string("common/emails/organization/delete_organization.txt"),
             None,
             [email],
             html_message=render_to_string(
-                "authentication/emails/delete_organization.html", context
+                "common/emails/organization/delete_organization.html", context
             ),
         )
 
@@ -248,11 +248,11 @@ class Organization(models.Model):
         }
         send_mail(
             _(f"{organization_previous_name} now it's {organization_new_name}"),
-            render_to_string("authentication/emails/change_organization_name.txt"),
+            render_to_string("common/emails/organization/change_organization_name.txt", context),
             None,
             [email],
             html_message=render_to_string(
-                "authentication/emails/change_organization_name.html", context
+                "common/emails/organization/change_organization_name.html", context
             ),
         )
 
@@ -285,11 +285,11 @@ class Organization(models.Model):
         }
         send_mail(
             _("A new permission has been assigned to you"),
-            render_to_string("authentication/emails/permission_change.txt"),
+            render_to_string("common/emails/organization/permission_change.txt"),
             None,
             [email],
             html_message=render_to_string(
-                "authentication/emails/permission_change.html", context
+                "common/emails/organization/permission_change.html", context
             ),
         )
 
@@ -424,11 +424,11 @@ class Project(models.Model):
         }
         send_mail(
             _(f"You have been invited to join the {self.name} organization"),
-            render_to_string("authentication/emails/project_create.txt"),
+            render_to_string("common/emails/project/project_create.txt"),
             None,
             [email],
             html_message=render_to_string(
-                "authentication/emails/project_create.html", context
+                "common/emails/project/project_create.html", context
             ),
         )
 
@@ -786,10 +786,10 @@ class BillingPlan(models.Model):
         }
         send_mail(
             _(f"Your {self.organization.name} organization's plan has ended "),
-            render_to_string("authentication/emails/added_card.txt"),
+            render_to_string("billing/emails/added_card.txt", context),
             None,
             [email],
-            html_message=render_to_string("authentication/emails/added_card.html", context)
+            html_message=render_to_string("billing/emails/added_card.html", context)
         )
 
     def send_email_changed_card(self, user_name: str, email: str):
@@ -802,10 +802,10 @@ class BillingPlan(models.Model):
         }
         send_mail(
             _(f"A credit card has been changed to the organization {self.organization.name}"),
-            render_to_string("authentication/emails/changed_card.txt"),
+            render_to_string("billing/emails/changed_card.txt", context),
             None,
             [email],
-            html_message=render_to_string("authentication/emails/changed_card.html", context)
+            html_message=render_to_string("billing/emails/changed_card.html", context)
         )
 
     def send_email_finished_plan(self, user_name: str, email: str):
@@ -850,7 +850,7 @@ class BillingPlan(models.Model):
         }
         send_mail(
             _(f"Your {self.organization.name} organization credit card its removed"),
-            render_to_string("billing/emails/removed_card.txt"),
+            render_to_string("billing/emails/removed_card.txt", context),
             None,
             [email],
             html_message=render_to_string("billing/emails/removed-card.html", context)
@@ -866,10 +866,10 @@ class BillingPlan(models.Model):
         }
         send_mail(
             _(f"The organization {self.organization.name} has already surpassed 200 active contacts"),
-            render_to_string("authentication/emails/free-plan-expired.txt"),
+            render_to_string("billing/emails/free-plan-expired.txt", context),
             None,
             [email],
-            html_message=render_to_string("authentication/emails/free-plan-expired.html", context)
+            html_message=render_to_string("billing/emails/free-plan-expired.html", context)
         )
 
     def send_email_free_plan(self, user_name: str, email: str):
@@ -882,10 +882,10 @@ class BillingPlan(models.Model):
         }
         send_mail(
             _(f"Your {self.organization.name} organization has the Free Plan"),
-            render_to_string("authentication/emails/free_plan.txt"),
+            render_to_string("billing/emails/free_plan.txt", context),
             None,
             [email],
-            html_message=render_to_string("authentication/emails/free_plan.html", context)
+            html_message=render_to_string("billing/emails/free_plan.html", context)
         )
 
     def send_email_changed_plan(self, user_name: str, email: str, old_plan: str):
