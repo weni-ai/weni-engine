@@ -81,9 +81,8 @@ class StripeGateway(Gateway):
         try:
             client_data = stripe.Customer.retrieve(identification)
             response = {
-                'name': client_data['name'] if 'name' in client_data else None,
-                'address': client_data['shipping']['address'] if 'shipping' in client_data and 'address' in client_data[
-                    'shipping'] else None
+                'name': client_data['name'] if client_data and 'name' in client_data else None,
+                'address': client_data['shipping']['address'] if client_data and 'shipping' in client_data and 'address' in client_data['shipping'] else None
             }
         except self.stripe.error.InvalidRequestError:
             return {"status": "FAILURE", "response": f"No such Customer: {identification}"}
