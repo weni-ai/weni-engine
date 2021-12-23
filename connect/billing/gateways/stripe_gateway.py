@@ -87,6 +87,4 @@ class StripeGateway(Gateway):
             }
         except self.stripe.error.InvalidRequestError:
             return {"status": "FAILURE", "response": f"No such Customer: {identification}"}
-        except self.stripe.error as error:
-            return {"status": "FAILURE", "response": f"error: {error}"}
         return {"status": "SUCCESS", "response": response}

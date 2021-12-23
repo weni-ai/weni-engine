@@ -10,7 +10,7 @@ from django.utils import timezone
 from connect.api.v1.invoice.filters import InvoiceFilter
 from connect.api.v1.invoice.serializers import InvoiceSerializer
 from connect.api.v1.metadata import Metadata
-from connect.common.models import Invoice, Organization, BillingPlan
+from connect.common.models import Invoice, Organization, BillingPlan, GenericBillingData
 from connect import utils
 from connect.billing.gateways.stripe_gateway import StripeGateway
 from django.http import JsonResponse
@@ -43,12 +43,15 @@ class InvoiceViewSet(
         invoice_id = request.query_params.get("invoice_id")
         invoice = get_object_or_404(organization.organization_billing_invoice, invoice_random_id=invoice_id)
         flow_instance = utils.get_grpc_types().get("flow")
+        billing_data = GenericBillingData.objects.first() if GenericBillingData.objects.all().exists() else GenericBillingData.objects.create()
+        precification = billing_data.precification
         invoice_data = {
             "billing_date": invoice.due_date,
             "invoice_date": timezone.now().strftime("%Y-%m-%d"),
             "plan": organization.organization_billing.plan,
             "invoice_id": invoice.invoice_random_id,
-            'total_invoice_amount': invoice.total_invoice_amount
+            'total_invoice_amount': invoice.total_invoice_amount,
+            "currency": precification['currency']
         }
         before = str(request.query_params.get("before") + " 00:00")
         after = str(request.query_params.get("after") + " 00:00")
