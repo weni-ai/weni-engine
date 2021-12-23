@@ -946,23 +946,24 @@ class BillingPlan(models.Model):
             html_message=render_to_string("billing/emails/free-plan-expired.html", context)
         )
 
-    def send_email_free_plan(self, user_name: str, email: str):
+    def send_email_chosen_plan(self, user_name: str, email: str, plan: str):
         if not settings.SEND_EMAILS:
             return False
         context = {
             "base_url": settings.BASE_URL,
             "user_name": user_name,
-            "org_name": self.organization.name
+            "org_name": self.organization.name,
+            "plan": plan
         }
         send_mail(
-            _(f"Your {self.organization.name} organization has the Free Plan"),
+            _(f"Your {self.organization.name} organization has the {plan.title()} Plan"),
             render_to_string("billing/emails/free_plan.txt", context),
             None,
             [email],
             html_message=render_to_string("billing/emails/free_plan.html", context)
         )
 
-    def send_email_changed_plan(self, user_name: str, email: str, old_plan: str):
+    def send_email_changed_plan(self, user_name: str, email: list, old_plan: str):
         if not settings.SEND_EMAILS:
             return False
         context = {
@@ -976,7 +977,7 @@ class BillingPlan(models.Model):
             _(f" Your {self.organization.name} organization's plan has been changed."),
             render_to_string("billing/emails/changed-plan.txt", context),
             None,
-            [email],
+            email,
             html_message=render_to_string("billing/emails/changed-plan.html", context)
         )
 

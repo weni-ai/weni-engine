@@ -312,8 +312,10 @@ class OrganizationViewSet(
         plan = request.data.get("organization_billing_plan")
         organization = get_object_or_404(Organization, uuid=organization_uuid)
         org_billing = organization.organization_billing
+        old_plan = organization.organization_billing.plan
         change_plan = org_billing.change_plan(plan)
         if change_plan:
+            organization.organization_billing.send_email_changed_plan(organization.name, organization.authorizations.values_list("user__email", flat=True), old_plan)
             return JsonResponse(data={"plan": org_billing.plan}, status=status.HTTP_200_OK)
         return JsonResponse(data={"message": "Invalid plan choice"}, status=status.HTTP_400_BAD_REQUEST)
 
