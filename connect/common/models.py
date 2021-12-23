@@ -138,12 +138,44 @@ class Organization(models.Model):
         }
         send_mail(
             _("Invitation to join organization"),
-            render_to_string("authentication/emails/invite_organization.txt"),
+            render_to_string("common/emails/organization/invite_organization.txt", context),
             None,
             [email],
             html_message=render_to_string(
-                "authentication/emails/invite_organization.html", context
+                "common/emails/organization/invite_organization.html", context
             ),
+        )
+
+    def send_email_organization_going_out(self, user_name: str, email: str):
+        if not settings.SEND_EMAILS:
+            return False
+        context = {
+            "base_url": settings.BASE_URL,
+            "user_name": user_name,
+            "organization_name": self.name
+        }
+        send_mail(
+            _(f"You going out of {self.name}"),
+            render_to_string("common/emails/organization/org_going_out.txt", context),
+            None,
+            [email],
+            html_message=render_to_string("common/emails/organization/org_going_out.html", context)
+        )
+
+    def send_email_organization_removed(self, email: str, user_name: str):
+        if not settings.SEND_EMAILS:
+            return False
+        context = {
+            "base_url": settings.BASE_URL,
+            "user_name": user_name,
+            "organization_name": self.name
+        }
+        send_mail(
+            _(f"You have been removed from {self.name}"),
+            render_to_string("common/emails/organization/org_removed.txt", context),
+            None,
+            [email],
+            html_message=render_to_string("common/emails/organization/org_removed.html", context)
         )
 
     def send_email_organization_create(self, email: str, first_name: str):
@@ -157,11 +189,11 @@ class Organization(models.Model):
         }
         send_mail(
             _("Organization created!"),
-            render_to_string("authentication/emails/organization_create.txt"),
+            render_to_string("common/emails/organization/organization_create.txt", context),
             None,
             [email],
             html_message=render_to_string(
-                "authentication/emails/organization_create.html", context
+                "common/emails/organization/organization_create.html", context
             ),
         )
 
@@ -176,12 +208,12 @@ class Organization(models.Model):
         send_mail(
             _(f"You have been removed from the {self.name}"),
             render_to_string(
-                "authentication/emails/remove_permission_organization.txt"
+                "common/emails/organization/remove_permission_organization.txt", context
             ),
             None,
             [email],
             html_message=render_to_string(
-                "authentication/emails/remove_permission_organization.html", context
+                "common/emails/organization/remove_permission_organization.html", context
             ),
         )
 
@@ -195,11 +227,68 @@ class Organization(models.Model):
         }
         send_mail(
             _(f"{self.name} no longer exists!"),
-            render_to_string("authentication/emails/delete_organization.txt"),
+            render_to_string("common/emails/organization/delete_organization.txt", context),
             None,
             [email],
             html_message=render_to_string(
-                "authentication/emails/delete_organization.html", context
+                "common/emails/organization/delete_organization.html", context
+            ),
+        )
+
+    def send_email_change_organization_name(self, user_name: str, email: str, organization_previous_name: str,
+                                            organization_new_name: str):
+        if not settings.SEND_EMAILS:
+            return False
+        context = {
+            "base_url": settings.BASE_URL,
+            "user_name": user_name,
+            "organization_previous_name": organization_previous_name,
+            "organization_new_name": organization_new_name
+        }
+        send_mail(
+            _(f"{organization_previous_name} now it's {organization_new_name}"),
+            render_to_string("common/emails/organization/change_organization_name.txt", context),
+            None,
+            [email],
+            html_message=render_to_string(
+                "common/emails/organization/change_organization_name.html", context
+            ),
+        )
+
+    def send_email_access_code(self, email: str, user_name: str, access_code: str):
+        if not settings.SEND_EMAILS:
+            return False  # pragma: no cover
+        context = {
+            "base_url": settings.BASE_URL,
+            "access_code": access_code,
+            "user_name": user_name,
+        }
+        send_mail(
+            _("You receive an access code to Weni Platform"),
+            render_to_string("authentication/emails/access_code.txt", context),
+            None,
+            [email],
+            html_message=render_to_string(
+                "authentication/emails/access_code.html", context
+            ),
+        )
+
+    def send_email_permission_change(self, user_name: str, old_permission: str, new_permission: str, email: str):
+        if not settings.SEND_EMAILS:
+            return False  # pragma: no cover
+        context = {
+            "base_url": settings.BASE_URL,
+            "user_name": user_name,
+            "old_permission": old_permission,
+            "new_permission": new_permission
+        }
+        send_mail(
+            _("A new permission has been assigned to you"),
+            render_to_string("common/emails/organization/permission_change.txt", context),
+            None,
+            [email],
+            html_message=render_to_string(
+                "common/emails/organization/permission_change.html", context
             ),
         )
 
@@ -349,11 +438,73 @@ class Project(models.Model):
         }
         send_mail(
             _(f"You have been invited to join the {self.name} organization"),
-            render_to_string("authentication/emails/project_create.txt"),
+            render_to_string("common/emails/project/project_create.txt", context),
             None,
             [email],
             html_message=render_to_string(
-                "authentication/emails/project_create.html", context
+                "common/emails/project/project_create.html", context
+            ),
+        )
+
+    def send_email_change_project(self, first_name: str, email: str, info: dict):
+        if not settings.SEND_EMAILS:
+            return False
+
+        old_project_name = info.get("old_project_name")
+        date_before = info.get("date_before")
+        timezone_before = info.get("old_timezone")
+        country_loc_suport_before = info.get("country_loc_suport_before")
+        country_loc_suport_now = info.get("country_loc_suport_now")
+        default_lang_before = info.get("default_lang_before")
+        default_lang_now = info.get("default_lang_now")
+        secondary_lang_before = info.get("secondary_lang_before")
+        secondary_lang_now = info.get("secondary_lang_now")
+        user = info.get("user")
+
+        context = {
+            "base_url": settings.BASE_URL,
+            "organization_name": self.organization.name,
+            "project_name": self.name,
+            "old_project_name": old_project_name,
+            "first_name": first_name,
+            "user": user,
+            "date_before": date_before,
+            "date_now": self.date_format,
+            "timezone_before": timezone_before,
+            "timezone_now": str(self.timezone),
+            "country_loc_suport_before": country_loc_suport_before,
+            "country_loc_suport_now": country_loc_suport_now,
+            "default_lang_before": default_lang_before,
+            "default_lang_now": default_lang_now,
+            "secondary_lang_before": secondary_lang_before,
+            "secondary_lang_now": secondary_lang_now,
+        }
+        send_mail(
+            _(f"You have been invited to join the {self.name} organization"),
+            render_to_string("common/emails/project-changed.txt", context),
+            None,
+            [email],
+            html_message=render_to_string(
+                "common/emails/project-changed.html", context
+            ),
+        )
+
+    def send_email_deleted_project(self, first_name: str, email: str):
+        if not settings.SEND_EMAILS:
+            return False  # pragma: no cover
+        context = {
+            "base_url": settings.BASE_URL,
+            "organization_name": self.organization.name,
+            "project_name": self.name,
+            "first_name": first_name,
+        }
+        send_mail(
+            _("A project was deleted..."),
+            render_to_string("common/emails/project-delete.txt", context),
+            None,
+            [email],
+            html_message=render_to_string(
+                "common/emails/project-delete.html", context
             ),
         )
 
@@ -694,6 +845,136 @@ class BillingPlan(models.Model):
             return 0
         elif count == 0:
             return 1
+
+    def send_email_added_card(self, user_name: str, email: str):
+        if not settings.SEND_EMAILS:
+            return False
+        context = {
+            "base_url": settings.BASE_URL,
+            "organization_name": self.organization.name,
+            "user_name": user_name
+        }
+        send_mail(
+            _(f"Your {self.organization.name} organization's plan has ended "),
+            render_to_string("billing/emails/added_card.txt", context),
+            None,
+            [email],
+            html_message=render_to_string("billing/emails/added_card.html", context)
+        )
+
+    def send_email_changed_card(self, user_name: str, email: str):
+        if not settings.SEND_EMAILS:
+            return False
+        context = {
+            "base_url": settings.BASE_URL,
+            "organization_name": self.organization.name,
+            "user_name": user_name
+        }
+        send_mail(
+            _(f"A credit card has been changed to the organization {self.organization.name}"),
+            render_to_string("billing/emails/changed_card.txt", context),
+            None,
+            [email],
+            html_message=render_to_string("billing/emails/changed_card.html", context)
+        )
+
+    def send_email_finished_plan(self, user_name: str, email: str):
+        if not settings.SEND_EMAILS:
+            return False
+        context = {
+            "base_url": settings.BASE_URL,
+            "organization_name": self.organization.name,
+            "user_name": user_name
+        }
+        send_mail(
+            _(f"Your {self.organization.name} organization's plan has ended"),
+            render_to_string("billing/emails/finished-plan.txt", context),
+            None,
+            [email],
+            html_message=render_to_string("billing/emails/finished-plan.html", context)
+        )
+
+    def send_email_reactivated_plan(self, user_name: str, email: str):
+        if not settings.SEND_EMAILS:
+            return False
+        context = {
+            "base_url": settings.BASE_URL,
+            "organization_name": self.organization.name,
+            "user_name": user_name
+        }
+        send_mail(
+            _(f" Your {self.organization.name} organization's plan has been reactivated."),
+            render_to_string("billing/emails/reactived-plan.txt", context),
+            None,
+            [email],
+            html_message=render_to_string("billing/emails/reactived-plan.html", context)
+        )
+
+    def send_email_removed_credit_card(self, user_name: str, email: str):
+        if not settings.SEND_EMAILS:
+            return False
+        context = {
+            "base_url": settings.BASE_URL,
+            "user_name": user_name,
+            "org_name": self.organization.name
+        }
+        send_mail(
+            _(f"Your {self.organization.name} organization credit card its removed"),
+            render_to_string("billing/emails/removed_card.txt", context),
+            None,
+            [email],
+            html_message=render_to_string("billing/emails/removed-card.html", context)
+        )
+
+    def send_email_expired_free_plan(self, user_name: str, email: str):
+        if not settings.SEND_EMAILS:
+            return False
+        context = {
+            "base_url": settings.BASE_URL,
+            "organization_name": self.organization.name,
+            "user_name": user_name
+        }
+        send_mail(
+            _(f"The organization {self.organization.name} has already surpassed 200 active contacts"),
+            render_to_string("billing/emails/free-plan-expired.txt", context),
+            None,
+            [email],
+            html_message=render_to_string("billing/emails/free-plan-expired.html", context)
+        )
+
+    def send_email_free_plan(self, user_name: str, email: str):
+        if not settings.SEND_EMAILS:
+            return False
+        context = {
+            "base_url": settings.BASE_URL,
+            "user_name": user_name,
+            "org_name": self.organization.name
+        }
+        send_mail(
+            _(f"Your {self.organization.name} organization has the Free Plan"),
+            render_to_string("billing/emails/free_plan.txt", context),
+            None,
+            [email],
+            html_message=render_to_string("billing/emails/free_plan.html", context)
+        )
+
+    def send_email_changed_plan(self, user_name: str, email: str, old_plan: str):
+        if not settings.SEND_EMAILS:
+            return False
+        context = {
+            "base_url": settings.BASE_URL,
+            "organization_name": self.organization.name,
+            "user_name": user_name,
+            "old_plan": old_plan,
+            "actual_plan": self.plan
+        }
+        send_mail(
+            _(f" Your {self.organization.name} organization's plan has been changed."),
+            render_to_string("billing/emails/changed-plan.txt", context),
+            None,
+            [email],
+            html_message=render_to_string("billing/emails/changed-plan.html", context)
+        )
 
 
 class Invoice(models.Model):

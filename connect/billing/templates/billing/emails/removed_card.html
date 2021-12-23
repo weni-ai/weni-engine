@@ -2,27 +2,28 @@
 {% load static i18n %}
 
 {% block main-content %}
-    <section style="width: 574px; margin: 50px auto">
+    <section style="width: 574px; margin: 48px">
           <div
             style="
               font-family: 'Lato', sans-serif;
               font-style: normal;
               font-weight: normal;
               font-size: 20px;
-              line-height: 24px;
+              line-height: 28px;
               color: #808080;
             "
           >
-            {% trans 'Hi' %},
+              {% trans "Hi" %},
             <span
               style="
                 font-family: 'Lato', sans-serif;
                 color: #262626;
                 font-size: 20px;
                 font-weight: bold;
+                line-height: 28px;
                 font-style: normal;
               "
-              >{{first_name}}!</span
+              >{{ user_name }}!</span
             >
           </div>
 
@@ -36,7 +37,7 @@
               margin-top: 24px;
             "
           >
-            {% trans 'You left the' %} {{ organization_name }}...
+              {% trans "The credit card of organization " %} {{ org_name }} {% trans " has been removed" %}
           </div>
 
           <div
@@ -50,17 +51,33 @@
               margin-top: 24px;
             "
           >
-            {% trans 'His departure from the' %} {{ organization_name }} {% trans 'was accomplished. We were sad about your departure, but we understand that life goes by and things change' %}
+              {% trans "An admistrator removed the register data from credit card " %}
+              {% trans "to perform billing of organization plan" %} <strong>{{ org_name }}</strong>.
+              {% trans "at the moment the operation of yours " %}
+              {% trans "Intelligences and Flows created and the chat module is freeze." %}
+          </div>
+
+          <div
+            style="
+              font-family: 'Lato', sans-serif;
+              font-style: normal;
+              font-weight: normal;
+              font-size: 16px;
+              line-height: 24px;
+              color: #808080;
+              margin-top: 24px;
+            "
+          >
+              {% trans "To continue using the weni platform request the" %}
+              {% trans " organization administrator add a valid credit card " %}
+              {% trans "in the billing section, we want you to stay with us" %}
             <span style="margin-left: 1px">
               <img
                 style="max-height: 16px"
-                src="./emojis/blue-heart.png"
+                src="{% static 'emojis/winking-face.png' %}"
                 alt=""
               />
             </span>
-            <p style="margin-top: 24px; margin-bottom: 0">
-              {% trans 'You can still create other organizations and projects if you want to continue with us!' %}
-            </p>
           </div>
         </section>
 {% endblock %}

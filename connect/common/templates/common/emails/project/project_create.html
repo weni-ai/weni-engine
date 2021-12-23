@@ -13,7 +13,7 @@
               color: #808080;
             "
           >
-            {% trans 'Hi' %},
+            {% trans 'Hi,' %}
             <span
               style="
                 font-family: 'Lato', sans-serif;
@@ -36,14 +36,7 @@
               margin-top: 24px;
             "
           >
-            {% trans 'The' %} {{ organization_name }} {% trans 'no longer exists' %}
-            <span style="margin-left: 2px">
-              <img
-                style="max-height: 20px"
-                src="./emojis/confused-face.png"
-                alt=""
-              />
-            </span>
+            {% trans 'Your project has been successfully created!' %}
           </div>
 
           <div
@@ -57,17 +50,16 @@
               margin-top: 24px;
             "
           >
-            {% trans 'One of the administrators deleted the organization' %} <strong>{{ organization_name }}</strong>,
-            {% trans 'so you can no longer access it through your account. We are saddened by his departure, but we understand that life passes and things change' %}
+            {% trans 'The project' %} <strong>{{ project_name }}</strong> {% trans 'was created and you can now start the creation of Intelligences and Flows to transform the way you work' %}
             <span style="margin-left: 1px">
               <img
                 style="max-height: 16px"
-                src="./emojis/blue-heart.png"
+                src="{% static 'emojis/blue-heart.png' %}"
                 alt=""
               />
             </span>
             <p style="margin-top: 24px; margin-bottom: 0">
-              {% trans 'You can still create other organizations and projects if you want to continue with us!' %}
+              {% trans 'Remember that everyone in the organization' %} <strong>{{ organization_name }}</strong> {% trans 'on what you created the project can view it, ok ?!' %}
             </p>
           </div>
         </section>

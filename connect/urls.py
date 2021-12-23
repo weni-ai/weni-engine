@@ -79,7 +79,7 @@ if settings.DEBUG:
                     path(
                         "invite-organization/",
                         render_template(
-                            "authentication/emails/invite_organization.html",
+                            "common/emails/organization/invite_organization.html",
                             base_url=settings.BASE_URL,
                             organization_name="Org Test",
                         ),

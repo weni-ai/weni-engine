@@ -1,0 +1,74 @@
+{% extends 'authentication/emails/base.html' %}
+{% load static i18n %}
+
+{% block main-content %}
+    <section style="width: 574px; margin: 50px auto">
+          <div
+            style="
+              font-family: 'Lato', sans-serif;
+              font-style: normal;
+              font-weight: normal;
+              font-size: 20px;
+              line-height: 24px;
+              color: #808080;
+            "
+          >
+            {% trans 'Hi' %},
+            <span
+              style="
+                font-family: 'Lato', sans-serif;
+                color: #262626;
+                font-size: 20px;
+                font-weight: bold;
+                font-style: normal;
+              "
+              >{{ first_name }}!</span
+            >
+          </div>
+
+          <div
+            style="
+              font-family: 'Lato', sans-serif;
+              font-weight: bold;
+              font-size: 20px;
+              line-height: 28px;
+              color: #262626;
+              margin-top: 24px;
+            "
+          >
+            {% trans 'The' %} {{ organization_name }} {% trans 'no longer exists' %}
+            <span style="margin-left: 2px">
+              <img
+                style="max-height: 20px"
+                src="{% static 'emojis/confused-face.png' %}"
+                alt=""
+              />
+            </span>
+          </div>
+
+          <div
+            style="
+              font-family: 'Lato', sans-serif;
+              font-style: normal;
+              font-weight: normal;
+              font-size: 16px;
+              line-height: 24px;
+              color: #808080;
+              margin-top: 24px;
+            "
+          >
+            {% trans 'One of the administrators deleted the organization' %} <strong>{{ organization_name }}</strong>,
+            {% trans 'so you can no longer access it through your account. We are saddened by his departure, but we understand that life passes and things change' %}
+            <span style="margin-left: 1px">
+              <img
+                style="max-height: 16px"
+                src="{% static 'emojis/blue-heart.png' %}"
+                alt=""
+              />
+            </span>
+            <p style="margin-top: 24px; margin-bottom: 0">
+              {% trans 'You can still create other organizations and projects if you want to continue with us!' %}
+            </p>
+          </div>
+        </section>
+{% endblock %}
