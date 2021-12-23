@@ -1,5 +1,6 @@
 {% extends 'authentication/emails/base.html' %}
-{% load static i18n %}
+{% load static %}
+{% load i18n %}
 
 {% block main-content %}
     <section style="width: 574px; margin: 50px auto">
@@ -18,7 +19,7 @@
             <span style="margin-left: 1px">
               <img
                 style="max-height: 20px"
-                src="./emojis/grinning-squinting.png"
+                src="{% static '/emojis/grinning-squinting.png' %}"
                 alt=""
               />
             </span>
@@ -38,11 +39,11 @@
             {% trans 'Uhuuul, now you can be one of us!' %}
 
             <p style="margin-top: 24px; margin-bottom: 0">
-              {% trans 'A' %} <strong> {{ organization_name }} </strong> {% trans 'member just sent you an invitation to join the organization. To enter, just click on the button down and you will be redirected to a registration page. Case already have registration, just login' %}
+              {% trans 'A' %} <strong> {{ organization_name }} </strong> {% trans 'member just sent you an invitation to join the organization. To enter, just click on the button down and you will be redirected to a registration page. Case you already have a registration, just login' %}
               <span style="margin-left: 1px">
                 <img
                   style="max-height: 16px"
-                  src="./emojis/winking-face.png"
+                  src="{% static '/emojis/winking-face.png' %}"
                   alt=""
                 />
               </span>

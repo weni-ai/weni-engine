@@ -209,7 +209,7 @@ class Organization(models.Model):
         send_mail(
             _(f"You have been removed from the {self.name}"),
             render_to_string(
-                "common/emails/organization/remove_permission_organization.txt"
+                "common/emails/organization/remove_permission_organization.txt", context
             ),
             None,
             [email],
@@ -228,7 +228,7 @@ class Organization(models.Model):
         }
         send_mail(
             _(f"{self.name} no longer exists!"),
-            render_to_string("common/emails/organization/delete_organization.txt"),
+            render_to_string("common/emails/organization/delete_organization.txt", context),
             None,
             [email],
             html_message=render_to_string(
@@ -266,7 +266,7 @@ class Organization(models.Model):
         }
         send_mail(
             _("You receive an access code to Weni Platform"),
-            render_to_string("authentication/emails/access_code.txt"),
+            render_to_string("authentication/emails/access_code.txt", context),
             None,
             [email],
             html_message=render_to_string(
@@ -285,7 +285,7 @@ class Organization(models.Model):
         }
         send_mail(
             _("A new permission has been assigned to you"),
-            render_to_string("common/emails/organization/permission_change.txt"),
+            render_to_string("common/emails/organization/permission_change.txt", context),
             None,
             [email],
             html_message=render_to_string(
@@ -424,7 +424,7 @@ class Project(models.Model):
         }
         send_mail(
             _(f"You have been invited to join the {self.name} organization"),
-            render_to_string("common/emails/project/project_create.txt"),
+            render_to_string("common/emails/project/project_create.txt", context),
             None,
             [email],
             html_message=render_to_string(
@@ -467,7 +467,7 @@ class Project(models.Model):
         }
         send_mail(
             _(f"You have been invited to join the {self.name} organization"),
-            render_to_string("common/emails/project-changed.txt"),
+            render_to_string("common/emails/project-changed.txt", context),
             None,
             [email],
             html_message=render_to_string(
@@ -486,7 +486,7 @@ class Project(models.Model):
         }
         send_mail(
             _("A project was deleted..."),
-            render_to_string("common/emails/project-delete.txt"),
+            render_to_string("common/emails/project-delete.txt", context),
             None,
             [email],
             html_message=render_to_string(
@@ -818,7 +818,7 @@ class BillingPlan(models.Model):
         }
         send_mail(
             _(f"Your {self.organization.name} organization's plan has ended"),
-            render_to_string("billing/emails/finished-plan.txt"),
+            render_to_string("billing/emails/finished-plan.txt", context),
             None,
             [email],
             html_message=render_to_string("billing/emails/finished-plan.html", context)
@@ -834,7 +834,7 @@ class BillingPlan(models.Model):
         }
         send_mail(
             _(f" Your {self.organization.name} organization's plan has been reactivated."),
-            render_to_string("billing/emails/reactived-plan.txt"),
+            render_to_string("billing/emails/reactived-plan.txt", context),
             None,
             [email],
             html_message=render_to_string("billing/emails/reactived-plan.html", context)
@@ -900,7 +900,7 @@ class BillingPlan(models.Model):
         }
         send_mail(
             _(f" Your {self.organization.name} organization's plan has been changed."),
-            render_to_string("billing/emails/changed-plan.txt"),
+            render_to_string("billing/emails/changed-plan.txt", context),
             None,
             [email],
             html_message=render_to_string("billing/emails/changed-plan.html", context)
