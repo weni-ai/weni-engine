@@ -39,7 +39,7 @@
           >
               {% trans "Your " %} {{ org_name }} {% trans "organization has the Free Plan" %}
             <span style="margin-left: 2px">
-              <img style="max-height: 20px" src="./emojis/rocket.png" alt="" />
+              <img style="max-height: 20px" src="{% static './emojis/rocket.png' %}" alt="" />
             </span>
           </div>
 
@@ -59,7 +59,7 @@
             <span style="margin-left: 1px">
               <img
                 style="max-height: 16px"
-                src="./emojis/blue-heart.png"
+                src="{% static './emojis/blue-heart.png' %}"
                 alt=""
               />
             </span>
