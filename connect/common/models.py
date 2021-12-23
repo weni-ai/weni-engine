@@ -742,6 +742,10 @@ class BillingPlan(models.Model):
         try:
             customer = stripe.Customer.retrieve(self.stripe_customer)
             return customer
+        except stripe.error.InvalidRequestError:
+            self.stripe_customer = None
+            self.save(update_fields=["stripe_customer"])
+            self.get_stripe_customer
         except Exception as e:
             logger.error(f"Could not get Stripe customer: {str(e)}", exc_info=True)
             return None
