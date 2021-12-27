@@ -256,3 +256,12 @@ class FlowType(GRPCType):
             )
         )
         return response
+
+    def get_active_contacts(self, project_uuid, before, after):
+        stub = billing_pb2_grpc.BillingStub(self.channel)
+        response = stub.Detailed(
+            billing_pb2.BillingRequest(
+                org_uuid=project_uuid, before=before, after=after
+            )
+        )
+        return response
