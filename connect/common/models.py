@@ -930,7 +930,7 @@ class BillingPlan(models.Model):
             html_message=render_to_string("billing/emails/removed_card.html", context)
         )
 
-    def send_email_expired_free_plan(self, user_name: str, email: str):
+    def send_email_expired_free_plan(self, user_name: str, email: list):
         if not settings.SEND_EMAILS:
             return False
         context = {
@@ -942,7 +942,7 @@ class BillingPlan(models.Model):
             _(f"The organization {self.organization.name} has already surpassed 200 active contacts"),
             render_to_string("billing/emails/free-plan-expired.txt", context),
             None,
-            [email],
+            email,
             html_message=render_to_string("billing/emails/free-plan-expired.html", context)
         )
 
