@@ -130,6 +130,8 @@ class OrganizationViewSet(
             organization.organization_billing.is_active = False
             organization.organization_billing.save(update_fields=["is_active"])
             organization.save(update_fields=["is_suspended"])
+            user_name = organization.name if request.user is None else request.user.name
+            organization.organization_billing.send_email_removed_credit_card(user_name, organization.authorizations.values_list("user__email", flat=True))
 
             return JsonResponse(data={"status": True}, status=status.HTTP_200_OK)
         return JsonResponse(data={"status": False}, status=status.HTTP_304_NOT_MODIFIED)
@@ -246,6 +248,7 @@ class OrganizationViewSet(
     def closing_plan(self, request, organization_uuid):  # pragma: no cover
         result = {}
         organization = get_object_or_404(Organization, uuid=organization_uuid)
+        self.check_object_permissions(self.request, organization)
 
         org_billing = organization.organization_billing
         org_billing.termination_date = timezone.now().date()
@@ -260,6 +263,9 @@ class OrganizationViewSet(
                     True
                 ],
             )
+        user_name = org_billing.organization.name if request.user is None else request.user.name
+        org_billing.send_email_finished_plan(user_name, organization.authorizations.values_list("user__email", flat=True))
+
         result = {
             "plan": org_billing.plan,
             "is_active": org_billing.is_active,
@@ -278,6 +284,8 @@ class OrganizationViewSet(
     def reactivate_plan(self, request, organization_uuid):  # pragma: no cover
 
         organization = get_object_or_404(Organization, uuid=organization_uuid)
+        self.check_object_permissions(self.request, organization)
+
         org_billing = organization.organization_billing
         org_billing.termination_date = None
         org_billing.is_active = True
@@ -292,6 +300,8 @@ class OrganizationViewSet(
                     False
                 ],
             )
+        user_name = org_billing.organization.name if request.user is None else request.user.name
+        org_billing.send_email_reactivated_plan(user_name, organization.authorizations.values_list("user__email", flat=True))
         result = {
             "plan": org_billing.plan,
             "is_active": org_billing.is_active,
@@ -311,9 +321,12 @@ class OrganizationViewSet(
     def change_plan(self, request, organization_uuid):
         plan = request.data.get("organization_billing_plan")
         organization = get_object_or_404(Organization, uuid=organization_uuid)
+        self.check_object_permissions(self.request, organization)
         org_billing = organization.organization_billing
+        old_plan = organization.organization_billing.plan
         change_plan = org_billing.change_plan(plan)
         if change_plan:
+            organization.organization_billing.send_email_changed_plan(organization.name, organization.authorizations.values_list("user__email", flat=True), old_plan)
             return JsonResponse(data={"plan": org_billing.plan}, status=status.HTTP_200_OK)
         return JsonResponse(data={"message": "Invalid plan choice"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -391,6 +404,7 @@ class OrganizationViewSet(
     )
     def add_additional_billing_information(self, request, organization_uuid):
         organization = get_object_or_404(Organization, uuid=organization_uuid)
+        self.check_object_permissions(self.request, organization)
         personal_identification_number = request.data.get('personal_identification_number') if 'personal_identification_number' in request.data else None
         extra_integration = request.data.get('extra_integration') if 'extra_integration' in request.data else None
         additional_info = request.data.get('additional_billing_info') if 'additional_billing_info' in request.data else None
