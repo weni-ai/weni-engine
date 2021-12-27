@@ -7,6 +7,7 @@ from grpc._channel import _InactiveRpcError
 from connect import utils, billing
 from connect.authentication.models import User
 from connect.celery import app
+import grpc
 from connect.common.models import (
     Service,
     Organization,
@@ -160,6 +161,30 @@ def create_organization(organization_name: str, user_email: str):
         user_email=user_email,
     )
     return {"id": organization.id}
+
+
+@app.task(name='get_contacts_detailed')
+def get_contacts_detailed(organization_uuid: str, before: str, after: str):
+    grpc_instance = utils.get_grpc_types().get("flow")
+    organization = Organization.objects.get(uuid=organization_uuid)
+    response = {"projects": []}
+    for project in organization.project.all():
+        try:
+            contacts = grpc_instance.get_active_contacts(str(project.flow_organization), before, after)
+            active_contacts_ids = []
+            for contact in contacts:
+                active_contacts_ids.append(contact.uuid)
+            response["projects"].append(
+                {
+                    'project_name': project.name,
+                    'active_contacts': len(active_contacts_ids),
+                    'contacts_ids': active_contacts_ids
+                }
+            )
+            return response
+        except grpc.RpcError as e:
+            if e.code() is not grpc.StatusCode.NOT_FOUND:
+                raise e
 
 
 @app.task(name="create_project")
