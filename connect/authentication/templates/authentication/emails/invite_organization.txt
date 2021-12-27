@@ -1,5 +1,0 @@
-{% load i18n %}
-<p>{% trans 'You have been invited to join the {{ organization_name }} organization' %}</p>
-<p>{% trans 'Uhuuul, now you can be one of us!' %}</p>
-<p>{% trans 'A {{ organization_name }} member just sent you an invitation to join the organization. To enter, just click on the button down and you will be redirected to a registration page. Case already have registration, just login' %}</p>
-<p>{% trans 'Click here to join the organization' %}</p>

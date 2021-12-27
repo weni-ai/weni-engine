@@ -231,6 +231,10 @@ class OrgBillingAdditionalInformation(TestCase):
             organization_billing__plan="enterprise",
         )
 
+        self.organization_authorization = self.organization.authorizations.create(
+            user=self.owner, role=OrganizationAuthorization.ROLE_ADMIN
+        )
+
     def request(self, value, data={}, token=None):
         authorization_header = (
             {"HTTP_AUTHORIZATION": "Token {}".format(token.key)} if token else {}
@@ -246,20 +250,14 @@ class OrgBillingAdditionalInformation(TestCase):
 
         return response, content_data
 
-    def test_add_aditional_info_with_cpf(self):
+    def test_add_aditional_info(self):
         data = {
-            'cpf': '111.111.111-11',
+            'personal_identification_number': '111.111.111-11',
             'additional_data': 'data'
         }
         response, content_data = self.request(self.organization.uuid, data, self.owner_token)
-        self.assertEqual(content_data['status'], 'SUCESS')
-
-    def test_add_additional_info_with_cpnj(self):
-        data = {
-            'cnpj': 'XX.XXX.XXX/0001-XX',
-        }
-        response, content_data = self.request(self.organization.uuid, data, self.owner_token)
-        self.assertEqual(content_data['status'], 'SUCESS')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(content_data['status'], 'SUCCESS')
 
     def test_add_additional_info_void_fields(self):
         data = {
@@ -447,15 +445,36 @@ class ActiveContactsLimitTestCase(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
         self.owner, self.owner_token = create_user_and_token("owner")
+
         self.organization = Organization.objects.create(
             name="test organization", description="", inteligence_organization=1,
             organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan="free",
+        )
+        self.enterprise_org = Organization.objects.create(
+            name="test organization enterprise", description="", inteligence_organization=2,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
             organization_billing__plan="enterprise",
         )
+        self.custom_org = Organization.objects.create(
+            name="test organization custom", description="", inteligence_organization=3,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan="custom",
+        )
+
         self.project = Project.objects.create(
             name="Unit Test Project", flow_organization=uuid4.uuid4(),
             organization_id=self.organization.uuid)
+
         self.organization_authorization = self.organization.authorizations.create(
+            user=self.owner, role=OrganizationAuthorization.ROLE_ADMIN
+        )
+
+        self.organization_authorization_enterprise = self.enterprise_org.authorizations.create(
+            user=self.owner, role=OrganizationAuthorization.ROLE_ADMIN
+        )
+
+        self.organization_authorization_enterprise = self.custom_org.authorizations.create(
             user=self.owner, role=OrganizationAuthorization.ROLE_ADMIN
         )
 
@@ -468,7 +487,7 @@ class ActiveContactsLimitTestCase(TestCase):
             f"/v1/organization/org/billing/{param}/{value}/", **authorization_header
         )
         response = OrganizationViewSet.as_view({"get": "organization_on_limit"})(
-            request, organization_uuid=self.organization.uuid
+            request, organization_uuid=value
         )
 
         content_data = json.loads(response.content)
@@ -505,6 +524,39 @@ class ActiveContactsLimitTestCase(TestCase):
             self.owner_token,
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual("free plan is valid yet", content_data["message"])
+
+    def test_organization_over_limit(self):
+        self.project2 = Project.objects.create(
+            name="Unit Test Project 2", flow_organization=uuid4.uuid4(),
+            organization_id=self.organization.uuid, contact_count=250
+        )
+        response, content_data = self.request(
+            "organization-on-limit",
+            self.organization.uuid,
+            self.owner_token,
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual("free plan isn't longer valid", content_data['message'])
+
+    def test_organization_limit_custom(self):
+        response, content_data = self.request(
+            "organization-on-limit",
+            self.custom_org.uuid,
+            self.owner_token,
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual("Your plan don't have a contact active limit", content_data['message'])
+
+    def test_organization_limit_enterprise(self):
+        response, content_data = self.request(
+            "organization-on-limit",
+            self.enterprise_org.uuid,
+            self.owner_token,
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual("Your plan don't have a contact active limit", content_data['message'])
 
     def test_get_active_contacts_limit(self):
         response, content_data = self.request2(

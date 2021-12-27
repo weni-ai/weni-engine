@@ -1,0 +1,4 @@
+{% load i18n %}
+{% trans 'Hi,' %} {{first_name}}
+{% trans 'You just gave life to' %} {{ organization_name }}
+{% trans 'Your organization was successfully created! Now you can invite members to help you build projects and increasingly increase the way you automate your life with our Intelligences and Flows' %}

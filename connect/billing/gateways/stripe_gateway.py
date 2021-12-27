@@ -76,3 +76,15 @@ class StripeGateway(Gateway):
         except self.stripe.error.InvalidRequestError:
             return {"status": "FAILURE", "response": f"No such customer: {identification}"}
         return {"status": "SUCCESS", "response": response}
+
+    def get_user_detail_data(self, identification: str):
+        try:
+            client_data = stripe.Customer.retrieve(identification)
+            response = {
+                'name': client_data['name'] if client_data and 'name' in client_data else None,
+                'address': client_data['address']
+
+            }
+        except self.stripe.error.InvalidRequestError:
+            return {"status": "FAILURE", "response": f"No such Customer: {identification}"}
+        return {"status": "SUCCESS", "response": response}
