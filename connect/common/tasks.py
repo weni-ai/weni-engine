@@ -167,14 +167,14 @@ def create_organization(organization_name: str, user_email: str):
 def get_contacts_detailed(organization_uuid: str, before: str, after: str):
     grpc_instance = utils.get_grpc_types().get("flow")
     organization = Organization.objects.get(uuid=organization_uuid)
-    response = {"projects": []}
+    response = []
     for project in organization.project.all():
         try:
             contacts = grpc_instance.get_active_contacts(str(project.flow_organization), before, after)
             active_contacts_ids = []
             for contact in contacts:
                 active_contacts_ids.append(contact.uuid)
-            response["projects"].append(
+            response.append(
                 {
                     'project_name': project.name,
                     'active_contacts': len(active_contacts_ids),
