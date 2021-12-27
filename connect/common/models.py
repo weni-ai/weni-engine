@@ -850,7 +850,7 @@ class BillingPlan(models.Model):
         elif count == 0:
             return 1
 
-    def send_email_added_card(self, user_name: str, email: str):
+    def send_email_added_card(self, user_name: str, email: list):
         if not settings.SEND_EMAILS:
             return False
         context = {
@@ -862,7 +862,7 @@ class BillingPlan(models.Model):
             _(f"Your {self.organization.name} organization's plan has ended "),
             render_to_string("billing/emails/added_card.txt", context),
             None,
-            [email],
+            email,
             html_message=render_to_string("billing/emails/added_card.html", context)
         )
 

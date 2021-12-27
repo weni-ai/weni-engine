@@ -231,6 +231,10 @@ class OrgBillingAdditionalInformation(TestCase):
             organization_billing__plan="enterprise",
         )
 
+        self.organization_authorization = self.organization.authorizations.create(
+            user=self.owner, role=OrganizationAuthorization.ROLE_ADMIN
+        )
+
     def request(self, value, data={}, token=None):
         authorization_header = (
             {"HTTP_AUTHORIZATION": "Token {}".format(token.key)} if token else {}
