@@ -882,7 +882,7 @@ class BillingPlan(models.Model):
             html_message=render_to_string("billing/emails/changed_card.html", context)
         )
 
-    def send_email_finished_plan(self, user_name: str, email: str):
+    def send_email_finished_plan(self, user_name: str, email: list):
         if not settings.SEND_EMAILS:
             return False
         context = {
@@ -894,7 +894,7 @@ class BillingPlan(models.Model):
             _(f"Your {self.organization.name} organization's plan has ended"),
             render_to_string("billing/emails/finished-plan.txt", context),
             None,
-            [email],
+            email,
             html_message=render_to_string("billing/emails/finished-plan.html", context)
         )
 
@@ -914,7 +914,7 @@ class BillingPlan(models.Model):
             html_message=render_to_string("billing/emails/reactived-plan.html", context)
         )
 
-    def send_email_removed_credit_card(self, user_name: str, email: str):
+    def send_email_removed_credit_card(self, user_name: str, email: list):
         if not settings.SEND_EMAILS:
             return False
         context = {
@@ -923,11 +923,11 @@ class BillingPlan(models.Model):
             "org_name": self.organization.name
         }
         send_mail(
-            _(f"Your {self.organization.name} organization credit card its removed"),
+            _(f"Your {self.organization.name} organization credit card was removed"),
             render_to_string("billing/emails/removed_card.txt", context),
             None,
-            [email],
-            html_message=render_to_string("billing/emails/removed-card.html", context)
+            email,
+            html_message=render_to_string("billing/emails/removed_card.html", context)
         )
 
     def send_email_expired_free_plan(self, user_name: str, email: str):
