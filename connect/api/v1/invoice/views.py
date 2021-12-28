@@ -11,9 +11,10 @@ from connect.api.v1.invoice.filters import InvoiceFilter
 from connect.api.v1.invoice.serializers import InvoiceSerializer
 from connect.api.v1.metadata import Metadata
 from connect.common.models import Invoice, Organization, BillingPlan, GenericBillingData
-from connect import utils
 from connect.billing.gateways.stripe_gateway import StripeGateway
 from django.http import JsonResponse
+from datetime import timedelta
+from connect.celery import app as celery_app
 
 
 class InvoiceViewSet(
@@ -42,7 +43,6 @@ class InvoiceViewSet(
         self.check_object_permissions(self.request, organization)
         invoice_id = request.query_params.get("invoice_id")
         invoice = get_object_or_404(organization.organization_billing_invoice, invoice_random_id=invoice_id)
-        flow_instance = utils.get_grpc_types().get("flow")
         billing_data = GenericBillingData.objects.first() if GenericBillingData.objects.all().exists() else GenericBillingData.objects.create()
         precification = billing_data.precification
         invoice_data = {
@@ -53,18 +53,23 @@ class InvoiceViewSet(
             'total_invoice_amount': invoice.total_invoice_amount,
             "currency": precification['currency']
         }
-        before = str(request.query_params.get("before") + " 00:00")
-        after = str(request.query_params.get("after") + " 00:00")
+        before = invoice.due_date.strftime("%Y-%m-%d %H:%M")
+        after = (invoice.due_date - timedelta(days=30)).strftime("%Y-%m-%d %H:%M")
         payment_data = {
             'payment_method': invoice.payment_method,
             'projects': [],
         }
         for project in organization.project.all():
-            contact_count = flow_instance.get_billing_total_statistics(
-                project_uuid=str(project.flow_organization),
-                before=before,
-                after=after,
-            ).get("active_contacts")
+            task = celery_app.send_task(
+                "get_billing_total_statistics",
+                args=[
+                    str(project.flow_organization),
+                    before,
+                    after,
+                ],
+            )
+            task.wait()
+            contact_count = task.result.get("active_contacts")
             payment_data['projects'].append(
                 {
                     'project_name': project.name,
