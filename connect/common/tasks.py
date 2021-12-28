@@ -254,7 +254,11 @@ def check_organization_free_plan():
                         True
                     ],
                 )
-            organization.save()
+            organization.save(
+                update_fields=[
+                    "is_suspended"
+                ]
+            )
             organization.organization_billing.send_email_expired_free_plan(organization.name, organization.authorizations.values_list("user__email", flat=True))
     return True
 
