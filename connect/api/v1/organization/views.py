@@ -11,7 +11,6 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
-from connect import utils
 from connect.api.v1.metadata import Metadata
 from connect.api.v1.mixins import MultipleFieldLookupMixin
 from connect.api.v1.organization.filters import (
@@ -161,16 +160,20 @@ class OrganizationViewSet(
                 _("Need to pass 'before' and 'after' in query params")
             )
 
-        flow_instance = utils.get_grpc_types().get("flow")
-
         result = {"projects": []}
 
         for project in organization.project.all():
-            contact_count = flow_instance.get_billing_total_statistics(
-                project_uuid=str(project.flow_organization),
-                before=before,
-                after=after,
-            ).get("active_contacts")
+            task = celery_app.send_task(
+                "get_billing_total_statistics",
+                args=[
+                    str(project.flow_organization),
+                    before,
+                    after,
+                ],
+            )
+
+            task.wait()
+            contact_count = task.result.get("active_contacts")
 
             result["projects"].append(
                 {
