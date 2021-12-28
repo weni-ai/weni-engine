@@ -39,6 +39,8 @@ class StripeGateway(Gateway):
                 confirm=True,
                 metadata=options,
             )
+        except IndexError:
+            return {"status": "FAILURE", "response": "Customer does not have a configured card"}
         except self.stripe.error.CardError as error:
             return {"status": "FAILURE", "response": error}
         return {"status": "SUCCESS", "response": response}
