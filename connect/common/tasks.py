@@ -451,3 +451,16 @@ def update_user_name(user_email: str, first_name: str, last_name: str):
     integrations_instance.update_user(user_email, first_name=first_name, last_name=last_name)
 
     return True
+
+
+@app.task(name="get_billing_total_statistics")
+def get_billing_total_statistics(project_uuid: str, before: str, after: str):
+    grpc_instance = utils.get_grpc_types().get("flow")
+
+    contact_count = grpc_instance.get_billing_total_statistics(
+        project_uuid=str(project_uuid),
+        before=before,
+        after=after,
+    )
+
+    return contact_count
