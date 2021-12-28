@@ -29,8 +29,6 @@ from connect.api.v1.organization.serializers import (
     RequestPermissionOrganizationSerializer,
 )
 
-from connect.common import tasks
-
 from connect.authentication.models import User
 from connect.celery import app as celery_app
 from connect.common.models import (
@@ -138,32 +136,6 @@ class OrganizationViewSet(
 
             return JsonResponse(data={"status": True}, status=status.HTTP_200_OK)
         return JsonResponse(data={"status": False}, status=status.HTTP_304_NOT_MODIFIED)
-
-    @action(
-        detail=True,
-        methods=["GET"],
-        url_name="get-contact-active-detailed",
-        url_path="grpc/get-contact-active-detailed/(?P<organization_uuid>[^/.]+)",
-        authentication_classes=[ExternalAuthentication],
-        permission_classes=[AllowAny],
-    )
-    def get_contact_active_detailed(self, request, organization_uuid):
-        organization = get_object_or_404(Organization, uuid=organization_uuid)
-
-        self.check_object_permissions(self.request, organization)
-
-        before = str(request.query_params.get("before") + " 00:00")
-        after = str(request.query_params.get("after") + " 00:00")
-
-        if not before or not after:
-            raise ValidationError(
-                _("Need to pass 'before' and 'after' in query params")
-            )
-        task = tasks.get_contacts_detailed.delay(str(organization_uuid), before, after)
-        task.wait()
-        contact_detailed = {'projects': task.result}
-        print(contact_detailed)
-        return JsonResponse(data=contact_detailed, status=status.HTTP_200_OK)
 
     @action(
         detail=True,

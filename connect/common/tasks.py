@@ -164,27 +164,26 @@ def create_organization(organization_name: str, user_email: str):
 
 
 @app.task(name='get_contacts_detailed')
-def get_contacts_detailed(organization_uuid: str, before: str, after: str):
+def get_contacts_detailed(project_uuid: str, before: str, after: str):
     grpc_instance = utils.get_grpc_types().get("flow")
-    organization = Organization.objects.get(uuid=organization_uuid)
+    project = Project.objects.get(uuid=project_uuid)
     response = []
-    for project in organization.project.all():
-        try:
-            contacts = grpc_instance.get_active_contacts(str(project.flow_organization), before, after)
-            active_contacts_ids = []
-            for contact in contacts:
-                active_contacts_ids.append(contact.uuid)
-            response.append(
-                {
-                    'project_name': project.name,
-                    'active_contacts': len(active_contacts_ids),
-                    'contacts_ids': active_contacts_ids
-                }
-            )
-            return response
-        except grpc.RpcError as e:
-            if e.code() is not grpc.StatusCode.NOT_FOUND:
-                raise e
+    try:
+        contacts = grpc_instance.get_active_contacts(str(project.flow_organization), before, after)
+        active_contacts_ids = []
+        for contact in contacts:
+            active_contacts_ids.append(contact.uuid)
+        response.append(
+            {
+                'project_name': project.name,
+                'active_contacts': len(active_contacts_ids),
+                'contacts_ids': active_contacts_ids
+            }
+        )
+        return response
+    except grpc.RpcError as e:
+        if e.code() is not grpc.StatusCode.NOT_FOUND:
+            raise e
 
 
 @app.task(name="create_project")
