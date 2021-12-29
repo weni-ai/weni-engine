@@ -1,0 +1,85 @@
+{% extends 'authentication/emails/base.html' %}
+{% load static i18n %}
+
+{% block main-content %}
+  <section style="width: 574px; margin: 48px">
+    <div
+      style="
+        font-family: 'Lato', sans-serif;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 20px;
+        line-height: 28px;
+        color: #808080;
+      "
+    >
+      {% trans 'Hi' %},
+      <span
+        style="
+          font-family: 'Lato', sans-serif;
+          color: #262626;
+          font-size: 20px;
+          font-weight: bold;
+          line-height: 28px;
+          font-style: normal;
+        "
+        >{{user_name}}!</span
+      >
+    </div>
+
+    <div
+      style="
+        font-family: 'Lato', sans-serif;
+        font-weight: bold;
+        font-size: 20px;
+        line-height: 28px;
+        color: #262626;
+        margin-top: 24px;
+      "
+    >
+    {% trans 'The organization' %} {{organization_name}} {% trans 'has already surpassed 200 active contacts' %}
+    </div>
+
+    <div
+      style="
+        font-family: 'Lato', sans-serif;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        line-height: 24px;
+        color: #808080;
+        margin-top: 24px;
+      "
+    > 
+      {% trans "This means that many people are interacting with your projects and our free plan no longer meets your organization's needs" %}
+      <span style="margin-left: 1px">
+        <img
+          style="max-height: 16px"
+          src="{% static 'emojis/party-popper.png' %}"
+          alt=""
+        />
+      </span>
+    </div>
+
+    <div
+      style="
+        font-family: 'Lato', sans-serif;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        line-height: 24px;
+        color: #808080;
+        margin-top: 24px;
+      "
+    > 
+      {% trans "At the moment the functioning of your intelligences, created Flows and the Chat module is paralyzed. To continue using Weni Plataform, ask the organization's Administrador to choose a new plan that makes sense for your projects, we want you to continue with us" %}
+      <span style="margin-left: 1px">
+        <img
+          style="max-height: 16px"
+          src="{% static 'emojis/winking-face.png' %}"
+          alt=""
+        />
+      </span>
+    </div>
+  </section>
+{% endblock %}

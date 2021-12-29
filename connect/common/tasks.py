@@ -1,12 +1,22 @@
-import requests
-from django.db import transaction
+from datetime import timedelta
 from django.utils import timezone
+import requests
+from django.conf import settings
+from django.db import transaction
 from grpc._channel import _InactiveRpcError
-
-from connect import utils
+from connect import utils, billing
 from connect.authentication.models import User
 from connect.celery import app
-from connect.common.models import Service, Organization, Project, LogService
+import grpc
+from connect.common.models import (
+    Service,
+    Organization,
+    Project,
+    LogService,
+    BillingPlan,
+    Invoice,
+    GenericBillingData,
+)
 
 
 @app.task()
@@ -78,11 +88,10 @@ def update_user_permission_organization(
     retry_kwargs={"max_retries": 5},
     retry_backoff=True,
 )
-def update_project(organization_uuid: str, user_email: str, organization_name: str):
+def update_project(organization_uuid: str, organization_name: str):
     grpc_instance = utils.get_grpc_types().get("flow")
     grpc_instance.update_project(
         organization_uuid=organization_uuid,
-        user_email=user_email,
         organization_name=organization_name,
     )
     return True
@@ -154,6 +163,29 @@ def create_organization(organization_name: str, user_email: str):
     return {"id": organization.id}
 
 
+@app.task(name='get_contacts_detailed')
+def get_contacts_detailed(project_uuid: str, before: str, after: str):
+    grpc_instance = utils.get_grpc_types().get("flow")
+    project = Project.objects.get(uuid=project_uuid)
+    response = []
+    try:
+        contacts = grpc_instance.get_active_contacts(str(project.flow_organization), before, after)
+        active_contacts_ids = []
+        for contact in contacts:
+            active_contacts_ids.append(contact.uuid)
+        response.append(
+            {
+                'project_name': project.name,
+                'active_contacts': len(active_contacts_ids),
+                'contacts_ids': active_contacts_ids
+            }
+        )
+        return response
+    except grpc.RpcError as e:
+        if e.code() is not grpc.StatusCode.NOT_FOUND:
+            raise e
+
+
 @app.task(name="create_project")
 def create_project(project_name: str, user_email: str, project_timezone: str):
     grpc_instance = utils.get_grpc_types().get("flow")
@@ -208,48 +240,163 @@ def search_project(organization_id: int, project_uuid: str, text: str):
 
 
 @app.task()
-def sync_updates_projects():
-    for project in Project.objects.all():
-        flow_instance = utils.get_grpc_types().get("flow")
-        inteligence_instance = utils.get_grpc_types().get("inteligence")
+def check_organization_free_plan():
+    limits = GenericBillingData.objects.first() if GenericBillingData.objects.all().exists() else GenericBillingData.objects.create()
+    for organization in Organization.objects.filter(organization_billing__plan='free', is_suspended=False):
+        current_active_contacts = organization.active_contacts
+        if current_active_contacts > limits.free_active_contacts_limit:
+            organization.is_suspended = True
+            for project in organization.project.all():
+                app.send_task(
+                    "update_suspend_project",
+                    args=[
+                        str(project.flow_organization),
+                        True
+                    ],
+                )
+            organization.save(
+                update_fields=[
+                    "is_suspended"
+                ]
+            )
+            organization.organization_billing.send_email_expired_free_plan(organization.name, organization.authorizations.values_list("user__email", flat=True))
+    return True
 
+
+@app.task()
+def sync_updates_projects():
+    flow_instance = utils.get_grpc_types().get("flow")
+    inteligence_instance = utils.get_grpc_types().get("inteligence")
+
+    for project in Project.objects.all():
         flow_result = flow_instance.get_project_info(
             project_uuid=str(project.flow_organization),
         )
-
         statistic_project_result = flow_instance.get_project_statistic(
             project_uuid=str(project.flow_organization),
         )
-
         classifiers_project = flow_instance.get_classifiers(
             project_uuid=str(project.flow_organization),
             classifier_type="bothub",
             is_active=True,
         )
 
-        inteligences_org = inteligence_instance.get_count_inteligences_project(
-            classifiers=classifiers_project,
-        )
+        try:
+            intelligence_count = int(inteligence_instance.get_count_inteligences_project(
+                classifiers=classifiers_project,
+            ).get("repositories_count"))
+        except Exception:
+            intelligence_count = 0
 
-        project.name = str(flow_result.get("name"))
-        project.timezone = str(flow_result.get("timezone"))
-        project.date_format = str(flow_result.get("date_format"))
-        project.inteligence_count = int(inteligences_org.get("repositories_count"))
-        project.flow_count = int(statistic_project_result.get("active_flows"))
-        project.contact_count = int(statistic_project_result.get("active_contacts"))
+        contact_count = flow_instance.get_billing_total_statistics(
+            project_uuid=str(project.flow_organization),
+            before=(
+                timezone.now().strftime("%Y-%m-%d %H:%M")
+                if project.organization.organization_billing.next_due_date is None
+                else project.organization.organization_billing.next_due_date.strftime("%Y-%m-%d %H:%M")
+            ),
+            after=(
+                project.organization.created_at.strftime("%Y-%m-%d %H:%M")
+                if project.organization.organization_billing.last_invoice_date is None
+                else project.organization.organization_billing.last_invoice_date.strftime("%Y-%m-%d %H:%M")
+            )
+        ).get("active_contacts")
 
-        project.save(
-            update_fields=[
-                "name",
-                "timezone",
-                "date_format",
-                "inteligence_count",
-                "flow_count",
-                "contact_count",
-            ]
-        )
+        integrations = len(list(flow_instance.list_channel(project_uuid=str(project.flow_organization))))
+        project.extra_active_integration = integrations
+        project.inteligence_count = intelligence_count
+
+        update_fields = []
+
+        if len(flow_result) > 0:
+            project.name = str(flow_result.get("name"))
+            project.timezone = str(flow_result.get("timezone"))
+            project.date_format = str(flow_result.get("date_format"))
+            update_fields.append("name")
+            update_fields.append("timezone")
+            update_fields.append("date_format")
+
+        if len(statistic_project_result) > 0:
+            project.flow_count = int(statistic_project_result.get("active_flows"))
+            update_fields.append("flow_count")
+
+        project.contact_count = int(contact_count)
+
+        if len(update_fields) > 0:
+            project.save(
+                update_fields=[
+                    "name",
+                    "timezone",
+                    "date_format",
+                    "inteligence_count",
+                    "flow_count",
+                    "contact_count",
+                    "extra_active_integration",
+                ]
+            )
 
     return True
+
+
+@app.task()
+def generate_project_invoice():
+    for org in Organization.objects.filter(
+        organization_billing__next_due_date__lte=timezone.now().date(),
+        is_suspended=False,
+    ):
+        invoice = org.organization_billing_invoice.create(
+            due_date=timezone.now() + timedelta(days=30),
+            invoice_random_id=1
+            if org.organization_billing_invoice.last() is None else org.organization_billing_invoice.last().invoice_random_id + 1,
+            discount=org.organization_billing.fixed_discount,
+            extra_integration=org.extra_integration,
+            cost_per_whatsapp=settings.BILLING_COST_PER_WHATSAPP,
+        )
+        for project in org.project.all():
+            flow_instance = utils.get_grpc_types().get("flow")
+
+            contact_count = flow_instance.get_billing_total_statistics(
+                project_uuid=str(project.flow_organization),
+                before=(
+                    timezone.now().strftime("%Y-%m-%d %H:%M")
+                    if org.organization_billing.next_due_date is None
+                    else org.organization_billing.next_due_date.strftime("%Y-%m-%d %H:%M")),
+                after=(
+                    org.created_at.strftime("%Y-%m-%d %H:%M")
+                    if org.organization_billing.last_invoice_date is None
+                    else org.organization_billing.last_invoice_date.strftime("%Y-%m-%d %H:%M")),
+            ).get("active_contacts")
+            invoice.organization_billing_invoice_project.create(
+                project=project,
+                contact_count=contact_count,
+                amount=org.organization_billing.calculate_amount(
+                    contact_count=contact_count
+                ),
+            )
+
+        obj = BillingPlan.objects.get(id=org.organization_billing.pk)
+        obj.next_due_date = org.organization_billing.next_due_date + timedelta(
+            BillingPlan.BILLING_CYCLE_DAYS.get(org.organization_billing.cycle)
+        )
+        obj.last_invoice_date = timezone.now().date()
+        obj.save(update_fields=["next_due_date", "last_invoice_date"])
+
+
+@app.task()
+def capture_invoice():
+    for invoice in Invoice.objects.filter(
+        payment_status=Invoice.PAYMENT_STATUS_PENDING, capture_payment=True
+    ):
+        gateway = billing.get_gateway("stripe")
+        result = gateway.purchase(
+            money=invoice.total_invoice_amount,
+            identification=invoice.organization.organization_billing.stripe_customer,
+            options={"id": invoice.pk},
+        )
+        if result.get("status") == "FAILURE":
+            invoice.capture_payment = False
+            invoice.save(update_fields=["capture_payment"])
+            # add send email
 
 
 @app.task()
@@ -277,6 +424,19 @@ def delete_status_logs():
         print(f" > deleted {num_updated} status logs")
 
 
+@app.task(
+    name="update_suspend_project",
+    autoretry_for=(_InactiveRpcError, Exception),
+    retry_kwargs={"max_retries": 5},
+    retry_backoff=True,
+)
+def update_suspend_project(project_uuid: str, is_suspended: bool):
+    utils.get_grpc_types().get("flow").suspend_or_unsuspend_project(
+        project_uuid=project_uuid,
+        is_suspended=is_suspended,
+    )
+
+
 @app.task(name="update_user_photo")
 def update_user_photo(user_email: str, photo_url: str):
     integrations_instance = utils.get_grpc_types().get("integrations")
@@ -291,3 +451,16 @@ def update_user_name(user_email: str, first_name: str, last_name: str):
     integrations_instance.update_user(user_email, first_name=first_name, last_name=last_name)
 
     return True
+
+
+@app.task(name="get_billing_total_statistics")
+def get_billing_total_statistics(project_uuid: str, before: str, after: str):
+    grpc_instance = utils.get_grpc_types().get("flow")
+
+    contact_count = grpc_instance.get_billing_total_statistics(
+        project_uuid=str(project_uuid),
+        before=before,
+        after=after,
+    )
+
+    return contact_count

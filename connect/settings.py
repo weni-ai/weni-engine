@@ -67,6 +67,8 @@ env = environ.Env(
     SEND_REQUEST_FLOW=(bool, False),
     FLOW_MARKETING_UUID=(str, None),
     TOKEN_AUTHORIZATION_FLOW_MARKETING=(str, None),
+    BILLING_TEST_MODE=(bool, False),
+    BILLING_SETTINGS=(dict, {}),
     TOKEN_EXTERNAL_AUTHENTICATION=(str, None),
 )
 
@@ -109,11 +111,13 @@ INSTALLED_APPS = [
     "elasticapm.contrib.django",
     "connect.authentication.apps.AuthenticationConfig",
     "connect.common.apps.CommonConfig",
+    "connect.billing",
     "django_celery_results",
     "django_celery_beat",
     "storages",
     "corsheaders",
     "django_grpc_framework",
+    "stripe",
 ]
 
 MIDDLEWARE = [
@@ -412,5 +416,24 @@ INTEGRATIONS_CERTIFICATE_GRPC_CRT = env.str("INTEGRATIONS_CERTIFICATE_GRPC_CRT")
 SEND_REQUEST_FLOW = env.bool("SEND_REQUEST_FLOW")
 FLOW_MARKETING_UUID = env.str("FLOW_MARKETING_UUID")
 TOKEN_AUTHORIZATION_FLOW_MARKETING = env.str("TOKEN_AUTHORIZATION_FLOW_MARKETING")
+
+
+# Billing
+"""
+Set gateway payment setting
+
+example:
+{
+    "stripe": {
+        "API_KEY": "",
+        "PUBLISHABLE_KEY": "",
+    }
+}
+
+"""
+
+BILLING_TEST_MODE = env.bool("BILLING_TEST_MODE")
+BILLING_SETTINGS = env.json("BILLING_SETTINGS")
+BILLING_COST_PER_WHATSAPP = env.float("BILLING_COST_PER_WHATSAPP")
 
 TOKEN_EXTERNAL_AUTHENTICATION = env.str("TOKEN_EXTERNAL_AUTHENTICATION")

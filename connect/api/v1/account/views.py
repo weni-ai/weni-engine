@@ -165,7 +165,7 @@ class MyUserProfileViewSet(
             ],
         )
 
-        return Response()
+        return Response({"language": user.language})
 
 
 class SearchUserViewSet(mixins.ListModelMixin, GenericViewSet):  # pragma: no cover

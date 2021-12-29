@@ -12,6 +12,7 @@ from connect.common.models import (
     OrganizationAuthorization,
     Newsletter,
     NewsletterLanguage,
+    BillingPlan,
 )
 
 
@@ -24,7 +25,12 @@ class ListStatusServiceTestCase(TestCase):
         self.user, self.token = create_user_and_token()
 
         self.organization = Organization.objects.create(
-            name="test organization", description="", inteligence_organization=1
+            name="test organization",
+            description="",
+            inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__payment_method=BillingPlan.PAYMENT_METHOD_CREDIT_CARD,
+            organization_billing__plan=BillingPlan.PLAN_ENTERPRISE,
         )
 
         self.organization_authorization = self.organization.authorizations.create(

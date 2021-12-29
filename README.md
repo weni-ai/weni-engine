@@ -65,6 +65,9 @@ You can set environment variables in your OS, write on ```.env``` file or pass v
 | SEND_REQUEST_FLOW |  ```boolean``` | ```False``` | Enables or disables sending user information to flows
 | FLOW_MARKETING_UUID |  ```string``` | ```None``` | UUID Flow
 | TOKEN_AUTHORIZATION_FLOW_MARKETING |  ```string``` | ```None``` | Token Authorization API Flow
+| BILLING_TEST_MODE |  ```boolean``` | ```False``` | Configure Test mode Billing
+| BILLING_SETTINGS |  ```json``` | ```{}``` | Set configuration for gateways payment billing
+| BILLING_COST_PER_WHATSAPP |  ```float``` | ```None``` | Set cost for extra whatsapp
 | TOKEN_EXTERNAL_AUTHENTICATION |  ```string``` | ```None``` | Token External Authorization API
 | ENVIRONMENT |  ```string``` | ```production``` | Specify the environment you are going to run, it is also used for sentry
 

@@ -9,7 +9,7 @@ from rest_framework import status
 
 from connect.api.v1.project.views import ProjectViewSet
 from connect.api.v1.tests.utils import create_user_and_token
-from connect.common.models import OrganizationAuthorization, Project, Organization
+from connect.common.models import OrganizationAuthorization, Project, Organization, BillingPlan
 
 
 class CreateProjectAPITestCase(TestCase):
@@ -18,7 +18,9 @@ class CreateProjectAPITestCase(TestCase):
         self.owner, self.owner_token = create_user_and_token("owner")
 
         self.organization = Organization.objects.create(
-            name="test organization", description="", inteligence_organization=1
+            name="test organization", description="", inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan="free",
         )
         self.organization_authorization = self.organization.authorizations.create(
             user=self.owner, role=OrganizationAuthorization.ROLE_ADMIN
@@ -64,7 +66,9 @@ class ListProjectAPITestCase(TestCase):
         self.owner, self.owner_token = create_user_and_token("owner")
 
         self.organization = Organization.objects.create(
-            name="test organization", description="", inteligence_organization=1
+            name="test organization", description="", inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan="free",
         )
         self.organization_authorization = self.organization.authorizations.create(
             user=self.owner, role=OrganizationAuthorization.ROLE_ADMIN
@@ -111,7 +115,9 @@ class UpdateProjectTestCase(TestCase):
         self.user, self.user_token = create_user_and_token("user")
 
         self.organization = Organization.objects.create(
-            name="test organization", description="", inteligence_organization=1
+            name="test organization", description="", inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan="free",
         )
         self.organization_authorization = self.organization.authorizations.create(
             user=self.owner, role=OrganizationAuthorization.ROLE_ADMIN

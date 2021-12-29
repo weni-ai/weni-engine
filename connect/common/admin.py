@@ -8,7 +8,26 @@ from connect.common.models import (
     Project,
     OrganizationAuthorization,
     NewsletterLanguage,
+    BillingPlan,
 )
+
+
+class BillingPlanInline(admin.TabularInline):
+    model = BillingPlan
+    extra = 1
+    min_num = 1
+    readonly_fields = [
+        "payment_method",
+        "last_invoice_date",
+        "next_due_date",
+        "termination_date",
+        "stripe_configured_card",
+        "final_card_number",
+        "card_expiration_date",
+        "cardholder_name",
+        "card_brand",
+    ]
+    can_delete = False
 
 
 class OrganizationAuthorizationInline(admin.TabularInline):
@@ -19,7 +38,7 @@ class OrganizationAuthorizationInline(admin.TabularInline):
 
 
 class OrganizationAdmin(admin.ModelAdmin):
-    inlines = [OrganizationAuthorizationInline]
+    inlines = [BillingPlanInline, OrganizationAuthorizationInline]
     search_fields = ["name", "inteligence_organization"]
 
 

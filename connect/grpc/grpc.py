@@ -45,7 +45,7 @@ class GRPCType(metaclass=ABCMeta):
         raise NotImplementedError()
 
     def update_project(
-        self, organization_uuid: int, user_email: str, organization_name: str
+        self, organization_uuid: int, organization_name: str
     ):
         raise NotImplementedError()
 
@@ -98,6 +98,9 @@ class GRPCType(metaclass=ABCMeta):
         raise NotImplementedError()
 
     def get_billing_total_statistics(self, project_uuid: str, before: str, after: str):
+        raise NotImplementedError()
+
+    def suspend_or_unsuspend_project(self, project_uuid: str, is_suspended: bool):
         raise NotImplementedError()
 
     def create_channel(self, name: str, user: str, base_url: str):

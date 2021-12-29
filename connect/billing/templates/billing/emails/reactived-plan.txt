@@ -1,0 +1,5 @@
+{% load i18n %}
+<p>{% trans "Hi {{ user_name }}" %}</p>
+<p>{% trans "Your {{ organization_name }} organization's plan has been reactivated" %}</p>
+<p>{% trans "Your Intelligences, created Flows and the Chat module came back to work again" %}</p>
+<p>{% trans "It's wonderfull to have your team back" %}</p>
