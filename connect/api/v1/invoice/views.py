@@ -59,6 +59,7 @@ class InvoiceViewSet(
             'payment_method': invoice.payment_method,
             'projects': [],
         }
+        contact_count = 0
         for project in organization.project.all():
             task = celery_app.send_task(
                 "get_billing_total_statistics",
@@ -69,15 +70,16 @@ class InvoiceViewSet(
                 ],
             )
             task.wait()
-            contact_count = task.result.get("active_contacts")
+            current_contact_count = task.result.get("active_contacts")
+            contact_count += current_contact_count
             payment_data['projects'].append(
                 {
                     'project_name': project.name,
-                    'contact_count': contact_count,
-                    'price': BillingPlan.calculate_amount(contact_count)
+                    'contact_count': current_contact_count,
                 }
             )
             client_data = StripeGateway().get_user_detail_data(organization.organization_billing.stripe_customer)
+        payment_data['price'] = BillingPlan.calculate_amount(contact_count)
         return JsonResponse(data={
             "payment_data": payment_data,
             "invoice": invoice_data,
