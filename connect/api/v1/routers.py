@@ -5,6 +5,7 @@ from connect.api.v1.dashboard.views import (
     NewsletterViewSet,
     StatusServiceViewSet,
 )
+from connect.api.v1.invoice.views import InvoiceViewSet
 from connect.api.v1.organization.views import (
     OrganizationViewSet,
     OrganizationAuthorizationViewSet,
@@ -95,3 +96,4 @@ router.register("organization/org", OrganizationViewSet)
 router.register("organization/project", ProjectViewSet)
 router.register("organization/authorizations", OrganizationAuthorizationViewSet)
 router.register("organization/request-permission", RequestPermissionOrganizationViewSet)
+router.register("organization/invoice", InvoiceViewSet)

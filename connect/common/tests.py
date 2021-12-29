@@ -10,6 +10,8 @@ from connect.common.models import (
     OrganizationAuthorization,
     ServiceStatus,
     NewsletterLanguage,
+    BillingPlan,
+    GenericBillingData
 )
 
 
@@ -32,7 +34,9 @@ class ServiceStatusTestCase(TestCase):
         self.owner = User.objects.create_user("owner@user.com", "owner")
 
         self.organization = Organization.objects.create(
-            name="Test", inteligence_organization=0
+            name="Test", inteligence_organization=0,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan="free",
         )
         self.project = self.organization.project.create(
             name="project test",
@@ -76,7 +80,9 @@ class OrganizationAuthorizationTestCase(TestCase):
         self.user = User.objects.create_user("fake@user.com", "user")
 
         self.organization = Organization.objects.create(
-            name="Test", inteligence_organization=0
+            name="Test", inteligence_organization=0,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan="free",
         )
         self.organization_authorization = self.organization.authorizations.create(
             user=self.owner, role=OrganizationAuthorization.ROLE_ADMIN
@@ -188,3 +194,29 @@ class OrganizationAuthorizationTestCase(TestCase):
         authorization_user.role = OrganizationAuthorization.ROLE_CONTRIBUTOR
         authorization_user.save()
         self.assertTrue(authorization_user.can_contribute)
+
+
+class UtilsTestCase(TestCase):
+    def setUp(self):
+        self.precification = GenericBillingData.objects.first() if GenericBillingData.objects.all().exists() else GenericBillingData.objects.create()
+
+    def test_calculate_active_contacts(self):
+        self.assertEqual(self.precification.calculate_active_contacts(contact_count=0), 267.0)
+        self.assertEqual(self.precification.calculate_active_contacts(contact_count=999), 267.0)
+        self.assertEqual(self.precification.calculate_active_contacts(contact_count=1000), 267.0)
+        self.assertEqual(self.precification.calculate_active_contacts(contact_count=9999), 1669.833)
+        self.assertEqual(self.precification.calculate_active_contacts(contact_count=10000), 1670.0)
+        self.assertEqual(
+            self.precification.calculate_active_contacts(contact_count=29999), 4679.844
+        )
+        self.assertEqual(self.precification.calculate_active_contacts(contact_count=30000), 4680.0)
+        self.assertEqual(self.precification.calculate_active_contacts(contact_count=49999), 7199.856)
+        self.assertEqual(
+            self.precification.calculate_active_contacts(contact_count=50000), 7199.999999999999
+        )
+        self.assertEqual(self.precification.calculate_active_contacts(contact_count=999999), 132999.867)
+        self.assertEqual(
+            self.precification.calculate_active_contacts(contact_count=100000), 14000.000000000002
+        )
+        self.assertEqual(self.precification.calculate_active_contacts(contact_count=249999), 33249.867)
+        self.assertEqual(self.precification.calculate_active_contacts(contact_count=250000), 33250.0)

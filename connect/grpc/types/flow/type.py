@@ -42,12 +42,12 @@ class FlowType(GRPCType):
         return response
 
     def update_project(
-        self, organization_uuid: int, user_email: str, organization_name: str
+        self, organization_uuid: int, organization_name: str
     ):
         stub = org_pb2_grpc.OrgControllerStub(self.channel)
         response = stub.Update(
             org_pb2.OrgUpdateRequest(
-                uuid=organization_uuid, user_email=user_email, name=organization_name
+                uuid=organization_uuid, name=organization_name
             )
         )
         return response
@@ -168,26 +168,42 @@ class FlowType(GRPCType):
         return result
 
     def get_project_info(self, project_uuid: str):
-        stub = org_pb2_grpc.OrgControllerStub(self.channel)
-        response = stub.Retrieve(org_pb2.OrgRetrieveRequest(uuid=project_uuid))
-        return {
-            "id": response.id,
-            "name": response.name,
-            "uuid": response.uuid,
-            "timezone": response.timezone,
-            "date_format": response.date_format,
-        }
+        result = []
+        try:
+            stub = org_pb2_grpc.OrgControllerStub(self.channel)
+            response = stub.Retrieve(org_pb2.OrgRetrieveRequest(uuid=project_uuid))
+            return (
+                {
+                    "id": response.id,
+                    "name": response.name,
+                    "uuid": response.uuid,
+                    "timezone": response.timezone,
+                    "date_format": response.date_format,
+                }
+            )
+        except grpc.RpcError as e:
+            if e.code() is not grpc.StatusCode.NOT_FOUND:
+                raise e
+        return result
 
     def get_project_statistic(self, project_uuid: str):
-        stub = statistic_pb2_grpc.OrgStatisticControllerStub(self.channel)
-        response = stub.Retrieve(
-            statistic_pb2.OrgStatisticRetrieveRequest(org_uuid=project_uuid)
-        )
-        return {
-            "active_flows": response.active_flows,
-            "active_classifiers": response.active_classifiers,
-            "active_contacts": response.active_contacts,
-        }
+        result = []
+        try:
+            stub = statistic_pb2_grpc.OrgStatisticControllerStub(self.channel)
+            response = stub.Retrieve(
+                statistic_pb2.OrgStatisticRetrieveRequest(org_uuid=project_uuid)
+            )
+            return(
+                {
+                    "active_flows": response.active_flows,
+                    "active_classifiers": response.active_classifiers,
+                    "active_contacts": response.active_contacts,
+                }
+            )
+        except grpc.RpcError as e:
+            if e.code() is not grpc.StatusCode.NOT_FOUND:
+                raise e
+        return result
 
     def get_billing_total_statistics(self, project_uuid: str, before: str, after: str):
         stub = billing_pb2_grpc.BillingStub(self.channel)
@@ -197,6 +213,16 @@ class FlowType(GRPCType):
             )
         )
         return {"active_contacts": response.active_contacts}
+
+    def suspend_or_unsuspend_project(self, project_uuid: str, is_suspended: bool):
+        stub = org_pb2_grpc.OrgControllerStub(self.channel)
+        response = stub.Update(
+            org_pb2.OrgUpdateRequest(
+                uuid=project_uuid,
+                is_suspended=is_suspended,
+            )
+        )
+        return response
 
     def create_channel(self, user: str, project_uuid: str, data: str, channeltype_code: str):
         # Create Channel
@@ -217,6 +243,25 @@ class FlowType(GRPCType):
             channel_pb2.ChannelDestroyRequest(
                 user=user,
                 uuid=channel_uuid,
+            )
+        )
+        return response
+
+    def list_channel(self, project_uuid: str, channel_type: str = "WA"):
+        stub = channel_pb2_grpc.ChannelControllerStub(self.channel)
+        response = stub.List(
+            channel_pb2.ChannelListRequest(
+                org=project_uuid,
+                channel_type=channel_type
+            )
+        )
+        return response
+
+    def get_active_contacts(self, project_uuid, before, after):
+        stub = billing_pb2_grpc.BillingStub(self.channel)
+        response = stub.Detailed(
+            billing_pb2.BillingRequest(
+                org_uuid=project_uuid, before=before, after=after
             )
         )
         return response

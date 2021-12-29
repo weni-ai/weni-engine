@@ -49,6 +49,18 @@ def delete_organization(instance, **kwargs):
         )
 
 
+@receiver(post_save, sender=Organization)
+def update_organization(instance, **kwargs):
+    for project in instance.project.all():
+        celery_app.send_task(  # pragma: no cover
+            name="update_suspend_project",
+            args=[
+                str(project.flow_organization),
+                instance.is_suspended,
+            ],
+        )
+
+
 @receiver(post_save, sender=OrganizationAuthorization)
 def org_authorizations(sender, instance, **kwargs):
     if instance.role is not OrganizationAuthorization.LEVEL_NOTHING:

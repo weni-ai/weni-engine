@@ -1,0 +1,6 @@
+{% load i18n %}
+<p>{% trans 'Hi' %} {{first_name}}</p>
+<p>{% trans 'A project was deleted' %}...</p>
+<p>{% trans 'The project' %} {{ project_name }} {% trans 'was deleted from the organization' %}
+{{organization_name}}, {% trans "we hope that it has built everything it wanted and that our intelligences did a good job" %}.
+</p>

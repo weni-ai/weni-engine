@@ -91,10 +91,12 @@ class ProjectService(
 
         if serializer.is_valid(raise_exception=True):
             classifier_uuid = serializer.validated_data.get("uuid")
+            user_email = serializer.validated_data.get("user_email")
 
             grpc_instance = utils.get_grpc_types().get("flow")
             grpc_instance.delete_classifier(
                 classifier_uuid=str(classifier_uuid),
+                user_email=str(user_email),
             )
 
             return empty_pb2.Empty()

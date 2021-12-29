@@ -116,6 +116,7 @@ class InteligenceType(GRPCType):
                         "inteligence_name": inteligence.name,
                         "inteligence_slug": inteligence.slug,
                         "inteligence_owner": inteligence.owner__nickname,
+                        "inteligence_type": inteligence.repository_type,
                     }
                 )
         except grpc.RpcError as e:

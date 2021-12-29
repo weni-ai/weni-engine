@@ -2,27 +2,28 @@
 {% load static i18n %}
 
 {% block main-content %}
-    <section style="width: 574px; margin: 50px auto">
+        <section style="width: 574px; margin: 48px">
           <div
             style="
               font-family: 'Lato', sans-serif;
               font-style: normal;
               font-weight: normal;
               font-size: 20px;
-              line-height: 24px;
+              line-height: 28px;
               color: #808080;
             "
           >
-            {% trans 'Hi,' %}
+            {% trans "Hi" %},
             <span
               style="
                 font-family: 'Lato', sans-serif;
                 color: #262626;
                 font-size: 20px;
                 font-weight: bold;
+                line-height: 28px;
                 font-style: normal;
               "
-              >{{ first_name }}!</span
+              >{{user_name}}!</span
             >
           </div>
 
@@ -36,14 +37,7 @@
               margin-top: 24px;
             "
           >
-            {% trans 'You just gave life to' %} {{ organization_name }}
-            <span style="margin-left: 2px">
-              <img
-                style="max-height: 20px"
-                src="./emojis/smiling-face-with-heart-eyes.png"
-                alt=""
-              />
-            </span>
+            {% trans "Your" %} {{organization_name}} {% trans "plan has been changed" %}.
           </div>
 
           <div
@@ -57,14 +51,16 @@
               margin-top: 24px;
             "
           >
-            {% trans 'Your organization was successfully created! Now you can invite members to help you build projects and increasingly increase the way you automate your life with our Intelligences and Flows' %}
+            {% trans "An administrator updated the" %}
+            <strong>{{organization_name}}</strong> {% trans "organization's plan"  %} {% trans "from" %} {{old_plan}} {% trans "to" %} {{actual_plan}}, 
+            {% trans "the plataform is ready to receive and use our resources" %}
             <span style="margin-left: 1px">
               <img
                 style="max-height: 16px"
-                src="./emojis/blue-heart.png"
+                src="{% static 'emojis/blue-heart.png' %}"
                 alt=""
               />
             </span>
           </div>
         </section>
-{% endblock %}
+{% endblock main-content %}
