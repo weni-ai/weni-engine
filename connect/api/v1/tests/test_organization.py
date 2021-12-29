@@ -163,9 +163,12 @@ class GetOrganizationContactsAPITestCase(TestCase):
             self.owner_token
         )
 
+        contact_count = 0
+        for project in content_data['projects']:
+            contact_count += int(project['active_contacts'])
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(content_data['projects'][0]['active_contacts'], 25)
-        self.assertEqual(content_data['projects'][1]['active_contacts'], 5)
+        self.assertEqual(contact_count, 30)
 
 
 @skipIf(True, "Skipping test until we find a way to mock flows and AI")
