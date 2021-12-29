@@ -128,7 +128,7 @@ class GetOrganizationContactsAPITestCase(TestCase):
             contact_count=5,
         )
 
-    def request(self, param, value, token=None):
+    def request(self, param, value, method, token=None):
         authorization_header = (
             {"HTTP_AUTHORIZATION": "Token {}".format(token.key)} if token else {}
         )
@@ -137,7 +137,7 @@ class GetOrganizationContactsAPITestCase(TestCase):
             f"/v1/organization/org/{param}/{value}", **authorization_header
         )
 
-        response = OrganizationViewSet.as_view({"get": "get_active_org_contacts"})(
+        response = OrganizationViewSet.as_view({"get": f"{method}"})(
             request, organization_uuid=self.organization.uuid
         )
 
@@ -148,11 +148,24 @@ class GetOrganizationContactsAPITestCase(TestCase):
         response, content_data = self.request(
             "organization",
             self.organization.uuid,
+            "get_active_org_contacts",
             self.owner_token,
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(content_data['active-contacts']['organization_active_contacts'], 30)
+
+    def test_contact_active_per_project(self):
+        response, content_data = self.request(
+            "contact-active-per-project",
+            self.organization.uuid,
+            "get_contacts_active_per_project",
+            self.owner_token
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(content_data['projects'][0]['active_contacts'], 25)
+        self.assertEqual(content_data['projects'][1]['active_contacts'], 5)
 
 
 @skipIf(True, "Skipping test until we find a way to mock flows and AI")
