@@ -1039,13 +1039,15 @@ class Invoice(models.Model):
 
     @property
     def total_invoice_amount(self):
+        generic_billing_data = GenericBillingData.objects.first() if GenericBillingData.objects.all().exists() else GenericBillingData.objects.create()
+
         amount = self.organization_billing_invoice_project.aggregate(
             total_amount=Sum("amount")
         ).get("total_amount")
 
         return Decimal(
             float(
-                0
+                generic_billing_data.calculate_active_contacts(0)
                 if amount is None
                 else amount + self.cost_per_whatsapp * self.extra_integration
             )
