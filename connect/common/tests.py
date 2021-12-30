@@ -13,7 +13,9 @@ from connect.common.models import (
     BillingPlan,
     GenericBillingData
 )
-
+from django.conf import settings
+from django.utils import timezone
+from datetime import timedelta
 
 class NewsletterTestCase(TestCase):
     def test_newsletter_create(self):
@@ -220,3 +222,26 @@ class UtilsTestCase(TestCase):
         )
         self.assertEqual(self.precification.calculate_active_contacts(contact_count=249999), 33249.867)
         self.assertEqual(self.precification.calculate_active_contacts(contact_count=250000), 33250.0)
+
+class InvoiceTestCase(TestCase):
+    def setUp(self):
+        self.organization = Organization.objects.create(
+            name="Test Invoice without Invoice project", inteligence_organization=0,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan="enterprise",
+        )
+        self.invoice = self.organization.organization_billing_invoice.create(
+            due_date=timezone.now() + timedelta(days=30),
+            invoice_random_id=1
+            if self.organization.organization_billing_invoice.last() is None else self.organization.organization_billing_invoice.last().invoice_random_id + 1,
+            discount=self.organization.organization_billing.fixed_discount,
+            extra_integration=self.organization.extra_integration,
+            cost_per_whatsapp=settings.BILLING_COST_PER_WHATSAPP,
+        )
+
+        self.generic_billing_data = GenericBillingData.objects.first() if GenericBillingData.objects.all().exists() else GenericBillingData.objects.create()
+
+
+    def test_if_invoice_project_null(self):
+        self.assertTrue(not self.invoice.organization_billing_invoice_project.all())
+        self.assertEqual(float(self.invoice.total_invoice_amount), float(self.generic_billing_data.calculate_active_contacts(self.organization.active_contacts)))
