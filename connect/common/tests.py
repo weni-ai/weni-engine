@@ -201,7 +201,7 @@ class OrganizationAuthorizationTestCase(TestCase):
 
 class UtilsTestCase(TestCase):
     def setUp(self):
-        self.precification = GenericBillingData.objects.first() if GenericBillingData.objects.all().exists() else GenericBillingData.objects.create()
+        self.precification = GenericBillingData.get_generic_billing_data_instance()
 
     def test_calculate_active_contacts(self):
         self.assertEqual(self.precification.calculate_active_contacts(contact_count=0), 267.0)
@@ -241,7 +241,7 @@ class InvoiceTestCase(TestCase):
             cost_per_whatsapp=settings.BILLING_COST_PER_WHATSAPP,
         )
 
-        self.generic_billing_data = GenericBillingData.objects.first() if GenericBillingData.objects.all().exists() else GenericBillingData.objects.create()
+        self.generic_billing_data = GenericBillingData.get_generic_billing_data_instance()
 
     def test_if_invoice_project_null(self):
         self.assertTrue(not self.invoice.organization_billing_invoice_project.all())
