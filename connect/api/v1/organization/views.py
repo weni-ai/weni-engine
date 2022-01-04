@@ -345,7 +345,7 @@ class OrganizationViewSet(
     def organization_on_limit(self, request, organization_uuid):
         organization = get_object_or_404(Organization, uuid=organization_uuid)
         self.check_object_permissions(self.request, organization)
-        limits = GenericBillingData.objects.first() if GenericBillingData.objects.all().exists() else GenericBillingData.objects.create()
+        limits = GenericBillingData.get_generic_billing_data_instance()
         billing = organization.organization_billing
         current_active_contacts = organization.active_contacts
 
@@ -386,7 +386,7 @@ class OrganizationViewSet(
         permission_classes=[AllowAny],
     )
     def active_contacts_limit(self, request):  # pragma: no cover
-        limit = GenericBillingData.objects.first() if GenericBillingData.objects.all().exists() else GenericBillingData.objects.create()
+        limit = GenericBillingData.get_generic_billing_data_instance()
         response = {
             "active_contacts_limit": limit.free_active_contacts_limit
         }
@@ -445,7 +445,7 @@ class OrganizationViewSet(
         permission_classes=[AllowAny]
     )
     def get_billing_precification(self, request):
-        billing_data = GenericBillingData.objects.first() if GenericBillingData.objects.all().exists() else GenericBillingData.objects.create()
+        billing_data = GenericBillingData.get_generic_billing_data_instance()
         return JsonResponse(data=billing_data.precification, status=status.HTTP_200_OK)
 
     @action(

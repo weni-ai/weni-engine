@@ -43,7 +43,7 @@ class InvoiceViewSet(
         self.check_object_permissions(self.request, organization)
         invoice_id = request.query_params.get("invoice_id")
         invoice = get_object_or_404(organization.organization_billing_invoice, invoice_random_id=invoice_id)
-        billing_data = GenericBillingData.objects.first() if GenericBillingData.objects.all().exists() else GenericBillingData.objects.create()
+        billing_data = GenericBillingData.get_generic_billing_data_instance()
         precification = billing_data.precification
         invoice_data = {
             "billing_date": invoice.due_date,
