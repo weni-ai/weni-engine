@@ -791,7 +791,7 @@ class BillingPlan(models.Model):
 
     @staticmethod
     def calculate_amount(contact_count: int):
-        precification = GenericBillingData.objects.first() if GenericBillingData.objects.all().exists() else GenericBillingData.objects.create()
+        precification = GenericBillingData.get_generic_billing_data_instance()
         return Decimal(
             str(precification.calculate_active_contacts(contact_count=contact_count))
         ).quantize(Decimal(".01"), decimal.ROUND_HALF_UP)
@@ -1039,15 +1039,17 @@ class Invoice(models.Model):
 
     @property
     def total_invoice_amount(self):
-        amount = self.organization_billing_invoice_project.aggregate(
-            total_amount=Sum("amount")
-        ).get("total_amount")
+        generic_billing_data = GenericBillingData.get_generic_billing_data_instance()
 
+        contact_count = self.organization_billing_invoice_project.aggregate(
+            total_contact_count=Sum("contact_count")
+        ).get("total_contact_count")
+
+        amount = generic_billing_data.calculate_active_contacts(contact_count if contact_count else 0)
+        integration_cost = float(self.cost_per_whatsapp * self.extra_integration)
         return Decimal(
             float(
-                0
-                if amount is None
-                else amount + self.cost_per_whatsapp * self.extra_integration
+                amount + integration_cost
             )
             * float(1 - self.discount / 100)
         ).quantize(Decimal(".01"), decimal.ROUND_HALF_UP)
@@ -1080,6 +1082,10 @@ class GenericBillingData(models.Model):
 
     def __str__(self):
         return f'{self.free_active_contacts_limit}'
+
+    @staticmethod
+    def get_generic_billing_data_instance():
+        return GenericBillingData.objects.first() if GenericBillingData.objects.all().exists() else GenericBillingData.objects.create()
 
     @property
     def free_active_contacts_limit(self):
@@ -1140,20 +1146,21 @@ class GenericBillingData(models.Model):
         }
 
     def calculate_active_contacts(self, contact_count):
-
+        value_total = 0
         if contact_count <= 1000:
-            return 1000 * self._from_1_to_1000
+            value_total = 1000 * self._from_1_to_1000
         elif contact_count <= 5000:
-            return contact_count * self._from_1001_to_5000
+            value_total = contact_count * self._from_1001_to_5000
         elif contact_count <= 10000:
-            return contact_count * self._from_5001_to_10000
+            value_total = contact_count * self._from_5001_to_10000
         elif contact_count <= 30000:
-            return contact_count * self._from_10001_to_30000
+            value_total = contact_count * self._from_10001_to_30000
         elif contact_count <= 50000:
-            return contact_count * self._from_30001_to_50000
+            value_total = contact_count * self._from_30001_to_50000
         elif contact_count <= 100000:
-            return contact_count * self._from_50001_to_100000
+            value_total = contact_count * self._from_50001_to_100000
         elif contact_count <= 250000:
-            return contact_count * self._from_100001_to_250000
+            value_total = contact_count * self._from_100001_to_250000
         elif contact_count >= 250000:
-            return contact_count * self._from_2500001
+            value_total = contact_count * self._from_2500001
+        return float(value_total)
