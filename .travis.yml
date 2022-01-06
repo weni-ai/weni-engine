@@ -37,8 +37,9 @@ before_script:
   - psql -U connect postgres -c "CREATE DATABASE connect;"
 
 install:
-  - pip install pipenv
-  - pipenv install --system --dev
+  - pip install poetry==1.1.12
+  - poetry config virtualenvs.create false
+  - poetry install --no-interaction --no-ansi
   - pip install coveralls
 
 env:
