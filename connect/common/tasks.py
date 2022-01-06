@@ -170,14 +170,14 @@ def get_contacts_detailed(project_uuid: str, before: str, after: str):
     response = []
     try:
         contacts = grpc_instance.get_active_contacts(str(project.flow_organization), before, after)
-        active_contacts_ids = []
+        active_contacts_info = []
         for contact in contacts:
-            active_contacts_ids.append(contact.uuid)
+            active_contacts_info.append({'name': contact.name, 'uuid': contact.uuid})
         response.append(
             {
                 'project_name': project.name,
-                'active_contacts': len(active_contacts_ids),
-                'contacts_ids': active_contacts_ids
+                'active_contacts': len(active_contacts_info),
+                'contacts_info': active_contacts_info
             }
         )
         return response
