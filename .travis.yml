@@ -38,8 +38,7 @@ before_script:
 
 install:
   - pip install poetry==1.1.12
-  - poetry shell
-  - poetry install --no-interaction --no-ansi
+  - poetry install -v
   - pip install coveralls
 
 env:
