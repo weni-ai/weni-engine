@@ -128,7 +128,7 @@ class GetOrganizationContactsAPITestCase(TestCase):
             contact_count=5,
         )
 
-    def request(self, param, value, token=None):
+    def request(self, param, value, method, token=None):
         authorization_header = (
             {"HTTP_AUTHORIZATION": "Token {}".format(token.key)} if token else {}
         )
@@ -137,7 +137,7 @@ class GetOrganizationContactsAPITestCase(TestCase):
             f"/v1/organization/org/{param}/{value}", **authorization_header
         )
 
-        response = OrganizationViewSet.as_view({"get": "get_active_org_contacts"})(
+        response = OrganizationViewSet.as_view({"get": f"{method}"})(
             request, organization_uuid=self.organization.uuid
         )
 
@@ -148,11 +148,27 @@ class GetOrganizationContactsAPITestCase(TestCase):
         response, content_data = self.request(
             "organization",
             self.organization.uuid,
+            "get_active_org_contacts",
             self.owner_token,
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(content_data['active-contacts']['organization_active_contacts'], 30)
+
+    def test_contact_active_per_project(self):
+        response, content_data = self.request(
+            "contact-active-per-project",
+            self.organization.uuid,
+            "get_contacts_active_per_project",
+            self.owner_token
+        )
+
+        contact_count = 0
+        for project in content_data['projects']:
+            contact_count += int(project['active_contacts'])
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(contact_count, 30)
 
 
 @skipIf(True, "Skipping test until we find a way to mock flows and AI")
@@ -614,3 +630,46 @@ class ExtraIntegrationsTestCase(TestCase):
             self.owner_token,
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+
+class GetOrganizationStripeDataTestCase(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.owner, self.owner_token = create_user_and_token("owner")
+
+        self.organization = Organization.objects.create(
+            name="test organization", description="", inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan="enterprise",
+        )
+        self.organization.organization_billing.stripe_customer = "cus_KpDZ129lPQbygj"
+        self.organization.organization_billing.save()
+        self.organization_authorization = self.organization.authorizations.create(
+            user=self.owner, role=OrganizationAuthorization.ROLE_ADMIN
+        )
+
+    def request(self, param, value, token=None):
+        authorization_header = (
+            {"HTTP_AUTHORIZATION": "Token {}".format(token.key)} if token else {}
+        )
+
+        request = self.factory.get(
+            f"/v1/organization/org/{param}/{value}/", **authorization_header
+        )
+        response = OrganizationViewSet.as_view({"get": "get_stripe_card_data"})(
+            request, organization_uuid=self.organization.uuid
+        )
+
+        content_data = json.loads(response.content)
+        return (response, content_data)
+
+    def test_get_stripe_card_data(self):
+        response, content_data = self.request(
+            "get-stripe-card-data",
+            self.organization.uuid,
+            self.owner_token,
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(content_data['response'][0]['last2'], '42')
+        self.assertEqual(content_data['response'][0]['brand'], 'visa')

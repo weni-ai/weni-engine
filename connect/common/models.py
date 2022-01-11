@@ -5,7 +5,8 @@ from datetime import timedelta
 from decimal import Decimal
 
 from django.conf import settings
-from django.core.mail import send_mail
+from django.core import mail
+#from django.core.mail import send_mail
 from django.db import models
 from django.db.models import Sum
 from django.template.loader import render_to_string
@@ -136,7 +137,7 @@ class Organization(models.Model):
             "webapp_base_url": settings.WEBAPP_BASE_URL,
             "organization_name": self.name,
         }
-        send_mail(
+        mail.send_mail(
             _("Invitation to join organization"),
             render_to_string("common/emails/organization/invite_organization.txt", context),
             None,
@@ -145,6 +146,7 @@ class Organization(models.Model):
                 "common/emails/organization/invite_organization.html", context
             ),
         )
+        return mail
 
     def send_email_organization_going_out(self, user_name: str, email: str):
         if not settings.SEND_EMAILS:
@@ -154,13 +156,14 @@ class Organization(models.Model):
             "user_name": user_name,
             "organization_name": self.name
         }
-        send_mail(
+        mail.send_mail(
             _(f"You going out of {self.name}"),
             render_to_string("common/emails/organization/org_going_out.txt", context),
             None,
             [email],
             html_message=render_to_string("common/emails/organization/org_going_out.html", context)
         )
+        return mail
 
     def send_email_organization_removed(self, email: str, user_name: str):
         if not settings.SEND_EMAILS:
@@ -170,13 +173,14 @@ class Organization(models.Model):
             "user_name": user_name,
             "organization_name": self.name
         }
-        send_mail(
+        mail.send_mail(
             _(f"You have been removed from {self.name}"),
             render_to_string("common/emails/organization/org_removed.txt", context),
             None,
             [email],
             html_message=render_to_string("common/emails/organization/org_removed.html", context)
         )
+        return mail
 
     def send_email_organization_create(self, email: str, first_name: str):
         if not settings.SEND_EMAILS:
@@ -187,7 +191,7 @@ class Organization(models.Model):
             "organization_name": self.name,
             "first_name": first_name,
         }
-        send_mail(
+        mail.send_mail(
             _("Organization created!"),
             render_to_string("common/emails/organization/organization_create.txt", context),
             None,
@@ -196,6 +200,7 @@ class Organization(models.Model):
                 "common/emails/organization/organization_create.html", context
             ),
         )
+        return mail
 
     def send_email_remove_permission_organization(self, first_name: str, email: str):
         if not settings.SEND_EMAILS:
@@ -205,7 +210,7 @@ class Organization(models.Model):
             "organization_name": self.name,
             "first_name": first_name,
         }
-        send_mail(
+        mail.send_mail(
             _(f"You have been removed from the {self.name}"),
             render_to_string(
                 "common/emails/organization/remove_permission_organization.txt", context
@@ -216,6 +221,7 @@ class Organization(models.Model):
                 "common/emails/organization/remove_permission_organization.html", context
             ),
         )
+        return mail
 
     def send_email_delete_organization(self, first_name: str, email: str):
         if not settings.SEND_EMAILS:
@@ -225,7 +231,7 @@ class Organization(models.Model):
             "organization_name": self.name,
             "first_name": first_name,
         }
-        send_mail(
+        mail.send_mail(
             _(f"{self.name} no longer exists!"),
             render_to_string("common/emails/organization/delete_organization.txt", context),
             None,
@@ -234,6 +240,7 @@ class Organization(models.Model):
                 "common/emails/organization/delete_organization.html", context
             ),
         )
+        return mail
 
     def send_email_change_organization_name(self, user_name: str, email: str, organization_previous_name: str,
                                             organization_new_name: str):
@@ -245,7 +252,7 @@ class Organization(models.Model):
             "organization_previous_name": organization_previous_name,
             "organization_new_name": organization_new_name
         }
-        send_mail(
+        mail.send_mail(
             _(f"{organization_previous_name} now it's {organization_new_name}"),
             render_to_string("common/emails/organization/change_organization_name.txt", context),
             None,
@@ -254,6 +261,7 @@ class Organization(models.Model):
                 "common/emails/organization/change_organization_name.html", context
             ),
         )
+        return mail
 
     def send_email_access_code(self, email: str, user_name: str, access_code: str):
         if not settings.SEND_EMAILS:
@@ -263,7 +271,7 @@ class Organization(models.Model):
             "access_code": access_code,
             "user_name": user_name,
         }
-        send_mail(
+        mail.send_mail(
             _("You receive an access code to Weni Platform"),
             render_to_string("authentication/emails/access_code.txt", context),
             None,
@@ -272,6 +280,7 @@ class Organization(models.Model):
                 "authentication/emails/access_code.html", context
             ),
         )
+        return mail
 
     def send_email_permission_change(self, user_name: str, old_permission: str, new_permission: str, email: str):
         if not settings.SEND_EMAILS:
@@ -282,7 +291,7 @@ class Organization(models.Model):
             "old_permission": old_permission,
             "new_permission": new_permission
         }
-        send_mail(
+        mail.send_mail(
             _("A new permission has been assigned to you"),
             render_to_string("common/emails/organization/permission_change.txt", context),
             None,
@@ -291,6 +300,7 @@ class Organization(models.Model):
                 "common/emails/organization/permission_change.html", context
             ),
         )
+        return mail
 
     @property
     def active_contacts(self):
@@ -436,7 +446,7 @@ class Project(models.Model):
             "project_name": self.name,
             "first_name": first_name,
         }
-        send_mail(
+        mail.send_mail(
             _(f"You have been invited to join the {self.name} organization"),
             render_to_string("common/emails/project/project_create.txt", context),
             None,
@@ -445,6 +455,7 @@ class Project(models.Model):
                 "common/emails/project/project_create.html", context
             ),
         )
+        return mail
 
     def send_email_change_project(self, first_name: str, email: str, info: dict):
         if not settings.SEND_EMAILS:
@@ -479,7 +490,7 @@ class Project(models.Model):
             "secondary_lang_before": secondary_lang_before,
             "secondary_lang_now": secondary_lang_now,
         }
-        send_mail(
+        mail.send_mail(
             _(f"You have been invited to join the {self.name} organization"),
             render_to_string("common/emails/project-changed.txt", context),
             None,
@@ -488,6 +499,7 @@ class Project(models.Model):
                 "common/emails/project-changed.html", context
             ),
         )
+        return mail
 
     def send_email_deleted_project(self, first_name: str, email: str):
         if not settings.SEND_EMAILS:
@@ -498,7 +510,7 @@ class Project(models.Model):
             "project_name": self.name,
             "first_name": first_name,
         }
-        send_mail(
+        mail.send_mail(
             _("A project was deleted..."),
             render_to_string("common/emails/project-delete.txt", context),
             None,
@@ -507,6 +519,7 @@ class Project(models.Model):
                 "common/emails/project-delete.html", context
             ),
         )
+        return mail
 
 
 class Service(models.Model):
@@ -858,13 +871,14 @@ class BillingPlan(models.Model):
             "organization_name": self.organization.name,
             "user_name": user_name
         }
-        send_mail(
+        mail.send_mail(
             _(f"Your {self.organization.name} organization's plan has ended "),
             render_to_string("billing/emails/added_card.txt", context),
             None,
             email,
             html_message=render_to_string("billing/emails/added_card.html", context)
         )
+        return mail
 
     def send_email_changed_card(self, user_name: str, email: str):
         if not settings.SEND_EMAILS:
@@ -874,13 +888,14 @@ class BillingPlan(models.Model):
             "organization_name": self.organization.name,
             "user_name": user_name
         }
-        send_mail(
+        mail.send_mail(
             _(f"A credit card has been changed to the organization {self.organization.name}"),
             render_to_string("billing/emails/changed_card.txt", context),
             None,
             [email],
             html_message=render_to_string("billing/emails/changed_card.html", context)
         )
+        return mail
 
     def send_email_finished_plan(self, user_name: str, email: list):
         if not settings.SEND_EMAILS:
@@ -890,7 +905,7 @@ class BillingPlan(models.Model):
             "organization_name": self.organization.name,
             "user_name": user_name
         }
-        send_mail(
+        mail.send_mail(
             _(f"Your {self.organization.name} organization's plan has ended"),
             render_to_string("billing/emails/finished-plan.txt", context),
             None,
@@ -906,13 +921,14 @@ class BillingPlan(models.Model):
             "organization_name": self.organization.name,
             "user_name": user_name
         }
-        send_mail(
+        mail.send_mail(
             _(f" Your {self.organization.name} organization's plan has been reactivated."),
             render_to_string("billing/emails/reactived-plan.txt", context),
             None,
             email,
             html_message=render_to_string("billing/emails/reactived-plan.html", context)
         )
+        return mail
 
     def send_email_removed_credit_card(self, user_name: str, email: list):
         if not settings.SEND_EMAILS:
@@ -922,13 +938,14 @@ class BillingPlan(models.Model):
             "user_name": user_name,
             "org_name": self.organization.name
         }
-        send_mail(
+        mail.send_mail(
             _(f"Your {self.organization.name} organization credit card was removed"),
             render_to_string("billing/emails/removed_card.txt", context),
             None,
             email,
             html_message=render_to_string("billing/emails/removed_card.html", context)
         )
+        return mail
 
     def send_email_expired_free_plan(self, user_name: str, email: list):
         if not settings.SEND_EMAILS:
@@ -938,13 +955,14 @@ class BillingPlan(models.Model):
             "organization_name": self.organization.name,
             "user_name": user_name
         }
-        send_mail(
+        mail.send_mail(
             _(f"The organization {self.organization.name} has already surpassed 200 active contacts"),
             render_to_string("billing/emails/free-plan-expired.txt", context),
             None,
             email,
             html_message=render_to_string("billing/emails/free-plan-expired.html", context)
         )
+        return mail
 
     def send_email_chosen_plan(self, user_name: str, email: str, plan: str):
         if not settings.SEND_EMAILS:
@@ -955,13 +973,14 @@ class BillingPlan(models.Model):
             "org_name": self.organization.name,
             "plan": plan
         }
-        send_mail(
+        mail.send_mail(
             _(f"Your {self.organization.name} organization has the {plan.title()} Plan"),
             render_to_string("billing/emails/free_plan.txt", context),
             None,
             [email],
             html_message=render_to_string("billing/emails/free_plan.html", context)
         )
+        return mail
 
     def send_email_changed_plan(self, user_name: str, email: list, old_plan: str):
         if not settings.SEND_EMAILS:
@@ -973,13 +992,14 @@ class BillingPlan(models.Model):
             "old_plan": old_plan,
             "actual_plan": self.plan
         }
-        send_mail(
+        mail.send_mail(
             _(f" Your {self.organization.name} organization's plan has been changed."),
             render_to_string("billing/emails/changed-plan.txt", context),
             None,
             email,
             html_message=render_to_string("billing/emails/changed-plan.html", context)
         )
+        return mail
 
 
 class Invoice(models.Model):

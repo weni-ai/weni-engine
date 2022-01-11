@@ -27,7 +27,8 @@ class NewsletterTestCase(TestCase):
         newsletter_language = NewsletterLanguage.objects.create(
             title=title, description=description, newsletter=newsletter
         )
-
+        self.assertEqual(newsletter_language.__str__(), 'Newsletter PK: 1 - en-us - New feature')
+        self.assertEqual(newsletter.__str__(), 'PK: 1')
         self.assertEqual(newsletter_language.title, title)
         self.assertEqual(newsletter_language.description, description)
 
@@ -246,3 +247,23 @@ class InvoiceTestCase(TestCase):
     def test_if_invoice_project_null(self):
         self.assertTrue(not self.invoice.organization_billing_invoice_project.all())
         self.assertEqual(float(self.invoice.total_invoice_amount), float(self.generic_billing_data.calculate_active_contacts(self.organization.active_contacts)))
+
+
+class OrganizationTestCase(TestCase):
+    def setUp(self):
+        self.organization = Organization.objects.create(
+            name="Test Organization", inteligence_organization=0,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan="enterprise",
+        )
+
+    def test_str_organization(self):
+        self.assertEqual(self.organization.__str__(), f"{self.organization.uuid} - {self.organization.name}")
+
+    def test_send_email_invite_organization(self):
+        sended_mail = self.organization.send_email_invite_organization(email='test@example.com')
+        self.assertEqual(len(sended_mail.outbox), 1)
+        outbox = sended_mail.outbox[0]
+        self.assertEqual(outbox.subject, 'Invitation to join organization')
+        self.assertEqual(outbox.from_email, 'webmaster@localhost')
+        self.assertEqual(outbox.to[0], 'test@example.com')
