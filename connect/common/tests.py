@@ -199,6 +199,9 @@ class OrganizationAuthorizationTestCase(TestCase):
         authorization_user.save()
         self.assertTrue(authorization_user.can_contribute)
 
+    def test_str_organization_authorization(self):
+        self.assertEqual('Test - owner@user.com', self.organization_authorization.__str__())
+
 
 class UtilsTestCase(TestCase):
     def setUp(self):
@@ -259,6 +262,7 @@ class OrganizationTestCase(TestCase):
         self.test_email = 'test@example.com'
         self.test_user_name = 'test_username'
         self.test_first_name = 'test'
+        self.organization_new_name = 'Test Org'
 
     def test_str_organization(self):
         self.assertEqual(self.organization.__str__(), f"{self.organization.uuid} - {self.organization.name}")
@@ -308,5 +312,31 @@ class OrganizationTestCase(TestCase):
         self.assertEqual(len(sended_email.outbox), 1)
         outbox = sended_email.outbox[0]
         self.assertEqual(outbox.subject, f'{self.organization.name} no longer exists!')
+        self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
+        self.assertEqual(outbox.to[0], self.test_email)
+
+    def test_send_email_change_organization_name(self):
+        sended_email = self.organization.send_email_change_organization_name(self.test_user_name, self.test_email,
+                                                                             self.organization.name,
+                                                                             self.organization_new_name)
+        self.assertEqual(len(sended_email.outbox), 1)
+        outbox = sended_email.outbox[0]
+        self.assertEqual(outbox.subject, f'{self.organization.name} now it\'s {self.organization_new_name}')
+        self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
+        self.assertEqual(outbox.to[0], self.test_email)
+
+    def test_send_email_access_code(self):
+        sended_email = self.organization.send_email_access_code(self.test_email, self.test_user_name, '1234')
+        self.assertEqual(len(sended_email.outbox), 1)
+        outbox = sended_email.outbox[0]
+        self.assertEqual(outbox.subject, 'You receive an access code to Weni Platform')
+        self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
+        self.assertEqual(outbox.to[0], self.test_email)
+
+    def test_send_email_permission_change(self):
+        sended_email = self.organization.send_email_permission_change(self.test_user_name, 'Admin', 'Viewer', self.test_email)
+        self.assertEqual(len(sended_email.outbox), 1)
+        outbox = sended_email.outbox[0]
+        self.assertEqual(outbox.subject, 'A new permission has been assigned to you')
         self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
         self.assertEqual(outbox.to[0], self.test_email)
