@@ -2,6 +2,7 @@ import json
 import uuid as uuid4
 from unittest.mock import patch
 from unittest import skipIf
+from django.conf import settings
 from django.test import RequestFactory
 from django.test import TestCase
 from django.test.client import MULTIPART_CONTENT
@@ -674,3 +675,34 @@ class GetOrganizationStripeDataTestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(content_data['response'][0]['last2'], '42')
         self.assertEqual(content_data['response'][0]['brand'], 'visa')
+
+
+class BillingPrecificationAPITestCase(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.owner, self.owner_token = create_user_and_token("owner")
+
+    def request(self, token=None):
+        authorization_header = (
+            {"HTTP_AUTHORIZATION": "Token {}".format(token.key)} if token else {}
+        )
+
+        request = self.factory.get(
+            "/v1/organization/org/billing/precification", **authorization_header
+        )
+
+        response = OrganizationViewSet.as_view({"get": "get_billing_precification"})(
+            request
+        )
+
+        content_data = json.loads(response.content)
+        return (response, content_data)
+
+    def test_okay(self):
+        response, content_data = self.request(
+            self.owner_token,
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(content_data['currency'], 'USD')
+        self.assertEqual(content_data['extra_whatsapp_integration'], settings.BILLING_COST_PER_WHATSAPP)

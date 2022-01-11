@@ -70,4 +70,4 @@ if __name__ == '__main__':
     if not os.getcwd().endswith("weni-engine"):
         raise Exception("The command need be executed in weni-engine")
     ci = CiUtils()
-    ci.run_ci(os.getcwd() + '/.env')
+    ci.run_ci(os.getcwd() + '/contrib/.env')
