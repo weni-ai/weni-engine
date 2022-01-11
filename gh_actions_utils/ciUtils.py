@@ -11,9 +11,8 @@ class CiUtils(object):
     def __init__(self):
         self.answers = ['SUCESS', 'FAILURE']
 
-    def init_ci(self):
+    def init_ci(self, path):
         self.logger = LogController()
-        path = os.getcwd() + '/.env'
         self.fileManager = FileManager(path)
         self.ENV_FILE = self.get_env_content()
         self.fileManager.write_str(self.ENV_FILE)
@@ -53,8 +52,8 @@ class CiUtils(object):
             self.logger.log(res, e.stdout.decode("utf-8").replace("\n", "\n ").strip())
         return res
 
-    def run_ci(self):
-        self.init_ci()
+    def run_ci(self, path):
+        self.init_ci(path)
         ok = self.execute('flake8 connect/', False)
         if self.execute('coverage run manage.py test --verbosity=2 --noinput', False) == 0:
             ok += self.execute('coverage report -m', True)
@@ -68,4 +67,4 @@ if __name__ == '__main__':
     if not os.getcwd().endswith("weni-integrations-engine"):
         raise Exception("The command need be executed in weni-marketplace-engine")
     ci = CiUtils()
-    ci.run_ci()
+    ci.run_ci(os.getcwd() + '/.env')
