@@ -244,7 +244,7 @@ class Organization(models.Model):
     def send_email_change_organization_name(self, user_name: str, email: str, organization_previous_name: str,
                                             organization_new_name: str):
         if not settings.SEND_EMAILS:
-            return False
+            return False  # pragma: no cover
         context = {
             "base_url": settings.BASE_URL,
             "user_name": user_name,
@@ -458,7 +458,7 @@ class Project(models.Model):
 
     def send_email_change_project(self, first_name: str, email: str, info: dict):
         if not settings.SEND_EMAILS:
-            return False
+            return False  # pragma: no cover
 
         old_project_name = info.get("old_project_name")
         date_before = info.get("date_before")
@@ -490,12 +490,12 @@ class Project(models.Model):
             "secondary_lang_now": secondary_lang_now,
         }
         mail.send_mail(
-            _(f"You have been invited to join the {self.name} organization"),
-            render_to_string("common/emails/project-changed.txt", context),
+            _(f"The project {self.name} has changed"),
+            render_to_string("common/emails/project/project-changed.txt", context),
             None,
             [email],
             html_message=render_to_string(
-                "common/emails/project-changed.html", context
+                "common/emails/project/project-changed.html", context
             ),
         )
         return mail
@@ -511,11 +511,11 @@ class Project(models.Model):
         }
         mail.send_mail(
             _("A project was deleted..."),
-            render_to_string("common/emails/project-delete.txt", context),
+            render_to_string("common/emails/project/project-delete.txt", context),
             None,
             [email],
             html_message=render_to_string(
-                "common/emails/project-delete.html", context
+                "common/emails/project/project-delete.html", context
             ),
         )
         return mail

@@ -664,7 +664,7 @@ class GetOrganizationStripeDataTestCase(TestCase):
         content_data = json.loads(response.content)
         return (response, content_data)
 
-    @skipIf(True, 'because strip not configured yet')
+    @skipIf(True, 'because stripe not configured yet')
     def test_get_stripe_card_data(self):
         response, content_data = self.request(
             "get-stripe-card-data",
