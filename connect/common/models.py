@@ -149,7 +149,7 @@ class Organization(models.Model):
 
     def send_email_organization_going_out(self, user_name: str, email: str):
         if not settings.SEND_EMAILS:
-            return False
+            return False  # pragma: no cover
         context = {
             "base_url": settings.BASE_URL,
             "user_name": user_name,
@@ -166,7 +166,7 @@ class Organization(models.Model):
 
     def send_email_organization_removed(self, email: str, user_name: str):
         if not settings.SEND_EMAILS:
-            return False
+            return False  # pragma: no cover
         context = {
             "base_url": settings.BASE_URL,
             "user_name": user_name,

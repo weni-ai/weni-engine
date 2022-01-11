@@ -1,5 +1,5 @@
-from gh_actions_utils.fileManager import FileManager
-from gh_actions_utils.logger import LogController
+from fileManager import FileManager
+from logger import LogController
 import os
 import subprocess
 
@@ -18,7 +18,8 @@ class CiUtils(object):
         self.fileManager.write_str(self.ENV_FILE)
 
     def get_env_content(self):
-        return f"""
+        stripe_config = {}
+        env = f"""
                 ENGINE_PORT=8080
                 SECRET_KEY=\"{get_random_secret_key()}\"
                 OIDC_RP_REALM_NAME=""
@@ -32,10 +33,12 @@ class CiUtils(object):
                 OIDC_RP_SERVER_URL=""
                 OIDC_OP_USER_ENDPOINT=""
                 OIDC_OP_JWKS_ENDPOINT=""
-                BILLING_COST_PER_WHATSAPP=0.1
+                BILLING_COST_PER_WHATSAPP=199
                 BILLING_TEST_MODE=True
-                BILLING_SETTINGS="{{}}"
+                BILLING_SETTINGS="{str(stripe_config)}"
             """.replace(" ", "").strip()
+        self.logger.log(0, f'env file created:\n{env}' + self.logger.logStyle[2])
+        return env
 
     def execute(self, command, is_printing=False):
         os.chdir(os.getcwd())

@@ -256,14 +256,57 @@ class OrganizationTestCase(TestCase):
             organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
             organization_billing__plan="enterprise",
         )
+        self.test_email = 'test@example.com'
+        self.test_user_name = 'test_username'
+        self.test_first_name = 'test'
 
     def test_str_organization(self):
         self.assertEqual(self.organization.__str__(), f"{self.organization.uuid} - {self.organization.name}")
 
     def test_send_email_invite_organization(self):
-        sended_mail = self.organization.send_email_invite_organization(email='test@example.com')
+        sended_mail = self.organization.send_email_invite_organization(email=self.test_email)
         self.assertEqual(len(sended_mail.outbox), 1)
         outbox = sended_mail.outbox[0]
         self.assertEqual(outbox.subject, 'Invitation to join organization')
-        self.assertEqual(outbox.from_email, 'webmaster@localhost')
-        self.assertEqual(outbox.to[0], 'test@example.com')
+        self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
+        self.assertEqual(outbox.to[0], self.test_email)
+
+    def test_send_email_organization_going_out(self):
+        sended_mail = self.organization.send_email_organization_going_out(self.test_user_name, self.test_email)
+        self.assertEqual(len(sended_mail.outbox), 1)
+        outbox = sended_mail.outbox[0]
+        self.assertEqual(outbox.subject, f"You going out of {self.organization.name}")
+        self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
+        self.assertEqual(outbox.to[0], self.test_email)
+
+    def test_send_email_organization_removed(self):
+        sended_mail = self.organization.send_email_organization_removed(self.test_email, self.test_user_name)
+        self.assertEqual(len(sended_mail.outbox), 1)
+        outbox = sended_mail.outbox[0]
+        self.assertEqual(outbox.subject, f"You have been removed from {self.organization.name}")
+        self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
+        self.assertEqual(outbox.to[0], self.test_email)
+
+    def test_send_email_organization_create(self):
+        sended_mail = self.organization.send_email_organization_create(self.test_email, self.test_first_name)
+        self.assertEqual(len(sended_mail.outbox), 1)
+        outbox = sended_mail.outbox[0]
+        self.assertEqual(outbox.subject, 'Organization created!')
+        self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
+        self.assertEqual(outbox.to[0], self.test_email)
+
+    def test_send_email_remove_permission_organization(self):
+        sended_mail = self.organization.send_email_remove_permission_organization(self.test_first_name, self.test_email)
+        self.assertEqual(len(sended_mail.outbox), 1)
+        outbox = sended_mail.outbox[0]
+        self.assertEqual(outbox.subject, f'You have been removed from the {self.organization.name}')
+        self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
+        self.assertEqual(outbox.to[0], self.test_email)
+
+    def test_send_email_delete_organization(self):
+        sended_email = self.organization.send_email_delete_organization(self.test_first_name, self.test_email)
+        self.assertEqual(len(sended_email.outbox), 1)
+        outbox = sended_email.outbox[0]
+        self.assertEqual(outbox.subject, f'{self.organization.name} no longer exists!')
+        self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
+        self.assertEqual(outbox.to[0], self.test_email)
