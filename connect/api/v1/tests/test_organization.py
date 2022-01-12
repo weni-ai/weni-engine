@@ -172,67 +172,109 @@ class GetOrganizationContactsAPITestCase(TestCase):
         self.assertEqual(contact_count, 30)
 
 
-@skipIf(True, "Skipping test until we find a way to mock flows and AI")
 class OrgBillingPlan(TestCase):
     def setUp(self):
-
-        from connect.grpc.types.flow import FlowType
-        self.flows = FlowType()
-
         self.factory = RequestFactory()
         self.owner, self.owner_token = create_user_and_token("owner")
 
-        self.flows_project = self.flows.create_project(project_name='Unit Test', user_email=self.owner.email, project_timezone='America/Maceio')
+        self.flows_project = {
+            "project_name": 'Unit Test',
+            'user_email': self.owner.email,
+            'project_timezone': 'America/Maceio',
+            'uuid': uuid4.uuid4(),
+        }
 
         self.organization = Organization.objects.create(
             name="test organization", description="", inteligence_organization=1,
             organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
-            organization_billing__plan="enterprise",
+            organization_billing__plan="free",
         )
         self.project = Project.objects.create(
-            name="Unit Test Project", flow_organization=self.flows_project.uuid,
+            name="Unit Test Project", flow_organization=self.flows_project['uuid'],
             organization_id=self.organization.uuid)
+        self.organization_authorization = self.organization.authorizations.create(
+            user=self.owner, role=OrganizationAuthorization.ROLE_ADMIN
+        )
 
-    def request(self, param, value, token=None):
+    def request(self, param, value, method, token=None):
         authorization_header = (
             {"HTTP_AUTHORIZATION": "Token {}".format(token.key)} if token else {}
         )
 
-        request = self.factory.post(
-            f"/v1/organization/org/billing/{param}/{value}/", **authorization_header
+        request = self.factory.patch(
+            f"/v1/organization/org/billing/{param}/{value}/", **authorization_header,
         )
-        if param == 'closing-plan':
-            response = OrganizationViewSet.as_view({"patch": "closing_plan"})(
-                request, organization_uuid=self.organization.uuid
-            )
-        elif param == 'reactivate-plan':
-            response = OrganizationViewSet.as_view({"patch": "reactivate_plan"})(
-                request, organization_uuid=self.organization.uuid
-            )
+
+        response = OrganizationViewSet.as_view({"patch": f"{method}"})(
+            request, organization_uuid=self.organization.uuid,
+        )
+        content_data = json.loads(response.content)
+        return (response, content_data)
+
+    def request_change_plan(self, value, data={}, token=None):
+        authorization_header = (
+            {"HTTP_AUTHORIZATION": "Token {}".format(token.key)} if token else {}
+        )
+        request = self.factory.patch(
+            f"/v1/organization/org/billing/change-plan/{value}/", data=json.dumps(data), content_type='application/json', format='json', **authorization_header
+        )
+        response = OrganizationViewSet.as_view({"patch": "change_plan"})(
+            request, organization_uuid=self.organization.uuid,
+        )
 
         content_data = json.loads(response.content)
         return (response, content_data)
 
-    def test_closing_plan(self):
+    @patch("connect.common.tasks.update_suspend_project.delay")
+    def test_closing_plan(self, task):
+        task.return_value.result = True
         response, content_data = self.request(
             "closing-plan",
             self.organization.uuid,
+            "closing_plan",
             self.owner_token,
         )
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(content_data['is_active'], False)
 
-    def test_reactivate_plan(self):
+    @patch("connect.common.tasks.update_suspend_project.delay")
+    def test_reactivate_plan(self, task):
+        task.return_value.result = True
         response, content_data = self.request(
             "reactivate-plan",
             self.organization.uuid,
+            "reactivate_plan",
             self.owner_token,
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(content_data['is_active'], True)
 
+    def test_change_plan(self):
+        data = {
+            "organization_billing_plan": "enterprise"
+        }
+        response, content_data = self.request_change_plan(
+            self.organization.uuid,
+            data,
+            self.owner_token)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(content_data['plan'], 'enterprise')
+
+    def test_change_plan_invalid(self):
+        data = {
+            "organization_billing_plan": "entprise"
+        }
+        response, content_data = self.request_change_plan(
+            self.organization.uuid,
+            data,
+            self.owner_token)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(content_data['message'], 'Invalid plan choice')
+
     def tearDown(self):
-        self.flows.delete_project(project_uuid=self.flows_project.uuid, user_email=self.owner.email)
         self.project.delete()
         self.organization.delete()
 
