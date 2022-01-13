@@ -5,10 +5,10 @@ on:
   # Triggers the workflow on push or pull request events but only for the main branch
   push:
     branches:
-      - feature/migrate-gh-actions
+      - '*'
   pull_request:
     branches:
-      - feature/migrate-gh-actions
+      - '*'
 env:
   DEFAULT_DATABASE: "postgres://connect:connect@postgres:5432/connect"
   # Stripe API keys
