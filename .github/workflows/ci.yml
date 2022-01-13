@@ -5,10 +5,10 @@ on:
   # Triggers the workflow on push or pull request events but only for the main branch
   push:
     branches:
-      - '*'
+      - '**'
   pull_request:
     branches:
-      - '*'
+      - '**'
 env:
   DEFAULT_DATABASE: "postgres://connect:connect@postgres:5432/connect"
   # Stripe API keys
