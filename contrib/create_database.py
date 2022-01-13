@@ -1,6 +1,7 @@
 import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 
+
 def create_database():
     try:
         con = psycopg2.connect(host="postgres", database="postgres", user="postgres", password="postgres")
@@ -20,6 +21,7 @@ def create_database():
     # close connection
     cur.close()
     con.close()
+
 
 if __name__ == "__main__":
     create_database()

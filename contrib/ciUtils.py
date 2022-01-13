@@ -18,7 +18,6 @@ class CiUtils(object):
         self.fileManager.write_str(self.ENV_FILE)
 
     def get_env_content(self):
-        stripe_config = {}
         env = f"""
                 ENGINE_PORT=8080
                 SECRET_KEY=\"{get_random_secret_key()}\"
