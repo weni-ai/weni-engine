@@ -27,8 +27,8 @@ class NewsletterTestCase(TestCase):
         newsletter_language = NewsletterLanguage.objects.create(
             title=title, description=description, newsletter=newsletter
         )
-        self.assertEqual(newsletter_language.__str__(), 'Newsletter PK: 1 - en-us - New feature')
-        self.assertEqual(newsletter.__str__(), 'PK: 1')
+        self.assertEqual(newsletter_language.__str__(), f'Newsletter PK: {newsletter_language.pk} - en-us - New feature')
+        self.assertEqual(newsletter.__str__(), f'PK: {newsletter.pk}')
         self.assertEqual(newsletter_language.title, title)
         self.assertEqual(newsletter_language.description, description)
 
