@@ -340,3 +340,85 @@ class OrganizationTestCase(TestCase):
         self.assertEqual(outbox.subject, 'A new permission has been assigned to you')
         self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
         self.assertEqual(outbox.to[0], self.test_email)
+
+
+class BillingPlanTestCase(TestCase):
+
+    def setUp(self):
+        self.organization = Organization.objects.create(
+            name="Test", inteligence_organization=0,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan="free",
+        )
+        self.billing = self.organization.organization_billing
+        self.test_user_name = "test username"
+        self.test_email = ["test@example.com"]
+        self.test_first_name = "test"
+        # self.organization.organization_billing.stripe_customer="cus_KpDZ129lPQbygj"
+        # self.organization.organization_billing.save()
+
+    def test_send_email_added_card(self):
+        sended_email = self.billing.send_email_added_card(self.test_user_name, self.test_email)
+        self.assertEqual(len(sended_email.outbox), 1)
+        outbox = sended_email.outbox[0]
+        self.assertEqual(outbox.subject, f"Your {self.organization.name} organization's plan has ended")
+        self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
+        self.assertEqual(outbox.to[0], self.test_email[0])
+
+    def test_send_email_changed_card(self):
+        sended_email = self.billing.send_email_changed_card(self.test_user_name, self.test_email)
+        self.assertEqual(len(sended_email.outbox), 1)
+        outbox = sended_email.outbox[0]
+        self.assertEqual(outbox.subject, f"A credit card has been changed to the organization {self.organization.name}")
+        self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
+        self.assertEqual(outbox.to[0], self.test_email[0])
+
+    def test_send_email_finished_plan(self):
+        sended_email = self.billing.send_email_finished_plan(self.test_user_name, self.test_email)
+        self.assertEqual(len(sended_email.outbox), 1)
+        outbox = sended_email.outbox[0]
+        self.assertEqual(outbox.subject, f"Your {self.organization.name} organization's plan has ended")
+        self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
+        self.assertEqual(outbox.to[0], self.test_email[0])
+
+    def test_send_email_reactivated_plan(self):
+        sended_email = self.billing.send_email_reactivated_plan(self.test_user_name, self.test_email)
+        self.assertEqual(len(sended_email.outbox), 1)
+        outbox = sended_email.outbox[0]
+        self.assertEqual(outbox.subject, f"Your {self.organization.name} organization's plan has been reactivated.")
+        self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
+        self.assertEqual(outbox.to[0], self.test_email[0])
+
+    def test_send_email_removed_credit_card(self):
+        sended_email = self.billing.send_email_removed_credit_card(self.test_user_name, self.test_email)
+        self.assertEqual(len(sended_email.outbox), 1)
+        outbox = sended_email.outbox[0]
+        self.assertEqual(outbox.subject, f"Your {self.organization.name} organization credit card was removed")
+        self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
+        self.assertEqual(outbox.to[0], self.test_email[0])
+
+    def test_send_email_expired_free_plan(self):
+        sended_email = self.billing.send_email_expired_free_plan(self.test_user_name, self.test_email)
+        self.assertEqual(len(sended_email.outbox), 1)
+        outbox = sended_email.outbox[0]
+        self.assertEqual(outbox.subject, f"The organization {self.organization.name} has already surpassed 200 active contacts")
+        self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
+        self.assertEqual(outbox.to[0], self.test_email[0])
+
+    def test_send_email_chosen_plan(self):
+        plan = BillingPlan.PLAN_ENTERPRISE
+        sended_email = self.billing.send_email_chosen_plan(self.test_user_name, self.test_email[0], plan)
+        self.assertEqual(len(sended_email.outbox), 1)
+        outbox = sended_email.outbox[0]
+        self.assertEqual(outbox.subject, f"Your {self.organization.name} organization has the {plan.title()} Plan")
+        self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
+        self.assertEqual(outbox.to[0], self.test_email[0])
+
+    def test_send_email_changed_plan(self):
+        plan = BillingPlan.PLAN_CHOICES[1][0]
+        sended_email = self.billing.send_email_changed_plan(self.test_user_name, self.test_email, plan)
+        self.assertEqual(len(sended_email.outbox), 1)
+        outbox = sended_email.outbox[0]
+        self.assertEqual(outbox.subject, f"Your {self.organization.name} organization's plan has been changed.")
+        self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
+        self.assertEqual(outbox.to[0], self.test_email[0])

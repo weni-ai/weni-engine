@@ -864,14 +864,14 @@ class BillingPlan(models.Model):
 
     def send_email_added_card(self, user_name: str, email: list):
         if not settings.SEND_EMAILS:
-            return False
+            return False  # pragma: no cover
         context = {
             "base_url": settings.BASE_URL,
             "organization_name": self.organization.name,
             "user_name": user_name
         }
         mail.send_mail(
-            _(f"Your {self.organization.name} organization's plan has ended "),
+            _(f"Your {self.organization.name} organization's plan has ended"),
             render_to_string("billing/emails/added_card.txt", context),
             None,
             email,
@@ -881,7 +881,7 @@ class BillingPlan(models.Model):
 
     def send_email_changed_card(self, user_name: str, email: str):
         if not settings.SEND_EMAILS:
-            return False
+            return False  # pragma: no cover
         context = {
             "base_url": settings.BASE_URL,
             "organization_name": self.organization.name,
@@ -891,14 +891,14 @@ class BillingPlan(models.Model):
             _(f"A credit card has been changed to the organization {self.organization.name}"),
             render_to_string("billing/emails/changed_card.txt", context),
             None,
-            [email],
+            email,
             html_message=render_to_string("billing/emails/changed_card.html", context)
         )
         return mail
 
     def send_email_finished_plan(self, user_name: str, email: list):
         if not settings.SEND_EMAILS:
-            return False
+            return False  # pragma: no cover
         context = {
             "base_url": settings.BASE_URL,
             "organization_name": self.organization.name,
@@ -911,17 +911,18 @@ class BillingPlan(models.Model):
             email,
             html_message=render_to_string("billing/emails/finished-plan.html", context)
         )
+        return mail
 
     def send_email_reactivated_plan(self, user_name: str, email: list):
         if not settings.SEND_EMAILS:
-            return False
+            return False  # pragma: no cover
         context = {
             "base_url": settings.BASE_URL,
             "organization_name": self.organization.name,
             "user_name": user_name
         }
         mail.send_mail(
-            _(f" Your {self.organization.name} organization's plan has been reactivated."),
+            _(f"Your {self.organization.name} organization's plan has been reactivated."),
             render_to_string("billing/emails/reactived-plan.txt", context),
             None,
             email,
@@ -931,7 +932,7 @@ class BillingPlan(models.Model):
 
     def send_email_removed_credit_card(self, user_name: str, email: list):
         if not settings.SEND_EMAILS:
-            return False
+            return False  # pragma: no cover
         context = {
             "base_url": settings.BASE_URL,
             "user_name": user_name,
@@ -948,7 +949,7 @@ class BillingPlan(models.Model):
 
     def send_email_expired_free_plan(self, user_name: str, email: list):
         if not settings.SEND_EMAILS:
-            return False
+            return False  # pragma: no cover
         context = {
             "base_url": settings.BASE_URL,
             "organization_name": self.organization.name,
@@ -965,7 +966,7 @@ class BillingPlan(models.Model):
 
     def send_email_chosen_plan(self, user_name: str, email: str, plan: str):
         if not settings.SEND_EMAILS:
-            return False
+            return False  # pragma: no cover
         context = {
             "base_url": settings.BASE_URL,
             "user_name": user_name,
@@ -983,7 +984,7 @@ class BillingPlan(models.Model):
 
     def send_email_changed_plan(self, user_name: str, email: list, old_plan: str):
         if not settings.SEND_EMAILS:
-            return False
+            return False  # pragma: no cover
         context = {
             "base_url": settings.BASE_URL,
             "organization_name": self.organization.name,
@@ -992,7 +993,7 @@ class BillingPlan(models.Model):
             "actual_plan": self.plan
         }
         mail.send_mail(
-            _(f" Your {self.organization.name} organization's plan has been changed."),
+            _(f"Your {self.organization.name} organization's plan has been changed."),
             render_to_string("billing/emails/changed-plan.txt", context),
             None,
             email,
