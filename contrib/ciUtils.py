@@ -35,7 +35,6 @@ class CiUtils(object):
                 OIDC_OP_JWKS_ENDPOINT=""
                 BILLING_COST_PER_WHATSAPP=199
                 BILLING_TEST_MODE=True
-                BILLING_SETTINGS="{str(stripe_config)}"
             """.replace(" ", "").strip()
         self.logger.log(0, f'env file created:\n{env}' + self.logger.logStyle[2])
         return env
