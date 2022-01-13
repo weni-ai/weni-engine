@@ -12,6 +12,7 @@ omit =
     ./connect/api/v1/swagger.py
     ./connect/authentication/tests.py
     ./connect/authentication/signals.py
+    ./connect/authentication/migrations/*
     ./connect/common/tests.py
     ./connect/common/tasks.py
     ./connect/common/signals.py

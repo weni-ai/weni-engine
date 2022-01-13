@@ -2,6 +2,7 @@ import json
 import uuid as uuid4
 from unittest.mock import patch
 from unittest import skipIf
+from django.conf import settings
 from django.test import RequestFactory
 from django.test import TestCase
 from django.test.client import MULTIPART_CONTENT
@@ -128,7 +129,7 @@ class GetOrganizationContactsAPITestCase(TestCase):
             contact_count=5,
         )
 
-    def request(self, param, value, token=None):
+    def request(self, param, value, method, token=None):
         authorization_header = (
             {"HTTP_AUTHORIZATION": "Token {}".format(token.key)} if token else {}
         )
@@ -137,7 +138,7 @@ class GetOrganizationContactsAPITestCase(TestCase):
             f"/v1/organization/org/{param}/{value}", **authorization_header
         )
 
-        response = OrganizationViewSet.as_view({"get": "get_active_org_contacts"})(
+        response = OrganizationViewSet.as_view({"get": f"{method}"})(
             request, organization_uuid=self.organization.uuid
         )
 
@@ -148,74 +149,132 @@ class GetOrganizationContactsAPITestCase(TestCase):
         response, content_data = self.request(
             "organization",
             self.organization.uuid,
+            "get_active_org_contacts",
             self.owner_token,
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(content_data['active-contacts']['organization_active_contacts'], 30)
 
+    def test_contact_active_per_project(self):
+        response, content_data = self.request(
+            "contact-active-per-project",
+            self.organization.uuid,
+            "get_contacts_active_per_project",
+            self.owner_token
+        )
 
-@skipIf(True, "Skipping test until we find a way to mock flows and AI")
+        contact_count = 0
+        for project in content_data['projects']:
+            contact_count += int(project['active_contacts'])
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(contact_count, 30)
+
+
 class OrgBillingPlan(TestCase):
     def setUp(self):
-
-        from connect.grpc.types.flow import FlowType
-        self.flows = FlowType()
-
         self.factory = RequestFactory()
         self.owner, self.owner_token = create_user_and_token("owner")
 
-        self.flows_project = self.flows.create_project(project_name='Unit Test', user_email=self.owner.email, project_timezone='America/Maceio')
+        self.flows_project = {
+            "project_name": 'Unit Test',
+            'user_email': self.owner.email,
+            'project_timezone': 'America/Maceio',
+            'uuid': uuid4.uuid4(),
+        }
 
         self.organization = Organization.objects.create(
             name="test organization", description="", inteligence_organization=1,
             organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
-            organization_billing__plan="enterprise",
+            organization_billing__plan="free",
         )
         self.project = Project.objects.create(
-            name="Unit Test Project", flow_organization=self.flows_project.uuid,
+            name="Unit Test Project", flow_organization=self.flows_project['uuid'],
             organization_id=self.organization.uuid)
+        self.organization_authorization = self.organization.authorizations.create(
+            user=self.owner, role=OrganizationAuthorization.ROLE_ADMIN
+        )
 
-    def request(self, param, value, token=None):
+    def request(self, param, value, method, token=None):
         authorization_header = (
             {"HTTP_AUTHORIZATION": "Token {}".format(token.key)} if token else {}
         )
 
-        request = self.factory.post(
-            f"/v1/organization/org/billing/{param}/{value}/", **authorization_header
+        request = self.factory.patch(
+            f"/v1/organization/org/billing/{param}/{value}/", **authorization_header,
         )
-        if param == 'closing-plan':
-            response = OrganizationViewSet.as_view({"patch": "closing_plan"})(
-                request, organization_uuid=self.organization.uuid
-            )
-        elif param == 'reactivate-plan':
-            response = OrganizationViewSet.as_view({"patch": "reactivate_plan"})(
-                request, organization_uuid=self.organization.uuid
-            )
+
+        response = OrganizationViewSet.as_view({"patch": f"{method}"})(
+            request, organization_uuid=self.organization.uuid,
+        )
+        content_data = json.loads(response.content)
+        return (response, content_data)
+
+    def request_change_plan(self, value, data={}, token=None):
+        authorization_header = (
+            {"HTTP_AUTHORIZATION": "Token {}".format(token.key)} if token else {}
+        )
+        request = self.factory.patch(
+            f"/v1/organization/org/billing/change-plan/{value}/", data=json.dumps(data), content_type='application/json', format='json', **authorization_header
+        )
+        response = OrganizationViewSet.as_view({"patch": "change_plan"})(
+            request, organization_uuid=self.organization.uuid,
+        )
 
         content_data = json.loads(response.content)
         return (response, content_data)
 
-    def test_closing_plan(self):
+    @patch("connect.common.tasks.update_suspend_project.delay")
+    def test_closing_plan(self, task):
+        task.return_value.result = True
         response, content_data = self.request(
             "closing-plan",
             self.organization.uuid,
+            "closing_plan",
             self.owner_token,
         )
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(content_data['is_active'], False)
 
-    def test_reactivate_plan(self):
+    @patch("connect.common.tasks.update_suspend_project.delay")
+    def test_reactivate_plan(self, task):
+        task.return_value.result = True
         response, content_data = self.request(
             "reactivate-plan",
             self.organization.uuid,
+            "reactivate_plan",
             self.owner_token,
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(content_data['is_active'], True)
 
+    def test_change_plan(self):
+        data = {
+            "organization_billing_plan": "enterprise"
+        }
+        response, content_data = self.request_change_plan(
+            self.organization.uuid,
+            data,
+            self.owner_token)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(content_data['plan'], 'enterprise')
+
+    def test_change_plan_invalid(self):
+        data = {
+            "organization_billing_plan": "entprise"
+        }
+        response, content_data = self.request_change_plan(
+            self.organization.uuid,
+            data,
+            self.owner_token)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(content_data['message'], 'Invalid plan choice')
+
     def tearDown(self):
-        self.flows.delete_project(project_uuid=self.flows_project.uuid, user_email=self.owner.email)
         self.project.delete()
         self.organization.delete()
 
@@ -614,3 +673,78 @@ class ExtraIntegrationsTestCase(TestCase):
             self.owner_token,
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+
+class GetOrganizationStripeDataTestCase(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.owner, self.owner_token = create_user_and_token("owner")
+
+        self.organization = Organization.objects.create(
+            name="test organization", description="", inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan="enterprise",
+        )
+        self.organization.organization_billing.stripe_customer = "cus_KpDZ129lPQbygj"
+        self.organization.organization_billing.save()
+        self.organization_authorization = self.organization.authorizations.create(
+            user=self.owner, role=OrganizationAuthorization.ROLE_ADMIN
+        )
+
+    def request(self, param, value, token=None):
+        authorization_header = (
+            {"HTTP_AUTHORIZATION": "Token {}".format(token.key)} if token else {}
+        )
+
+        request = self.factory.get(
+            f"/v1/organization/org/{param}/{value}/", **authorization_header
+        )
+        response = OrganizationViewSet.as_view({"get": "get_stripe_card_data"})(
+            request, organization_uuid=self.organization.uuid
+        )
+
+        content_data = json.loads(response.content)
+        return (response, content_data)
+
+    @skipIf(True, 'because stripe not configured yet')
+    def test_get_stripe_card_data(self):
+        response, content_data = self.request(
+            "get-stripe-card-data",
+            self.organization.uuid,
+            self.owner_token,
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(content_data['response'][0]['last2'], '42')
+        self.assertEqual(content_data['response'][0]['brand'], 'visa')
+
+
+class BillingPrecificationAPITestCase(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.owner, self.owner_token = create_user_and_token("owner")
+
+    def request(self, token=None):
+        authorization_header = (
+            {"HTTP_AUTHORIZATION": "Token {}".format(token.key)} if token else {}
+        )
+
+        request = self.factory.get(
+            "/v1/organization/org/billing/precification", **authorization_header
+        )
+
+        response = OrganizationViewSet.as_view({"get": "get_billing_precification"})(
+            request
+        )
+
+        content_data = json.loads(response.content)
+        return (response, content_data)
+
+    def test_okay(self):
+        response, content_data = self.request(
+            self.owner_token,
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(content_data['currency'], 'USD')
+        self.assertEqual(content_data['extra_whatsapp_integration'], settings.BILLING_COST_PER_WHATSAPP)

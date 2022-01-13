@@ -1,0 +1,56 @@
+name: CI
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - '**'
+env:
+  DEFAULT_DATABASE: "postgres://connect:connect@postgres:5432/connect"
+  # Stripe API keys
+  BILLING_SETTINGS: "${{secrets.BILLING_SETTINGS}}"
+  # The hostname used to communicate with the PostgreSQL service container
+  POSTGRES_HOST: postgres
+  # The default PostgreSQL port
+  POSTGRES_PORT: 5432
+jobs:
+  # Label of the container job
+  container-job:
+    # Containers must run in Linux based operating systems
+    runs-on: ubuntu-latest
+    # Docker Hub image that `container-job` executes in
+    container: python:3.6.15-bullseye
+
+    # Service containers to run with `container-job`
+    services:
+      # Label used to access the service container
+      postgres:
+        # Docker Hub image
+        image: postgres:11
+        # Provide the password for postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      # Downloads a copy of the code in your repository before running CI tests
+      - name: Check out repository code
+        uses: actions/checkout@v2
+
+      - name: Setup Python
+        run: |
+          pip install poetry
+          poetry config virtualenvs.create false --local
+          poetry install
+      - name: Create database
+        run: python contrib/create_database.py
+      - name: Run Tests
+        run: python contrib/ciUtils.py
