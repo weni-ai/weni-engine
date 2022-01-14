@@ -1,7 +1,6 @@
 import json
 import uuid as uuid4
 from unittest.mock import patch
-from unittest import skipIf
 from django.conf import settings
 from django.test import RequestFactory
 from django.test import TestCase
@@ -706,7 +705,6 @@ class GetOrganizationStripeDataTestCase(TestCase):
         content_data = json.loads(response.content)
         return (response, content_data)
 
-    @skipIf(True, 'because stripe not configured yet')
     def test_get_stripe_card_data(self):
         response, content_data = self.request(
             "get-stripe-card-data",
