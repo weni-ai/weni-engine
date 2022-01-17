@@ -130,7 +130,7 @@ class OrganizationViewSet(
             organization.organization_billing.is_active = False
             organization.organization_billing.save(update_fields=["is_active"])
             organization.save(update_fields=["is_suspended"])
-            user_name = organization.name if request.user is None else request.user.name
+            user_name = organization.name if request.user is None else request.user.first_name
             organization.organization_billing.send_email_removed_credit_card(user_name, organization.authorizations.values_list("user__email", flat=True))
 
             return JsonResponse(data={"status": True}, status=status.HTTP_200_OK)
@@ -267,7 +267,7 @@ class OrganizationViewSet(
                     True
                 ],
             )
-        user_name = org_billing.organization.name if request.user is None else request.user.name
+        user_name = org_billing.organization.name if request.user is None else request.user.first_name
         org_billing.send_email_finished_plan(user_name, organization.authorizations.values_list("user__email", flat=True))
 
         result = {
@@ -304,7 +304,7 @@ class OrganizationViewSet(
                     False
                 ],
             )
-        user_name = org_billing.organization.name if request.user is None else request.user.name
+        user_name = org_billing.organization.name if request.user is None else request.user.first_name
         org_billing.send_email_reactivated_plan(user_name, organization.authorizations.values_list("user__email", flat=True))
         result = {
             "plan": org_billing.plan,
