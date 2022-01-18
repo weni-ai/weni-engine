@@ -279,7 +279,7 @@ class OrganizationTestCase(TestCase):
         sended_mail = self.organization.send_email_organization_going_out(self.test_user_name, self.test_email)
         self.assertEqual(len(sended_mail.outbox), 1)
         outbox = sended_mail.outbox[0]
-        self.assertEqual(outbox.subject, f"You going out of {self.organization.name}")
+        self.assertEqual(outbox.subject, f"You are going out of {self.organization.name}")
         self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
         self.assertEqual(outbox.to[0], self.test_email)
 
@@ -361,7 +361,7 @@ class BillingPlanTestCase(TestCase):
         sended_email = self.billing.send_email_added_card(self.test_user_name, self.test_email)
         self.assertEqual(len(sended_email.outbox), 1)
         outbox = sended_email.outbox[0]
-        self.assertEqual(outbox.subject, f"Your {self.organization.name} organization's plan has ended")
+        self.assertEqual(outbox.subject, f"A credit card has been added to the organization {self.organization.name}")
         self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
         self.assertEqual(outbox.to[0], self.test_email[0])
 
