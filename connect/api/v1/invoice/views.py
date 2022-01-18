@@ -55,8 +55,16 @@ class InvoiceViewSet(
         }
         before = invoice.due_date.strftime("%Y-%m-%d %H:%M")
         after = (invoice.due_date - timedelta(days=30)).strftime("%Y-%m-%d %H:%M")
+        payment_details_result = StripeGateway().get_payment_method_details(invoice.stripe_charge)
+        card_data =  {
+                'brand': payment_details_result['response']['brand'],
+                'last4': payment_details_result['response']['last4'],
+                'exp_month': payment_details_result['response']['exp_month'],
+                'exp_year': payment_details_result['response']['exp_year']
+            } if payment_details_result['status'] == 'OK' else {'message': 'stripe charge not found!'}
         payment_data = {
             'payment_method': invoice.payment_method,
+
             'projects': [],
         }
         contact_count = 0
