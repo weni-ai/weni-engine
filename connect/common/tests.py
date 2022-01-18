@@ -228,6 +228,9 @@ class UtilsTestCase(TestCase):
         self.assertEqual(self.precification.calculate_active_contacts(contact_count=249999), 33249.867)
         self.assertEqual(self.precification.calculate_active_contacts(contact_count=250000), 33250.0)
 
+    def test_str_generic_billing_data(self):
+        self.assertEqual(self.precification.__str__(), f'{self.precification.free_active_contacts_limit}')
+
 
 class InvoiceTestCase(TestCase):
     def setUp(self):
