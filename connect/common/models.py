@@ -156,7 +156,7 @@ class Organization(models.Model):
             "organization_name": self.name
         }
         mail.send_mail(
-            _(f"You going out of {self.name}"),
+            _(f"You are going out of {self.name}"),
             render_to_string("common/emails/organization/org_going_out.txt", context),
             None,
             [email],
@@ -871,7 +871,7 @@ class BillingPlan(models.Model):
             "user_name": user_name
         }
         mail.send_mail(
-            _(f"Your {self.organization.name} organization's plan has ended"),
+            _(f"A credit card has been added to the organization {self.organization.name}"),
             render_to_string("billing/emails/added_card.txt", context),
             None,
             email,
