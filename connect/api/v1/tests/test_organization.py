@@ -684,7 +684,7 @@ class GetOrganizationStripeDataTestCase(TestCase):
             organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
             organization_billing__plan="enterprise",
         )
-        self.organization.organization_billing.stripe_customer = "cus_KpDZ129lPQbygj"
+        self.organization.organization_billing.stripe_customer = "cus_KzFc41F3yLCLoO"
         self.organization.organization_billing.save()
         self.organization_authorization = self.organization.authorizations.create(
             user=self.owner, role=OrganizationAuthorization.ROLE_ADMIN
