@@ -90,3 +90,17 @@ class StripeGateway(Gateway):
         except self.stripe.error.InvalidRequestError:
             return {"status": "FAILURE", "response": f"No such Customer: {identification}"}
         return {"status": "SUCCESS", "response": response}
+
+    def get_payment_method_details(self, stripe_charge_id: str):
+        try:
+            charge = stripe.Charge.retrieve(stripe_charge_id)
+            card_data = charge['payment_method_details']['card']
+            response = {
+                'last4': card_data['last4'],
+                'brand': card_data['brand'],
+                'exp_month': card_data['exp_month'],
+                'exp_year': card_data['exp_year']
+            }
+        except self.stripe.error.InvalidRequestError:
+            return {'response': f'No such Charge id: {stripe_charge_id}', 'status': 'FAIL'}
+        return {'response': response, 'status': 'SUCCESS'}
