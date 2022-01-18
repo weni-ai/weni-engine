@@ -12,7 +12,7 @@ class StripeGatewayTestCase(TestCase):
         self.merchant = get_gateway("stripe")
         stripe.api_key = self.merchant.stripe.api_key
         self.stripe = stripe
-        self.customer = "cus_KpDZ129lPQbygj"
+        self.customer = "cus_KzFc41F3yLCLoO"
 
     def testPurchase(self):
         resp = self.merchant.purchase(10, self.customer)
