@@ -144,4 +144,4 @@ class InvoiceDataTestCase(TestCase):
             self.owner_token,
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(content_data['payment_data'], {'payment_method': 'credit_card', 'card_data': {'brand': 'visa', 'last4': '4242', 'exp_month': 4, 'exp_year': 2024}, 'projects': [{'project_name': 'project test', 'contact_count': 0}], 'price': '267.00'})
+        self.assertEqual(content_data['payment_data'], {'payment_method': 'credit_card', 'card_data': {'brand': 'visa', 'last4': '4242'}, 'projects': [{'project_name': 'project test', 'contact_count': 0}], 'price': '267.00'})

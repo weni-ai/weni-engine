@@ -1061,6 +1061,15 @@ class Invoice(models.Model):
     @property
     def card_data(self):
         card_data = StripeGateway().get_payment_method_details(self.stripe_charge)
+        if card_data['status'] == 'FAIL':
+            billing = self.organization.organization_billing
+            card_data = {
+                'status': 'SUCCESS',
+                'response': {
+                    'brand': billing.card_brand,
+                    'last4': billing.final_card_number
+                }
+            }
         return card_data
 
     @property
