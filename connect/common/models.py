@@ -1067,7 +1067,7 @@ class Invoice(models.Model):
                 'status': 'SUCCESS',
                 'response': {
                     'brand': billing.card_brand,
-                    'last4': billing.final_card_number
+                    'last2': billing.final_card_number[len(billing.final_card_number) - 2:]
                 }
             }
         return card_data
