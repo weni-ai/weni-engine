@@ -80,7 +80,6 @@ class ListInvoiceAPITestCase(TestCase):
             self.organization.uuid,
             self.owner_token,
         )
-        print(content_data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(content_data.get("count"), 1)
 
