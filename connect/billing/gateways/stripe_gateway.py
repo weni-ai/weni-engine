@@ -96,7 +96,7 @@ class StripeGateway(Gateway):
             charge = stripe.Charge.retrieve(stripe_charge_id)
             card_data = charge['payment_method_details']['card']
             response = {
-                'last4': card_data['last4'],
+                'final_card_number': card_data['last4'],
                 'brand': card_data['brand']
             }
         except self.stripe.error.InvalidRequestError:

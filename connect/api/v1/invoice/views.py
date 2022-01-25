@@ -58,7 +58,7 @@ class InvoiceViewSet(
         payment_details_result = StripeGateway().get_payment_method_details(invoice.stripe_charge)
         card_data = {
             'brand': payment_details_result['response']['brand'],
-            'last4': payment_details_result['response']['last4']
+            'final_card_number': payment_details_result['response']['final_card_number']
         } if payment_details_result['status'] == 'SUCCESS' else {'message': 'stripe charge not found!'}
         payment_data = {
             'payment_method': invoice.payment_method,
