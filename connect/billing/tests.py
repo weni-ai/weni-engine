@@ -41,7 +41,7 @@ class StripeGatewayTestCase(TestCase):
     def test_get_payment_method_details(self):
         resp = self.merchant.get_payment_method_details("ch_3K9wZYGB60zUb40p1C0iiskn")
         self.assertEquals(resp['status'], 'SUCCESS')
-        self.assertEquals(resp['response']['last4'], '4242')
+        self.assertEquals(resp['response']['final_card_number'], '4242')
         self.assertEquals(resp['response']['brand'], 'visa')
 
     def test_get_payment_method_details_fail(self):
