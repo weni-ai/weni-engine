@@ -1071,6 +1071,7 @@ class Invoice(models.Model):
                 }
             }
         if(card_data['response']['final_card_number']):
+            card_data['response']['final_card_number'] = str(card_data['response']['final_card_number'])
             card_data['response']['final_card_number'] = card_data['response']['final_card_number'][len(card_data['response']['final_card_number']) - 2:]
         return card_data
 
