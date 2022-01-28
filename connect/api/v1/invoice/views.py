@@ -55,8 +55,14 @@ class InvoiceViewSet(
         }
         before = invoice.due_date.strftime("%Y-%m-%d %H:%M")
         after = (invoice.due_date - timedelta(days=30)).strftime("%Y-%m-%d %H:%M")
+        payment_details_result = StripeGateway().get_payment_method_details(invoice.stripe_charge)
+        card_data = {
+            'brand': payment_details_result['response']['brand'],
+            'final_card_number': payment_details_result['response']['final_card_number']
+        } if payment_details_result['status'] == 'SUCCESS' else {'message': 'stripe charge not found!'}
         payment_data = {
             'payment_method': invoice.payment_method,
+            'card_data': card_data,
             'projects': [],
         }
         contact_count = 0
@@ -83,5 +89,5 @@ class InvoiceViewSet(
         return JsonResponse(data={
             "payment_data": payment_data,
             "invoice": invoice_data,
-            "client_data": client_data
+            "client_data": client_data,
         }, status=status.HTTP_200_OK)

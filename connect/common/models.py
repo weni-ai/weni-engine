@@ -15,6 +15,7 @@ from timezone_field import TimeZoneField
 
 from connect import billing
 from connect.authentication.models import User
+from connect.billing.gateways.stripe_gateway import StripeGateway
 
 logger = logging.getLogger(__name__)
 
@@ -1056,6 +1057,22 @@ class Invoice(models.Model):
     cost_per_whatsapp = models.DecimalField(
         _("cost per whatsapp"), decimal_places=2, max_digits=11, default=0
     )
+
+    @property
+    def card_data(self):
+        card_data = StripeGateway().get_payment_method_details(self.stripe_charge)
+        if card_data['status'] == 'FAIL':
+            billing = self.organization.organization_billing
+            card_data = {
+                'status': 'SUCCESS',
+                'response': {
+                    'brand': billing.card_brand,
+                    'final_card_number': billing.final_card_number
+                }
+            }
+        if(card_data['response']['final_card_number']):
+            card_data['response']['final_card_number'] = card_data['response']['final_card_number'][len(card_data['response']['final_card_number']) - 2:]
+        return card_data
 
     @property
     def total_invoice_amount(self):

@@ -27,7 +27,7 @@ class LogController(object):
         print(f'{COLORS.BLUE}RUNNING:\n{COLORS.CYAN} └─ {logText}{COLORS.ENDC}')
     
     def success(self):
-        print(f'{COLORS.GREEN} └──── SUCESS')
+        print(f'{COLORS.GREEN} └──── SUCCESS')
 
     def purpleText(self, logText: str):
         print(f'{COLORS.BLUE}RUNNING:\n{COLORS.PURPLE} └─ {logText}{COLORS.ENDC}')
