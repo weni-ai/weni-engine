@@ -83,6 +83,8 @@ class OrganizationAuthorizationTestCase(TestCase):
     def setUp(self):
         self.owner = User.objects.create_user("owner@user.com", "owner")
         self.user = User.objects.create_user("fake@user.com", "user")
+        self.financial = User.objects.create_user("financial@user.com", "financial")
+        self.contributor = User.objects.create_user("contrib@user.com", "contrib")
 
         self.organization = Organization.objects.create(
             name="Test", inteligence_organization=0,
@@ -91,6 +93,13 @@ class OrganizationAuthorizationTestCase(TestCase):
         )
         self.organization_authorization = self.organization.authorizations.create(
             user=self.owner, role=OrganizationRole.ADMIN.value
+        )
+        self.organization_financial_authorization = self.organization.authorizations.create(
+            user=self.financial, role=OrganizationRole.FINANCIAL.value
+        )
+
+        self.organization_contribute_authorization = self.organization.authorizations.create(
+            user=self.contributor, role=OrganizationRole.CONTRIBUTOR.value
         )
 
     def test_admin_level(self):
@@ -202,6 +211,14 @@ class OrganizationAuthorizationTestCase(TestCase):
 
     def test_str_organization_authorization(self):
         self.assertEqual('Test - owner@user.com', self.organization_authorization.__str__())
+
+    def test_financial_level(self):
+        self.assertTrue(self.organization_financial_authorization.is_financial)
+
+    def test_can_contribute_billing(self):
+        self.assertTrue(self.organization_financial_authorization.can_contribute_billing)
+        self.assertTrue(self.organization_authorization.can_contribute_billing)
+        self.assertFalse(self.organization_contribute_authorization.can_contribute_billing)
 
 
 class UtilsTestCase(TestCase):

@@ -367,6 +367,9 @@ class OrganizationAuthorization(models.Model):
         if self.role == OrganizationRole.ADMIN.value:
             return OrganizationLevelRole.ADMIN.value
 
+        if self.role == OrganizationRole.FINANCIAL.value:
+            return OrganizationLevelRole.FINANCIAL.value
+
     @property
     def can_read(self):
         return self.level in [
