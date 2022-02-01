@@ -7,11 +7,12 @@ from connect.common.models import (
     Newsletter,
     Service,
     Organization,
-    OrganizationAuthorization,
     ServiceStatus,
     NewsletterLanguage,
     BillingPlan,
-    GenericBillingData
+    GenericBillingData,
+    OrganizationRole,
+    OrganizationLevelRole
 )
 from django.conf import settings
 from django.utils import timezone
@@ -89,16 +90,16 @@ class OrganizationAuthorizationTestCase(TestCase):
             organization_billing__plan="free",
         )
         self.organization_authorization = self.organization.authorizations.create(
-            user=self.owner, role=OrganizationAuthorization.ROLE_ADMIN
+            user=self.owner, role=OrganizationRole.ADMIN.value
         )
 
     def test_admin_level(self):
         authorization = self.organization.get_user_authorization(self.owner)
-        self.assertEqual(authorization.level, OrganizationAuthorization.LEVEL_ADMIN)
+        self.assertEqual(authorization.level, OrganizationLevelRole.ADMIN.value)
 
     def test_not_read_level(self):
         authorization = self.organization.get_user_authorization(self.user)
-        self.assertNotEqual(authorization.level, OrganizationAuthorization.LEVEL_VIEWER)
+        self.assertNotEqual(authorization.level, OrganizationLevelRole.VIEWER.value)
 
     def test_can_read(self):
         # organization owner
@@ -163,39 +164,39 @@ class OrganizationAuthorizationTestCase(TestCase):
     def test_role_user_can_read(self):
         # public organization
         authorization_user = self.organization.get_user_authorization(self.user)
-        authorization_user.role = OrganizationAuthorization.ROLE_VIEWER
+        authorization_user.role = OrganizationRole.VIEWER.value
         authorization_user.save()
         self.assertTrue(authorization_user.can_read)
 
         # private organization
         authorization_user = self.organization.get_user_authorization(self.user)
-        authorization_user.role = OrganizationAuthorization.ROLE_VIEWER
+        authorization_user.role = OrganizationRole.VIEWER.value
         authorization_user.save()
         self.assertTrue(authorization_user.can_read)
 
     def test_role_user_can_t_contribute(self):
         # public organization
         authorization_user = self.organization.get_user_authorization(self.user)
-        authorization_user.role = OrganizationAuthorization.ROLE_VIEWER
+        authorization_user.role = OrganizationRole.VIEWER.value
         authorization_user.save()
         self.assertFalse(authorization_user.can_contribute)
 
         # private organization
         authorization_user = self.organization.get_user_authorization(self.user)
-        authorization_user.role = OrganizationAuthorization.ROLE_VIEWER
+        authorization_user.role = OrganizationRole.VIEWER.value
         authorization_user.save()
         self.assertFalse(authorization_user.can_contribute)
 
     def test_role_contributor_can_contribute(self):
         # public organization
         authorization_user = self.organization.get_user_authorization(self.user)
-        authorization_user.role = OrganizationAuthorization.ROLE_CONTRIBUTOR
+        authorization_user.role = OrganizationRole.CONTRIBUTOR.value
         authorization_user.save()
         self.assertTrue(authorization_user.can_contribute)
 
         # private organization
         authorization_user = self.organization.get_user_authorization(self.user)
-        authorization_user.role = OrganizationAuthorization.ROLE_CONTRIBUTOR
+        authorization_user.role = OrganizationRole.CONTRIBUTOR.value
         authorization_user.save()
         self.assertTrue(authorization_user.can_contribute)
 

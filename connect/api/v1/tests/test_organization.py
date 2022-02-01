@@ -12,7 +12,7 @@ from connect.api.v1.organization.views import (
     OrganizationAuthorizationViewSet,
 )
 from connect.api.v1.tests.utils import create_user_and_token
-from connect.common.models import Organization, OrganizationAuthorization, BillingPlan, Project
+from connect.common.models import Organization, OrganizationAuthorization, BillingPlan, Project, OrganizationRole
 
 
 class CreateOrganizationAPITestCase(TestCase):
@@ -60,7 +60,7 @@ class CreateOrganizationAPITestCase(TestCase):
         self.assertEqual(organization_authorization.count(), 1)
         self.assertEqual(
             organization_authorization.first().role,
-            OrganizationAuthorization.ROLE_ADMIN,
+            OrganizationRole.ADMIN.value
         )
 
 
@@ -75,18 +75,16 @@ class ListOrganizationAPITestCase(TestCase):
             organization_billing__plan="free",
         )
         self.organization_authorization = self.organization.authorizations.create(
-            user=self.owner, role=OrganizationAuthorization.ROLE_ADMIN
+            user=self.owner, role=OrganizationRole.ADMIN.value
         )
 
     def request(self, param, value, token=None):
         authorization_header = (
             {"HTTP_AUTHORIZATION": "Token {}".format(token.key)} if token else {}
         )
-
         request = self.factory.get(
             "/v1/organization/org/?{}={}".format(param, value), **authorization_header
         )
-
         response = OrganizationViewSet.as_view({"get": "list"})(
             request, organization=self.organization.uuid
         )
@@ -115,7 +113,7 @@ class GetOrganizationContactsAPITestCase(TestCase):
             organization_billing__plan="free",
         )
         self.organization_authorization = self.organization.authorizations.create(
-            user=self.owner, role=OrganizationAuthorization.ROLE_ADMIN
+            user=self.owner, role=OrganizationRole.ADMIN.value
         )
 
         self.project1 = Project.objects.create(
@@ -192,7 +190,7 @@ class OrgBillingPlan(TestCase):
             name="Unit Test Project", flow_organization=self.flows_project['uuid'],
             organization_id=self.organization.uuid)
         self.organization_authorization = self.organization.authorizations.create(
-            user=self.owner, role=OrganizationAuthorization.ROLE_ADMIN
+            user=self.owner, role=OrganizationRole.ADMIN.value
         )
 
     def request(self, param, value, method, token=None):
@@ -290,7 +288,7 @@ class OrgBillingAdditionalInformation(TestCase):
         )
 
         self.organization_authorization = self.organization.authorizations.create(
-            user=self.owner, role=OrganizationAuthorization.ROLE_ADMIN
+            user=self.owner, role=OrganizationRole.ADMIN.value
         )
 
     def request(self, value, data={}, token=None):
@@ -340,11 +338,11 @@ class ListOrganizationAuthorizationTestCase(TestCase):
             organization_billing__plan="free",
         )
         self.organization_authorization = self.organization.authorizations.create(
-            user=self.owner, role=OrganizationAuthorization.ROLE_ADMIN
+            user=self.owner, role=OrganizationRole.ADMIN.value
         )
 
         self.user_auth = self.organization.get_user_authorization(self.user)
-        self.user_auth.role = OrganizationAuthorization.ROLE_CONTRIBUTOR
+        self.user_auth.role = OrganizationRole.CONTRIBUTOR.value
         self.user_auth.save()
 
     def request(self, organization, token):
@@ -360,7 +358,6 @@ class ListOrganizationAuthorizationTestCase(TestCase):
 
     def test_okay(self):
         response, content_data = self.request(self.organization.uuid, self.owner_token)
-
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         self.assertEqual(content_data.get("count"), 2)
@@ -397,7 +394,7 @@ class UpdateAuthorizationRoleTestCase(TestCase):
             organization_billing__plan="free",
         )
         self.organization_authorization = self.organization.authorizations.create(
-            user=self.owner, role=OrganizationAuthorization.ROLE_ADMIN
+            user=self.owner, role=OrganizationRole.ADMIN.value
         )
 
     def request(self, organization, token, user, data):
@@ -419,17 +416,16 @@ class UpdateAuthorizationRoleTestCase(TestCase):
             self.organization,
             self.owner_token,
             self.user,
-            {"role": OrganizationAuthorization.ROLE_CONTRIBUTOR},
+            {"role": OrganizationRole.CONTRIBUTOR.value},
         )
-
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
-            content_data.get("role"), OrganizationAuthorization.ROLE_CONTRIBUTOR
+            content_data.get("role"), OrganizationRole.CONTRIBUTOR.value
         )
 
         user_authorization = self.organization.get_user_authorization(self.user)
         self.assertEqual(
-            user_authorization.role, OrganizationAuthorization.ROLE_CONTRIBUTOR
+            user_authorization.role, OrganizationRole.CONTRIBUTOR.value
         )
 
     def test_forbidden(self):
@@ -437,7 +433,7 @@ class UpdateAuthorizationRoleTestCase(TestCase):
             self.organization,
             self.user_token,
             self.user,
-            {"role": OrganizationAuthorization.ROLE_CONTRIBUTOR},
+            {"role": OrganizationRole.CONTRIBUTOR.value},
         )
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -447,7 +443,7 @@ class UpdateAuthorizationRoleTestCase(TestCase):
             self.organization,
             self.owner_token,
             self.owner,
-            {"role": OrganizationAuthorization.ROLE_CONTRIBUTOR},
+            {"role": OrganizationRole.CONTRIBUTOR.value},
         )
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -466,11 +462,11 @@ class DestroyAuthorizationRoleTestCase(TestCase):
             organization_billing__plan="free",
         )
         self.organization_authorization = self.organization.authorizations.create(
-            user=self.owner, role=OrganizationAuthorization.ROLE_ADMIN
+            user=self.owner, role=OrganizationRole.ADMIN.value
         )
 
         self.user_organization_authorization = self.organization.authorizations.create(
-            user=self.user, role=OrganizationAuthorization.ROLE_CONTRIBUTOR
+            user=self.user, role=OrganizationRole.CONTRIBUTOR.value
         )
 
     def request(self, organization, token, user):
@@ -525,15 +521,15 @@ class ActiveContactsLimitTestCase(TestCase):
             organization_id=self.organization.uuid)
 
         self.organization_authorization = self.organization.authorizations.create(
-            user=self.owner, role=OrganizationAuthorization.ROLE_ADMIN
+            user=self.owner, role=OrganizationRole.ADMIN.value
         )
 
         self.organization_authorization_enterprise = self.enterprise_org.authorizations.create(
-            user=self.owner, role=OrganizationAuthorization.ROLE_ADMIN
+            user=self.owner, role=OrganizationRole.ADMIN.value
         )
 
         self.organization_authorization_enterprise = self.custom_org.authorizations.create(
-            user=self.owner, role=OrganizationAuthorization.ROLE_ADMIN
+            user=self.owner, role=OrganizationRole.ADMIN.value
         )
 
     def request(self, param, value, token=None):
@@ -647,7 +643,7 @@ class ExtraIntegrationsTestCase(TestCase):
             organization_id=self.organization.uuid)
 
         self.organization_authorization = self.organization.authorizations.create(
-            user=self.owner, role=OrganizationAuthorization.ROLE_ADMIN
+            user=self.owner, role=OrganizationRole.ADMIN.value
         )
 
     def request(self, value, param, token=None):
@@ -687,7 +683,7 @@ class GetOrganizationStripeDataTestCase(TestCase):
         self.organization.organization_billing.stripe_customer = "cus_KzFc41F3yLCLoO"
         self.organization.organization_billing.save()
         self.organization_authorization = self.organization.authorizations.create(
-            user=self.owner, role=OrganizationAuthorization.ROLE_ADMIN
+            user=self.owner, role=OrganizationRole.ADMIN.value
         )
 
     def request(self, param, value, token=None):

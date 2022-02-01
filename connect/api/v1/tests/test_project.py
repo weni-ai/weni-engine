@@ -10,7 +10,7 @@ from rest_framework import status
 
 from connect.api.v1.project.views import ProjectViewSet
 from connect.api.v1.tests.utils import create_user_and_token
-from connect.common.models import OrganizationAuthorization, Project, Organization, BillingPlan
+from connect.common.models import Project, Organization, BillingPlan, OrganizationRole
 
 
 class CreateProjectAPITestCase(TestCase):
@@ -24,7 +24,7 @@ class CreateProjectAPITestCase(TestCase):
             organization_billing__plan="free",
         )
         self.organization_authorization = self.organization.authorizations.create(
-            user=self.owner, role=OrganizationAuthorization.ROLE_ADMIN
+            user=self.owner, role=OrganizationRole.ADMIN.value
         )
 
     def request(self, data, token=None):
@@ -74,7 +74,7 @@ class ListProjectAPITestCase(TestCase):
             organization_billing__plan="free",
         )
         self.organization_authorization = self.organization.authorizations.create(
-            user=self.owner, role=OrganizationAuthorization.ROLE_ADMIN
+            user=self.owner, role=OrganizationRole.ADMIN.value
         )
         self.project = self.organization.project.create(
             name="project test",
@@ -123,7 +123,7 @@ class UpdateProjectTestCase(TestCase):
             organization_billing__plan="free",
         )
         self.organization_authorization = self.organization.authorizations.create(
-            user=self.owner, role=OrganizationAuthorization.ROLE_ADMIN
+            user=self.owner, role=OrganizationRole.ADMIN.value
         )
         self.project = self.organization.project.create(
             name="project test",
@@ -169,7 +169,7 @@ class UpdateProjectTestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
         user_authorization = self.organization.get_user_authorization(self.user)
-        user_authorization.role = OrganizationAuthorization.ROLE_VIEWER
+        user_authorization.role = OrganizationRole.VIEWER.value
         user_authorization.save(update_fields=["role"])
 
         response, content_data = self.request(
@@ -194,7 +194,7 @@ class ProjectEmailTestCase(TestCase):
             organization_billing__plan="free",
         )
         self.organization_authorization = self.organization.authorizations.create(
-            user=self.owner, role=OrganizationAuthorization.ROLE_ADMIN
+            user=self.owner, role=OrganizationRole.ADMIN.value
         )
         self.project = self.organization.project.create(
             name="project test",
