@@ -544,7 +544,7 @@ class ProjectAuthorization(models.Model):
     )
     user = models.ForeignKey(User, models.CASCADE, related_name="project_authorizations_user")
     project = models.ForeignKey(Project, models.CASCADE, related_name="project_authorizations")
-    organization_authorization = models.ForeignKey(Organization, models.CASCADE)
+    organization_authorization = models.ForeignKey(OrganizationAuthorization, models.CASCADE)
     role = models.PositiveIntegerField(
         _("role"), choices=ROLE_CHOICES, default=ProjectRole.NOT_SETTED.value
     )
