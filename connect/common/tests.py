@@ -457,7 +457,7 @@ class ProjectAuthorizationTestCase(TestCase):
             organization_billing__plan="free",
         )
         self.organization_authorization = self.organization.authorizations.create(
-            user=self.owner, role=OrganizationAuthorization.ROLE_ADMIN
+            user=self.owner, role=OrganizationRole.ADMIN.value
         )
         self.project = self.organization.project.create(
             name="project test",
