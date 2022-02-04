@@ -369,7 +369,7 @@ class OrganizationAuthorization(models.Model):
     @property
     def can_read(self):
         return self.level in [
-            OrganizationLevelRole.CONTRIBUTOR.value,
+            OrganizationLevelRole.FINANCIAL.value,
             OrganizationLevelRole.CONTRIBUTOR.value,
             OrganizationLevelRole.ADMIN.value,
         ]

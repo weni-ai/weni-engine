@@ -165,11 +165,8 @@ class ListProjectAPITestCase(TestCase):
             self.organization.uuid,
             self.finacial_token,
         )
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-        self.assertEqual(
-            content_data.get("detail"),
-            "You do not have permission to perform this action.",
-        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(content_data.get("count"), 0)
 
 
 class UpdateProjectTestCase(TestCase):
