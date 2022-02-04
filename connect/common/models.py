@@ -320,11 +320,11 @@ class Organization(models.Model):
 
 
 class OrganizationLevelRole(Enum):
-    NOTHING, VIEWER, CONTRIBUTOR, ADMIN, FINANCIAL = list(range(5))
+    NOTHING, CONTRIBUTOR, ADMIN, FINANCIAL = list(range(4))
 
 
 class OrganizationRole(Enum):
-    NOT_SETTED, VIEWER, CONTRIBUTOR, ADMIN, FINANCIAL = list(range(5))
+    NOT_SETTED, CONTRIBUTOR, ADMIN, FINANCIAL = list(range(4))
 
 
 class OrganizationAuthorization(models.Model):
@@ -335,7 +335,6 @@ class OrganizationAuthorization(models.Model):
 
     ROLE_CHOICES = [
         (OrganizationRole.NOT_SETTED.value, _("not set")),
-        (OrganizationRole.VIEWER.value, _("viewer")),
         (OrganizationRole.CONTRIBUTOR.value, _("contributor")),
         (OrganizationRole.ADMIN.value, _("admin")),
         (OrganizationRole.FINANCIAL.value, _('financial')),
@@ -358,9 +357,6 @@ class OrganizationAuthorization(models.Model):
 
     @property
     def level(self):
-        if self.role == OrganizationRole.VIEWER.value:
-            return OrganizationLevelRole.VIEWER.value
-
         if self.role == OrganizationRole.CONTRIBUTOR.value:
             return OrganizationLevelRole.CONTRIBUTOR.value
 
@@ -373,7 +369,6 @@ class OrganizationAuthorization(models.Model):
     @property
     def can_read(self):
         return self.level in [
-            OrganizationLevelRole.VIEWER.value,
             OrganizationLevelRole.CONTRIBUTOR.value,
             OrganizationLevelRole.ADMIN.value,
         ]

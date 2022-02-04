@@ -109,7 +109,7 @@ class OrganizationAuthorizationTestCase(TestCase):
 
     def test_not_read_level(self):
         authorization = self.organization.get_user_authorization(self.user)
-        self.assertNotEqual(authorization.level, OrganizationLevelRole.VIEWER.value)
+        self.assertNotEqual(authorization.level, OrganizationLevelRole.CONTRIBUTOR.value)
 
     def test_can_read(self):
         # organization owner
@@ -174,28 +174,31 @@ class OrganizationAuthorizationTestCase(TestCase):
     def test_role_user_can_read(self):
         # public organization
         authorization_user = self.organization.get_user_authorization(self.user)
-        authorization_user.role = OrganizationRole.VIEWER.value
+        authorization_user.role = OrganizationRole.CONTRIBUTOR.value
         authorization_user.save()
         self.assertTrue(authorization_user.can_read)
 
         # private organization
         authorization_user = self.organization.get_user_authorization(self.user)
-        authorization_user.role = OrganizationRole.VIEWER.value
+        authorization_user.role = OrganizationRole.CONTRIBUTOR.value
         authorization_user.save()
         self.assertTrue(authorization_user.can_read)
 
-    def test_role_user_can_t_contribute(self):
-        # public organization
-        authorization_user = self.organization.get_user_authorization(self.user)
-        authorization_user.role = OrganizationRole.VIEWER.value
-        authorization_user.save()
-        self.assertFalse(authorization_user.can_contribute)
+    # All users now are contributors, they can create projects
+    # on the organization but only read and write in those which they have permissions
 
-        # private organization
-        authorization_user = self.organization.get_user_authorization(self.user)
-        authorization_user.role = OrganizationRole.VIEWER.value
-        authorization_user.save()
-        self.assertFalse(authorization_user.can_contribute)
+    # def test_role_user_can_t_contribute(self):
+    #     # public organization
+    #     authorization_user = self.organization.get_user_authorization(self.user)
+    #     authorization_user.role = OrganizationRole.VIEWER.value
+    #     authorization_user.save()
+    #     self.assertFalse(authorization_user.can_contribute)
+
+        # # private organization
+        # authorization_user = self.organization.get_user_authorization(self.user)
+        # authorization_user.role = OrganizationRole.VIEWER.value
+        # authorization_user.save()
+        # self.assertFalse(authorization_user.can_contribute)
 
     def test_role_contributor_can_contribute(self):
         # public organization
@@ -475,7 +478,7 @@ class ProjectAuthorizationTestCase(TestCase):
 
     def test_not_read_level(self):
         authorization = self.project.get_user_authorization(self.user)
-        self.assertNotEqual(authorization.level, ProjectRoleLevel.VIEWER.value)
+        self.assertNotEqual(authorization.level, ProjectRoleLevel.CONTRIBUTOR.value)
 
     def test_can_read(self):
         # project owner

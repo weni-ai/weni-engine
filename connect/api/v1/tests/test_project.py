@@ -169,7 +169,7 @@ class UpdateProjectTestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
         user_authorization = self.organization.get_user_authorization(self.user)
-        user_authorization.role = OrganizationRole.VIEWER.value
+        user_authorization.role = OrganizationRole.CONTRIBUTOR.value
         user_authorization.save(update_fields=["role"])
 
         response, content_data = self.request(
