@@ -439,6 +439,17 @@ class Project(models.Model):
     def __str__(self):
         return f"{self.uuid} - Project: {self.name} - Org: {self.organization.name}"
 
+    def get_user_authorization(self, user, **kwargs):
+        if user.is_anonymous:
+            return ProjectAuthorization(project=self)  # pragma: no cover
+        get, created = ProjectAuthorization.objects.get_or_create(
+            user=user,
+            project=self,
+            organization_authorization=self.organization.authorizations.first(),
+            **kwargs,
+        )
+        return get
+
     def send_email_create_project(self, first_name: str, email: str):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover

@@ -11,7 +11,8 @@ from connect.common.models import (
     ServiceStatus,
     NewsletterLanguage,
     BillingPlan,
-    GenericBillingData
+    GenericBillingData,
+    ProjectRoleLevel
 )
 from django.conf import settings
 from django.utils import timezone
@@ -425,3 +426,95 @@ class BillingPlanTestCase(TestCase):
         self.assertEqual(outbox.subject, f"Your {self.organization.name} organization's plan has been changed.")
         self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
         self.assertEqual(outbox.to[0], self.test_email[0])
+
+
+class ProjectAuthorizationTestCase(TestCase):
+    def setUp(self):
+        self.owner = User.objects.create_user("owner@user.com", "owner")
+        self.user = User.objects.create_user("fake@user.com", "user")
+
+        self.organization = Organization.objects.create(
+            name="Test", inteligence_organization=0,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan="free",
+        )
+        self.organization_authorization = self.organization.authorizations.create(
+            user=self.owner, role=OrganizationAuthorization.ROLE_ADMIN
+        )
+        self.project = self.organization.project.create(
+            name="project test",
+            timezone="America/Sao_Paulo",
+            flow_organization=uuid4.uuid4(),
+        )
+        self.project_authorization = self.project.project_authorizations.create(
+            user=self.owner, role=ProjectRoleLevel.ADMIN.value,
+            organization_authorization=self.organization_authorization
+        )
+
+    def test_admin_level(self):
+        authorization = self.project.get_user_authorization(self.owner)
+        self.assertEqual(authorization.level, ProjectRoleLevel.ADMIN.value)
+
+    def test_not_read_level(self):
+        authorization = self.project.get_user_authorization(self.user)
+        self.assertNotEqual(authorization.level, ProjectRoleLevel.VIEWER.value)
+
+    def test_can_read(self):
+        # project owner
+        authorization_owner = self.project.get_user_authorization(self.owner)
+        self.assertTrue(authorization_owner.can_read)
+        # secondary user
+        private_authorization_user = self.project.get_user_authorization(self.user)
+        self.assertFalse(private_authorization_user.can_read)
+
+    def test_can_contribute(self):
+        # organization owner
+        authorization_owner = self.project.get_user_authorization(self.owner)
+        self.assertTrue(authorization_owner.can_contribute)
+        # secondary user
+        authorization_user = self.project.get_user_authorization(self.user)
+        self.assertFalse(authorization_user.can_contribute)
+
+        private_authorization_owner = self.project.get_user_authorization(
+            self.owner
+        )
+        self.assertTrue(private_authorization_owner.can_contribute)
+        # secondary user
+        private_authorization_user = self.project.get_user_authorization(self.user)
+        self.assertFalse(private_authorization_user.can_contribute)
+
+    def test_can_write(self):
+        # organization owner
+        authorization_owner = self.project.get_user_authorization(self.owner)
+        self.assertTrue(authorization_owner.can_write)
+        # secondary user
+        authorization_user = self.project.get_user_authorization(self.user)
+        self.assertFalse(authorization_user.can_write)
+        # private owner
+        private_authorization_owner = self.project.get_user_authorization(
+            self.owner
+        )
+        self.assertTrue(private_authorization_owner.can_write)
+        # secondary user
+        private_authorization_user = self.project.get_user_authorization(self.user)
+        self.assertFalse(private_authorization_user.can_write)
+
+    def test_is_admin(self):
+        # organization owner
+        authorization_owner = self.project.project_authorizations.get(user=self.owner)
+        self.assertTrue(authorization_owner.is_admin)
+        # secondary user
+        authorization_user = self.project.get_user_authorization(self.user)
+        self.assertFalse(authorization_user.is_admin)
+        # private owner
+        private_authorization_owner = self.project.get_user_authorization(
+            self.owner
+        )
+        self.assertTrue(private_authorization_owner.is_admin)
+        # secondary user
+        private_authorization_user = self.project.get_user_authorization(self.user)
+        self.assertFalse(private_authorization_user.is_admin)
+
+    def test_owner_ever_admin(self):
+        authorization_owner = self.project.project_authorizations.get(user=self.owner)
+        self.assertTrue(authorization_owner.is_admin)
