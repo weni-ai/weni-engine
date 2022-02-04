@@ -449,6 +449,17 @@ class Project(models.Model):
     def __str__(self):
         return f"{self.uuid} - Project: {self.name} - Org: {self.organization.name}"
 
+    def get_user_authorization(self, user, **kwargs):
+        if user.is_anonymous:
+            return ProjectAuthorization(project=self)  # pragma: no cover
+        get, created = ProjectAuthorization.objects.get_or_create(
+            user=user,
+            project=self,
+            organization_authorization=self.organization.authorizations.first(),
+            **kwargs,
+        )
+        return get
+
     def send_email_create_project(self, first_name: str, email: str):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
@@ -532,6 +543,61 @@ class Project(models.Model):
             ),
         )
         return mail
+
+
+class ProjectRole(Enum):
+    NOT_SETTED, ADMIN, CONTRIBUTOR, VIEWER = list(range(4))
+
+
+class ProjectRoleLevel(Enum):
+    NOTHING, ADMIN, CONTRIBUTOR, VIEWER = list(range(4))
+
+
+class ProjectAuthorization(models.Model):
+    ROLE_CHOICES = [
+        (ProjectRole.NOT_SETTED.value, _("not set")),
+        (ProjectRole.VIEWER.value, _("viewer")),
+        (ProjectRole.CONTRIBUTOR.value, _("contributor")),
+        (ProjectRole.ADMIN.value, _("admin")),
+    ]
+    uuid = models.UUIDField(
+        _("UUID"), primary_key=True, default=uuid4.uuid4, editable=False
+    )
+    user = models.ForeignKey(User, models.CASCADE, related_name="project_authorizations_user")
+    project = models.ForeignKey(Project, models.CASCADE, related_name="project_authorizations")
+    organization_authorization = models.ForeignKey(OrganizationAuthorization, models.CASCADE)
+    role = models.PositiveIntegerField(
+        _("role"), choices=ROLE_CHOICES, default=ProjectRole.NOT_SETTED.value
+    )
+    created_at = models.DateTimeField(_("created at"), auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.project.name} - {self.user.email}'
+
+    @property
+    def level(self):
+        if self.role == ProjectRole.ADMIN.value:
+            return ProjectRoleLevel.ADMIN.value
+        elif self.role == ProjectRole.CONTRIBUTOR.value:
+            return ProjectRoleLevel.CONTRIBUTOR.value
+        elif self.role == ProjectRole.VIEWER.value:
+            return ProjectRoleLevel.VIEWER.value
+
+    @property
+    def is_admin(self):
+        return self.level == ProjectRoleLevel.ADMIN.value
+
+    @property
+    def can_write(self):
+        return self.level in [ProjectRoleLevel.ADMIN.value]
+
+    @property
+    def can_read(self):
+        return self.level in [ProjectRoleLevel.ADMIN.value, ProjectRoleLevel.CONTRIBUTOR.value, ProjectRoleLevel.VIEWER.value]
+
+    @property
+    def can_contribute(self):
+        return self.level in [ProjectRoleLevel.ADMIN.value, ProjectRoleLevel.CONTRIBUTOR.value]
 
 
 class Service(models.Model):
