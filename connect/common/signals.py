@@ -10,6 +10,7 @@ from connect.common.models import (
     Organization,
     OrganizationAuthorization,
     RequestPermissionOrganization,
+    OrganizationLevelRole,
 )
 from connect.celery import app as celery_app
 
@@ -63,7 +64,7 @@ def update_organization(instance, **kwargs):
 
 @receiver(post_save, sender=OrganizationAuthorization)
 def org_authorizations(sender, instance, **kwargs):
-    if instance.role is not OrganizationAuthorization.LEVEL_NOTHING:
+    if instance.role is not OrganizationLevelRole.NOTHING.value:
         celery_app.send_task(
             "update_user_permission_organization",
             args=[

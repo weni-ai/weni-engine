@@ -9,10 +9,10 @@ from connect.api.v1.tests.utils import create_user_and_token
 from connect.common.models import (
     Service,
     Organization,
-    OrganizationAuthorization,
     Newsletter,
     NewsletterLanguage,
     BillingPlan,
+    OrganizationRole,
 )
 
 
@@ -34,7 +34,7 @@ class ListStatusServiceTestCase(TestCase):
         )
 
         self.organization_authorization = self.organization.authorizations.create(
-            user=self.user, role=OrganizationAuthorization.ROLE_ADMIN
+            user=self.user, role=OrganizationRole.ADMIN.value
         )
 
         self.project = self.organization.project.create(

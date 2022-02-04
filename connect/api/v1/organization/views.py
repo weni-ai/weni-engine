@@ -33,7 +33,7 @@ from connect.celery import app as celery_app
 from connect.common.models import (
     Organization,
     OrganizationAuthorization,
-    RequestPermissionOrganization, GenericBillingData,
+    RequestPermissionOrganization, GenericBillingData, OrganizationRole
 )
 from connect.middleware import ExternalAuthentication
 
@@ -58,8 +58,9 @@ class OrganizationViewSet(
         if getattr(self, "swagger_fake_view", False):
             # queryset just for schema generation metadata
             return Organization.objects.none()  # pragma: no cover
+        exclude_roles = [OrganizationRole.NOT_SETTED.value, OrganizationRole.FINANCIAL.value]
         auth = (
-            OrganizationAuthorization.objects.exclude(role=0)
+            OrganizationAuthorization.objects.exclude(role__in=exclude_roles)
             .filter(user=self.request.user)
             .values("organization")
         )

@@ -17,6 +17,8 @@ from connect import billing
 from connect.authentication.models import User
 from connect.billing.gateways.stripe_gateway import StripeGateway
 
+from enum import Enum
+
 logger = logging.getLogger(__name__)
 
 
@@ -317,27 +319,26 @@ class Organization(models.Model):
         return 0 if active_integrations_counter <= 1 else active_integrations_counter - 1
 
 
+class OrganizationLevelRole(Enum):
+    NOTHING, VIEWER, CONTRIBUTOR, ADMIN, FINANCIAL = list(range(5))
+
+
+class OrganizationRole(Enum):
+    NOT_SETTED, VIEWER, CONTRIBUTOR, ADMIN, FINANCIAL = list(range(5))
+
+
 class OrganizationAuthorization(models.Model):
     class Meta:
         verbose_name = _("organization authorization")
         verbose_name_plural = _("organization authorizations")
         unique_together = ["user", "organization"]
 
-    LEVEL_NOTHING = 0
-    LEVEL_VIEWER = 1
-    LEVEL_CONTRIBUTOR = 2
-    LEVEL_ADMIN = 3
-
-    ROLE_NOT_SETTED = 0
-    ROLE_VIEWER = 1
-    ROLE_CONTRIBUTOR = 2
-    ROLE_ADMIN = 3
-
     ROLE_CHOICES = [
-        (ROLE_NOT_SETTED, _("not set")),
-        (ROLE_VIEWER, _("viewer")),
-        (ROLE_CONTRIBUTOR, _("contributor")),
-        (ROLE_ADMIN, _("admin")),
+        (OrganizationRole.NOT_SETTED.value, _("not set")),
+        (OrganizationRole.VIEWER.value, _("viewer")),
+        (OrganizationRole.CONTRIBUTOR.value, _("contributor")),
+        (OrganizationRole.ADMIN.value, _("admin")),
+        (OrganizationRole.FINANCIAL.value, _('financial')),
     ]
 
     uuid = models.UUIDField(
@@ -348,7 +349,7 @@ class OrganizationAuthorization(models.Model):
         Organization, models.CASCADE, related_name="authorizations"
     )
     role = models.PositiveIntegerField(
-        _("role"), choices=ROLE_CHOICES, default=ROLE_NOT_SETTED
+        _("role"), choices=ROLE_CHOICES, default=OrganizationRole.NOT_SETTED.value
     )
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
 
@@ -357,37 +358,48 @@ class OrganizationAuthorization(models.Model):
 
     @property
     def level(self):
-        if self.role == OrganizationAuthorization.ROLE_VIEWER:
-            return OrganizationAuthorization.LEVEL_VIEWER
+        if self.role == OrganizationRole.VIEWER.value:
+            return OrganizationLevelRole.VIEWER.value
 
-        if self.role == OrganizationAuthorization.ROLE_CONTRIBUTOR:
-            return OrganizationAuthorization.LEVEL_CONTRIBUTOR
+        if self.role == OrganizationRole.CONTRIBUTOR.value:
+            return OrganizationLevelRole.CONTRIBUTOR.value
 
-        if self.role == OrganizationAuthorization.ROLE_ADMIN:
-            return OrganizationAuthorization.LEVEL_ADMIN
+        if self.role == OrganizationRole.ADMIN.value:
+            return OrganizationLevelRole.ADMIN.value
+
+        if self.role == OrganizationRole.FINANCIAL.value:
+            return OrganizationLevelRole.FINANCIAL.value
 
     @property
     def can_read(self):
         return self.level in [
-            OrganizationAuthorization.LEVEL_VIEWER,
-            OrganizationAuthorization.LEVEL_CONTRIBUTOR,
-            OrganizationAuthorization.LEVEL_ADMIN,
+            OrganizationLevelRole.VIEWER.value,
+            OrganizationLevelRole.CONTRIBUTOR.value,
+            OrganizationLevelRole.ADMIN.value,
         ]
 
     @property
     def can_contribute(self):
         return self.level in [
-            OrganizationAuthorization.LEVEL_CONTRIBUTOR,
-            OrganizationAuthorization.LEVEL_ADMIN,
+            OrganizationLevelRole.CONTRIBUTOR.value,
+            OrganizationLevelRole.ADMIN.value,
         ]
 
     @property
     def can_write(self):
-        return self.level in [OrganizationAuthorization.LEVEL_ADMIN]
+        return self.level in [OrganizationLevelRole.ADMIN.value]
 
     @property
     def is_admin(self):
-        return self.level == OrganizationAuthorization.LEVEL_ADMIN
+        return self.level == OrganizationLevelRole.ADMIN.value
+
+    @property
+    def is_financial(self):
+        return self.level == OrganizationLevelRole.FINANCIAL.value
+
+    @property
+    def can_contribute_billing(self):
+        return self.level in [OrganizationLevelRole.ADMIN.value, OrganizationLevelRole.FINANCIAL.value]
 
     @property
     def role_verbose(self):
@@ -624,7 +636,7 @@ class RequestPermissionOrganization(models.Model):
     role = models.PositiveIntegerField(
         _("role"),
         choices=OrganizationAuthorization.ROLE_CHOICES,
-        default=OrganizationAuthorization.ROLE_NOT_SETTED,
+        default=OrganizationRole.NOT_SETTED.value,
     )
     created_by = models.ForeignKey(User, models.CASCADE)
 
