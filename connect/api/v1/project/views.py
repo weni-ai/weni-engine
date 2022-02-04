@@ -11,7 +11,10 @@ from rest_framework.viewsets import GenericViewSet
 from connect.api.v1.metadata import Metadata
 from connect.api.v1.project.filters import ProjectOrgFilter
 from connect.api.v1.project.permissions import ProjectHasPermission
-from connect.api.v1.project.serializers import ProjectSerializer, ProjectSearchSerializer
+from connect.api.v1.project.serializers import (
+    ProjectSerializer,
+    ProjectSearchSerializer,
+)
 from connect.celery import app as celery_app
 from connect.common.models import OrganizationAuthorization, Project
 
@@ -108,5 +111,5 @@ class ProjectViewSet(
             )
         task = tasks.get_contacts_detailed.delay(str(project_uuid), before, after)
         task.wait()
-        contact_detailed = {'projects': task.result}
+        contact_detailed = {"projects": task.result}
         return JsonResponse(data=contact_detailed, status=status.HTTP_200_OK)
