@@ -19,7 +19,6 @@ from connect.common.models import (
     RocketRole,
     RocketRoleLevel,
     RocketAuthorization,
-    ProjectRoleLevel,
 )
 from django.conf import settings
 from django.utils import timezone
@@ -715,7 +714,7 @@ class RequestPermissionProjectTestCase(TestCase):
         self.request_permission = RequestPermissionProject.objects.create(
             email="fake@user.com",
             project=self.project,
-            role=ProjectRole.ADMIN.value,
+            role=ProjectRole.MODERATOR.value,
             created_by=self.owner,
         )
         self.assertTrue(self.request_permission)
