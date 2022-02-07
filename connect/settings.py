@@ -199,6 +199,7 @@ LANGUAGE_CODE = env.str("LANGUAGE_CODE")
 # Available languages for translation
 # -----------------------------------------------------------------------------------
 LANGUAGES = (
+    ("es", _("Spanish"))
     ("en-us", _("English")),
     ("pt-br", _("Portuguese")),
 )
