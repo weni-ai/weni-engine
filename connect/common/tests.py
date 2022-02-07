@@ -13,7 +13,10 @@ from connect.common.models import (
     GenericBillingData,
     OrganizationRole,
     OrganizationLevelRole,
-    ProjectRoleLevel
+    ProjectRoleLevel,
+    RocketRole,
+    RocketRoleLevel,
+    RocketAuthorization
 )
 from django.conf import settings
 from django.utils import timezone
@@ -468,13 +471,13 @@ class ProjectAuthorizationTestCase(TestCase):
             flow_organization=uuid4.uuid4(),
         )
         self.project_authorization = self.project.project_authorizations.create(
-            user=self.owner, role=ProjectRoleLevel.ADMIN.value,
+            user=self.owner, role=ProjectRoleLevel.MODERATOR.value,
             organization_authorization=self.organization_authorization
         )
 
     def test_admin_level(self):
         authorization = self.project.get_user_authorization(self.owner)
-        self.assertEqual(authorization.level, ProjectRoleLevel.ADMIN.value)
+        self.assertEqual(authorization.level, ProjectRoleLevel.MODERATOR.value)
 
     def test_not_read_level(self):
         authorization = self.project.get_user_authorization(self.user)
@@ -520,22 +523,40 @@ class ProjectAuthorizationTestCase(TestCase):
         private_authorization_user = self.project.get_user_authorization(self.user)
         self.assertFalse(private_authorization_user.can_write)
 
-    def test_is_admin(self):
+    def test_is_moderator(self):
         # organization owner
         authorization_owner = self.project.project_authorizations.get(user=self.owner)
-        self.assertTrue(authorization_owner.is_admin)
+        self.assertTrue(authorization_owner.is_moderator)
         # secondary user
         authorization_user = self.project.get_user_authorization(self.user)
-        self.assertFalse(authorization_user.is_admin)
+        self.assertFalse(authorization_user.is_moderator)
         # private owner
         private_authorization_owner = self.project.get_user_authorization(
             self.owner
         )
-        self.assertTrue(private_authorization_owner.is_admin)
+        self.assertTrue(private_authorization_owner.is_moderator)
         # secondary user
         private_authorization_user = self.project.get_user_authorization(self.user)
-        self.assertFalse(private_authorization_user.is_admin)
+        self.assertFalse(private_authorization_user.is_moderator)
 
     def test_owner_ever_admin(self):
         authorization_owner = self.project.project_authorizations.get(user=self.owner)
-        self.assertTrue(authorization_owner.is_admin)
+        self.assertTrue(authorization_owner.is_moderator)
+
+
+class RocketAuthorizationTestCase(TestCase):
+    def setUp(self):
+        self.agent_authorization = RocketAuthorization.objects.create(role=RocketRole.AGENT.value)
+        self.service_manager_authorization = RocketAuthorization.objects.create(role=RocketRole.SERVICE_MANAGER.value)
+        self.not_set_auth = RocketAuthorization.objects.create()
+
+    def test_level_agent(self):
+        self.assertTrue(self.agent_authorization.level == RocketRoleLevel.AGENT.value)
+        self.assertFalse(self.agent_authorization.level == RocketRoleLevel.SERVICE_MANAGER.value)
+
+    def test_level_service_manager(self):
+        self.assertTrue(self.service_manager_authorization.level == RocketRoleLevel.SERVICE_MANAGER.value)
+        self.assertFalse(self.service_manager_authorization.level == RocketRoleLevel.AGENT.value)
+
+    def test_level_nothing_permission(self):
+        self.assertTrue(self.not_set_auth.level == RocketRoleLevel.NOTHING.value)

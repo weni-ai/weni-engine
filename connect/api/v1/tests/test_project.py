@@ -110,17 +110,17 @@ class ListProjectAPITestCase(TestCase):
         )
         self.owner_project_authorization = self.project.project_authorizations.create(
             user=self.owner,
-            role=ProjectRoleLevel.ADMIN.value,
+            role=ProjectRoleLevel.MODERATOR.value,
             organization_authorization=self.owner_organization_authorization,
         )
         self.owner_project_authorization2 = self.project2.project_authorizations.create(
             user=self.owner,
-            role=ProjectRoleLevel.ADMIN.value,
+            role=ProjectRoleLevel.MODERATOR.value,
             organization_authorization=self.owner_organization_authorization,
         )
         self.user_project_authorization = self.project.project_authorizations.create(
             user=self.user,
-            role=ProjectRoleLevel.ADMIN.value,
+            role=ProjectRoleLevel.MODERATOR.value,
             organization_authorization=self.user_organization_authorization,
         )
 
