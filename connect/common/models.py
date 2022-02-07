@@ -612,7 +612,7 @@ class ProjectAuthorization(models.Model):
         (ProjectRole.NOT_SETTED.value, _("not set")),
         (ProjectRole.VIEWER.value, _("viewer")),
         (ProjectRole.CONTRIBUTOR.value, _("contributor")),
-        (ProjectRole.MODERATOR.value, _("MODERATOR")),
+        (ProjectRole.MODERATOR.value, _("moderator")),
     ]
     uuid = models.UUIDField(
         _("UUID"), primary_key=True, default=uuid4.uuid4, editable=False
