@@ -24,3 +24,9 @@ class OrganizationAdminManagerAuthorization(
     def has_object_permission(self, request, view, obj):
         authorization = obj.organization.get_user_authorization(request.user)
         return authorization.is_admin
+
+
+class OrganizationHasPermissionBilling(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        authorization = obj.organization.get_user_authorization(request.user)
+        return authorization.can_contribute_billing

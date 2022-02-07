@@ -141,7 +141,9 @@ class Organization(models.Model):
         }
         mail.send_mail(
             _("Invitation to join organization"),
-            render_to_string("common/emails/organization/invite_organization.txt", context),
+            render_to_string(
+                "common/emails/organization/invite_organization.txt", context
+            ),
             None,
             [email],
             html_message=render_to_string(
@@ -156,14 +158,16 @@ class Organization(models.Model):
         context = {
             "base_url": settings.BASE_URL,
             "user_name": user_name,
-            "organization_name": self.name
+            "organization_name": self.name,
         }
         mail.send_mail(
             _(f"You are going out of {self.name}"),
             render_to_string("common/emails/organization/org_going_out.txt", context),
             None,
             [email],
-            html_message=render_to_string("common/emails/organization/org_going_out.html", context)
+            html_message=render_to_string(
+                "common/emails/organization/org_going_out.html", context
+            ),
         )
         return mail
 
@@ -173,14 +177,16 @@ class Organization(models.Model):
         context = {
             "base_url": settings.BASE_URL,
             "user_name": user_name,
-            "organization_name": self.name
+            "organization_name": self.name,
         }
         mail.send_mail(
             _(f"You have been removed from {self.name}"),
             render_to_string("common/emails/organization/org_removed.txt", context),
             None,
             [email],
-            html_message=render_to_string("common/emails/organization/org_removed.html", context)
+            html_message=render_to_string(
+                "common/emails/organization/org_removed.html", context
+            ),
         )
         return mail
 
@@ -195,7 +201,9 @@ class Organization(models.Model):
         }
         mail.send_mail(
             _("Organization created!"),
-            render_to_string("common/emails/organization/organization_create.txt", context),
+            render_to_string(
+                "common/emails/organization/organization_create.txt", context
+            ),
             None,
             [email],
             html_message=render_to_string(
@@ -220,7 +228,8 @@ class Organization(models.Model):
             None,
             [email],
             html_message=render_to_string(
-                "common/emails/organization/remove_permission_organization.html", context
+                "common/emails/organization/remove_permission_organization.html",
+                context,
             ),
         )
         return mail
@@ -235,7 +244,9 @@ class Organization(models.Model):
         }
         mail.send_mail(
             _(f"{self.name} no longer exists!"),
-            render_to_string("common/emails/organization/delete_organization.txt", context),
+            render_to_string(
+                "common/emails/organization/delete_organization.txt", context
+            ),
             None,
             [email],
             html_message=render_to_string(
@@ -244,19 +255,26 @@ class Organization(models.Model):
         )
         return mail
 
-    def send_email_change_organization_name(self, user_name: str, email: str, organization_previous_name: str,
-                                            organization_new_name: str):
+    def send_email_change_organization_name(
+        self,
+        user_name: str,
+        email: str,
+        organization_previous_name: str,
+        organization_new_name: str,
+    ):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
         context = {
             "base_url": settings.BASE_URL,
             "user_name": user_name,
             "organization_previous_name": organization_previous_name,
-            "organization_new_name": organization_new_name
+            "organization_new_name": organization_new_name,
         }
         mail.send_mail(
             _(f"{organization_previous_name} now it's {organization_new_name}"),
-            render_to_string("common/emails/organization/change_organization_name.txt", context),
+            render_to_string(
+                "common/emails/organization/change_organization_name.txt", context
+            ),
             None,
             [email],
             html_message=render_to_string(
@@ -284,18 +302,22 @@ class Organization(models.Model):
         )
         return mail
 
-    def send_email_permission_change(self, user_name: str, old_permission: str, new_permission: str, email: str):
+    def send_email_permission_change(
+        self, user_name: str, old_permission: str, new_permission: str, email: str
+    ):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
         context = {
             "base_url": settings.BASE_URL,
             "user_name": user_name,
             "old_permission": old_permission,
-            "new_permission": new_permission
+            "new_permission": new_permission,
         }
         mail.send_mail(
             _("A new permission has been assigned to you"),
-            render_to_string("common/emails/organization/permission_change.txt", context),
+            render_to_string(
+                "common/emails/organization/permission_change.txt", context
+            ),
             None,
             [email],
             html_message=render_to_string(
@@ -316,7 +338,9 @@ class Organization(models.Model):
         active_integrations_counter = 0
         for project in self.project.all():
             active_integrations_counter += project.extra_active_integration
-        return 0 if active_integrations_counter <= 1 else active_integrations_counter - 1
+        return (
+            0 if active_integrations_counter <= 1 else active_integrations_counter - 1
+        )
 
 
 class OrganizationLevelRole(Enum):
@@ -337,7 +361,7 @@ class OrganizationAuthorization(models.Model):
         (OrganizationRole.NOT_SETTED.value, _("not set")),
         (OrganizationRole.CONTRIBUTOR.value, _("contributor")),
         (OrganizationRole.ADMIN.value, _("admin")),
-        (OrganizationRole.FINANCIAL.value, _('financial')),
+        (OrganizationRole.FINANCIAL.value, _("financial")),
     ]
 
     uuid = models.UUIDField(
@@ -395,7 +419,10 @@ class OrganizationAuthorization(models.Model):
 
     @property
     def can_contribute_billing(self):
-        return self.level in [OrganizationLevelRole.ADMIN.value, OrganizationLevelRole.FINANCIAL.value]
+        return self.level in [
+            OrganizationLevelRole.ADMIN.value,
+            OrganizationLevelRole.FINANCIAL.value,
+        ]
 
     @property
     def role_verbose(self):
@@ -440,7 +467,9 @@ class Project(models.Model):
     flow_count = models.IntegerField(_("Flows count"), default=0)
     contact_count = models.IntegerField(_("Contacts count"), default=0)
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
-    extra_active_integration = models.IntegerField(_("Whatsapp Integrations"), default=0)
+    extra_active_integration = models.IntegerField(
+        _("Whatsapp Integrations"), default=0
+    )
 
     def __str__(self):
         return f"{self.uuid} - Project: {self.name} - Org: {self.organization.name}"
@@ -559,16 +588,22 @@ class ProjectAuthorization(models.Model):
     uuid = models.UUIDField(
         _("UUID"), primary_key=True, default=uuid4.uuid4, editable=False
     )
-    user = models.ForeignKey(User, models.CASCADE, related_name="project_authorizations_user")
-    project = models.ForeignKey(Project, models.CASCADE, related_name="project_authorizations")
-    organization_authorization = models.ForeignKey(OrganizationAuthorization, models.CASCADE)
+    user = models.ForeignKey(
+        User, models.CASCADE, related_name="project_authorizations_user"
+    )
+    project = models.ForeignKey(
+        Project, models.CASCADE, related_name="project_authorizations"
+    )
+    organization_authorization = models.ForeignKey(
+        OrganizationAuthorization, models.CASCADE
+    )
     role = models.PositiveIntegerField(
         _("role"), choices=ROLE_CHOICES, default=ProjectRole.NOT_SETTED.value
     )
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
 
     def __str__(self):
-        return f'{self.project.name} - {self.user.email}'
+        return f"{self.project.name} - {self.user.email}"
 
     @property
     def level(self):
@@ -589,11 +624,18 @@ class ProjectAuthorization(models.Model):
 
     @property
     def can_read(self):
-        return self.level in [ProjectRoleLevel.ADMIN.value, ProjectRoleLevel.CONTRIBUTOR.value, ProjectRoleLevel.VIEWER.value]
+        return self.level in [
+            ProjectRoleLevel.ADMIN.value,
+            ProjectRoleLevel.CONTRIBUTOR.value,
+            ProjectRoleLevel.VIEWER.value,
+        ]
 
     @property
     def can_contribute(self):
-        return self.level in [ProjectRoleLevel.ADMIN.value, ProjectRoleLevel.CONTRIBUTOR.value]
+        return self.level in [
+            ProjectRoleLevel.ADMIN.value,
+            ProjectRoleLevel.CONTRIBUTOR.value,
+        ]
 
 
 class Service(models.Model):
@@ -703,6 +745,24 @@ class RequestPermissionOrganization(models.Model):
     created_by = models.ForeignKey(User, models.CASCADE)
 
 
+class RequestPermissionProject(models.Model):
+    class Meta:
+        verbose_name = _("request permission project")
+        unique_together = ["email", "project"]
+
+    email = models.EmailField(_("email"))
+    project = models.ForeignKey(Project, models.CASCADE)
+    role = models.PositiveIntegerField(
+        _("role"),
+        choices=ProjectAuthorization.ROLE_CHOICES,
+        default=ProjectRole.NOT_SETTED.value,
+    )
+    created_by = models.ForeignKey(User, models.CASCADE)
+
+    def __str__(self):
+        return f"{self.project.name}, {self.role}, <{self.email}>"
+
+
 class BillingPlan(models.Model):
     class Meta:
         verbose_name = _("organization billing plan")
@@ -754,7 +814,7 @@ class BillingPlan(models.Model):
     PLAN_CHOICES = [
         (PLAN_FREE, _("free")),
         (PLAN_ENTERPRISE, _("enterprise")),
-        (PLAN_CUSTOM, _("custom"))
+        (PLAN_CUSTOM, _("custom")),
     ]
 
     organization = models.OneToOneField(
@@ -776,7 +836,9 @@ class BillingPlan(models.Model):
         _("notes administration"), null=True, blank=True
     )
     fixed_discount = models.FloatField(_("fixed discount"), default=0)
-    plan = models.CharField(_("plan"), max_length=10, choices=PLAN_CHOICES, default=PLAN_CUSTOM)
+    plan = models.CharField(
+        _("plan"), max_length=10, choices=PLAN_CHOICES, default=PLAN_CUSTOM
+    )
     contract_on = models.DateField(_("date of contract plan"), auto_now_add=True)
     is_active = models.BooleanField(_("active plan"), default=True)
     stripe_customer = models.CharField(
@@ -803,13 +865,17 @@ class BillingPlan(models.Model):
     )
 
     personal_identification_number = models.CharField(
-        verbose_name="Personal Identification Number", null=True, blank=True,
-        max_length=50
+        verbose_name="Personal Identification Number",
+        null=True,
+        blank=True,
+        max_length=50,
     )
 
     additional_billing_information = models.CharField(
         verbose_name=_("Additional billing information"),
-        null=True, blank=True, max_length=250
+        null=True,
+        blank=True,
+        max_length=250,
     )
 
     @property
@@ -866,7 +932,7 @@ class BillingPlan(models.Model):
     def remove_credit_card(self):
         gateway = billing.get_gateway("stripe")
         unstore = gateway.unstore(identification=self.stripe_customer)
-        if unstore['status'] == 'SUCCESS':
+        if unstore["status"] == "SUCCESS":
             self.card_brand = None
             self.card_expiration_date = None
             self.final_card_number = None
@@ -898,15 +964,16 @@ class BillingPlan(models.Model):
                         self.organization.organization_billing.calculate_amount(
                             contact_count=0 if contact_count is None else contact_count
                         )
-                    ) + (settings.BILLING_COST_PER_WHATSAPP * self.organization.extra_integration)
+                    )
+                    + (
+                        settings.BILLING_COST_PER_WHATSAPP
+                        * self.organization.extra_integration
+                    )
                 )
                 * float(1 - self.fixed_discount / 100)
             ).quantize(Decimal(".01"), decimal.ROUND_HALF_UP)
 
-        return {
-            "total_contact": contact_count,
-            "amount_currenty": amount_currenty
-        }
+        return {"total_contact": contact_count, "amount_currenty": amount_currenty}
 
     def change_plan(self, plan):
         _is_valid = False
@@ -921,14 +988,14 @@ class BillingPlan(models.Model):
 
     def add_additional_information(self, data: dict):
         count = 0
-        if not (data['additional_info'] is None):
-            self.additional_billing_information = data['additional_info']
+        if not (data["additional_info"] is None):
+            self.additional_billing_information = data["additional_info"]
             count += 1
-        if not (data['personal_identification_number'] is None):
-            self.personal_identification_number = data['personal_identification_number']
+        if not (data["personal_identification_number"] is None):
+            self.personal_identification_number = data["personal_identification_number"]
             count += 1
-        if not (data['extra_integration'] is None):
-            self.organization.extra_integration = data['extra_integration']
+        if not (data["extra_integration"] is None):
+            self.organization.extra_integration = data["extra_integration"]
             self.organization.save()
             count += 1
         if count > 0:
@@ -943,14 +1010,16 @@ class BillingPlan(models.Model):
         context = {
             "base_url": settings.BASE_URL,
             "organization_name": self.organization.name,
-            "user_name": user_name
+            "user_name": user_name,
         }
         mail.send_mail(
-            _(f"A credit card has been added to the organization {self.organization.name}"),
+            _(
+                f"A credit card has been added to the organization {self.organization.name}"
+            ),
             render_to_string("billing/emails/added_card.txt", context),
             None,
             email,
-            html_message=render_to_string("billing/emails/added_card.html", context)
+            html_message=render_to_string("billing/emails/added_card.html", context),
         )
         return mail
 
@@ -960,14 +1029,16 @@ class BillingPlan(models.Model):
         context = {
             "base_url": settings.BASE_URL,
             "organization_name": self.organization.name,
-            "user_name": user_name
+            "user_name": user_name,
         }
         mail.send_mail(
-            _(f"A credit card has been changed to the organization {self.organization.name}"),
+            _(
+                f"A credit card has been changed to the organization {self.organization.name}"
+            ),
             render_to_string("billing/emails/changed_card.txt", context),
             None,
             email,
-            html_message=render_to_string("billing/emails/changed_card.html", context)
+            html_message=render_to_string("billing/emails/changed_card.html", context),
         )
         return mail
 
@@ -977,14 +1048,14 @@ class BillingPlan(models.Model):
         context = {
             "base_url": settings.BASE_URL,
             "organization_name": self.organization.name,
-            "user_name": user_name
+            "user_name": user_name,
         }
         mail.send_mail(
             _(f"Your {self.organization.name} organization's plan has ended"),
             render_to_string("billing/emails/finished-plan.txt", context),
             None,
             email,
-            html_message=render_to_string("billing/emails/finished-plan.html", context)
+            html_message=render_to_string("billing/emails/finished-plan.html", context),
         )
         return mail
 
@@ -994,14 +1065,18 @@ class BillingPlan(models.Model):
         context = {
             "base_url": settings.BASE_URL,
             "organization_name": self.organization.name,
-            "user_name": user_name
+            "user_name": user_name,
         }
         mail.send_mail(
-            _(f"Your {self.organization.name} organization's plan has been reactivated."),
+            _(
+                f"Your {self.organization.name} organization's plan has been reactivated."
+            ),
             render_to_string("billing/emails/reactived-plan.txt", context),
             None,
             email,
-            html_message=render_to_string("billing/emails/reactived-plan.html", context)
+            html_message=render_to_string(
+                "billing/emails/reactived-plan.html", context
+            ),
         )
         return mail
 
@@ -1011,14 +1086,14 @@ class BillingPlan(models.Model):
         context = {
             "base_url": settings.BASE_URL,
             "user_name": user_name,
-            "org_name": self.organization.name
+            "org_name": self.organization.name,
         }
         mail.send_mail(
             _(f"Your {self.organization.name} organization credit card was removed"),
             render_to_string("billing/emails/removed_card.txt", context),
             None,
             email,
-            html_message=render_to_string("billing/emails/removed_card.html", context)
+            html_message=render_to_string("billing/emails/removed_card.html", context),
         )
         return mail
 
@@ -1028,14 +1103,18 @@ class BillingPlan(models.Model):
         context = {
             "base_url": settings.BASE_URL,
             "organization_name": self.organization.name,
-            "user_name": user_name
+            "user_name": user_name,
         }
         mail.send_mail(
-            _(f"The organization {self.organization.name} has already surpassed 200 active contacts"),
+            _(
+                f"The organization {self.organization.name} has already surpassed 200 active contacts"
+            ),
             render_to_string("billing/emails/free-plan-expired.txt", context),
             None,
             email,
-            html_message=render_to_string("billing/emails/free-plan-expired.html", context)
+            html_message=render_to_string(
+                "billing/emails/free-plan-expired.html", context
+            ),
         )
         return mail
 
@@ -1046,14 +1125,16 @@ class BillingPlan(models.Model):
             "base_url": settings.BASE_URL,
             "user_name": user_name,
             "org_name": self.organization.name,
-            "plan": plan
+            "plan": plan,
         }
         mail.send_mail(
-            _(f"Your {self.organization.name} organization has the {plan.title()} Plan"),
+            _(
+                f"Your {self.organization.name} organization has the {plan.title()} Plan"
+            ),
             render_to_string("billing/emails/free_plan.txt", context),
             None,
             [email],
-            html_message=render_to_string("billing/emails/free_plan.html", context)
+            html_message=render_to_string("billing/emails/free_plan.html", context),
         )
         return mail
 
@@ -1065,14 +1146,14 @@ class BillingPlan(models.Model):
             "organization_name": self.organization.name,
             "user_name": user_name,
             "old_plan": old_plan,
-            "actual_plan": self.plan
+            "actual_plan": self.plan,
         }
         mail.send_mail(
             _(f"Your {self.organization.name} organization's plan has been changed."),
             render_to_string("billing/emails/changed-plan.txt", context),
             None,
             email,
-            html_message=render_to_string("billing/emails/changed-plan.html", context)
+            html_message=render_to_string("billing/emails/changed-plan.html", context),
         )
         return mail
 
@@ -1135,18 +1216,22 @@ class Invoice(models.Model):
     @property
     def card_data(self):
         card_data = StripeGateway().get_payment_method_details(self.stripe_charge)
-        if card_data['status'] == 'FAIL':
+        if card_data["status"] == "FAIL":
             billing = self.organization.organization_billing
             card_data = {
-                'status': 'SUCCESS',
-                'response': {
-                    'brand': billing.card_brand,
-                    'final_card_number': billing.final_card_number
-                }
+                "status": "SUCCESS",
+                "response": {
+                    "brand": billing.card_brand,
+                    "final_card_number": billing.final_card_number,
+                },
             }
-        if(card_data['response']['final_card_number']):
-            card_data['response']['final_card_number'] = str(card_data['response']['final_card_number'])
-            card_data['response']['final_card_number'] = card_data['response']['final_card_number'][len(card_data['response']['final_card_number']) - 2:]
+        if card_data["response"]["final_card_number"]:
+            card_data["response"]["final_card_number"] = str(
+                card_data["response"]["final_card_number"]
+            )
+            card_data["response"]["final_card_number"] = card_data["response"][
+                "final_card_number"
+            ][len(card_data["response"]["final_card_number"]) - 2 :]
         return card_data
 
     @property
@@ -1157,13 +1242,12 @@ class Invoice(models.Model):
             total_contact_count=Sum("contact_count")
         ).get("total_contact_count")
 
-        amount = generic_billing_data.calculate_active_contacts(contact_count if contact_count else 0)
+        amount = generic_billing_data.calculate_active_contacts(
+            contact_count if contact_count else 0
+        )
         integration_cost = float(self.cost_per_whatsapp * self.extra_integration)
         return Decimal(
-            float(
-                amount + integration_cost
-            )
-            * float(1 - self.discount / 100)
+            float(amount + integration_cost) * float(1 - self.discount / 100)
         ).quantize(Decimal(".01"), decimal.ROUND_HALF_UP)
 
 
@@ -1182,22 +1266,68 @@ class InvoiceProject(models.Model):
 
 
 class GenericBillingData(models.Model):
-    _free_active_contacts_limit = models.PositiveIntegerField(_("Free active contacts limit"), default=200)
-    _from_1_to_1000 = models.DecimalField(_("From 1 to 1000 active contacts"), decimal_places=3, max_digits=11, default=0.267)
-    _from_1001_to_5000 = models.DecimalField(_("From 1001 to 5000 active contacts"), decimal_places=3, max_digits=11, default=0.178)
-    _from_5001_to_10000 = models.DecimalField(_("From 5001 to 10000 active contacts"), decimal_places=3, max_digits=11, default=0.167)
-    _from_10001_to_30000 = models.DecimalField(_("From 10001 to 30000 active contacts"), decimal_places=3, max_digits=11, default=0.156)
-    _from_30001_to_50000 = models.DecimalField(_("From 30001 to 50000 active contacts"), decimal_places=3, max_digits=11, default=0.144)
-    _from_50001_to_100000 = models.DecimalField(_("From 50001 to 100000 active contacts"), decimal_places=3, max_digits=11, default=0.140)
-    _from_100001_to_250000 = models.DecimalField(_("From 100001 to 250000 active contacts"), decimal_places=3, max_digits=11, default=0.133)
-    _from_2500001 = models.DecimalField(_("From 100001 to 250000 active contacts"), decimal_places=3, max_digits=11, default=0.133)
+    _free_active_contacts_limit = models.PositiveIntegerField(
+        _("Free active contacts limit"), default=200
+    )
+    _from_1_to_1000 = models.DecimalField(
+        _("From 1 to 1000 active contacts"),
+        decimal_places=3,
+        max_digits=11,
+        default=0.267,
+    )
+    _from_1001_to_5000 = models.DecimalField(
+        _("From 1001 to 5000 active contacts"),
+        decimal_places=3,
+        max_digits=11,
+        default=0.178,
+    )
+    _from_5001_to_10000 = models.DecimalField(
+        _("From 5001 to 10000 active contacts"),
+        decimal_places=3,
+        max_digits=11,
+        default=0.167,
+    )
+    _from_10001_to_30000 = models.DecimalField(
+        _("From 10001 to 30000 active contacts"),
+        decimal_places=3,
+        max_digits=11,
+        default=0.156,
+    )
+    _from_30001_to_50000 = models.DecimalField(
+        _("From 30001 to 50000 active contacts"),
+        decimal_places=3,
+        max_digits=11,
+        default=0.144,
+    )
+    _from_50001_to_100000 = models.DecimalField(
+        _("From 50001 to 100000 active contacts"),
+        decimal_places=3,
+        max_digits=11,
+        default=0.140,
+    )
+    _from_100001_to_250000 = models.DecimalField(
+        _("From 100001 to 250000 active contacts"),
+        decimal_places=3,
+        max_digits=11,
+        default=0.133,
+    )
+    _from_2500001 = models.DecimalField(
+        _("From 100001 to 250000 active contacts"),
+        decimal_places=3,
+        max_digits=11,
+        default=0.133,
+    )
 
     def __str__(self):
-        return f'{self.free_active_contacts_limit}'
+        return f"{self.free_active_contacts_limit}"
 
     @staticmethod
     def get_generic_billing_data_instance():
-        return GenericBillingData.objects.first() if GenericBillingData.objects.all().exists() else GenericBillingData.objects.create()
+        return (
+            GenericBillingData.objects.first()
+            if GenericBillingData.objects.all().exists()
+            else GenericBillingData.objects.create()
+        )
 
     @property
     def free_active_contacts_limit(self):
@@ -1254,7 +1384,7 @@ class GenericBillingData(models.Model):
                     "to": "infinite",
                     "value_per_contact": self._from_100001_to_250000,
                 },
-            ]
+            ],
         }
 
     def calculate_active_contacts(self, contact_count):
