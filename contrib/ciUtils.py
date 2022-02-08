@@ -56,7 +56,8 @@ class CiUtils(object):
 
     def run_ci(self, path, is_local:bool):
         self.init_ci(path, is_local)
-        ok = self.execute('python manage.py collectstatic --noinput', False)
+        ok = self.execute('python manage.py migrate')
+        ok += self.execute('python manage.py collectstatic --noinput', False)
         ok += self.execute('flake8 connect/', False)
         if self.execute('coverage run manage.py test --verbosity=2 --noinput', False) == 0:
             ok += self.execute('coverage report -m', True)

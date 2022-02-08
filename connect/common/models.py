@@ -626,6 +626,9 @@ class ProjectAuthorization(models.Model):
     organization_authorization = models.ForeignKey(
         OrganizationAuthorization, models.CASCADE
     )
+    rocket_authorization = models.ForeignKey(
+        RocketAuthorization, models.CASCADE, null=True
+    )
     role = models.PositiveIntegerField(
         _("role"), choices=ROLE_CHOICES, default=ProjectRole.NOT_SETTED.value
     )
