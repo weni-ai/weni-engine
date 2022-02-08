@@ -49,7 +49,7 @@ class ProjectViewSet(
             .filter(user=self.request.user)
             .values("organization")
         )
-        return self.queryset.filter(organization__pk__in=auth)
+        return self.queryset.filter(organization__pk__in=auth).filter(project_authorizations__user=self.request.user)
 
     def perform_destroy(self, instance):
         flow_organization = instance.flow_organization
