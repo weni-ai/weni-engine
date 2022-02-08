@@ -22,7 +22,7 @@ from connect.middleware import ExternalAuthentication
 from rest_framework.exceptions import ValidationError
 from connect.common import tasks
 from django.http import JsonResponse
-
+from django.db.models import Q
 
 class ProjectViewSet(
     mixins.ListModelMixin,
@@ -49,7 +49,10 @@ class ProjectViewSet(
             .filter(user=self.request.user)
             .values("organization")
         )
-        return self.queryset.filter(organization__pk__in=auth).filter(project_authorizations__user=self.request.user)
+
+        filter = Q(project_authorizations__user__email="alisson.souza@weni.ai") & ~Q(project_authorizations__role=0)
+
+        return self.queryset.filter(organization__pk__in=auth).filter(filter)
 
     def perform_destroy(self, instance):
         flow_organization = instance.flow_organization
