@@ -570,12 +570,41 @@ class Project(models.Model):
         return mail
 
 
+class RocketRole(Enum):
+    NOT_SETTED, AGENT, SERVICE_MANAGER = list(range(3))
+
+
+class RocketRoleLevel(Enum):
+    NOTHING, AGENT, SERVICE_MANAGER = list(range(3))
+
+
+class RocketAuthorization(models.Model):
+    ROLE_CHOICES = [
+        (RocketRole.NOT_SETTED.value, _('not set')),
+        (RocketRole.AGENT.value, _('agent')),
+        (RocketRole.SERVICE_MANAGER.value, _('service manager'))
+    ]
+
+    role = models.PositiveIntegerField(
+        _("role"), choices=ROLE_CHOICES, default=RocketRole.NOT_SETTED.value
+    )
+    created_at = models.DateTimeField(_("created at"), auto_now_add=True)
+
+    @property
+    def level(self):
+        if(self.role == RocketRole.AGENT.value):
+            return RocketRoleLevel.AGENT.value
+        elif(self.role == RocketRole.SERVICE_MANAGER.value):
+            return RocketRoleLevel.SERVICE_MANAGER.value
+        return RocketRoleLevel.NOTHING.value
+
+
 class ProjectRole(Enum):
-    NOT_SETTED, ADMIN, CONTRIBUTOR, VIEWER = list(range(4))
+    NOT_SETTED, MODERATOR, CONTRIBUTOR, VIEWER = list(range(4))
 
 
 class ProjectRoleLevel(Enum):
-    NOTHING, ADMIN, CONTRIBUTOR, VIEWER = list(range(4))
+    NOTHING, MODERATOR, CONTRIBUTOR, VIEWER = list(range(4))
 
 
 class ProjectAuthorization(models.Model):
@@ -583,7 +612,7 @@ class ProjectAuthorization(models.Model):
         (ProjectRole.NOT_SETTED.value, _("not set")),
         (ProjectRole.VIEWER.value, _("viewer")),
         (ProjectRole.CONTRIBUTOR.value, _("contributor")),
-        (ProjectRole.ADMIN.value, _("admin")),
+        (ProjectRole.MODERATOR.value, _("moderator")),
     ]
     uuid = models.UUIDField(
         _("UUID"), primary_key=True, default=uuid4.uuid4, editable=False
@@ -597,6 +626,9 @@ class ProjectAuthorization(models.Model):
     organization_authorization = models.ForeignKey(
         OrganizationAuthorization, models.CASCADE
     )
+    rocket_authorization = models.ForeignKey(
+        RocketAuthorization, models.CASCADE, null=True
+    )
     role = models.PositiveIntegerField(
         _("role"), choices=ROLE_CHOICES, default=ProjectRole.NOT_SETTED.value
     )
@@ -607,25 +639,25 @@ class ProjectAuthorization(models.Model):
 
     @property
     def level(self):
-        if self.role == ProjectRole.ADMIN.value:
-            return ProjectRoleLevel.ADMIN.value
+        if self.role == ProjectRole.MODERATOR.value:
+            return ProjectRoleLevel.MODERATOR.value
         elif self.role == ProjectRole.CONTRIBUTOR.value:
             return ProjectRoleLevel.CONTRIBUTOR.value
         elif self.role == ProjectRole.VIEWER.value:
             return ProjectRoleLevel.VIEWER.value
 
     @property
-    def is_admin(self):
-        return self.level == ProjectRoleLevel.ADMIN.value
+    def is_moderator(self):
+        return self.level == ProjectRoleLevel.MODERATOR.value
 
     @property
     def can_write(self):
-        return self.level in [ProjectRoleLevel.ADMIN.value]
+        return self.level in [ProjectRoleLevel.MODERATOR.value]
 
     @property
     def can_read(self):
         return self.level in [
-            ProjectRoleLevel.ADMIN.value,
+            ProjectRoleLevel.MODERATOR.value,
             ProjectRoleLevel.CONTRIBUTOR.value,
             ProjectRoleLevel.VIEWER.value,
         ]
@@ -633,7 +665,7 @@ class ProjectAuthorization(models.Model):
     @property
     def can_contribute(self):
         return self.level in [
-            ProjectRoleLevel.ADMIN.value,
+            ProjectRoleLevel.MODERATOR.value,
             ProjectRoleLevel.CONTRIBUTOR.value,
         ]
 
