@@ -139,6 +139,7 @@ class ListProjectAPITestCase(TestCase):
         )
         response.render()
         content_data = json.loads(response.content)
+
         return (response, content_data)
 
     def test_user_project_authorizations(self):
@@ -192,6 +193,12 @@ class UpdateProjectTestCase(TestCase):
             flow_organization=uuid4.uuid4(),
         )
 
+        self.owner_project_authorization2 = self.project.project_authorizations.create(
+            user=self.owner,
+            role=ProjectRoleLevel.MODERATOR.value,
+            organization_authorization=self.organization_authorization,
+        )
+
     def request(self, project, data={}, token=None):
         authorization_header = (
             {"HTTP_AUTHORIZATION": "Token {}".format(token.key)} if token else {}
@@ -207,6 +214,7 @@ class UpdateProjectTestCase(TestCase):
         response = ProjectViewSet.as_view({"patch": "update"})(
             request, uuid=project.uuid, partial=True
         )
+
         response.render()
         content_data = json.loads(response.content)
         return (response, content_data)
@@ -238,8 +246,8 @@ class UpdateProjectTestCase(TestCase):
             {"name": "Project new"},
             self.user_token,
         )
-
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        # if the user dosen't have an authorization he cant find the project
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
 class ProjectEmailTestCase(TestCase):

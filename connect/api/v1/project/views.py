@@ -24,6 +24,7 @@ from connect.common import tasks
 from django.http import JsonResponse
 from django.db.models import Q
 
+
 class ProjectViewSet(
     mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
@@ -50,7 +51,9 @@ class ProjectViewSet(
             .values("organization")
         )
 
-        filter = Q(project_authorizations__user__email="alisson.souza@weni.ai") & ~Q(project_authorizations__role=0)
+        filter = Q(project_authorizations__user=self.request.user) & ~Q(
+            project_authorizations__role=0
+        )
 
         return self.queryset.filter(organization__pk__in=auth).filter(filter)
 
