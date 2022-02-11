@@ -400,7 +400,7 @@ class OrganizationAuthorization(models.Model):
             OrganizationLevelRole.FINANCIAL.value,
             OrganizationLevelRole.CONTRIBUTOR.value,
             OrganizationLevelRole.ADMIN.value,
-            OrganizationLevelRle.VIEWER.value,
+            OrganizationLevelRole.VIEWER.value,
         ]
 
     @property
@@ -585,9 +585,9 @@ class RocketRoleLevel(Enum):
 
 class RocketAuthorization(models.Model):
     ROLE_CHOICES = [
-        (RocketRole.NOT_SETTED.value, _('not set')),
-        (RocketRole.AGENT.value, _('agent')),
-        (RocketRole.SERVICE_MANAGER.value, _('service manager'))
+        (RocketRole.NOT_SETTED.value, _("not set")),
+        (RocketRole.AGENT.value, _("agent")),
+        (RocketRole.SERVICE_MANAGER.value, _("service manager")),
     ]
 
     role = models.PositiveIntegerField(
@@ -597,11 +597,12 @@ class RocketAuthorization(models.Model):
 
     @property
     def level(self):
-        if(self.role == RocketRole.AGENT.value):
+        if self.role == RocketRole.AGENT.value:
             return RocketRoleLevel.AGENT.value
-        elif(self.role == RocketRole.SERVICE_MANAGER.value):
+        elif self.role == RocketRole.SERVICE_MANAGER.value:
             return RocketRoleLevel.SERVICE_MANAGER.value
         return RocketRoleLevel.NOTHING.value
+
 
 class ProjectRole(Enum):
     NOT_SETTED, VIEWER, CONTRIBUTOR, MODERATOR = list(range(4))
