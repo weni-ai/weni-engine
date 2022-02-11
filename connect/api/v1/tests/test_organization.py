@@ -2,6 +2,7 @@ import json
 import uuid as uuid4
 from unittest.mock import patch
 from django.conf import settings
+from django.http import JsonResponse
 from django.test import RequestFactory
 from django.test import TestCase
 from django.test.client import MULTIPART_CONTENT
@@ -12,7 +13,13 @@ from connect.api.v1.organization.views import (
     OrganizationAuthorizationViewSet,
 )
 from connect.api.v1.tests.utils import create_user_and_token
-from connect.common.models import Organization, OrganizationAuthorization, BillingPlan, Project, OrganizationRole
+from connect.common.models import (
+    Organization,
+    OrganizationAuthorization,
+    BillingPlan,
+    Project,
+    OrganizationRole,
+)
 
 
 class CreateOrganizationAPITestCase(TestCase):
@@ -59,8 +66,7 @@ class CreateOrganizationAPITestCase(TestCase):
 
         self.assertEqual(organization_authorization.count(), 1)
         self.assertEqual(
-            organization_authorization.first().role,
-            OrganizationRole.ADMIN.value
+            organization_authorization.first().role, OrganizationRole.ADMIN.value
         )
 
 
@@ -70,7 +76,9 @@ class ListOrganizationAPITestCase(TestCase):
         self.owner, self.owner_token = create_user_and_token("owner")
 
         self.organization = Organization.objects.create(
-            name="test organization", description="", inteligence_organization=1,
+            name="test organization",
+            description="",
+            inteligence_organization=1,
             organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
             organization_billing__plan="free",
         )
@@ -108,7 +116,9 @@ class GetOrganizationContactsAPITestCase(TestCase):
         self.owner, self.owner_token = create_user_and_token("owner")
 
         self.organization = Organization.objects.create(
-            name="test organization", description="", inteligence_organization=1,
+            name="test organization",
+            description="",
+            inteligence_organization=1,
             organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
             organization_billing__plan="free",
         )
@@ -117,12 +127,16 @@ class GetOrganizationContactsAPITestCase(TestCase):
         )
 
         self.project1 = Project.objects.create(
-            name="project 1", flow_organization=uuid4.uuid4(), organization=self.organization,
+            name="project 1",
+            flow_organization=uuid4.uuid4(),
+            organization=self.organization,
             contact_count=25,
         )
 
         self.project2 = Project.objects.create(
-            name="project 2", flow_organization=uuid4.uuid4(), organization=self.organization,
+            name="project 2",
+            flow_organization=uuid4.uuid4(),
+            organization=self.organization,
             contact_count=5,
         )
 
@@ -151,19 +165,21 @@ class GetOrganizationContactsAPITestCase(TestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(content_data['active-contacts']['organization_active_contacts'], 30)
+        self.assertEqual(
+            content_data["active-contacts"]["organization_active_contacts"], 30
+        )
 
     def test_contact_active_per_project(self):
         response, content_data = self.request(
             "contact-active-per-project",
             self.organization.uuid,
             "get_contacts_active_per_project",
-            self.owner_token
+            self.owner_token,
         )
 
         contact_count = 0
-        for project in content_data['projects']:
-            contact_count += int(project['active_contacts'])
+        for project in content_data["projects"]:
+            contact_count += int(project["active_contacts"])
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(contact_count, 30)
@@ -173,24 +189,42 @@ class OrgBillingPlan(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
         self.owner, self.owner_token = create_user_and_token("owner")
+        self.contributor, self.contributor_token = create_user_and_token("contributor")
+        self.financial, self.financial_token = create_user_and_token("financial")
 
         self.flows_project = {
-            "project_name": 'Unit Test',
-            'user_email': self.owner.email,
-            'project_timezone': 'America/Maceio',
-            'uuid': uuid4.uuid4(),
+            "project_name": "Unit Test",
+            "user_email": self.owner.email,
+            "project_timezone": "America/Maceio",
+            "uuid": uuid4.uuid4(),
         }
 
         self.organization = Organization.objects.create(
-            name="test organization", description="", inteligence_organization=1,
+            name="test organization",
+            description="",
+            inteligence_organization=1,
             organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
             organization_billing__plan="free",
         )
         self.project = Project.objects.create(
-            name="Unit Test Project", flow_organization=self.flows_project['uuid'],
-            organization_id=self.organization.uuid)
-        self.organization_authorization = self.organization.authorizations.create(
+            name="Unit Test Project",
+            flow_organization=self.flows_project["uuid"],
+            organization_id=self.organization.uuid,
+        )
+        # Authorizations
+        self.admin_organization_authorization = self.organization.authorizations.create(
             user=self.owner, role=OrganizationRole.ADMIN.value
+        )
+        self.contributor_organization_authorization = (
+            self.organization.authorizations.create(
+                user=self.contributor, role=OrganizationRole.CONTRIBUTOR.value
+            )
+        )
+
+        self.financial_organization_authorization = (
+            self.organization.authorizations.create(
+                user=self.financial, role=OrganizationRole.FINANCIAL.value
+            )
         )
 
     def request(self, param, value, method, token=None):
@@ -199,31 +233,24 @@ class OrgBillingPlan(TestCase):
         )
 
         request = self.factory.patch(
-            f"/v1/organization/org/billing/{param}/{value}/", **authorization_header,
+            f"/v1/organization/org/billing/{param}/{value}/",
+            **authorization_header,
         )
 
         response = OrganizationViewSet.as_view({"patch": f"{method}"})(
-            request, organization_uuid=self.organization.uuid,
+            request,
+            organization_uuid=self.organization.uuid,
         )
-        content_data = json.loads(response.content)
-        return (response, content_data)
+        if type(response) == JsonResponse:
+            content_data = json.loads(response.content)
+            return response, content_data
 
-    def request_change_plan(self, value, data={}, token=None):
-        authorization_header = (
-            {"HTTP_AUTHORIZATION": "Token {}".format(token.key)} if token else {}
-        )
-        request = self.factory.patch(
-            f"/v1/organization/org/billing/change-plan/{value}/", data=json.dumps(data), content_type='application/json', format='json', **authorization_header
-        )
-        response = OrganizationViewSet.as_view({"patch": "change_plan"})(
-            request, organization_uuid=self.organization.uuid,
-        )
-
+        response.render()
         content_data = json.loads(response.content)
-        return (response, content_data)
+        return response, content_data
 
     @patch("connect.common.tasks.update_suspend_project.delay")
-    def test_closing_plan(self, task):
+    def test_closing_plan_admin(self, task):
         task.return_value.result = True
         response, content_data = self.request(
             "closing-plan",
@@ -233,10 +260,40 @@ class OrgBillingPlan(TestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(content_data['is_active'], False)
+        self.assertEqual(content_data["is_active"], False)
 
     @patch("connect.common.tasks.update_suspend_project.delay")
-    def test_reactivate_plan(self, task):
+    def test_closing_plan_contributor(self, task):
+        task.return_value.result = True
+        response, content_data = self.request(
+            "closing-plan",
+            self.organization.uuid,
+            "closing_plan",
+            self.contributor_token,
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(
+            content_data["detail"], "You do not have permission to perform this action."
+        )
+
+    @patch("connect.common.tasks.update_suspend_project.delay")
+    def test_closing_plan_financial(self, task):
+        task.return_value.result = True
+        response, content_data = self.request(
+            "closing-plan",
+            self.organization.uuid,
+            "closing_plan",
+            self.financial_token,
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(
+            content_data["detail"], "You do not have permission to perform this action."
+        )
+
+    @patch("connect.common.tasks.update_suspend_project.delay")
+    def test_reactivate_plan_admin(self, task):
         task.return_value.result = True
         response, content_data = self.request(
             "reactivate-plan",
@@ -245,31 +302,100 @@ class OrgBillingPlan(TestCase):
             self.owner_token,
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(content_data['is_active'], True)
+        self.assertEqual(content_data["is_active"], True)
 
-    def test_change_plan(self):
-        data = {
-            "organization_billing_plan": "enterprise"
-        }
-        response, content_data = self.request_change_plan(
+    @patch("connect.common.tasks.update_suspend_project.delay")
+    def test_reactivate_plan_contributor(self, task):
+        task.return_value.result = True
+        response, content_data = self.request(
+            "reactivate-plan",
             self.organization.uuid,
-            data,
-            self.owner_token)
+            "reactivate_plan",
+            self.contributor_token,
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(
+            content_data["detail"], "You do not have permission to perform this action."
+        )
+
+    @patch("connect.common.tasks.update_suspend_project.delay")
+    def test_reactivate_plan_financial(self, task):
+        task.return_value.result = True
+        response, content_data = self.request(
+            "reactivate-plan",
+            self.organization.uuid,
+            "reactivate_plan",
+            self.financial_token,
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(
+            content_data["detail"], "You do not have permission to perform this action."
+        )
+
+    # Change plan
+    def request_change_plan(self, value, data={}, token=None):
+        authorization_header = (
+            {"HTTP_AUTHORIZATION": "Token {}".format(token.key)} if token else {}
+        )
+        request = self.factory.patch(
+            f"/v1/organization/org/billing/change-plan/{value}/",
+            data=json.dumps(data),
+            content_type="application/json",
+            format="json",
+            **authorization_header,
+        )
+        response = OrganizationViewSet.as_view({"patch": "change_plan"})(
+            request,
+            organization_uuid=self.organization.uuid,
+        )
+
+        if type(response) == JsonResponse:
+            content_data = json.loads(response.content)
+            return response, content_data
+
+        response.render()
+        content_data = json.loads(response.content)
+        return response, content_data
+
+    def test_change_plan_admin(self):
+        data = {"organization_billing_plan": "enterprise"}
+        response, content_data = self.request_change_plan(
+            self.organization.uuid, data, self.owner_token
+        )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(content_data['plan'], 'enterprise')
+        self.assertEqual(content_data["plan"], "enterprise")
+
+    def test_change_plan_contributor(self):
+        data = {"organization_billing_plan": "enterprise"}
+        response, content_data = self.request_change_plan(
+            self.organization.uuid, data, self.contributor_token
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(
+            content_data["detail"], "You do not have permission to perform this action."
+        )
+
+    def test_change_plan_financial(self):
+        data = {"organization_billing_plan": "enterprise"}
+        response, content_data = self.request_change_plan(
+            self.organization.uuid, data, self.financial_token
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(
+            content_data["detail"], "You do not have permission to perform this action."
+        )
 
     def test_change_plan_invalid(self):
-        data = {
-            "organization_billing_plan": "entprise"
-        }
+        data = {"organization_billing_plan": "entprise"}
         response, content_data = self.request_change_plan(
-            self.organization.uuid,
-            data,
-            self.owner_token)
+            self.organization.uuid, data, self.owner_token
+        )
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(content_data['message'], 'Invalid plan choice')
+        self.assertEqual(content_data["message"], "Invalid plan choice")
 
     def tearDown(self):
         self.project.delete()
@@ -279,16 +405,32 @@ class OrgBillingPlan(TestCase):
 class OrgBillingAdditionalInformation(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
-        self.owner, self.owner_token = create_user_and_token("owner")
+        self.admin, self.admin_token = create_user_and_token("admin")
+        self.contributor, self.contributor_token = create_user_and_token("contributor")
+        self.financial, self.financial_token = create_user_and_token("financial")
 
         self.organization = Organization.objects.create(
-            name="test organization", description="", inteligence_organization=1,
+            name="test organization",
+            description="",
+            inteligence_organization=1,
             organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
             organization_billing__plan="enterprise",
         )
 
-        self.organization_authorization = self.organization.authorizations.create(
-            user=self.owner, role=OrganizationRole.ADMIN.value
+        self.admin_organization_authorization = self.organization.authorizations.create(
+            user=self.admin, role=OrganizationRole.ADMIN.value
+        )
+
+        self.contributor_organization_authorization = (
+            self.organization.authorizations.create(
+                user=self.contributor, role=OrganizationRole.CONTRIBUTOR.value
+            )
+        )
+
+        self.financial_organization_authorization = (
+            self.organization.authorizations.create(
+                user=self.financial, role=OrganizationRole.FINANCIAL.value
+            )
         )
 
     def request(self, value, data={}, token=None):
@@ -296,30 +438,59 @@ class OrgBillingAdditionalInformation(TestCase):
             {"HTTP_AUTHORIZATION": "Token {}".format(token.key)} if token else {}
         )
         request = self.factory.post(
-            f"/v1/organization/org/billing/add-additional-information/{value}/", **authorization_header,
+            f"/v1/organization/org/billing/add-additional-information/{value}/",
+            **authorization_header,
             data=data,
         )
-        response = OrganizationViewSet.as_view({"post": "add_additional_billing_information"})(
-            request, organization_uuid=self.organization.uuid
-        )
-        content_data = json.loads(response.content)
+        response = OrganizationViewSet.as_view(
+            {"post": "add_additional_billing_information"}
+        )(request, organization_uuid=self.organization.uuid)
 
+        if type(response) == JsonResponse:
+            content_data = json.loads(response.content)
+            return response, content_data
+
+        response.render()
+        content_data = json.loads(response.content)
         return response, content_data
 
     def test_add_aditional_info(self):
         data = {
-            'personal_identification_number': '111.111.111-11',
-            'additional_data': 'data'
+            "personal_identification_number": "111.111.111-11",
+            "additional_data": "data",
         }
-        response, content_data = self.request(self.organization.uuid, data, self.owner_token)
+        response, content_data = self.request(
+            self.organization.uuid, data, self.admin_token
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(content_data['status'], 'SUCCESS')
+        self.assertEqual(content_data["status"], "SUCCESS")
+
+    def test_add_aditional_info_contributor(self):
+        data = {
+            "personal_identification_number": "111.111.111-11",
+            "additional_data": "This will fail",
+        }
+        response, content_data = self.request(
+            self.organization.uuid, data, self.contributor_token
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_add_aditional_info_financial(self):
+        data = {
+            "personal_identification_number": "111.111.111-11",
+            "additional_data": "This will fail also",
+        }
+        response, content_data = self.request(
+            self.organization.uuid, data, self.financial_token
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_add_additional_info_void_fields(self):
-        data = {
-        }
-        response, content_data = self.request(self.organization.uuid, data, self.owner_token)
-        self.assertEqual(content_data['status'], 'NO CHANGES')
+        data = {}
+        response, content_data = self.request(
+            self.organization.uuid, data, self.admin_token
+        )
+        self.assertEqual(content_data["status"], "NO CHANGES")
 
     def tearDown(self):
         self.organization.delete()
@@ -333,7 +504,9 @@ class ListOrganizationAuthorizationTestCase(TestCase):
         self.user, self.user_token = create_user_and_token()
 
         self.organization = Organization.objects.create(
-            name="test organization", description="", inteligence_organization=1,
+            name="test organization",
+            description="",
+            inteligence_organization=1,
             organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
             organization_billing__plan="free",
         )
@@ -389,7 +562,9 @@ class UpdateAuthorizationRoleTestCase(TestCase):
         self.user, self.user_token = create_user_and_token()
 
         self.organization = Organization.objects.create(
-            name="test organization", description="", inteligence_organization=1,
+            name="test organization",
+            description="",
+            inteligence_organization=1,
             organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
             organization_billing__plan="free",
         )
@@ -419,14 +594,10 @@ class UpdateAuthorizationRoleTestCase(TestCase):
             {"role": OrganizationRole.CONTRIBUTOR.value},
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(
-            content_data.get("role"), OrganizationRole.CONTRIBUTOR.value
-        )
+        self.assertEqual(content_data.get("role"), OrganizationRole.CONTRIBUTOR.value)
 
         user_authorization = self.organization.get_user_authorization(self.user)
-        self.assertEqual(
-            user_authorization.role, OrganizationRole.CONTRIBUTOR.value
-        )
+        self.assertEqual(user_authorization.role, OrganizationRole.CONTRIBUTOR.value)
 
     def test_forbidden(self):
         response, content_data = self.request(
@@ -457,7 +628,9 @@ class DestroyAuthorizationRoleTestCase(TestCase):
         self.user, self.user_token = create_user_and_token()
 
         self.organization = Organization.objects.create(
-            name="test organization", description="", inteligence_organization=1,
+            name="test organization",
+            description="",
+            inteligence_organization=1,
             organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
             organization_billing__plan="free",
         )
@@ -501,35 +674,47 @@ class ActiveContactsLimitTestCase(TestCase):
         self.owner, self.owner_token = create_user_and_token("owner")
 
         self.organization = Organization.objects.create(
-            name="test organization", description="", inteligence_organization=1,
+            name="test organization",
+            description="",
+            inteligence_organization=1,
             organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
             organization_billing__plan="free",
         )
         self.enterprise_org = Organization.objects.create(
-            name="test organization enterprise", description="", inteligence_organization=2,
+            name="test organization enterprise",
+            description="",
+            inteligence_organization=2,
             organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
             organization_billing__plan="enterprise",
         )
         self.custom_org = Organization.objects.create(
-            name="test organization custom", description="", inteligence_organization=3,
+            name="test organization custom",
+            description="",
+            inteligence_organization=3,
             organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
             organization_billing__plan="custom",
         )
 
         self.project = Project.objects.create(
-            name="Unit Test Project", flow_organization=uuid4.uuid4(),
-            organization_id=self.organization.uuid)
+            name="Unit Test Project",
+            flow_organization=uuid4.uuid4(),
+            organization_id=self.organization.uuid,
+        )
 
         self.organization_authorization = self.organization.authorizations.create(
             user=self.owner, role=OrganizationRole.ADMIN.value
         )
 
-        self.organization_authorization_enterprise = self.enterprise_org.authorizations.create(
-            user=self.owner, role=OrganizationRole.ADMIN.value
+        self.organization_authorization_enterprise = (
+            self.enterprise_org.authorizations.create(
+                user=self.owner, role=OrganizationRole.ADMIN.value
+            )
         )
 
-        self.organization_authorization_enterprise = self.custom_org.authorizations.create(
-            user=self.owner, role=OrganizationRole.ADMIN.value
+        self.organization_authorization_enterprise = (
+            self.custom_org.authorizations.create(
+                user=self.owner, role=OrganizationRole.ADMIN.value
+            )
         )
 
     def request(self, param, value, token=None):
@@ -551,7 +736,7 @@ class ActiveContactsLimitTestCase(TestCase):
         authorization_header = (
             {"HTTP_AUTHORIZATION": "Token {}".format(token.key)} if token else {}
         )
-        if method == 'GET':
+        if method == "GET":
             request = self.factory.get(
                 f"/v1/organization/org/billing/{param}/", **authorization_header
             )
@@ -561,7 +746,8 @@ class ActiveContactsLimitTestCase(TestCase):
             )
         else:
             request = self.factory.patch(
-                f"/v1/organization/org/billing/{param}/", **authorization_header,
+                f"/v1/organization/org/billing/{param}/",
+                **authorization_header,
             )
 
             response = OrganizationViewSet.as_view({"patch": "active_contacts_limit"})(
@@ -582,8 +768,10 @@ class ActiveContactsLimitTestCase(TestCase):
 
     def test_organization_over_limit(self):
         self.project2 = Project.objects.create(
-            name="Unit Test Project 2", flow_organization=uuid4.uuid4(),
-            organization_id=self.organization.uuid, contact_count=250
+            name="Unit Test Project 2",
+            flow_organization=uuid4.uuid4(),
+            organization_id=self.organization.uuid,
+            contact_count=250,
         )
         response, content_data = self.request(
             "organization-on-limit",
@@ -592,7 +780,7 @@ class ActiveContactsLimitTestCase(TestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual("free plan isn't longer valid", content_data['message'])
+        self.assertEqual("free plan isn't longer valid", content_data["message"])
 
     def test_organization_limit_custom(self):
         response, content_data = self.request(
@@ -601,7 +789,9 @@ class ActiveContactsLimitTestCase(TestCase):
             self.owner_token,
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual("Your plan don't have a contact active limit", content_data['message'])
+        self.assertEqual(
+            "Your plan don't have a contact active limit", content_data["message"]
+        )
 
     def test_organization_limit_enterprise(self):
         response, content_data = self.request(
@@ -610,16 +800,18 @@ class ActiveContactsLimitTestCase(TestCase):
             self.owner_token,
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual("Your plan don't have a contact active limit", content_data['message'])
+        self.assertEqual(
+            "Your plan don't have a contact active limit", content_data["message"]
+        )
 
     def test_get_active_contacts_limit(self):
         response, content_data = self.request2(
             "active-contacts-limit",
-            'GET',
+            "GET",
             self.owner_token,
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(content_data['active_contacts_limit'], 200)
+        self.assertEqual(content_data["active_contacts_limit"], 200)
 
     def tearDown(self):
         self.project.delete()
@@ -633,14 +825,19 @@ class ExtraIntegrationsTestCase(TestCase):
         self.owner, self.owner_token = create_user_and_token("owner")
         self.user, self.user_token = create_user_and_token()
         self.organization = Organization.objects.create(
-            name="test organization", description="", inteligence_organization=1,
+            name="test organization",
+            description="",
+            inteligence_organization=1,
             organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
-            organization_billing__plan="free", extra_integration=4,
+            organization_billing__plan="free",
+            extra_integration=4,
         )
 
         self.project = Project.objects.create(
-            name="Unit Test Project", flow_organization="57257d94-e54b-4ec1-8952-113a81610465",
-            organization_id=self.organization.uuid)
+            name="Unit Test Project",
+            flow_organization="57257d94-e54b-4ec1-8952-113a81610465",
+            organization_id=self.organization.uuid,
+        )
 
         self.organization_authorization = self.organization.authorizations.create(
             user=self.owner, role=OrganizationRole.ADMIN.value
@@ -653,9 +850,9 @@ class ExtraIntegrationsTestCase(TestCase):
         request = self.factory.get(
             f"/v1/organization/org/billing/{value}/{param}", **authorization_header
         )
-        response = OrganizationViewSet.as_view({"get": "get_extra_active_integrations"})(
-            request, organization_uuid=self.organization.uuid
-        )
+        response = OrganizationViewSet.as_view(
+            {"get": "get_extra_active_integrations"}
+        )(request, organization_uuid=self.organization.uuid)
 
         content_data = json.loads(response.content)
 
@@ -676,7 +873,9 @@ class GetOrganizationStripeDataTestCase(TestCase):
         self.owner, self.owner_token = create_user_and_token("owner")
 
         self.organization = Organization.objects.create(
-            name="test organization", description="", inteligence_organization=1,
+            name="test organization",
+            description="",
+            inteligence_organization=1,
             organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
             organization_billing__plan="enterprise",
         )
@@ -709,8 +908,8 @@ class GetOrganizationStripeDataTestCase(TestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(content_data['response'][0]['last2'], '42')
-        self.assertEqual(content_data['response'][0]['brand'], 'visa')
+        self.assertEqual(content_data["response"][0]["last2"], "42")
+        self.assertEqual(content_data["response"][0]["brand"], "visa")
 
 
 class BillingPrecificationAPITestCase(TestCase):
@@ -740,5 +939,8 @@ class BillingPrecificationAPITestCase(TestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(content_data['currency'], 'USD')
-        self.assertEqual(content_data['extra_whatsapp_integration'], settings.BILLING_COST_PER_WHATSAPP)
+        self.assertEqual(content_data["currency"], "USD")
+        self.assertEqual(
+            content_data["extra_whatsapp_integration"],
+            settings.BILLING_COST_PER_WHATSAPP,
+        )

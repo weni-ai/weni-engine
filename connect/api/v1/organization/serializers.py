@@ -199,8 +199,10 @@ class OrganizationAuthorizationSerializer(serializers.ModelSerializer):
             "role",
             "can_read",
             "can_contribute",
+            "can_contribute_billing",
             "can_write",
             "is_admin",
+            "is_financial",
             "created_at",
         ]
         read_only = ["user", "user__username", "organization", "role", "created_at"]
