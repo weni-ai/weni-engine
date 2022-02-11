@@ -344,11 +344,11 @@ class Organization(models.Model):
 
 
 class OrganizationLevelRole(Enum):
-    NOTHING, CONTRIBUTOR, ADMIN, FINANCIAL = list(range(4))
+    NOTHING, VIEWER, CONTRIBUTOR, ADMIN, FINANCIAL = list(range(5))
 
 
 class OrganizationRole(Enum):
-    NOT_SETTED, CONTRIBUTOR, ADMIN, FINANCIAL = list(range(4))
+    NOT_SETTED, VIEWER, CONTRIBUTOR, ADMIN, FINANCIAL = list(range(5))
 
 
 class OrganizationAuthorization(models.Model):
@@ -361,6 +361,7 @@ class OrganizationAuthorization(models.Model):
         (OrganizationRole.NOT_SETTED.value, _("not set")),
         (OrganizationRole.CONTRIBUTOR.value, _("contributor")),
         (OrganizationRole.ADMIN.value, _("admin")),
+        (OrganizationRole.VIEWER.value, _("viewer")),
         (OrganizationRole.FINANCIAL.value, _("financial")),
     ]
 
@@ -387,6 +388,9 @@ class OrganizationAuthorization(models.Model):
         if self.role == OrganizationRole.ADMIN.value:
             return OrganizationLevelRole.ADMIN.value
 
+        if self.role == OrganizationRole.VIEWER.value:
+            return OrganizationLevelRole.VIEWER.value
+
         if self.role == OrganizationRole.FINANCIAL.value:
             return OrganizationLevelRole.FINANCIAL.value
 
@@ -396,6 +400,7 @@ class OrganizationAuthorization(models.Model):
             OrganizationLevelRole.FINANCIAL.value,
             OrganizationLevelRole.CONTRIBUTOR.value,
             OrganizationLevelRole.ADMIN.value,
+            OrganizationLevelRle.VIEWER.value,
         ]
 
     @property
@@ -598,13 +603,12 @@ class RocketAuthorization(models.Model):
             return RocketRoleLevel.SERVICE_MANAGER.value
         return RocketRoleLevel.NOTHING.value
 
-
 class ProjectRole(Enum):
-    NOT_SETTED, MODERATOR, CONTRIBUTOR, VIEWER = list(range(4))
+    NOT_SETTED, VIEWER, CONTRIBUTOR, MODERATOR = list(range(4))
 
 
 class ProjectRoleLevel(Enum):
-    NOTHING, MODERATOR, CONTRIBUTOR, VIEWER = list(range(4))
+    NOTHING, VIEWER, CONTRIBUTOR, MODERATOR = list(range(4))
 
 
 class ProjectAuthorization(models.Model):

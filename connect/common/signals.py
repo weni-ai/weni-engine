@@ -11,6 +11,8 @@ from connect.common.models import (
     OrganizationAuthorization,
     RequestPermissionOrganization,
     OrganizationLevelRole,
+    OrganizationRole,
+    RequestPermissionProject,
 )
 from connect.celery import app as celery_app
 
@@ -23,7 +25,7 @@ def create_service_status(sender, instance, created, **kwargs):
         for service in Service.objects.filter(default=True):
             instance.service_status.create(service=service)
 
-        for permission in instance.organization.authorizations.all():
+        for permission in instance.project_authorizations.all():
             celery_app.send_task(
                 "update_user_permission_project",
                 args=[
@@ -73,16 +75,6 @@ def org_authorizations(sender, instance, **kwargs):
                 instance.role,
             ],
         )
-        for project in instance.organization.project.all():
-            celery_app.send_task(
-                "update_user_permission_project",
-                args=[
-                    project.flow_organization,
-                    project.uuid,
-                    instance.user.email,
-                    instance.role,
-                ],
-            )
 
 
 @receiver(post_delete, sender=OrganizationAuthorization)
@@ -100,5 +92,22 @@ def request_permission_organization(sender, instance, created, **kwargs):
             perm = instance.organization.get_user_authorization(user=user.first())
             perm.role = instance.role
             perm.save(update_fields=["role"])
+            if perm.can_contribute:
+                for proj in instance.organization.project.all():
+                    proj.project_authorizations.create(
+                        user=user.first(), role=perm.role, organization_authorization=perm
+                    )
             instance.delete()
         instance.organization.send_email_invite_organization(email=instance.email)
+
+@receiver(post_save, sender=RequestPermissionProject)
+def request_permission_organization(sender, instance, created, **kwargs):
+    if created:
+        user = User.objects.filter(email=instance.email)
+        if user.exists():
+            user = user.first()
+            perm = instance.project.get_user_authorization(user=user)
+            perm.role = instance.role
+            perm.save(update_fields=['role'])
+            org = instance.project.organization
+            org.authorizations.create(user=user, role=OrganizationRole.VIEWER.value)
