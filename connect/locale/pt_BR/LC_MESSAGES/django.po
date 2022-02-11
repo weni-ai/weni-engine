@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-08 20:15+0000\n"
+"POT-Creation-Date: 2022-02-11 21:56+0000\n"
 "PO-Revision-Date: 2021-06-10 13:36+0000\n"
 "Last-Translator: Daniel Yohan <dyohan9@gmail.com>, 2021\n"
 "Language-Team: Portuguese (Brazil) (https://www.transifex.com/bothub/"
@@ -204,7 +204,9 @@ msgstr "nome do usuário"
 
 #: connect/authentication/models.py:61
 msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr "Obrigatório. 150 caracteres ou menos. Letras, dígitos e @ /. / + / - / _ apenas."
+msgstr ""
+"Obrigatório. 150 caracteres ou menos. Letras, dígitos e @ /. / + / - / _ "
+"apenas."
 
 #: connect/authentication/models.py:65
 msgid "A user with that username already exists."
@@ -294,7 +296,9 @@ msgstr "Digite o código de acesso abaixo na plataforma Weni"
 msgid ""
 "You receive an access code to Weni Platform. When adding a organization in "
 "system press on "
-msgstr "Você recebeu um código de acesso para a Plataforma Weni. Ao adicionar uma organização no sistema aperte em "
+msgstr ""
+"Você recebeu um código de acesso para a Plataforma Weni. Ao adicionar uma "
+"organização no sistema aperte em "
 
 #: connect/authentication/templates/authentication/emails/access_code.html:55
 #: connect/authentication/templates/authentication/emails/access_code.txt:5
@@ -369,7 +373,9 @@ msgstr "Clique aqui para ingressar na organização"
 #: connect/billing/templates/billing/emails/added_card.txt:4
 msgid ""
 "An Administrator adds new credit card data to bill the organization's plan "
-msgstr "Um administrador adicionou os dado de um novo cartão de crédito para o pagamento do plano da organização "
+msgstr ""
+"Um administrador adicionou os dado de um novo cartão de crédito para o "
+"pagamento do plano da organização "
 
 #: connect/billing/templates/billing/emails/added_card.html:18
 #: connect/billing/templates/billing/emails/added_card.txt:4
@@ -432,7 +438,8 @@ msgid ""
 "An administrator changed credit card information to bill the organization's "
 "plan"
 msgstr ""
-"Um administrador mudou as informações do cartão de crédito para o pagamento do plano da organização"
+"Um administrador mudou as informações do cartão de crédito para o pagamento "
+"do plano da organização"
 
 #: connect/billing/templates/billing/emails/finished-plan.html:34
 #, fuzzy
@@ -486,7 +493,9 @@ msgstr "autorização da organização"
 #: connect/billing/templates/billing/emails/finished-plan.html:63
 #: connect/billing/templates/billing/emails/finished-plan.txt:8
 msgid "to reactivate or choose a new plan that makes sense for your projects"
-msgstr "para reativar ou escolher um novo plano que faça sentido para os seus projetos"
+msgstr ""
+"para reativar ou escolher um novo plano que faça sentido para os seus "
+"projetos"
 
 #: connect/billing/templates/billing/emails/finished-plan.html:64
 #: connect/billing/templates/billing/emails/finished-plan.txt:9
@@ -533,8 +542,8 @@ msgid ""
 "This means that many people are interacting with your projects and our free "
 "plan no longer meets your organization's needs"
 msgstr ""
-"Isso quer dizer que muitas pessoas estão interagindo com seus projetos e nosso plano grátis "
-"não atende mais as necessidades da sua organização"
+"Isso quer dizer que muitas pessoas estão interagindo com seus projetos e "
+"nosso plano grátis não atende mais as necessidades da sua organização"
 
 #: connect/billing/templates/billing/emails/free-plan-expired.html:75
 #: connect/billing/templates/billing/emails/free-plan-expired.txt:5
@@ -544,10 +553,10 @@ msgid ""
 "organization's Administrador to choose a new plan that makes sense for your "
 "projects, we want you to continue with us"
 msgstr ""
-"No momento o funcionamento das suas inteligências, Fluxos criados e o "
-"módulo de Chat estão paralizados. Para continuar usando a plataforma da Weni, pergunte ao "
-"Administrador da organização para escolher um novo plano que faça sentido para seus "
-"projetos, nós queremos que você continue conosco"
+"No momento o funcionamento das suas inteligências, Fluxos criados e o módulo "
+"de Chat estão paralizados. Para continuar usando a plataforma da Weni, "
+"pergunte ao Administrador da organização para escolher um novo plano que "
+"faça sentido para seus projetos, nós queremos que você continue conosco"
 
 #: connect/billing/templates/billing/emails/free_plan.html:40
 #: connect/billing/templates/billing/emails/free_plan.txt:3
@@ -583,8 +592,8 @@ msgid ""
 "The members can now take advantage of the benefits and scale their "
 "communication with our tools"
 msgstr ""
-"Os membros podem agora aproveitar os beneficios e dimensionar "
-"a comunicação com nossas ferramentas"
+"Os membros podem agora aproveitar os beneficios e dimensionar a comunicação "
+"com nossas ferramentas"
 
 #: connect/billing/templates/billing/emails/free_plan.txt:3
 #, fuzzy
@@ -630,7 +639,8 @@ msgstr "O plano da {{organization_name}} foi reativado com sucesso"
 #: connect/billing/templates/billing/emails/reactived-plan.txt:4
 msgid ""
 "Your Intelligences, created Flows and the Chat module came back to work again"
-msgstr "Suas Inteligências, Fluxos criados e módulo de chat voltaram a funcionar"
+msgstr ""
+"Suas Inteligências, Fluxos criados e módulo de chat voltaram a funcionar"
 
 #: connect/billing/templates/billing/emails/removed_card.html:40
 #: connect/billing/templates/billing/emails/removed_card.txt:3
@@ -1088,14 +1098,15 @@ msgid ""
 msgstr ""
 "Um cartão de crédito foi adicionado a organização {self.organization.name}"
 
-
 #: connect/common/models.py:892
 #, fuzzy, python-brace-format
 #| msgid ""
 #| "You have been invited to join the {{ organization_name }} organization"
 msgid ""
 "A credit card has been changed to the organization {self.organization.name}"
-msgstr "Um cartão de crédito foi alterado com sucesso na organização {{ self.organization_name }}"
+msgstr ""
+"Um cartão de crédito foi alterado com sucesso na organização {{ self."
+"organization_name }}"
 
 #: connect/common/models.py:909
 #, python-brace-format
@@ -1105,12 +1116,15 @@ msgstr "O plano da sua organização {self.organization.name} foi encerrado"
 #: connect/common/models.py:926
 #, python-brace-format
 msgid "Your {self.organization.name} organization's plan has been reactivated."
-msgstr "O plano da sua organização {self.organization.name} foi reativado com sucesso"
+msgstr ""
+"O plano da sua organização {self.organization.name} foi reativado com sucesso"
 
 #: connect/common/models.py:943
 #, python-brace-format
 msgid "Your {self.organization.name} organization credit card was removed"
-msgstr "O cartão de crédito da sua organização {self.organization.name} foi removido com sucesso"
+msgstr ""
+"O cartão de crédito da sua organização {self.organization.name} foi removido "
+"com sucesso"
 
 #: connect/common/models.py:960
 #, python-brace-format
@@ -1126,7 +1140,8 @@ msgstr "Sua organização {self.organization.name} tem o plano {plan.title()}"
 #: connect/common/models.py:997
 #, python-brace-format
 msgid "Your {self.organization.name} organization's plan has been changed."
-msgstr "O plano da sua organização {self.organization.name} foi alterado com sucesso."
+msgstr ""
+"O plano da sua organização {self.organization.name} foi alterado com sucesso."
 
 #: connect/common/models.py:1008
 #, fuzzy
@@ -1191,8 +1206,9 @@ msgid ""
 "Controls whether the system will capture the payment, if not successful, the "
 "user will receive an alert to adjust the payment data"
 msgstr ""
-"Controla se o sistema irá capturar o pagamento, caso não seja bem sucedido, o"
-"o usuário receberá um alerta para ajustar os dados de pagamento"
+"Controla se o sistema irá capturar o pagamento, caso não seja bem sucedido, "
+"oo usuário receberá um alerta para ajustar os dados de pagamento"
+
 #: connect/common/models.py:1058
 msgid "cost per whatsapp"
 msgstr "custo por whatsapp"
@@ -1270,8 +1286,8 @@ msgid ""
 "To learn more about the change, contact a person responsible for your "
 "organization"
 msgstr ""
-"Para saber mais sobre a mudança, entre em contato com um responsável pelo seu "
-"organização"
+"Para saber mais sobre a mudança, entre em contato com um responsável pelo "
+"seu organização"
 
 #: connect/common/templates/common/emails/organization/change_organization_name.txt:4
 msgid " changed the name of organization to "
@@ -1378,8 +1394,8 @@ msgid ""
 "We are sad with your departure, but we understand that life passes and "
 "things change "
 msgstr ""
-"Ficamos tristes com sua saída, mas entendemos que a vida "
-"passa e as coisas mudam"
+"Ficamos tristes com sua saída, mas entendemos que a vida passa e as coisas "
+"mudam"
 
 #: connect/common/templates/common/emails/organization/org_going_out.txt:3
 msgid "You going out of "
@@ -1412,8 +1428,9 @@ msgid ""
 "yours projects. We are sad with your departure, but we understand that life "
 "passes and things change "
 msgstr ""
-"administrador removou você da organização, então você não pode mais acessá-lo através de sua conta. Ficamos tristes com "
-"sua partida, mas entendemos que a vida passa e as coisas mudam"
+"administrador removou você da organização, então você não pode mais acessá-"
+"lo através de sua conta. Ficamos tristes com sua partida, mas entendemos que "
+"a vida passa e as coisas mudam"
 
 #: connect/common/templates/common/emails/organization/organization_create.html:16
 #: connect/common/templates/common/emails/organization/organization_create.txt:2
@@ -1605,8 +1622,10 @@ msgid "Remember that everyone in the organization"
 msgstr "Lembre-se de que todos na organização"
 
 #: connect/common/templates/common/emails/project/project_create.html:62
-msgid "on what you created the project can view it, ok ?!"
-msgstr "sobre o que você criou o projeto pode visualizar, ok ?!"
+#, fuzzy
+#| msgid "on what you created the project can view it, ok ?!"
+msgid " that you created the project can view it, ok ?!"
+msgstr " em que você criou o projeto pode visualizar, ok ?!"
 
 #: connect/settings.py:194
 msgid "An error has occurred"
