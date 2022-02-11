@@ -3,7 +3,7 @@
 <p>{% trans "Your {{ organization_name }} organization's plan has ended" %}</p>
 <p>{% trans 'An Adminstrator has terminated the organization plan' %}</p>
 <p>{% trans 'At the moment, the functioning of your Intelligences, created Flows and the Chat module are paralyzed' %}</p>
-<p>{% trans 'To continue using the Weni Plataform ask your' %}</p>
+<p>{% trans 'To continue using the Weni Platform ask your' %}</p>
 <p>{% trans "organization's administrator" %}</p>
 <p>{% trans 'to reactivate or choose a new plan that makes sense for your projects' %}</p>
 <p>{% trans 'we want you to stay with us' %}</p>
