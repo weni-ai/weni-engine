@@ -378,7 +378,7 @@ msgid ""
 "normally. It's wonderful to have your team back."
 msgstr ""
 "Suas Inteligências, Fluxos criados e o módulo de chat voltaram a funcionar "
-"normalmente. É maravilhoso ter sua equipe de volta.
+"normalmente. É maravilhoso ter sua equipe de volta."
 
 #: connect/billing/templates/billing/emails/changed-plan.html:40
 #: connect/billing/templates/billing/emails/changed-plan.txt:3
@@ -1619,14 +1619,3 @@ msgstr "Inglês"
 #: connect/settings.py:203
 msgid "Portuguese"
 msgstr "Português"
-
-#~ msgid ""
-#~ "A {{ organization_name }} member just sent you an invitation to join the "
-#~ "organization. To enter, just click on the button down and you will be "
-#~ "redirected to a registration page. Case already have registration, just "
-#~ "login"
-#~ msgstr ""
-#~ "Um membro da {{ organization_name }} acaba de enviar a você um convite "
-#~ "para ingressar na organização. Para entrar, basta clicar no botão abaixo "
-#~ "e você será redirecionado para uma página de cadastro. Caso já tenha "
-#~ "cadastro, basta fazer o login"
