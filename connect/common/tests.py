@@ -1,3 +1,4 @@
+from unittest import skipIf
 import uuid as uuid4
 
 from django.test import TestCase
@@ -23,6 +24,7 @@ from connect.common.models import (
 from django.conf import settings
 from django.utils import timezone
 from datetime import timedelta
+from connect.common.gateways.rocket_gateway import Rocket
 
 
 class NewsletterTestCase(TestCase):
@@ -659,9 +661,7 @@ class ProjectAuthorizationTestCase(TestCase):
         authorization_user = self.project.get_user_authorization(self.user)
         self.assertFalse(authorization_user.is_moderator)
         # private owner
-        private_authorization_owner = self.project.get_user_authorization(
-            self.owner
-        )
+        private_authorization_owner = self.project.get_user_authorization(self.owner)
         self.assertTrue(private_authorization_owner.is_moderator)
         # secondary user
         private_authorization_user = self.project.get_user_authorization(self.user)
@@ -674,17 +674,28 @@ class ProjectAuthorizationTestCase(TestCase):
 
 class RocketAuthorizationTestCase(TestCase):
     def setUp(self):
-        self.agent_authorization = RocketAuthorization.objects.create(role=RocketRole.AGENT.value)
-        self.service_manager_authorization = RocketAuthorization.objects.create(role=RocketRole.SERVICE_MANAGER.value)
+        self.agent_authorization = RocketAuthorization.objects.create(
+            role=RocketRole.AGENT.value
+        )
+        self.service_manager_authorization = RocketAuthorization.objects.create(
+            role=RocketRole.SERVICE_MANAGER.value
+        )
         self.not_set_auth = RocketAuthorization.objects.create()
 
     def test_level_agent(self):
         self.assertTrue(self.agent_authorization.level == RocketRoleLevel.AGENT.value)
-        self.assertFalse(self.agent_authorization.level == RocketRoleLevel.SERVICE_MANAGER.value)
+        self.assertFalse(
+            self.agent_authorization.level == RocketRoleLevel.SERVICE_MANAGER.value
+        )
 
     def test_level_service_manager(self):
-        self.assertTrue(self.service_manager_authorization.level == RocketRoleLevel.SERVICE_MANAGER.value)
-        self.assertFalse(self.service_manager_authorization.level == RocketRoleLevel.AGENT.value)
+        self.assertTrue(
+            self.service_manager_authorization.level
+            == RocketRoleLevel.SERVICE_MANAGER.value
+        )
+        self.assertFalse(
+            self.service_manager_authorization.level == RocketRoleLevel.AGENT.value
+        )
 
     def test_level_nothing_permission(self):
         self.assertTrue(self.not_set_auth.level == RocketRoleLevel.NOTHING.value)
@@ -722,3 +733,27 @@ class RequestPermissionProjectTestCase(TestCase):
             self.request_permission.__str__(),
             f"{self.request_permission.project.name}, {self.request_permission.role}, <{self.request_permission.email}>",
         )
+
+
+@skipIf(not settings.ROCKET_TEST_MODE, "Skip if rocket isnt in test mode")
+class TestRocket(TestCase):
+    def setUp(self):
+        self.rocket = Rocket()
+
+    def test_rocket_is_authenticated(self):
+        self.assertTrue(self.rocket.is_authenticated)
+
+    def test_change_user_role(self):
+        # Add user role
+        response = self.rocket.add_user_role("admin", "teste.connect")
+        self.assertTrue(response["success"])
+        # Remove user role
+        response = self.rocket.remove_user_role("admin", "teste.connect")
+        self.assertTrue(response["success"])
+
+    def test_fail_to_get_keycloak_authorization_token(self):
+        self.rocket = Rocket()
+        self.rocket.username = ''
+        response = self.rocket.get_keycloak_authorization_token()
+        self.assertEquals(response['status'], 'FAILED')
+        self.assertEquals(response['message']['error_description'], 'Invalid user credentials')
