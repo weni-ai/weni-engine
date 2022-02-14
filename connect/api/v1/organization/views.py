@@ -263,7 +263,7 @@ class OrganizationViewSet(
         url_name="billing-closing-plan",
         url_path="billing/closing-plan/(?P<organization_uuid>[^/.]+)",
         authentication_classes=[ExternalAuthentication],
-        permission_classes=[IsAuthenticated, OrganizationHasPermissionBilling],
+        permission_classes=[AllowAny],
     )
     def closing_plan(self, request, organization_uuid):  # pragma: no cover
         result = {}
@@ -302,7 +302,7 @@ class OrganizationViewSet(
         url_name="billing-reactivate-plan",
         url_path="billing/reactivate-plan/(?P<organization_uuid>[^/.]+)",
         authentication_classes=[ExternalAuthentication],
-        permission_classes=[OrganizationHasPermissionBilling],
+        permission_classes=[AllowAny],
     )
     def reactivate_plan(self, request, organization_uuid):  # pragma: no cover
 
@@ -342,7 +342,7 @@ class OrganizationViewSet(
         url_name="billing-change-plan",
         url_path="billing/change-plan/(?P<organization_uuid>[^/.]+)",
         authentication_classes=[ExternalAuthentication],
-        permission_classes=[IsAuthenticated, OrganizationHasPermissionBilling],
+        permission_classes=[AllowAny],
     )
     def change_plan(self, request, organization_uuid):
         plan = request.data.get("organization_billing_plan")
@@ -432,7 +432,7 @@ class OrganizationViewSet(
         url_name="additional-billing-information",
         url_path="billing/add-additional-information/(?P<organization_uuid>[^/.]+)",
         authentication_classes=[ExternalAuthentication],
-        permission_classes=[IsAuthenticated, OrganizationAdminManagerAuthorization],
+        permission_classes=[AllowAny],
     )
     def add_additional_billing_information(self, request, organization_uuid):
         organization = get_object_or_404(Organization, uuid=organization_uuid)
