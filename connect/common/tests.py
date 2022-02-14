@@ -659,9 +659,7 @@ class ProjectAuthorizationTestCase(TestCase):
         authorization_user = self.project.get_user_authorization(self.user)
         self.assertFalse(authorization_user.is_moderator)
         # private owner
-        private_authorization_owner = self.project.get_user_authorization(
-            self.owner
-        )
+        private_authorization_owner = self.project.get_user_authorization(self.owner)
         self.assertTrue(private_authorization_owner.is_moderator)
         # secondary user
         private_authorization_user = self.project.get_user_authorization(self.user)
@@ -674,17 +672,28 @@ class ProjectAuthorizationTestCase(TestCase):
 
 class RocketAuthorizationTestCase(TestCase):
     def setUp(self):
-        self.agent_authorization = RocketAuthorization.objects.create(role=RocketRole.AGENT.value)
-        self.service_manager_authorization = RocketAuthorization.objects.create(role=RocketRole.SERVICE_MANAGER.value)
+        self.agent_authorization = RocketAuthorization.objects.create(
+            role=RocketRole.AGENT.value
+        )
+        self.service_manager_authorization = RocketAuthorization.objects.create(
+            role=RocketRole.SERVICE_MANAGER.value
+        )
         self.not_set_auth = RocketAuthorization.objects.create()
 
     def test_level_agent(self):
         self.assertTrue(self.agent_authorization.level == RocketRoleLevel.AGENT.value)
-        self.assertFalse(self.agent_authorization.level == RocketRoleLevel.SERVICE_MANAGER.value)
+        self.assertFalse(
+            self.agent_authorization.level == RocketRoleLevel.SERVICE_MANAGER.value
+        )
 
     def test_level_service_manager(self):
-        self.assertTrue(self.service_manager_authorization.level == RocketRoleLevel.SERVICE_MANAGER.value)
-        self.assertFalse(self.service_manager_authorization.level == RocketRoleLevel.AGENT.value)
+        self.assertTrue(
+            self.service_manager_authorization.level
+            == RocketRoleLevel.SERVICE_MANAGER.value
+        )
+        self.assertFalse(
+            self.service_manager_authorization.level == RocketRoleLevel.AGENT.value
+        )
 
     def test_level_nothing_permission(self):
         self.assertTrue(self.not_set_auth.level == RocketRoleLevel.NOTHING.value)
@@ -717,8 +726,11 @@ class RequestPermissionProjectTestCase(TestCase):
             role=ProjectRole.MODERATOR.value,
             created_by=self.owner,
         )
+
         self.assertTrue(self.request_permission)
         self.assertEqual(
             self.request_permission.__str__(),
             f"{self.request_permission.project.name}, {self.request_permission.role}, <{self.request_permission.email}>",
         )
+        auth = self.organization.get_user_authorization(user=self.user)
+        self.assertEqual(auth.role, OrganizationRole.VIEWER.value)
