@@ -19,7 +19,6 @@ from connect.api.v1.organization.filters import (
 )
 from connect.api.v1.organization.permissions import (
     OrganizationHasPermission,
-    OrganizationHasPermissionBilling,
     OrganizationAdminManagerAuthorization,
 )
 from connect.api.v1.organization.serializers import (
