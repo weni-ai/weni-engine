@@ -39,6 +39,14 @@ app.conf.beat_schedule = {
         "task": "connect.common.tasks.check_organization_free_plan",
         "schedule": schedules.crontab(minute="*/6"),
     },
+    "sync-active-contacts": {
+        "task": "connect.common.tasks.sync_active_contacts",
+        "schedule": schedules.crontab(hour="*/6")
+    },
+    "sync-project-information": {
+        "task": "connect.common.tasks.sync_project_information",
+        "schedule": schedules.crontab(minute="*/5")
+    }
 }
 
 
