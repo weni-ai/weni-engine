@@ -242,7 +242,24 @@ def search_project(organization_id: int, project_uuid: str, text: str):
 @app.task()
 def check_organization_free_plan():
     limits = GenericBillingData.get_generic_billing_data_instance()
+    flow_instance = utils.get_grpc_types().get("flow")
     for organization in Organization.objects.filter(organization_billing__plan='free', is_suspended=False):
+        for project in organization.project():
+            contact_count = flow_instance.get_billing_total_statistics(
+                project_uuid=str(project.flow_organization),
+                before=(
+                    timezone.now().strftime("%Y-%m-%d %H:%M")
+                    if project.organization.organization_billing.next_due_date is None
+                    else project.organization.organization_billing.next_due_date.strftime("%Y-%m-%d %H:%M")
+                ),
+                after=(
+                    project.organization.created_at.strftime("%Y-%m-%d %H:%M")
+                    if project.organization.organization_billing.last_invoice_date is None
+                    else project.organization.organization_billing.last_invoice_date.strftime("%Y-%m-%d %H:%M")
+                )
+            ).get("active_contacts")
+            project.contact_count = int(contact_count)
+            project.save(update_fields=['active_contacts'])
         current_active_contacts = organization.active_contacts
         if current_active_contacts > limits.free_active_contacts_limit:
             organization.is_suspended = True
@@ -283,6 +300,7 @@ def sync_active_contacts():
         project.contact_count = int(contact_count)
         project.save(update_fields=['active_contacts'])
 
+
 @app.task()
 def sync_project_information():
     flow_instance = utils.get_grpc_types().get("flow")
@@ -296,6 +314,8 @@ def sync_project_information():
             project.date_format = str(flow_result.get("date_format"))
             project.save(update_fields=['name', 'timezone', 'date_format'])
 
+
+@app.task()
 def sync_project_statistics():
     flow_instance = utils.get_grpc_types().get("flow")
     inteligence_instance = utils.get_grpc_types().get("inteligence")
@@ -316,13 +336,14 @@ def sync_project_statistics():
             ).get("repositories_count"))
         except Exception:
             intelligence_count = 0
-        
+
         update_fields = ["intelligence_count"]
         project.intelligence_count = intelligence_count
         if len(statistic_project_result) > 0:
             project.flow_count = int(statistic_project_result.get("active_flows"))
             update_fields.append("flow_count")
         project.save(update_fields=update_fields)
+
 
 @app.task()
 def sync_updates_projects():
