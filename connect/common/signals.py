@@ -113,4 +113,7 @@ def request_permission_project(sender, instance, created, **kwargs):
             perm.role = instance.role
             perm.save(update_fields=["role"])
             org = instance.project.organization
-            org.authorizations.create(user=user, role=OrganizationRole.VIEWER.value)
+            if not org.authorizations.filter(user__email=user.email).exists():
+                org.authorizations.create(user=user, role=OrganizationRole.VIEWER.value)
+            instance.delete()
+        # todo: send invite project email
