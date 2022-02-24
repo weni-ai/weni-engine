@@ -20,6 +20,7 @@ from connect.api.v1.organization.filters import (
 from connect.api.v1.organization.permissions import (
     OrganizationHasPermission,
     OrganizationAdminManagerAuthorization,
+    OrganizationHasPermissionBilling,
 )
 from connect.api.v1.organization.serializers import (
     OrganizationSeralizer,
@@ -261,8 +262,7 @@ class OrganizationViewSet(
         methods=["PATCH"],
         url_name="billing-closing-plan",
         url_path="billing/closing-plan/(?P<organization_uuid>[^/.]+)",
-        authentication_classes=[ExternalAuthentication],
-        permission_classes=[AllowAny],
+        permission_classes=[IsAuthenticated, OrganizationHasPermission],
     )
     def closing_plan(self, request, organization_uuid):  # pragma: no cover
         result = {}
@@ -300,8 +300,7 @@ class OrganizationViewSet(
         methods=["PATCH"],
         url_name="billing-reactivate-plan",
         url_path="billing/reactivate-plan/(?P<organization_uuid>[^/.]+)",
-        authentication_classes=[ExternalAuthentication],
-        permission_classes=[AllowAny],
+        permission_classes=[IsAuthenticated, OrganizationHasPermission],
     )
     def reactivate_plan(self, request, organization_uuid):  # pragma: no cover
 
@@ -340,8 +339,7 @@ class OrganizationViewSet(
         methods=["PATCH"],
         url_name="billing-change-plan",
         url_path="billing/change-plan/(?P<organization_uuid>[^/.]+)",
-        authentication_classes=[ExternalAuthentication],
-        permission_classes=[AllowAny],
+        permission_classes=[IsAuthenticated, OrganizationHasPermission],
     )
     def change_plan(self, request, organization_uuid):
         plan = request.data.get("organization_billing_plan")
@@ -430,8 +428,7 @@ class OrganizationViewSet(
         methods=["POST"],
         url_name="additional-billing-information",
         url_path="billing/add-additional-information/(?P<organization_uuid>[^/.]+)",
-        authentication_classes=[ExternalAuthentication],
-        permission_classes=[AllowAny],
+        permission_classes=[IsAuthenticated, OrganizationHasPermissionBilling],
     )
     def add_additional_billing_information(self, request, organization_uuid):
         organization = get_object_or_404(Organization, uuid=organization_uuid)
@@ -489,8 +486,7 @@ class OrganizationViewSet(
         methods=["GET"],
         url_name="extra-integrations",
         url_path="billing/extra-integrations/(?P<organization_uuid>[^/.]+)",
-        authentication_classes=[ExternalAuthentication],
-        permission_classes=[AllowAny],
+        permission_classes = [IsAuthenticated, OrganizationHasPermissionBilling]
     )
     def get_extra_active_integrations(self, request, organization_uuid):
         organization = get_object_or_404(Organization, uuid=organization_uuid)

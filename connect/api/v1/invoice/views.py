@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import action
-
+from rest_framework.decorators import api_view, permission_classes
 from django.utils import timezone
 from connect.api.v1.invoice.filters import InvoiceFilter
 from connect.api.v1.invoice.serializers import InvoiceSerializer
@@ -15,16 +15,19 @@ from connect.billing.gateways.stripe_gateway import StripeGateway
 from django.http import JsonResponse
 from datetime import timedelta
 from connect.celery import app as celery_app
-
+from connect.api.v1.organization.permissions import (
+    OrganizationHasPermissionBilling,
+)
 
 class InvoiceViewSet(
     mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
     GenericViewSet,
 ):
+
     queryset = Invoice.objects
     serializer_class = InvoiceSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, OrganizationHasPermissionBilling]
     filter_class = InvoiceFilter
     filter_backends = [OrderingFilter, SearchFilter, DjangoFilterBackend]
     lookup_field = "pk"
@@ -35,6 +38,7 @@ class InvoiceViewSet(
         methods=["GET"],
         url_name="invoice-data",
         url_path="invoice-data/(?P<organization_uuid>[^/.]+)",
+        permission_classes = [IsAuthenticated, OrganizationHasPermissionBilling]
     )
     def invoice_data(
             self, request, organization_uuid
