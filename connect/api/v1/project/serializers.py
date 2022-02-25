@@ -105,7 +105,7 @@ class ProjectSearchSerializer(serializers.Serializer):
 class RequestPermissionProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = RequestPermissionProject
-        fields = ["id", "email", "project", "role", "created_by"]
+        fields = ["email", "project", "role", "created_by"]
         ref_name = None
 
     email = serializers.EmailField(max_length=254, required=True)

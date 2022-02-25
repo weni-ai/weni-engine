@@ -13,6 +13,7 @@ from connect.common.models import (
     OrganizationLevelRole,
     OrganizationRole,
     RequestPermissionProject,
+    ProjectAuthorization
 )
 from connect.celery import app as celery_app
 
@@ -117,3 +118,11 @@ def request_permission_project(sender, instance, created, **kwargs):
                 org.authorizations.create(user=user, role=OrganizationRole.VIEWER.value)
             instance.delete()
         # todo: send invite project email
+
+@receiver(post_save, sender=ProjectAuthorization)
+def project_authorization(sender, instance, created, **kwargs):
+    if created:
+        instance_user = instance.organization_authorization.organization.get_user_authorization(instance.user)
+        if instance_user.level == OrganizationLevelRole.NOTHING.value:
+            instance_user.role = OrganizationRole.VIEWER.value
+            instance_user.save(update_fields=["role"])

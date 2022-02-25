@@ -382,6 +382,9 @@ class OrganizationAuthorization(models.Model):
 
     @property
     def level(self):
+        if self.role == OrganizationRole.NOT_SETTED.value:
+            return OrganizationLevelRole.NOTHING.value
+
         if self.role == OrganizationRole.CONTRIBUTOR.value:
             return OrganizationLevelRole.CONTRIBUTOR.value
 
