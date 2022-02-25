@@ -29,8 +29,7 @@ def signal_user(instance, created, **kwargs):
             logger.error(e)
 
     if created:
-        from connect.common.models import RequestPermissionOrganization
-
+        from connect.common.models import RequestPermissionOrganization, RequestPermissionProject
         requests_perm = RequestPermissionOrganization.objects.filter(
             email=instance.email
         )
@@ -39,3 +38,12 @@ def signal_user(instance, created, **kwargs):
                 user=instance, defaults={"role": perm.role}
             )
         requests_perm.delete()
+
+        requests_perm_project = RequestPermissionProject.objects.filter(
+            email=instance.email
+        )
+        for perm in requests_perm_project:
+            perm.project.get_user_authorization(
+                user=instance, defaults={"role": perm.role}
+            )
+        requests_perm_project.delete()

@@ -14,9 +14,12 @@ from connect.api.v1.project.permissions import ProjectHasPermission
 from connect.api.v1.project.serializers import (
     ProjectSerializer,
     ProjectSearchSerializer,
+    RequestPermissionProjectSerializer
 )
 from connect.celery import app as celery_app
-from connect.common.models import OrganizationAuthorization, Project
+from connect.common.models import (
+    OrganizationAuthorization, Project, RequestPermissionProject
+)
 
 from connect.middleware import ExternalAuthentication
 from rest_framework.exceptions import ValidationError
@@ -119,3 +122,17 @@ class ProjectViewSet(
         task.wait()
         contact_detailed = {"projects": task.result}
         return JsonResponse(data=contact_detailed, status=status.HTTP_200_OK)
+
+
+class RequestPermissionProjectViewSet(
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    mixins.DestroyModelMixin,
+    GenericViewSet,
+):
+    queryset = RequestPermissionProject.objects.all()
+    serializer_class = RequestPermissionProjectSerializer
+    # todo: change organization class to project class
+    # permission_classes = [IsAuthenticated, OrganizationAdminManagerAuthorization]
+    # filter_class = RequestPermissionOrganizationFilter
+    metadata_class = Metadata

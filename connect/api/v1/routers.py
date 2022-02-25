@@ -11,7 +11,7 @@ from connect.api.v1.organization.views import (
     OrganizationAuthorizationViewSet,
     RequestPermissionOrganizationViewSet,
 )
-from connect.api.v1.project.views import ProjectViewSet
+from connect.api.v1.project.views import ProjectViewSet, RequestPermissionProjectViewSet
 
 
 class Router(routers.SimpleRouter):  # pragma: no cover
@@ -97,3 +97,4 @@ router.register("organization/project", ProjectViewSet)
 router.register("organization/authorizations", OrganizationAuthorizationViewSet)
 router.register("organization/request-permission", RequestPermissionOrganizationViewSet)
 router.register("organization/invoice", InvoiceViewSet)
+router.register('project/request-permission', RequestPermissionProjectViewSet)
