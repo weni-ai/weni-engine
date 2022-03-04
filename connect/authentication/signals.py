@@ -29,7 +29,11 @@ def signal_user(instance, created, **kwargs):
             logger.error(e)
 
     if created:
-        from connect.common.models import RequestPermissionOrganization, RequestPermissionProject
+        from connect.common.models import (
+            RequestPermissionOrganization,
+            RequestPermissionProject,
+        )
+
         requests_perm = RequestPermissionOrganization.objects.filter(
             email=instance.email
         )

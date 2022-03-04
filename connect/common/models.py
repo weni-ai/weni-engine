@@ -488,7 +488,7 @@ class Project(models.Model):
         get, created = ProjectAuthorization.objects.get_or_create(
             user=user,
             project=self,
-            organization_authorization=self.organization.authorizations.first(),
+            organization_authorization=self.organization.get_user_authorization(user),
             **kwargs,
         )
         return get
@@ -616,6 +616,10 @@ class ProjectRoleLevel(Enum):
 
 
 class ProjectAuthorization(models.Model):
+
+    class Meta:
+        unique_together = ["user", "project"]
+
     ROLE_CHOICES = [
         (ProjectRole.NOT_SETTED.value, _("not set")),
         (ProjectRole.VIEWER.value, _("viewer")),

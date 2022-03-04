@@ -13,7 +13,7 @@ from connect.common.models import (
     OrganizationLevelRole,
     OrganizationRole,
     RequestPermissionProject,
-    ProjectAuthorization
+    ProjectAuthorization,
 )
 from connect.celery import app as celery_app
 
@@ -36,6 +36,11 @@ def create_service_status(sender, instance, created, **kwargs):
                     permission.role,
                 ],
             )
+        for authorization in instance.organization.authorizations.all():
+            if authorization.can_contribute:
+                project_auth = instance.get_user_authorization(authorization.user)
+                project_auth.role = authorization.role
+                project_auth.save()
 
 
 @receiver(post_save, sender=Service)
@@ -119,10 +124,25 @@ def request_permission_project(sender, instance, created, **kwargs):
             instance.delete()
         # todo: send invite project email
 
+
 @receiver(post_save, sender=ProjectAuthorization)
 def project_authorization(sender, instance, created, **kwargs):
     if created:
-        instance_user = instance.organization_authorization.organization.get_user_authorization(instance.user)
+        instance_user = (
+            instance.organization_authorization.organization.get_user_authorization(
+                instance.user
+            )
+        )
         if instance_user.level == OrganizationLevelRole.NOTHING.value:
             instance_user.role = OrganizationRole.VIEWER.value
             instance_user.save(update_fields=["role"])
+
+        celery_app.send_task(
+            "update_user_permission_project",
+            args=[
+                instance.project.flow_organization,
+                instance.project.uuid,
+                instance.user.email,
+                instance.role,
+            ],
+        )

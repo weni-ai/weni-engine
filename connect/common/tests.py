@@ -601,11 +601,6 @@ class ProjectAuthorizationTestCase(TestCase):
             timezone="America/Sao_Paulo",
             flow_organization=uuid4.uuid4(),
         )
-        self.project_authorization = self.project.project_authorizations.create(
-            user=self.owner,
-            role=ProjectRoleLevel.MODERATOR.value,
-            organization_authorization=self.organization_authorization,
-        )
 
     def test_admin_level(self):
         authorization = self.project.get_user_authorization(self.owner)

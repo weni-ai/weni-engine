@@ -486,7 +486,7 @@ class OrganizationViewSet(
         methods=["GET"],
         url_name="extra-integrations",
         url_path="billing/extra-integrations/(?P<organization_uuid>[^/.]+)",
-        permission_classes = [IsAuthenticated, OrganizationHasPermissionBilling]
+        permission_classes=[IsAuthenticated, OrganizationHasPermissionBilling],
     )
     def get_extra_active_integrations(self, request, organization_uuid):
         organization = get_object_or_404(Organization, uuid=organization_uuid)

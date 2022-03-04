@@ -15,7 +15,6 @@ from connect.common.models import (
     Organization,
     BillingPlan,
     OrganizationRole,
-    ProjectRoleLevel,
 )
 
 
@@ -108,21 +107,6 @@ class ListProjectAPITestCase(TestCase):
             timezone="America/Sao_Paulo",
             flow_organization=uuid4.uuid4(),
         )
-        self.owner_project_authorization = self.project.project_authorizations.create(
-            user=self.owner,
-            role=ProjectRoleLevel.MODERATOR.value,
-            organization_authorization=self.owner_organization_authorization,
-        )
-        self.owner_project_authorization2 = self.project2.project_authorizations.create(
-            user=self.owner,
-            role=ProjectRoleLevel.MODERATOR.value,
-            organization_authorization=self.owner_organization_authorization,
-        )
-        self.user_project_authorization = self.project.project_authorizations.create(
-            user=self.user,
-            role=ProjectRoleLevel.MODERATOR.value,
-            organization_authorization=self.user_organization_authorization,
-        )
 
     def request(self, param, value, token=None):
         authorization_header = (
@@ -148,8 +132,9 @@ class ListProjectAPITestCase(TestCase):
             self.organization.uuid,
             self.user_token,
         )
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(content_data.get("count"), 1)
+        self.assertEqual(content_data.get("count"), 2)
 
     def test_owner_project_authorizations(self):
         response, content_data = self.request(
@@ -191,12 +176,6 @@ class UpdateProjectTestCase(TestCase):
             name="project test",
             timezone="America/Sao_Paulo",
             flow_organization=uuid4.uuid4(),
-        )
-
-        self.owner_project_authorization2 = self.project.project_authorizations.create(
-            user=self.owner,
-            role=ProjectRoleLevel.MODERATOR.value,
-            organization_authorization=self.organization_authorization,
         )
 
     def request(self, project, data={}, token=None):

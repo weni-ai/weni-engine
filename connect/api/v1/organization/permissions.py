@@ -28,7 +28,6 @@ class OrganizationAdminManagerAuthorization(
 
 
 class OrganizationHasPermissionBilling(permissions.BasePermission):
-
     def has_permission(self, request, view):
         # if the request pass organization uuid in query params else call has_object_permission
         uuid = request.query_params.get("organization")
@@ -40,5 +39,3 @@ class OrganizationHasPermissionBilling(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         authorization = obj.get_user_authorization(request.user)
         return authorization.can_contribute_billing
-
-
