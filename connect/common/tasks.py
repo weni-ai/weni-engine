@@ -245,16 +245,17 @@ def check_organization_free_plan():
     flow_instance = utils.get_grpc_types().get("flow")
     for organization in Organization.objects.filter(organization_billing__plan='free', is_suspended=False):
         for project in organization.project.all():
-            before = (
-                    timezone.now().strftime("%Y-%m-%d %H:%M")
-                    if project.organization.organization_billing.next_due_date is None
-                    else project.organization.organization_billing.next_due_date.strftime("%Y-%m-%d %H:%M")
-                )
-            after = (
-                project.organization.created_at.strftime("%Y-%m-%d %H:%M")
-                    if project.organization.organization_billing.last_invoice_date is None
-                    else project.organization.organization_billing.last_invoice_date.strftime("%Y-%m-%d %H:%M")
-            )
+            next_due_date = project.organization.organization_billing.next_due_date
+            last_invoice_date = project.organization.organization_billing.last_invoice_date
+            org_created = project.organization.created_at
+            date_now = timezone.now()
+
+            before = date_now if next_due_date is None else next_due_date
+            after = org_created if last_invoice_date is None else last_invoice_date
+
+            before = before.strftime("%Y-%m-%d %H:%M")
+            after = after.strftime("%Y-%m-%d %H:%M")
+
             contact_count = flow_instance.get_billing_total_statistics(
                 project_uuid=str(project.flow_organization),
                 before=before,
