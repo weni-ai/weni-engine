@@ -287,21 +287,22 @@ def check_organization_free_plan():
 def sync_active_contacts():
     flow_instance = utils.get_grpc_types().get("flow")
     for project in Project.objects.all():
+        last_invoice_date = project.organization.organization_billing.last_invoice_date
+        next_due_date = project.organization.organization_billing.next_due_date
+        created_at = project.organization.created_at
+
+        before = timezone.now() if next_due_date is None else next_due_date
+        after = created_at if last_invoice_date is None else last_invoice_date
+        print(before.strftime("%Y-%m-%d %H:%M"))
+        print(after.strftime("%Y-%m-%d %H:%M"))
         contact_count = flow_instance.get_billing_total_statistics(
             project_uuid=str(project.flow_organization),
-            before=(
-                timezone.now().strftime("%Y-%m-%d %H:%M")
-                if project.organization.organization_billing.next_due_date is None
-                else project.organization.organization_billing.next_due_date.strftime("%Y-%m-%d %H:%M")
-            ),
-            after=(
-                project.organization.created_at.strftime("%Y-%m-%d %H:%M")
-                if project.organization.organization_billing.last_invoice_date is None
-                else project.organization.organization_billing.last_invoice_date.strftime("%Y-%m-%d %H:%M")
-            )
+            before=before.strftime("%Y-%m-%d %H:%M"),
+            after=after.strftime("%Y-%m-%d %H:%M"),
         ).get("active_contacts")
         project.contact_count = int(contact_count)
-        project.save(update_fields=['active_contacts'])
+        project.save(update_fields=['contact_count'])
+    return True
 
 
 @app.task()
