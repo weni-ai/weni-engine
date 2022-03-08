@@ -442,7 +442,7 @@ class SyncUpdateTasksTestCase(TestCase):
             timezone="America/Sao_Paulo",
             flow_organization=uuid4.uuid4(),
         )
-    
+
     def test_okay(self):
         from connect.common.tasks import sync_active_contacts
         self.assertTrue(sync_active_contacts())
