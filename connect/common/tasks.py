@@ -262,7 +262,7 @@ def check_organization_free_plan():
                 after=after
             ).get("active_contacts")
             project.contact_count = int(contact_count)
-            project.save(update_fields=['active_contacts'])
+            project.save(update_fields=['contact_count'])
         current_active_contacts = organization.active_contacts
         if current_active_contacts > limits.free_active_contacts_limit:
             organization.is_suspended = True
