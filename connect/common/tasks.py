@@ -293,8 +293,6 @@ def sync_active_contacts():
 
         before = timezone.now() if next_due_date is None else next_due_date
         after = created_at if last_invoice_date is None else last_invoice_date
-        print(before.strftime("%Y-%m-%d %H:%M"))
-        print(after.strftime("%Y-%m-%d %H:%M"))
         contact_count = flow_instance.get_billing_total_statistics(
             project_uuid=str(project.flow_organization),
             before=before.strftime("%Y-%m-%d %H:%M"),
