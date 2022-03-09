@@ -54,6 +54,10 @@ app.conf.beat_schedule = {
     "sync-channels-statistics": {
         "task": "connect.common.tasks.sync_channels_statistics",
         "schedule": schedules.crontab(minute="*/7")
+    },
+    "sync-total-active-contacts": {
+        "task": "connect.common.tasks.sync_total_contact_count",
+        "schedule": schedules.crontab(hour="3", minute=0)
     }
 }
 
