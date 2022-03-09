@@ -23,7 +23,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             "inteligence_count",
             "flow_count",
             "contact_count",
-            "total_contact_count"
+            "total_contact_count",
             "menu",
             "created_at",
         ]
