@@ -14,7 +14,6 @@ from connect.common.models import (
     OrganizationRole,
     RequestPermissionProject,
     ProjectAuthorization,
-    ProjectRole,
     ProjectRoleLevel,
 )
 from connect.celery import app as celery_app
@@ -126,7 +125,7 @@ def request_permission_project(sender, instance, created, **kwargs):
                 org_auth = org.authorizations.create(user=user, role=OrganizationRole.VIEWER.value)
             else:
                 org_auth = org_auth.first()
-            
+
             if not auth_user.exists():
                 ProjectAuthorization.objects.create(
                     user=user,
@@ -154,8 +153,7 @@ def project_authorization(sender, instance, created, **kwargs):
         if instance_user.level == OrganizationLevelRole.NOTHING.value:
             instance_user.role = OrganizationRole.VIEWER.value
             instance_user.save(update_fields=["role"])
-        
-        
+
         celery_app.send_task(
             "update_user_permission_project",
             args=[
