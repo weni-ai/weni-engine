@@ -23,6 +23,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             "inteligence_count",
             "flow_count",
             "contact_count",
+            "total_contact_count",
             "menu",
             "created_at",
         ]
@@ -42,6 +43,7 @@ class ProjectSerializer(serializers.ModelSerializer):
     inteligence_count = serializers.IntegerField(read_only=True)
     flow_count = serializers.IntegerField(read_only=True)
     contact_count = serializers.IntegerField(read_only=True)
+    total_contact_count = serializers.IntegerField(read_only=True)
     created_at = serializers.DateTimeField(
         required=False, read_only=True, style={"show": False}
     )

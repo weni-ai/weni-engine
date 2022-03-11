@@ -1,5 +1,5 @@
 import uuid as uuid4
-
+from unittest import skipIf
 from django.test import TestCase
 
 from connect.authentication.models import User
@@ -425,3 +425,24 @@ class BillingPlanTestCase(TestCase):
         self.assertEqual(outbox.subject, f"Your {self.organization.name} organization's plan has been changed.")
         self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
         self.assertEqual(outbox.to[0], self.test_email[0])
+
+
+@skipIf(True, "can't run that without port-forward")
+class SyncUpdateTasksTestCase(TestCase):
+
+    def setUp(self):
+        self.organization = Organization.objects.create(
+            name="Test", inteligence_organization=0,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan="free",
+        )
+        self.billing = self.organization.organization_billing
+        self.project = self.organization.project.create(
+            name="project test",
+            timezone="America/Sao_Paulo",
+            flow_organization=uuid4.uuid4(),
+        )
+
+    def test_okay(self):
+        from connect.common.tasks import sync_active_contacts
+        self.assertTrue(sync_active_contacts())

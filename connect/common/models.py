@@ -211,7 +211,7 @@ class Organization(models.Model):
             "first_name": first_name,
         }
         mail.send_mail(
-            _(f"You have been removed from the {self.name}"),
+            _("You have been removed from the ") + self.name,
             render_to_string(
                 "common/emails/organization/remove_permission_organization.txt", context
             ),
@@ -431,6 +431,7 @@ class Project(models.Model):
     inteligence_count = models.IntegerField(_("Intelligence count"), default=0)
     flow_count = models.IntegerField(_("Flows count"), default=0)
     contact_count = models.IntegerField(_("Contacts count"), default=0)
+    total_contact_count = models.IntegerField(_("Contacts count of all time"), default=0)
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
     extra_active_integration = models.IntegerField(_("Whatsapp Integrations"), default=0)
 
