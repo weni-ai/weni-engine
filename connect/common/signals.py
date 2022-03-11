@@ -14,6 +14,8 @@ from connect.common.models import (
     OrganizationRole,
     RequestPermissionProject,
     ProjectAuthorization,
+    ProjectRole,
+    ProjectRoleLevel,
 )
 from connect.celery import app as celery_app
 
@@ -115,19 +117,35 @@ def request_permission_project(sender, instance, created, **kwargs):
         user = User.objects.filter(email=instance.email)
         if user.exists():
             user = user.first()
-            perm = instance.project.get_user_authorization(user=user)
-            perm.role = instance.role
-            perm.save(update_fields=["role"])
             org = instance.project.organization
-            if not org.authorizations.filter(user__email=user.email).exists():
-                org.authorizations.create(user=user, role=OrganizationRole.VIEWER.value)
+            auth = instance.project.project_authorizations
+            auth_user = auth.filter(user=user)
+            org_auth = org.authorizations.filter(user__email=user.email)
+
+            if not org_auth.exists():
+                org_auth = org.authorizations.create(user=user, role=OrganizationRole.VIEWER.value)
+            else:
+                org_auth = org_auth.first()
+            
+            if not auth_user.exists():
+                ProjectAuthorization.objects.create(
+                    user=user,
+                    project=instance.project,
+                    organization_authorization=org_auth,
+                    role=instance.role
+                )
+            else:
+                auth_user = auth_user.first()
+                auth_user.role = instance.role
+                auth_user.save(update_fields=["role"])
             instance.delete()
         # todo: send invite project email
 
 
 @receiver(post_save, sender=ProjectAuthorization)
 def project_authorization(sender, instance, created, **kwargs):
-    if created:
+    if instance.role is not ProjectRoleLevel.NOTHING.value:
+        print(instance.__dict__)
         instance_user = (
             instance.organization_authorization.organization.get_user_authorization(
                 instance.user
@@ -136,7 +154,8 @@ def project_authorization(sender, instance, created, **kwargs):
         if instance_user.level == OrganizationLevelRole.NOTHING.value:
             instance_user.role = OrganizationRole.VIEWER.value
             instance_user.save(update_fields=["role"])
-
+        
+        
         celery_app.send_task(
             "update_user_permission_project",
             args=[
