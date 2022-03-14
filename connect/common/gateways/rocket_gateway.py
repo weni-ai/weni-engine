@@ -1,7 +1,7 @@
 import json
 import requests
 from django.conf import settings
-
+from django.utils.crypto import get_random_string
 
 class Rocket:
     def __init__(self):
@@ -11,6 +11,7 @@ class Rocket:
         self.keycloak_oidc_url = getattr(settings, "KEYCLOAK_OIDC_URL")
         self.rocket_base_url = getattr(settings, "ROCKET_BASE_URL")
         self.is_authenticated = self.authenticate()
+        self.valid_roles = ['admin', 'user', 'livechat-manager', 'livechat-agent']
 
     def get_keycloak_authorization_token(self):
         data = {
@@ -68,20 +69,21 @@ class Rocket:
     def add_user_role(self, role_name: str, username: str):
         is_authenticated, message = self.is_authenticated
         if is_authenticated:
-            path = "/roles.addUserToRole"
-            headers = {
-                "Content-Type": "application/json",
-                "X-Auth-Token": self.rocket_credentials["X-Auth-Token"],
-                "X-User-Id": self.rocket_credentials["X-User-Id"],
-            }
-            data = {"roleName": role_name, "username": username}
+            if role_name in self.valid_roles:
+                path = "/roles.addUserToRole"
+                headers = {
+                    "Content-Type": "application/json",
+                    "X-Auth-Token": self.rocket_credentials["X-Auth-Token"],
+                    "X-User-Id": self.rocket_credentials["X-User-Id"],
+                }
+                data = {"roleName": role_name, "username": username}
 
-            r = requests.post(
-                self.rocket_base_url + path, headers=headers, data=json.dumps(data)
-            )
-            data = json.loads(r.text)
-            return data
-
+                r = requests.post(
+                    self.rocket_base_url + path, headers=headers, data=json.dumps(data)
+                )
+                data = json.loads(r.text)
+                return data
+            return 'Invalid role name'
         return message
 
     def remove_user_role(self, role_name, username):
@@ -100,4 +102,40 @@ class Rocket:
             data = json.loads(r.text)
             return data
 
+        return message
+
+    def create_user(self, name, email):
+        is_authenticated, message = self.is_authenticated
+        if is_authenticated:
+            password = get_random_string()
+            print(password)
+            username = email.split("@")[0]
+            path = "/users.create"
+            headers = {
+                "Content-Type": "application/json",
+                "X-Auth-Token": self.rocket_credentials["X-Auth-Token"],
+                "X-User-Id": self.rocket_credentials["X-User-Id"],
+            }
+            data = {"name": name, "email": email, "password": password, "username": username}
+            r = requests.post(
+                self.rocket_base_url + path, headers=headers, data=json.dumps(data)
+            )
+            data = json.loads(r.text)
+            return data
+        return message
+
+    def get_user(self, username):
+        is_authenticated, message = self.is_authenticated
+        if is_authenticated:
+            path = f"/users.info?username={username}"
+            headers = {
+                "Content-Type": "application/json",
+                "X-Auth-Token": self.rocket_credentials["X-Auth-Token"],
+                "X-User-Id": self.rocket_credentials["X-User-Id"],
+            }
+            r = requests.get(
+                self.rocket_base_url + path, headers=headers
+            )
+            data = json.loads(r.text)
+            return data
         return message
