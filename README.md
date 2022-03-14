@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.com/Ilhasoft/weni-engine.svg?branch=main)](https://travis-ci.com/Ilhasoft/weni-engine)
 [![Coverage Status](https://coveralls.io/repos/github/Ilhasoft/weni-engine/badge.svg?branch=main)](https://coveralls.io/github/Ilhasoft/weni-engine?branch=main)
 [![Python Version](https://img.shields.io/badge/python-3.6-blue.svg)](https://www.python.org/)
-[![License GPL-3.0](https://img.shields.io/badge/license-%20GPL--3.0-yellow.svg)](https://github.com/Ilhasoft/weni-engine/blob/master/LICENSE)
+[![License: MPL 2.0](https://img.shields.io/badge/License-MPL_2.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0)
 
 ## Environment Variables
 
