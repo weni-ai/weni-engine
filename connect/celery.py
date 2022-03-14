@@ -18,10 +18,6 @@ app.conf.beat_schedule = {
         "task": "connect.common.tasks.status_service",
         "schedule": schedules.crontab(minute="*/3"),
     },
-    "sync-project-flows-organization-info": {
-        "task": "connect.common.tasks.sync_updates_projects",
-        "schedule": schedules.crontab(minute="*/5"),
-    },
     "delete-status-logs": {
         "task": "connect.common.tasks.delete_status_logs",
         "schedule": schedules.crontab(hour="22", minute=0),
@@ -39,6 +35,30 @@ app.conf.beat_schedule = {
         "task": "connect.common.tasks.check_organization_free_plan",
         "schedule": schedules.crontab(minute="*/6"),
     },
+    "sync-active-contacts": {
+        "task": "connect.common.tasks.sync_active_contacts",
+        "schedule": schedules.crontab(hour="*/6")
+    },
+    "sync-project-information": {
+        "task": "connect.common.tasks.sync_project_information",
+        "schedule": schedules.crontab(minute="*/5")
+    },
+    "sync-project-statistics": {
+        "task": "connect.common.tasks.sync_project_statistics",
+        "schedule": schedules.crontab(minute="*/6")
+    },
+    "sync-repositories-statistics": {
+        "task": "connect.common.tasks.sync_repositories_statistics",
+        "schedule": schedules.crontab(minute="*/8")
+    },
+    "sync-channels-statistics": {
+        "task": "connect.common.tasks.sync_channels_statistics",
+        "schedule": schedules.crontab(minute="*/7")
+    },
+    "sync-total-active-contacts": {
+        "task": "connect.common.tasks.sync_total_contact_count",
+        "schedule": schedules.crontab(hour="3", minute=0)
+    }
 }
 
 
