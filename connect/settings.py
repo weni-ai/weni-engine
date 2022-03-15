@@ -201,6 +201,7 @@ LANGUAGE_CODE = env.str("LANGUAGE_CODE")
 LANGUAGES = (
     ("en-us", _("English")),
     ("pt-br", _("Portuguese")),
+    ("es", _("Spanish"))
 )
 
 MODELTRANSLATION_DEFAULT_LANGUAGE = "en-us"
