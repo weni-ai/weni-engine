@@ -211,7 +211,7 @@ class Organization(models.Model):
             "first_name": first_name,
         }
         mail.send_mail(
-            _("You have been removed from the ") + self.name,
+            _(f"You have been removed from the {self.name}"),
             render_to_string(
                 "common/emails/organization/remove_permission_organization.txt", context
             ),
