@@ -683,6 +683,10 @@ class ProjectAuthorization(models.Model):
         ]
 
 
+class RequestRocketPermission(models.Model):
+    ...
+
+
 class Service(models.Model):
     class Meta:
         verbose_name = _("service")
