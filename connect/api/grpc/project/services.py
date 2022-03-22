@@ -12,7 +12,7 @@ from connect.api.grpc.project.serializers import (
     ReleaseChannelRequestSerializer,
 )
 from connect.common.models import Project
-from weni.protobuf.connect.project_pb2 import ClassifierResponse, CreateChannelResponse
+from weni.protobuf.connect.project_pb2 import ClassifierResponse, ChannelResponse
 
 
 class ProjectService(
@@ -124,8 +124,11 @@ class ProjectService(
                     self.context.abort(grpc.StatusCode.INVALID_ARGUMENT, "Bad Request")
                 raise error
 
-            return CreateChannelResponse(
-                uuid=response.uuid, name=response.name, config=response.config, address=response.address
+            return ChannelResponse(
+                uuid=response.uuid,
+                name=response.name,
+                config=response.config,
+                address=response.address,
             )
 
     def ReleaseChannel(self, request, context):
@@ -139,3 +142,21 @@ class ProjectService(
         )
 
         return empty_pb2.Empty()
+
+    def Channel(self, request, context):
+        grpc_instance = utils.get_grpc_types().get("flow")
+        channel_type = getattr(request, "channel_type")
+
+        for project in Project.objects.all():
+            response = grpc_instance.list_channel(
+                project_uuid=str(project.flow_organization),
+                channel_type=channel_type,
+            )
+
+            for channel in response:
+                yield ChannelResponse(
+                    uuid=channel.uuid,
+                    name=channel.name,
+                    config=channel.config,
+                    address=channel.address,
+                )
