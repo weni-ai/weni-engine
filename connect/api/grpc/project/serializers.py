@@ -53,7 +53,7 @@ class CreateChannelRequestSerializer(ProtoSerializer):
     channeltype_code = serializers.CharField(required=True)
 
     class Meta:
-        proto_class = project_pb2.CreateChannelResponse
+        proto_class = project_pb2.ChannelCreateResponse
 
 
 class ReleaseChannelRequestSerializer(ProtoSerializer):
