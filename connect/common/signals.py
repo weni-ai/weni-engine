@@ -15,9 +15,7 @@ from connect.common.models import (
     RequestPermissionProject,
     ProjectAuthorization,
     ProjectRoleLevel,
-    RequestRocketPermission,
-    RocketRole,
-    RocketRoleLevel
+    RequestRocketPermission
 )
 from connect.celery import app as celery_app
 
@@ -178,8 +176,8 @@ def request_rocket_permission(sender, instance, created, **kwargs):
             if project_auth.exists():
                 project_auth = project_auth.first()
                 if not project_auth.rocket_authorization.exists():
-                    project_auth.rocket_authorization.create(role = role)
+                    project_auth.rocket_authorization.create(role=instance.role)
                 else:
-                    project_auth.rocket_authorization.role = role
+                    project_auth.rocket_authorization.role = instance.role
                 project_auth.save(update_fields=["rocket_authorization"])
             instance.delete()
