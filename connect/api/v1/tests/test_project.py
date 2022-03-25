@@ -10,7 +10,12 @@ from rest_framework import status
 
 from connect.api.v1.project.views import ProjectViewSet
 from connect.api.v1.tests.utils import create_user_and_token
-from connect.common.models import OrganizationAuthorization, Project, Organization, BillingPlan
+from connect.common.models import (
+    Project,
+    Organization,
+    BillingPlan,
+    OrganizationRole,
+)
 
 
 class CreateProjectAPITestCase(TestCase):
@@ -19,12 +24,14 @@ class CreateProjectAPITestCase(TestCase):
         self.owner, self.owner_token = create_user_and_token("owner")
 
         self.organization = Organization.objects.create(
-            name="test organization", description="", inteligence_organization=1,
+            name="test organization",
+            description="",
+            inteligence_organization=1,
             organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
             organization_billing__plan="free",
         )
         self.organization_authorization = self.organization.authorizations.create(
-            user=self.owner, role=OrganizationAuthorization.ROLE_ADMIN
+            user=self.owner, role=OrganizationRole.ADMIN.value
         )
 
     def request(self, data, token=None):
@@ -60,24 +67,43 @@ class CreateProjectAPITestCase(TestCase):
 
         self.assertEqual(project.name, "Project 1")
 
-        self.assertEqual(project.__str__(), f"{project.uuid} - Project: {project.name} - Org: {project.organization.name}")
+        self.assertEqual(
+            project.__str__(),
+            f"{project.uuid} - Project: {project.name} - Org: {project.organization.name}",
+        )
 
 
 class ListProjectAPITestCase(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
         self.owner, self.owner_token = create_user_and_token("owner")
-
+        self.user, self.user_token = create_user_and_token("user")
+        self.finacial, self.finacial_token = create_user_and_token("finacial")
         self.organization = Organization.objects.create(
-            name="test organization", description="", inteligence_organization=1,
+            name="test organization",
+            description="",
+            inteligence_organization=1,
             organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
             organization_billing__plan="free",
         )
-        self.organization_authorization = self.organization.authorizations.create(
-            user=self.owner, role=OrganizationAuthorization.ROLE_ADMIN
+        self.owner_organization_authorization = self.organization.authorizations.create(
+            user=self.owner, role=OrganizationRole.ADMIN.value
+        )
+        self.user_organization_authorization = self.organization.authorizations.create(
+            user=self.user, role=OrganizationRole.CONTRIBUTOR.value
+        )
+        self.financial_organization_authorization = (
+            self.organization.authorizations.create(
+                user=self.finacial, role=OrganizationRole.FINANCIAL.value
+            )
         )
         self.project = self.organization.project.create(
             name="project test",
+            timezone="America/Sao_Paulo",
+            flow_organization=uuid4.uuid4(),
+        )
+        self.project2 = self.organization.project.create(
+            name="project test 2",
             timezone="America/Sao_Paulo",
             flow_organization=uuid4.uuid4(),
         )
@@ -97,17 +123,36 @@ class ListProjectAPITestCase(TestCase):
         )
         response.render()
         content_data = json.loads(response.content)
+
         return (response, content_data)
 
-    def test_okay(self):
+    def test_user_project_authorizations(self):
+        response, content_data = self.request(
+            "organization",
+            self.organization.uuid,
+            self.user_token,
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(content_data.get("count"), 2)
+
+    def test_owner_project_authorizations(self):
         response, content_data = self.request(
             "organization",
             self.organization.uuid,
             self.owner_token,
         )
-
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(content_data.get("count"), 1)
+        self.assertEqual(content_data.get("count"), 2)
+
+    def test_financial_project_authorizations(self):
+        response, content_data = self.request(
+            "organization",
+            self.organization.uuid,
+            self.finacial_token,
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(content_data.get("count"), 0)
 
 
 class UpdateProjectTestCase(TestCase):
@@ -118,12 +163,14 @@ class UpdateProjectTestCase(TestCase):
         self.user, self.user_token = create_user_and_token("user")
 
         self.organization = Organization.objects.create(
-            name="test organization", description="", inteligence_organization=1,
+            name="test organization",
+            description="",
+            inteligence_organization=1,
             organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
             organization_billing__plan="free",
         )
         self.organization_authorization = self.organization.authorizations.create(
-            user=self.owner, role=OrganizationAuthorization.ROLE_ADMIN
+            user=self.owner, role=OrganizationRole.ADMIN.value
         )
         self.project = self.organization.project.create(
             name="project test",
@@ -146,6 +193,7 @@ class UpdateProjectTestCase(TestCase):
         response = ProjectViewSet.as_view({"patch": "update"})(
             request, uuid=project.uuid, partial=True
         )
+
         response.render()
         content_data = json.loads(response.content)
         return (response, content_data)
@@ -169,7 +217,7 @@ class UpdateProjectTestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
         user_authorization = self.organization.get_user_authorization(self.user)
-        user_authorization.role = OrganizationAuthorization.ROLE_VIEWER
+        user_authorization.role = OrganizationRole.CONTRIBUTOR.value
         user_authorization.save(update_fields=["role"])
 
         response, content_data = self.request(
@@ -177,8 +225,8 @@ class UpdateProjectTestCase(TestCase):
             {"name": "Project new"},
             self.user_token,
         )
-
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        # if the user dosen't have an authorization he cant find the project
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
 class ProjectEmailTestCase(TestCase):
@@ -189,38 +237,42 @@ class ProjectEmailTestCase(TestCase):
         self.user, self.user_token = create_user_and_token("user")
 
         self.organization = Organization.objects.create(
-            name="test organization", description="", inteligence_organization=1,
+            name="test organization",
+            description="",
+            inteligence_organization=1,
             organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
             organization_billing__plan="free",
         )
         self.organization_authorization = self.organization.authorizations.create(
-            user=self.owner, role=OrganizationAuthorization.ROLE_ADMIN
+            user=self.owner, role=OrganizationRole.ADMIN.value
         )
         self.project = self.organization.project.create(
             name="project test",
             timezone="America/Sao_Paulo",
             flow_organization=uuid4.uuid4(),
         )
-        self.test_email = 'test@example.com'
-        self.test_user_name = 'test_username'
-        self.test_first_name = 'test'
-        self.organization_new_name = 'Test Org'
+        self.test_email = "test@example.com"
+        self.test_user_name = "test_username"
+        self.test_first_name = "test"
+        self.organization_new_name = "Test Org"
 
     def test_send_email_change_project(self):
         info = {
-            'old_project_name': 'name_test',
-            'date_before': 'DD-MM-AAAA',
-            'old_timezone': '(GMT -03:00) America / Argentina / Buenos Aires',
-            'country_loc_suport_before': 'Argentina',
-            'country_loc_suport_now': 'Brasil',
-            'default_lang_before': 'Espanhol',
-            'default_lang_now': 'Português do Brasil',
-            'secondary_lang_before': 'Espanhol',
-            'secondary_lang_now': 'Espanhol',
-            'user': 'João'
+            "old_project_name": "name_test",
+            "date_before": "DD-MM-AAAA",
+            "old_timezone": "(GMT -03:00) America / Argentina / Buenos Aires",
+            "country_loc_suport_before": "Argentina",
+            "country_loc_suport_now": "Brasil",
+            "default_lang_before": "Espanhol",
+            "default_lang_now": "Português do Brasil",
+            "secondary_lang_before": "Espanhol",
+            "secondary_lang_now": "Espanhol",
+            "user": "João",
         }
 
-        sended_mail = self.project.send_email_change_project(self.test_first_name, self.test_email, info)
+        sended_mail = self.project.send_email_change_project(
+            self.test_first_name, self.test_email, info
+        )
         self.assertEqual(len(sended_mail.outbox), 1)
         outbox = sended_mail.outbox[0]
         self.assertEqual(outbox.subject, f"The project {self.project.name} has changed")
@@ -228,7 +280,9 @@ class ProjectEmailTestCase(TestCase):
         self.assertEqual(outbox.to[0], self.test_email)
 
     def test_send_email_deleted_project(self):
-        sended_mail = self.project.send_email_deleted_project(self.test_first_name, self.test_email)
+        sended_mail = self.project.send_email_deleted_project(
+            self.test_first_name, self.test_email
+        )
         self.assertEqual(len(sended_mail.outbox), 1)
         outbox = sended_mail.outbox[0]
         self.assertEqual(outbox.subject, "A project was deleted...")

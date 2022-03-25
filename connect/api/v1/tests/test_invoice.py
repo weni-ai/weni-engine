@@ -11,9 +11,9 @@ from rest_framework import status
 from connect.api.v1.invoice.views import InvoiceViewSet
 from connect.api.v1.tests.utils import create_user_and_token
 from connect.common.models import (
-    OrganizationAuthorization,
     Organization,
     BillingPlan,
+    OrganizationRole
 )
 
 
@@ -41,7 +41,7 @@ class ListInvoiceAPITestCase(TestCase):
             organization_billing__plan=BillingPlan.PLAN_ENTERPRISE,
         )
         self.organization_authorization = self.organization.authorizations.create(
-            user=self.owner, role=OrganizationAuthorization.ROLE_ADMIN
+            user=self.owner, role=OrganizationRole.ADMIN.value
         )
         self.project = self.organization.project.create(
             name="project test",
@@ -100,7 +100,7 @@ class InvoiceDataTestCase(TestCase):
             organization_billing__plan=BillingPlan.PLAN_ENTERPRISE,
         )
         self.organization_authorization = self.organization.authorizations.create(
-            user=self.owner, role=OrganizationAuthorization.ROLE_ADMIN
+            user=self.owner, role=OrganizationRole.ADMIN.value
         )
         self.project = self.organization.project.create(
             name="project test",

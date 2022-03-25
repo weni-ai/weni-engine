@@ -11,14 +11,21 @@ from rest_framework.viewsets import GenericViewSet
 from connect.api.v1.metadata import Metadata
 from connect.api.v1.project.filters import ProjectOrgFilter
 from connect.api.v1.project.permissions import ProjectHasPermission
-from connect.api.v1.project.serializers import ProjectSerializer, ProjectSearchSerializer
+from connect.api.v1.project.serializers import (
+    ProjectSerializer,
+    ProjectSearchSerializer,
+    RequestPermissionProjectSerializer
+)
 from connect.celery import app as celery_app
-from connect.common.models import OrganizationAuthorization, Project
+from connect.common.models import (
+    OrganizationAuthorization, Project, RequestPermissionProject
+)
 
 from connect.middleware import ExternalAuthentication
 from rest_framework.exceptions import ValidationError
 from connect.common import tasks
 from django.http import JsonResponse
+from django.db.models import Q
 
 
 class ProjectViewSet(
@@ -46,7 +53,12 @@ class ProjectViewSet(
             .filter(user=self.request.user)
             .values("organization")
         )
-        return self.queryset.filter(organization__pk__in=auth)
+
+        filter = Q(project_authorizations__user=self.request.user) & ~Q(
+            project_authorizations__role=0
+        )
+
+        return self.queryset.filter(organization__pk__in=auth).filter(filter)
 
     def perform_destroy(self, instance):
         flow_organization = instance.flow_organization
@@ -108,5 +120,19 @@ class ProjectViewSet(
             )
         task = tasks.get_contacts_detailed.delay(str(project_uuid), before, after)
         task.wait()
-        contact_detailed = {'projects': task.result}
+        contact_detailed = {"projects": task.result}
         return JsonResponse(data=contact_detailed, status=status.HTTP_200_OK)
+
+
+class RequestPermissionProjectViewSet(
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    mixins.DestroyModelMixin,
+    GenericViewSet,
+):
+    queryset = RequestPermissionProject.objects.all()
+    serializer_class = RequestPermissionProjectSerializer
+    # todo: change organization class to project class
+    # permission_classes = [IsAuthenticated, OrganizationAdminManagerAuthorization]
+    # filter_class = RequestPermissionOrganizationFilter
+    metadata_class = Metadata
