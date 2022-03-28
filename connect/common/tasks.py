@@ -17,6 +17,7 @@ from connect.common.models import (
     Invoice,
     GenericBillingData,
 )
+from django.db.models import Q
 
 
 @app.task()
@@ -285,8 +286,10 @@ def check_organization_free_plan():
 
 @app.task()
 def sync_active_contacts():
+    filter_organizations = Q(uuid__icontains="82fa0f4a") | Q(name="Elogroup")
+    orgs_to_exclude = [o.uuid for o in Organization.objects.filter(filter_organizations)]
     flow_instance = utils.get_grpc_types().get("flow")
-    for project in Project.objects.all():
+    for project in Project.objects.all().exclude(organization__uuid__in=orgs_to_exclude):
         last_invoice_date = project.organization.organization_billing.last_invoice_date
         next_due_date = project.organization.organization_billing.next_due_date
         created_at = project.organization.created_at
