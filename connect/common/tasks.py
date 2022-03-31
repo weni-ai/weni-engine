@@ -342,7 +342,7 @@ def sync_project_statistics():
 @app.task()
 def sync_repositories_statistics():
     flow_instance = utils.get_grpc_types().get("flow")
-    inteligence_instance = utils.get_grpc_types().get("inteligence")
+    intelligence_instance = utils.get_grpc_types().get("inteligence")
 
     for project in Project.objects.all():
         classifiers_project = flow_instance.get_classifiers(
@@ -351,13 +351,14 @@ def sync_repositories_statistics():
             is_active=True,
         )
         try:
-            intelligence_count = int(inteligence_instance.get_count_inteligences_project(
+            intelligence_count = int(intelligence_instance.get_count_inteligences_project(
                 classifiers=classifiers_project,
             ).get("repositories_count"))
-        except Exception:
+        except Exception as e:
+            print(e)
             intelligence_count = 0
 
-        project.intelligence_count = intelligence_count
+        project.inteligence_count = intelligence_count
         project.save(update_fields=["inteligence_count"])
 
 
