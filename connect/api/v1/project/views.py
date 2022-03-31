@@ -14,11 +14,15 @@ from connect.api.v1.project.permissions import ProjectHasPermission
 from connect.api.v1.project.serializers import (
     ProjectSerializer,
     ProjectSearchSerializer,
-    RequestPermissionProjectSerializer
+    RequestRocketPermissionSerializer,
+    RequestPermissionProjectSerializer,
 )
 from connect.celery import app as celery_app
 from connect.common.models import (
-    OrganizationAuthorization, Project, RequestPermissionProject, RequestRocketPermission
+    OrganizationAuthorization,
+    Project,
+    RequestPermissionProject,
+    RequestRocketPermission,
 )
 
 from connect.middleware import ExternalAuthentication
@@ -146,7 +150,6 @@ class RequestPermissionRocketViewSet(
 ):
     queryset = RequestRocketPermission.objects.all()
     serializer_class = RequestRocketPermissionSerializer
-    # todo: change organization class to project class
-    # permission_classes = [IsAuthenticated, OrganizationAdminManagerAuthorization]
-    # filter_class = RequestPermissionOrganizationFilter
+    permission_classes = [IsAuthenticated]
     metadata_class = Metadata
+    lookup_field = "pk"

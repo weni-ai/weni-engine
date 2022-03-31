@@ -10,7 +10,13 @@ from connect.api.v1.project.validators import CanContributeInOrganizationValidat
 from connect.celery import app as celery_app
 from connect.common import tasks
 from connect.common.models import (
-    Service, Project, Organization, RequestPermissionProject, ProjectRoleLevel, RocketRole, RocketRoleLevel
+    Service,
+    Project,
+    Organization,
+    RequestPermissionProject,
+    ProjectRoleLevel,
+    RocketRole,
+    RequestRocketPermission,
 )
 
 
@@ -125,6 +131,7 @@ class RequestPermissionProjectSerializer(serializers.ModelSerializer):
             raise PermissionDenied(_("You cannot set user role 0"))
         return attrs
 
+
 class RequestRocketPermissionSerializer(serializers.ModelSerializer):
     class Meta:
         model = RequestRocketPermission
@@ -139,8 +146,8 @@ class RequestRocketPermissionSerializer(serializers.ModelSerializer):
     created_by = serializers.HiddenField(
         default=serializers.CurrentUserDefault(), style={"show": False}
     )
-    
+
     def validate(self, attrs):
-        if(attrs.get('role') == RocketRole().NOT_SETTED.value):
+        if attrs.get("role") == RocketRole().NOT_SETTED.value:
             raise PermissionDenied(_("You cannot set user role 0"))
         return attrs
