@@ -18,7 +18,7 @@ from connect.api.v1.project.serializers import (
 )
 from connect.celery import app as celery_app
 from connect.common.models import (
-    OrganizationAuthorization, Project, RequestPermissionProject
+    OrganizationAuthorization, Project, RequestPermissionProject, RequestRocketPermission
 )
 
 from connect.middleware import ExternalAuthentication
@@ -132,6 +132,20 @@ class RequestPermissionProjectViewSet(
 ):
     queryset = RequestPermissionProject.objects.all()
     serializer_class = RequestPermissionProjectSerializer
+    # todo: change organization class to project class
+    # permission_classes = [IsAuthenticated, OrganizationAdminManagerAuthorization]
+    # filter_class = RequestPermissionOrganizationFilter
+    metadata_class = Metadata
+
+
+class RequestPermissionRocketViewSet(
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    mixins.DestroyModelMixin,
+    GenericViewSet,
+):
+    queryset = RequestRocketPermission.objects.all()
+    serializer_class = RequestRocketPermissionSerializer
     # todo: change organization class to project class
     # permission_classes = [IsAuthenticated, OrganizationAdminManagerAuthorization]
     # filter_class = RequestPermissionOrganizationFilter
