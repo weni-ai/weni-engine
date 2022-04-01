@@ -15,7 +15,8 @@ from connect.common.models import (
     RequestPermissionProject,
     ProjectAuthorization,
     ProjectRoleLevel,
-    RequestRocketPermission
+    RocketAuthorization,
+    RequestRocketPermission,
 )
 from connect.celery import app as celery_app
 
@@ -123,7 +124,9 @@ def request_permission_project(sender, instance, created, **kwargs):
             org_auth = org.authorizations.filter(user__email=user.email)
 
             if not org_auth.exists():
-                org_auth = org.authorizations.create(user=user, role=OrganizationRole.VIEWER.value)
+                org_auth = org.authorizations.create(
+                    user=user, role=OrganizationRole.VIEWER.value
+                )
             else:
                 org_auth = org_auth.first()
 
@@ -132,7 +135,7 @@ def request_permission_project(sender, instance, created, **kwargs):
                     user=user,
                     project=instance.project,
                     organization_authorization=org_auth,
-                    role=instance.role
+                    role=instance.role,
                 )
             else:
                 auth_user = auth_user.first()
@@ -145,7 +148,6 @@ def request_permission_project(sender, instance, created, **kwargs):
 @receiver(post_save, sender=ProjectAuthorization)
 def project_authorization(sender, instance, created, **kwargs):
     if instance.role is not ProjectRoleLevel.NOTHING.value:
-        print(instance.__dict__)
         instance_user = (
             instance.organization_authorization.organization.get_user_authorization(
                 instance.user
@@ -175,8 +177,10 @@ def request_rocket_permission(sender, instance, created, **kwargs):
             project_auth = instance.project.project_authorizations.filter(user=user)
             if project_auth.exists():
                 project_auth = project_auth.first()
-                if not project_auth.rocket_authorization.exists():
-                    project_auth.rocket_authorization.create(role=instance.role)
+                if not project_auth.rocket_authorization:
+                    project_auth.rocket_authorization = (
+                        RocketAuthorization.objects.create(role=instance.role)
+                    )
                 else:
                     project_auth.rocket_authorization.role = instance.role
                 project_auth.save(update_fields=["rocket_authorization"])

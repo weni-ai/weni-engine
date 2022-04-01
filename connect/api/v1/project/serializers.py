@@ -148,6 +148,6 @@ class RequestRocketPermissionSerializer(serializers.ModelSerializer):
     )
 
     def validate(self, attrs):
-        if attrs.get("role") == RocketRole().NOT_SETTED.value:
+        if attrs.get("role") == RocketRole.NOT_SETTED.value:
             raise PermissionDenied(_("You cannot set user role 0"))
         return attrs
