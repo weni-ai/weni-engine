@@ -23,6 +23,7 @@ from connect.common.models import (
 from django.conf import settings
 from django.utils import timezone
 from datetime import timedelta
+from connect.common.gateways.rocket_gateway import Rocket
 
 
 class NewsletterTestCase(TestCase):
@@ -750,3 +751,27 @@ class SyncUpdateTasksTestCase(TestCase):
     def test_okay(self):
         from connect.common.tasks import sync_active_contacts
         self.assertTrue(sync_active_contacts())
+
+
+@skipIf(not settings.ROCKET_TEST_MODE, "Skip if rocket isnt in test mode")
+class TestRocket(TestCase):
+    def setUp(self):
+        self.rocket = Rocket()
+
+    def test_rocket_is_authenticated(self):
+        self.assertTrue(self.rocket.is_authenticated)
+
+    def test_change_user_role(self):
+        # Add user role
+        response = self.rocket.add_user_role("admin", "teste.connect")
+        self.assertTrue(response["success"])
+        # Remove user role
+        response = self.rocket.remove_user_role("admin", "teste.connect")
+        self.assertTrue(response["success"])
+
+    def test_fail_to_get_keycloak_authorization_token(self):
+        self.rocket = Rocket()
+        self.rocket.username = ''
+        response = self.rocket.get_keycloak_authorization_token()
+        self.assertEquals(response['status'], 'FAILED')
+        self.assertEquals(response['message']['error_description'], 'Invalid user credentials')
