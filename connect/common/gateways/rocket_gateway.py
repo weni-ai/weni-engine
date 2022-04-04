@@ -3,6 +3,7 @@ import requests
 from django.conf import settings
 from django.utils.crypto import get_random_string
 
+
 class Rocket:
     def __init__(self):
         self.client_id = getattr(settings, "ROCKET_CLIENT_ID")
