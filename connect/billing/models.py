@@ -1,3 +1,4 @@
+from ast import arg
 import logging
 import uuid as uuid4
 
@@ -23,7 +24,7 @@ class SyncManagerTask(models.Model):
         _("UUID"), primary_key=True, default=uuid4.uuid4, editable=False
     )
     status = models.BooleanField(
-        default=False, help_text=_("Whether this organization is currently suspended.")
+        default=False, help_text=_("Whether this task succeded or not.")
     )
     task_type = models.CharField(_("task type"), max_length=150)
     started_at = models.DateTimeField(_("started at"))
@@ -62,39 +63,41 @@ class Channel(models.Model):
         return Channel.objects.filter(channel_flow_uuid=channel_flow_uuid).exists()
 
 
+class ContactManager(models.Manager):
+    def create(self, *args, **kwargs):
+        contact = self.get_contact(kwargs.get('contact_flow_uuid'))
+        if contact.exists():
+            return contact.first()
+        else:
+            return super(ContactManager, self).create(*args, **kwargs)   
+
+    def get_contact(self, contact_flow_uuid):
+        return self.filter(
+                    created_at__date__month=timezone.now().date().month,
+                    created_at__date__year=timezone.now().date().year,
+                    contact_flow_uuid=contact_flow_uuid)
+
+
 class Contact(models.Model):
     uuid = models.UUIDField(
         _("UUID"), primary_key=True, default=uuid4.uuid4, editable=False
     )
-    contact_flow_uuid = models.UUIDField(_("flow identification UUID"), unique=True)
+    contact_flow_uuid = models.UUIDField(_("flow identification UUID"))
     name = models.CharField(_("contact name"), max_length=150)
     channel = models.ForeignKey(Channel, models.CASCADE, related_name="channel")
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(blank=True, null=True)
 
-    def create_contact(self):
-        pass
-        # checa com o isrew_contaet)
-        # cria objeto de contato
-        # chama o create contact_msg
-        # chama o create channel
 
-    def is_new_contact(self):
-        return (
-            self.date_str
-            != f"{timezone.now().date().year}-{timezone.now().date().month}"
-        )
+    objects = ContactManager()
 
-    @property
-    def date_str(self):
-        return f"{self.created_at.date().year}-{self.created_at.date().month}"
 
 
 class Message(models.Model):
     uuid = models.UUIDField(
         _("UUID"), primary_key=True, default=uuid4.uuid4, editable=False
     )
-    contact = models.ForeignKey(Contact, models.CASCADE, related_name="contact")
+    contact = models.ForeignKey(Contact, models.CASCADE, related_name="message")
     text = models.TextField()
     sent_on = models.DateTimeField()
     direction = models.CharField(_("contact name"), max_length=150)
@@ -108,8 +111,8 @@ class ContactCount(models.Model):
     count = models.PositiveIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
 
-    def increase_contact_count():
-        pass
+    def increase_contact_count(self):
+        self.count += len(self.filter())
         # verifica se existe novos
         # contatos e Soma com
         #     o número atual
