@@ -5,14 +5,14 @@ from django.utils.crypto import get_random_string
 
 
 class Rocket:
-    def __init__(self):
+    def __init__(self, rocket):
         self.client_id = getattr(settings, "ROCKET_CLIENT_ID")
         self.username = getattr(settings, "ROCKET_USERNAME")
         self.password = getattr(settings, "ROCKET_PASSWORD")
-        self.keycloak_oidc_url = getattr(settings, "KEYCLOAK_OIDC_URL")
-        self.rocket_base_url = getattr(settings, "ROCKET_BASE_URL")
+        self.keycloak_oidc_url = getattr(settings, "OIDC_OP_TOKEN_ENDPOINT")
+        self.rocket_base_url = f'{rocket.url}/api/v1'
         self.is_authenticated = self.authenticate()
-        self.valid_roles = ['admin', 'user', 'livechat-manager', 'livechat-agent']
+        self.valid_roles = ['not-set', 'user', 'admin', 'livechat-agent', 'livechat-manager']
 
     def get_keycloak_authorization_token(self):
         data = {
@@ -67,24 +67,24 @@ class Rocket:
             return False, "Could not connect to rocket"
         return True, "Connected"
 
-    def add_user_role(self, role_name: str, username: str):
+    def add_user_role(self, role: int, username: str):
         is_authenticated, message = self.is_authenticated
         if is_authenticated:
-            if role_name in self.valid_roles:
+            if role < len(self.valid_roles):
                 path = "/roles.addUserToRole"
                 headers = {
                     "Content-Type": "application/json",
                     "X-Auth-Token": self.rocket_credentials["X-Auth-Token"],
                     "X-User-Id": self.rocket_credentials["X-User-Id"],
                 }
-                data = {"roleName": role_name, "username": username}
+                data = {"roleName": self.valid_roles[role], "username": username}
 
                 r = requests.post(
                     self.rocket_base_url + path, headers=headers, data=json.dumps(data)
                 )
                 data = json.loads(r.text)
                 return data
-            return 'Invalid role name'
+            return 'Invalid role choice'
         return message
 
     def remove_user_role(self, role_name, username):
@@ -109,7 +109,6 @@ class Rocket:
         is_authenticated, message = self.is_authenticated
         if is_authenticated:
             password = get_random_string()
-            print(password)
             username = email.split("@")[0]
             path = "/users.create"
             headers = {

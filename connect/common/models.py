@@ -580,16 +580,17 @@ class Project(models.Model):
 
 
 class RocketRole(Enum):
-    NOT_SETTED, AGENT, SERVICE_MANAGER = list(range(3))
+    NOT_SETTED, USER, ADMIN, AGENT, SERVICE_MANAGER = list(range(5))
 
 
 class RocketRoleLevel(Enum):
-    NOTHING, AGENT, SERVICE_MANAGER = list(range(3))
+    NOTHING, USER, ADMIN, AGENT, SERVICE_MANAGER = list(range(5))
 
 
 class RocketAuthorization(models.Model):
     ROLE_CHOICES = [
         (RocketRole.NOT_SETTED.value, _("not set")),
+        (RocketRole.ADMIN.value, _("admin")),
         (RocketRole.AGENT.value, _("agent")),
         (RocketRole.SERVICE_MANAGER.value, _("service manager")),
     ]
