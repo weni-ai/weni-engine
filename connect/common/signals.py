@@ -186,24 +186,5 @@ def request_rocket_permission(sender, instance, created, **kwargs):
                 else:
                     project_auth.rocket_authorization.role = instance.role
                 project_auth.save(update_fields=["rocket_authorization"])
+                project_auth.rocket_authorization.update_rocket_permission()
             instance.delete()
-
-
-@receiver(post_save, sender=RocketAuthorization)
-def send_rocket_request(sender, instance, created, **kwargs):
-    rocket = (
-        instance.projectauthorization_set.first()
-        .project.service_status.get(service__service_type="type_service_chat")
-        .service
-    )
-    rocket_user = instance.projectauthorization_set.first().user.email.split('@')[0]
-
-    handler = Rocket(rocket)
-    user_exists = handler.get_user(rocket_user)
-    if user_exists:
-        username = user_exists['user']['username']
-    else:
-        response = handler.create_user(instance.projectauthorization_set.first().user.first_name, instance.projectauthorization_set.first().user.email)
-        username = response['user']['username']
-    
-    handler.add_user_role(instance.role, username)

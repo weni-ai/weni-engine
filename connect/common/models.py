@@ -16,6 +16,7 @@ from timezone_field import TimeZoneField
 from connect import billing
 from connect.authentication.models import User
 from connect.billing.gateways.stripe_gateway import StripeGateway
+from connect.common.gateways.rocket_gateway import Rocket
 
 from enum import Enum
 
@@ -607,6 +608,30 @@ class RocketAuthorization(models.Model):
         elif self.role == RocketRole.SERVICE_MANAGER.value:
             return RocketRoleLevel.SERVICE_MANAGER.value
         return RocketRoleLevel.NOTHING.value
+
+    def update_rocket_permission(self):
+        rocket = (
+            self.projectauthorization_set.first()
+            .project.service_status.get(service__service_type="type_service_chat")
+            .service
+        )
+
+        rocket_user = self.projectauthorization_set.first().user.email.split('@')[0]
+
+        handler = Rocket(rocket)
+        print(handler)
+        user_exists = handler.get_user(rocket_user)
+
+        if user_exists:
+            username = user_exists['user']['username']
+        else:
+            response = handler.create_user(
+                RocketAuthorization.projectauthorization_set.first().user.first_name, 
+                RocketAuthorization.projectauthorization_set.first().user.email
+            )
+            username = response['user']['username']
+        
+        handler.add_user_role(RocketAuthorization.role, username)
 
 
 class ProjectRole(Enum):
