@@ -10,6 +10,8 @@ from connect.api.v1.project.validators import CanContributeInOrganizationValidat
 from connect.celery import app as celery_app
 from connect.common import tasks
 from connect.common.models import (
+    ProjectAuthorization,
+    RocketAuthorization,
     Service,
     Project,
     Organization,
@@ -36,6 +38,9 @@ class ProjectSerializer(serializers.ModelSerializer):
             "total_contact_count",
             "menu",
             "created_at",
+            "authorizations",
+            "pending_authorizations",
+            "authorization",
         ]
         ref_name = None
 
@@ -57,6 +62,9 @@ class ProjectSerializer(serializers.ModelSerializer):
     created_at = serializers.DateTimeField(
         required=False, read_only=True, style={"show": False}
     )
+    authorizations = serializers.SerializerMethodField(style={"show": False})
+    pending_authorizations = serializers.SerializerMethodField(style={"show": False})
+    authorization = serializers.SerializerMethodField(style={"show": False})
 
     def get_menu(self, obj):
         return {
@@ -99,6 +107,53 @@ class ProjectSerializer(serializers.ModelSerializer):
         )
         return super().update(instance, validated_data)
 
+    def get_authorizations(self, obj):
+        return {
+            "count": obj.project_authorizations.count(),
+            "users": [
+                {
+                    "username": i.user.username,
+                    "first_name": i.user.first_name,
+                    "last_name": i.user.last_name,
+                    "project_role": i.role,
+                    "photo_user": i.user.photo_url,
+                    "rocket_authorization": i.rocket_authorization.role
+                    if i.rocket_authorization
+                    else None,
+                }
+                for i in obj.project_authorizations.all()
+            ],
+        }
+
+    def get_pending_authorizations(self, obj):
+        return {
+            "count": obj.requestpermissionproject_set.count(),
+            "users": [
+                {
+                    "email": i.email,
+                    "role": i.role,
+                    "created_by": i.created_by.email,
+                }
+                for i in obj.requestpermissionproject_set.all()
+            ],
+        }
+
+    def get_authorization(self, obj):
+        request = self.context.get("request")
+        if not request or not request.user.is_authenticated:
+            return None
+
+        data = ProjectAuthorizationSerializer(
+            obj.get_user_authorization(request.user)
+        ).data
+        return data
+
+
+class RocketAuthorizationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RocketAuthorization
+        fields = ["role", "created_at"]
+
 
 class ProjectSearchSerializer(serializers.Serializer):
     text = TextField(label=_("Text Search"), max_length=600)
@@ -130,6 +185,37 @@ class RequestPermissionProjectSerializer(serializers.ModelSerializer):
         if attrs.get("role") == ProjectRoleLevel.NOTHING.value:
             raise PermissionDenied(_("You cannot set user role 0"))
         return attrs
+
+
+class ProjectAuthorizationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProjectAuthorization
+        fields = [
+            "uuid",
+            "user",
+            "user__id",
+            "user__username",
+            "user__email",
+            "user__photo",
+            "project",
+            "rocket_authorization",
+            "role",
+            "created_at",
+        ]
+
+        read_only = ["user", "user__username", "organization", "role", "created_at"]
+
+    user__id = serializers.IntegerField(source="user.id", read_only=True)
+    user__username = serializers.SlugRelatedField(
+        source="user", slug_field="username", read_only=True
+    )
+    user__email = serializers.EmailField(
+        source="user.email", label=_("Email"), read_only=True
+    )
+    user__photo = serializers.ImageField(
+        source="user.photo", label=_("User photo"), read_only=True
+    )
+    rocket_authorization = RocketAuthorizationSerializer()
 
 
 class RequestRocketPermissionSerializer(serializers.ModelSerializer):

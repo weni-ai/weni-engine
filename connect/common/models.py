@@ -475,7 +475,9 @@ class Project(models.Model):
     inteligence_count = models.IntegerField(_("Intelligence count"), default=0)
     flow_count = models.IntegerField(_("Flows count"), default=0)
     contact_count = models.IntegerField(_("Contacts count"), default=0)
-    total_contact_count = models.IntegerField(_("Contacts count of all time"), default=0)
+    total_contact_count = models.IntegerField(
+        _("Contacts count of all time"), default=0
+    )
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
     extra_active_integration = models.IntegerField(
         _("Whatsapp Integrations"), default=0
@@ -601,6 +603,9 @@ class RocketAuthorization(models.Model):
     )
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
 
+    def __str__(self):
+        return self.role
+
     @property
     def level(self):
         if self.role == RocketRole.AGENT.value:
@@ -616,21 +621,21 @@ class RocketAuthorization(models.Model):
             .service
         )
 
-        rocket_user = self.projectauthorization_set.first().user.email.split('@')[0]
+        rocket_user = self.projectauthorization_set.first().user.email.split("@")[0]
 
         handler = Rocket(rocket)
         print(handler)
         user_exists = handler.get_user(rocket_user)
 
         if user_exists:
-            username = user_exists['user']['username']
+            username = user_exists["user"]["username"]
         else:
             response = handler.create_user(
-                RocketAuthorization.projectauthorization_set.first().user.first_name, 
-                RocketAuthorization.projectauthorization_set.first().user.email
+                RocketAuthorization.projectauthorization_set.first().user.first_name,
+                RocketAuthorization.projectauthorization_set.first().user.email,
             )
-            username = response['user']['username']
-        
+            username = response["user"]["username"]
+
         handler.add_user_role(RocketAuthorization.role, username)
 
 
@@ -643,7 +648,6 @@ class ProjectRoleLevel(Enum):
 
 
 class ProjectAuthorization(models.Model):
-
     class Meta:
         unique_together = ["user", "project"]
 
@@ -711,7 +715,11 @@ class ProjectAuthorization(models.Model):
 
 class RequestRocketPermission(models.Model):
     email = models.EmailField(_("email"))
-    role = models.PositiveIntegerField(_("role"), choices=RocketAuthorization.ROLE_CHOICES, default=RocketRole.NOT_SETTED.value)
+    role = models.PositiveIntegerField(
+        _("role"),
+        choices=RocketAuthorization.ROLE_CHOICES,
+        default=RocketRole.NOT_SETTED.value,
+    )
     project = models.ForeignKey(Project, models.CASCADE)
     created_by = models.ForeignKey(User, models.CASCADE)
 

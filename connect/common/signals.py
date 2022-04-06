@@ -1,4 +1,3 @@
-import email
 import logging
 
 from django.db.models.signals import post_save, post_delete
@@ -20,7 +19,6 @@ from connect.common.models import (
     RequestRocketPermission,
 )
 from connect.celery import app as celery_app
-from connect.common.gateways.rocket_gateway import Rocket
 
 logger = logging.getLogger("connect.common.signals")
 
