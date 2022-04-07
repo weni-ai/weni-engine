@@ -593,6 +593,7 @@ class RocketRoleLevel(Enum):
 class RocketAuthorization(models.Model):
     ROLE_CHOICES = [
         (RocketRole.NOT_SETTED.value, _("not set")),
+        (RocketRole.USER.value, _("user")),
         (RocketRole.ADMIN.value, _("admin")),
         (RocketRole.AGENT.value, _("agent")),
         (RocketRole.SERVICE_MANAGER.value, _("service manager")),
@@ -603,9 +604,6 @@ class RocketAuthorization(models.Model):
     )
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
 
-    def __str__(self):
-        return self.role
-
     @property
     def level(self):
         if self.role == RocketRole.AGENT.value:
@@ -614,7 +612,7 @@ class RocketAuthorization(models.Model):
             return RocketRoleLevel.SERVICE_MANAGER.value
         return RocketRoleLevel.NOTHING.value
 
-    def update_rocket_permission(self):
+    def update_rocket_permission(self):  # pragma: no cover
         rocket = (
             self.projectauthorization_set.first()
             .project.service_status.get(service__service_type="type_service_chat")
@@ -622,21 +620,21 @@ class RocketAuthorization(models.Model):
         )
 
         rocket_user = self.projectauthorization_set.first().user.email.split("@")[0]
-
         handler = Rocket(rocket)
-        print(handler)
+
         user_exists = handler.get_user(rocket_user)
 
-        if user_exists:
+        if user_exists["success"]:
             username = user_exists["user"]["username"]
         else:
             response = handler.create_user(
-                RocketAuthorization.projectauthorization_set.first().user.first_name,
-                RocketAuthorization.projectauthorization_set.first().user.email,
+                self.projectauthorization_set.first().user.first_name,
+                self.projectauthorization_set.first().user.email,
             )
             username = response["user"]["username"]
 
-        handler.add_user_role(RocketAuthorization.role, username)
+        request = handler.add_user_role(self.role, username)
+        return request
 
 
 class ProjectRole(Enum):
