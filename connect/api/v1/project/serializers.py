@@ -113,6 +113,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             "users": [
                 {
                     "username": i.user.username,
+                    "email": i.user.email,
                     "first_name": i.user.first_name,
                     "last_name": i.user.last_name,
                     "project_role": i.role,
