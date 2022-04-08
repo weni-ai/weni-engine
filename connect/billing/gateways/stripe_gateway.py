@@ -6,6 +6,8 @@ from django.conf import settings
 class StripeGateway(Gateway):
     default_currency = "USD"
     display_name = "Stripe"
+    verification_amount = 1
+    verification_description = "Card Verification Charge"
 
     def __init__(self):
         billing_settings = getattr(settings, "BILLING_SETTINGS")
@@ -40,7 +42,10 @@ class StripeGateway(Gateway):
                 metadata=options,
             )
         except IndexError:
-            return {"status": "FAILURE", "response": "Customer does not have a configured card"}
+            return {
+                "status": "FAILURE",
+                "response": "Customer does not have a configured card",
+            }
         except self.stripe.error.CardError as error:
             return {"status": "FAILURE", "response": error}
         return {"status": "SUCCESS", "response": response}
@@ -53,8 +58,10 @@ class StripeGateway(Gateway):
             type="card",
         )
         for card in existing_cards.get("data"):
-            if options and options.get("card_id") and str(card["id"]) == str(
-                options.get("card_id")
+            if (
+                options
+                and options.get("card_id")
+                and str(card["id"]) == str(options.get("card_id"))
             ):
                 continue
             response.append(
@@ -66,39 +73,65 @@ class StripeGateway(Gateway):
 
     def get_card_data(self, identification, options: dict = None):
         try:
-            cards = stripe.PaymentMethod.list(
-                customer=identification,
-                type='card'
-            )
+            cards = stripe.PaymentMethod.list(customer=identification, type="card")
             response = []
-            for card in cards.get('data'):
-                response.append({'last2': card['card']['last4'][2:], 'brand': card['card']['brand']})
+            for card in cards.get("data"):
+                response.append(
+                    {"last2": card["card"]["last4"][2:], "brand": card["card"]["brand"]}
+                )
         except self.stripe.error.CardError as error:
             return {"status": "FAILURE", "response": error}
         except self.stripe.error.InvalidRequestError:
-            return {"status": "FAILURE", "response": f"No such customer: {identification}"}
+            return {
+                "status": "FAILURE",
+                "response": f"No such customer: {identification}",
+            }
         return {"status": "SUCCESS", "response": response}
 
     def get_user_detail_data(self, identification: str):
         try:
             client_data = stripe.Customer.retrieve(identification)
             response = {
-                'name': client_data['name'] if client_data and 'name' in client_data else None,
-                'address': client_data['address']
-
+                "name": client_data["name"]
+                if client_data and "name" in client_data
+                else None,
+                "address": client_data["address"],
             }
         except self.stripe.error.InvalidRequestError:
-            return {"status": "FAILURE", "response": f"No such Customer: {identification}"}
+            return {
+                "status": "FAILURE",
+                "response": f"No such Customer: {identification}",
+            }
         return {"status": "SUCCESS", "response": response}
 
     def get_payment_method_details(self, stripe_charge_id: str):
         try:
             charge = stripe.Charge.retrieve(stripe_charge_id)
-            card_data = charge['payment_method_details']['card']
+            card_data = charge["payment_method_details"]["card"]
             response = {
-                'final_card_number': card_data['last4'],
-                'brand': card_data['brand']
+                "final_card_number": card_data["last4"],
+                "brand": card_data["brand"],
             }
         except self.stripe.error.InvalidRequestError:
-            return {'response': f'No such Charge id: {stripe_charge_id}', 'status': 'FAIL'}
-        return {'response': response, 'status': 'SUCCESS'}
+            return {
+                "response": f"No such Charge id: {stripe_charge_id}",
+                "status": "FAIL",
+            }
+        return {"response": response, "status": "SUCCESS"}
+
+    def verification_charge(self, customer):  # pragma: no cover
+        try:
+            response = stripe.Charge.create(
+                customer=customer,
+                amount=100 * int(self.verification_amount),
+                currency="usd",
+                description=self.verification_description,
+            )
+        except IndexError:
+            return {
+                "status": "FAILURE",
+                "response": "Customer does not have a configured card",
+            }
+        except self.stripe.error.CardError as error:
+            return {"status": "FAILURE", "response": error}
+        return {"status": "SUCCESS", "response": response}

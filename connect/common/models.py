@@ -923,6 +923,8 @@ class BillingPlan(models.Model):
         max_length=250,
     )
 
+    card_is_valid = models.BooleanField(_("Card is valid"), default=False)
+
     @property
     def get_stripe_customer(self):
         import stripe
@@ -993,6 +995,11 @@ class BillingPlan(models.Model):
         return Decimal(
             str(precification.calculate_active_contacts(contact_count=contact_count))
         ).quantize(Decimal(".01"), decimal.ROUND_HALF_UP)
+
+    @property
+    def is_card_valid(self):  # pragma: no cover
+        if self.plan == self.PLAN_ENTERPRISE:
+            return self.card_is_valid
 
     @property
     def currenty_invoice(self):

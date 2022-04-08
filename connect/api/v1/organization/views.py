@@ -37,9 +37,11 @@ from connect.common.models import (
     RequestPermissionOrganization,
     GenericBillingData,
     OrganizationRole,
+    RequestPermissionOrganization,
+    GenericBillingData,
 )
 from connect.middleware import ExternalAuthentication
-
+from connect import billing
 from connect.billing.gateways.stripe_gateway import StripeGateway
 
 
@@ -496,6 +498,19 @@ class OrganizationViewSet(
             "limit_extra_integrations": organization.extra_integration,
         }
         return JsonResponse(data=response, status=status.HTTP_200_OK)
+
+    @action(
+        detail=True,
+        methods=["POST"],
+        url_name="validate-customer-card",
+        url_path="billing/validate-customer-card",
+    )
+    def validate_customer_card(self, request):
+        customer = request.data.get("customer")
+        gateway = billing.get_gateway("stripe")
+        gateway.verification_charge(customer)
+
+        return JsonResponse(data={"message": customer}, status=status.HTTP_200_OK)
 
 
 class OrganizationAuthorizationViewSet(
