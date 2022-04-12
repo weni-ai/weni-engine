@@ -111,8 +111,6 @@ class ContactCount(models.Model):
     count = models.PositiveIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
 
-    def increase_contact_count(self):
-        self.count += len(self.filter())
-        # verifica se existe novos
-        # contatos e Soma com
-        #     o número atual
+    def increase_contact_count(self, contact_count):
+        self.count += contact_count
+        self.save(update_fields=["count"])
