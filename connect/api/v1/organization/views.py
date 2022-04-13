@@ -37,8 +37,6 @@ from connect.common.models import (
     RequestPermissionOrganization,
     GenericBillingData,
     OrganizationRole,
-    RequestPermissionOrganization,
-    GenericBillingData,
 )
 from connect.middleware import ExternalAuthentication
 from connect import billing

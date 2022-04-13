@@ -882,8 +882,7 @@ class BillingPlan(models.Model):
     )
     fixed_discount = models.FloatField(_("fixed discount"), default=0)
     plan = models.CharField(
-        _("plan"), max_length=10, choices=PLAN_CHOICES, default=PLAN_CUSTOM
-    )
+        _("plan"), max_length=10, choices=PLAN_CHOICES)
     contract_on = models.DateField(_("date of contract plan"), auto_now_add=True)
     is_active = models.BooleanField(_("active plan"), default=True)
     stripe_customer = models.CharField(
