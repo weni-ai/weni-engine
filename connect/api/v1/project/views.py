@@ -136,10 +136,20 @@ class RequestPermissionProjectViewSet(
 ):
     queryset = RequestPermissionProject.objects.all()
     serializer_class = RequestPermissionProjectSerializer
-    # todo: change organization class to project class
-    # permission_classes = [IsAuthenticated, OrganizationAdminManagerAuthorization]
-    # filter_class = RequestPermissionOrganizationFilter
+    permission_classes = [IsAuthenticated]
     metadata_class = Metadata
+
+    def create(request, *args, **kwargs):
+        created_by = request.request.user
+        role = request.request.data.get('role')
+        email = request.request.data.get('email')
+        project_uuid = request.request.data.get('project')
+        project = Project.objects.filter(uuid=project_uuid)
+        if len(project) == 0:
+            return Response({"status": 404, "message": f"Project {project_uuid} not found"})
+        project = project.first()
+        RequestPermissionProject.objects.create(created_by=created_by, email=email, role=role, project=project)
+        return Response({"status": 200, "data": {"created_by": created_by.email, "role": role, "email": email, "project": project_uuid}})
 
 
 class RequestPermissionRocketViewSet(
