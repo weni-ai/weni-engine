@@ -148,7 +148,7 @@ class RequestPermissionProjectViewSet(
         if len(project) == 0:
             return Response({"status": 404, "message": f"Project {project_uuid} not found"})
         project = project.first()
-        created_request = RequestPermissionProject.objects.create(created_by=created_by, email=email, role=role, project=project)
+        RequestPermissionProject.objects.create(created_by=created_by, email=email, role=role, project=project)
         return Response({"status": 200, "data": {"created_by": created_by.email, "role": role, "email": email, "project": project_uuid}})
 
 
