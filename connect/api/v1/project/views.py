@@ -162,7 +162,7 @@ class RequestPermissionProjectViewSet(
             project_auth.save()
         else:
             RequestPermissionProject.objects.create(created_by=created_by, email=email, role=role, project=project)
-        
+
         return Response({"status": 200, "data": {"created_by": created_by.email, "role": role, "email": email, "project": project_uuid}})
 
 
