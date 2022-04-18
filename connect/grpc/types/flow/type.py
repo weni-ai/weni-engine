@@ -206,10 +206,10 @@ class FlowType(GRPCType):
         return result
 
     def get_billing_total_statistics(self, project_uuid: str, before: str, after: str):
-        stub = billing_pb2_grpc.BillingStub(self.channel)
+        stub = billing_pb2_grpc.BillingControllerStub(self.channel)
         response = stub.Total(
             billing_pb2.BillingRequest(
-                org_uuid=project_uuid, before=before, after=after
+                org=project_uuid, before=before, after=after
             )
         )
         return {"active_contacts": response.active_contacts}
@@ -258,10 +258,10 @@ class FlowType(GRPCType):
         return response
 
     def get_active_contacts(self, project_uuid, before, after):
-        stub = billing_pb2_grpc.BillingStub(self.channel)
+        stub = billing_pb2_grpc.BillingControlerStub(self.channel)
         response = stub.Detailed(
             billing_pb2.BillingRequest(
-                org_uuid=project_uuid, before=before, after=after
+                org=project_uuid, before=before, after=after
             )
         )
         return response
