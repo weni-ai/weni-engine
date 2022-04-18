@@ -26,6 +26,9 @@ class SyncManagerTask(models.Model):
     status = models.BooleanField(
         default=False, help_text=_("Whether this task succeded or not.")
     )
+    retried = models.BooleanField(
+        default=False, help_text=_("Whether this task retry or not.")
+    )
     task_type = models.CharField(_("task type"), max_length=150)
     started_at = models.DateTimeField(_("started at"))
     finished_at = models.DateTimeField(_("finished at"))
