@@ -42,6 +42,10 @@ app.conf.beat_schedule = {
         "task": "connect.common.tasks.sync_channels_statistics",
         "schedule": schedules.crontab(minute="*/7")
     },
+    "generate_project_invoice": {
+        "task": "connect.common.tasks.generate_project_invoice",
+        "schedule": schedules.crontab(minute="*/5"),
+    }
     # "sync-total-active-contacts": {
     #     "task": "connect.common.tasks.sync_total_contact_count",
     #     "schedule": schedules.crontab(hour="3", minute=0)
@@ -50,10 +54,6 @@ app.conf.beat_schedule = {
     #     "task": "connect.common.tasks.sync_active_contacts",
     #     "schedule": schedules.crontab(hour="*/6")
     # },
-    # "generate_project_invoice": {
-    #     "task": "connect.common.tasks.generate_project_invoice",
-    #     "schedule": schedules.crontab(minute="*/5"),
-    # },,
     # "capture_invoice": {
     #     "task": "connect.common.tasks.capture_invoice",
     #     "schedule": schedules.crontab(hour="8,10,13,15,17", minute=0),
