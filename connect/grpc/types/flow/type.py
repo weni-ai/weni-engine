@@ -258,7 +258,7 @@ class FlowType(GRPCType):
         return response
 
     def get_active_contacts(self, project_uuid, before, after):
-        stub = billing_pb2_grpc.BillingControlerStub(self.channel)
+        stub = billing_pb2_grpc.BillingControllerStub(self.channel)
         response = stub.Detailed(
             billing_pb2.BillingRequest(
                 org=project_uuid, before=before, after=after
