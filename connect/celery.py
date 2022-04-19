@@ -22,22 +22,9 @@ app.conf.beat_schedule = {
         "task": "connect.common.tasks.delete_status_logs",
         "schedule": schedules.crontab(hour="22", minute=0),
     },
-    "generate_project_invoice": {
-        "task": "connect.common.tasks.generate_project_invoice",
-        "schedule": schedules.crontab(minute="*/5"),
-    },
-    "capture_invoice": {
-        "task": "connect.common.tasks.capture_invoice",
-        "schedule": schedules.crontab(hour="8,10,13,15,17", minute=0),
-        # "schedule": 30,
-    },
     "check-organization-free-plan": {
         "task": "connect.common.tasks.check_organization_free_plan",
         "schedule": schedules.crontab(minute="*/6"),
-    },
-    "sync-active-contacts": {
-        "task": "connect.common.tasks.sync_active_contacts",
-        "schedule": schedules.crontab(hour="*/6")
     },
     "sync-project-information": {
         "task": "connect.common.tasks.sync_project_information",
@@ -55,10 +42,23 @@ app.conf.beat_schedule = {
         "task": "connect.common.tasks.sync_channels_statistics",
         "schedule": schedules.crontab(minute="*/7")
     },
-    "sync-total-active-contacts": {
-        "task": "connect.common.tasks.sync_total_contact_count",
-        "schedule": schedules.crontab(hour="3", minute=0)
-    }
+    # "sync-total-active-contacts": {
+    #     "task": "connect.common.tasks.sync_total_contact_count",
+    #     "schedule": schedules.crontab(hour="3", minute=0)
+    # },
+    # "sync-active-contacts": {
+    #     "task": "connect.common.tasks.sync_active_contacts",
+    #     "schedule": schedules.crontab(hour="*/6")
+    # },
+    # "generate_project_invoice": {
+    #     "task": "connect.common.tasks.generate_project_invoice",
+    #     "schedule": schedules.crontab(minute="*/5"),
+    # },,
+    # "capture_invoice": {
+    #     "task": "connect.common.tasks.capture_invoice",
+    #     "schedule": schedules.crontab(hour="8,10,13,15,17", minute=0),
+    #     # "schedule": 30,
+    # }
 }
 
 
