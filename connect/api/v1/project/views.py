@@ -23,6 +23,7 @@ from connect.common.models import (
     Project,
     RequestPermissionProject,
     RequestRocketPermission,
+    ProjectAuthorization,
 )
 
 from connect.middleware import ExternalAuthentication
@@ -139,16 +140,13 @@ class RequestPermissionProjectViewSet(
     permission_classes = [IsAuthenticated]
     metadata_class = Metadata
 
-    def valid_role(role): 
-        return len([item for item in projectAuthorization.ROLE_CHOICES if item[0] == role]) > 0
-
     def create(request, *args, **kwargs):
         created_by = request.request.user
         role = request.request.data.get('role')
         email = request.request.data.get('email')
         project_uuid = request.request.data.get('project')
         project = Project.objects.filter(uuid=project_uuid)
-        if not valid_role(role):
+        if len([item for item in ProjectAuthorization.ROLE_CHOICES if item[0] == role]) == 0:
             return Response({"status": 422, "message": f"{role} is not a valid role!"})
         if len(project) == 0:
             return Response({"status": 404, "message": f"Project {project_uuid} not found!"})
@@ -157,20 +155,27 @@ class RequestPermissionProjectViewSet(
         request_permission = RequestPermissionProject.objects.filter(email=email, project=project)
         project_auth = project.project_authorizations.filter(user__email=email)
         user_name = ''
+        first_name = ''
+        last_name = ''
+        photo = ''
+        is_pendent = False
         if request_permission.exists():
             request_permission = request_permission.first()
-            user_name = request_permission.user.name
+            is_pendent = True
             request_permission.role = role
             request_permission.save()
         elif project_auth.exists():
             project_auth = project_auth.first()
-            user_name = project_auth.user.name
+            user_name = project_auth.user.username
+            first_name = project_auth.user.first_name
+            last_name = project_auth.user.last_name
+            photo = project_auth.user.photo_url
             project_auth.role = role
             project_auth.save()
         else:
             RequestPermissionProject.objects.create(created_by=created_by, email=email, role=role, project=project)
-
-        return Response({"status": 200, "data": {"created_by": created_by.email, "role": role, "email": email, "project": project_uuid, "name": user_name}})
+            is_pendent = RequestPermissionProject.objects.filter(email=email, project=project).exists()
+        return Response({"status": 200, "data": {"created_by": created_by.email, "role": role, "email": email, "project": project_uuid, "username": user_name, "first_name": first_name, "last_name": last_name, "photo_user": photo, "is_pendent": is_pendent}})
 
 
 class RequestPermissionRocketViewSet(
