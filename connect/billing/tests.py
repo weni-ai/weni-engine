@@ -1,13 +1,17 @@
 import uuid
 import stripe
 
+from datetime import timedelta
+from django.utils import timezone
+
 from unittest import skipIf
+from unittest.mock import patch
 
 from django.test import TestCase
 from connect.billing import get_gateway
 
 from django.conf import settings
-from connect.billing.models import Channel
+from connect.billing.models import Channel, SyncManagerTask
 from connect.common.models import Organization, BillingPlan
 
 
@@ -86,3 +90,30 @@ class ChannelTestCase(TestCase):
         )
         self.assertAlmostEquals(channel.channel_flow_uuid, self.channel_flow_uuid)
         self.assertAlmostEquals(same_channel.channel_flow_uuid, self.channel_flow_uuid)
+
+
+class SyncManagerTest(TestCase):
+    def setUp(self):
+        self.manager = SyncManagerTask.objects.create(
+            task_type="sync_contacts",
+            started_at=timezone.now(),
+            before=timezone.now(),
+            after=(timezone.now() - timedelta(hours=5)),
+        )
+
+    @patch("connect.billing.tasks.sync_contacts.delay")
+    def test_ok(self, task):
+        # task run sucessfully
+        task.return_value.result = True
+        self.manager.finished_at = timezone.now()
+        self.manager.status = task.return_value.result
+        self.manager.save(update_fields=["finished_at", "status"])
+        self.assertEquals(self.manager.status, True)
+
+    @patch("connect.billing.tasks.sync_contacts.delay")
+    def test_fail(self, task):
+        task.return_value.result = False
+        self.manager.finished_at = timezone.now()
+        self.manager.status = task.return_value.result
+        self.manager.save(update_fields=["finished_at", "status"])
+        self.assertEquals(self.manager.status, False)

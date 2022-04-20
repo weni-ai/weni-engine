@@ -50,7 +50,9 @@ def sync_contacts():
         manager.finished_at = timezone.now()
         manager.status = True
         manager.save(update_fields=["finished_at", "status"])
+        return True
     except Exception:
         manager.finished_at = timezone.now()
         manager.status = False
         manager.save(update_fields=["finished_at", "status"])
+        return False
