@@ -1,7 +1,7 @@
 from connect.celery import app
 from connect import utils
 from connect.common.models import Project
-from connect.billing.models import Channel, Contact, Message, SyncManagerTask
+from connect.billing.models import Channel, Contact, Message, SyncManagerTask, ContactCount
 from datetime import datetime, timedelta
 from django.utils import timezone
 
@@ -56,7 +56,7 @@ def sync_contacts():
         manager.save(update_fields=["finished_at", "status"])
 
 
-@app_task()
+@app.task()
 def retry_billing_tasks():
     task_failed = SyncManagerTask.objects.filter(status=False, retried=False)
 
@@ -67,12 +67,11 @@ def retry_billing_tasks():
         if task.task_type == 'count_contacts':
             status = count_contacts().delay()
         elif task.task_type == 'sync_contacts':
-            # status = sync_contacts().delay()
-            status = True
+            status = sync_contacts().delay()
         return status
 
 
-@app_task()
+@app.task()
 def count_contacts():
     last_sync = SyncManagerTask.objects.filter(task_type="sync_contacts").order_by("finished_at").last()
     manager = SyncManagerTask.objects.create(
@@ -81,6 +80,7 @@ def count_contacts():
         before=timezone.now(),
         after=last_sync.before if last_sync.exists() else timezone.now() - timedelta(hours=5)
     )
+    status = False
     days = {}
     for contact in Contact.objects.filter(created_at__lte=last_sync.before, created_at__gte=last_sync.after):
         contact_count = ContactCount.objects.filter(
@@ -102,8 +102,15 @@ def count_contacts():
         if contact_count.exists():
             contact_count = contact_count.first()
             contact_count.increase_contact_count(count)
+            status = True
         else:
-            ContactCount.objects.create(
-                channel=Chanel.objects.get(channel_flow_uuid=cur_date[3]),
-                count=count
-            )
+            if Channel.channel_exists(cur_date[3]):
+                ContactCount.objects.create(
+                    channel=Channel.objects.get(channel_flow_uuid=cur_date[3]),
+                    count=count
+                )
+                status = True
+
+        manager.status = status
+        manager.finished_at = timezone.now()
+        manager.save()
