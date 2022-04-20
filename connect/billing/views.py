@@ -1,6 +1,6 @@
 import json
 from datetime import datetime
-
+from connect.common import tasks
 from django.conf import settings
 from django.http import HttpResponse
 from django.views import View
@@ -38,8 +38,8 @@ class StripeHandler(View):  # pragma: no cover
         if not event:
             return HttpResponse("Ignored, no event")
 
-        if not event.livemode and settings.BILLING_TEST_MODE:
-            return HttpResponse("Ignored, test event")
+        # if not event.livemode and settings.BILLING_TEST_MODE:
+        #     return HttpResponse("Ignored, test event")
 
         # we only care about invoices being paid or failing
         if event.type == "charge.succeeded" or event.type == "charge.failed":
@@ -54,8 +54,21 @@ class StripeHandler(View):  # pragma: no cover
             org = Organization.objects.filter(
                 organization_billing__stripe_customer=customer.id
             ).first()
+
             if not org:
                 return HttpResponse("Ignored, no org for customer")
+
+            if charge.description == "Card Verification Charge":
+                cvc_check = charge.payment_method_details.card.checks.cvc_check
+                tasks.refund_validation_charge.delay(charge.id)
+                if cvc_check == "pass":
+                    org.organization_billing.card_is_valid = True
+                    org.organization_billing.save(update_fields=["card_is_valid"])
+                    return HttpResponse("CVC check passed, Card is valid")
+                else:
+                    org.organization_billing.is_active = False
+                    org.organization_billing.save(update_fields=["is_active"])
+                    return HttpResponse("CVC didint check pass, Card is not valid")
 
             # look up the topup that matches this charge
             invoice = Invoice.objects.filter(pk=invoice_id).first()
@@ -115,7 +128,10 @@ class StripeHandler(View):  # pragma: no cover
                 ]
             )
             org.allow_payments()
-            org.send_email_added_card(org.organization.name, org.organization.authorizations.values_list("user__email", flat=True))
+            org.send_email_added_card(
+                org.organization.name,
+                org.organization.authorizations.values_list("user__email", flat=True),
+            )
 
         # empty response, 200 lets Stripe know we handled it
         return HttpResponse("Ignored, uninteresting event")

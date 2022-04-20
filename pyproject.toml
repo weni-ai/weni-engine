@@ -33,7 +33,7 @@ grpcio-tools = "~=1.39.0"
 djangogrpcframework = "~=0.2.1"
 stripe = "~=2.60.0"
 psutil = "~=5.8.0"
-weni-protobuffers = "1.2.12"
+weni-protobuffers = "1.2.9"
 
 [tool.poetry.dev-dependencies]
 flake8 = "~=3.9.2"
