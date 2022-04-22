@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext_lazy as _
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import mixins, status
@@ -74,6 +75,12 @@ class ProjectViewSet(
             args=[flow_organization, self.request.user.email],
         )
 
+    def perform_project_authorization_destroy(self, instance):
+        # flow_organization = instance.project.flow_organization
+        instance.delete()
+
+        # celery call
+
     @action(
         detail=True,
         methods=["GET"],
@@ -127,6 +134,35 @@ class ProjectViewSet(
         task.wait()
         contact_detailed = {"projects": task.result}
         return JsonResponse(data=contact_detailed, status=status.HTTP_200_OK)
+
+    @action(
+        detail=True,
+        methods=["DELETE"],
+        url_name="destroy-user-permission",
+        url_path="grpc/destroy-user-permission/(?P<project_uuid>[^/.]+)",
+        authentication_classes=[ExternalAuthentication],
+        permission_classes=[AllowAny],
+    )
+    def destroy_user_permission(self, request, project_uuid):
+        user_email = request.data.get('email')
+        project = get_object_or_404(Project, uuid=project_uuid)
+
+        project_permission = project.project_authorizations.filter(
+            user__email=user_email)
+        request_permission = project.requestpermissionproject_set.filter(
+            email=user_email)
+
+        if request_permission.exists():
+            self.perform_project_authorization_destroy(request_permission.first())
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        elif project_permission.exists():
+            self.perform_project_authorization_destroy(project_permission.first())
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+        # deletar no flows
 
 
 class RequestPermissionProjectViewSet(

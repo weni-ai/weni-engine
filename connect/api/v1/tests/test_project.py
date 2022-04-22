@@ -15,6 +15,7 @@ from connect.common.models import (
     Organization,
     BillingPlan,
     OrganizationRole,
+    RequestPermissionProject,
 )
 
 
@@ -288,3 +289,74 @@ class ProjectEmailTestCase(TestCase):
         self.assertEqual(outbox.subject, "A project was deleted...")
         self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
         self.assertEqual(outbox.to[0], self.test_email)
+
+
+class DeleteProjectAuthTestCase(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+
+        self.owner, self.owner_token = create_user_and_token("owner")
+        self.user, self.user_token = create_user_and_token("user")
+
+        self.organization = Organization.objects.create(
+            name="test organization",
+            description="",
+            inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan="free",
+        )
+        self.organization_authorization = self.organization.authorizations.create(
+            user=self.owner, role=OrganizationRole.ADMIN.value
+        )
+        self.project = self.organization.project.create(
+            name="project test",
+            timezone="America/Sao_Paulo",
+            flow_organization=uuid4.uuid4(),
+        )
+
+        self.owner_project_authorization = self.project.get_user_authorization(self.owner)
+        self.owner_project_authorization.role = 3
+        self.owner_project_authorization.save()
+
+        self.project_auth = self.project.get_user_authorization(self.user)
+        self.project_auth.role = 3
+        self.project_auth.save()
+
+        self.request_auth = RequestPermissionProject.objects.create(
+            project=self.project,
+            email="delete@auth.com",
+            role=2,
+            created_by=self.owner)
+
+    def request(self, project, data={}, token=None):
+        authorization_header = (
+            {"HTTP_AUTHORIZATION": "Token {}".format(token.key)} if token else {}
+        )
+
+        request = self.factory.delete(
+            f"/v1/organization/project/grpc/destroy-user-permission/{project}/",
+            data=json.dumps(data),
+            content_type="application/json",
+            format="json",
+            **authorization_header,
+        )
+
+        response = ProjectViewSet.as_view({"delete": "destroy_user_permission"})(
+            request, project_uuid=project)
+        return response
+
+    def test_destroy_permission_project(self):
+        response = self.request(
+            self.project.uuid,
+            {"email": f"{self.user.email}"},
+            self.owner_token,
+        )
+        self.assertEquals(response.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_destroy_request_permission_project(self):
+        response = self.request(
+            self.project.uuid,
+            {"email": "delete@auth.com"},
+            self.owner_token,
+        )
+        self.assertEquals(response.status_code, status.HTTP_204_NO_CONTENT)
