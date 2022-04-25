@@ -20,6 +20,7 @@ from connect.api.v1.organization.filters import (
 from connect.api.v1.organization.permissions import (
     OrganizationHasPermission,
     OrganizationAdminManagerAuthorization,
+    OrganizationHasPermissionBilling,
 )
 from connect.api.v1.organization.serializers import (
     OrganizationSeralizer,
@@ -35,6 +36,7 @@ from connect.common.models import (
     OrganizationAuthorization,
     RequestPermissionOrganization,
     GenericBillingData,
+    OrganizationRole,
 )
 from connect.middleware import ExternalAuthentication
 from connect import billing
@@ -59,8 +61,9 @@ class OrganizationViewSet(
         if getattr(self, "swagger_fake_view", False):
             # queryset just for schema generation metadata
             return Organization.objects.none()  # pragma: no cover
+        exclude_roles = [OrganizationRole.NOT_SETTED.value]
         auth = (
-            OrganizationAuthorization.objects.exclude(role=0)
+            OrganizationAuthorization.objects.exclude(role__in=exclude_roles)
             .filter(user=self.request.user)
             .values("organization")
         )
@@ -223,7 +226,7 @@ class OrganizationViewSet(
         url_name="get-org-active-contacts",
         authentication_classes=[ExternalAuthentication],
         url_path="org-active-contacts/(?P<organization_uuid>[^/.]+)",
-        permission_classes=[AllowAny],
+        permission_classes=[IsAuthenticated, OrganizationHasPermission],
     )
     def get_active_org_contacts(self, request, organization_uuid):
         organization = get_object_or_404(Organization, uuid=organization_uuid)
@@ -259,8 +262,7 @@ class OrganizationViewSet(
         methods=["PATCH"],
         url_name="billing-closing-plan",
         url_path="billing/closing-plan/(?P<organization_uuid>[^/.]+)",
-        authentication_classes=[ExternalAuthentication],
-        permission_classes=[AllowAny],
+        permission_classes=[IsAuthenticated, OrganizationHasPermission],
     )
     def closing_plan(self, request, organization_uuid):  # pragma: no cover
         result = {}
@@ -298,8 +300,7 @@ class OrganizationViewSet(
         methods=["PATCH"],
         url_name="billing-reactivate-plan",
         url_path="billing/reactivate-plan/(?P<organization_uuid>[^/.]+)",
-        authentication_classes=[ExternalAuthentication],
-        permission_classes=[AllowAny],
+        permission_classes=[IsAuthenticated, OrganizationHasPermission],
     )
     def reactivate_plan(self, request, organization_uuid):  # pragma: no cover
 
@@ -338,8 +339,7 @@ class OrganizationViewSet(
         methods=["PATCH"],
         url_name="billing-change-plan",
         url_path="billing/change-plan/(?P<organization_uuid>[^/.]+)",
-        authentication_classes=[ExternalAuthentication],
-        permission_classes=[AllowAny],
+        permission_classes=[IsAuthenticated, OrganizationHasPermission],
     )
     def change_plan(self, request, organization_uuid):
         plan = request.data.get("organization_billing_plan")
@@ -428,8 +428,7 @@ class OrganizationViewSet(
         methods=["POST"],
         url_name="additional-billing-information",
         url_path="billing/add-additional-information/(?P<organization_uuid>[^/.]+)",
-        authentication_classes=[ExternalAuthentication],
-        permission_classes=[AllowAny],
+        permission_classes=[IsAuthenticated, OrganizationHasPermissionBilling],
     )
     def add_additional_billing_information(self, request, organization_uuid):
         organization = get_object_or_404(Organization, uuid=organization_uuid)
@@ -487,8 +486,7 @@ class OrganizationViewSet(
         methods=["GET"],
         url_name="extra-integrations",
         url_path="billing/extra-integrations/(?P<organization_uuid>[^/.]+)",
-        authentication_classes=[ExternalAuthentication],
-        permission_classes=[AllowAny],
+        permission_classes=[IsAuthenticated, OrganizationHasPermissionBilling],
     )
     def get_extra_active_integrations(self, request, organization_uuid):
         organization = get_object_or_404(Organization, uuid=organization_uuid)

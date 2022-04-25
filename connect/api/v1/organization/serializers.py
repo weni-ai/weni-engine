@@ -11,6 +11,8 @@ from connect.common.models import (
     OrganizationAuthorization,
     RequestPermissionOrganization,
     BillingPlan,
+    OrganizationLevelRole,
+    OrganizationRole
 )
 
 
@@ -153,7 +155,7 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
         )
 
         instance.authorizations.create(
-            user=self.context["request"].user, role=OrganizationAuthorization.ROLE_ADMIN
+            user=self.context["request"].user, role=OrganizationRole.ADMIN.value
         )
 
         return instance
@@ -198,8 +200,10 @@ class OrganizationAuthorizationSerializer(serializers.ModelSerializer):
             "role",
             "can_read",
             "can_contribute",
+            "can_contribute_billing",
             "can_write",
             "is_admin",
+            "is_financial",
             "created_at",
         ]
         read_only = ["user", "user__username", "organization", "role", "created_at"]
@@ -224,7 +228,7 @@ class OrganizationAuthorizationRoleSerializer(serializers.ModelSerializer):
         ref_name = None
 
     def validate(self, attrs):
-        if attrs.get("role") == OrganizationAuthorization.LEVEL_NOTHING:
+        if attrs.get("role") == OrganizationLevelRole.NOTHING.value:
             raise PermissionDenied(_("You cannot set user role 0"))
         return attrs
 
@@ -247,6 +251,6 @@ class RequestPermissionOrganizationSerializer(serializers.ModelSerializer):
     )
 
     def validate(self, attrs):
-        if attrs.get("role") == OrganizationAuthorization.LEVEL_NOTHING:
+        if attrs.get("role") == OrganizationLevelRole.NOTHING.value:
             raise PermissionDenied(_("You cannot set user role 0"))
         return attrs

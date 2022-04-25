@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext_lazy as _
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import mixins, status
@@ -11,14 +12,26 @@ from rest_framework.viewsets import GenericViewSet
 from connect.api.v1.metadata import Metadata
 from connect.api.v1.project.filters import ProjectOrgFilter
 from connect.api.v1.project.permissions import ProjectHasPermission
-from connect.api.v1.project.serializers import ProjectSerializer, ProjectSearchSerializer
+from connect.api.v1.project.serializers import (
+    ProjectSerializer,
+    ProjectSearchSerializer,
+    RequestRocketPermissionSerializer,
+    RequestPermissionProjectSerializer,
+)
 from connect.celery import app as celery_app
-from connect.common.models import OrganizationAuthorization, Project
+from connect.common.models import (
+    OrganizationAuthorization,
+    Project,
+    RequestPermissionProject,
+    RequestRocketPermission,
+    ProjectAuthorization,
+)
 
 from connect.middleware import ExternalAuthentication
 from rest_framework.exceptions import ValidationError
 from connect.common import tasks
 from django.http import JsonResponse
+from django.db.models import Q
 
 
 class ProjectViewSet(
@@ -46,7 +59,12 @@ class ProjectViewSet(
             .filter(user=self.request.user)
             .values("organization")
         )
-        return self.queryset.filter(organization__pk__in=auth)
+
+        filter = Q(project_authorizations__user=self.request.user) & ~Q(
+            project_authorizations__role=0
+        )
+
+        return self.queryset.filter(organization__pk__in=auth).filter(filter)
 
     def perform_destroy(self, instance):
         flow_organization = instance.flow_organization
@@ -56,6 +74,12 @@ class ProjectViewSet(
             "delete_project",
             args=[flow_organization, self.request.user.email],
         )
+
+    def perform_project_authorization_destroy(self, instance):
+        # flow_organization = instance.project.flow_organization
+        instance.delete()
+
+        # celery call
 
     @action(
         detail=True,
@@ -108,5 +132,96 @@ class ProjectViewSet(
             )
         task = tasks.get_contacts_detailed.delay(str(project_uuid), before, after)
         task.wait()
-        contact_detailed = {'projects': task.result}
+        contact_detailed = {"projects": task.result}
         return JsonResponse(data=contact_detailed, status=status.HTTP_200_OK)
+
+    @action(
+        detail=True,
+        methods=["DELETE"],
+        url_name="destroy-user-permission",
+        url_path="grpc/destroy-user-permission/(?P<project_uuid>[^/.]+)",
+        authentication_classes=[ExternalAuthentication],
+        permission_classes=[AllowAny],
+    )
+    def destroy_user_permission(self, request, project_uuid):
+        user_email = request.data.get('email')
+        project = get_object_or_404(Project, uuid=project_uuid)
+
+        project_permission = project.project_authorizations.filter(
+            user__email=user_email)
+        request_permission = project.requestpermissionproject_set.filter(
+            email=user_email)
+
+        if request_permission.exists():
+            self.perform_project_authorization_destroy(request_permission.first())
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        elif project_permission.exists():
+            self.perform_project_authorization_destroy(project_permission.first())
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+        # deletar no flows
+
+
+class RequestPermissionProjectViewSet(
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    mixins.DestroyModelMixin,
+    GenericViewSet,
+):
+    queryset = RequestPermissionProject.objects.all()
+    serializer_class = RequestPermissionProjectSerializer
+    permission_classes = [IsAuthenticated]
+    metadata_class = Metadata
+
+    def create(request, *args, **kwargs):
+        created_by = request.request.user
+        role = request.request.data.get('role')
+        email = request.request.data.get('email')
+        project_uuid = request.request.data.get('project')
+        project = Project.objects.filter(uuid=project_uuid)
+        if len([item for item in ProjectAuthorization.ROLE_CHOICES if item[0] == role]) == 0:
+            return Response({"status": 422, "message": f"{role} is not a valid role!"})
+        if len(project) == 0:
+            return Response({"status": 404, "message": f"Project {project_uuid} not found!"})
+        project = project.first()
+
+        request_permission = RequestPermissionProject.objects.filter(email=email, project=project)
+        project_auth = project.project_authorizations.filter(user__email=email)
+        user_name = ''
+        first_name = ''
+        last_name = ''
+        photo = ''
+        is_pendent = False
+        if request_permission.exists():
+            request_permission = request_permission.first()
+            is_pendent = True
+            request_permission.role = role
+            request_permission.save()
+        elif project_auth.exists():
+            project_auth = project_auth.first()
+            user_name = project_auth.user.username
+            first_name = project_auth.user.first_name
+            last_name = project_auth.user.last_name
+            photo = project_auth.user.photo_url
+            project_auth.role = role
+            project_auth.save()
+        else:
+            RequestPermissionProject.objects.create(created_by=created_by, email=email, role=role, project=project)
+            is_pendent = RequestPermissionProject.objects.filter(email=email, project=project).exists()
+        return Response({"status": 200, "data": {"created_by": created_by.email, "role": role, "email": email, "project": project_uuid, "username": user_name, "first_name": first_name, "last_name": last_name, "photo_user": photo, "is_pendent": is_pendent}})
+
+
+class RequestPermissionRocketViewSet(
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    mixins.DestroyModelMixin,
+    GenericViewSet,
+):
+    queryset = RequestRocketPermission.objects.all()
+    serializer_class = RequestRocketPermissionSerializer
+    permission_classes = [IsAuthenticated]
+    metadata_class = Metadata
+    lookup_field = "pk"

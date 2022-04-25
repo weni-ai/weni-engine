@@ -41,14 +41,10 @@ class FlowType(GRPCType):
         )
         return response
 
-    def update_project(
-        self, organization_uuid: int, organization_name: str
-    ):
+    def update_project(self, organization_uuid: int, organization_name: str):
         stub = org_pb2_grpc.OrgControllerStub(self.channel)
         response = stub.Update(
-            org_pb2.OrgUpdateRequest(
-                uuid=organization_uuid, name=organization_name
-            )
+            org_pb2.OrgUpdateRequest(uuid=organization_uuid, name=organization_name)
         )
         return response
 
@@ -172,15 +168,13 @@ class FlowType(GRPCType):
         try:
             stub = org_pb2_grpc.OrgControllerStub(self.channel)
             response = stub.Retrieve(org_pb2.OrgRetrieveRequest(uuid=project_uuid))
-            return (
-                {
-                    "id": response.id,
-                    "name": response.name,
-                    "uuid": response.uuid,
-                    "timezone": response.timezone,
-                    "date_format": response.date_format,
-                }
-            )
+            return {
+                "id": response.id,
+                "name": response.name,
+                "uuid": response.uuid,
+                "timezone": response.timezone,
+                "date_format": response.date_format,
+            }
         except grpc.RpcError as e:
             if e.code() is not grpc.StatusCode.NOT_FOUND:
                 raise e
@@ -193,13 +187,11 @@ class FlowType(GRPCType):
             response = stub.Retrieve(
                 statistic_pb2.OrgStatisticRetrieveRequest(org_uuid=project_uuid)
             )
-            return(
-                {
-                    "active_flows": response.active_flows,
-                    "active_classifiers": response.active_classifiers,
-                    "active_contacts": response.active_contacts,
-                }
-            )
+            return {
+                "active_flows": response.active_flows,
+                "active_classifiers": response.active_classifiers,
+                "active_contacts": response.active_contacts,
+            }
         except grpc.RpcError as e:
             if e.code() is not grpc.StatusCode.NOT_FOUND:
                 raise e
@@ -224,7 +216,9 @@ class FlowType(GRPCType):
         )
         return response
 
-    def create_channel(self, user: str, project_uuid: str, data: str, channeltype_code: str):
+    def create_channel(
+        self, user: str, project_uuid: str, data: str, channeltype_code: str
+    ):
         # Create Channel
         stub = channel_pb2_grpc.ChannelControllerStub(self.channel)
         response = stub.Create(
@@ -250,10 +244,7 @@ class FlowType(GRPCType):
     def list_channel(self, project_uuid: str, channel_type: str = "WA"):
         stub = channel_pb2_grpc.ChannelControllerStub(self.channel)
         response = stub.List(
-            channel_pb2.ChannelListRequest(
-                org=project_uuid,
-                channel_type=channel_type
-            )
+            channel_pb2.ChannelListRequest(org=project_uuid, channel_type=channel_type)
         )
         return response
 
