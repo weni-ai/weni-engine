@@ -75,12 +75,13 @@ class ProjectViewSet(
             args=[flow_organization, self.request.user.email],
         )
 
-    def perform_project_authorization_destroy(self, instance):
+    def perform_project_authorization_destroy(self, instance, is_request_permission):
         flow_organization = instance.project.flow_organization
-        celery_app.send_task(
-            "delete_user_permission_project",
-            args=[flow_organization, instance.user.email, instance.role],
-        )
+        if not is_request_permission:
+            celery_app.send_task(
+                "delete_user_permission_project",
+                args=[flow_organization, instance.user.email, instance.role],
+            )
         instance.delete()
 
     @action(
@@ -155,11 +156,11 @@ class ProjectViewSet(
             email=user_email)
 
         if request_permission.exists():
-            self.perform_project_authorization_destroy(request_permission.first())
+            self.perform_project_authorization_destroy(request_permission.first(), True)
             return Response(status=status.HTTP_204_NO_CONTENT)
 
         elif project_permission.exists():
-            self.perform_project_authorization_destroy(project_permission.first())
+            self.perform_project_authorization_destroy(project_permission.first(), False)
             return Response(status=status.HTTP_204_NO_CONTENT)
 
         return Response(status=status.HTTP_404_NOT_FOUND)
