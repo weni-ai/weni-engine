@@ -76,10 +76,12 @@ class ProjectViewSet(
         )
 
     def perform_project_authorization_destroy(self, instance):
-        # flow_organization = instance.project.flow_organization
+        flow_organization = instance.project.flow_organization
+        celery_app.send_task(
+            "delete_user_permission_project",
+            args=[flow_organization, instance.user.email, instance.role],
+        )
         instance.delete()
-
-        # celery call
 
     @action(
         detail=True,
@@ -161,8 +163,6 @@ class ProjectViewSet(
             return Response(status=status.HTTP_204_NO_CONTENT)
 
         return Response(status=status.HTTP_404_NOT_FOUND)
-
-        # deletar no flows
 
 
 class RequestPermissionProjectViewSet(
