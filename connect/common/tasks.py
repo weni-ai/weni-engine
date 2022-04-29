@@ -520,3 +520,17 @@ def refund_validation_charge(charge_id):  # pragma: no cover
     stripe.api_key = settings.BILLING_SETTINGS.get("stripe", {}).get("API_KEY")
     stripe.Refund.create(charge=charge_id)
     return True
+
+
+@app.task(
+    name="delete_user_permission_project",
+    autoretry_for=(_InactiveRpcError, Exception),
+    retry_kwargs={"max_retries": 5},
+    retry_backoff=True,
+)
+def delete_user_permission_project(project_uuid: str, user_email: str, permission: int):
+    utils.get_grpc_types().get("flow").delete_user_permission_project(
+        project_uuid=project_uuid,
+        user_email=user_email,
+        permission=permission
+    )
