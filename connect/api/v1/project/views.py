@@ -181,20 +181,30 @@ class RequestPermissionProjectViewSet(
         role = request.request.data.get('role')
         email = request.request.data.get('email')
         project_uuid = request.request.data.get('project')
+        rocket_role = request.request.data.get('rocket_authorization')
         project = Project.objects.filter(uuid=project_uuid)
+
         if len([item for item in ProjectAuthorization.ROLE_CHOICES if item[0] == role]) == 0:
             return Response({"status": 422, "message": f"{role} is not a valid role!"})
         if len(project) == 0:
             return Response({"status": 404, "message": f"Project {project_uuid} not found!"})
         project = project.first()
+        
+        if len([item for item in RocketAuthorization.ROLE_CHOICES if item[0] == rocket_role]) == 0:
+            return Response({"status": 422, "message": f"{rocket_role} is not a valid rocket role!"})
 
         request_permission = RequestPermissionProject.objects.filter(email=email, project=project)
         project_auth = project.project_authorizations.filter(user__email=email)
+
+        request_rocket_authorization = RequestRocketPermission.objects.filter(email=email, project=project)
+        rocket_authorization = None
+
         user_name = ''
         first_name = ''
         last_name = ''
         photo = ''
         is_pendent = False
+        
         if request_permission.exists():
             request_permission = request_permission.first()
             is_pendent = True
@@ -202,6 +212,7 @@ class RequestPermissionProjectViewSet(
             request_permission.save()
         elif project_auth.exists():
             project_auth = project_auth.first()
+            rocket_authorization = project_auth.rocket_authorization
             user_name = project_auth.user.username
             first_name = project_auth.user.first_name
             last_name = project_auth.user.last_name
@@ -211,7 +222,18 @@ class RequestPermissionProjectViewSet(
         else:
             RequestPermissionProject.objects.create(created_by=created_by, email=email, role=role, project=project)
             is_pendent = RequestPermissionProject.objects.filter(email=email, project=project).exists()
-        return Response({"status": 200, "data": {"created_by": created_by.email, "role": role, "email": email, "project": project_uuid, "username": user_name, "first_name": first_name, "last_name": last_name, "photo_user": photo, "is_pendent": is_pendent}})
+        
+        if request_rocket_authorization.exists():
+            request_rocket_authorization = request_rocket_authorization.first()
+            request_rocket_authorization.role = rocket_role
+            request_rocket_authorization.save()
+        elif not (rocket_authorization is None):
+            rocket_authorization.role = rocket_role
+            rocket_authorization.save()
+        elif rocket_role:
+            RequestRocketPermission.objects.create(email=email, role=rocket_role, project=project, created_by=created_by)
+        
+        return Response({"status": 200, "data": {"created_by": created_by.email, "role": role, "rocket_authorization": rocket_role, "email": email, "project": project_uuid, "username": user_name, "first_name": first_name, "last_name": last_name, "photo_user": photo, "is_pendent": is_pendent}})
 
 
 class RequestPermissionRocketViewSet(

@@ -541,6 +541,13 @@ class OrganizationAuthorizationViewSet(
 
     permission_classes = [IsAuthenticated]
 
+    def get_queryset(self, *args, **kwargs):
+        if getattr(self, "swagger_fake_view", False):
+            # queryset just for schema generation metadata
+            return Organization.objects.none()  # pragma: no cover
+        exclude_roles = [ProjectRole.VIEWER.value, ProjectRole.NOT_SETTED.value]
+        return self.queryset.exclude(role=exclude_roles)
+
     def get_object(self):
         organization_uuid = self.kwargs.get("organization__uuid")
         user_id = self.kwargs.get("user__id")

@@ -98,16 +98,24 @@ def request_permission_organization(sender, instance, created, **kwargs):
     if created:
         user = User.objects.filter(email=instance.email)
         if user.exists():
-            perm = instance.organization.get_user_authorization(user=user.first())
+            user = user.first()
+            perm = instance.organization.get_user_authorization(user=user)
             perm.role = instance.role
             perm.save(update_fields=["role"])
             if perm.can_contribute:
                 for proj in instance.organization.project.all():
-                    proj.project_authorizations.create(
-                        user=user.first(),
-                        role=perm.role,
-                        organization_authorization=perm,
-                    )
+                    project_perm = proj.project_authorizations.filter(user=user)
+                    if not project_perm.exists():
+                        proj.project_authorizations.create(
+                            user=user.first(),
+                            role=perm.role,
+                            organization_authorization=perm,
+                        )
+                    else:
+                        project_perm = project_perm.first()
+                        if project_perm.role < perm.role:
+                            project_perm.role = perm.role
+                            project_perm.save()
             instance.delete()
         instance.organization.send_email_invite_organization(email=instance.email)
 
