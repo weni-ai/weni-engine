@@ -24,7 +24,7 @@ class OrganizationAdminManagerAuthorization(
 ):  # pragma: no cover
     def has_object_permission(self, request, view, obj):
         authorization = obj.organization.get_user_authorization(request.user)
-        return authorization.is_admin
+        return authorization.can_contribute
 
 
 class OrganizationHasPermissionBilling(permissions.BasePermission):

@@ -161,6 +161,7 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
         return instance
 
     def get_authorizations(self, obj):
+        exclude_roles = [OrganizationRole.NOT_SETTED.value, OrganizationRole.VIEWER.value]
         return {
             "count": obj.authorizations.count(),
             "users": [
@@ -171,7 +172,7 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
                     "role": i.role,
                     "photo_user": i.user.photo_url,
                 }
-                for i in obj.authorizations.all()
+                for i in obj.authorizations.exclude(role_in=exclude_roles)
             ],
         }
 

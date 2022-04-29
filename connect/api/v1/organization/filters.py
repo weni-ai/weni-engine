@@ -28,7 +28,7 @@ class OrganizationAuthorizationFilter(filters.FilterSet):
         try:
             organization = Organization.objects.get(uuid=value)
             authorization = organization.get_user_authorization(request.user)
-            if not authorization.is_admin:
+            if not authorization.can_contribute:
                 raise PermissionDenied()
             return queryset.filter(organization=organization)
         except Organization.DoesNotExist:
