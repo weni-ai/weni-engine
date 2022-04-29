@@ -37,6 +37,7 @@ from connect.common.models import (
     RequestPermissionOrganization,
     GenericBillingData,
     OrganizationRole,
+    ProjectRole
 )
 from connect.middleware import ExternalAuthentication
 from connect import billing
@@ -544,9 +545,9 @@ class OrganizationAuthorizationViewSet(
     def get_queryset(self, *args, **kwargs):
         if getattr(self, "swagger_fake_view", False):
             # queryset just for schema generation metadata
-            return Organization.objects.none()  # pragma: no cover
+            return OrganizationAuthorization.objects.none()  # pragma: no cover
         exclude_roles = [ProjectRole.VIEWER.value, ProjectRole.NOT_SETTED.value]
-        return self.queryset.exclude(role=exclude_roles)
+        return self.queryset.exclude(role__in=exclude_roles)
 
     def get_object(self):
         organization_uuid = self.kwargs.get("organization__uuid")

@@ -25,6 +25,7 @@ from connect.common.models import (
     RequestPermissionProject,
     RequestRocketPermission,
     ProjectAuthorization,
+    RocketAuthorization
 )
 
 from connect.middleware import ExternalAuthentication
@@ -189,8 +190,8 @@ class RequestPermissionProjectViewSet(
         if len(project) == 0:
             return Response({"status": 404, "message": f"Project {project_uuid} not found!"})
         project = project.first()
-        
-        if len([item for item in RocketAuthorization.ROLE_CHOICES if item[0] == rocket_role]) == 0:
+
+        if len([item for item in RocketAuthorization.ROLE_CHOICES if item[0] == rocket_role]) == 0 and rocket_role:
             return Response({"status": 422, "message": f"{rocket_role} is not a valid rocket role!"})
 
         request_permission = RequestPermissionProject.objects.filter(email=email, project=project)
@@ -204,7 +205,7 @@ class RequestPermissionProjectViewSet(
         last_name = ''
         photo = ''
         is_pendent = False
-        
+
         if request_permission.exists():
             request_permission = request_permission.first()
             is_pendent = True
@@ -222,7 +223,7 @@ class RequestPermissionProjectViewSet(
         else:
             RequestPermissionProject.objects.create(created_by=created_by, email=email, role=role, project=project)
             is_pendent = RequestPermissionProject.objects.filter(email=email, project=project).exists()
-        
+
         if request_rocket_authorization.exists():
             request_rocket_authorization = request_rocket_authorization.first()
             request_rocket_authorization.role = rocket_role
@@ -232,7 +233,7 @@ class RequestPermissionProjectViewSet(
             rocket_authorization.save()
         elif rocket_role:
             RequestRocketPermission.objects.create(email=email, role=rocket_role, project=project, created_by=created_by)
-        
+
         return Response({"status": 200, "data": {"created_by": created_by.email, "role": role, "rocket_authorization": rocket_role, "email": email, "project": project_uuid, "username": user_name, "first_name": first_name, "last_name": last_name, "photo_user": photo, "is_pendent": is_pendent}})
 
 

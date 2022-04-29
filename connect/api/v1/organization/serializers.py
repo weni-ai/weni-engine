@@ -172,7 +172,7 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
                     "role": i.role,
                     "photo_user": i.user.photo_url,
                 }
-                for i in obj.authorizations.exclude(role=exclude_roles)
+                for i in obj.authorizations.exclude(role_in=exclude_roles)
             ],
         }
 
