@@ -538,11 +538,6 @@ class ListOrganizationAuthorizationTestCase(TestCase):
         self.assertEqual(content_data.get("results")[0].get("user"), self.owner.id)
         self.assertEqual(content_data.get("results")[1].get("user"), self.user.id)
 
-    def test_user_forbidden(self):
-        response, content_data = self.request(self.organization.uuid, self.user_token)
-
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-
     def test_organization_not_found(self):
         response, content_data = self.request(uuid4.uuid4(), self.user_token)
 

@@ -3,6 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 from django_filters import rest_framework as filters
 from rest_framework.exceptions import NotFound
 from rest_framework.exceptions import PermissionDenied
+from connect.api.v1 import READ_METHODS
 
 from connect.common.models import (
     OrganizationAuthorization,
@@ -28,8 +29,12 @@ class OrganizationAuthorizationFilter(filters.FilterSet):
         try:
             organization = Organization.objects.get(uuid=value)
             authorization = organization.get_user_authorization(request.user)
-            if not authorization.can_contribute:
-                raise PermissionDenied()
+            if request.method in READ_METHODS:
+                if not authorization.can_contribute:
+                    raise PermissionDenied()
+            else:
+                if not authorization.is_admin:
+                    raise PermissionDenied()
             return queryset.filter(organization=organization)
         except Organization.DoesNotExist:
             raise NotFound(_("Organization {} does not exist").format(value))
