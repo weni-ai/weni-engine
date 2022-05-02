@@ -107,7 +107,7 @@ def request_permission_organization(sender, instance, created, **kwargs):
                     project_perm = proj.project_authorizations.filter(user=user)
                     if not project_perm.exists():
                         proj.project_authorizations.create(
-                            user=user.first(),
+                            user=user,
                             role=perm.role,
                             organization_authorization=perm,
                         )
