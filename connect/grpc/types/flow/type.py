@@ -122,9 +122,9 @@ class FlowType(GRPCType):
             "is_active": response.is_active,
         }
 
-    def delete_classifier(self, classifier_uuid: str):
+    def delete_classifier(self, classifier_uuid: str, user_email: str):
         stub = classifier_pb2_grpc.ClassifierControllerStub(self.channel)
-        stub.Destroy(classifier_pb2.ClassifierDestroyRequest(uuid=classifier_uuid))
+        stub.Destroy(classifier_pb2.ClassifierDestroyRequest(uuid=classifier_uuid, user_email=user_email))
 
     def get_classifier(self, classifier_uuid: str):
         stub = classifier_pb2_grpc.ClassifierControllerStub(self.channel)
