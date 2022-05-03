@@ -290,7 +290,7 @@ def sync_active_contacts():
     filter_organizations = Q(uuid__icontains="82fa0f4a") | Q(name="Elogroup")
     orgs_to_exclude = [o.uuid for o in Organization.objects.filter(filter_organizations)]
     flow_instance = utils.get_grpc_types().get("flow")
-    for project in Project.objects.all().exclude(organization__uuid__in=orgs_to_exclude):
+    for project in Project.objects.filter(is_active=True).exclude(organization__uuid__in=orgs_to_exclude):
         last_invoice_date = project.organization.organization_billing.last_invoice_date
         next_due_date = project.organization.organization_billing.next_due_date
         created_at = project.organization.created_at
@@ -310,7 +310,7 @@ def sync_active_contacts():
 @app.task()
 def sync_total_contact_count():
     flow_instance = utils.get_grpc_types().get("flow")
-    for project in Project.objects.all():
+    for project in Project.objects.filter(is_active=True):
         project.total_contact_count = flow_instance.get_project_statistic(
             project_uuid=project.uuid
         )
@@ -329,13 +329,14 @@ def sync_project_information():
             project.name = flow_result.get("name")
             project.timezone = str(flow_result.get("timezone"))
             project.date_format = str(flow_result.get("date_format"))
-            project.save(update_fields=["name", "timezone", "date_format"])
+            project.is_active = flow_result.get("is_active")
+            project.save(update_fields=["name", "timezone", "date_format", "is_active"])
 
 
 @app.task()
 def sync_project_statistics():
     flow_instance = utils.get_grpc_types().get("flow")
-    for project in Project.objects.all():
+    for project in Project.objects.filter(is_active=True):
         statistic_project_result = flow_instance.get_project_statistic(
             project_uuid=str(project.flow_organization),
         )
@@ -350,7 +351,7 @@ def sync_repositories_statistics():
     flow_instance = utils.get_grpc_types().get("flow")
     inteligence_instance = utils.get_grpc_types().get("inteligence")
 
-    for project in Project.objects.all():
+    for project in Project.objects.filter(is_active=True):
         classifiers_project = flow_instance.get_classifiers(
             project_uuid=str(project.flow_organization),
             classifier_type="bothub",
@@ -372,7 +373,7 @@ def sync_repositories_statistics():
 @app.task()
 def sync_channels_statistics():
     flow_instance = utils.get_grpc_types().get("flow")
-    for project in Project.objects.all():
+    for project in Project.objects.filter(is_active=True):
         project.extra_active_integration = len(
             list(
                 flow_instance.list_channel(project_uuid=str(project.flow_organization))

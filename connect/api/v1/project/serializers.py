@@ -41,6 +41,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             "authorizations",
             "pending_authorizations",
             "authorization",
+            "is_active"
         ]
         ref_name = None
 

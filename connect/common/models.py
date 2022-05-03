@@ -482,6 +482,7 @@ class Project(models.Model):
     extra_active_integration = models.IntegerField(
         _("Whatsapp Integrations"), default=0
     )
+    is_active = models.BooleanField(_("Defines whether the project is active"), default=True)
 
     def __str__(self):
         return f"{self.uuid} - Project: {self.name} - Org: {self.organization.name}"

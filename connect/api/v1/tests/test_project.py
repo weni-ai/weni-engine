@@ -107,6 +107,7 @@ class ListProjectAPITestCase(TestCase):
             name="project test 2",
             timezone="America/Sao_Paulo",
             flow_organization=uuid4.uuid4(),
+            is_active=False
         )
 
     def request(self, param, value, token=None):
@@ -135,7 +136,7 @@ class ListProjectAPITestCase(TestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(content_data.get("count"), 2)
+        self.assertEqual(content_data.get("count"), 1)
 
     def test_owner_project_authorizations(self):
         response, content_data = self.request(
@@ -144,7 +145,7 @@ class ListProjectAPITestCase(TestCase):
             self.owner_token,
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(content_data.get("count"), 2)
+        self.assertEqual(content_data.get("count"), 1)
 
     def test_financial_project_authorizations(self):
         response, content_data = self.request(
