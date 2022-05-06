@@ -1,9 +1,20 @@
+import uuid
+import stripe
+
+from datetime import timedelta
+from django.utils import timezone
+
 from unittest import skipIf
+from unittest.mock import patch
+import uuid as uuid4
 
 from django.test import TestCase
-from connect.billing import get_gateway
-import stripe
 from django.conf import settings
+
+from connect.billing import get_gateway
+
+from connect.billing.models import Contact, Channel, Message, SyncManagerTask
+from connect.common.models import Organization, Project, BillingPlan
 
 
 @skipIf(not settings.BILLING_SETTINGS.get("stripe", None), "gateway not configured")
@@ -48,6 +59,7 @@ class StripeGatewayTestCase(TestCase):
         resp = self.merchant.get_payment_method_details("ch_3K9wZYGB60zUb40p1C0iisk")
         self.assertEquals(resp['status'], 'FAIL')
 
+
 class SyncManagerTest(TestCase):
     def setUp(self):
         self.manager = SyncManagerTask.objects.create(
@@ -73,10 +85,12 @@ class SyncManagerTest(TestCase):
         self.manager.status = task.return_value.result
         self.manager.save(update_fields=["finished_at", "status"])
         self.assertEquals(self.manager.status, False)
+
+
 class ContactTestCase(TestCase):
-    
+
     def setUp(self):
-        
+
         self.organization = Organization.objects.create(
             name='org test',
             description='desc',
@@ -92,7 +106,7 @@ class ContactTestCase(TestCase):
             flow_organization=uuid4.uuid4(),
             organization=self.organization
         )
-        
+
         self.channel = Channel.objects.create(
             name='channel test',
             channel_type='WA',
@@ -108,6 +122,7 @@ class ContactTestCase(TestCase):
 
     def test_create_contact(self):
         self.assertEquals(self.contact.name, "contact test 1")
+
 
 class MessageTestCase(TestCase):
 
@@ -128,7 +143,7 @@ class MessageTestCase(TestCase):
             flow_organization=uuid4.uuid4(),
             organization=self.organization
         )
-        
+
         self.channel = Channel.objects.create(
             name='channel test',
             channel_type='WA',
