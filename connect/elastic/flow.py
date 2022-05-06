@@ -12,12 +12,12 @@ class ElasticFlow(ElasticHandler):
     def __init__(self) -> None:
         super().__init__()
 
-    def get_contact_detailed(self, before: str, after: str):
+    def get_contact_detailed(self, flow_id: int, before: str, after: str):
         index = "contacts"
         before, after = es_convert_datetime(before, after)
 
         qs = Q(
-            'bool', must=[Q('match', is_active='true')]) \
+            'bool', must=[Q('match', is_active='true') & Q('match', org_id=flow_id)]) \
             & Q(
             "range", last_seen_on={
                 "gte": str(after),
