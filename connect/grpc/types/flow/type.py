@@ -175,7 +175,8 @@ class FlowType(GRPCType):
                 "uuid": response.uuid,
                 "timezone": response.timezone,
                 "date_format": response.date_format,
-                "is_active": response.is_active
+                "is_active": response.is_active,
+                "users": response.users
             }
         except grpc.RpcError as e:
             if e.code() is not grpc.StatusCode.NOT_FOUND:

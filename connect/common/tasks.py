@@ -332,6 +332,7 @@ def sync_total_contact_count():
     retry_backoff=True,
 )
 def sync_project_information():
+    permissions = {'viewer': 1, 'editor': 2, 'administrator': 3}
     flow_instance = utils.get_grpc_types().get("flow")
     for project in Project.objects.all():
         flow_result = flow_instance.get_project_info(
@@ -343,6 +344,17 @@ def sync_project_information():
             project.date_format = str(flow_result.get("date_format"))
             project.is_active = flow_result.get("is_active")
             project.save(update_fields=["name", "timezone", "date_format", "is_active"])
+
+            # Sync permissions
+            users = flow_result.get("users")
+            for user in users:
+                connect_user = User.objects.get(email=user.email)
+                connect_permission = project.get_user_authorization(connect_user)
+                flows_permission = permissions.get(user.permission_type)
+                print(connect_permission, flows_permission)
+                if connect_permission.role != flows_permission:
+                    flow_instance.update_user_permission_project(
+                        str(project.flow_organization), user.email, connect_permission.role)
 
 
 @app.task(
