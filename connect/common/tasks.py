@@ -329,7 +329,8 @@ def sync_project_information():
             project.name = flow_result.get("name")
             project.timezone = str(flow_result.get("timezone"))
             project.date_format = str(flow_result.get("date_format"))
-            project.save(update_fields=["name", "timezone", "date_format"])
+            project.flow_id = flow_result.get("id")
+            project.save(update_fields=["name", "timezone", "date_format", "flow_id"])
 
 
 @app.task()
