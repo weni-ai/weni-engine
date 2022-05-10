@@ -121,11 +121,18 @@ class StripeGateway(Gateway):
 
     def verification_charge(self, customer):  # pragma: no cover
         try:
-            response = stripe.Charge.create(
+            payment = stripe.PaymentMethod.list(
                 customer=customer,
+                type="card",
+            )
+            response = stripe.PaymentIntent.create(
                 amount=100 * int(self.verification_amount),
-                currency="usd",
-                description=self.verification_description,
+                currency='usd',
+                customer=customer,
+                description="Card Verification Charge",
+                payment_method=payment.get("data", {})[0].get("id"),
+                off_session=True,
+                confirm=True,
             )
         except IndexError:
             return {
