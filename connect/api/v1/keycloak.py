@@ -37,8 +37,11 @@ class KeycloakControl:  # pragma: no cover
         Configure two factor autnetication to user
         """
         user_id = self.get_user_id_by_email(email)
-        response = self.instance.update_user(
-            user_id=user_id,
-            payload={'requiredActions': ['CONFIGURE_TOTP']}
-        )
-        return response
+        if user_id is not None:
+            response = self.instance.update_user(
+                user_id=user_id,
+                payload={'requiredActions': ['CONFIGURE_TOTP']}
+            )
+            return response
+        else:
+            return 'User not found'
