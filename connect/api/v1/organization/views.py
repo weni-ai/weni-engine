@@ -511,6 +511,27 @@ class OrganizationViewSet(
 
         return JsonResponse(data={"message": customer}, status=status.HTTP_200_OK)
 
+    @action(
+        detail=True,
+        methods=["POST"],
+        url_name="organization-retrieve",
+        url_path="internal/retrieve"
+    )
+    def retrieve(self, request):
+        flow_organization_uuid = request.uuid
+        organization = Organization.objects.get(project__flow_organization=flow_organization_uuid)
+        return {
+            "status": status.HTTP_200_OK,
+            "response": {
+                "uuid": str(organization.uuid),
+                "name": organization.name,
+                "description": organization.description,
+                "inteligence_organization": organization.inteligence_organization,
+                "extra_integration": organization.extra_integration,
+                "is_suspended": organization.is_suspended,
+            }
+        }
+
 
 class OrganizationAuthorizationViewSet(
     MultipleFieldLookupMixin,

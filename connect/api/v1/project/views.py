@@ -17,6 +17,12 @@ from connect.api.v1.project.serializers import (
     ProjectSearchSerializer,
     RequestRocketPermissionSerializer,
     RequestPermissionProjectSerializer,
+    ReleaseChannelSerializer,
+    DestroyClassifierSerializer,
+    CreateChannelSerializer,
+    RetrieveClassifierSerializer,
+    CreateClassifierSerializer,
+    ClassifierSerializer,
 )
 from connect.celery import app as celery_app
 from connect.common.models import (
@@ -165,6 +171,154 @@ class ProjectViewSet(
             return Response(status=status.HTTP_204_NO_CONTENT)
 
         return Response(status=status.HTTP_404_NOT_FOUND)
+
+    @action(
+        detail=True,
+        methods=["GET"],
+        url_name="list-channel",
+    )
+    def list_channel(self, request):
+        # TODO: uncomment below line when adding flows endpoint
+        # channel_type = request.channel_type
+        channels = []
+        for project in Project.objects.all():
+            # TODO: call flows endpoint to list channels
+            response = []
+
+            for channel in response:
+                channels.append(
+                    {
+                        "uuid": channel.uuid,
+                        "name": channel.name,
+                        "config": channel.config,
+                        "address": channel.address,
+                        "project_uuid": str(project.uuid),
+                    }
+                )
+        return JsonResponse(status=status.HTTP_200_OK, data=channels)
+
+    @action(
+        detail=True,
+        methods=["GET"],
+        url_name="realease-channel",
+        serializer_class=ReleaseChannelSerializer,
+    )
+    def release_channel(self, request):
+        serializer = ReleaseChannelSerializer(message=request)
+        serializer.is_valid(raise_exception=True)
+
+        # TODO: call realease_channel flows endpoint
+        return JsonResponse(status=status.HTTP_200_OK)
+
+    @action(
+        detail=True,
+        methods=["POST"],
+        url_name='create-channel',
+        serializer_class=CreateChannelSerializer
+    )
+    def create_channel(self, request):
+        serializer = CreateChannelSerializer(message=request)
+        if serializer.is_valid(raise_exception=True):
+            # TODO: uncomment below lines when adding flows endpoint
+            # project_uuid = serializer.validated_data.get("project_uuid")
+            # project = Project.objects.get(uuid=project_uuid)
+
+            # TODO: call flows endpoint to create channel
+
+            return JsonResponse(status=status.HTTP_200_OK)
+
+    @action(
+        detail=True,
+        methods=["DELETE"],
+        url_name='destroy-classifier',
+        serializer_class=DestroyClassifierSerializer
+    )
+    def destroy_classifier(self, request):
+        serializer = DestroyClassifierSerializer(message=request)
+        if serializer.is_valid(raise_exception=True):
+            # TODO: uncomment below lines when adding flows endpoint
+            # classifier_uuid = serializer.validated_data.get("uuid")
+            # user_email = serializer.validated_data.get("user_email")
+
+            # TODO: call flows endpoint to delete classifier
+
+            return JsonResponse(status=status.HTTP_200_OK)
+
+    @action(
+        detail=True,
+        methods=["GET"],
+        url_name='retrieve-classifier',
+        serializer_class=RetrieveClassifierSerializer
+    )
+    def retrieve_classifier(self, request):
+        serializer = RetrieveClassifierSerializer(message=request)
+
+        if serializer.is_valid(raise_exception=True):
+            # TODO: uncomment below line when adding flows endpoint
+            # classifier_uuid = serializer.validated_data.get("uuid")
+
+            # TODO: call flows endpoint to retrieve classifier
+            response = {}
+            data = {
+                "authorization_uuid": response.get("access_token"),
+                "classifier_type": response.get("classifier_type"),
+                "name": response.get("name"),
+                "is_active": response.get("is_active"),
+                "uuid": response.get("uuid"),
+            }
+            return JsonResponse(status=status.HTTP_200_OK, data=data)
+
+    @action(
+        detail=True,
+        methods=["POST"],
+        url_name='create-classifier',
+        serializer_class=CreateClassifierSerializer
+    )
+    def create_classifier(self, request):
+        serializer = CreateClassifierSerializer(message=request)
+
+        if serializer.is_valid(raise_exception=True):
+            # TODO: uncomment below lines when adding flows endpoint
+            # project_uuid = serializer.validated_data.get("project_uuid")
+            # project = Project.objects.get(uuid=project_uuid)
+
+            # TODO: call flows endpoint to create classifier
+            response = {}
+            created_classifier = {
+                "authorization_uuid": response.get("access_token"),
+                "classifier_type": response.get("classifier_type"),
+                "name": response.get("name"),
+                "is_active": response.get("is_active"),
+                "uuid": response.get("uuid"),
+            }
+            return JsonResponse(status=status.HTTP_200_OK, data=created_classifier)
+
+    @action(
+        detail=True,
+        methods=["GET"],
+        url_name='list-classifier',
+        serializer_class=ClassifierSerializer
+    )
+    def list_classifier(self, request):
+        serializer = ClassifierSerializer(message=request)
+
+        if serializer.is_valid(raise_exception=True):
+            # TODO: uncomment below lines when adding flows endpoint
+            # project_uuid = serializer.validated_data.get("project_uuid")
+            # project = Project.objects.get(uuid=project_uuid)
+
+            # call flows endpoint to get classifiers list
+            response = {}
+            classifiers = []
+            for i in response:
+                classifiers.append({
+                    "authorization_uuid": i.get("authorization_uuid"),
+                    "classifier_type": i.get("classifier_type"),
+                    "name": i.get("name"),
+                    "is_active": i.get("is_active"),
+                    "uuid": i.get("uuid"),
+                })
+            return JsonResponse(status=status.HTTP_200_OK, data=classifiers)
 
 
 class RequestPermissionProjectViewSet(
