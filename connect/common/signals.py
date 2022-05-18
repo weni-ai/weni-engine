@@ -17,6 +17,7 @@ from connect.common.models import (
     ProjectRoleLevel,
     RocketAuthorization,
     RequestRocketPermission,
+    OpenedProject,
 )
 from connect.celery import app as celery_app
 
@@ -161,6 +162,13 @@ def project_authorization(sender, instance, created, **kwargs):
                 instance.user
             )
         )
+        if created:
+            OpenedProject.objects.create(
+                user=instance.user,
+                project=instance.project,
+                day=instance.project.created_at
+            )
+
         if instance_user.level == OrganizationLevelRole.NOTHING.value:
             instance_user.role = OrganizationRole.VIEWER.value
             instance_user.save(update_fields=["role"])

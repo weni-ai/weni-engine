@@ -583,6 +583,14 @@ class Project(models.Model):
         return mail
 
 
+class OpenedProject(models.Model):
+    day = models.DateTimeField(_("Day"))
+    project = models.ForeignKey(
+        Project, models.CASCADE, related_name="opened_project"
+    )
+    user = models.ForeignKey(User, models.CASCADE, related_name="user")
+
+
 class RocketRole(Enum):
     NOT_SETTED, USER, ADMIN, AGENT, SERVICE_MANAGER = list(range(5))
 
