@@ -162,7 +162,6 @@ class ProjectSerializer(serializers.ModelSerializer):
             opened = opened.first()
             response = opened.day
         return response
-        
 
 
 class RocketAuthorizationSerializer(serializers.ModelSerializer):

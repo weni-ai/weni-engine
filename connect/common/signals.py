@@ -99,11 +99,13 @@ def request_permission_organization(sender, instance, created, **kwargs):
     if created:
         user = User.objects.filter(email=instance.email)
         if user.exists():
+            print('user exists')
             user = user.first()
             perm = instance.organization.get_user_authorization(user=user)
             perm.role = instance.role
             perm.save(update_fields=["role"])
             if perm.can_contribute:
+                print('can contribute')
                 for proj in instance.organization.project.all():
                     project_perm = proj.project_authorizations.filter(user=user)
                     if not project_perm.exists():

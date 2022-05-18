@@ -37,6 +37,7 @@ from django.http import JsonResponse
 from django.db.models import Q
 from django.utils import timezone
 
+
 class ProjectViewSet(
     mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
@@ -189,6 +190,7 @@ class ProjectViewSet(
         else:
             OpenedProject.objects.create(project=project, user=user, day=timezone.now())
         return JsonResponse(status=status.HTTP_200_OK, data={"day": str(last_opened_on.day)})
+
 
 class RequestPermissionProjectViewSet(
     mixins.ListModelMixin,
