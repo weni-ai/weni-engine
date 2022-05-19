@@ -49,6 +49,7 @@ env = environ.Env(
     WEBAPP_BASE_URL=(str, "https://dash.weni.ai"),
     INTELIGENCE_URL=(str, "https://bothub.it/"),
     FLOWS_URL=(str, "https://new.push.al/"),
+    FLOWS_ELASTIC_URL=(str, None),
     INTEGRATIONS_URL=(str, None),
     USE_SENTRY=(bool, False),
     SENTRY_URL=(str, None),
@@ -70,6 +71,10 @@ env = environ.Env(
     BILLING_TEST_MODE=(bool, False),
     BILLING_SETTINGS=(dict, {}),
     TOKEN_EXTERNAL_AUTHENTICATION=(str, None),
+    ROCKET_CLIENT_ID=(str, None),
+    ROCKET_USERNAME=(str, None),
+    ROCKET_PASSWORD=(str, None),
+    ROCKET_TEST_MODE=(bool, False)
 )
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -438,3 +443,13 @@ BILLING_SETTINGS = env.json("BILLING_SETTINGS")
 BILLING_COST_PER_WHATSAPP = env.float("BILLING_COST_PER_WHATSAPP")
 
 TOKEN_EXTERNAL_AUTHENTICATION = env.str("TOKEN_EXTERNAL_AUTHENTICATION")
+
+
+# Rocket
+ROCKET_CLIENT_ID = env.str("ROCKET_CLIENT_ID")
+ROCKET_USERNAME = env.str("ROCKET_USERNAME")
+ROCKET_PASSWORD = env.str("ROCKET_PASSWORD")
+ROCKET_TEST_MODE = env.bool("ROCKET_TEST_MODE")
+
+# Elastic Search
+FLOWS_ELASTIC_URL = env.str("FLOWS_ELASTIC_URL")

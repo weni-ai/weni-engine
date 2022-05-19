@@ -20,4 +20,4 @@ omit =
     ./connect/common/migrations/*
 
 [report]
-fail_under = 90
+fail_under = 85

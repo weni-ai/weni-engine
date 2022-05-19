@@ -25,7 +25,8 @@ class ProjectOrgFilter(filters.FilterSet):
             authorization = organization.get_user_authorization(request.user)
             if not authorization.can_read:
                 raise PermissionDenied()
-            return queryset.filter(organization=organization)
+            new_queryset = queryset.filter(organization=organization)
+            return new_queryset.filter(project_authorizations__user=request.user)
         except Organization.DoesNotExist:
             raise NotFound(_("Organization {} does not exist").format(value))
         except DjangoValidationError:

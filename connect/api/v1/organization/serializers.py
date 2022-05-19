@@ -11,6 +11,8 @@ from connect.common.models import (
     OrganizationAuthorization,
     RequestPermissionOrganization,
     BillingPlan,
+    OrganizationLevelRole,
+    OrganizationRole
 )
 
 
@@ -35,6 +37,7 @@ class BillingPlanSerializer(serializers.ModelSerializer):
             "problem_capture_invoice",
             "currenty_invoice",
             "contract_on",
+            "is_card_valid"
         ]
         ref_name = None
 
@@ -152,12 +155,13 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
         )
 
         instance.authorizations.create(
-            user=self.context["request"].user, role=OrganizationAuthorization.ROLE_ADMIN
+            user=self.context["request"].user, role=OrganizationRole.ADMIN.value
         )
 
         return instance
 
     def get_authorizations(self, obj):
+        exclude_roles = [OrganizationRole.NOT_SETTED.value, OrganizationRole.VIEWER.value]
         return {
             "count": obj.authorizations.count(),
             "users": [
@@ -168,7 +172,7 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
                     "role": i.role,
                     "photo_user": i.user.photo_url,
                 }
-                for i in obj.authorizations.all()
+                for i in obj.authorizations.exclude(role__in=exclude_roles)
             ],
         }
 
@@ -197,8 +201,10 @@ class OrganizationAuthorizationSerializer(serializers.ModelSerializer):
             "role",
             "can_read",
             "can_contribute",
+            "can_contribute_billing",
             "can_write",
             "is_admin",
+            "is_financial",
             "created_at",
         ]
         read_only = ["user", "user__username", "organization", "role", "created_at"]
@@ -223,7 +229,7 @@ class OrganizationAuthorizationRoleSerializer(serializers.ModelSerializer):
         ref_name = None
 
     def validate(self, attrs):
-        if attrs.get("role") == OrganizationAuthorization.LEVEL_NOTHING:
+        if attrs.get("role") == OrganizationLevelRole.NOTHING.value:
             raise PermissionDenied(_("You cannot set user role 0"))
         return attrs
 
@@ -246,6 +252,6 @@ class RequestPermissionOrganizationSerializer(serializers.ModelSerializer):
     )
 
     def validate(self, attrs):
-        if attrs.get("role") == OrganizationAuthorization.LEVEL_NOTHING:
+        if attrs.get("role") == OrganizationLevelRole.NOTHING.value:
             raise PermissionDenied(_("You cannot set user role 0"))
         return attrs
