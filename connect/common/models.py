@@ -117,6 +117,7 @@ class Organization(models.Model):
         default=False, help_text=_("Whether this organization is currently suspended.")
     )
     extra_integration = models.IntegerField(_("Whatsapp Extra Integration"), default=0)
+    enforce_2fa = models.BooleanField(_("Only users with 2fa can access the organization"), default=False)
     objects = OrganizationManager()
 
     def __str__(self):
@@ -343,6 +344,10 @@ class Organization(models.Model):
             0 if active_integrations_counter <= 1 else active_integrations_counter - 1
         )
 
+    def set_2fa_required(self, flag: bool):
+        self.enforce_2fa = flag
+        self.save()
+
 
 class OrganizationLevelRole(Enum):
     NOTHING, VIEWER, CONTRIBUTOR, ADMIN, FINANCIAL = list(range(5))
@@ -377,6 +382,7 @@ class OrganizationAuthorization(models.Model):
         _("role"), choices=ROLE_CHOICES, default=OrganizationRole.NOT_SETTED.value
     )
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
+    has_2fa = models.BooleanField(_("2 factor authentication"), default=False)
 
     def __str__(self):
         return f"{self.organization.name} - {self.user.email}"
