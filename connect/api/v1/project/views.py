@@ -25,14 +25,17 @@ from connect.common.models import (
     RequestPermissionProject,
     RequestRocketPermission,
     ProjectAuthorization,
-    RocketAuthorization
+    RocketAuthorization,
+    OpenedProject,
 )
+from connect.authentication.models import User
 
 from connect.middleware import ExternalAuthentication
 from rest_framework.exceptions import ValidationError
 from connect.common import tasks
 from django.http import JsonResponse
 from django.db.models import Q
+from django.utils import timezone
 
 
 class ProjectViewSet(
@@ -61,11 +64,14 @@ class ProjectViewSet(
             .values("organization")
         )
 
-        filter = Q(project_authorizations__user=self.request.user) & ~Q(
+        filter = Q(
+            project_authorizations__user=self.request.user
+        ) & ~Q(
             project_authorizations__role=0
+        ) & Q(
+            opened_project__user=self.request.user
         )
-
-        return self.queryset.filter(organization__pk__in=auth).filter(filter)
+        return self.queryset.filter(organization__pk__in=auth).filter(filter).order_by("-opened_project__day")
 
     def perform_destroy(self, instance):
         flow_organization = instance.flow_organization
@@ -166,6 +172,25 @@ class ProjectViewSet(
 
         return Response(status=status.HTTP_404_NOT_FOUND)
 
+    @action(
+        detail=True,
+        methods=["POST"],
+        url_name="update-last-opened-on",
+        url_path="update-last-opened-on/(?P<project_uuid>[^/.]+)",
+    )
+    def update_last_opened_on(self, request, project_uuid):
+        user_email = request._user
+        project = get_object_or_404(Project, uuid=project_uuid)
+        user = User.objects.get(email=user_email)
+        last_opened_on = OpenedProject.objects.filter(user=user, project=project)
+        if(last_opened_on.exists()):
+            last_opened_on = last_opened_on.first()
+            last_opened_on.day = timezone.now()
+            last_opened_on.save()
+        else:
+            OpenedProject.objects.create(project=project, user=user, day=timezone.now())
+        return JsonResponse(status=status.HTTP_200_OK, data={"day": str(last_opened_on.day)})
+
 
 class RequestPermissionProjectViewSet(
     mixins.ListModelMixin,
@@ -185,6 +210,9 @@ class RequestPermissionProjectViewSet(
         project_uuid = request.request.data.get('project')
         rocket_role = request.request.data.get('rocket_authorization')
         project = Project.objects.filter(uuid=project_uuid)
+
+        if len(email) == 0:
+            return Response({"status": 400, "message": "E-mail field isn't valid!"})
 
         if len([item for item in ProjectAuthorization.ROLE_CHOICES if item[0] == role]) == 0:
             return Response({"status": 422, "message": f"{role} is not a valid role!"})
