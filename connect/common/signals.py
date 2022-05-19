@@ -2,6 +2,7 @@ import logging
 
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
+from django.utils import timezone
 
 from connect.authentication.models import User
 from connect.common.models import (
@@ -17,6 +18,7 @@ from connect.common.models import (
     ProjectRoleLevel,
     RocketAuthorization,
     RequestRocketPermission,
+    OpenedProject,
 )
 from connect.celery import app as celery_app
 
@@ -161,6 +163,17 @@ def project_authorization(sender, instance, created, **kwargs):
                 instance.user
             )
         )
+        opened = OpenedProject.objects.filter(project=instance.project, user=instance.user)
+        if not opened.exists():
+            OpenedProject.objects.create(
+                user=instance.user,
+                project=instance.project,
+                day=instance.project.created_at
+            )
+        else:
+            opened = opened.first()
+            opened.day = timezone.now()
+            opened.save()
         if instance_user.level == OrganizationLevelRole.NOTHING.value:
             instance_user.role = OrganizationRole.VIEWER.value
             instance_user.save(update_fields=["role"])

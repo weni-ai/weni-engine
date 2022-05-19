@@ -49,6 +49,7 @@ env = environ.Env(
     WEBAPP_BASE_URL=(str, "https://dash.weni.ai"),
     INTELIGENCE_URL=(str, "https://bothub.it/"),
     FLOWS_URL=(str, "https://new.push.al/"),
+    FLOWS_ELASTIC_URL=(str, None),
     INTEGRATIONS_URL=(str, None),
     USE_SENTRY=(bool, False),
     SENTRY_URL=(str, None),
@@ -449,3 +450,6 @@ ROCKET_CLIENT_ID = env.str("ROCKET_CLIENT_ID")
 ROCKET_USERNAME = env.str("ROCKET_USERNAME")
 ROCKET_PASSWORD = env.str("ROCKET_PASSWORD")
 ROCKET_TEST_MODE = env.bool("ROCKET_TEST_MODE")
+
+# Elastic Search
+FLOWS_ELASTIC_URL = env.str("FLOWS_ELASTIC_URL")

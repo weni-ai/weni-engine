@@ -1,4 +1,5 @@
 import requests
+import pendulum
 
 
 def upload_photo_rocket(server_rocket: str, jwt_token: str, avatar_url: str) -> bool:
@@ -26,3 +27,10 @@ def get_grpc_types():
     from connect.grpc import TYPES
 
     return TYPES
+
+
+def es_convert_datetime(before: str, after: str):
+    """convert to an format that is accepted by elasticsearch query"""
+    before = pendulum.parse(before)
+    after = pendulum.parse(after)
+    return before, after

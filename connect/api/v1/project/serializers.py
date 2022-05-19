@@ -19,6 +19,7 @@ from connect.common.models import (
     ProjectRoleLevel,
     RocketRole,
     RequestRocketPermission,
+    OpenedProject,
 )
 
 
@@ -41,6 +42,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             "authorizations",
             "pending_authorizations",
             "authorization",
+            "last_opened_on",
         ]
         ref_name = None
 
@@ -65,6 +67,7 @@ class ProjectSerializer(serializers.ModelSerializer):
     authorizations = serializers.SerializerMethodField(style={"show": False})
     pending_authorizations = serializers.SerializerMethodField(style={"show": False})
     authorization = serializers.SerializerMethodField(style={"show": False})
+    last_opened_on = serializers.SerializerMethodField()
 
     def get_menu(self, obj):
         return {
@@ -157,6 +160,17 @@ class ProjectSerializer(serializers.ModelSerializer):
             obj.get_user_authorization(request.user)
         ).data
         return data
+
+    def get_last_opened_on(self, obj):
+        request = self.context.get("request")
+        if not request or not request.user.is_authenticated:
+            return None
+        opened = OpenedProject.objects.filter(user__email=request.user, project=obj.uuid)
+        response = None
+        if opened.exists():
+            opened = opened.first()
+            response = opened.day
+        return response
 
 
 class RocketAuthorizationSerializer(serializers.ModelSerializer):

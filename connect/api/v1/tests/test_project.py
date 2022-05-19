@@ -16,6 +16,7 @@ from connect.common.models import (
     BillingPlan,
     OrganizationRole,
     RequestPermissionProject,
+    RequestPermissionOrganization,
 )
 
 
@@ -79,7 +80,7 @@ class ListProjectAPITestCase(TestCase):
         self.factory = RequestFactory()
         self.owner, self.owner_token = create_user_and_token("owner")
         self.user, self.user_token = create_user_and_token("user")
-        self.finacial, self.finacial_token = create_user_and_token("finacial")
+        self.financial, self.financial_token = create_user_and_token("financial")
         self.organization = Organization.objects.create(
             name="test organization",
             description="",
@@ -87,17 +88,30 @@ class ListProjectAPITestCase(TestCase):
             organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
             organization_billing__plan="free",
         )
-        self.owner_organization_authorization = self.organization.authorizations.create(
-            user=self.owner, role=OrganizationRole.ADMIN.value
+
+        RequestPermissionOrganization.objects.create(
+            email=self.owner.email,
+            organization=self.organization,
+            role=OrganizationRole.ADMIN.value,
+            created_by=self.owner
         )
-        self.user_organization_authorization = self.organization.authorizations.create(
-            user=self.user, role=OrganizationRole.CONTRIBUTOR.value
+        RequestPermissionOrganization.objects.create(
+            email=self.user.email,
+            organization=self.organization,
+            role=OrganizationRole.CONTRIBUTOR.value,
+            created_by=self.owner
         )
-        self.financial_organization_authorization = (
-            self.organization.authorizations.create(
-                user=self.finacial, role=OrganizationRole.FINANCIAL.value
-            )
+        RequestPermissionOrganization.objects.create(
+            email=self.financial.email,
+            organization=self.organization,
+            role=OrganizationRole.FINANCIAL.value,
+            created_by=self.owner
         )
+
+        self.owner_organization_authorization = self.organization.authorizations.get(user=self.owner)
+        self.user_organization_authorization = self.organization.authorizations.get(user=self.user)
+        self.financial_organization_authorization = self.organization.authorizations.get(user=self.financial)
+
         self.project = self.organization.project.create(
             name="project test",
             timezone="America/Sao_Paulo",
@@ -133,7 +147,6 @@ class ListProjectAPITestCase(TestCase):
             self.organization.uuid,
             self.user_token,
         )
-
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(content_data.get("count"), 2)
 
@@ -150,7 +163,7 @@ class ListProjectAPITestCase(TestCase):
         response, content_data = self.request(
             "organization",
             self.organization.uuid,
-            self.finacial_token,
+            self.financial_token,
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(content_data.get("count"), 0)
@@ -170,9 +183,13 @@ class UpdateProjectTestCase(TestCase):
             organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
             organization_billing__plan="free",
         )
-        self.organization_authorization = self.organization.authorizations.create(
-            user=self.owner, role=OrganizationRole.ADMIN.value
+        RequestPermissionOrganization.objects.create(
+            email=self.owner.email,
+            organization=self.organization,
+            role=OrganizationRole.ADMIN.value,
+            created_by=self.owner
         )
+        self.organization_authorization = self.organization.authorizations.get(user=self.owner)
         self.project = self.organization.project.create(
             name="project test",
             timezone="America/Sao_Paulo",

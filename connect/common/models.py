@@ -472,6 +472,7 @@ class Project(models.Model):
         help_text=_("Whether day comes first or month comes first in dates"),
     )
     flow_organization = models.UUIDField(_("flow identification UUID"), unique=True)
+    flow_id = models.PositiveIntegerField(_("flow identification ID"), unique=True, null=True)
     inteligence_count = models.IntegerField(_("Intelligence count"), default=0)
     flow_count = models.IntegerField(_("Flows count"), default=0)
     contact_count = models.IntegerField(_("Contacts count"), default=0)
@@ -580,6 +581,14 @@ class Project(models.Model):
             ),
         )
         return mail
+
+
+class OpenedProject(models.Model):
+    day = models.DateTimeField(_("Day"))
+    project = models.ForeignKey(
+        Project, models.CASCADE, related_name="opened_project"
+    )
+    user = models.ForeignKey(User, models.CASCADE, related_name="user")
 
 
 class RocketRole(Enum):
