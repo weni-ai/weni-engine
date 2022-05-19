@@ -2,6 +2,7 @@ import logging
 
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
+from django.utils import timezone
 
 from connect.authentication.models import User
 from connect.common.models import (
@@ -99,13 +100,11 @@ def request_permission_organization(sender, instance, created, **kwargs):
     if created:
         user = User.objects.filter(email=instance.email)
         if user.exists():
-            print('user exists')
             user = user.first()
             perm = instance.organization.get_user_authorization(user=user)
             perm.role = instance.role
             perm.save(update_fields=["role"])
             if perm.can_contribute:
-                print('can contribute')
                 for proj in instance.organization.project.all():
                     project_perm = proj.project_authorizations.filter(user=user)
                     if not project_perm.exists():
@@ -164,13 +163,17 @@ def project_authorization(sender, instance, created, **kwargs):
                 instance.user
             )
         )
-        if created:
+        opened = OpenedProject.objects.filter(project=instance.project, user=instance.user)
+        if not opened.exists():
             OpenedProject.objects.create(
                 user=instance.user,
                 project=instance.project,
                 day=instance.project.created_at
             )
-
+        else:
+            opened = opened.first()
+            opened.day = timezone.now()
+            opened.save()
         if instance_user.level == OrganizationLevelRole.NOTHING.value:
             instance_user.role = OrganizationRole.VIEWER.value
             instance_user.save(update_fields=["role"])
