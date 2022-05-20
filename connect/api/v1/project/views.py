@@ -8,7 +8,9 @@ from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
+import grpc
 
+from connect import utils
 from connect.api.v1.metadata import Metadata
 from connect.api.v1.project.filters import ProjectOrgFilter
 from connect.api.v1.project.permissions import ProjectHasPermission
@@ -178,12 +180,14 @@ class ProjectViewSet(
         url_name="list-channel",
     )
     def list_channel(self, request):
-        # TODO: uncomment below line when adding flows endpoint
-        # channel_type = request.channel_type
+        channel_type = request.channel_type
         channels = []
+        grpc_instance = utils.get_grpc_types().get("flow")
         for project in Project.objects.all():
-            # TODO: call flows endpoint to list channels
-            response = []
+            response = grpc_instance.list_channel(
+                project_uuid=str(project.flow_organization),
+                channel_type=channel_type,
+            )
 
             for channel in response:
                 channels.append(
@@ -207,7 +211,12 @@ class ProjectViewSet(
         serializer = ReleaseChannelSerializer(message=request)
         serializer.is_valid(raise_exception=True)
 
-        # TODO: call realease_channel flows endpoint
+        grpc_instance = utils.get_grpc_types().get("flow")
+        grpc_instance.release_channel(
+            channel_uuid=serializer.validated_data.get("channel_uuid"),
+            user=serializer.validated_data.get("user"),
+        )
+
         return JsonResponse(status=status.HTTP_200_OK)
 
     @action(
@@ -219,13 +228,31 @@ class ProjectViewSet(
     def create_channel(self, request):
         serializer = CreateChannelSerializer(message=request)
         if serializer.is_valid(raise_exception=True):
-            # TODO: uncomment below lines when adding flows endpoint
-            # project_uuid = serializer.validated_data.get("project_uuid")
-            # project = Project.objects.get(uuid=project_uuid)
+            project_uuid = serializer.validated_data.get("project_uuid")
+            project = Project.objects.get(uuid=project_uuid)
 
-            # TODO: call flows endpoint to create channel
+            grpc_instance = utils.get_grpc_types().get("flow")
 
-            return JsonResponse(status=status.HTTP_200_OK)
+            try:
+                response = grpc_instance.create_channel(
+                    user=serializer.validated_data.get("user"),
+                    project_uuid=str(project.flow_organization),
+                    data=serializer.validated_data.get("data"),
+                    channeltype_code=serializer.validated_data.get("channeltype_code"),
+                )
+            except grpc.RpcError as error:
+                if error.code() is grpc.StatusCode.INVALID_ARGUMENT:
+                    self.context.abort(grpc.StatusCode.INVALID_ARGUMENT, "Bad Request")
+                raise error
+
+            data = {
+                "uuid": response.uuid,
+                "name": response.name,
+                "config": response.config,
+                "address": response.address
+            }
+
+            return JsonResponse(status=status.HTTP_200_OK, data=data)
 
     @action(
         detail=True,
@@ -236,11 +263,14 @@ class ProjectViewSet(
     def destroy_classifier(self, request):
         serializer = DestroyClassifierSerializer(message=request)
         if serializer.is_valid(raise_exception=True):
-            # TODO: uncomment below lines when adding flows endpoint
-            # classifier_uuid = serializer.validated_data.get("uuid")
-            # user_email = serializer.validated_data.get("user_email")
+            classifier_uuid = serializer.validated_data.get("uuid")
+            user_email = serializer.validated_data.get("user_email")
 
-            # TODO: call flows endpoint to delete classifier
+            grpc_instance = utils.get_grpc_types().get("flow")
+            grpc_instance.delete_classifier(
+                classifier_uuid=str(classifier_uuid),
+                user_email=str(user_email),
+            )
 
             return JsonResponse(status=status.HTTP_200_OK)
 
@@ -254,11 +284,13 @@ class ProjectViewSet(
         serializer = RetrieveClassifierSerializer(message=request)
 
         if serializer.is_valid(raise_exception=True):
-            # TODO: uncomment below line when adding flows endpoint
-            # classifier_uuid = serializer.validated_data.get("uuid")
+            classifier_uuid = serializer.validated_data.get("uuid")
 
-            # TODO: call flows endpoint to retrieve classifier
-            response = {}
+            grpc_instance = utils.get_grpc_types().get("flow")
+            response = grpc_instance.get_classifier(
+                classifier_uuid=str(classifier_uuid),
+            )
+
             data = {
                 "authorization_uuid": response.get("access_token"),
                 "classifier_type": response.get("classifier_type"),
@@ -278,12 +310,18 @@ class ProjectViewSet(
         serializer = CreateClassifierSerializer(message=request)
 
         if serializer.is_valid(raise_exception=True):
-            # TODO: uncomment below lines when adding flows endpoint
-            # project_uuid = serializer.validated_data.get("project_uuid")
-            # project = Project.objects.get(uuid=project_uuid)
+            project_uuid = serializer.validated_data.get("project_uuid")
+            project = Project.objects.get(uuid=project_uuid)
 
-            # TODO: call flows endpoint to create classifier
-            response = {}
+            grpc_instance = utils.get_grpc_types().get("flow")
+            response = grpc_instance.create_classifier(
+                project_uuid=str(project.flow_organization),
+                user_email=serializer.validated_data.get("user"),
+                classifier_type="bothub",
+                classifier_name=serializer.validated_data.get("name"),
+                access_token=serializer.validated_data.get("access_token"),
+            )
+
             created_classifier = {
                 "authorization_uuid": response.get("access_token"),
                 "classifier_type": response.get("classifier_type"),
@@ -303,12 +341,16 @@ class ProjectViewSet(
         serializer = ClassifierSerializer(message=request)
 
         if serializer.is_valid(raise_exception=True):
-            # TODO: uncomment below lines when adding flows endpoint
-            # project_uuid = serializer.validated_data.get("project_uuid")
-            # project = Project.objects.get(uuid=project_uuid)
+            project_uuid = serializer.validated_data.get("project_uuid")
+            project = Project.objects.get(uuid=project_uuid)
 
-            # call flows endpoint to get classifiers list
-            response = {}
+            grpc_instance = utils.get_grpc_types().get("flow")
+            response = grpc_instance.get_classifiers(
+                project_uuid=str(project.flow_organization),
+                classifier_type="bothub",
+                is_active=True,
+            )
+
             classifiers = []
             for i in response:
                 classifiers.append({
