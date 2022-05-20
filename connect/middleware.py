@@ -8,6 +8,7 @@ from rest_framework import HTTP_HEADER_ENCODING, exceptions
 from rest_framework.authentication import BaseAuthentication, get_authorization_header
 
 from connect.celery import app as celery_app
+from connect.utils import check_module_permission
 
 LOGGER = logging.getLogger("weni_django_oidc")
 
@@ -42,6 +43,8 @@ class WeniOIDCAuthenticationBackend(OIDCAuthenticationBackend):
         user.email = claims.get("email", "")
         user.save()
 
+        check_module_permission(claims, user)
+
         if settings.SYNC_ORGANIZATION_INTELIGENCE:
             task = celery_app.send_task(  # pragma: no cover
                 name="migrate_organization",
@@ -56,6 +59,8 @@ class WeniOIDCAuthenticationBackend(OIDCAuthenticationBackend):
         user.email = claims.get("email", "")
         user.save()
 
+        check_module_permission(claims, user)
+        
         return user
 
 

@@ -34,3 +34,20 @@ def es_convert_datetime(before: str, after: str):
     before = pendulum.parse(before)
     after = pendulum.parse(after)
     return before, after
+
+def check_module_permission(claims, user):
+    from django.contrib.auth.models import Permission
+    from django.contrib.contenttypes.models import ContentType
+    from connect.authentication.models import User
+
+    if claims.get("can_communicate_internally", False):
+        content_type = ContentType.objects.get_for_model(User)
+        permission, created = Permission.objects.get_or_create(
+            codename="can_communicate_internally",
+            name="can communicate internally",
+            content_type=content_type,
+        )
+        if not user.has_perm("authentication.can_communicate_internally"):
+            user.user_permissions.add(permission)
+        return True
+    return False
