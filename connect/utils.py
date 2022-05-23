@@ -35,6 +35,7 @@ def es_convert_datetime(before: str, after: str):
     after = pendulum.parse(after)
     return before, after
 
+
 def check_module_permission(claims, user):
     from django.contrib.auth.models import Permission
     from django.contrib.contenttypes.models import ContentType

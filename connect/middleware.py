@@ -60,7 +60,7 @@ class WeniOIDCAuthenticationBackend(OIDCAuthenticationBackend):
         user.save()
 
         check_module_permission(claims, user)
-        
+
         return user
 
 
