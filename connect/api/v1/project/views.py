@@ -180,7 +180,9 @@ class ProjectViewSet(
         url_name="list-channel",
     )
     def list_channel(self, request):
-        channel_type = request.data.channel_type
+        channel_type = request.data.get("channel_type", None)
+        if not channel_type:
+            return JsonResponse(status=status.HTTP_400_BAD_REQUEST, data={"message": "Need pass the channel_type"})
         channels = []
         grpc_instance = utils.get_grpc_types().get("flow")
         for project in Project.objects.all():
