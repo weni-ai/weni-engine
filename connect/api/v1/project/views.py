@@ -208,7 +208,7 @@ class ProjectViewSet(
         serializer_class=ReleaseChannelSerializer,
     )
     def release_channel(self, request):
-        serializer = ReleaseChannelSerializer(message=request)
+        serializer = ReleaseChannelSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         grpc_instance = utils.get_grpc_types().get("flow")
@@ -226,7 +226,7 @@ class ProjectViewSet(
         serializer_class=CreateChannelSerializer
     )
     def create_channel(self, request):
-        serializer = CreateChannelSerializer(message=request)
+        serializer = CreateChannelSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             project_uuid = serializer.validated_data.get("project_uuid")
             project = Project.objects.get(uuid=project_uuid)
@@ -261,7 +261,7 @@ class ProjectViewSet(
         serializer_class=DestroyClassifierSerializer
     )
     def destroy_classifier(self, request):
-        serializer = DestroyClassifierSerializer(message=request)
+        serializer = DestroyClassifierSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             classifier_uuid = serializer.validated_data.get("uuid")
             user_email = serializer.validated_data.get("user_email")
@@ -281,7 +281,7 @@ class ProjectViewSet(
         serializer_class=RetrieveClassifierSerializer
     )
     def retrieve_classifier(self, request):
-        serializer = RetrieveClassifierSerializer(message=request)
+        serializer = RetrieveClassifierSerializer(data=request.data)
 
         if serializer.is_valid(raise_exception=True):
             classifier_uuid = serializer.validated_data.get("uuid")
@@ -307,7 +307,7 @@ class ProjectViewSet(
         serializer_class=CreateClassifierSerializer
     )
     def create_classifier(self, request):
-        serializer = CreateClassifierSerializer(message=request)
+        serializer = CreateClassifierSerializer(data=request.data)
 
         if serializer.is_valid(raise_exception=True):
             project_uuid = serializer.validated_data.get("project_uuid")
@@ -338,7 +338,7 @@ class ProjectViewSet(
         serializer_class=ClassifierSerializer
     )
     def list_classifier(self, request):
-        serializer = ClassifierSerializer(message=request)
+        serializer = ClassifierSerializer(data=request.data)
 
         if serializer.is_valid(raise_exception=True):
             project_uuid = serializer.validated_data.get("project_uuid")
