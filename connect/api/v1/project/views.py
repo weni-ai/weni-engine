@@ -180,7 +180,7 @@ class ProjectViewSet(
         url_name="list-channel",
     )
     def list_channel(self, request):
-        channel_type = request.channel_type
+        channel_type = request.data.channel_type
         channels = []
         grpc_instance = utils.get_grpc_types().get("flow")
         for project in Project.objects.all():
