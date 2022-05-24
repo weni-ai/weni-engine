@@ -9,7 +9,6 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 import grpc
-import json
 
 from connect import utils
 from connect.api.v1.metadata import Metadata
@@ -179,9 +178,11 @@ class ProjectViewSet(
         detail=True,
         methods=["GET"],
         url_name="list-channel",
+        authentication_classes=[ExternalAuthentication],
+        permission_classes=[AllowAny],
     )
     def list_channel(self, request):
-        request_data = json.dumps(request.data)
+        request_data = request.data
         channel_type = request_data.get("channel_type", None)
         if not channel_type:
             return JsonResponse(status=status.HTTP_400_BAD_REQUEST, data={"message": "Need pass the channel_type"})
@@ -210,9 +211,11 @@ class ProjectViewSet(
         methods=["GET"],
         url_name="realease-channel",
         serializer_class=ReleaseChannelSerializer,
+        authentication_classes=[ExternalAuthentication],
+        permission_classes=[AllowAny],
     )
     def release_channel(self, request):
-        serializer = ReleaseChannelSerializer(data=json.dumps(request.data))
+        serializer = ReleaseChannelSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         grpc_instance = utils.get_grpc_types().get("flow")
@@ -227,10 +230,12 @@ class ProjectViewSet(
         detail=True,
         methods=["POST"],
         url_name='create-channel',
-        serializer_class=CreateChannelSerializer
+        serializer_class=CreateChannelSerializer,
+        authentication_classes=[ExternalAuthentication],
+        permission_classes=[AllowAny],
     )
     def create_channel(self, request):
-        serializer = CreateChannelSerializer(data=json.dumps(request.data))
+        serializer = CreateChannelSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             project_uuid = serializer.validated_data.get("project_uuid")
             project = Project.objects.get(uuid=project_uuid)
@@ -262,10 +267,12 @@ class ProjectViewSet(
         detail=True,
         methods=["DELETE"],
         url_name='destroy-classifier',
-        serializer_class=DestroyClassifierSerializer
+        serializer_class=DestroyClassifierSerializer,
+        authentication_classes=[ExternalAuthentication],
+        permission_classes=[AllowAny],
     )
     def destroy_classifier(self, request):
-        serializer = DestroyClassifierSerializer(data=json.dumps(request.query_params))
+        serializer = DestroyClassifierSerializer(data=request.query_params)
         if serializer.is_valid(raise_exception=True):
             classifier_uuid = serializer.validated_data.get("uuid")
             user_email = serializer.validated_data.get("user_email")
@@ -282,7 +289,9 @@ class ProjectViewSet(
         detail=True,
         methods=["GET"],
         url_name='retrieve-classifier',
-        serializer_class=RetrieveClassifierSerializer
+        serializer_class=RetrieveClassifierSerializer,
+        authentication_classes=[ExternalAuthentication],
+        permission_classes=[AllowAny],
     )
     def retrieve_classifier(self, request):
         serializer = RetrieveClassifierSerializer(data=request.query_params)
@@ -308,15 +317,16 @@ class ProjectViewSet(
         detail=True,
         methods=["POST"],
         url_name='create-classifier',
-        serializer_class=CreateClassifierSerializer
+        serializer_class=CreateClassifierSerializer,
+        authentication_classes=[ExternalAuthentication],
+        permission_classes=[AllowAny],
     )
     def create_classifier(self, request):
-        serializer = CreateClassifierSerializer(data=json.dumps(request.query_params))
-
+        request_data = request.query_params
+        serializer = CreateClassifierSerializer(data=request_data)
         if serializer.is_valid(raise_exception=True):
             project_uuid = serializer.validated_data.get("project_uuid")
             project = Project.objects.get(uuid=project_uuid)
-
             grpc_instance = utils.get_grpc_types().get("flow")
             response = grpc_instance.create_classifier(
                 project_uuid=str(project.flow_organization),
@@ -339,15 +349,17 @@ class ProjectViewSet(
         detail=True,
         methods=["GET"],
         url_name='list-classifier',
-        serializer_class=ClassifierSerializer
+        serializer_class=ClassifierSerializer,
+        authentication_classes=[ExternalAuthentication],
+        permission_classes=[AllowAny],
     )
     def list_classifier(self, request):
-        serializer = ClassifierSerializer(data=json.dumps(request.query_params))
+        print(request.query_params)
+        serializer = ClassifierSerializer(data=request.query_params)
 
         if serializer.is_valid(raise_exception=True):
             project_uuid = serializer.validated_data.get("project_uuid")
             project = Project.objects.get(uuid=project_uuid)
-
             grpc_instance = utils.get_grpc_types().get("flow")
             response = grpc_instance.get_classifiers(
                 project_uuid=str(project.flow_organization),
@@ -355,9 +367,9 @@ class ProjectViewSet(
                 is_active=True,
             )
 
-            classifiers = []
+            classifiers = {"data": []}
             for i in response:
-                classifiers.append({
+                classifiers["data"].append({
                     "authorization_uuid": i.get("authorization_uuid"),
                     "classifier_type": i.get("classifier_type"),
                     "name": i.get("name"),
