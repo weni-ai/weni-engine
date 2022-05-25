@@ -43,3 +43,26 @@ class IntelligenceRESTClient:
             headers=self.authentication_instance.get_headers(),
             json=json.dumps({"user_email": user_email, "organization_id": organization_id})
         )
+
+    def update_organization(self, organization_id, organization_name):
+        response = requests.patch(
+            url=f"{self.base_url}/v2/internal/update-organization",
+            headers=self.authentication_instance.get_headers(),
+            json=json.dumps({"organization_id": organization_id, "organization_name": organization_name})
+        )
+
+    def update_user_permission_organization(
+        self, organization_id, user_email, permission
+    ):
+        response = requests.patch(
+            url=f"{self.base_url}/v2/internal/update-user-permission",
+            headers=self.authentication_instance.get_headers(),
+            json=json.dumps(
+                {
+                    "organization_id": organization_id,
+                    "user_email": user_email,
+                    "permission": permission
+                }
+            )
+        )
+        return response
