@@ -182,8 +182,9 @@ class ProjectViewSet(
         permission_classes=[AllowAny],
     )
     def list_channel(self, request):
-        request_data = request.data
-        channel_type = request_data.get("channel_type", None)
+        channel_type = None
+        print(request, request._data)
+        channel_type = request._data.get('channel_type', None)
         if not channel_type:
             return JsonResponse(status=status.HTTP_400_BAD_REQUEST, data={"message": "Need pass the channel_type"})
         channels = []
@@ -204,7 +205,7 @@ class ProjectViewSet(
                         "project_uuid": str(project.uuid),
                     }
                 )
-        return JsonResponse(status=status.HTTP_200_OK, data=channels)
+        return JsonResponse(status=status.HTTP_200_OK, data={"data": channels})
 
     @action(
         detail=True,
@@ -215,7 +216,7 @@ class ProjectViewSet(
         permission_classes=[AllowAny],
     )
     def release_channel(self, request):
-        serializer = ReleaseChannelSerializer(data=request.data)
+        serializer = ReleaseChannelSerializer(data=request._data)
         serializer.is_valid(raise_exception=True)
 
         grpc_instance = utils.get_grpc_types().get("flow")
@@ -235,7 +236,7 @@ class ProjectViewSet(
         permission_classes=[AllowAny],
     )
     def create_channel(self, request):
-        serializer = CreateChannelSerializer(data=request.data)
+        serializer = CreateChannelSerializer(data=request._data)
         if serializer.is_valid(raise_exception=True):
             project_uuid = serializer.validated_data.get("project_uuid")
             project = Project.objects.get(uuid=project_uuid)
