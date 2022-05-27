@@ -25,13 +25,13 @@ class IntelligenceRESTClient:
         response = requests.get(
             url=f"{self.base_url}v2/internal/user/permission/",
             headers=self.authentication_instance.get_headers(),
-            params={"user_email": user_email, "organization_id": organization_id}
+            params={"user_email": user_email, "org_id": organization_id}
         )
         return response.data.role
 
     def create_organization(self, user_email, organization_name):
         response = requests.post(
-            url=f"{self.base_url}v2/internal//organization/",
+            url=f"{self.base_url}v2/internal/organization/",
             headers=self.authentication_instance.get_headers(),
             json=json.dumps({"user_email": user_email, "organization_name": organization_name})
         )
@@ -39,17 +39,18 @@ class IntelligenceRESTClient:
 
     def delete_organization(self, organization_id, user_email):
         response = requests.delete(
-            url=f"{self.base_url}v2/internal/{organization_id}/delete-organization/",
+            url=f"{self.base_url}v2/internal/organization/{organization_id}",
             headers=self.authentication_instance.get_headers(),
             params={"user_email": user_email}
         )
         return response
 
-    def update_organization(self, organization_id, organization_name):
+    def update_organization(self, organization_id, organization_name, user_email):
         response = requests.put(
-            url=f"{self.base_url}v2/internal/{organization_id}/organization/",
+            url=f"{self.base_url}v2/internal/organization/{organization_id}",
             headers=self.authentication_instance.get_headers(),
-            params={"organization_name": organization_name}
+            json=json.dumps({"name": organization_name}),
+            params={"user_email": user_email}
         )
         return response
 
@@ -59,7 +60,7 @@ class IntelligenceRESTClient:
         response = requests.put(
             url=f"{self.base_url}v2/internal/user/permission/",
             headers=self.authentication_instance.get_headers(),
-            params={"organization_id": organization_id, "user_email": user_email},
+            params={"org_id": organization_id, "user_email": user_email},
             json=json.dumps({"role": permission})
         )
         return response.data
@@ -69,7 +70,7 @@ class IntelligenceRESTClient:
         response = requests.get(
             url=f"{self.base_url}v2/internal/repository/",
             headers=self.authentication_instance.get_headers(),
-            params={"intelligence_name": intelligence_name, "org_id": organization_id}
+            params={"name": intelligence_name, "org_id": organization_id}
         )
 
         return response.data
@@ -83,11 +84,11 @@ class IntelligenceRESTClient:
         )
         return response.data
 
-    def get_organization_statistics(self, organization_id):
+    def get_organization_statistics(self, organization_id, user_email):
         response = requests.get(
-            url=f"{self.base_url}v2/internal/repository/",
+            url=f"{self.base_url}/v2/internal/organization/{organization_id}/",
             headers=self.authentication_instance.get_headers(),
-            params={"organization_id": organization_id}
+            params={"user_email": user_email}
         )
         return len(response.data.repositories_count)
 
