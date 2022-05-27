@@ -74,7 +74,7 @@ env = environ.Env(
     ROCKET_CLIENT_ID=(str, None),
     ROCKET_USERNAME=(str, None),
     ROCKET_PASSWORD=(str, None),
-    ROCKET_TEST_MODE=(bool, False)
+    ROCKET_TEST_MODE=(bool, False),
     INTELLIGENCE_REST_ENDPOINT=(str, None)
 )
 

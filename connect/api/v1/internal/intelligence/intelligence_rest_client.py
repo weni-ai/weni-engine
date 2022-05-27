@@ -27,7 +27,7 @@ class IntelligenceRESTClient:
             params={"user_email": user_email, "organization_id": organization_id}
         )
         return response.data.role
-    
+
     def create_organization(self, user_email, organization_name):
         response = requests.post(
             url=f"{self.base_url}v2/internal//organization/",
@@ -56,7 +56,7 @@ class IntelligenceRESTClient:
         response = requests.put(
             url=f"{self.base_url}v2/internal/user/permission/",
             headers=self.authentication_instance.get_headers(),
-            params={"organization_id": organization_id,"user_email": user_email}
+            params={"organization_id": organization_id, "user_email": user_email},
             json=json.dumps({"role": permission})
         )
         return response.data
@@ -75,7 +75,7 @@ class IntelligenceRESTClient:
         response = requests.put(
             url=f"{self.base_url}v2/internal/user/language/",
             headers=self.authentication_instance.get_headers(),
-            params={"user_email": user_email}
+            params={"user_email": user_email},
             json=json.dumps({"language": language})
         )
         return response.data
