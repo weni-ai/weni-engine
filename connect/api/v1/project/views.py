@@ -8,9 +8,7 @@ from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
-import grpc
 
-from connect import utils
 from connect.api.v1.metadata import Metadata
 from connect.api.v1.project.filters import ProjectOrgFilter
 from connect.api.v1.project.permissions import ProjectHasPermission
@@ -186,7 +184,7 @@ class ProjectViewSet(
         if not channel_type:
             return JsonResponse(status=status.HTTP_400_BAD_REQUEST, data={"message": "Need pass the channel_type"})
         channels = []
-        
+
         for project in Project.objects.all():
             task = tasks.list_channels.delay(
                 project_uuid=str(project.flow_organization),
@@ -222,7 +220,6 @@ class ProjectViewSet(
         )
         task.wait()
         return JsonResponse(status=status.HTTP_200_OK, data={"release": task.result})
-        
 
     @action(
         detail=True,
@@ -273,6 +270,7 @@ class ProjectViewSet(
                 classifier_uuid=str(classifier_uuid),
                 user_email=str(user_email),
             )
+            task.wait()
 
             return JsonResponse(status=status.HTTP_200_OK)
 
@@ -292,7 +290,7 @@ class ProjectViewSet(
 
             task = tasks.retrieve_classifier.delay(classifier_uuid=classifier_uuid)
             task.wait()
-            repsonse = task.result
+            response = task.result
 
             data = {
                 "authorization_uuid": response.get("access_token"),
@@ -317,7 +315,7 @@ class ProjectViewSet(
         if serializer.is_valid(raise_exception=True):
             project_uuid = serializer.validated_data.get("project_uuid")
             project = Project.objects.get(uuid=project_uuid)
-            
+
             task = tasks.create_classifier.delay(
                 project_uuid=str(project.flow_organization),
                 user=serializer.validated_data.get("user"),
@@ -351,9 +349,10 @@ class ProjectViewSet(
         if serializer.is_valid(raise_exception=True):
             project_uuid = serializer.validated_data.get("project_uuid")
             project = Project.objects.get(uuid=project_uuid)
-            
-            task = tasks.list_classifiers.delay(project_uuid=str(project.flow_organization))
 
+            task = tasks.list_classifiers.delay(project_uuid=str(project.flow_organization))
+            task.wait()
+            response = task.result
             classifiers = {"data": []}
             for i in response:
                 classifiers["data"].append({

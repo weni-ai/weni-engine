@@ -540,6 +540,7 @@ def delete_user_permission_project(project_uuid: str, user_email: str, permissio
         permission=permission
     )
 
+
 @app.task(name="list_channels")
 def list_channels(project_uuid, channel_type):
     grpc_instance = utils.get_grpc_types().get("flow")
@@ -550,6 +551,7 @@ def list_channels(project_uuid, channel_type):
         )
     )
 
+
 @app.task(name='release_channel')
 def realease_channel(channel_uuid, user):
     grpc_instance = utils.get_grpc_types().get("flow")
@@ -559,22 +561,24 @@ def realease_channel(channel_uuid, user):
     )
     return True
 
+
 @app.task(name='create_channel')
 def create_channel(user, project_uuid, data, channeltype_code):
     grpc_instance = utils.get_grpc_types().get("flow")
-    
+
     try:
         response = grpc_instance.create_channel(
             user=user,
             project_uuid=project_uuid,
             data=data,
-            channeltype_code=channeltype_code"
+            channeltype_code=channeltype_code
         )
-        return repsonse
+        return response
     except grpc.RpcError as error:
         if error.code() is grpc.StatusCode.INVALID_ARGUMENT:
-            self.context.abort(grpc.StatusCode.INVALID_ARGUMENT, "Bad Request")
+            raise error
         raise error
+
 
 @app.task(name='delete_classifier')
 def delete_classifier(classifier_uuid, user_email):
@@ -585,6 +589,7 @@ def delete_classifier(classifier_uuid, user_email):
     )
     return True
 
+
 @app.task(name='retrieve_classifier')
 def retrieve_classifier(classifier_uuid):
     grpc_instance = utils.get_grpc_types().get("flow")
@@ -592,6 +597,7 @@ def retrieve_classifier(classifier_uuid):
         classifier_uuid=classifier_uuid,
     )
     return response
+
 
 @app.task(name='create_classifier')
 def create_classifier(project_uuid, user_email, classifier_name, access_token):
@@ -603,7 +609,8 @@ def create_classifier(project_uuid, user_email, classifier_name, access_token):
         classifier_name=classifier_name,
         access_token=access_token,
     )
-    return respose
+    return response
+
 
 @app.task(name='list_classifiers')
 def list_classifiers(project_uuid):
