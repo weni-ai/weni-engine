@@ -183,26 +183,19 @@ class ProjectViewSet(
         channel_type = request.data.get('channel_type', None)
         if not channel_type:
             return JsonResponse(status=status.HTTP_400_BAD_REQUEST, data={"message": "Need pass the channel_type"})
-        channels = []
+
+        response = []
 
         for project in Project.objects.all():
             task = tasks.list_channels.delay(
-                project_uuid=str(project.flow_organization),
+                flow_organization=str(project.flow_organization),
                 channel_type=channel_type,
+                project_uuid=str(project.uuid)
             )
             task.wait()
-            response = task.result
-            for channel in response:
-                channels.append(
-                    {
-                        "uuid": channel.get("uuid"),
-                        "name": channel.get("name"),
-                        "config": channel.get("config"),
-                        "address": channel.get("address"),
-                        "project_uuid": str(project.uuid),
-                    }
-                )
-        return JsonResponse(status=status.HTTP_200_OK, data={"data": channels})
+            response.append(dict(project_uuid=str(project.uuid), channels=task.result))
+
+        return JsonResponse(status=status.HTTP_200_OK, data={"data": response})
 
     @action(
         detail=True,
@@ -316,7 +309,7 @@ class ProjectViewSet(
         if serializer.is_valid(raise_exception=True):
             project_uuid = serializer.validated_data.get("project_uuid")
             project = Project.objects.get(uuid=project_uuid)
-            
+
             task = tasks.create_classifier.delay(
                 project_uuid=str(project.flow_organization),
                 user_email=serializer.validated_data.get("user"),
@@ -325,7 +318,7 @@ class ProjectViewSet(
             )
             task.wait()
             response = task.result
-            
+
             created_classifier = {
                 "authorization_uuid": response.get("access_token"),
                 "classifier_type": response.get("classifier_type"),
