@@ -182,20 +182,18 @@ class ProjectViewSet(
         permission_classes=[AllowAny],
     )
     def list_channel(self, request):
-        channel_type = None
-        print(request, request.data)
         channel_type = request.data.get('channel_type', None)
         if not channel_type:
             return JsonResponse(status=status.HTTP_400_BAD_REQUEST, data={"message": "Need pass the channel_type"})
         channels = []
-        grpc_instance = utils.get_grpc_types().get("flow")
+        
         for project in Project.objects.all():
-            response = grpc_instance.list_channel(
+            task = tasks.list_channels.delay(
                 project_uuid=str(project.flow_organization),
                 channel_type=channel_type,
             )
-
-            for channel in response:
+            task.wait()
+            for channel in task.result:
                 channels.append(
                     {
                         "uuid": channel.uuid,
@@ -218,14 +216,13 @@ class ProjectViewSet(
     def release_channel(self, request):
         serializer = ReleaseChannelSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-
-        grpc_instance = utils.get_grpc_types().get("flow")
-        grpc_instance.release_channel(
+        task = tasks.realease_channel.delay(
             channel_uuid=serializer.validated_data.get("channel_uuid"),
             user=serializer.validated_data.get("user"),
         )
-
-        return JsonResponse(status=status.HTTP_200_OK)
+        task.wait()
+        return JsonResponse(status=status.HTTP_200_OK, data={"release": task.result})
+        
 
     @action(
         detail=True,
@@ -241,20 +238,14 @@ class ProjectViewSet(
             project_uuid = serializer.validated_data.get("project_uuid")
             project = Project.objects.get(uuid=project_uuid)
 
-            grpc_instance = utils.get_grpc_types().get("flow")
-
-            try:
-                response = grpc_instance.create_channel(
-                    user=serializer.validated_data.get("user"),
-                    project_uuid=str(project.flow_organization),
-                    data=serializer.validated_data.get("data"),
-                    channeltype_code=serializer.validated_data.get("channeltype_code"),
-                )
-            except grpc.RpcError as error:
-                if error.code() is grpc.StatusCode.INVALID_ARGUMENT:
-                    self.context.abort(grpc.StatusCode.INVALID_ARGUMENT, "Bad Request")
-                raise error
-
+            task = tasks.create_channel.delay(
+                user=serializer.validated_data.get("user"),
+                project_uuid=str(project.flow_organization),
+                data=serializer.validated_data.get("data"),
+                channeltype_code=serializer.validated_data.get("channeltype_code"),
+            )
+            task.wait()
+            response = task.result
             data = {
                 "uuid": response.uuid,
                 "name": response.name,
@@ -278,8 +269,7 @@ class ProjectViewSet(
             classifier_uuid = serializer.validated_data.get("uuid")
             user_email = serializer.validated_data.get("user_email")
 
-            grpc_instance = utils.get_grpc_types().get("flow")
-            grpc_instance.delete_classifier(
+            task = tasks.delete_classifier.delay(
                 classifier_uuid=str(classifier_uuid),
                 user_email=str(user_email),
             )
@@ -300,10 +290,9 @@ class ProjectViewSet(
         if serializer.is_valid(raise_exception=True):
             classifier_uuid = serializer.validated_data.get("uuid")
 
-            grpc_instance = utils.get_grpc_types().get("flow")
-            response = grpc_instance.get_classifier(
-                classifier_uuid=str(classifier_uuid),
-            )
+            task = tasks.retrieve_classifier.delay(classifier_uuid=classifier_uuid)
+            task.wait()
+            repsonse = task.result
 
             data = {
                 "authorization_uuid": response.get("access_token"),
@@ -328,14 +317,15 @@ class ProjectViewSet(
         if serializer.is_valid(raise_exception=True):
             project_uuid = serializer.validated_data.get("project_uuid")
             project = Project.objects.get(uuid=project_uuid)
-            grpc_instance = utils.get_grpc_types().get("flow")
-            response = grpc_instance.create_classifier(
+            
+            task = tasks.create_classifier.delay(
                 project_uuid=str(project.flow_organization),
-                user_email=serializer.validated_data.get("user"),
-                classifier_type="bothub",
+                user=serializer.validated_data.get("user"),
                 classifier_name=serializer.validated_data.get("name"),
-                access_token=serializer.validated_data.get("access_token"),
+                access_token=serializer.validated_data.get("access_token")
             )
+            task.wait()
+            response = task.result
 
             created_classifier = {
                 "authorization_uuid": response.get("access_token"),
@@ -344,6 +334,7 @@ class ProjectViewSet(
                 "is_active": response.get("is_active"),
                 "uuid": response.get("uuid"),
             }
+
             return JsonResponse(status=status.HTTP_200_OK, data=created_classifier)
 
     @action(
@@ -355,18 +346,13 @@ class ProjectViewSet(
         permission_classes=[AllowAny],
     )
     def list_classifier(self, request):
-        print(request.query_params)
         serializer = ClassifierSerializer(data=request.query_params)
 
         if serializer.is_valid(raise_exception=True):
             project_uuid = serializer.validated_data.get("project_uuid")
             project = Project.objects.get(uuid=project_uuid)
-            grpc_instance = utils.get_grpc_types().get("flow")
-            response = grpc_instance.get_classifiers(
-                project_uuid=str(project.flow_organization),
-                classifier_type="bothub",
-                is_active=True,
-            )
+            
+            task = tasks.list_classifiers.delay(project_uuid=str(project.flow_organization))
 
             classifiers = {"data": []}
             for i in response:

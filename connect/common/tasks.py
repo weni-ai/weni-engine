@@ -539,3 +539,78 @@ def delete_user_permission_project(project_uuid: str, user_email: str, permissio
         user_email=user_email,
         permission=permission
     )
+
+@app.task(name="list_channels")
+def list_channels(project_uuid, channel_type):
+    grpc_instance = utils.get_grpc_types().get("flow")
+    return list(
+        grpc_instance.list_channel(
+            project_uuid=project_uuid,
+            channel_type=channel_type,
+        )
+    )
+
+@app.task(name='release_channel')
+def realease_channel(channel_uuid, user):
+    grpc_instance = utils.get_grpc_types().get("flow")
+    grpc_instance.release_channel(
+        channel_uuid=channel_uuid,
+        user=user,
+    )
+    return True
+
+@app.task(name='create_channel')
+def create_channel(user, project_uuid, data, channeltype_code):
+    grpc_instance = utils.get_grpc_types().get("flow")
+    
+    try:
+        response = grpc_instance.create_channel(
+            user=user,
+            project_uuid=project_uuid,
+            data=data,
+            channeltype_code=channeltype_code"
+        )
+        return repsonse
+    except grpc.RpcError as error:
+        if error.code() is grpc.StatusCode.INVALID_ARGUMENT:
+            self.context.abort(grpc.StatusCode.INVALID_ARGUMENT, "Bad Request")
+        raise error
+
+@app.task(name='delete_classifier')
+def delete_classifier(classifier_uuid, user_email):
+    grpc_instance = utils.get_grpc_types().get("flow")
+    grpc_instance.delete_classifier(
+        classifier_uuid=classifier_uuid,
+        user_email=user_email,
+    )
+    return True
+
+@app.task(name='retrieve_classifier')
+def retrieve_classifier(classifier_uuid):
+    grpc_instance = utils.get_grpc_types().get("flow")
+    response = grpc_instance.get_classifier(
+        classifier_uuid=classifier_uuid,
+    )
+    return response
+
+@app.task(name='create_classifier')
+def create_classifier(project_uuid, user_email, classifier_name, access_token):
+    grpc_instance = utils.get_grpc_types().get("flow")
+    response = grpc_instance.create_classifier(
+        project_uuid=project_uuid,
+        user_email=user_email,
+        classifier_type="bothub",
+        classifier_name=classifier_name,
+        access_token=access_token,
+    )
+    return respose
+
+@app.task(name='list_classifiers')
+def list_classifiers(project_uuid):
+    grpc_instance = utils.get_grpc_types().get("flow")
+    response = grpc_instance.get_classifiers(
+        project_uuid=project_uuid,
+        classifier_type="bothub",
+        is_active=True,
+    )
+    return list(response)
