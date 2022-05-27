@@ -316,16 +316,16 @@ class ProjectViewSet(
         if serializer.is_valid(raise_exception=True):
             project_uuid = serializer.validated_data.get("project_uuid")
             project = Project.objects.get(uuid=project_uuid)
-
+            
             task = tasks.create_classifier.delay(
                 project_uuid=str(project.flow_organization),
-                user=serializer.validated_data.get("user"),
+                user_email=serializer.validated_data.get("user"),
                 classifier_name=serializer.validated_data.get("name"),
                 access_token=serializer.validated_data.get("access_token")
             )
             task.wait()
             response = task.result
-
+            
             created_classifier = {
                 "authorization_uuid": response.get("access_token"),
                 "classifier_type": response.get("classifier_type"),
