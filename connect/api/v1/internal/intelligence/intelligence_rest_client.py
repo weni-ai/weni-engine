@@ -1,6 +1,7 @@
 from django.conf import settings
 
 import requests
+import json
 
 from connect.api.v1.internal.internal_authencation import InternalAuthentication
 
@@ -42,6 +43,7 @@ class IntelligenceRESTClient:
             headers=self.authentication_instance.get_headers(),
             params={"user_email": user_email}
         )
+        return response
 
     def update_organization(self, organization_id, organization_name):
         response = requests.put(
@@ -49,6 +51,7 @@ class IntelligenceRESTClient:
             headers=self.authentication_instance.get_headers(),
             params={"organization_name": organization_name}
         )
+        return response
 
     def update_user_permission_organization(
         self, organization_id, user_email, permission
