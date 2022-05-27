@@ -17,7 +17,9 @@ class InternalAuthentication:
         return f"Bearer {token}"
 
     def get_headers(self):
-        return {
+        token = self.get_module_token()
+        header = {
             "Content-Type": "application/json; charset: utf-8",
-            "Authorization": self.get_auth_token(),
+            "Authorization": token,
         }
+        return header
