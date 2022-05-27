@@ -188,9 +188,8 @@ class ProjectViewSet(
 
         for project in Project.objects.all():
             task = tasks.list_channels.delay(
-                flow_organization=str(project.flow_organization),
+                project_uuid=str(project.flow_organization),
                 channel_type=channel_type,
-                project_uuid=str(project.uuid)
             )
             task.wait()
             response.append(dict(project_uuid=str(project.uuid), channels=task.result))
