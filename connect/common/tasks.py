@@ -544,12 +544,13 @@ def delete_user_permission_project(project_uuid: str, user_email: str, permissio
 @app.task(name="list_channels")
 def list_channels(project_uuid, channel_type):
     grpc_instance = utils.get_grpc_types().get("flow")
-    return list(
+    channels = list(
         grpc_instance.list_channel(
             project_uuid=project_uuid,
             channel_type=channel_type,
         )
     )
+    return channels
 
 
 @app.task(name='release_channel')

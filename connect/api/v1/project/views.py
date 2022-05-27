@@ -191,13 +191,14 @@ class ProjectViewSet(
                 channel_type=channel_type,
             )
             task.wait()
-            for channel in task.result:
+            response = task.result
+            for channel in response:
                 channels.append(
                     {
-                        "uuid": channel.uuid,
-                        "name": channel.name,
-                        "config": channel.config,
-                        "address": channel.address,
+                        "uuid": channel.get("uuid"),
+                        "name": channel.get("name"),
+                        "config": channel.get("config"),
+                        "address": channel.get("address"),
                         "project_uuid": str(project.uuid),
                     }
                 )
@@ -268,7 +269,7 @@ class ProjectViewSet(
 
             task = tasks.delete_classifier.delay(
                 classifier_uuid=str(classifier_uuid),
-                user_email=str(user_email),
+                user_email=user_email,
             )
             task.wait()
 
