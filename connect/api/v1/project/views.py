@@ -235,8 +235,6 @@ class ProjectViewSet(
                 channeltype_code=serializer.validated_data.get("channeltype_code"),
             )
             task.wait()
-            response = task.result
-
             return JsonResponse(status=status.HTTP_200_OK, data=task.result)
 
     @action(
