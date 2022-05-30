@@ -2,6 +2,7 @@ from connect import settings
 from connect.internal.internal_authencation import InternalAuthentication
 
 import requests
+import json
 
 
 class IntegrationsRESTClient:
@@ -9,7 +10,7 @@ class IntegrationsRESTClient:
     def __init__(self):
         self.base_url = settings.INTEGRATIONS_REST_ENDPOINT
         self.authentication_instance = InternalAuthentication()
-    
+
     def update_user_permission_project(self, project_uuid, user_email, role):
         body = {
             "project_uuid": project_uuid,
