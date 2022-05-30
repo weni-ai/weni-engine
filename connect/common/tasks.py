@@ -579,7 +579,13 @@ def create_channel(user, project_uuid, data, channeltype_code):
             data=data,
             channeltype_code=channeltype_code
         )
-        return response
+        channel = dict(
+            uuid=response.uuid,
+            name=response.name,
+            config=response.config,
+            address=response.address
+        )
+        return channel
     except grpc.RpcError as error:
         if error.code() is grpc.StatusCode.INVALID_ARGUMENT:
             raise error

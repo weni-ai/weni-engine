@@ -236,14 +236,8 @@ class ProjectViewSet(
             )
             task.wait()
             response = task.result
-            data = {
-                "uuid": response.uuid,
-                "name": response.name,
-                "config": response.config,
-                "address": response.address
-            }
 
-            return JsonResponse(status=status.HTTP_200_OK, data=data)
+            return JsonResponse(status=status.HTTP_200_OK, data=task.result)
 
     @action(
         detail=True,
