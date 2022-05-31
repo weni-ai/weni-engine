@@ -74,7 +74,8 @@ env = environ.Env(
     ROCKET_CLIENT_ID=(str, None),
     ROCKET_USERNAME=(str, None),
     ROCKET_PASSWORD=(str, None),
-    ROCKET_TEST_MODE=(bool, False)
+    ROCKET_TEST_MODE=(bool, False),
+    VERIFICATION_AMOUNT=(int, 1)
 )
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -444,6 +445,7 @@ BILLING_COST_PER_WHATSAPP = env.float("BILLING_COST_PER_WHATSAPP")
 
 TOKEN_EXTERNAL_AUTHENTICATION = env.str("TOKEN_EXTERNAL_AUTHENTICATION")
 
+VERIFICATION_AMOUNT = env.int("VERIFICATION_AMOUNT")
 
 # Rocket
 ROCKET_CLIENT_ID = env.str("ROCKET_CLIENT_ID")
