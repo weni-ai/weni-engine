@@ -52,7 +52,7 @@ class Has2FA(permissions.BasePermission):
                 auth = organization.get_user_authorization(request._user)
                 return auth.has_2fa
             else:
-                # return true to pass this permisson check and verify others 
+                # return true to pass this permisson check and verify others
                 return True
         return True
 
@@ -64,7 +64,6 @@ class Has2FA(permissions.BasePermission):
 
         if org.enforce_2fa:
             auth = obj.get_user_authorization(request.user)
-            print(auth.has_2fa)
             return auth.has_2fa
         else:
             return True

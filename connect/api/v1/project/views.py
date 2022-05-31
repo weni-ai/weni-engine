@@ -5,7 +5,7 @@ from rest_framework import mixins, status
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.filters import OrderingFilter, SearchFilter
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
@@ -29,7 +29,6 @@ from connect.common.models import (
     RocketAuthorization
 )
 
-from connect.middleware import ExternalAuthentication
 from rest_framework.exceptions import ValidationError
 from connect.common import tasks
 from django.http import JsonResponse

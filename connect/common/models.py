@@ -449,6 +449,13 @@ class OrganizationAuthorization(models.Model):
         if not settings.SEND_EMAILS:  # pragma: no cover
             return False  # pragma: no cover
 
+    @staticmethod
+    def set_2fa(user):
+        authorizations = OrganizationAuthorization.objects.filter(user=user)
+        for auth in authorizations:
+            auth.has_2fa = True
+            auth.save()
+
 
 class Project(models.Model):
     class Meta:
