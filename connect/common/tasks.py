@@ -312,8 +312,8 @@ def sync_total_contact_count():
     flow_instance = utils.get_grpc_types().get("flow")
     for project in Project.objects.all():
         project.total_contact_count = flow_instance.get_project_statistic(
-            project_uuid=project.uuid
-        )
+            project_uuid=str(project.flow_organization)
+        ).get("active_contacts")
         project.save(update_fields=["total_contact_count"])
     return True
 
