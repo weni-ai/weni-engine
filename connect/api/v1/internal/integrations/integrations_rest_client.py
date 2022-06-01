@@ -22,7 +22,7 @@ class IntegrationsRESTClient:
             headers=self.authentication_instance.get_headers(),
             json=body
         )
-        return dict(status=response.status_code, data=json.loads(response.content.decode('utf-8')))
+        return dict(status=response.status_code)
 
     def update_user(self, user_email, photo_url, first_name, last_name):
         body = {
@@ -36,4 +36,5 @@ class IntegrationsRESTClient:
             headers=self.authentication_instance.get_headers(),
             json=body
         )
-        return dict(status=response.status_code, data=json.loads(response.content.decode('utf-8')))
+
+        return dict(status=response.status_code)
