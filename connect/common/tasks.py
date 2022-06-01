@@ -9,6 +9,7 @@ from connect import utils, billing
 from connect.authentication.models import User
 from connect.celery import app
 import grpc
+from connect.api.v1.internal.integrations.integrations_rest_client import IntegrationsRESTClient
 from connect.common.models import (
     Service,
     Organization,
