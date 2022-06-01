@@ -2,7 +2,6 @@ from connect import settings
 from connect.api.v1.internal.internal_authentication import InternalAuthentication
 
 import requests
-import json
 
 
 class IntegrationsRESTClient:
