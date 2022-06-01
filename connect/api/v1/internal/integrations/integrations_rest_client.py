@@ -1,5 +1,5 @@
 from connect import settings
-from connect.internal.internal_authencation import InternalAuthentication
+from connect.api.v1.internal.internal_authentication import InternalAuthentication
 
 import requests
 import json
@@ -17,12 +17,12 @@ class IntegrationsRESTClient:
             "user": user_email,
             "role": role
         }
-        requests.patch(
+        response = requests.patch(
             url=f"{self.base_url}api/v1/internal/user-permission/{project_uuid}/",
             headers=self.authentication_instance.get_headers(),
-            json=json.dumps(body)
+            json=body
         )
-        return True
+        return dict(status=response.status_code, data=json.loads(response.content.decode('utf-8')))
 
     def update_user(self, user_email, photo_url, first_name, last_name):
         body = {
@@ -31,8 +31,9 @@ class IntegrationsRESTClient:
             "first_name": first_name,
             "last_name": last_name
         }
-        requests.post(
+        response = requests.post(
             url=f"{self.base_url}api/v1/internal/user/",
             headers=self.authentication_instance.get_headers(),
-            json=json.dumps(body)
+            json=body
         )
+        return dict(status=response.status_code, data=json.loads(response.content.decode('utf-8')))
