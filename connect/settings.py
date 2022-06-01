@@ -58,6 +58,7 @@ env = environ.Env(
     APM_SERVICE_NAME=(str, ""),
     APM_SECRET_TOKEN=(str, ""),
     APM_SERVER_URL=(str, ""),
+    INTEGRATIONS_REST_ENDPOINT=(str, "https://integrations-engine.dev.cloud.weni.ai/"),
     FLOW_GRPC_ENDPOINT=(str, "localhost:8002"),
     INTELIGENCE_GRPC_ENDPOINT=(str, "localhost:8003"),
     INTEGRATIONS_GRPC_ENDPOINT=(str, "localhost:8004"),
@@ -406,6 +407,8 @@ SEND_EMAILS = env.bool("SEND_EMAILS")
 INTELIGENCE_URL = env.str("INTELIGENCE_URL")
 FLOWS_URL = env.str("FLOWS_URL")
 INTEGRATIONS_URL = env.str("INTEGRATIONS_URL")
+
+INTEGRATIONS_REST_ENDPOINT = env.str("INTEGRATIONS_REST_ENDPOINT")
 
 FLOW_GRPC_ENDPOINT = env.str("FLOW_GRPC_ENDPOINT")
 INTELIGENCE_GRPC_ENDPOINT = env.str("INTELIGENCE_GRPC_ENDPOINT")
