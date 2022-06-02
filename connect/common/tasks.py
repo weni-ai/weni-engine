@@ -364,7 +364,7 @@ def sync_repositories_statistics():
         project.save(update_fields=["inteligence_count"])
 
 
-@app.task()
+@app.task(name="sync_channels_statistics")
 def sync_channels_statistics():
     flow_instance = utils.get_grpc_types().get("flow")
     for project in Project.objects.all():
@@ -378,6 +378,8 @@ def sync_channels_statistics():
 
 @app.task()
 def generate_project_invoice():
+    task = app.send_task(name="sync_channels_statistics")
+    task.wait()
     for org in Organization.objects.filter(
         organization_billing__next_due_date__lte=timezone.now().date(),
         is_suspended=False,
@@ -389,7 +391,7 @@ def generate_project_invoice():
             if org.organization_billing_invoice.last() is None
             else org.organization_billing_invoice.last().invoice_random_id + 1,
             discount=org.organization_billing.fixed_discount,
-            extra_integration=org.extra_integration,
+            extra_integration=org.extra_active_integrations,
             cost_per_whatsapp=settings.BILLING_COST_PER_WHATSAPP,
         )
         for project in org.project.all():
