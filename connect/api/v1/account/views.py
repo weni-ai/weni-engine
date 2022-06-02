@@ -175,13 +175,15 @@ class MyUserProfileViewSet(
     )
     def set_two_factor_authentication(self, request, **kwargs):
         user = request.user
-        keycloak_instance = KeycloakControl()
-        response = keycloak_instance.configure_2fa(user.email)
-        if response == {}:
-            OrganizationAuthorization.set_2fa(user)
-            return Response(status=status.HTTP_200_OK, data={"email": user.email})
-        else:
-            return Response(status=status.HTTP_404_NOT_FOUND, data={"response": response})
+        activate_2fa = request.data.get("2FA")
+        if isinstance(activate_2fa, bool):
+            keycloak_instance = KeycloakControl()
+            response = keycloak_instance.configure_2fa(user.email, activate_2fa)
+            if response == {}:
+                OrganizationAuthorization.set_2fa(user)
+                return Response(status=status.HTTP_200_OK, data={"email": user.email})
+            else:
+                return Response(status=status.HTTP_404_NOT_FOUND, data={"response": response})
 
 
 class SearchUserViewSet(mixins.ListModelMixin, GenericViewSet):  # pragma: no cover
