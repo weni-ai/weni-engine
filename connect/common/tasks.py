@@ -310,7 +310,9 @@ def sync_active_contacts():
 @app.task()
 def sync_total_contact_count():
     flow_instance = utils.get_grpc_types().get("flow")
-    for project in Project.objects.all():
+    filter_organizations = Q(uuid__icontains="82fa0f4a") | Q(name="Elogroup")
+    orgs_to_exclude = [o.uuid for o in Organization.objects.filter(filter_organizations)]
+    for project in Project.objects.all().exclude(organization__uuid__in=orgs_to_exclude):
         project.total_contact_count = flow_instance.get_project_statistic(
             project_uuid=str(project.flow_organization)
         ).get("active_contacts")
