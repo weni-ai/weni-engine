@@ -1,4 +1,5 @@
 import stripe
+import pendulum
 from datetime import timedelta
 from django.utils import timezone
 import requests
@@ -251,18 +252,11 @@ def check_organization_free_plan():
         organization_billing__plan="free", is_suspended=False
     ):
         for project in organization.project.all():
-            next_due_date = project.organization.organization_billing.next_due_date
-            last_invoice_date = (
-                project.organization.organization_billing.last_invoice_date
-            )
-            org_created = project.organization.created_at
-            date_now = timezone.now()
-
-            before = date_now if next_due_date is None else next_due_date
-            after = org_created if last_invoice_date is None else last_invoice_date
-
-            before = before.strftime("%Y-%m-%d %H:%M")
-            after = after.strftime("%Y-%m-%d %H:%M")
+            project_timezone = project.timezone
+            now = pendulum.now(project_timezone)
+            before = now.strftime("%Y-%m-%d %H:%M")
+            # first day of month
+            after = now.start_of('month').strftime("%Y-%m-%d %H:%M")
 
             contact_count = flow_instance.get_billing_total_statistics(
                 project_uuid=str(project.flow_organization), before=before, after=after
