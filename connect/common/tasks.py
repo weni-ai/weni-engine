@@ -513,7 +513,7 @@ def update_user_name(user_email: str, first_name: str, last_name: str):
         user = user.first()
         integrations_client.update_user(
             user_email=user_email,
-            photo_url=user.photo_url,
+            photo_url='' if user.photo_url is None else user.photo_url,
             first_name=first_name,
             last_name=last_name
         )

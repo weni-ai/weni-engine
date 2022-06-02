@@ -35,5 +35,5 @@ class IntegrationsRESTClient:
             headers=self.authentication_instance.get_headers(),
             json=body
         )
-
+        response.raise_for_status()
         return dict(status=response.status_code)
