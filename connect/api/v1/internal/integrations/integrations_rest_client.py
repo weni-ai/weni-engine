@@ -17,7 +17,7 @@ class IntegrationsRESTClient:
             "role": role
         }
         response = requests.patch(
-            url=f"{self.base_url}api/v1/internal/user-permission/{project_uuid}/",
+            url=f"{self.base_url}/api/v1/internal/user-permission/{project_uuid}/",
             headers=self.authentication_instance.get_headers(),
             json=body
         )
@@ -31,7 +31,7 @@ class IntegrationsRESTClient:
             "last_name": last_name
         }
         response = requests.post(
-            url=f"{self.base_url}api/v1/internal/user/",
+            url=f"{self.base_url}/api/v1/internal/user/",
             headers=self.authentication_instance.get_headers(),
             json=body
         )
