@@ -245,6 +245,18 @@ class ReleaseChannelSerializer(serializers.Serializer):
     user = serializers.CharField(required=True)
 
 
+class ListChannelSerializer(serializers.Serializer):
+    channel_data = serializers.SerializerMethodField()
+
+    def get_channel_data(self, obj):
+        task = tasks.list_channels.delay(
+            project_uuid=str(obj.flow_organization),
+            channel_type=self.context["channel_type"],
+        )
+        task.wait()
+        return dict(project_uuid=obj.uuid, channels=task.result)
+
+
 class CreateChannelSerializer(serializers.Serializer):
     user = serializers.CharField(required=True)
     project_uuid = serializers.CharField(required=True)

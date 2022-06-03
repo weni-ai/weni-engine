@@ -19,6 +19,7 @@ from connect.api.v1.project.serializers import (
     RequestPermissionProjectSerializer,
     ReleaseChannelSerializer,
     DestroyClassifierSerializer,
+    ListChannelSerializer,
     CreateChannelSerializer,
     RetrieveClassifierSerializer,
     CreateClassifierSerializer,
@@ -184,17 +185,16 @@ class ProjectViewSet(
         if not channel_type:
             return JsonResponse(status=status.HTTP_400_BAD_REQUEST, data={"message": "Need pass the channel_type"})
 
-        response = []
-
-        for project in Project.objects.all():
-            task = tasks.list_channels.delay(
-                project_uuid=str(project.flow_organization),
-                channel_type=channel_type,
-            )
-            task.wait()
-            response.append(dict(project_uuid=str(project.uuid), channels=task.result))
-
-        return JsonResponse(status=status.HTTP_200_OK, data={"data": response})
+        page = self.paginate_queryset(
+            self.filter_queryset(self.queryset),
+        )
+        context = self.get_serializer_context()
+        context["channel_type"] = channel_type
+        channel_serializer = ListChannelSerializer(page, many=True, context=context)
+        return JsonResponse(
+            status=status.HTTP_200_OK,
+            data=self.get_paginated_response(channel_serializer.data)
+        )
 
     @action(
         detail=True,
