@@ -178,6 +178,8 @@ class MyUserProfileViewSet(
         activate_2fa = request.data.get("2FA")
         if isinstance(activate_2fa, bool):
             keycloak_instance = KeycloakControl()
+            user.has_2fa = activate_2fa
+            user.save()
             response = keycloak_instance.configure_2fa(user.email, activate_2fa)
             if response == {}:
                 OrganizationAuthorization.set_2fa(user)
