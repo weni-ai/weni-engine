@@ -191,10 +191,7 @@ class ProjectViewSet(
         context = self.get_serializer_context()
         context["channel_type"] = channel_type
         channel_serializer = ListChannelSerializer(page, many=True, context=context)
-        return JsonResponse(
-            status=status.HTTP_200_OK,
-            data=self.get_paginated_response(channel_serializer.data)
-        )
+        return self.get_paginated_response(channel_serializer.data)
 
     @action(
         detail=True,
