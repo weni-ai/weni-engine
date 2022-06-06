@@ -1,4 +1,5 @@
 import stripe
+import pendulum
 from datetime import timedelta
 from django.utils import timezone
 import requests
@@ -251,18 +252,11 @@ def check_organization_free_plan():
         organization_billing__plan="free", is_suspended=False
     ):
         for project in organization.project.all():
-            next_due_date = project.organization.organization_billing.next_due_date
-            last_invoice_date = (
-                project.organization.organization_billing.last_invoice_date
-            )
-            org_created = project.organization.created_at
-            date_now = timezone.now()
-
-            before = date_now if next_due_date is None else next_due_date
-            after = org_created if last_invoice_date is None else last_invoice_date
-
-            before = before.strftime("%Y-%m-%d %H:%M")
-            after = after.strftime("%Y-%m-%d %H:%M")
+            project_timezone = project.timezone
+            now = pendulum.now(project_timezone)
+            before = now.strftime("%Y-%m-%d %H:%M")
+            # first day of month
+            after = now.start_of('month').strftime("%Y-%m-%d %H:%M")
 
             contact_count = flow_instance.get_billing_total_statistics(
                 project_uuid=str(project.flow_organization), before=before, after=after
@@ -310,10 +304,12 @@ def sync_active_contacts():
 @app.task()
 def sync_total_contact_count():
     flow_instance = utils.get_grpc_types().get("flow")
-    for project in Project.objects.all():
+    filter_organizations = Q(uuid__icontains="82fa0f4a") | Q(name="Elogroup")
+    orgs_to_exclude = [o.uuid for o in Organization.objects.filter(filter_organizations)]
+    for project in Project.objects.all().exclude(organization__uuid__in=orgs_to_exclude):
         project.total_contact_count = flow_instance.get_project_statistic(
-            project_uuid=project.uuid
-        )
+            project_uuid=str(project.flow_organization)
+        ).get("active_contacts")
         project.save(update_fields=["total_contact_count"])
     return True
 
@@ -370,7 +366,7 @@ def sync_repositories_statistics():
         project.save(update_fields=["inteligence_count"])
 
 
-@app.task()
+@app.task(name="sync_channels_statistics")
 def sync_channels_statistics():
     flow_instance = utils.get_grpc_types().get("flow")
     for project in Project.objects.all():
@@ -384,6 +380,8 @@ def sync_channels_statistics():
 
 @app.task()
 def generate_project_invoice():
+    task = app.send_task(name="sync_channels_statistics")
+    task.wait()
     for org in Organization.objects.filter(
         organization_billing__next_due_date__lte=timezone.now().date(),
         is_suspended=False,
@@ -395,7 +393,7 @@ def generate_project_invoice():
             if org.organization_billing_invoice.last() is None
             else org.organization_billing_invoice.last().invoice_random_id + 1,
             discount=org.organization_billing.fixed_discount,
-            extra_integration=org.extra_integration,
+            extra_integration=org.extra_active_integrations,
             cost_per_whatsapp=settings.BILLING_COST_PER_WHATSAPP,
         )
         for project in org.project.all():

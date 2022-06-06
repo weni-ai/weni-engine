@@ -5,13 +5,14 @@ from rest_framework import mixins, status
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.filters import OrderingFilter, SearchFilter
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from connect.api.v1.metadata import Metadata
 from connect.api.v1.project.filters import ProjectOrgFilter
 from connect.api.v1.project.permissions import ProjectHasPermission
+from connect.api.v1.organization.permissions import Has2FA
 from connect.api.v1.project.serializers import (
     ProjectSerializer,
     ProjectSearchSerializer,
@@ -30,7 +31,6 @@ from connect.common.models import (
 )
 from connect.authentication.models import User
 
-from connect.middleware import ExternalAuthentication
 from rest_framework.exceptions import ValidationError
 from connect.common import tasks
 from django.http import JsonResponse
@@ -48,7 +48,7 @@ class ProjectViewSet(
 ):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
-    permission_classes = [IsAuthenticated, ProjectHasPermission]
+    permission_classes = [IsAuthenticated, ProjectHasPermission, Has2FA]
     filter_class = ProjectOrgFilter
     filter_backends = [OrderingFilter, SearchFilter, DjangoFilterBackend]
     lookup_field = "uuid"
@@ -128,8 +128,6 @@ class ProjectViewSet(
         methods=["GET"],
         url_name="get-contact-active-detailed",
         url_path="grpc/get-contact-active-detailed/(?P<project_uuid>[^/.]+)",
-        authentication_classes=[ExternalAuthentication],
-        permission_classes=[AllowAny],
     )
     def get_contact_active_detailed(self, request, project_uuid):
 
@@ -150,8 +148,6 @@ class ProjectViewSet(
         methods=["DELETE"],
         url_name="destroy-user-permission",
         url_path="grpc/destroy-user-permission/(?P<project_uuid>[^/.]+)",
-        authentication_classes=[ExternalAuthentication],
-        permission_classes=[AllowAny],
     )
     def destroy_user_permission(self, request, project_uuid):
         user_email = request.data.get('email')
