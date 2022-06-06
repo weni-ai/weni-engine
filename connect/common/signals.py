@@ -76,8 +76,23 @@ def update_organization(instance, **kwargs):
 
 
 @receiver(post_save, sender=OrganizationAuthorization)
-def org_authorizations(sender, instance, **kwargs):
+def org_authorizations(sender, instance, created, **kwargs):
+
     if instance.role is not OrganizationLevelRole.NOTHING.value:
+        if created:
+            for project in instance.organization.project.all():
+                project_perm = project.project_authorizations.filter(user=instance.user)
+                if not project_perm.exists():
+                    project.project_authorizations.create(
+                        user=instance.user,
+                        role=instance.role,
+                        organization_authorization=instance,
+                    )
+                else:
+                    project_perm = project_perm.first()
+                    if instance.role > project_perm.role:
+                        project_perm.role = instance.role
+                        project_perm.save(update_fields=["role"])
         celery_app.send_task(
             "update_user_permission_organization",
             args=[
