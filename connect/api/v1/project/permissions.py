@@ -16,3 +16,11 @@ class ProjectHasPermission(permissions.BasePermission):  # pragma: no cover
                 return authorization.can_write
             return authorization.is_moderator
         return False
+
+
+class ModuleHasPermission(permissions.BasePermission): # pragma: no cover
+    def has_permission(self, request, view):  
+        return request.user.has_perm("authentication.can_communicate_internally")
+
+    def has_object_permission(self, request, view, obj):
+        return self.has_permission(request, view)

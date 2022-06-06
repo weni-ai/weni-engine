@@ -11,7 +11,7 @@ from rest_framework.viewsets import GenericViewSet
 
 from connect.api.v1.metadata import Metadata
 from connect.api.v1.project.filters import ProjectOrgFilter
-from connect.api.v1.project.permissions import ProjectHasPermission
+from connect.api.v1.project.permissions import ProjectHasPermission, ModuleHasPermission
 from connect.api.v1.project.serializers import (
     ProjectSerializer,
     ProjectSearchSerializer,
@@ -177,8 +177,7 @@ class ProjectViewSet(
         detail=True,
         methods=["GET"],
         url_name="list-channel",
-        authentication_classes=[ExternalAuthentication],
-        permission_classes=[AllowAny],
+        permission_classes=[ModuleHasPermission],
     )
     def list_channel(self, request):
         channel_type = request.data.get('channel_type', None)
@@ -199,7 +198,7 @@ class ProjectViewSet(
         url_name="realease-channel",
         serializer_class=ReleaseChannelSerializer,
         authentication_classes=[ExternalAuthentication],
-        permission_classes=[AllowAny],
+        permission_classes=[ModuleHasPermission],
     )
     def release_channel(self, request):
         serializer = ReleaseChannelSerializer(data=request.data)
@@ -216,8 +215,7 @@ class ProjectViewSet(
         methods=["POST"],
         url_name='create-channel',
         serializer_class=CreateChannelSerializer,
-        authentication_classes=[ExternalAuthentication],
-        permission_classes=[AllowAny],
+        permission_classes=[ModuleHasPermission],
     )
     def create_channel(self, request):
         serializer = CreateChannelSerializer(data=request.data)
@@ -239,8 +237,7 @@ class ProjectViewSet(
         methods=["DELETE"],
         url_name='destroy-classifier',
         serializer_class=DestroyClassifierSerializer,
-        authentication_classes=[ExternalAuthentication],
-        permission_classes=[AllowAny],
+        permission_classes=[ModuleHasPermission],
     )
     def destroy_classifier(self, request):
         serializer = DestroyClassifierSerializer(data=request.query_params)
@@ -261,8 +258,7 @@ class ProjectViewSet(
         methods=["GET"],
         url_name='retrieve-classifier',
         serializer_class=RetrieveClassifierSerializer,
-        authentication_classes=[ExternalAuthentication],
-        permission_classes=[AllowAny],
+        permission_classes=[ModuleHasPermission],
     )
     def retrieve_classifier(self, request):
         serializer = RetrieveClassifierSerializer(data=request.query_params)
@@ -288,8 +284,7 @@ class ProjectViewSet(
         methods=["POST"],
         url_name='create-classifier',
         serializer_class=CreateClassifierSerializer,
-        authentication_classes=[ExternalAuthentication],
-        permission_classes=[AllowAny],
+        permission_classes=[ModuleHasPermission],
     )
     def create_classifier(self, request):
         request_data = request.query_params
@@ -322,8 +317,7 @@ class ProjectViewSet(
         methods=["GET"],
         url_name='list-classifier',
         serializer_class=ClassifierSerializer,
-        authentication_classes=[ExternalAuthentication],
-        permission_classes=[AllowAny],
+        permission_classes=[ModuleHasPermission],
     )
     def list_classifier(self, request):
         serializer = ClassifierSerializer(data=request.query_params)
