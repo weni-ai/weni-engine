@@ -43,7 +43,7 @@ class WeniOIDCAuthenticationBackend(OIDCAuthenticationBackend):
         user.email = claims.get("email", "")
         user.save()
 
-        print(f'has permission: {check_module_permission(claims, user)}')
+        check_module_permission(claims, user)
 
         if settings.SYNC_ORGANIZATION_INTELIGENCE:
             task = celery_app.send_task(  # pragma: no cover
@@ -59,7 +59,7 @@ class WeniOIDCAuthenticationBackend(OIDCAuthenticationBackend):
         user.email = claims.get("email", "")
         user.save()
 
-        print(f'has permission: {check_module_permission(claims, user)}')
+        check_module_permission(claims, user)
 
         return user
 
