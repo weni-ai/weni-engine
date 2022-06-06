@@ -18,9 +18,10 @@ from connect.api.v1.account.serializers import (
 )
 from connect.api.v1.keycloak import KeycloakControl
 from connect.authentication.models import User
-from connect.common.models import Service
+from connect.common.models import OrganizationAuthorization, Service
 from connect.utils import upload_photo_rocket
 from connect.celery import app as celery_app
+from rest_framework import status
 
 
 class MyUserProfileViewSet(
@@ -166,6 +167,25 @@ class MyUserProfileViewSet(
         )
 
         return Response({"language": user.language})
+
+    @action(
+        detail=True,
+        methods=["PATCH"],
+        url_name="two-factor-authentication",
+    )
+    def set_two_factor_authentication(self, request, **kwargs):
+        user = request.user
+        activate_2fa = request.data.get("2FA")
+        if isinstance(activate_2fa, bool):
+            keycloak_instance = KeycloakControl()
+            user.has_2fa = activate_2fa
+            user.save()
+            response = keycloak_instance.configure_2fa(user.email, activate_2fa)
+            if response == {}:
+                OrganizationAuthorization.set_2fa(user)
+                return Response(status=status.HTTP_200_OK, data={"email": user.email})
+            else:
+                return Response(status=status.HTTP_404_NOT_FOUND, data={"response": response})
 
 
 class SearchUserViewSet(mixins.ListModelMixin, GenericViewSet):  # pragma: no cover

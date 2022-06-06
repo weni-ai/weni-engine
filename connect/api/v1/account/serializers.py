@@ -26,6 +26,7 @@ class UserSerializer(serializers.ModelSerializer):
             "last_update_profile",
             "utm",
             "email_marketing",
+            "has_2fa"
         ]
         ref_name = None
 

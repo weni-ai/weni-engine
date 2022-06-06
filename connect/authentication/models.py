@@ -104,6 +104,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     email_marketing = models.BooleanField(
         verbose_name=_("Allows receiving marketing emails"), default=True
     )
+    has_2fa = models.BooleanField(_("Two factor authentication"), default=False)
 
     objects = UserManager()
 

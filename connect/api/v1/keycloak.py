@@ -31,3 +31,24 @@ class KeycloakControl:  # pragma: no cover
 
         users = self.instance.get_users(query={"email": email})
         return next((user["id"] for user in users if user["email"] == email), None)
+
+    def configure_2fa(self, email: str, active: bool):
+        """
+        Configure two factor authentication to user
+        """
+        user_id = self.get_user_id_by_email(email)
+        if user_id is not None:
+            if active:
+                response = self.instance.update_user(
+                    user_id=user_id,
+                    payload={'requiredActions': ['CONFIGURE_TOTP']}
+                )
+                return response
+            else:
+                response = self.instance.update_user(
+                    user_id=user_id,
+                    payload={'requiredActions': []}
+                )
+                return response
+        else:
+            return 'User not found'
