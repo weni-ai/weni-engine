@@ -273,7 +273,7 @@ class FlowType(GRPCType):
         stub = billing_pb2_grpc.BillingControllerStub(self.channel)
         request = billing_pb2.MessageDetailRequest(
             org_uuid=org_uuid,
-            contact_uuid=uuid,
+            contact_uuid=contact_uuid,
             before=before,
             after=after
         )
