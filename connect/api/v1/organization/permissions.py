@@ -63,7 +63,7 @@ class Has2FA(permissions.BasePermission):
             org = obj.organization
 
         if org.enforce_2fa:
-            auth = obj.get_user_authorization(request.user)
+            auth = org.get_user_authorization(request.user)
             return auth.has_2fa
         else:
             return True
