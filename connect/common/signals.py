@@ -118,9 +118,11 @@ def request_permission_organization(sender, instance, created, **kwargs):
             user = user.first()
             perm = instance.organization.get_user_authorization(user=user)
             perm.role = instance.role
+            update_fields = ["role"]
             if user.has_2fa:
                 perm.has_2fa = True
-            perm.save(update_fields=["role", "has_2fa"])
+                update_fields.append("has_2fa")
+            perm.save(update_fields=update_fields)
             if perm.can_contribute:
                 for proj in instance.organization.project.all():
                     project_perm = proj.project_authorizations.filter(user=user)
