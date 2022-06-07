@@ -268,3 +268,15 @@ class FlowType(GRPCType):
         response = stub.Remove(request)
 
         return response
+    
+    def get_message(self, org_uuid: str, contact_uuid: str, before: str, after:str):
+        stub = billing_pb2_grpc.BillingControllerStub(self.channel)
+        request = billing_pb2.MessageDetailRequest(
+            org_uuid=org_uuid,
+            contact_uuid=uuid,
+            before=before,
+            after=after
+        )
+        response = stub.MessageDetail(request)
+
+        return response

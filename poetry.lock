@@ -1215,7 +1215,7 @@ python-versions = "*"
 
 [[package]]
 name = "weni-protobuffers"
-version = "1.2.13"
+version = "1.2.13a0"
 description = "Protocol Buffers for Weni Platform"
 category = "main"
 optional = false
@@ -1259,7 +1259,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytes
 [metadata]
 lock-version = "1.1"
 python-versions = "~=3.6.2"
-content-hash = "fa4e327d76ab6748d7cb5c48d0c030c7999b87279b2d6960b911d90b612c1838"
+content-hash = "525670e85a63640cb3ecca46b53db8a48a6856769065e094b2acd86d1647dc74"
 
 [metadata.files]
 amqp = [
@@ -2284,8 +2284,8 @@ wcwidth = [
     {file = "wcwidth-0.2.5.tar.gz", hash = "sha256:c4d647b99872929fdb7bdcaa4fbe7f01413ed3d98077df798530e5b04f116c83"},
 ]
 weni-protobuffers = [
-    {file = "weni-protobuffers-1.2.13.tar.gz", hash = "sha256:d4c550091441103eb4f9d40a9ba13f8af11eef58f7eb9d6de4fcf37af2b24260"},
-    {file = "weni_protobuffers-1.2.13-py3-none-any.whl", hash = "sha256:65df7182660f2594ab29aab7eba468415e0344d25f102c41496846db7f1ebea8"},
+    {file = "weni-protobuffers-1.2.13a0.tar.gz", hash = "sha256:19e8e66999a4d1469ae8b84fc1dea2a438ccfff39b9f816799fa86cc7a1825e4"},
+    {file = "weni_protobuffers-1.2.13a0-py3-none-any.whl", hash = "sha256:c24b7f4ec773e3b7e4c39788501b3223b8a783b0b78c307198195c3df4cd56e2"},
 ]
 whitenoise = [
     {file = "whitenoise-5.3.0-py2.py3-none-any.whl", hash = "sha256:d963ef25639d1417e8a247be36e6aedd8c7c6f0a08adcb5a89146980a96b577c"},
