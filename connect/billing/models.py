@@ -80,7 +80,9 @@ class Contact(models.Model):
     )
     contact_flow_uuid = models.UUIDField(_("flow identification UUID"))
     name = models.CharField(_("contact name"), max_length=150)
-    channel = models.ForeignKey(Channel, models.CASCADE, related_name="channel")
+    last_seen_on = models.DateTimeField(blank=True, null=True)
+    # channel = models.ForeignKey(Channel, models.CASCADE, related_name="channel")
+    channel_type = models.CharField(_("channel_type"), max_length=150, default="whatsapp")
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(blank=True, null=True)
 
