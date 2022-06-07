@@ -130,17 +130,26 @@ class ProjectSerializer(serializers.ModelSerializer):
         }
 
     def get_pending_authorizations(self, obj):
-        return {
+        response = {
             "count": obj.requestpermissionproject_set.count(),
-            "users": [
+            "users": [],
+        }
+        for i in obj.requestpermissionproject_set.all():
+            rocket_authorization = RequestRocketPermission.objects.filter(email=i.email)
+            rocket_role = None
+            if(len(rocket_authorization) > 0):
+                rocket_authorization = rocket_authorization.first()
+                rocket_role = rocket_authorization.role
+
+            response["users"].append(
                 {
                     "email": i.email,
-                    "role": i.role,
+                    "project_role": i.role,
                     "created_by": i.created_by.email,
+                    "rocket_authorization": rocket_role
                 }
-                for i in obj.requestpermissionproject_set.all()
-            ],
-        }
+            )
+        return response
 
     def get_authorization(self, obj):
         request = self.context.get("request")

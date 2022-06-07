@@ -128,6 +128,7 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
     extra_integration = serializers.IntegerField(read_only=True)
     enforce_2fa = serializers.BooleanField(
         label=_("enforce 2fa"),
+        required=False,
         help_text=_("if this field is true, only users with 2fa activated can access the org")
     )
 
