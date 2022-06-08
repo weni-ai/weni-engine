@@ -75,6 +75,13 @@ def update_organization(instance, **kwargs):
         )
 
 
+@receiver(post_delete, sender=ProjectAuthorization)
+def delete_opened_project(sender, instance, **kwargs):
+    opened = OpenedProject.objects.filter(user=instance.user, project=instance.project)
+    if opened.exists():
+        opened.delete()
+
+
 @receiver(post_save, sender=OrganizationAuthorization)
 def org_authorizations(sender, instance, created, **kwargs):
 
