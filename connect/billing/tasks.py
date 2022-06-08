@@ -21,7 +21,7 @@ def get_messages(contact_uuid: str, before: str, after: str, project_uuid: str):
     flow_instance = utils.get_grpc_types().get("flow")
     contact = Contact.objects.get(uuid=contact_uuid)
     project = Project.objects.get(uuid=project_uuid)
-    message = flow_instance.get_message(project.flow_organization, contact.contact_flow_uuid, before, after)
+    message = flow_instance.get_message(str(project.flow_organization), str(contact.contact_flow_uuid), before, after)
 
     Message.objects.create(
         contact=contact,
@@ -71,7 +71,7 @@ def sync_contacts():
 
                 task = current_app.send_task(  # pragma: no cover
                     name="get_messages",
-                    args=[contact.uuid, str(manager.before), str(manager.after), project.uuid],
+                    args=[str(contact.uuid), str(manager.before), str(manager.after), str(project.uuid)],
                 )
                 task.wait()
 
