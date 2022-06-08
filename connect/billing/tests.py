@@ -184,7 +184,6 @@ class ContactTestCase(TestCase):
         self.contact = Contact.objects.create(
             contact_flow_uuid=uuid4.uuid4(),
             name='contact test 1',
-            channel_type="whatsapp",
             last_seen_on=datetime(2022, 4, 8, 10, 20, 0, 0, pytz.UTC)
         )
 

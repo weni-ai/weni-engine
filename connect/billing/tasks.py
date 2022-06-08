@@ -16,10 +16,11 @@ from grpc._channel import _InactiveRpcError
     retry_kwargs={"max_retries": 5},
     retry_backoff=True,
 )
-def get_messages(contact: Contact, before: str, after: str, project: Project):
+def get_messages(contact_uuid: str, before: str, after: str, project_uuid: str):
 
     flow_instance = utils.get_grpc_types().get("flow")
-
+    contact = Contact.objects.get(uuid=contact_uuid)
+    project = Project.objects.get(uuid=project_uuid)
     message = flow_instance.get_message(project.flow_organization, contact.contact_flow_uuid, before, after)
 
     Message.objects.create(
@@ -61,16 +62,16 @@ def sync_contacts():
             active_contacts = elastic_instance.get_contact_detailed(
                 str(project.flow_id), str(manager.before), str(manager.after)
             )
-            for contact in active_contacts:
-                Contact.objects.create(
-                    contact_flow_uuid=contact.uuid,
-                    name=contact.name,
-                    last_seen_on=pendulum.parse(contact.last_seen_on),
+            for elastic_contact in active_contacts:
+                contact = Contact.objects.create(
+                    contact_flow_uuid=elastic_contact.uuid,
+                    name=elastic_contact.name,
+                    last_seen_on=pendulum.parse(elastic_contact.last_seen_on),
                 )
 
                 task = current_app.send_task(  # pragma: no cover
                     name="get_messages",
-                    args=[contact, str(manager.before), str(manager.after), project],
+                    args=[contact.uuid, str(manager.before), str(manager.after), project.uuid],
                 )
                 task.wait()
 
