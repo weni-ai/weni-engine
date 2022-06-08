@@ -1,10 +1,41 @@
 import pendulum
 from connect.celery import app
 from connect.common.models import Project
-from connect.billing.models import Contact, SyncManagerTask, ContactCount
+from connect.billing.models import Contact, Message, SyncManagerTask, ContactCount, Channel
 from connect.elastic.flow import ElasticFlow
 from datetime import timedelta
 from django.utils import timezone
+from connect import utils
+from celery import current_app
+from grpc._channel import _InactiveRpcError
+
+
+@app.task(
+    name="get_messages",
+    autoretry_for=(_InactiveRpcError, Exception),
+    retry_kwargs={"max_retries": 5},
+    retry_backoff=True,
+)
+def get_messages(contact: Contact, before: str, after: str, project: Project):
+
+    flow_instance = utils.get_grpc_types().get("flow")
+
+    message = flow_instance.get_message(project.flow_organization, contact.contact_flow_uuid, before, after)
+
+    Message.objects.create(
+        contact=contact,
+        text=message.text,
+        created_on=message.created_on,
+        direction=message.direction,
+        message_flow_uuid=message.message_flow_uuid
+    )
+
+    channel = Channel.create(
+        channel_type=message.channel_type,
+        channel_flow_id=message.channel_id,
+        project=project
+    )
+    contact.update_channel(channel)
 
 
 @app.task()
@@ -12,43 +43,36 @@ def sync_contacts():
     last_sync = (
         SyncManagerTask.objects.filter(task_type="sync_contacts")
         .order_by("finished_at")
-        .last()
+        .first()
     )
     manager = SyncManagerTask.objects.create(
         task_type="sync_contacts",
         started_at=timezone.now(),
         before=timezone.now(),
         after=last_sync.before
-        if last_sync.exists()
+        if isinstance(last_sync, SyncManagerTask)
         else timezone.now() - timedelta(hours=5),
     )
+
     try:
-        # grpc_instance = utils.get_grpc_types().get("flow")
         elastic_instance = ElasticFlow()
 
         for project in Project.objects.all():
             active_contacts = elastic_instance.get_contact_detailed(
-                str(project.flow_id), manager.before, manager.after
+                str(project.flow_id), str(manager.before), str(manager.after)
             )
             for contact in active_contacts:
-                # channel = Channel.create(
-                #     project=project,
-                #     channel_flow_uuid=contact.channel.uuid,
-                #     channel_type="WA",
-                #     name=contact.channel.name,
-                # )
-
                 Contact.objects.create(
                     contact_flow_uuid=contact.uuid,
                     name=contact.name,
                     last_seen_on=pendulum.parse(contact.last_seen_on),
                 )
-                # Message.objects.get_or_create(
-                #     contact=new_contact,
-                #     text=contact.msg.text,
-                #     sent_on=datetime.fromtimestamp(contact.msg.sent_on.seconds),
-                #     message_flow_uuid=contact.msg.uuid,
-                # )
+
+                task = current_app.send_task(  # pragma: no cover
+                    name="get_messages",
+                    args=[contact, str(manager.before), str(manager.after), project],
+                )
+                task.wait()
 
         manager.finished_at = timezone.now()
         manager.status = True
@@ -78,37 +102,45 @@ def retry_billing_tasks():
 
 @app.task()
 def count_contacts():
-    last_sync = SyncManagerTask.objects.filter(task_type="sync_contacts").order_by("finished_at").last()
+    last_sync = SyncManagerTask.objects.filter(task_type="sync_contacts").order_by("finished_at").first()
     manager = SyncManagerTask.objects.create(
         task_type="count_contacts",
         started_at=timezone.now(),
         before=timezone.now(),
-        after=last_sync.before if last_sync.exists() else timezone.now() - timedelta(hours=5)
+        after=last_sync.before if isinstance(last_sync, SyncManagerTask) else timezone.now() - timedelta(hours=5)
     )
+
     status = False
     days = {}
+
     for contact in Contact.objects.filter(created_at__lte=last_sync.before, created_at__gte=last_sync.after):
         contact_count = ContactCount.objects.filter(
             created_at__day=contact.created_at.day,
             created_at__month=contact.created_at.month,
-            created_at__year=contact.created_at.year
+            created_at__year=contact.created_at.year,
+            channel=contact.channel
         )
-        cur_date = contact.created_at.day + "-" + contact.created_at.month + "-" + contact.created_at.year
+
+        cur_date = f"{contact.created_at.day}-{contact.created_at.month}-{contact.created_at.year}-{contact.channel.uuid}"
         days[cur_date] = 1 if not contact_count.exists() else days[cur_date] + 1
+
     for day, count in days.items():
         cur_day = day.split('-')
         contact_count = ContactCount.objects.filter(
             created_at__day=cur_day[0],
             created_at__month=cur_day[1],
-            created_at__year=cur_day[2]
+            created_at__year=cur_day[2],
+            channel__uuid=cur_day[3]
         )
         if contact_count.exists():
             contact_count = contact_count.first()
             contact_count.increase_contact_count(count)
             status = True
         else:
+            channel = Channel.objects.get(uuid=cur_day[3])
             ContactCount.objects.create(
-                count=count
+                count=count,
+                channel=channel
             )
             status = True
 
