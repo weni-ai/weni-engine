@@ -38,10 +38,7 @@ elasticsearch-dsl = "~=7.4.0"
 pendulum = "^2.1.2"
 pylint = "^2.13.9"
 weni-protobuffers = "1.2.14a1"
-<<<<<<< HEAD
 freezegun = "^1.2.1"
-=======
->>>>>>> 68543f07950fcbd0ccb267d3ff8e21b3258a47c1
 
 [tool.poetry.dev-dependencies]
 flake8 = "~=3.9.2"
