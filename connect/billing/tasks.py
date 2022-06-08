@@ -43,7 +43,7 @@ def sync_contacts():
     last_sync = (
         SyncManagerTask.objects.filter(task_type="sync_contacts")
         .order_by("finished_at")
-        .first()
+        .last()
     )
     manager = SyncManagerTask.objects.create(
         task_type="sync_contacts",
@@ -78,10 +78,11 @@ def sync_contacts():
         manager.status = True
         manager.save(update_fields=["finished_at", "status"])
         return True
-    except Exception:
+    except Exception as error:
         manager.finished_at = timezone.now()
+        manager.fail_message = str(error)
         manager.status = False
-        manager.save(update_fields=["finished_at", "status"])
+        manager.save(update_fields=["finished_at", "status", "fail_message"])
         return False
 
 
@@ -94,15 +95,21 @@ def retry_billing_tasks():
         task.retried = True
         task.save()
         if task.task_type == 'count_contacts':
-            status = count_contacts().delay()
+            task = current_app.send_task(  # pragma: no cover
+                name="count_contacts",
+            )
+            task.wait()
         elif task.task_type == 'sync_contacts':
-            status = sync_contacts().delay()
+            task = current_app.send_task(  # pragma: no cover
+                name="sync_contacts",
+            )
+            task.wait()
         return status
 
 
 @app.task()
 def count_contacts():
-    last_sync = SyncManagerTask.objects.filter(task_type="sync_contacts").order_by("finished_at").first()
+    last_sync = SyncManagerTask.objects.filter(task_type="sync_contacts").order_by("finished_at").last()
     manager = SyncManagerTask.objects.create(
         task_type="count_contacts",
         started_at=timezone.now(),
