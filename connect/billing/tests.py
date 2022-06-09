@@ -1,7 +1,9 @@
 import uuid
+import pendulum
 import stripe
+import pytz
 
-from datetime import timedelta
+from datetime import timedelta, datetime
 from django.utils import timezone
 
 from unittest import skipIf
@@ -15,6 +17,9 @@ from connect.billing import get_gateway
 
 from connect.billing.models import Contact, Channel, Message, SyncManagerTask
 from connect.common.models import Organization, Project, BillingPlan
+
+from freezegun import freeze_time
+from connect.billing.tasks import sync_contacts
 
 
 @skipIf(not settings.BILLING_SETTINGS.get("stripe", None), "gateway not configured")
@@ -87,6 +92,68 @@ class SyncManagerTest(TestCase):
         self.assertEquals(self.manager.status, False)
 
 
+@skipIf(True, "Need elastic search and grpc to run this test")
+class SyncContactsTestCase(TestCase):
+    def setUp(self):
+        self.first_sync = SyncManagerTask.objects.create(
+            task_type="sync_contacts",
+            started_at=pendulum.datetime(2022, 4, 9, 8, 0, 0),
+            before=pendulum.datetime(2022, 4, 8, 9, 0, 0),
+            after=pendulum.datetime(2022, 4, 8, 4, 0, 0),
+            status=True,
+            finished_at=pendulum.datetime(2022, 4, 8, 9, 0, 0)
+        )
+
+        self.first_count_sync = SyncManagerTask.objects.create(
+            task_type="count_contacts",
+            started_at=pendulum.datetime(2022, 4, 9, 8, 0, 0),
+            before=pendulum.datetime(2022, 4, 8, 9, 0, 0),
+            after=pendulum.datetime(2022, 4, 8, 4, 0, 0),
+            status=True,
+            finished_at=pendulum.datetime(2022, 4, 8, 9, 0, 0)
+        )
+
+        self.organization = Organization.objects.create(
+            name="test organization",
+            description="test organization",
+            inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan="free",
+        )
+
+        self.project = self.organization.project.create(
+            name="project test",
+            timezone="America/Sao_Paulo",
+            flow_organization=uuid.uuid4(),
+            flow_id=11
+        )
+
+    @freeze_time("2022-04-08 14")
+    def test_sync_contacts(self, task):
+        task.return_value.result = {
+            "uuid": "4b801fbe-5625-41c6-bd99-c872e7aaf99d",
+            "text": "Oi",
+            "created_on": "2022-03-31 18:06:26.746932+00:00",
+            "direction": "I",
+            "channel_id": 2,
+            "channel_type": "WA",
+        }
+        sync_contacts()
+        last_sync = (
+            SyncManagerTask.objects.filter(task_type="sync_contacts")
+            .order_by("finished_at")
+            .first()
+        )
+
+        contacts = Contact.objects.all()
+
+        self.assertEquals(contacts.count(), 1)
+        contact = contacts.first()
+
+        self.assertTrue(last_sync.before > contact.last_seen_on)
+        self.assertTrue(contact.last_seen_on > last_sync.after)
+
+
 class ContactTestCase(TestCase):
 
     def setUp(self):
@@ -107,23 +174,25 @@ class ContactTestCase(TestCase):
             organization=self.organization
         )
 
-        self.channel = Channel.objects.create(
-            name='channel test',
-            channel_type='WA',
-            channel_flow_uuid=uuid4.uuid4(),
-            project=self.project
-        )
+        # self.channel = Channel.objects.create(
+        #     name='channel test',
+        #     channel_type='WA',
+        #     channel_flow_uuid=uuid4.uuid4(),
+        #     project=self.project
+        # )
 
         self.contact = Contact.objects.create(
             contact_flow_uuid=uuid4.uuid4(),
             name='contact test 1',
-            channel=self.channel
+            last_seen_on=datetime(2022, 4, 8, 10, 20, 0, 0, pytz.UTC)
         )
 
     def test_create_contact(self):
         self.assertEquals(self.contact.name, "contact test 1")
+        self.assertEquals(self.contact.last_seen_on, datetime(2022, 4, 8, 10, 20, 0, 0, pytz.UTC))
 
 
+@skipIf(True, "message not saved yet.")
 class MessageTestCase(TestCase):
 
     def setUp(self):
