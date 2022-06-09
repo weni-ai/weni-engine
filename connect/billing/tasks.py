@@ -129,11 +129,11 @@ def count_contacts():
             channel=contact.channel
         )
 
-        cur_date = f"{contact.created_at.day}-{contact.created_at.month}-{contact.created_at.year}-{contact.channel.uuid}"
+        cur_date = f"{contact.created_at.day}#{contact.created_at.month}#{contact.created_at.year}#{contact.channel.uuid}"
         days[cur_date] = 1 if not contact_count.exists() else days[cur_date] + 1
 
     for day, count in days.items():
-        cur_day = day.split('-')
+        cur_day = day.split('#')
         contact_count = ContactCount.objects.filter(
             created_at__day=cur_day[0],
             created_at__month=cur_day[1],
