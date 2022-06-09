@@ -56,6 +56,16 @@ class CreateChannelRequestSerializer(ProtoSerializer):
         proto_class = project_pb2.ChannelCreateResponse
 
 
+class CreateWACChannelRequestSerializer(ProtoSerializer):
+    user = serializers.CharField(required=True)
+    project_uuid = serializers.CharField(required=True)
+    config = serializers.CharField(required=True)
+    phone_number_id = serializers.CharField(required=True)
+
+    class Meta:
+        proto_class = project_pb2.ChannelCreateResponse
+
+
 class ReleaseChannelRequestSerializer(ProtoSerializer):
     channel_uuid = serializers.CharField(required=True)
     user = serializers.CharField(required=True)
