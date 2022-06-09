@@ -1272,6 +1272,7 @@ lock-version = "1.1"
 python-versions = "~=3.6.2"
 content-hash = "88c49d12b00db448fda4cd1e84ce0dc8f777335e1192fe7c6a3f40f5260f7dcb"
 
+
 [metadata.files]
 amqp = [
     {file = "amqp-5.1.1-py3-none-any.whl", hash = "sha256:6f0956d2c23d8fa6e7691934d8c3930eadb44972cbbd1a7ae3a520f735d43359"},

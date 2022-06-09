@@ -232,6 +232,18 @@ class FlowType(GRPCType):
         )
         return response
 
+    def create_wac_channel(self, user: str, flow_organization: str, config: str, phone_number_id: str):
+        stub = channel_pb2_grpc.ChannelControllerStub(self.channel)
+        response = stub.CreateWAC(
+            channel_pb2.ChannelWACCreateRequest(
+                user=user,
+                org=flow_organization,
+                config=config,
+                phone_number_id=phone_number_id,
+            )
+        )
+        return response
+
     def release_channel(self, channel_uuid: str, user: str):
         stub = channel_pb2_grpc.ChannelControllerStub(self.channel)
         response = stub.Destroy(

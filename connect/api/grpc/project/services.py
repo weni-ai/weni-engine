@@ -10,6 +10,7 @@ from connect.api.grpc.project.serializers import (
     RetrieveClassifierRequestSerializer,
     CreateChannelRequestSerializer,
     ReleaseChannelRequestSerializer,
+    CreateWACChannelRequestSerializer,
 )
 from connect.common.models import Project
 from weni.protobuf.connect.project_pb2 import ClassifierResponse, ChannelListResponse, ChannelCreateResponse
@@ -117,6 +118,36 @@ class ProjectService(
                     project_uuid=str(project.flow_organization),
                     data=serializer.validated_data.get("data"),
                     channeltype_code=serializer.validated_data.get("channeltype_code"),
+                )
+
+            except grpc.RpcError as error:
+                if error.code() is grpc.StatusCode.INVALID_ARGUMENT:
+                    self.context.abort(grpc.StatusCode.INVALID_ARGUMENT, "Bad Request")
+                raise error
+
+            return ChannelCreateResponse(
+                uuid=response.uuid,
+                name=response.name,
+                config=response.config,
+                address=response.address,
+            )
+
+    def CreateWACChannel(self, request, context):
+        serializer = CreateWACChannelRequestSerializer(message=request)
+
+        if serializer.is_valid(raise_exception=True):
+            project_uuid = serializer.validated_data.get("project_uuid")
+
+            project = Project.objects.get(uuid=project_uuid)
+
+            grpc_instance = utils.get_grpc_types().get("flow")
+
+            try:
+                response = grpc_instance.create_wac_channel(
+                    user=serializer.validated_data.get("user"),
+                    flow_organization=str(project.flow_organization),
+                    config=serializer.validated_data.get("config"),
+                    phone_number_id=serializer.validated_data.get("phone_number_id"),
                 )
 
             except grpc.RpcError as error:
