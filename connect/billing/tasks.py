@@ -28,7 +28,7 @@ def get_messages(contact_uuid: str, before: str, after: str, project_uuid: str):
         text=message.text,
         created_on=message.created_on,
         direction=message.direction,
-        message_flow_uuid=message.message_flow_uuid
+        message_flow_uuid=message.uuid
     )
 
     channel = Channel.create(
