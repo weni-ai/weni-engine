@@ -41,6 +41,7 @@ from connect.common.models import (
 )
 from connect import billing
 from connect.billing.gateways.stripe_gateway import StripeGateway
+from connect.utils import count_contacts
 
 
 class OrganizationViewSet(
@@ -173,13 +174,12 @@ class OrganizationViewSet(
         result = {"projects": []}
 
         for project in organization.project.all():
-            
             result["projects"].append(
                 {
                     "uuid": project.uuid,
                     "name": project.name,
                     "flow_organization": project.flow_organization,
-                    "active_contacts": project.count_contacts(before=before, after=after),
+                    "active_contacts": count_contacts(before=before, after=after),
                 }
             )
 

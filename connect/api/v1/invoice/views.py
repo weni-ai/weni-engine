@@ -11,9 +11,10 @@ from connect.api.v1.invoice.serializers import InvoiceSerializer
 from connect.api.v1.metadata import Metadata
 from connect.common.models import Invoice, Organization, BillingPlan, GenericBillingData
 from connect.billing.gateways.stripe_gateway import StripeGateway
+from connect.utils import count_contacts
 from django.http import JsonResponse
 from datetime import timedelta
-from connect.celery import app as celery_app
+
 from connect.api.v1.organization.permissions import (
     OrganizationHasPermissionBilling,
 )
@@ -79,7 +80,8 @@ class InvoiceViewSet(
         }
         contact_count = 0
         for project in organization.project.all():
-            contact_count += project.count_contacts(before=before, after=after)
+            current_contact_count = count_contacts(project=project, before=before, after=after)
+            contact_count += current_contact_count
             payment_data["projects"].append(
                 {
                     "project_name": project.name,

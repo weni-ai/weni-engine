@@ -16,7 +16,6 @@ from timezone_field import TimeZoneField
 from connect import billing
 from connect.authentication.models import User
 from connect.billing.gateways.stripe_gateway import StripeGateway
-from connect.billing.models import ContactCount
 from connect.common.gateways.rocket_gateway import Rocket
 
 from enum import Enum
@@ -595,16 +594,6 @@ class Project(models.Model):
             ),
         )
         return mail
-
-    @property
-    def count_contacts(self, before: str, after: str):
-        contacts_day_count = ContactCount.objects.filter(
-            channel__project=self,
-            created_at__lte=before,
-            created_at__gte=after
-        )
-
-        return sum([day_count.count for day_count in contacts_day_count])
 
 
 class OpenedProject(models.Model):

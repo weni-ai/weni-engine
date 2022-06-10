@@ -1,15 +1,17 @@
 import stripe
 import pendulum
 from datetime import timedelta
-from django.utils import timezone
 import requests
+import grpc
+from grpc._channel import _InactiveRpcError
+
+from django.utils import timezone
 from django.conf import settings
 from django.db import transaction
-from grpc._channel import _InactiveRpcError
+
 from connect import utils, billing
 from connect.authentication.models import User
 from connect.celery import app
-import grpc
 from connect.common.models import (
     Service,
     Organization,
@@ -19,7 +21,7 @@ from connect.common.models import (
     Invoice,
     GenericBillingData,
 )
-from django.db.models import Q
+from connect.billing.models import ContactCount
 
 
 @app.task()
@@ -287,7 +289,7 @@ def sync_active_contacts():
         created_at = project.organization.created_at
         before = timezone.now() if next_due_date is None else next_due_date
         after = created_at if last_invoice_date is None else last_invoice_date
-        contact_count = project.count_contacts(after=after, before=before)
+        contact_count = utils.count_contacts(project=project, after=after, before=before)
         project.contact_count = int(contact_count)
         project.save(update_fields=["contact_count"])
     return True
@@ -299,7 +301,7 @@ def sync_total_contact_count():
         contacts_day_count = ContactCount.objects.filter(
             channel__project=project
         )
-        project.total_contact_count = return sum([day_count.count for day_count in contacts_day_count])
+        project.total_contact_count = sum([day_count.count for day_count in contacts_day_count])
         project.save(update_fields=["total_contact_count"])
     return True
 
@@ -315,7 +317,7 @@ def sync_project_information():
             project.name = flow_result.get("name")
             project.timezone = str(flow_result.get("timezone"))
             project.date_format = str(flow_result.get("date_format"))
-            project.flow_id = flow_result.get("id")     
+            project.flow_id = flow_result.get("id")
             project.save(update_fields=["name", "timezone", "date_format", "flow_id"])
 
 
@@ -401,8 +403,8 @@ def generate_project_invoice():
             )
         )
         for project in org.project.all():
-            contact_count = project.count_contacts(after=after, before=before)
-            
+            contact_count = utils.count_contacts(project=project, after=after, before=before)
+
             invoice.organization_billing_invoice_project.create(
                 project=project,
                 contact_count=contact_count,
