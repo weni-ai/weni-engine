@@ -24,7 +24,7 @@ def sync_contacts():
     try:
         grpc_instance = utils.get_grpc_types().get("flow")
 
-        for project in Project.objects.all():
+        for project in Project.objects.exclude(flow_id=None):
             active_contacts = grpc_instance.get_active_contacts(
                 str(project.flow_organization), manager.before, manager.after
             )

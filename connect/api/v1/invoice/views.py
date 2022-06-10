@@ -79,17 +79,7 @@ class InvoiceViewSet(
         }
         contact_count = 0
         for project in organization.project.all():
-            task = celery_app.send_task(
-                "get_billing_total_statistics",
-                args=[
-                    str(project.flow_organization),
-                    before,
-                    after,
-                ],
-            )
-            task.wait()
-            current_contact_count = task.result.get("active_contacts")
-            contact_count += current_contact_count
+            contact_count += project.count_contacts(before=before, after=after)
             payment_data["projects"].append(
                 {
                     "project_name": project.name,
