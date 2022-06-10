@@ -57,7 +57,6 @@ def sync_contacts():
 
     try:
         elastic_instance = ElasticFlow()
-
         for project in Project.objects.all():
             active_contacts = elastic_instance.get_contact_detailed(
                 str(project.flow_id), str(manager.before), str(manager.after)
