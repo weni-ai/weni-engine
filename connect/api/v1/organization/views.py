@@ -41,6 +41,7 @@ from connect.common.models import (
 )
 from connect import billing
 from connect.billing.gateways.stripe_gateway import StripeGateway
+from connect.utils import count_contacts
 
 
 class OrganizationViewSet(
@@ -173,24 +174,12 @@ class OrganizationViewSet(
         result = {"projects": []}
 
         for project in organization.project.all():
-            task = celery_app.send_task(
-                "get_billing_total_statistics",
-                args=[
-                    str(project.flow_organization),
-                    before,
-                    after,
-                ],
-            )
-
-            task.wait()
-            contact_count = task.result.get("active_contacts")
-
             result["projects"].append(
                 {
                     "uuid": project.uuid,
                     "name": project.name,
                     "flow_organization": project.flow_organization,
-                    "active_contacts": contact_count,
+                    "active_contacts": count_contacts(before=before, after=after),
                 }
             )
 
