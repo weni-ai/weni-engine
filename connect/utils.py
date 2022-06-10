@@ -1,5 +1,7 @@
 import requests
 import pendulum
+from connect.common.models import Project
+from connect.billing.models import ContactCount
 
 
 def upload_photo_rocket(server_rocket: str, jwt_token: str, avatar_url: str) -> bool:
@@ -34,3 +36,12 @@ def es_convert_datetime(before: str, after: str):
     before = pendulum.parse(before)
     after = pendulum.parse(after)
     return before, after
+
+
+def count_contacts(project: Project, before: str, after: str):
+    contacts_day_count = ContactCount.objects.filter(
+        channel__project=project,
+        created_at__lte=before,
+        created_at__gte=after
+    )
+    return sum([day_count.count for day_count in contacts_day_count])
