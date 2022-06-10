@@ -18,6 +18,7 @@ class SyncManagerTask(models.Model):
     retried = models.BooleanField(
         default=False, help_text=_("Whether this task retry or not.")
     )
+    fail_message = models.TextField(null=True)
     task_type = models.CharField(_("task type"), max_length=150)
     started_at = models.DateTimeField(_("started at"))
     finished_at = models.DateTimeField(_("finished at"), null=True)
@@ -33,29 +34,27 @@ class Channel(models.Model):
     uuid = models.UUIDField(
         _("UUID"), primary_key=True, default=uuid4.uuid4, editable=False
     )
-    name = models.CharField(_("name"), max_length=150)
     channel_type = models.CharField(
         _("channel_type"), max_length=150, choices=CHANNEL_CHOICES
     )
-    channel_flow_uuid = models.UUIDField(_("flow identification UUID"), unique=True)
-    project = models.ForeignKey(Project, models.CASCADE, related_name="project")
+    channel_flow_id = models.PositiveIntegerField(_("channel id"), unique=True)
+    project = models.ForeignKey(Project, models.CASCADE, related_name="channel")
 
     @staticmethod
     def create(*args, **kwargs):
-        if not Channel.channel_exists(kwargs["channel_flow_uuid"]):
+        if not Channel.channel_exists(kwargs["channel_flow_id"]):
             channel = Channel.objects.create(
                 project=kwargs["project"],
-                channel_flow_uuid=kwargs["channel_flow_uuid"],
+                channel_flow_id=kwargs["channel_flow_id"],
                 channel_type=kwargs["channel_type"],
-                name=kwargs["name"],
             )
         else:
-            channel = Channel.objects.get(channel_flow_uuid=kwargs["channel_flow_uuid"])
+            channel = Channel.objects.get(channel_flow_id=kwargs["channel_flow_id"])
         return channel
 
     @staticmethod
-    def channel_exists(channel_flow_uuid):
-        return Channel.objects.filter(channel_flow_uuid=channel_flow_uuid).exists()
+    def channel_exists(channel_flow_id):
+        return Channel.objects.filter(channel_flow_id=channel_flow_id).exists()
 
 
 class ContactManager(models.Manager):
@@ -80,11 +79,16 @@ class Contact(models.Model):
     )
     contact_flow_uuid = models.UUIDField(_("flow identification UUID"))
     name = models.CharField(_("contact name"), max_length=150)
-    channel = models.ForeignKey(Channel, models.CASCADE, related_name="channel")
+    last_seen_on = models.DateTimeField(blank=True, null=True)
+    channel = models.ForeignKey(Channel, models.CASCADE, related_name="channel", null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(blank=True, null=True)
 
     objects = ContactManager()
+
+    def update_channel(self, channel):
+        self.channel = channel
+        self.save(update_fields=["channel"])
 
 
 class Message(models.Model):
@@ -93,7 +97,7 @@ class Message(models.Model):
     )
     contact = models.ForeignKey(Contact, models.CASCADE, related_name="message")
     text = models.TextField()
-    sent_on = models.DateTimeField()
+    created_on = models.DateTimeField()
     direction = models.CharField(_("contact name"), max_length=150)
     message_flow_uuid = models.UUIDField(_("flow identification UUID"), unique=True)
 
