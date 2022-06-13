@@ -1,4 +1,3 @@
-import stripe
 import pendulum
 from datetime import timedelta
 import requests
@@ -321,7 +320,7 @@ def sync_project_information():
             project.save(update_fields=["name", "timezone", "date_format", "flow_id"])
 
 
-@app.task()
+@app.task(name="sync_project_statistics")
 def sync_project_statistics():
     flow_instance = utils.get_grpc_types().get("flow")
     for project in Project.objects.all():
@@ -505,13 +504,6 @@ def get_billing_total_statistics(project_uuid: str, before: str, after: str):
     )
 
     return contact_count
-
-
-@app.task(name="refund_validation_charge")
-def refund_validation_charge(charge_id):  # pragma: no cover
-    stripe.api_key = settings.BILLING_SETTINGS.get("stripe", {}).get("API_KEY")
-    stripe.Refund.create(charge=charge_id)
-    return True
 
 
 @app.task(

@@ -1,3 +1,4 @@
+import stripe
 import pendulum
 from connect.celery import app
 from connect.common.models import Project
@@ -8,6 +9,7 @@ from django.utils import timezone
 from connect import utils
 from celery import current_app
 from grpc._channel import _InactiveRpcError
+from django.conf import settings
 
 
 @app.task(
@@ -154,3 +156,10 @@ def count_contacts():
         manager.status = status
         manager.finished_at = timezone.now()
         manager.save()
+
+
+@app.task(name="refund_validation_charge")
+def refund_validation_charge(charge_id):  # pragma: no cover
+    stripe.api_key = settings.BILLING_SETTINGS.get("stripe", {}).get("API_KEY")
+    stripe.Refund.create(charge=charge_id)
+    return True

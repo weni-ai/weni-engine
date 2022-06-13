@@ -1,6 +1,6 @@
 import json
 from datetime import datetime
-from connect.common import tasks
+from connect.billing import tasks as billing_tasks
 from django.conf import settings
 from django.http import HttpResponse
 from django.views import View
@@ -60,15 +60,11 @@ class StripeHandler(View):  # pragma: no cover
 
             if charge.description == "Card Verification Charge":
                 cvc_check = charge.payment_method_details.card.checks.cvc_check
-                tasks.refund_validation_charge.delay(charge.id)
+                billing_tasks.refund_validation_charge.delay(charge.id)
                 if cvc_check == "pass":
-                    org.organization_billing.card_is_valid = True
-                    org.organization_billing.save(update_fields=["card_is_valid"])
-                    return HttpResponse("CVC check passed, Card is valid")
+                    return HttpResponse("CVC check passed")
                 else:
-                    org.organization_billing.is_active = False
-                    org.organization_billing.save(update_fields=["is_active"])
-                    return HttpResponse("CVC didint check pass, Card is not valid")
+                    return HttpResponse("CVC didint check pass")
 
             # look up the topup that matches this charge
             invoice = Invoice.objects.filter(pk=invoice_id).first()
