@@ -168,7 +168,7 @@ class ProjectViewSet(
             self.perform_project_authorization_destroy(request_permission.first(), True)
             return Response(status=status.HTTP_204_NO_CONTENT)
 
-        elif project_permission.exists() and oganization_auth.exists():
+        elif project_permission.exists() and organization_auth.exists():
             organization_auth = organization_auth.first()
             if not organization_auth.can_contribute:
                 self.perform_project_authorization_destroy(project_permission.first(), False)
