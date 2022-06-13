@@ -154,18 +154,27 @@ class ProjectViewSet(
         project = get_object_or_404(Project, uuid=project_uuid)
 
         project_permission = project.project_authorizations.filter(
-            user__email=user_email)
+            user__email=user_email
+        )
         request_permission = project.requestpermissionproject_set.filter(
-            email=user_email)
+            email=user_email
+        )
+
+        organization_auth = project.organization.authorizations.filter(
+            user__email=user_email
+        )
 
         if request_permission.exists():
             self.perform_project_authorization_destroy(request_permission.first(), True)
             return Response(status=status.HTTP_204_NO_CONTENT)
 
-        elif project_permission.exists():
-            self.perform_project_authorization_destroy(project_permission.first(), False)
-            return Response(status=status.HTTP_204_NO_CONTENT)
-
+        elif project_permission.exists() and oganization_auth.exists():
+            organization_auth = organization_auth.first()
+            if not organization_auth.can_contribute:
+                self.perform_project_authorization_destroy(project_permission.first(), False)
+                return Response(status=status.HTTP_204_NO_CONTENT)
+            else:
+                return Response(status=status.HTTP_401_UNAUTHORIZATED)
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     @action(
