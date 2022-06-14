@@ -170,7 +170,7 @@ class ProjectViewSet(
 
         elif project_permission.exists() and organization_auth.exists():
             organization_auth = organization_auth.first()
-            if not organization_auth.can_contribute:
+            if not organization_auth.is_admin:
                 self.perform_project_authorization_destroy(project_permission.first(), False)
                 return Response(status=status.HTTP_204_NO_CONTENT)
             else:
