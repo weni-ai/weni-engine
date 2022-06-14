@@ -4,7 +4,7 @@ from connect.celery import app
 from connect.common.models import Project
 from connect.billing.models import Contact, Message, SyncManagerTask, ContactCount, Channel
 from connect.elastic.flow import ElasticFlow
-from datetime import timedelta
+from datetime import datetime, timedelta
 from django.utils import timezone
 from connect import utils
 from celery import current_app
@@ -41,14 +41,14 @@ def get_messages(contact_uuid: str, before: str, after: str, project_uuid: str):
     contact.update_channel(channel)
 
 
-@app.task()
-def sync_contacts(sync_manager = None):
-    if sync_manager:
+@app.task(name="sync_contacts")
+def sync_contacts(sync_before: str = None, sync_after: str = None):
+    if sync_before and sync_after:
         manager = SyncManagerTask.objects.create(
             task_type="sync_contacts",
             started_at=timezone.now(),
-            before=sync_manager.before,
-            after=sync_manager.after
+            before=sync_before,
+            after=sync_after
         )
     else:
 
@@ -97,7 +97,7 @@ def sync_contacts(sync_manager = None):
         return False
 
 
-@app.task()
+@app.task(name="retry_billing_tasks")
 def retry_billing_tasks():
     task_failed = SyncManagerTask.objects.filter(status=False, retried=False)
 
@@ -108,30 +108,30 @@ def retry_billing_tasks():
         if task.task_type == 'count_contacts':
             task = current_app.send_task(  # pragma: no cover
                 name="count_contacts",
-                args=[task]
+                args=[task.before, task.after]
             )
             task.wait()
         elif task.task_type == 'sync_contacts':
             task = current_app.send_task(  # pragma: no cover
                 name="sync_contacts",
-                args=[task]
+                args=[task.before, task.after]
             )
             task.wait()
         return status
 
 
-@app.task()
-def count_contacts(sync_manager=None):
-    if sync_manager:
+@app.task(name="count_contacts")
+def count_contacts(sync_before: datetime = None, sync_after: datetime = None):
+    if sync_before and sync_after:
         manager = SyncManagerTask.objects.create(
             task_type="count_contacts",
             started_at=timezone.now(),
-            before=sync_manager.before,
-            after=sync_manager.after
+            before=sync_before,
+            after=sync_after
         )
         last_sync = SyncManagerTask.objects.filter(
-            started_at__gte=sync_manager.before - timedelta(hours=2), 
-            started_at__lte=sync_manager.before,
+            started_at__gte=sync_before - timedelta(hours=2), 
+            started_at__lte=sync_before,
             task_type="sync_contacts"
         ).last()
     else:
