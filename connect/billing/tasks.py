@@ -1,3 +1,4 @@
+import stripe
 import pendulum
 from connect.celery import app
 from connect.common.models import Project
@@ -8,6 +9,7 @@ from django.utils import timezone
 from connect import utils
 from celery import current_app
 from grpc._channel import _InactiveRpcError
+from django.conf import settings
 
 
 @app.task(
@@ -39,21 +41,32 @@ def get_messages(contact_uuid: str, before: str, after: str, project_uuid: str):
     contact.update_channel(channel)
 
 
-@app.task()
-def sync_contacts():
-    last_sync = (
-        SyncManagerTask.objects.filter(task_type="sync_contacts")
-        .order_by("finished_at")
-        .last()
-    )
-    manager = SyncManagerTask.objects.create(
-        task_type="sync_contacts",
-        started_at=timezone.now(),
-        before=timezone.now(),
-        after=last_sync.before
-        if isinstance(last_sync, SyncManagerTask)
-        else timezone.now() - timedelta(hours=5),
-    )
+@app.task(name="sync_contacts")
+def sync_contacts(sync_before: str = None, sync_after: str = None):
+    if sync_before and sync_after:
+        sync_before = pendulum.parse(sync_before)
+        sync_after = pendulum.parse(sync_after)
+        manager = SyncManagerTask.objects.create(
+            task_type="sync_contacts",
+            started_at=timezone.now(),
+            before=sync_before,
+            after=sync_after
+        )
+    else:
+
+        last_sync = (
+            SyncManagerTask.objects.filter(task_type="sync_contacts")
+            .order_by("finished_at")
+            .last()
+        )
+        manager = SyncManagerTask.objects.create(
+            task_type="sync_contacts",
+            started_at=timezone.now(),
+            before=timezone.now(),
+            after=last_sync.before
+            if isinstance(last_sync, SyncManagerTask)
+            else timezone.now() - timedelta(hours=5),
+        )
 
     try:
         elastic_instance = ElasticFlow()
@@ -86,36 +99,56 @@ def sync_contacts():
         return False
 
 
-@app.task()
+@app.task(name="retry_billing_tasks")
 def retry_billing_tasks():
     task_failed = SyncManagerTask.objects.filter(status=False, retried=False)
 
     for task in task_failed:
-        status = False
         task.retried = True
         task.save()
         if task.task_type == 'count_contacts':
             task = current_app.send_task(  # pragma: no cover
                 name="count_contacts",
+                args=[task.before, task.after, task.started_at]
             )
             task.wait()
         elif task.task_type == 'sync_contacts':
             task = current_app.send_task(  # pragma: no cover
                 name="sync_contacts",
+                args=[task.before, task.after]
             )
             task.wait()
-        return status
+
+    return True
 
 
-@app.task()
-def count_contacts():
-    last_sync = SyncManagerTask.objects.filter(task_type="sync_contacts").order_by("finished_at").last()
-    manager = SyncManagerTask.objects.create(
-        task_type="count_contacts",
-        started_at=timezone.now(),
-        before=timezone.now(),
-        after=last_sync.before if isinstance(last_sync, SyncManagerTask) else timezone.now() - timedelta(hours=5)
-    )
+@app.task(name="count_contacts")
+def count_contacts(sync_before: str = None, sync_after: str = None, started_at: str = None):
+    if sync_before and sync_after and started_at:
+        count_before = pendulum.parse(sync_before)
+        count_after = pendulum.parse(sync_after)
+        count_started_at = pendulum.parse(started_at)
+
+        manager = SyncManagerTask.objects.create(
+            task_type="count_contacts",
+            started_at=timezone.now(),
+            before=count_before,
+            after=count_after
+        )
+
+        last_sync = SyncManagerTask.objects.filter(
+            started_at__gte=count_started_at - timedelta(hours=2),
+            started_at__lte=count_started_at,
+            task_type="sync_contacts"
+        ).last()
+    else:
+        last_sync = SyncManagerTask.objects.filter(task_type="sync_contacts").order_by("finished_at").last()
+        manager = SyncManagerTask.objects.create(
+            task_type="count_contacts",
+            started_at=timezone.now(),
+            before=timezone.now(),
+            after=last_sync.before if isinstance(last_sync, SyncManagerTask) else timezone.now() - timedelta(hours=6)
+        )
 
     status = False
     days = {}
@@ -154,3 +187,10 @@ def count_contacts():
         manager.status = status
         manager.finished_at = timezone.now()
         manager.save()
+
+
+@app.task(name="refund_validation_charge")
+def refund_validation_charge(charge_id):  # pragma: no cover
+    stripe.api_key = settings.BILLING_SETTINGS.get("stripe", {}).get("API_KEY")
+    stripe.Refund.create(charge=charge_id)
+    return True

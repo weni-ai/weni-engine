@@ -119,7 +119,26 @@ class StripeGateway(Gateway):
             }
         return {"response": response, "status": "SUCCESS"}
 
-    def verification_charge(self, customer):  # pragma: no cover
+    def verify_payment_method(self, customer):
+        payment_method = self.stripe.Customer.list_payment_methods(
+            customer,
+            type="card"
+        )
+        data = payment_method["data"][0]
+        response = {
+            "cvc_check": '',
+            "address_postal_code_check": ''
+        }
+        if data["card"]["checks"].get("cvc_check") == "pass":
+            response["cvc_check"] = data["card"]["checks"].get("cvc_check")
+            response["address_postal_code_check"] = data["card"]["checks"].get("address_postal_code_check")
+            return response
+
+        response["cvc_check"] = data["card"]["checks"].get("cvc_check")
+        response["address_postal_code_check"] = data["card"]["checks"].get("address_postal_code_check")
+        return response
+
+    def card_verification_charge(self, customer):  # pragma: no cover
         try:
             payment = stripe.PaymentMethod.list(
                 customer=customer,
@@ -134,6 +153,10 @@ class StripeGateway(Gateway):
                 off_session=True,
                 confirm=True,
             )
+            return {
+                "status": "SUCCESS",
+                "response": response["charges"]["data"][0]["paid"]
+            }
         except IndexError:
             return {
                 "status": "FAILURE",
@@ -141,4 +164,3 @@ class StripeGateway(Gateway):
             }
         except self.stripe.error.CardError as error:
             return {"status": "FAILURE", "response": error}
-        return {"status": "SUCCESS", "response": response}

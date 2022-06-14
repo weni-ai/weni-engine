@@ -37,7 +37,6 @@ class BillingPlanSerializer(serializers.ModelSerializer):
             "problem_capture_invoice",
             "currenty_invoice",
             "contract_on",
-            "is_card_valid"
         ]
         ref_name = None
 
