@@ -426,12 +426,12 @@ def capture_invoice():
         payment_status=Invoice.PAYMENT_STATUS_PENDING, capture_payment=True
     ):
         gateway = billing.get_gateway("stripe")
-        result = gateway.purchase(
+        purchase_result = gateway.purchase(
             money=invoice.total_invoice_amount,
             identification=invoice.organization.organization_billing.stripe_customer,
             options={"id": invoice.pk},
         )
-        if result.get("status") == "FAILURE":
+        if purchase_result.get("status") == "FAILURE":
             invoice.capture_payment = False
             invoice.save(update_fields=["capture_payment"])
             # add send email
