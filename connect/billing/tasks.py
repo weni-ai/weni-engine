@@ -108,13 +108,13 @@ def retry_billing_tasks():
         if task.task_type == 'count_contacts':
             task = current_app.send_task(  # pragma: no cover
                 name="count_contacts",
-                args=[task_failed]
+                args=[task]
             )
             task.wait()
         elif task.task_type == 'sync_contacts':
             task = current_app.send_task(  # pragma: no cover
                 name="sync_contacts",
-                args=[task_failed]
+                args=[task]
             )
             task.wait()
         return status
