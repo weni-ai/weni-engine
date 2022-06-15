@@ -58,6 +58,18 @@ app.conf.beat_schedule = {
         "task": "connect.common.tasks.capture_invoice",
         "schedule": schedules.crontab(hour="8,10,13,15,17", minute=0),
         # "schedule": 30,
+    },
+    "sync_contacts": {
+        "task": "connect.billing.tasks.sync_contacts",
+        "schedule": schedules.crontab(hour="*/5")
+    },
+    "count_contacts": {
+        "task": "connect.billing.tasks.count_contacts",
+        "schedule": schedules.crontab(hour="*/6")
+    },
+    "retry_billing_tasks": {
+        "task": "connect.billing.tasks.retry_billing_tasks",
+        "schedule": schedules.crontab(hour="1")
     }
 }
 

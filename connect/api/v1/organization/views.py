@@ -41,6 +41,7 @@ from connect.common.models import (
 )
 from connect import billing
 from connect.billing.gateways.stripe_gateway import StripeGateway
+from connect.utils import count_contacts
 
 
 class OrganizationViewSet(
@@ -173,24 +174,12 @@ class OrganizationViewSet(
         result = {"projects": []}
 
         for project in organization.project.all():
-            task = celery_app.send_task(
-                "get_billing_total_statistics",
-                args=[
-                    str(project.flow_organization),
-                    before,
-                    after,
-                ],
-            )
-
-            task.wait()
-            contact_count = task.result.get("active_contacts")
-
             result["projects"].append(
                 {
                     "uuid": project.uuid,
                     "name": project.name,
                     "flow_organization": project.flow_organization,
-                    "active_contacts": contact_count,
+                    "active_contacts": count_contacts(before=before, after=after),
                 }
             )
 
@@ -480,19 +469,6 @@ class OrganizationViewSet(
 
     @action(
         detail=True,
-        methods=["POST"],
-        url_name="validate-customer-card",
-        url_path="billing/validate-customer-card",
-    )
-    def validate_customer_card(self, request):
-        customer = request.data.get("customer")
-        gateway = billing.get_gateway("stripe")
-        gateway.verification_charge(customer)
-
-        return JsonResponse(data={"message": customer}, status=status.HTTP_200_OK)
-
-    @action(
-        detail=True,
         methods=["PATCH"],
         url_name="enforce-users-2fa",
         url_path="enforce-two-factor-auth/(?P<organization_uuid>[^/.]+)",
@@ -503,6 +479,25 @@ class OrganizationViewSet(
         organization.set_2fa_required(flag)
         data = {"2fa_required": organization.enforce_2fa}
         return JsonResponse(data=data, status=status.HTTP_200_OK)
+
+    @action(
+        detail=True,
+        methods=['POST'],
+        url_path="billing/validate-customer-card"
+
+    )
+    def validate_customer_card(self, request):
+        customer = request.data.get("customer")
+        if customer:
+            gateway = billing.get_gateway("stripe")
+            response = gateway.verify_payment_method(customer)
+            response["charge"] = None
+
+            if response["cvc_check"]:
+                response["charge"] = gateway.card_verification_charge(customer)
+
+            return JsonResponse(data=response, status=status.HTTP_200_OK)
+        return JsonResponse(data={"response": "no customer"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class OrganizationAuthorizationViewSet(
