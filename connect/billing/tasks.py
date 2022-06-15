@@ -25,6 +25,9 @@ def get_messages(contact_uuid: str, before: str, after: str, project_uuid: str):
     project = Project.objects.get(uuid=project_uuid)
     message = flow_instance.get_message(str(project.flow_organization), str(contact.contact_flow_uuid), before, after)
 
+    if len(message.uuid) == 0:
+        return False
+
     Message.objects.create(
         contact=contact,
         text=message.text,
@@ -39,6 +42,7 @@ def get_messages(contact_uuid: str, before: str, after: str, project_uuid: str):
         project=project
     )
     contact.update_channel(channel)
+    return True
 
 
 @app.task(name="sync_contacts")
@@ -70,6 +74,7 @@ def sync_contacts(sync_before: str = None, sync_after: str = None):
 
     try:
         elastic_instance = ElasticFlow()
+        update_fields = ["finished_at", "status"]
         for project in Project.objects.exclude(flow_id=None):
             active_contacts = elastic_instance.get_contact_detailed(
                 str(project.flow_id), str(manager.before), str(manager.after)
@@ -86,11 +91,21 @@ def sync_contacts(sync_before: str = None, sync_after: str = None):
                     args=[str(contact.uuid), str(manager.before), str(manager.after), str(project.uuid)],
                 )
                 task.wait()
+                if not task.result:
+                    last_message = Message.objects.filter(
+                        contact=contact,
+                        created_on__date__month=timezone.now().date().month,
+                        created_on__date__year=timezone.now().date().year
+                    )
+                    if not last_message.exists():
+                        contact.delete()
+                        manager.fail_message = "Contact don't have delivery/received message"
+                        update_fields.append('fail_message')
 
         manager.finished_at = timezone.now()
         manager.status = True
-        manager.save(update_fields=["finished_at", "status"])
-        return True
+        manager.save(update_fields=update_fields)
+        return manager.status
     except Exception as error:
         manager.finished_at = timezone.now()
         manager.fail_message = str(error)
@@ -153,7 +168,7 @@ def count_contacts(sync_before: str = None, sync_after: str = None, started_at: 
     status = False
     days = {}
 
-    for contact in Contact.objects.filter(created_at__lte=last_sync.before, created_at__gte=last_sync.after):
+    for contact in Contact.objects.filter(created_at__lte=last_sync.finished_at, created_at__gte=last_sync.after):
         contact_count = ContactCount.objects.filter(
             created_at__day=contact.created_at.day,
             created_at__month=contact.created_at.month,
