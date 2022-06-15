@@ -162,7 +162,7 @@ def count_contacts(sync_before: str = None, sync_after: str = None, started_at: 
         )
 
         cur_date = f"{contact.created_at.day}#{contact.created_at.month}#{contact.created_at.year}#{contact.channel.uuid}"
-        days[cur_date] = 1 if not contact_count.exists() else days[cur_date] + 1
+        days[cur_date] = 1 if not contact_count.exists() else days.get(cur_date, 0) + 1
 
     for day, count in days.items():
         cur_day = day.split('#')
