@@ -168,7 +168,7 @@ def count_contacts(sync_before: str = None, sync_after: str = None, started_at: 
     status = False
     days = {}
 
-    for contact in Contact.objects.filter(created_at__lte=last_sync.before, created_at__gte=last_sync.after):
+    for contact in Contact.objects.filter(created_at__lte=last_sync.finished_at, created_at__gte=last_sync.after):
         contact_count = ContactCount.objects.filter(
             created_at__day=contact.created_at.day,
             created_at__month=contact.created_at.month,
