@@ -104,7 +104,7 @@ def sync_contacts(sync_before: str = None, sync_after: str = None):
 
         manager.finished_at = timezone.now()
         manager.status = True
-        manager.save(update_fields=[update_fields])
+        manager.save(update_fields=update_fields)
         return manager.status
     except Exception as error:
         manager.finished_at = timezone.now()
