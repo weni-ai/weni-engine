@@ -31,7 +31,7 @@ app.conf.beat_schedule = {
         "schedule": schedules.crontab(minute="*/5")
     },
     "sync-project-statistics": {
-        "task": "connect.common.tasks.sync_project_statistics",
+        "task": "sync_project_statistics",
         "schedule": schedules.crontab(minute="*/6")
     },
     "sync-repositories-statistics": {
@@ -57,18 +57,17 @@ app.conf.beat_schedule = {
     "capture_invoice": {
         "task": "connect.common.tasks.capture_invoice",
         "schedule": schedules.crontab(hour="8,10,13,15,17", minute=0),
-        # "schedule": 30,
     },
     "sync_contacts": {
-        "task": "connect.billing.tasks.sync_contacts",
+        "task": "sync_contacts",
         "schedule": schedules.crontab(hour="*/5")
     },
     "count_contacts": {
-        "task": "connect.billing.tasks.count_contacts",
+        "task": "count_contacts",
         "schedule": schedules.crontab(hour="*/6")
     },
     "retry_billing_tasks": {
-        "task": "connect.billing.tasks.retry_billing_tasks",
+        "task": "retry_billing_tasks",
         "schedule": schedules.crontab(hour="1")
     }
 }
