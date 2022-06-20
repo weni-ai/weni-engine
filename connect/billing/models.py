@@ -78,7 +78,7 @@ class Contact(models.Model):
         _("UUID"), primary_key=True, default=uuid4.uuid4, editable=False
     )
     contact_flow_uuid = models.UUIDField(_("flow identification UUID"))
-    name = models.CharField(_("contact name"), max_length=150)
+    name = models.CharField(_("contact name"), max_length=150, blank=True, null=True)
     last_seen_on = models.DateTimeField(blank=True, null=True)
     channel = models.ForeignKey(Channel, models.CASCADE, related_name="channel", null=True)
     created_at = models.DateTimeField(auto_now_add=True)
