@@ -369,7 +369,7 @@ class OrganizationAuthorization(models.Model):
         (OrganizationRole.ADMIN.value, _("admin")),
         (OrganizationRole.VIEWER.value, _("viewer")),
         (OrganizationRole.FINANCIAL.value, _("financial")),
-        (OrganizationRole.SUPPORT.value, _("SUPPORT")),
+        (OrganizationRole.SUPPORT.value, _("support")),
     ]
 
     uuid = models.UUIDField(

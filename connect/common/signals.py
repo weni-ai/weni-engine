@@ -95,7 +95,7 @@ def org_authorizations(sender, instance, created, **kwargs):
             }
             for project in instance.organization.project.all():
                 project_perm = project.project_authorizations.filter(user=instance.user)
-                project_role = organization_permission_mapper.get(instance.role, None)
+                project_role = organization_permission_mapper.get(instance.role, ProjectRole.NOT_SETTED.value)
                 if not project_perm.exists():
                     project.project_authorizations.create(
                         user=instance.user,
@@ -169,8 +169,6 @@ def request_permission_project(sender, instance, created, **kwargs):
         if user.exists():
             user = user.first()
             org = instance.project.organization
-            auth = instance.project.project_authorizations
-            auth_user = auth.filter(user=user)
             org_auth = org.authorizations.filter(user__email=user.email)
 
             if not org_auth.exists():
@@ -180,6 +178,8 @@ def request_permission_project(sender, instance, created, **kwargs):
             else:
                 org_auth = org_auth.first()
 
+            auth = instance.project.project_authorizations
+            auth_user = auth.filter(user=user)
             if not auth_user.exists():
                 ProjectAuthorization.objects.create(
                     user=user,
