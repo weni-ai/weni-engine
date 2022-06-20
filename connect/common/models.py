@@ -404,7 +404,7 @@ class OrganizationAuthorization(models.Model):
 
         if self.role == OrganizationRole.FINANCIAL.value:
             return OrganizationLevelRole.FINANCIAL.value
-        
+
         if self.role == OrganizationRole.SUPPORT.value:
             return OrganizationLevelRole.SUPPORT.value
 
