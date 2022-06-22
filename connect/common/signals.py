@@ -112,6 +112,9 @@ def org_authorizations(sender, instance, created, **kwargs):
 
 @receiver(post_delete, sender=OrganizationAuthorization)
 def delete_authorizations(instance, **kwargs):
+    for project in instance.organization.project.all():
+        project.project_authorizations.filter(user__email=instance.user.email).delete()
+
     instance.organization.send_email_remove_permission_organization(
         first_name=instance.user.first_name, email=instance.user.email
     )
