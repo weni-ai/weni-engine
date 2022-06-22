@@ -15,6 +15,7 @@ from connect.common.models import (
     OrganizationRole,
     RequestPermissionProject,
     ProjectAuthorization,
+    ProjectRole,
     ProjectRoleLevel,
     RocketAuthorization,
     RequestRocketPermission,
@@ -87,18 +88,24 @@ def org_authorizations(sender, instance, created, **kwargs):
 
     if instance.role is not OrganizationLevelRole.NOTHING.value:
         if created:
+            organization_permission_mapper = {
+                OrganizationRole.ADMIN.value: ProjectRole.MODERATOR.value,
+                OrganizationRole.CONTRIBUTOR.value: ProjectRole.CONTRIBUTOR.value,
+                OrganizationRole.SUPPORT.value: ProjectRole.SUPPORT.value,
+            }
             for project in instance.organization.project.all():
                 project_perm = project.project_authorizations.filter(user=instance.user)
+                project_role = organization_permission_mapper.get(instance.role, ProjectRole.NOT_SETTED.value)
                 if not project_perm.exists():
                     project.project_authorizations.create(
                         user=instance.user,
-                        role=instance.role,
+                        role=project_role,
                         organization_authorization=instance,
                     )
                 else:
                     project_perm = project_perm.first()
                     if instance.role > project_perm.role:
-                        project_perm.role = instance.role
+                        project_perm.role = project_role
                         project_perm.save(update_fields=["role"])
         celery_app.send_task(
             "update_user_permission_organization",
@@ -134,18 +141,25 @@ def request_permission_organization(sender, instance, created, **kwargs):
                 update_fields.append("has_2fa")
             perm.save(update_fields=update_fields)
             if perm.can_contribute:
+                organization_permission_mapper = {
+                    OrganizationRole.ADMIN.value: ProjectRole.MODERATOR.value,
+                    OrganizationRole.CONTRIBUTOR.value: ProjectRole.CONTRIBUTOR.value,
+                    OrganizationRole.SUPPORT.value: ProjectRole.SUPPORT.value,
+                }
                 for proj in instance.organization.project.all():
                     project_perm = proj.project_authorizations.filter(user=user)
-                    if not project_perm.exists():
+                    project_role = organization_permission_mapper.get(perm.role, None)
+                    if not project_perm.exists() and project_role is not None:
                         proj.project_authorizations.create(
                             user=user,
-                            role=perm.role,
+                            role=project_role,
                             organization_authorization=perm,
                         )
                     else:
                         project_perm = project_perm.first()
-                        if project_perm.role < perm.role:
-                            project_perm.role = perm.role
+                        project_role = organization_permission_mapper.get(perm.role, None)
+                        if project_perm.role < perm.role and project_role is not None:
+                            project_perm.role = project_role
                             project_perm.save()
             instance.delete()
         instance.organization.send_email_invite_organization(email=instance.email)
@@ -158,8 +172,6 @@ def request_permission_project(sender, instance, created, **kwargs):
         if user.exists():
             user = user.first()
             org = instance.project.organization
-            auth = instance.project.project_authorizations
-            auth_user = auth.filter(user=user)
             org_auth = org.authorizations.filter(user__email=user.email)
 
             if not org_auth.exists():
@@ -169,6 +181,8 @@ def request_permission_project(sender, instance, created, **kwargs):
             else:
                 org_auth = org_auth.first()
 
+            auth = instance.project.project_authorizations
+            auth_user = auth.filter(user=user)
             if not auth_user.exists():
                 ProjectAuthorization.objects.create(
                     user=user,
