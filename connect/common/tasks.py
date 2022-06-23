@@ -1,4 +1,3 @@
-from os import sync
 import pendulum
 from datetime import timedelta
 import requests
