@@ -85,13 +85,8 @@ def sync_contacts(sync_before: str = None, sync_after: str = None):
                     name=elastic_contact.name,
                     last_seen_on=pendulum.parse(elastic_contact.last_seen_on),
                 )
-
-                task = current_app.send_task(  # pragma: no cover
-                    name="get_messages",
-                    args=[str(contact.uuid), str(manager.before), str(manager.after), str(project.uuid)],
-                )
-                task.wait()
-                if not task.result:
+                has_message = get_messages(str(contact.uuid), str(manager.before), str(manager.after), str(project.uuid))
+                if not has_message:
                     last_message = Message.objects.filter(
                         contact=contact,
                         created_on__date__month=timezone.now().date().month,
@@ -122,17 +117,17 @@ def retry_billing_tasks():
         task.retried = True
         task.save()
         if task.task_type == 'count_contacts':
-            task = current_app.send_task(  # pragma: no cover
+            current_task = current_app.send_task(  # pragma: no cover
                 name="count_contacts",
                 args=[task.before, task.after, task.started_at]
             )
-            task.wait()
+            current_task.wait()
         elif task.task_type == 'sync_contacts':
-            task = current_app.send_task(  # pragma: no cover
+            current_task = current_app.send_task(  # pragma: no cover
                 name="sync_contacts",
                 args=[task.before, task.after]
             )
-            task.wait()
+            current_task.wait()
 
     return True
 
