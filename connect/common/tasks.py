@@ -371,8 +371,7 @@ def sync_channels_statistics():
 
 @app.task()
 def generate_project_invoice():
-    task = app.send_task(name="sync_channels_statistics")
-    task.wait()
+    sync_channels_statistics()
     for org in Organization.objects.filter(
         organization_billing__next_due_date__lte=timezone.now().date(),
         is_suspended=False,
