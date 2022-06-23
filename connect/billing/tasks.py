@@ -85,13 +85,8 @@ def sync_contacts(sync_before: str = None, sync_after: str = None):
                     name=elastic_contact.name,
                     last_seen_on=pendulum.parse(elastic_contact.last_seen_on),
                 )
-
-                task = current_app.send_task(  # pragma: no cover
-                    name="get_messages",
-                    args=[str(contact.uuid), str(manager.before), str(manager.after), str(project.uuid)],
-                )
-                task.wait()
-                if not task.result:
+                has_message = get_messages(str(contact.uuid), str(manager.before), str(manager.after), str(project.uuid))
+                if not has_message:
                     last_message = Message.objects.filter(
                         contact=contact,
                         created_on__date__month=timezone.now().date().month,
