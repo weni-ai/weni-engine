@@ -154,11 +154,6 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
 
         instance = super(OrganizationSeralizer, self).create(validated_data)
 
-        instance.send_email_organization_create(
-            email=self.context["request"].user.email,
-            first_name=self.context["request"].user.first_name,
-        )
-
         instance.authorizations.create(
             user=self.context["request"].user, role=OrganizationRole.ADMIN.value
         )

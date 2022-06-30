@@ -95,11 +95,6 @@ class ProjectSerializer(serializers.ModelSerializer):
         validated_data.update({"flow_organization": project.get("uuid")})
         instance = super().create(validated_data)
 
-        instance.send_email_create_project(
-            first_name=self.context["request"].user.first_name,
-            email=self.context["request"].user.email,
-        )
-
         return instance
 
     def update(self, instance, validated_data):

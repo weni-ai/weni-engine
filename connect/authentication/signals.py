@@ -51,3 +51,12 @@ def signal_user(instance, created, **kwargs):
                 user=instance, defaults={"role": perm.role}
             )
         requests_perm_project.delete()
+
+
+@receiver(models.signals.post_delete, sender=User)
+def delete_user(instance, **kwargs):
+    if settings.TESTING:
+        return False # pragma: no cover
+    keycloak_instance = KeycloakControl()
+    user_id = keycloak_instance.get_user_id_by_email(email=instance.email)
+    keycloak_instance.delete_user(user_id=user_id)
