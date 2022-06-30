@@ -215,7 +215,6 @@ def refund_validation_charge(charge_id):  # pragma: no cover
 def problem_capture_invoice():
     for organization in Organization.objects.filter(organization_billing__plan=BillingPlan.PLAN_ENTERPRISE, is_suspended=False):
         if organization.organization_billing.problem_capture_invoice:
- 
             organization.is_suspended = True
             organization.save(update_fields=["is_suspended"])
             organization.organization_billing.is_active = False
