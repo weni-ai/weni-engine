@@ -1,7 +1,7 @@
 import stripe
 import pendulum
 from connect.celery import app
-from connect.common.models import Project
+from connect.common.models import Organization, Project, BillingPlan
 from connect.billing.models import Contact, Message, SyncManagerTask, ContactCount, Channel
 from connect.elastic.flow import ElasticFlow
 from datetime import timedelta
@@ -209,3 +209,18 @@ def refund_validation_charge(charge_id):  # pragma: no cover
     stripe.api_key = settings.BILLING_SETTINGS.get("stripe", {}).get("API_KEY")
     stripe.Refund.create(charge=charge_id)
     return True
+
+
+@app.task(name="problem_capture_invoice")
+def problem_capture_invoice():
+    for organization in Organization.objects.filter(organization_billing__plan=BillingPlan.PLAN_ENTERPRISE, is_suspended=False):
+        if organization.organization_billing.problem_capture_invoice:
+            organization.is_suspended = True
+            organization.save(update_fields=["is_suspended"])
+            organization.organization_billing.is_active = False
+            organization.organization_billing.save(update_fields=["is_active"])
+            for project in organization.project.all():
+                current_app.send_task(  # pragma: no cover
+                    name="update_suspend_project",
+                    args=[project.flow_organization, True]
+                )
