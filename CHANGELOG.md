@@ -1,3 +1,7 @@
+# 1.1.1
+## ADD:
+  - exclude support users from authorization list
+
 # 1.1.0
 ## ADD:
   - Suport Role to organization and project authorizations
