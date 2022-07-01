@@ -15,6 +15,7 @@ from connect.common.models import (
     OrganizationRole,
     RequestPermissionProject,
     ProjectAuthorization,
+    ProjectRole,
     ProjectRoleLevel,
     RocketAuthorization,
     RequestRocketPermission,
@@ -55,14 +56,6 @@ def create_service_default_in_all_user(sender, instance, created, **kwargs):
             project.service_status.create(service=instance)
 
 
-@receiver(post_delete, sender=Organization)
-def delete_organization(instance, **kwargs):
-    for authorization in instance.authorizations.all():
-        instance.send_email_delete_organization(
-            first_name=authorization.user.first_name, email=authorization.user.email
-        )
-
-
 @receiver(post_save, sender=Organization)
 def update_organization(instance, **kwargs):
     for project in instance.project.all():
@@ -87,18 +80,24 @@ def org_authorizations(sender, instance, created, **kwargs):
 
     if instance.role is not OrganizationLevelRole.NOTHING.value:
         if created:
+            organization_permission_mapper = {
+                OrganizationRole.ADMIN.value: ProjectRole.MODERATOR.value,
+                OrganizationRole.CONTRIBUTOR.value: ProjectRole.CONTRIBUTOR.value,
+                OrganizationRole.SUPPORT.value: ProjectRole.SUPPORT.value,
+            }
             for project in instance.organization.project.all():
                 project_perm = project.project_authorizations.filter(user=instance.user)
+                project_role = organization_permission_mapper.get(instance.role, ProjectRole.NOT_SETTED.value)
                 if not project_perm.exists():
                     project.project_authorizations.create(
                         user=instance.user,
-                        role=instance.role,
+                        role=project_role,
                         organization_authorization=instance,
                     )
                 else:
                     project_perm = project_perm.first()
                     if instance.role > project_perm.role:
-                        project_perm.role = instance.role
+                        project_perm.role = project_role
                         project_perm.save(update_fields=["role"])
         celery_app.send_task(
             "update_user_permission_organization",
@@ -112,6 +111,9 @@ def org_authorizations(sender, instance, created, **kwargs):
 
 @receiver(post_delete, sender=OrganizationAuthorization)
 def delete_authorizations(instance, **kwargs):
+    for project in instance.organization.project.all():
+        project.project_authorizations.filter(user__email=instance.user.email).delete()
+
     instance.organization.send_email_remove_permission_organization(
         first_name=instance.user.first_name, email=instance.user.email
     )
@@ -131,18 +133,25 @@ def request_permission_organization(sender, instance, created, **kwargs):
                 update_fields.append("has_2fa")
             perm.save(update_fields=update_fields)
             if perm.can_contribute:
+                organization_permission_mapper = {
+                    OrganizationRole.ADMIN.value: ProjectRole.MODERATOR.value,
+                    OrganizationRole.CONTRIBUTOR.value: ProjectRole.CONTRIBUTOR.value,
+                    OrganizationRole.SUPPORT.value: ProjectRole.SUPPORT.value,
+                }
                 for proj in instance.organization.project.all():
                     project_perm = proj.project_authorizations.filter(user=user)
-                    if not project_perm.exists():
+                    project_role = organization_permission_mapper.get(perm.role, None)
+                    if not project_perm.exists() and project_role is not None:
                         proj.project_authorizations.create(
                             user=user,
-                            role=perm.role,
+                            role=project_role,
                             organization_authorization=perm,
                         )
                     else:
                         project_perm = project_perm.first()
-                        if project_perm.role < perm.role:
-                            project_perm.role = perm.role
+                        project_role = organization_permission_mapper.get(perm.role, None)
+                        if project_perm.role < perm.role and project_role is not None:
+                            project_perm.role = project_role
                             project_perm.save()
             instance.delete()
         instance.organization.send_email_invite_organization(email=instance.email)
@@ -155,8 +164,6 @@ def request_permission_project(sender, instance, created, **kwargs):
         if user.exists():
             user = user.first()
             org = instance.project.organization
-            auth = instance.project.project_authorizations
-            auth_user = auth.filter(user=user)
             org_auth = org.authorizations.filter(user__email=user.email)
 
             if not org_auth.exists():
@@ -166,6 +173,8 @@ def request_permission_project(sender, instance, created, **kwargs):
             else:
                 org_auth = org_auth.first()
 
+            auth = instance.project.project_authorizations
+            auth_user = auth.filter(user=user)
             if not auth_user.exists():
                 ProjectAuthorization.objects.create(
                     user=user,
@@ -233,3 +242,16 @@ def request_rocket_permission(sender, instance, created, **kwargs):
                 project_auth.save(update_fields=["rocket_authorization"])
                 project_auth.rocket_authorization.update_rocket_permission()
             instance.delete()
+
+
+@receiver(post_save, sender=Organization)
+def add_support_role(sender, instance, created, **kwargs):
+    if created:
+        sup_emails = set()
+        for sup_user in OrganizationAuthorization.objects.filter(role=OrganizationRole.SUPPORT.value):
+            sup_emails.add(sup_user.user.email)
+        for email in sup_emails:
+            instance.authorization.create(
+                user=User.objects.get(email=email),
+                role=OrganizationRole.SUPPORT.value,
+            )

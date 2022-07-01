@@ -83,3 +83,14 @@ class KeycloakControl:  # pragma: no cover
         r = requests.delete(f"{server_url}admin/realms/{realm_name}/users/{user_id}/credentials/{credential_id}", headers=headers)
 
         return r.status_code
+
+    def delete_user(self, user_id):
+        token = self.instance._token["access_token"]
+        realm_name = settings.OIDC_RP_REALM_NAME
+        server_url = settings.OIDC_RP_SERVER_URL
+
+        headers = {"Authorization": f"Bearer {token}"}
+
+        r = requests.delete(f"{server_url}admin/realms/{realm_name}/users/{user_id}", headers=headers)
+
+        return r.status_code
