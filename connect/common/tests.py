@@ -96,6 +96,7 @@ class OrganizationAuthorizationTestCase(TestCase):
         self.user = User.objects.create_user("fake@user.com", "user")
         self.financial = User.objects.create_user("financial@user.com", "financial")
         self.contributor = User.objects.create_user("contrib@user.com", "contrib")
+        self.support = User.objects.create_user("support@user.com", "support")
 
         self.organization = Organization.objects.create(
             name="Test",
@@ -111,7 +112,11 @@ class OrganizationAuthorizationTestCase(TestCase):
                 user=self.financial, role=OrganizationRole.FINANCIAL.value
             )
         )
-
+        self.organization_support_authorization = (
+            self.organization.authorizations.create(
+                user=self.support, role=OrganizationRole.SUPPORT.value
+            )
+        )
         self.organization_contribute_authorization = (
             self.organization.authorizations.create(
                 user=self.contributor, role=OrganizationRole.CONTRIBUTOR.value
@@ -121,6 +126,10 @@ class OrganizationAuthorizationTestCase(TestCase):
     def test_admin_level(self):
         authorization = self.organization.get_user_authorization(self.owner)
         self.assertEqual(authorization.level, OrganizationLevelRole.ADMIN.value)
+
+    def test_support_level(self):
+        authorization = self.organization.get_user_authorization(self.support)
+        self.assertEqual(authorization.level, OrganizationLevelRole.SUPPORT.value)
 
     def test_not_read_level(self):
         authorization = self.organization.get_user_authorization(self.user)
@@ -152,6 +161,9 @@ class OrganizationAuthorizationTestCase(TestCase):
         private_authorization_user = self.organization.get_user_authorization(self.user)
         self.assertFalse(private_authorization_user.can_contribute)
 
+        authorization_support = self.organization.get_user_authorization(self.support)
+        self.assertTrue(authorization_support.can_contribute)
+
     def test_can_write(self):
         # organization owner
         authorization_owner = self.organization.get_user_authorization(self.owner)
@@ -168,6 +180,9 @@ class OrganizationAuthorizationTestCase(TestCase):
         private_authorization_user = self.organization.get_user_authorization(self.user)
         self.assertFalse(private_authorization_user.can_write)
 
+        authorization_support = self.organization.get_user_authorization(self.support)
+        self.assertTrue(authorization_support.can_write)
+
     def test_is_admin(self):
         # organization owner
         authorization_owner = self.organization.get_user_authorization(self.owner)
@@ -183,6 +198,9 @@ class OrganizationAuthorizationTestCase(TestCase):
         # secondary user in private organization
         private_authorization_user = self.organization.get_user_authorization(self.user)
         self.assertFalse(private_authorization_user.is_admin)
+
+        authorization_support = self.organization.get_user_authorization(self.support)
+        self.assertTrue(authorization_support.is_admin)
 
     def test_owner_ever_admin(self):
         authorization_owner = self.organization.get_user_authorization(self.owner)
@@ -246,6 +264,8 @@ class OrganizationAuthorizationTestCase(TestCase):
         self.assertFalse(
             self.organization_contribute_authorization.can_contribute_billing
         )
+
+        self.assertTrue(self.organization_support_authorization.can_contribute_billing)
 
 
 class UtilsTestCase(TestCase):
