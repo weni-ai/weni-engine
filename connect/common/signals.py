@@ -56,14 +56,6 @@ def create_service_default_in_all_user(sender, instance, created, **kwargs):
             project.service_status.create(service=instance)
 
 
-@receiver(post_delete, sender=Organization)
-def delete_organization(instance, **kwargs):
-    for authorization in instance.authorizations.all():
-        instance.send_email_delete_organization(
-            first_name=authorization.user.first_name, email=authorization.user.email
-        )
-
-
 @receiver(post_save, sender=Organization)
 def update_organization(instance, **kwargs):
     for project in instance.project.all():
