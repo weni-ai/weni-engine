@@ -90,7 +90,7 @@ class KeycloakControl:  # pragma: no cover
         server_url = settings.OIDC_RP_SERVER_URL
 
         headers = {"Authorization": f"Bearer {token}"}
-        
+
         r = requests.delete(f"{server_url}admin/realms/{realm_name}/users/{user_id}", headers=headers)
 
         return r.status_code
