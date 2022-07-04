@@ -42,6 +42,8 @@ class WeniOIDCAuthenticationBackend(OIDCAuthenticationBackend):
         user.email = claims.get("email", "")
         user.save()
 
+        check_module_permission(claims, user)
+
         if settings.SYNC_ORGANIZATION_INTELIGENCE:
             task = celery_app.send_task(  # pragma: no cover
                 name="migrate_organization",
@@ -55,7 +57,9 @@ class WeniOIDCAuthenticationBackend(OIDCAuthenticationBackend):
         user.name = claims.get("name", "")
         user.email = claims.get("email", "")
         user.save()
-
+        
+        check_module_permission(claims, user)
+        
         return user
 
 
