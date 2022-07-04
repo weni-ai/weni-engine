@@ -123,7 +123,7 @@ def update_user_permission_project(
     flow_organization: str, project_uuid: str, user_email: str, permission: int
 ):
     flow_instance = utils.get_grpc_types().get("flow")
-    
+
     integrations_client = IntegrationsRESTClient()
 
     flow_instance.update_user_permission_project(
@@ -589,10 +589,10 @@ def create_wac_channel(user, flow_organization, config, phone_number_id):
     grpc_instance = utils.get_grpc_types().get("flow")
     try:
         response = grpc_instance.create_wac_channel(
-            user=serializer.validated_data.get("user"),
-            flow_organization=str(project.flow_organization),
-            config=serializer.validated_data.get("config"),
-            phone_number_id=serializer.validated_data.get("phone_number_id"),
+            user=user,
+            flow_organization=str(flow_organization),
+            config=config,
+            phone_number_id=phone_number_id,
         )
         return dict(
             uuid=response.uuid,
@@ -601,6 +601,4 @@ def create_wac_channel(user, flow_organization, config, phone_number_id):
             address=response.address
         )
     except grpc.RpcError as error:
-        if error.code() is grpc.StatusCode.INVALID_ARGUMENT:
-            self.context.abort(grpc.StatusCode.INVALID_ARGUMENT, "Bad Request")
         raise error

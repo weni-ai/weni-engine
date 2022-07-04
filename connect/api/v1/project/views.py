@@ -12,12 +12,17 @@ from rest_framework.viewsets import GenericViewSet
 from connect.api.v1.metadata import Metadata
 from connect.api.v1.project.filters import ProjectOrgFilter
 from connect.api.v1.project.permissions import ProjectHasPermission
+from connect.api.v1.internal.permissions import ModuleHasPermission
 from connect.api.v1.organization.permissions import Has2FA
 from connect.api.v1.project.serializers import (
     ProjectSerializer,
     ProjectSearchSerializer,
     RequestRocketPermissionSerializer,
     RequestPermissionProjectSerializer,
+    ReleaseChannelSerializer,
+    ListChannelSerializer,
+    CreateChannelSerializer,
+    CreateWACChannelSerializer,
 )
 from connect.celery import app as celery_app
 from connect.common.models import (
@@ -261,7 +266,7 @@ class ProjectViewSet(
         permission_classes=[ModuleHasPermission],
     )
     def create_wac_channel(self, request):
-        serializer  = CreateWACChannelSerializer(data=request.data)
+        serializer = CreateWACChannelSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             project_uuid = serializer.validated_data.get("project_uuid")
             project = Project.objects.get(uuid=project_uuid)

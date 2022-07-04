@@ -274,11 +274,13 @@ class ListChannelSerializer(serializers.Serializer):
         task.wait()
         return dict(project_uuid=obj.uuid, channels=task.result)
 
+
 class CreateWACChannelSerializer(serializers.Serializer):
     user = serializers.CharField(required=True)
     project_uuid = serializers.CharField(required=True)
     config = serializers.CharField(required=True)
     phone_number_id = serializers.CharField(required=True)
+
 
 class CreateChannelSerializer(serializers.Serializer):
     user = serializers.CharField(required=True)
