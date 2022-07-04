@@ -242,16 +242,3 @@ def request_rocket_permission(sender, instance, created, **kwargs):
                 project_auth.save(update_fields=["rocket_authorization"])
                 project_auth.rocket_authorization.update_rocket_permission()
             instance.delete()
-
-
-@receiver(post_save, sender=Organization)
-def add_support_role(sender, instance, created, **kwargs):
-    if created:
-        sup_emails = set()
-        for sup_user in OrganizationAuthorization.objects.filter(role=OrganizationRole.SUPPORT.value):
-            sup_emails.add(sup_user.user.email)
-        for email in sup_emails:
-            instance.authorization.create(
-                user=User.objects.get(email=email),
-                role=OrganizationRole.SUPPORT.value,
-            )
