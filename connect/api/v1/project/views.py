@@ -196,6 +196,85 @@ class ProjectViewSet(
             OpenedProject.objects.create(project=project, user=user, day=timezone.now())
         return JsonResponse(status=status.HTTP_200_OK, data={"day": str(last_opened_on.day)})
 
+    @action(
+        detail=True,
+        methods=["GET"],
+        url_name="list-channel",
+        permission_classes=[ModuleHasPermission],
+    )
+    def list_channel(self, request):
+        channel_type = request.data.get('channel_type', None)
+        if not channel_type:
+            return JsonResponse(status=status.HTTP_400_BAD_REQUEST, data={"message": "Need pass the channel_type"})
+
+        page = self.paginate_queryset(
+            self.filter_queryset(self.queryset),
+        )
+        context = self.get_serializer_context()
+        context["channel_type"] = channel_type
+        channel_serializer = ListChannelSerializer(page, many=True, context=context)
+        return self.get_paginated_response(channel_serializer.data)
+
+    @action(
+        detail=True,
+        methods=["GET"],
+        url_name="realease-channel",
+        serializer_class=ReleaseChannelSerializer,
+        permission_classes=[ModuleHasPermission],
+    )
+    def release_channel(self, request):
+        serializer = ReleaseChannelSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        task = tasks.realease_channel.delay(
+            channel_uuid=serializer.validated_data.get("channel_uuid"),
+            user=serializer.validated_data.get("user"),
+        )
+        task.wait()
+        return JsonResponse(status=status.HTTP_200_OK, data={"release": task.result})
+
+    @action(
+        detail=True,
+        methods=["POST"],
+        url_name='create-channel',
+        serializer_class=CreateChannelSerializer,
+        permission_classes=[ModuleHasPermission],
+    )
+    def create_channel(self, request):
+        serializer = CreateChannelSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            project_uuid = serializer.validated_data.get("project_uuid")
+            project = Project.objects.get(uuid=project_uuid)
+
+            task = tasks.create_channel.delay(
+                user=serializer.validated_data.get("user"),
+                project_uuid=str(project.flow_organization),
+                data=serializer.validated_data.get("data"),
+                channeltype_code=serializer.validated_data.get("channeltype_code"),
+            )
+            task.wait()
+            return JsonResponse(status=status.HTTP_200_OK, data=task.result)
+
+    @action(
+        detail=True,
+        methods=["POST"],
+        url_name='create-wac-channel',
+        permission_classes=[ModuleHasPermission],
+    )
+    def create_wac_channel(self, request):
+        serializer  = CreateWACChannelSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            project_uuid = serializer.validated_data.get("project_uuid")
+            project = Project.objects.get(uuid=project_uuid)
+            task = tasks.create_wac_channel.delay(
+                user=serializer.validated_data.get("user"),
+                flow_organization=str(project.flow_organization),
+                config=serializer.validated_data.get("config"),
+                phone_number_id=serializer.validated_data.get("phone_number_id"),
+            )
+
+            task.wait()
+            return JsonResponse(status=status.HTTP_200_OK, data=task.result)
+
 
 class RequestPermissionProjectViewSet(
     mixins.ListModelMixin,

@@ -22,6 +22,8 @@ from connect.common.models import (
 )
 from connect.billing.models import ContactCount
 
+from connect.api.v1.internal.integrations.integrations_rest_client import IntegrationsRESTClient
+
 
 @app.task()
 def status_service() -> None:
@@ -121,16 +123,18 @@ def update_user_permission_project(
     flow_organization: str, project_uuid: str, user_email: str, permission: int
 ):
     flow_instance = utils.get_grpc_types().get("flow")
-    integrations_instance = utils.get_grpc_types().get("integrations")
+    
+    integrations_client = IntegrationsRESTClient()
+
     flow_instance.update_user_permission_project(
         organization_uuid=flow_organization,
         user_email=user_email,
         permission=permission,
     )
-    integrations_instance.update_user_permission_project(
+    integrations_client.update_user_permission_project(
         project_uuid=project_uuid,
         user_email=user_email,
-        permission=permission,
+        role=permission
     )
 
     return True
@@ -477,19 +481,31 @@ def update_suspend_project(project_uuid: str, is_suspended: bool):
 
 @app.task(name="update_user_photo")
 def update_user_photo(user_email: str, photo_url: str):
-    integrations_instance = utils.get_grpc_types().get("integrations")
-    integrations_instance.update_user(user_email, photo_url=photo_url)
-
+    integrations_client = IntegrationsRESTClient()
+    user = User.objects.filter(email=user_email)
+    if user.exists():
+        user = user.first()
+        integrations_client.update_user(
+            user_email=user_email,
+            photo_url=photo_url,
+            first_name=user.first_name,
+            last_name=user.last_name
+        )
     return True
 
 
 @app.task(name="update_user_name")
 def update_user_name(user_email: str, first_name: str, last_name: str):
-    integrations_instance = utils.get_grpc_types().get("integrations")
-    integrations_instance.update_user(
-        user_email, first_name=first_name, last_name=last_name
-    )
-
+    integrations_client = IntegrationsRESTClient()
+    user = User.objects.filter(email=user_email)
+    if user.exists():
+        user = user.first()
+        integrations_client.update_user(
+            user_email=user_email,
+            photo_url='' if user.photo_url is None else user.photo_url,
+            first_name=first_name,
+            last_name=last_name
+        )
     return True
 
 
@@ -518,3 +534,73 @@ def delete_user_permission_project(project_uuid: str, user_email: str, permissio
         user_email=user_email,
         permission=permission
     )
+
+
+@app.task(name="list_channels")
+def list_channels(project_uuid, channel_type):
+    grpc_instance = utils.get_grpc_types().get("flow")
+    response = list(grpc_instance.list_channel(project_uuid=project_uuid, channel_type=channel_type))
+    channels = []
+    for channel in response:
+        channels.append(
+            {
+                "uuid": channel.uuid,
+                "name": channel.name,
+                "config": channel.config,
+                "address": channel.address,
+            }
+        )
+    return channels
+
+
+@app.task(name='release_channel')
+def realease_channel(channel_uuid, user):
+    grpc_instance = utils.get_grpc_types().get("flow")
+    grpc_instance.release_channel(
+        channel_uuid=channel_uuid,
+        user=user,
+    )
+    return True
+
+
+@app.task(name='create_channel')
+def create_channel(user, project_uuid, data, channeltype_code):
+    grpc_instance = utils.get_grpc_types().get("flow")
+
+    try:
+        response = grpc_instance.create_channel(
+            user=user,
+            project_uuid=project_uuid,
+            data=data,
+            channeltype_code=channeltype_code
+        )
+        return dict(
+            uuid=response.uuid,
+            name=response.name,
+            config=response.config,
+            address=response.address
+        )
+    except grpc.RpcError as error:
+        raise error
+
+
+@app.task(name="create_wac_channel")
+def create_wac_channel(user, flow_organization, config, phone_number_id):
+    grpc_instance = utils.get_grpc_types().get("flow")
+    try:
+        response = grpc_instance.create_wac_channel(
+            user=serializer.validated_data.get("user"),
+            flow_organization=str(project.flow_organization),
+            config=serializer.validated_data.get("config"),
+            phone_number_id=serializer.validated_data.get("phone_number_id"),
+        )
+        return dict(
+            uuid=response.uuid,
+            name=response.name,
+            config=response.config,
+            address=response.address
+        )
+    except grpc.RpcError as error:
+        if error.code() is grpc.StatusCode.INVALID_ARGUMENT:
+            self.context.abort(grpc.StatusCode.INVALID_ARGUMENT, "Bad Request")
+        raise error
