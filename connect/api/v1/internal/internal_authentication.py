@@ -1,5 +1,5 @@
 import requests
-from connect import settings
+from django.conf import settings
 
 
 class InternalAuthentication:

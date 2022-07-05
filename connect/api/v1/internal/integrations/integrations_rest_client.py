@@ -1,7 +1,8 @@
-from connect import settings
-from connect.api.v1.internal.internal_authentication import InternalAuthentication
+from django.conf import settings
 
 import requests
+
+from connect.api.v1.internal.internal_authentication import InternalAuthentication
 
 
 class IntegrationsRESTClient:
