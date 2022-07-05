@@ -179,7 +179,7 @@ class OrganizationViewSet(
                     "uuid": project.uuid,
                     "name": project.name,
                     "flow_organization": project.flow_organization,
-                    "active_contacts": count_contacts(before=before, after=after),
+                    "active_contacts": count_contacts(project=project, before=before, after=after),
                 }
             )
 
