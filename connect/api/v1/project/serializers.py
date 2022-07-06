@@ -285,5 +285,5 @@ class CreateWACChannelSerializer(serializers.Serializer):
 class CreateChannelSerializer(serializers.Serializer):
     user = serializers.CharField(required=True)
     project_uuid = serializers.CharField(required=True)
-    data = serializers.CharField(required=True)
+    data = serializers.JSONField(required=True)
     channeltype_code = serializers.CharField(required=True)
