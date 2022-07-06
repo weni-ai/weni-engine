@@ -56,13 +56,14 @@ class UserSerializer(serializers.ModelSerializer):
         if "phone" in validated_data or "short_phone_prefix" in validated_data:
             instance.send_request_flow_user_info()
 
-        integrations_client = IntegrationsRESTClient()
+        if "first_name" in validated_data or "last_name" in validated_data:
+            integrations_client = IntegrationsRESTClient()
 
-        integrations_client.update_user(
-            user_email=update_instance.email,
-            first_name=update_instance.first_name,
-            last_name=update_instance.last_name
-        )
+            integrations_client.update_user(
+                user_email=update_instance.email,
+                first_name=update_instance.first_name,
+                last_name=update_instance.last_name
+            )
 
         return update_instance
 
