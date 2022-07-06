@@ -488,8 +488,6 @@ def update_user_photo(user_email: str, photo_url: str):
         integrations_client.update_user(
             user_email=user_email,
             photo_url=photo_url,
-            first_name=user.first_name,
-            last_name=user.last_name
         )
     return True
 
@@ -502,7 +500,6 @@ def update_user_name(user_email: str, first_name: str, last_name: str):
         user = user.first()
         integrations_client.update_user(
             user_email=user_email,
-            photo_url='' if user.photo_url is None else user.photo_url,
             first_name=first_name,
             last_name=last_name
         )

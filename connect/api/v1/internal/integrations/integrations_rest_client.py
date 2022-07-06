@@ -24,13 +24,20 @@ class IntegrationsRESTClient:
         )
         return dict(status=response.status_code)
 
-    def update_user(self, user_email, photo_url, first_name, last_name):
+    def update_user(self, user_email, photo_url=None, first_name=None, last_name=None):
         body = {
             "email": user_email,
-            "photo_url": photo_url,
-            "first_name": first_name,
-            "last_name": last_name
         }
+
+        if photo_url:
+            body["photo_url"] = photo_url
+
+        if first_name:
+            body["first_name"] = first_name
+
+        if last_name:
+            body["last_name"] = last_name
+
         response = requests.post(
             url=f"{self.base_url}/api/v1/internal/user/",
             headers=self.authentication_instance.get_headers(),
