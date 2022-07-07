@@ -20,6 +20,7 @@ from connect.common.models import (
     RocketRole,
     RequestRocketPermission,
     OpenedProject,
+    ProjectRole,
 )
 
 
@@ -106,6 +107,7 @@ class ProjectSerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data)
 
     def get_authorizations(self, obj):
+        exclude_roles = [ProjectRole.SUPPORT.value]
         return {
             "count": obj.project_authorizations.count(),
             "users": [
@@ -120,7 +122,7 @@ class ProjectSerializer(serializers.ModelSerializer):
                     if i.rocket_authorization
                     else None,
                 }
-                for i in obj.project_authorizations.all()
+                for i in obj.project_authorizations.exclude(role__in=exclude_roles)
             ],
         }
 
