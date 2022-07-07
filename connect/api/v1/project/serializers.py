@@ -20,6 +20,7 @@ from connect.common.models import (
     RocketRole,
     RequestRocketPermission,
     OpenedProject,
+    ProjectRole,
 )
 
 
@@ -106,6 +107,7 @@ class ProjectSerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data)
 
     def get_authorizations(self, obj):
+        exclude_roles = [ProjectRole.SUPPORT.value]
         return {
             "count": obj.project_authorizations.count(),
             "users": [
@@ -120,7 +122,7 @@ class ProjectSerializer(serializers.ModelSerializer):
                     if i.rocket_authorization
                     else None,
                 }
-                for i in obj.project_authorizations.all()
+                for i in obj.project_authorizations.exclude(role__in=exclude_roles)
             ],
         }
 
@@ -256,3 +258,34 @@ class RequestRocketPermissionSerializer(serializers.ModelSerializer):
         if attrs.get("role") == RocketRole.NOT_SETTED.value:
             raise PermissionDenied(_("You cannot set user role 0"))
         return attrs
+
+
+class ReleaseChannelSerializer(serializers.Serializer):
+    channel_uuid = serializers.CharField(required=True)
+    user = serializers.CharField(required=True)
+
+
+class ListChannelSerializer(serializers.Serializer):
+    channel_data = serializers.SerializerMethodField()
+
+    def get_channel_data(self, obj):
+        task = tasks.list_channels.delay(
+            project_uuid=str(obj.flow_organization),
+            channel_type=self.context["channel_type"],
+        )
+        task.wait()
+        return dict(project_uuid=obj.uuid, channels=task.result)
+
+
+class CreateWACChannelSerializer(serializers.Serializer):
+    user = serializers.CharField(required=True)
+    project_uuid = serializers.CharField(required=True)
+    config = serializers.CharField(required=True)
+    phone_number_id = serializers.CharField(required=True)
+
+
+class CreateChannelSerializer(serializers.Serializer):
+    user = serializers.CharField(required=True)
+    project_uuid = serializers.CharField(required=True)
+    data = serializers.JSONField(required=True)
+    channeltype_code = serializers.CharField(required=True)

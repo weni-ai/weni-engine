@@ -39,7 +39,7 @@ app.conf.beat_schedule = {
         "schedule": schedules.crontab(minute="*/8")
     },
     "sync-channels-statistics": {
-        "task": "connect.common.tasks.sync_channels_statistics",
+        "task": "sync_channels_statistics",
         "schedule": schedules.crontab(minute="*/7")
     },
     "generate_project_invoice": {
