@@ -9,6 +9,8 @@ from rest_framework.authentication import BaseAuthentication, get_authorization_
 
 from connect.celery import app as celery_app
 
+from connect.utils import check_module_permission
+
 LOGGER = logging.getLogger("weni_django_oidc")
 
 
@@ -57,9 +59,9 @@ class WeniOIDCAuthenticationBackend(OIDCAuthenticationBackend):
         user.name = claims.get("name", "")
         user.email = claims.get("email", "")
         user.save()
-        
+
         check_module_permission(claims, user)
-        
+
         return user
 
 
