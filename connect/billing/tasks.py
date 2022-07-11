@@ -76,9 +76,9 @@ def sync_contacts(sync_before: str = None, sync_after: str = None):
         elastic_instance = ElasticFlow()
         update_fields = ["finished_at", "status"]
         for project in Project.objects.exclude(flow_id=None):
-            active_contacts = elastic_instance.get_contact_detailed(
+            active_contacts = list(elastic_instance.get_contact_detailed(
                 str(project.flow_id), str(manager.before), str(manager.after)
-            )
+            ))
             for elastic_contact in active_contacts:
                 contact = Contact.objects.create(
                     contact_flow_uuid=elastic_contact.uuid,
