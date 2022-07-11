@@ -21,9 +21,9 @@ class ElasticFlow(ElasticHandler):
             & Q(
             "range", last_seen_on={
                 "gte": str(after),
-                "lt": str(before)}
+                "lte": str(before)}
         )
 
         contacts = Search(using=self.client, index=index).query(qs)
-        response = contacts.execute()
+        response = contacts.scan()
         return response
