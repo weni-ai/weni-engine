@@ -114,13 +114,7 @@ class FlowType(GRPCType):
                 access_token=access_token,
             )
         )
-        return {
-            "uuid": response.uuid,
-            "classifier_type": response.classifier_type,
-            "name": response.name,
-            "access_token": response.access_token,
-            "is_active": response.is_active,
-        }
+        return response
 
     def delete_classifier(self, classifier_uuid: str, user_email: str):
         stub = classifier_pb2_grpc.ClassifierControllerStub(self.channel)

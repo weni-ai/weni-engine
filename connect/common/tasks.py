@@ -607,11 +607,11 @@ def retrieve_classifier(classifier_uuid: str):
         classifier_uuid=str(classifier_uuid),
     )
     return dict(
-        authorization_uuid=response.access_token,
-        classifier_type=response.classifier_type,
-        name=response.name,
-        is_active=response.is_active,
-        uuid=response.uuid,
+        authorization_uuid=response.get("access_token"),
+        classifier_type=response.get("classifier_type"),
+        name=response.get("name"),
+        is_active=response.get("is_active"),
+        uuid=response.get("uuid"),
     )
 
 
