@@ -50,7 +50,8 @@ def count_contacts(project: Project, before: str, after: str):
 def check_module_permission(claims, user):
     from django.contrib.auth.models import Permission
     from django.contrib.contenttypes.models import ContentType
-    from connect.authentication.models import User
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
 
     if claims.get("can_communicate_internally", False):
         content_type = ContentType.objects.get_for_model(User)

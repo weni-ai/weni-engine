@@ -212,7 +212,7 @@ class ProjectViewSet(
     def list_channel(self, request):
         channel_type = request.data.get('channel_type', None)
         if not channel_type:
-            return JsonResponse(status=status.HTTP_400_BAD_REQUEST, data={"message": "Need pass the channel_type"})
+            raise ValidationError("Need pass the channel_type")
 
         page = self.paginate_queryset(
             self.filter_queryset(self.queryset),
@@ -230,7 +230,7 @@ class ProjectViewSet(
         permission_classes=[ModuleHasPermission],
     )
     def release_channel(self, request):
-        serializer = ReleaseChannelSerializer(data=request.data)
+        serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         task = tasks.realease_channel.delay(
             channel_uuid=serializer.validated_data.get("channel_uuid"),
@@ -247,7 +247,7 @@ class ProjectViewSet(
         permission_classes=[ModuleHasPermission],
     )
     def create_channel(self, request):
-        serializer = CreateChannelSerializer(data=request.data)
+        serializer = self.get_serializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             project_uuid = serializer.validated_data.get("project_uuid")
             project = Project.objects.get(uuid=project_uuid)

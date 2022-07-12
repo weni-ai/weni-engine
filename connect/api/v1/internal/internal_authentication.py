@@ -17,7 +17,8 @@ class InternalAuthentication:
         token = request.json().get("access_token")
         return f"Bearer {token}"
 
-    def get_headers(self):
+    @property
+    def headers(self):
         return {
             "Content-Type": "application/json; charset: utf-8",
             "Authorization": self.get_module_token(),
