@@ -598,3 +598,68 @@ def create_wac_channel(user, flow_organization, config, phone_number_id):
         )
     except grpc.RpcError as error:
         raise error
+
+
+@app.task(name="retrieve_classifier")
+def retrieve_classifier(classifier_uuid: str):
+    grpc_instance = utils.get_grpc_types().get("flow")
+    response = grpc_instance.get_classifier(
+        classifier_uuid=str(classifier_uuid),
+    )
+    return dict(
+        authorization_uuid=response.access_token,
+        classifier_type=response.classifier_type,
+        name=response.name,
+        is_active=response.is_active,
+        uuid=response.uuid,
+    )
+
+
+@app.task(name="destroy_classifier")
+def destroy_classifier(classifier_uuid: str, user_email: str):
+    grpc_instance = utils.get_grpc_types().get("flow")
+    grpc_instance.delete_classifier(
+        classifier_uuid=str(classifier_uuid),
+        user_email=str(user_email),
+    )
+    return True
+
+
+@app.task(name="create_classifier")
+def create_classifier(project_uuid: str, user_email: str, classifier_name: str, access_token):
+    grpc_instance = utils.get_grpc_types().get("flow")
+    response = grpc_instance.create_classifier(
+        project_uuid=project_uuid,
+        user_email=user_email,
+        classifier_type="bothub",
+        classifier_name=classifier_name,
+        access_token=access_token,
+    )
+    return dict(
+        authorization_uuid=response.access_token,
+        classifier_type=response.classifier_type,
+        name=response.name,
+        is_active=response.is_active,
+        uuid=response.uuid,
+    )
+
+
+@app.task(name='list_classifier')
+def list_classifier(project_uuid: str):
+    grpc_instance = utils.get_grpc_types().get("flow")
+    response = grpc_instance.get_classifiers(
+        project_uuid=str(project_uuid),
+        classifier_type="bothub",
+        is_active=True,
+    )
+
+    classifiers = {"data": []}
+    for i in response:
+        classifiers["data"].append({
+            "authorization_uuid": i.get("authorization_uuid"),
+            "classifier_type": i.get("classifier_type"),
+            "name": i.get("name"),
+            "is_active": i.get("is_active"),
+            "uuid": i.get("uuid"),
+        })
+    return classifiers

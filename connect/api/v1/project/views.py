@@ -3,6 +3,10 @@ import json
 from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext_lazy as _
 from django_filters.rest_framework import DjangoFilterBackend
+from django.http import JsonResponse
+from django.db.models import Q
+from django.utils import timezone
+
 from rest_framework import mixins, status
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
@@ -10,6 +14,7 @@ from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
+from rest_framework.exceptions import ValidationError
 
 from connect.api.v1.metadata import Metadata
 from connect.api.v1.project.filters import ProjectOrgFilter
@@ -25,6 +30,10 @@ from connect.api.v1.project.serializers import (
     ListChannelSerializer,
     CreateChannelSerializer,
     CreateWACChannelSerializer,
+    DestroyClassifierSerializer,
+    RetrieveClassifierSerializer,
+    CreateClassifierSerializer,
+    ClassifierSerializer,
 )
 from connect.celery import app as celery_app
 from connect.common.models import (
@@ -37,12 +46,7 @@ from connect.common.models import (
     OpenedProject,
 )
 from connect.authentication.models import User
-
-from rest_framework.exceptions import ValidationError
 from connect.common import tasks
-from django.http import JsonResponse
-from django.db.models import Q
-from django.utils import timezone
 
 
 class ProjectViewSet(
@@ -278,6 +282,78 @@ class ProjectViewSet(
                 phone_number_id=serializer.validated_data.get("phone_number_id"),
             )
 
+            task.wait()
+            return JsonResponse(status=status.HTTP_200_OK, data=task.result)
+
+    @action(
+        detail=True,
+        methods=["DELETE"],
+        url_name='destroy-classifier',
+        serializer_class=DestroyClassifierSerializer,
+        permission_classes=[ModuleHasPermission],
+    )
+    def destroy_classifier(self, request):
+        serializer = DestroyClassifierSerializer(data=request.query_params)
+        if serializer.is_valid(raise_exception=True):
+            classifier_uuid = serializer.validated_data.get("uuid")
+            user_email = serializer.validated_data.get("user_email")
+
+            task = tasks.destroy_classifier.delay(str(classifier_uuid), user_email)
+            task.wait()
+            return JsonResponse(status=status.HTTP_200_OK)
+
+    @action(
+        detail=True,
+        methods=["GET"],
+        url_name='retrieve-classifier',
+        serializer_class=RetrieveClassifierSerializer,
+        permission_classes=[ModuleHasPermission],
+    )
+    def retrieve_classifier(self, request):
+        serializer = RetrieveClassifierSerializer(data=request.query_params)
+
+        if serializer.is_valid(raise_exception=True):
+            classifier_uuid = serializer.validated_data.get("uuid")
+
+            task = tasks.retrieve_classifier.delay(str(classifier_uuid))
+            task.wait()
+            return JsonResponse(status=status.HTTP_200_OK, data=task.result)
+
+    @action(
+        detail=True,
+        methods=["POST"],
+        url_name='create-classifier',
+        serializer_class=CreateClassifierSerializer,
+        permission_classes=[ModuleHasPermission],
+    )
+    def create_classifier(self, request):
+        request_data = request.query_params
+        serializer = CreateClassifierSerializer(data=request_data)
+        if serializer.is_valid(raise_exception=True):
+            project_uuid = serializer.validated_data.get("project_uuid")
+            project = Project.objects.get(uuid=project_uuid)
+            task = tasks.create_classifier.delay(
+                project_uuid=str(project.flow_organization),
+                user_email=serializer.validated_data.get("user"),
+                classifier_name=serializer.validated_data.get("name"),
+                access_token=serializer.validated_data.get("access_token"),
+            )
+            task.wait()
+            return JsonResponse(status=status.HTTP_200_OK, data=task.result)
+
+    @action(
+        detail=True,
+        methods=["GET"],
+        url_name='list-classifier',
+        serializer_class=ClassifierSerializer,
+        permission_classes=[ModuleHasPermission],
+    )
+    def list_classifier(self, request):
+        serializer = ClassifierSerializer(data=request.query_params)
+        if serializer.is_valid(raise_exception=True):
+            project_uuid = serializer.validated_data.get("project_uuid")
+            project = Project.objects.get(uuid=project_uuid)
+            task = tasks.list_classifier.delay(str(project.flow_organization))
             task.wait()
             return JsonResponse(status=status.HTTP_200_OK, data=task.result)
 
