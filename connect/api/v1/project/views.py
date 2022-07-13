@@ -264,10 +264,11 @@ class ProjectViewSet(
         detail=True,
         methods=["POST"],
         url_name='create-wac-channel',
+        serializer_class=CreateWACChannelSerializer,
         permission_classes=[ModuleHasPermission],
     )
     def create_wac_channel(self, request):
-        serializer = CreateWACChannelSerializer(data=request.data)
+        serializer = self.get_serializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             project_uuid = serializer.validated_data.get("project_uuid")
             project = Project.objects.get(uuid=project_uuid)
