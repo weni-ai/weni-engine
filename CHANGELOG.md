@@ -1,3 +1,7 @@
+# 1.1.2
+## CHANGE:
+  - fix `get_contact_detailed` method to get all documents instead of paginated results
+
 # 1.1.1
 ## ADD:
   - exclude support users from authorization list
