@@ -1,5 +1,5 @@
 # 1.2.0
-## *Added*
+## *Add*
   - Module permission class
     - On receive a request check if is a module
   - Internal communication class using rest
