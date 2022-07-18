@@ -1,3 +1,10 @@
+# 1.2.1
+## Change
+  - Change `SyncManagerTask filter` in `count_contacts`  to only get objects with `status=True` 
+  - remove `task.wait()` from `retry_billing_tasks`
+  - Replaces Message `get_or_create` method with `try/except`
+
+
 # 1.2.0
 ## *Add*
   - Module permission class
