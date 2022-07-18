@@ -117,17 +117,16 @@ def retry_billing_tasks():
         task.retried = True
         task.save()
         if task.task_type == 'count_contacts':
-            current_task = current_app.send_task(  # pragma: no cover
+            current_app.send_task(  # pragma: no cover
                 name="count_contacts",
                 args=[task.before, task.after, task.started_at]
             )
-            current_task.wait()
+
         elif task.task_type == 'sync_contacts':
-            current_task = current_app.send_task(  # pragma: no cover
+            current_app.send_task(  # pragma: no cover
                 name="sync_contacts",
                 args=[task.before, task.after]
             )
-            current_task.wait()
 
     return True
 
@@ -149,10 +148,11 @@ def count_contacts(sync_before: str = None, sync_after: str = None, started_at: 
         last_sync = SyncManagerTask.objects.filter(
             started_at__gte=count_started_at - timedelta(hours=2),
             started_at__lte=count_started_at,
-            task_type="sync_contacts"
+            task_type="sync_contacts",
+            status=True
         ).last()
     else:
-        last_sync = SyncManagerTask.objects.filter(task_type="sync_contacts").order_by("finished_at").last()
+        last_sync = SyncManagerTask.objects.filter(task_type="sync_contacts", status=True).order_by("finished_at").last()
         manager = SyncManagerTask.objects.create(
             task_type="count_contacts",
             started_at=timezone.now(),
