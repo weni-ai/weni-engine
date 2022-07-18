@@ -121,7 +121,7 @@ def retry_billing_tasks():
                 name="count_contacts",
                 args=[task.before, task.after, task.started_at]
             )
-            
+
         elif task.task_type == 'sync_contacts':
             current_app.send_task(  # pragma: no cover
                 name="sync_contacts",
