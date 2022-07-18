@@ -27,14 +27,16 @@ def get_messages(contact_uuid: str, before: str, after: str, project_uuid: str):
 
     if len(message.uuid) == 0:
         return False
-
-    Message.objects.get_or_create(
-        contact=contact,
-        text=message.text,
-        created_on=message.created_on,
-        direction=message.direction,
-        message_flow_uuid=message.uuid
-    )
+    try:
+        Message.objects.get(message_flow_uuid=message.uuid)
+    except Message.DoesNotExist:
+        Message.objects.create(
+            contact=contact,
+            text=message.text,
+            created_on=message.created_on,
+            direction=message.direction,
+            message_flow_uuid=message.uuid
+        )
 
     channel = Channel.create(
         channel_type=message.channel_type,
