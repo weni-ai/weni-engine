@@ -13,7 +13,7 @@ from weni.protobuf.flows import classifier_pb2_grpc, classifier_pb2
 
 class FlowType(GRPCType):
     slug = "flow"
-    permissions = {1: "viewer", 2: "editor", 3: "administrator"}
+    permissions = {1: "viewer", 2: "editor", 3: "administrator", 4: "administrator"}
 
     def __init__(self):
         self.channel = self.get_channel()
@@ -58,7 +58,7 @@ class FlowType(GRPCType):
     def update_user_permission_project(
         self, organization_uuid: str, user_email: str, permission: int
     ):
-        permissions = {1: "viewer", 2: "editor", 3: "administrator"}
+        permissions = {1: "viewer", 2: "editor", 3: "administrator", 4: "administrator"}
 
         stub = user_pb2_grpc.UserPermissionControllerStub(self.channel)
         response = stub.Update(
