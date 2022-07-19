@@ -66,10 +66,10 @@ app.conf.beat_schedule = {
         "task": "count_contacts",
         "schedule": schedules.crontab(hour="*/6")
     },
-    "retry_billing_tasks": {
-        "task": "retry_billing_tasks",
-        "schedule": schedules.crontab(hour="1")
-    },
+    # "retry_billing_tasks": {
+    #     "task": "retry_billing_tasks",
+    #     "schedule": schedules.crontab(hour="1")
+    # },
     "problem_capture_invoice": {
         "task": "problem_capture_invoice",
         "schedule": schedules.crontab(hour="9,11,14,16,18")
