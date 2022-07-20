@@ -1,10 +1,13 @@
-from django.conf import settings
-
+import logging
 import requests
 import json
 
+
+from django.conf import settings
+
 from connect.api.v1.internal.internal_authentication import InternalAuthentication
 
+logger = logging.getLogger(__name__)
 
 class IntelligenceRESTClient:
 
@@ -103,5 +106,6 @@ class IntelligenceRESTClient:
             )
             if response.status_code == 200:
                 auth_list.add(response.json().get("uuid"))
-            
+            else:
+                logger.error(f"{response.status_code}: classifier not found")
         return {"repositories_count": len(auth_list)}
