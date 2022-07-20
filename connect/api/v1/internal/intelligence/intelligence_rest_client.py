@@ -1,13 +1,12 @@
 import logging
 import requests
-import json
-
 
 from django.conf import settings
 
 from connect.api.v1.internal.internal_authentication import InternalAuthentication
 
 logger = logging.getLogger(__name__)
+
 
 class IntelligenceRESTClient:
 
