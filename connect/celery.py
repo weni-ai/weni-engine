@@ -52,7 +52,7 @@ app.conf.beat_schedule = {
     },
     "sync-active-contacts": {
         "task": "connect.common.tasks.sync_active_contacts",
-        "schedule": schedules.crontab(hour="*/6")
+        "schedule": schedules.crontab(hour="*/6", minute=0)
     },
     "capture_invoice": {
         "task": "connect.common.tasks.capture_invoice",
@@ -60,11 +60,11 @@ app.conf.beat_schedule = {
     },
     "sync_contacts": {
         "task": "sync_contacts",
-        "schedule": schedules.crontab(hour="*/5")
+        "schedule": schedules.crontab(hour="*/5", minute=0)
     },
     "count_contacts": {
         "task": "count_contacts",
-        "schedule": schedules.crontab(hour="*/6")
+        "schedule": schedules.crontab(hour="*/6", minute=0)
     },
     # "retry_billing_tasks": {
     #     "task": "retry_billing_tasks",
@@ -72,7 +72,7 @@ app.conf.beat_schedule = {
     # },
     "problem_capture_invoice": {
         "task": "problem_capture_invoice",
-        "schedule": schedules.crontab(hour="9,11,14,16,18")
+        "schedule": schedules.crontab(hour="9,11,14,16,18", minute=0)
     }
 }
 
