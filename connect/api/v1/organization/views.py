@@ -42,6 +42,7 @@ from connect.common.models import (
 from connect import billing
 from connect.billing.gateways.stripe_gateway import StripeGateway
 from connect.utils import count_contacts
+from connect.api.v1.internal.intelligence.intelligence_rest_client import IntelligenceRESTClient
 
 
 class OrganizationViewSet(
@@ -71,13 +72,10 @@ class OrganizationViewSet(
         return self.queryset.filter(pk__in=auth)
 
     def perform_destroy(self, instance):
-        inteligence_organization = instance.inteligence_organization
+        intelligence_organization = instance.inteligence_organization
         instance.delete()
-
-        celery_app.send_task(
-            "delete_organization",
-            args=[inteligence_organization, self.request.user.email],
-        )
+        ai_client = IntelligenceRESTClient()
+        ai_client.delete_organization(organization_id=intelligence_organization, user_email=self.request.user.email)
 
     @action(
         detail=True,

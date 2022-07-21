@@ -23,6 +23,7 @@ from connect.common.models import (
 from connect.billing.models import ContactCount
 
 from connect.api.v1.internal.integrations.integrations_rest_client import IntegrationsRESTClient
+from connect.api.v1.internal.intelligence.intelligence_rest_client import IntelligenceRESTClient
 
 
 @app.task()
@@ -52,8 +53,8 @@ def status_service() -> None:
 
 @app.task(name="delete_organization")
 def delete_organization(inteligence_organization: int, user_email):
-    grpc_instance = utils.get_grpc_types().get("inteligence")
-    grpc_instance.delete_organization(
+    ai_client = IntelligenceRESTClient()
+    ai_client.delete_organization(
         organization_id=inteligence_organization,
         user_email=user_email,
     )
@@ -61,26 +62,24 @@ def delete_organization(inteligence_organization: int, user_email):
 
 
 @app.task(name="update_organization")
-def update_organization(inteligence_organization: int, organization_name: str):
-    grpc_instance = utils.get_grpc_types().get("inteligence")
-    grpc_instance.update_organization(
+def update_organization(inteligence_organization: int, organization_name: str, user_email: str):
+    ai_client = IntelligenceRESTClient()
+    ai_client.update_organization(
         organization_id=inteligence_organization,
         organization_name=organization_name,
+        user_email=user_email
     )
     return True
 
 
 @app.task(
-    name="update_user_permission_organization",
-    autoretry_for=(_InactiveRpcError, Exception),
-    retry_kwargs={"max_retries": 5},
-    retry_backoff=True,
+    name="update_user_permission_organization"
 )
 def update_user_permission_organization(
     inteligence_organization: int, user_email: str, permission: int
 ):
-    grpc_instance = utils.get_grpc_types().get("inteligence")
-    grpc_instance.update_user_permission_organization(
+    ai_client = IntelligenceRESTClient()
+    ai_client.update_user_permission_organization(
         organization_id=inteligence_organization,
         user_email=user_email,
         permission=permission,
@@ -143,9 +142,9 @@ def update_user_permission_project(
 @app.task(name="migrate_organization")
 def migrate_organization(user_email: str):
     user = User.objects.get(email=user_email)
-    grpc_instance = utils.get_grpc_types().get("inteligence")
+    ai_client = IntelligenceRESTClient()
 
-    organizations = grpc_instance.list_organizations(user_email=user_email)
+    organizations = ai_client.list_organizations(user_email=user_email)
 
     for organization in organizations:
         org, created = Organization.objects.get_or_create(
@@ -153,8 +152,9 @@ def migrate_organization(user_email: str):
             defaults={"name": organization.get("name"), "description": ""},
         )
 
-        role = grpc_instance.get_user_organization_permission_role(
-            user_email=user_email, organization_id=organization.get("id")
+        role = ai_client.get_user_organization_permission_role(
+            user_email=user_email,
+            organization_id=organization.get("id")
         )
 
         org.authorizations.create(user=user, role=role)
@@ -162,9 +162,8 @@ def migrate_organization(user_email: str):
 
 @app.task(name="create_organization")
 def create_organization(organization_name: str, user_email: str):
-    grpc_instance = utils.get_grpc_types().get("inteligence")
-
-    organization = grpc_instance.create_organization(
+    ai_client = IntelligenceRESTClient()
+    organization = ai_client.create_organization(
         organization_name=organization_name,
         user_email=user_email,
     )
@@ -219,7 +218,7 @@ def update_user_language(user_email: str, language: str):
         user_email=user_email,
         language=language,
     )
-    utils.get_grpc_types().get("inteligence").update_language(
+    IntelligenceRESTClient().update_language(
         user_email=user_email,
         language=language,
     )
@@ -237,10 +236,9 @@ def search_project(organization_id: int, project_uuid: str, text: str):
         )
     )
     inteligence_result = (
-        utils.get_grpc_types()
-        .get("inteligence")
-        .get_organization_inteligences(
-            inteligence_name=text,
+        IntelligenceRESTClient.get_organization_intelligences(
+            intelligence_name=text,
+            organization_id=organization_id
         )
     )
     return {
@@ -340,7 +338,7 @@ def sync_project_statistics():
 @app.task()
 def sync_repositories_statistics():
     flow_instance = utils.get_grpc_types().get("flow")
-    inteligence_instance = utils.get_grpc_types().get("inteligence")
+    ai_client = IntelligenceRESTClient()
 
     for project in Project.objects.all():
         classifiers_project = flow_instance.get_classifiers(
@@ -350,7 +348,7 @@ def sync_repositories_statistics():
         )
         try:
             intelligence_count = int(
-                inteligence_instance.get_count_inteligences_project(
+                ai_client.get_count_intelligences_project(
                     classifiers=classifiers_project,
                 ).get("repositories_count")
             )
