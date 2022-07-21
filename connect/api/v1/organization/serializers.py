@@ -1,4 +1,5 @@
 from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
 from rest_framework import serializers
 from rest_framework.exceptions import PermissionDenied
 
@@ -131,12 +132,13 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
     )
 
     def create(self, validated_data):
-        ai_client = IntelligenceRESTClient()
-
-        organization = ai_client.create_organization(
-            user_email=self.context["request"].user.email,
-            organization_name=validated_data.get("name")
-        )
+        organization = {"id": 0}
+        if not settings.TESTING:
+            ai_client = IntelligenceRESTClient()
+            organization = ai_client.create_organization(
+                user_email=self.context["request"].user.email,
+                organization_name=validated_data.get("name")
+            )
 
         validated_data.update({"inteligence_organization": organization.get("id")})
 
