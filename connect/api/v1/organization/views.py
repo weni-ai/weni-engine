@@ -503,7 +503,7 @@ class OrganizationViewSet(
         url_name="organization-retrieve",
         url_path="internal/retrieve"
     )
-    def retrieve(self, request):
+    def retrieve_organization(self, request):
         flow_organization_uuid = request.uuid
         organization = Organization.objects.get(project__flow_organization=flow_organization_uuid)
         return {
