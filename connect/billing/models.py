@@ -8,6 +8,11 @@ from connect.common.models import Project
 logger = logging.getLogger(__name__)
 
 
+class FailMessageLog(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    message = models.TextField()
+
+
 class SyncManagerTask(models.Model):
     uuid = models.UUIDField(
         _("UUID"), primary_key=True, default=uuid4.uuid4, editable=False
@@ -18,7 +23,7 @@ class SyncManagerTask(models.Model):
     retried = models.BooleanField(
         default=False, help_text=_("Whether this task retry or not.")
     )
-    fail_message = models.TextField(null=True)
+    fail_message = models.ManyToManyField(FailMessageLog, verbose_name=_("Manager fail messages"))
     task_type = models.CharField(_("task type"), max_length=150)
     started_at = models.DateTimeField(_("started at"))
     finished_at = models.DateTimeField(_("finished at"), null=True)
@@ -111,4 +116,4 @@ class ContactCount(models.Model):
 
     def increase_contact_count(self, contact_count):
         self.count += contact_count
-        self.save(update_fields=["count"])
+        self.save()

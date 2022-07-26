@@ -2,7 +2,7 @@ import stripe
 import pendulum
 from connect.celery import app
 from connect.common.models import Organization, Project, BillingPlan
-from connect.billing.models import Contact, Message, SyncManagerTask, ContactCount, Channel
+from connect.billing.models import Contact, Message, SyncManagerTask, ContactCount, Channel, FailMessageLog
 from connect.elastic.flow import ElasticFlow
 from datetime import timedelta
 from django.utils import timezone
@@ -48,18 +48,12 @@ def get_messages(contact_uuid: str, before: str, after: str, project_uuid: str):
 
 
 @app.task(name="sync_contacts")
-def sync_contacts(sync_before: str = None, sync_after: str = None):
+def sync_contacts(sync_before: str = None, sync_after: str = None, task_uuid: str = None):
     if sync_before and sync_after:
         sync_before = pendulum.parse(sync_before)
         sync_after = pendulum.parse(sync_after)
-        manager = SyncManagerTask.objects.create(
-            task_type="sync_contacts",
-            started_at=timezone.now(),
-            before=sync_before,
-            after=sync_after
-        )
+        manager = SyncManagerTask.objects.get(uuid=task_uuid)
     else:
-
         last_sync = (
             SyncManagerTask.objects.filter(task_type="sync_contacts")
             .order_by("finished_at")
@@ -96,8 +90,7 @@ def sync_contacts(sync_before: str = None, sync_after: str = None):
                     )
                     if not last_message.exists():
                         contact.delete()
-                        manager.fail_message = "Contact don't have delivery/received message"
-                        update_fields.append('fail_message')
+                        manager.fail_message.create(message="Contact don't have delivery/received message")
                 
         count_contacts.delay(manager.before, manager.after)
 
@@ -107,9 +100,9 @@ def sync_contacts(sync_before: str = None, sync_after: str = None):
         return manager.status
     except Exception as error:
         manager.finished_at = timezone.now()
-        manager.fail_message = str(error)
+        manager.fail_message.create(message=str(error))
         manager.status = False
-        manager.save(update_fields=["finished_at", "status", "fail_message"])
+        manager.save(update_fields=["finished_at", "status"])
         return False
 
 
@@ -123,43 +116,49 @@ def retry_billing_tasks():
         if task.task_type == 'count_contacts':
             current_app.send_task(  # pragma: no cover
                 name="count_contacts",
-                args=[task.before, task.after]
+                args=[task.before, task.after, task.uuid]
             )
 
         elif task.task_type == 'sync_contacts':
             current_app.send_task(  # pragma: no cover
                 name="sync_contacts",
-                args=[task.before, task.after]
+                args=[task.before, task.after, task.uuid]
             )
 
     return True
 
 
 @app.task(name="count_contacts")
-def count_contacts(before, after):
-    manager = SyncManagerTask.objects.create(
-            task_type="count_contacts",
-            started_at=pendulum.now(),
-            before=before,
-            after=after
-        )
+def count_contacts(before, after, task_uuid: str = None):
+    if task_uuid:
+        manager = SyncManagerTask.objects.get(uuid=task_uuid)
+    else:
+
+        manager = SyncManagerTask.objects.create(
+                task_type="count_contacts",
+                started_at=pendulum.now(),
+                before=before,
+                after=after
+            )
     try:
         for project in Project.objects.all():
             for channel in project.channel.all():
-                amount = Contact.objects.filter(channel=channel, last_seen_on__range=(after, before)) 
+                amount = Contact.objects.filter(channel=channel, last_seen_on__range=(after, before)).count()
                 try:
-                    contact_count = ContactCount.objects.get(channel=channel, created_at__range=(after, before))
+                    contact_count = ContactCount.objects.filter(channel=channel, created_at__range=(after, before))\
+                    .order_by("created_at").last()
                 except ContactCount.DoesNotExist:
                     contact_count = ContactCount.objects.create(channel=channel, count=0)
                 contact_count.increase_contact_count(amount)
             manager.status = True
             manager.finished_at=pendulum.now()
             manager.save(update_fields=["status", "finished_at"])
+            return True
     except Exception as error:
         manager.finished_at = pendulum.now()
-        manager.fail_message = str(error)
+        manager.fail_message.create(message=str(error))
         manager.status = False
-        manager.save(update_fields=["finished_at", "status", "fail_message"])
+        manager.save(update_fields=["finished_at", "status"])
         return False
 
 
