@@ -9,7 +9,6 @@ logger = logging.getLogger(__name__)
 
 
 class IntelligenceRESTClient:
-
     def __init__(self):
         self.base_url = settings.INTELLIGENCE_REST_ENDPOINT
         self.authentication_instance = InternalAuthentication()
@@ -18,7 +17,7 @@ class IntelligenceRESTClient:
         response = requests.get(
             url=f"{self.base_url}v2/internal/organization/",
             headers=self.authentication_instance.get_headers(),
-            params={"user_email": user_email}
+            params={"user_email": user_email},
         )
 
         return response.json()
@@ -27,16 +26,16 @@ class IntelligenceRESTClient:
         response = requests.get(
             url=f"{self.base_url}v2/internal/user/permission/",
             headers=self.authentication_instance.get_headers(),
-            params={"user_email": user_email, "org_id": organization_id}
+            params={"user_email": user_email, "org_id": organization_id},
         )
-        return response.json().get('role')
+        return response.json().get("role")
 
     def create_organization(self, user_email, organization_name):
         response = requests.post(
             url=f"{self.base_url}v2/internal/organization/",
             headers=self.authentication_instance.get_headers(),
             json={"user_email": user_email, "organization_name": organization_name},
-            params={"user_email": user_email}
+            params={"user_email": user_email},
         )
         return response.json()
 
@@ -44,7 +43,7 @@ class IntelligenceRESTClient:
         response = requests.delete(
             url=f"{self.base_url}v2/internal/organization/{organization_id}/",
             headers=self.authentication_instance.get_headers(),
-            params={"user_email": user_email}
+            params={"user_email": user_email},
         )
         return response.json()
 
@@ -53,7 +52,7 @@ class IntelligenceRESTClient:
             url=f"{self.base_url}v2/internal/organization/{organization_id}/",
             headers=self.authentication_instance.get_headers(),
             params={"user_email": user_email},
-            json={"name": organization_name}
+            json={"name": organization_name},
         )
         return response.json()
 
@@ -64,7 +63,7 @@ class IntelligenceRESTClient:
             url=f"{self.base_url}v2/internal/user/permission/",
             headers=self.authentication_instance.get_headers(),
             params={"org_id": organization_id, "user_email": user_email},
-            json={"role": permission}
+            json={"role": permission},
         )
         return response.json()
 
@@ -73,7 +72,7 @@ class IntelligenceRESTClient:
         response = requests.get(
             url=f"{self.base_url}v2/internal/repository/",
             headers=self.authentication_instance.get_headers(),
-            params={"name": intelligence_name, "org_id": organization_id}
+            params={"name": intelligence_name, "org_id": organization_id},
         )
 
         return response.json()
@@ -83,7 +82,7 @@ class IntelligenceRESTClient:
             url=f"{self.base_url}v2/internal/user/language/",
             headers=self.authentication_instance.get_headers(),
             params={"user_email": user_email},
-            json={"language": language}
+            json={"language": language},
         )
         return response.json()
 
@@ -91,7 +90,7 @@ class IntelligenceRESTClient:
         response = requests.get(
             url=f"{self.base_url}v2/internal/organization/{organization_id}/",
             headers=self.authentication_instance.get_headers(),
-            params={"user_email": user_email}
+            params={"user_email": user_email},
         )
         return response.json().get("repositories_count", 0)
 
@@ -101,7 +100,9 @@ class IntelligenceRESTClient:
             response = requests.get(
                 url=f"{self.base_url}v2/internal/repository/retrieve_authorization/",
                 headers=self.authentication_instance.get_headers(),
-                params={"repository_authorization": classifier.get('authorization_uuid')}
+                params={
+                    "repository_authorization": classifier.get("authorization_uuid")
+                },
             )
             if response.status_code == 200:
                 auth_list.add(response.json().get("uuid"))
