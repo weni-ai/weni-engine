@@ -1,5 +1,6 @@
 import logging
 
+from django.conf import settings
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from django.utils import timezone
@@ -22,6 +23,7 @@ from connect.common.models import (
     OpenedProject,
 )
 from connect.celery import app as celery_app
+from connect.api.v1.internal.intelligence.intelligence_rest_client import IntelligenceRESTClient
 
 logger = logging.getLogger("connect.common.signals")
 
@@ -99,14 +101,13 @@ def org_authorizations(sender, instance, created, **kwargs):
                     if instance.role > project_perm.role:
                         project_perm.role = project_role
                         project_perm.save(update_fields=["role"])
-        celery_app.send_task(
-            "update_user_permission_organization",
-            args=[
-                instance.organization.inteligence_organization,
-                instance.user.email,
-                instance.role,
-            ],
-        )
+        if not settings.TESTING:
+            ai_client = IntelligenceRESTClient()
+            ai_client.update_user_permission_organization(
+                organization_id=instance.organization.inteligence_organization,
+                user_email=instance.user.email,
+                permission=instance.role
+            )
 
 
 @receiver(post_delete, sender=OrganizationAuthorization)
