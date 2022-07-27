@@ -13,6 +13,17 @@ app.config_from_object("django.conf:settings", namespace="CELERY")
 
 app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 
+task_create_missing_queues = True
+
+# Billing Tasks
+
+app.conf.task_routes = {
+    'sync_contacts': {'queue': 'billing'},
+    'count_contacts': {'queue': 'billing'},
+    'retry_billing_tasks': {'queue': 'billing'},
+}
+
+
 app.conf.beat_schedule = {
     "check-status-services": {
         "task": "connect.common.tasks.status_service",
@@ -66,10 +77,10 @@ app.conf.beat_schedule = {
         "task": "count_contacts",
         "schedule": schedules.crontab(hour="*/6", minute=0)
     },
-    # "retry_billing_tasks": {
-    #     "task": "retry_billing_tasks",
-    #     "schedule": schedules.crontab(hour="1")
-    # },
+    "retry_billing_tasks": {
+        "task": "retry_billing_tasks",
+        "schedule": schedules.crontab(hour="1")
+    },
     "problem_capture_invoice": {
         "task": "problem_capture_invoice",
         "schedule": schedules.crontab(hour="9,11,14,16,18", minute=0)
