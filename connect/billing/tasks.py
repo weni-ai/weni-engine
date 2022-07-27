@@ -2,7 +2,7 @@ import stripe
 import pendulum
 from connect.celery import app
 from connect.common.models import Organization, Project, BillingPlan
-from connect.billing.models import Contact, Message, SyncManagerTask, ContactCount, Channel, FailMessageLog
+from connect.billing.models import Contact, Message, SyncManagerTask, ContactCount, Channel
 from connect.elastic.flow import ElasticFlow
 from datetime import timedelta
 from django.utils import timezone
@@ -91,7 +91,7 @@ def sync_contacts(sync_before: str = None, sync_after: str = None, task_uuid: st
                     if not last_message.exists():
                         contact.delete()
                         manager.fail_message.create(message="Contact don't have delivery/received message")
-                
+
         count_contacts.delay(manager.before, manager.after)
 
         manager.finished_at = timezone.now()
@@ -135,23 +135,23 @@ def count_contacts(before, after, task_uuid: str = None):
     else:
 
         manager = SyncManagerTask.objects.create(
-                task_type="count_contacts",
-                started_at=pendulum.now(),
-                before=before,
-                after=after
-            )
+            task_type="count_contacts",
+            started_at=pendulum.now(),
+            before=before,
+            after=after
+        )
     try:
         for project in Project.objects.all():
             for channel in project.channel.all():
                 amount = Contact.objects.filter(channel=channel, last_seen_on__range=(after, before)).count()
                 try:
                     contact_count = ContactCount.objects.filter(channel=channel, created_at__range=(after, before))\
-                    .order_by("created_at").last()
+                        .order_by("created_at").last()
                 except ContactCount.DoesNotExist:
                     contact_count = ContactCount.objects.create(channel=channel, count=0)
                 contact_count.increase_contact_count(amount)
             manager.status = True
-            manager.finished_at=pendulum.now()
+            manager.finished_at = pendulum.now()
             manager.save(update_fields=["status", "finished_at"])
             return True
     except Exception as error:
@@ -160,7 +160,6 @@ def count_contacts(before, after, task_uuid: str = None):
         manager.status = False
         manager.save(update_fields=["finished_at", "status"])
         return False
-
 
 
 @app.task(name="refund_validation_charge")
@@ -183,3 +182,57 @@ def problem_capture_invoice():
                     name="update_suspend_project",
                     args=[project.flow_organization, True]
                 )
+
+
+@app.task(name="sync_contacts_retroactive")
+def sync_contacts_retroactive(before, after, task_uuid: str = None):
+    if task_uuid:
+        manager = SyncManagerTask.objects.get(uuid=task_uuid)
+    else:
+        last_retroactive_sync = SyncManagerTask.objects.filter(
+            task_type="retroactive_sync",
+            status=True,
+        ).order_by("started_at").last()
+
+        if last_retroactive_sync:
+            after = pendulum.instance(last_retroactive_sync.before)
+            before = after.add(hours=3)
+
+        manager = SyncManagerTask.objects.create(
+            task_type="retroactive_sync",
+            started_at=pendulum.now(),
+            before=before,
+            after=after
+        )
+
+    try:
+        flow_instance = utils.get_grpc_types().get("flow")
+        for project in Project.objects.exclude(flow_id=None):
+            active_contacts = list(
+                flow_instance.get_active_contacts(
+                    str(project.flow_organization), before, after))
+            for contact in active_contacts:
+                contact = Contact.objects.create(
+                    contact_flow_uuid=contact.uuid,
+                    name=contact.name,
+                    last_seen_on=pendulum.from_timestamp(contact.msg.sent_on.seconds.real),
+                )
+                message = Message.objects.create(
+                    contact=contact,
+                    text=contact.msg.text,
+                    created_on=pendulum.from_timestamp(contact.msg.sent_on.seconds.real),
+                    direction=contact.msg.direction,
+                    message_flow_uuid=contact.msg.uuid
+                )
+                channel = Channel.create(
+                    channel_type=message.channel_type,
+                    channel_flow_id=contact.channel.uuid,
+                    project=project
+                )
+                contact.update_channel(channel)
+    except Exception as error:
+        manager.finished_at = pendulum.now()
+        manager.fail_message.create(message=str(error))
+        manager.status = False
+        manager.save(update_fields=["finished_at", "status"])
+        return False
