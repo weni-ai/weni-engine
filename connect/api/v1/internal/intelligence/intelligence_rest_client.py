@@ -16,7 +16,7 @@ class IntelligenceRESTClient:
     def list_organizations(self, user_email):
         response = requests.get(
             url=f"{self.base_url}v2/internal/organization/",
-            headers=self.authentication_instance.get_headers(),
+            headers=self.authentication_instance.headers,
             params={"user_email": user_email},
         )
 
@@ -25,7 +25,7 @@ class IntelligenceRESTClient:
     def get_user_organization_permission_role(self, user_email, organization_id):
         response = requests.get(
             url=f"{self.base_url}v2/internal/user/permission/",
-            headers=self.authentication_instance.get_headers(),
+            headers=self.authentication_instance.headers,
             params={"user_email": user_email, "org_id": organization_id},
         )
         return response.json().get("role")
@@ -33,7 +33,7 @@ class IntelligenceRESTClient:
     def create_organization(self, user_email, organization_name):
         response = requests.post(
             url=f"{self.base_url}v2/internal/organization/",
-            headers=self.authentication_instance.get_headers(),
+            headers=self.authentication_instance.headers,
             json={"user_email": user_email, "organization_name": organization_name},
             params={"user_email": user_email},
         )
@@ -42,7 +42,7 @@ class IntelligenceRESTClient:
     def delete_organization(self, organization_id, user_email):
         response = requests.delete(
             url=f"{self.base_url}v2/internal/organization/{organization_id}/",
-            headers=self.authentication_instance.get_headers(),
+            headers=self.authentication_instance.headers,
             params={"user_email": user_email},
         )
         return response.json()
@@ -50,7 +50,7 @@ class IntelligenceRESTClient:
     def update_organization(self, organization_id, organization_name, user_email):
         response = requests.put(
             url=f"{self.base_url}v2/internal/organization/{organization_id}/",
-            headers=self.authentication_instance.get_headers(),
+            headers=self.authentication_instance.headers,
             params={"user_email": user_email},
             json={"name": organization_name},
         )
@@ -61,7 +61,7 @@ class IntelligenceRESTClient:
     ):
         response = requests.put(
             url=f"{self.base_url}v2/internal/user/permission/",
-            headers=self.authentication_instance.get_headers(),
+            headers=self.authentication_instance.headers,
             params={"org_id": organization_id, "user_email": user_email},
             json={"role": permission},
         )
@@ -71,7 +71,7 @@ class IntelligenceRESTClient:
 
         response = requests.get(
             url=f"{self.base_url}v2/internal/repository/",
-            headers=self.authentication_instance.get_headers(),
+            headers=self.authentication_instance.headers,
             params={"name": intelligence_name, "org_id": organization_id},
         )
 
@@ -80,7 +80,7 @@ class IntelligenceRESTClient:
     def update_language(self, user_email, language):
         response = requests.put(
             url=f"{self.base_url}v2/internal/user/language/",
-            headers=self.authentication_instance.get_headers(),
+            headers=self.authentication_instance.headers,
             params={"user_email": user_email},
             json={"language": language},
         )
@@ -89,7 +89,7 @@ class IntelligenceRESTClient:
     def get_organization_statistics(self, organization_id, user_email):
         response = requests.get(
             url=f"{self.base_url}v2/internal/organization/{organization_id}/",
-            headers=self.authentication_instance.get_headers(),
+            headers=self.authentication_instance.headers,
             params={"user_email": user_email},
         )
         return response.json().get("repositories_count", 0)
@@ -99,7 +99,7 @@ class IntelligenceRESTClient:
         for classifier in classifiers:
             response = requests.get(
                 url=f"{self.base_url}v2/internal/repository/retrieve_authorization/",
-                headers=self.authentication_instance.get_headers(),
+                headers=self.authentication_instance.headers,
                 params={
                     "repository_authorization": classifier.get("authorization_uuid")
                 },
