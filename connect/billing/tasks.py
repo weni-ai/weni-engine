@@ -176,10 +176,10 @@ def count_contacts(before, after, task_uuid: str = None):
                         channel=channel, count=0
                     )
                 contact_count.increase_contact_count(amount)
-            manager.status = True
-            manager.finished_at = pendulum.now()
-            manager.save(update_fields=["status", "finished_at"])
-            return True
+        manager.status = True
+        manager.finished_at = pendulum.now()
+        manager.save(update_fields=["status", "finished_at"])
+        return True
     except Exception as error:
         manager.finished_at = pendulum.now()
         manager.fail_message.create(message=str(error))
