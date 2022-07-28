@@ -236,7 +236,7 @@ def search_project(organization_id: int, project_uuid: str, text: str):
         )
     )
     inteligence_result = (
-        IntelligenceRESTClient.get_organization_intelligences(
+        IntelligenceRESTClient().get_organization_intelligences(
             intelligence_name=text,
             organization_id=organization_id
         )

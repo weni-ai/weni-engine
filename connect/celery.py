@@ -45,10 +45,10 @@ app.conf.beat_schedule = {
         "task": "sync_project_statistics",
         "schedule": schedules.crontab(minute="*/6")
     },
-    # "sync-repositories-statistics": {
-    #     "task": "connect.common.tasks.sync_repositories_statistics",
-    #     "schedule": schedules.crontab(minute="*/8")
-    # },
+    "sync-repositories-statistics": {
+        "task": "connect.common.tasks.sync_repositories_statistics",
+        "schedule": schedules.crontab(minute="*/8")
+    },
     "sync-channels-statistics": {
         "task": "sync_channels_statistics",
         "schedule": schedules.crontab(minute="*/7")
