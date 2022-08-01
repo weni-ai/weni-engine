@@ -1,3 +1,4 @@
+from email.policy import strict
 import json
 
 from django.shortcuts import get_object_or_404
@@ -152,8 +153,8 @@ class ProjectViewSet(
                 _("Need to pass 'before' and 'after' in query params")
             )
 
-        before = pendulum.parse(before).end_of("day")
-        after = pendulum.parse(after).start_of("day")
+        before = pendulum.parse(before, strict=False).end_of("day")
+        after = pendulum.parse(after, strict=False).start_of("day")
 
         contact_count = count_contacts(str(project_uuid), before, after)
         contacts = Contact.objects.filter(channel__project=project_uuid, last_seen_on__range=(after, before))
