@@ -20,7 +20,6 @@ from connect.api.v1.account.serializers import (
 from connect.api.v1.keycloak import KeycloakControl
 from connect.authentication.models import User
 from connect.common.models import OrganizationAuthorization, Service
-from connect.api.v1.organization.permissions import OrganizationHasPermission
 from connect.utils import upload_photo_rocket
 from connect.celery import app as celery_app
 from rest_framework import status
