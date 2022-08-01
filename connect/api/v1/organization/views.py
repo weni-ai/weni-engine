@@ -43,6 +43,7 @@ from connect import billing
 from connect.billing.gateways.stripe_gateway import StripeGateway
 from connect.utils import count_contacts
 from connect.api.v1.internal.intelligence.intelligence_rest_client import IntelligenceRESTClient
+import pendulum
 
 
 class OrganizationViewSet(
@@ -159,15 +160,16 @@ class OrganizationViewSet(
 
         organization = get_object_or_404(Organization, uuid=organization_uuid)
 
-        self.check_object_permissions(self.request, organization)
-
-        before = str(request.query_params.get("before") + " 00:00")
-        after = str(request.query_params.get("after") + " 00:00")
-
+        before = request.query_params.get("before")
+        after = request.query_params.get("after")
+        print(before, after)
         if not before or not after:
             raise ValidationError(
                 _("Need to pass 'before' and 'after' in query params")
             )
+
+        before = pendulum.parse(before).end_of("day")
+        after = pendulum.parse(after).start_of("day")
 
         result = {"projects": []}
 
