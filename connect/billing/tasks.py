@@ -163,15 +163,14 @@ def count_contacts(before, after, task_uuid: str = None):
                 amount = Contact.objects.filter(
                     channel=channel, last_seen_on__range=(after, before)
                 ).count()
-                try:
-                    contact_count = (
-                        ContactCount.objects.filter(
-                            channel=channel, created_at__range=(after, before)
-                        )
-                        .order_by("created_at")
-                        .last()
+                contact_count = (
+                    ContactCount.objects.filter(
+                        channel=channel, created_at__range=(after, before)
                     )
-                except ContactCount.DoesNotExist:
+                    .order_by("created_at")
+                    .last()
+                )
+                if not contact_count:
                     contact_count = ContactCount.objects.create(
                         channel=channel, count=0
                     )
