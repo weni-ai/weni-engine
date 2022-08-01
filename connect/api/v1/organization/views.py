@@ -168,8 +168,8 @@ class OrganizationViewSet(
                 _("Need to pass 'before' and 'after' in query params")
             )
 
-        before = pendulum.parse(before).end_of("day")
-        after = pendulum.parse(after).start_of("day")
+        before = pendulum.parse(before, strict=False).end_of("day")
+        after = pendulum.parse(after, strict=False).start_of("day")
 
         result = {"projects": []}
 
