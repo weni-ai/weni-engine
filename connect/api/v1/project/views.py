@@ -6,7 +6,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.http import JsonResponse
 from django.db.models import Q
 from django.utils import timezone
-
+import pendulum
+from connect.billing.models import Contact
 from rest_framework import mixins, status
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
@@ -47,6 +48,7 @@ from connect.common.models import (
 )
 from connect.authentication.models import User
 from connect.common import tasks
+from connect.utils import count_contacts
 
 
 class ProjectViewSet(
@@ -142,16 +144,33 @@ class ProjectViewSet(
     )
     def get_contact_active_detailed(self, request, project_uuid):
 
-        before = str(request.query_params.get("before") + " 00:00")
-        after = str(request.query_params.get("after") + " 00:00")
+        before = request.query_params.get("before")
+        after = request.query_params.get("after")
 
         if not before or not after:
             raise ValidationError(
                 _("Need to pass 'before' and 'after' in query params")
             )
-        task = tasks.get_contacts_detailed.delay(str(project_uuid), before, after)
-        task.wait()
-        contact_detailed = {"projects": task.result}
+
+        before = pendulum.parse(before).end_of("day")
+        after = pendulum.parse(after).start_of("day")
+
+        contact_count = count_contacts(str(project_uuid), before, after)
+        contacts = Contact.objects.filter(channel__project=project_uuid, last_seen_on__range=(after, before))
+
+        project = Project.objects.get(uuid=project_uuid)
+
+        active_contacts_info = []
+        for contact in contacts:
+            active_contacts_info.append({"name": contact.name, "uuid": contact.contact_flow_uuid})
+
+        project_info = {
+            "project_name": project.name,
+            "active_contacts": contact_count,
+            "contacts_info": active_contacts_info,
+        }
+
+        contact_detailed = {"projects": project_info}
         return JsonResponse(data=contact_detailed, status=status.HTTP_200_OK)
 
     @action(
