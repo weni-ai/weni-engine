@@ -15,10 +15,12 @@ from connect.api.v1.account.serializers import (
     UserPhotoSerializer,
     ChangePasswordSerializer,
     ChangeLanguageSerializer,
+    SearchUserSerializer,
 )
 from connect.api.v1.keycloak import KeycloakControl
 from connect.authentication.models import User
 from connect.common.models import OrganizationAuthorization, Service
+from connect.api.v1.organization.permissions import OrganizationHasPermission
 from connect.utils import upload_photo_rocket
 from connect.celery import app as celery_app
 from rest_framework import status
@@ -189,9 +191,10 @@ class MyUserProfileViewSet(
 
 
 class SearchUserViewSet(mixins.ListModelMixin, GenericViewSet):  # pragma: no cover
-    serializer_class = UserSerializer
+    serializer_class = SearchUserSerializer
     queryset = User.objects.all()
     filter_backends = [DjangoFilterBackend, SearchFilter]
+    permission_classes = [permissions.IsAuthenticated]
     search_fields = [
         "=first_name",
         "^first_name",
@@ -210,6 +213,10 @@ class SearchUserViewSet(mixins.ListModelMixin, GenericViewSet):  # pragma: no co
     limit = 5
 
     def list(self, request, *args, **kwargs):
+        if len(request.query_params.get("search", "")) == 0:
+            raise ValidationError(
+                _("The search field needed the text to search.")
+            )
         queryset = self.filter_queryset(self.get_queryset())[: self.limit]
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
