@@ -72,6 +72,13 @@ class OrganizationViewSet(
         )
         return self.queryset.filter(pk__in=auth)
 
+    def list(self, request, *args, **kwargs):
+        page = self.paginate_queryset(
+            self.filter_queryset(self.get_queryset().order_by("name")),
+        )
+        organization_serializer = OrganizationSeralizer(page, many=True, context=self.get_serializer_context())
+        return self.get_paginated_response(organization_serializer.data)
+
     def perform_destroy(self, instance):
         intelligence_organization = instance.inteligence_organization
         instance.delete()
