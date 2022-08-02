@@ -3,6 +3,11 @@ import json
 from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext_lazy as _
 from django_filters.rest_framework import DjangoFilterBackend
+from django.http import JsonResponse
+from django.db.models import Q
+from django.utils import timezone
+import pendulum
+from connect.billing.models import Contact
 from rest_framework import mixins, status
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
@@ -10,6 +15,7 @@ from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
+from rest_framework.exceptions import ValidationError
 
 from connect.api.v1.metadata import Metadata
 from connect.api.v1.project.filters import ProjectOrgFilter
@@ -25,6 +31,10 @@ from connect.api.v1.project.serializers import (
     ListChannelSerializer,
     CreateChannelSerializer,
     CreateWACChannelSerializer,
+    DestroyClassifierSerializer,
+    RetrieveClassifierSerializer,
+    CreateClassifierSerializer,
+    ClassifierSerializer,
 )
 from connect.celery import app as celery_app
 from connect.common.models import (
@@ -37,12 +47,8 @@ from connect.common.models import (
     OpenedProject,
 )
 from connect.authentication.models import User
-
-from rest_framework.exceptions import ValidationError
 from connect.common import tasks
-from django.http import JsonResponse
-from django.db.models import Q
-from django.utils import timezone
+from connect.utils import count_contacts
 
 
 class ProjectViewSet(
@@ -138,16 +144,33 @@ class ProjectViewSet(
     )
     def get_contact_active_detailed(self, request, project_uuid):
 
-        before = str(request.query_params.get("before") + " 00:00")
-        after = str(request.query_params.get("after") + " 00:00")
+        before = request.query_params.get("before")
+        after = request.query_params.get("after")
 
         if not before or not after:
             raise ValidationError(
                 _("Need to pass 'before' and 'after' in query params")
             )
-        task = tasks.get_contacts_detailed.delay(str(project_uuid), before, after)
-        task.wait()
-        contact_detailed = {"projects": task.result}
+
+        before = pendulum.parse(before, strict=False).end_of("day")
+        after = pendulum.parse(after, strict=False).start_of("day")
+
+        contact_count = count_contacts(str(project_uuid), before, after)
+        contacts = Contact.objects.filter(channel__project=project_uuid, last_seen_on__range=(after, before))
+
+        project = Project.objects.get(uuid=project_uuid)
+
+        active_contacts_info = []
+        for contact in contacts:
+            active_contacts_info.append({"name": contact.name, "uuid": contact.contact_flow_uuid})
+
+        project_info = {
+            "project_name": project.name,
+            "active_contacts": contact_count,
+            "contacts_info": active_contacts_info,
+        }
+
+        contact_detailed = {"projects": project_info}
         return JsonResponse(data=contact_detailed, status=status.HTTP_200_OK)
 
     @action(
@@ -279,6 +302,78 @@ class ProjectViewSet(
                 phone_number_id=serializer.validated_data.get("phone_number_id"),
             )
 
+            task.wait()
+            return JsonResponse(status=status.HTTP_200_OK, data=task.result)
+
+    @action(
+        detail=True,
+        methods=["DELETE"],
+        url_name='destroy-classifier',
+        serializer_class=DestroyClassifierSerializer,
+        permission_classes=[ModuleHasPermission],
+    )
+    def destroy_classifier(self, request):
+        serializer = DestroyClassifierSerializer(data=request.query_params)
+        if serializer.is_valid(raise_exception=True):
+            classifier_uuid = serializer.validated_data.get("uuid")
+            user_email = serializer.validated_data.get("user_email")
+
+            task = tasks.destroy_classifier.delay(str(classifier_uuid), user_email)
+            task.wait()
+            return JsonResponse(status=status.HTTP_200_OK)
+
+    @action(
+        detail=True,
+        methods=["GET"],
+        url_name='retrieve-classifier',
+        serializer_class=RetrieveClassifierSerializer,
+        permission_classes=[ModuleHasPermission],
+    )
+    def retrieve_classifier(self, request):
+        serializer = RetrieveClassifierSerializer(data=request.query_params)
+
+        if serializer.is_valid(raise_exception=True):
+            classifier_uuid = serializer.validated_data.get("uuid")
+
+            task = tasks.retrieve_classifier.delay(str(classifier_uuid))
+            task.wait()
+            return JsonResponse(status=status.HTTP_200_OK, data=task.result)
+
+    @action(
+        detail=True,
+        methods=["POST"],
+        url_name='create-classifier',
+        serializer_class=CreateClassifierSerializer,
+        permission_classes=[ModuleHasPermission],
+    )
+    def create_classifier(self, request):
+        request_data = request.query_params
+        serializer = CreateClassifierSerializer(data=request_data)
+        if serializer.is_valid(raise_exception=True):
+            project_uuid = serializer.validated_data.get("project_uuid")
+            project = Project.objects.get(uuid=project_uuid)
+            task = tasks.create_classifier.delay(
+                project_uuid=str(project.flow_organization),
+                user_email=serializer.validated_data.get("user"),
+                classifier_name=serializer.validated_data.get("name"),
+                access_token=serializer.validated_data.get("access_token"),
+            )
+            task.wait()
+            return JsonResponse(status=status.HTTP_200_OK, data=task.result)
+
+    @action(
+        detail=True,
+        methods=["GET"],
+        url_name='list-classifier',
+        serializer_class=ClassifierSerializer,
+        permission_classes=[ModuleHasPermission],
+    )
+    def list_classifier(self, request):
+        serializer = ClassifierSerializer(data=request.query_params)
+        if serializer.is_valid(raise_exception=True):
+            project_uuid = serializer.validated_data.get("project_uuid")
+            project = Project.objects.get(uuid=project_uuid)
+            task = tasks.list_classifier.delay(str(project.flow_organization))
             task.wait()
             return JsonResponse(status=status.HTTP_200_OK, data=task.result)
 

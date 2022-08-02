@@ -80,3 +80,16 @@ class ChangePasswordSerializer(serializers.Serializer):
 
 class ChangeLanguageSerializer(serializers.Serializer):
     language = serializers.ChoiceField(settings.LANGUAGES, label=_("Language"))
+
+
+class SearchUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "username",
+            "email",
+            "first_name",
+            "last_name",
+            "photo",
+        ]
