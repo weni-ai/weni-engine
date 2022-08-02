@@ -71,12 +71,12 @@ app.conf.beat_schedule = {
     },
     "sync_contacts": {
         "task": "sync_contacts",
-        "schedule": schedules.crontab(hour="*/5", minute=0)
+        "schedule": schedules.crontab(hour=settings.SYNC_CONTACTS_SCHEDULE, minute=0)
     },
-    "count_contacts": {
-        "task": "count_contacts",
-        "schedule": schedules.crontab(hour="*/6", minute=0)
-    },
+    # "count_contacts": {
+    #     "task": "count_contacts",
+    #     "schedule": schedules.crontab(hour="*/6", minute=0)
+    # },
     "retry_billing_tasks": {
         "task": "retry_billing_tasks",
         "schedule": schedules.crontab(hour="1")

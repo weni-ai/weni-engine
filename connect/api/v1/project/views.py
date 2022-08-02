@@ -1,4 +1,3 @@
-from email.policy import strict
 import json
 
 from django.shortcuts import get_object_or_404
