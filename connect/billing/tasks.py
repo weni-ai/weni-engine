@@ -10,7 +10,6 @@ from connect.billing.models import (
     Channel,
 )
 from connect.elastic.flow import ElasticFlow
-from datetime import timedelta
 from django.utils import timezone
 from connect import utils
 from celery import current_app
@@ -71,11 +70,11 @@ def sync_contacts(
         )
         manager = SyncManagerTask.objects.create(
             task_type="sync_contacts",
-            started_at=timezone.now(),
-            before=timezone.now(),
+            started_at=pendulum.now(),
+            before=pendulum.now(),
             after=last_sync.before
             if isinstance(last_sync, SyncManagerTask)
-            else timezone.now() - timedelta(hours=5),
+            else pendulum.now().subtract(hours=1),
         )
 
     try:

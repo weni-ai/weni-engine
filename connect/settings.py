@@ -77,7 +77,8 @@ env = environ.Env(
     ROCKET_USERNAME=(str, None),
     ROCKET_PASSWORD=(str, None),
     ROCKET_TEST_MODE=(bool, False),
-    VERIFICATION_AMOUNT=(float, 1)
+    VERIFICATION_AMOUNT=(float, 1),
+    SYNC_CONTACTS_SCHEDULE=(str, "*/1"),
 )
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -371,6 +372,8 @@ CELERY_BROKER_URL = env.str("CELERY_BROKER_URL")
 CELERY_ACCEPT_CONTENT = ["application/json"]
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TASK_SERIALIZER = "json"
+
+SYNC_CONTACTS_SCHEDULE = env.str("SYNC_CONTACTS_SCHEDULE")
 
 # AWS
 
