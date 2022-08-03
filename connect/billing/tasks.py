@@ -1,3 +1,5 @@
+import uuid
+import random
 import stripe
 import pendulum
 from connect.celery import app
@@ -23,34 +25,58 @@ from django.conf import settings
     retry_kwargs={"max_retries": 5},
     retry_backoff=True,
 )
-def get_messages(contact_uuid: str, before: str, after: str, project_uuid: str):
+def get_messages(temp_channel_uuid: str, before: str, after: str, project_uuid: str):
+    manager = SyncManagerTask.objects.create(
+        task_type="get_messages",
+        started_at=pendulum.now(),
+        before=pendulum.parse(before),
+        after=pendulum.parse(after)
+    )
 
     flow_instance = utils.get_grpc_types().get("flow")
-    contact = Contact.objects.get(uuid=contact_uuid)
     project = Project.objects.get(uuid=project_uuid)
-    message = flow_instance.get_message(
-        str(project.flow_organization), str(contact.contact_flow_uuid), before, after
-    )
 
-    if len(message.uuid) == 0:
-        return False
-    try:
-        Message.objects.get(message_flow_uuid=message.uuid)
-    except Message.DoesNotExist:
-        Message.objects.create(
-            contact=contact,
-            text=message.text,
-            created_on=message.created_on,
-            direction=message.direction,
-            message_flow_uuid=message.uuid,
+    for contact in Contact.objects.filter(channel__uuid=temp_channel_uuid, last_seen_on__range=(after, before)):
+
+        message = flow_instance.get_message(
+            str(project.flow_organization), str(contact.contact_flow_uuid), before, after
         )
 
-    channel = Channel.create(
-        channel_type=message.channel_type,
-        channel_flow_id=message.channel_id,
-        project=project,
-    )
-    contact.update_channel(channel)
+        if not message:
+            last_message = Message.objects.filter(
+                contact=contact,
+                created_on__date__month=timezone.now().date().month,
+                created_on__date__year=timezone.now().date().year,
+            )
+
+        if not last_message.exists():
+            contact.delete()
+            manager.fail_message.create(
+                message="Contact don't have delivery/received message"
+            )
+
+            continue
+
+        try:
+            Message.objects.get(message_flow_uuid=message.uuid)
+        except Message.DoesNotExist:
+            Message.objects.create(
+                contact=contact,
+                text=message.text,
+                created_on=message.created_on,
+                direction=message.direction,
+                message_flow_uuid=message.uuid,
+            )
+
+        channel = Channel.create(
+            channel_type=message.channel_type,
+            channel_flow_id=message.channel_id,
+            project=project,
+        )
+        contact.update_channel(channel)
+
+    count_contacts.delay(manager.before, manager.after)
+
     return True
 
 
@@ -80,37 +106,39 @@ def sync_contacts(
     try:
         elastic_instance = ElasticFlow()
         update_fields = ["finished_at", "status"]
+
         for project in Project.objects.exclude(flow_id=None):
+
             active_contacts = list(
                 elastic_instance.get_contact_detailed(
                     str(project.flow_id), str(manager.before), str(manager.after)
                 )
             )
+
+            temp_channel_uuid = uuid.uuid4()
+            temp_channel = Channel.create(
+                uuid=temp_channel_uuid,
+                project=project,
+                channel_flow_id=random.randint(2147483000, 2147483646),
+                channel_type="TEMP",
+            )
+
             for elastic_contact in active_contacts:
+
                 contact = Contact.objects.create(
                     contact_flow_uuid=elastic_contact.uuid,
                     name=elastic_contact.name,
                     last_seen_on=pendulum.parse(elastic_contact.last_seen_on),
                 )
-                has_message = get_messages(
-                    str(contact.uuid),
-                    str(manager.before),
-                    str(manager.after),
-                    str(project.uuid),
-                )
-                if not has_message:
-                    last_message = Message.objects.filter(
-                        contact=contact,
-                        created_on__date__month=timezone.now().date().month,
-                        created_on__date__year=timezone.now().date().year,
-                    )
-                    if not last_message.exists():
-                        contact.delete()
-                        manager.fail_message.create(
-                            message="Contact don't have delivery/received message"
-                        )
 
-        count_contacts.delay(manager.before, manager.after)
+                contact.update_channel(temp_channel)
+
+            get_messages.delay(
+                str(temp_channel_uuid),
+                str(manager.before),
+                str(manager.after),
+                str(project.uuid),
+            )
 
         manager.finished_at = timezone.now()
         manager.status = True
