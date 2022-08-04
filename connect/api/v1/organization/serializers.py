@@ -19,6 +19,7 @@ from connect.api.v1.internal.intelligence.intelligence_rest_client import Intell
 
 User = get_user_model()
 
+
 class BillingPlanSerializer(serializers.ModelSerializer):
     class Meta:
         model = BillingPlan
@@ -270,5 +271,5 @@ class RequestPermissionOrganizationSerializer(serializers.ModelSerializer):
                 name=f"{user.first_name} {user.last_name}",
                 photo=user.photo_url
             )
-        
+
         return user_data
