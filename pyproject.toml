@@ -6,7 +6,7 @@ authors = ["weni.ai"]
 license = "MPL-2.0"
 
 [tool.poetry.dependencies]
-python = "~=3.6.2"
+python = "~=3.9"
 django = "~=3.2.6"
 djangorestframework = "~=3.12.4"
 drf-yasg2 = "~=1.19.4"
@@ -39,6 +39,7 @@ pendulum = "^2.1.2"
 pylint = "^2.13.9"
 weni-protobuffers = "1.2.15"
 freezegun = "^1.2.1"
+pre-commit = "^2.20.0"
 
 [tool.poetry.dev-dependencies]
 flake8 = "~=3.9.2"
