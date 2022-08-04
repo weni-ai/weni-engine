@@ -15,15 +15,11 @@ from connect.elastic.flow import ElasticFlow
 from django.utils import timezone
 from connect import utils
 from celery import current_app
-from grpc._channel import _InactiveRpcError
 from django.conf import settings
 
 
 @app.task(
     name="get_messages",
-    autoretry_for=(_InactiveRpcError, Exception),
-    retry_kwargs={"max_retries": 5},
-    retry_backoff=True,
     ignore_result=True
 )
 def get_messages(temp_channel_uuid: str, before: str, after: str, project_uuid: str):
@@ -161,12 +157,8 @@ def retry_billing_tasks():
     for task in task_failed:
         task.retried = True
         task.save()
-        if task.task_type == "count_contacts":
-            current_app.send_task(  # pragma: no cover
-                name="count_contacts", args=[task.before, task.after, task.uuid]
-            )
 
-        elif task.task_type == "sync_contacts":
+        if task.task_type == "sync_contacts":
             current_app.send_task(  # pragma: no cover
                 name="sync_contacts", args=[task.before, task.after, task.uuid]
             )
