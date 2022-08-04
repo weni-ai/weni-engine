@@ -24,6 +24,7 @@ from django.conf import settings
     autoretry_for=(_InactiveRpcError, Exception),
     retry_kwargs={"max_retries": 5},
     retry_backoff=True,
+    ignore_result=True
 )
 def get_messages(temp_channel_uuid: str, before: str, after: str, project_uuid: str):
     manager = SyncManagerTask.objects.create(
@@ -35,9 +36,8 @@ def get_messages(temp_channel_uuid: str, before: str, after: str, project_uuid: 
 
     flow_instance = utils.get_grpc_types().get("flow")
     project = Project.objects.get(uuid=project_uuid)
-
-    for contact in Contact.objects.filter(channel__uuid=temp_channel_uuid, last_seen_on__range=(after, before)):
-
+    contacts = Contact.objects.filter(channel__uuid=temp_channel_uuid, last_seen_on__range=(after, before))
+    for contact in contacts:
         message = flow_instance.get_message(
             str(project.flow_organization), str(contact.contact_flow_uuid), before, after
         )
@@ -75,12 +75,12 @@ def get_messages(temp_channel_uuid: str, before: str, after: str, project_uuid: 
         )
         contact.update_channel(channel)
 
-    count_contacts.delay(manager.before, manager.after)
+    count_contacts.apply_async(args=[manager.before, manager.after, project_uuid])
 
     return True
 
 
-@app.task(name="sync_contacts")
+@app.task(name="sync_contacts", ignore_result=True)
 def sync_contacts(
     sync_before: str = None, sync_after: str = None, task_uuid: str = None
 ):
@@ -106,8 +106,8 @@ def sync_contacts(
     try:
         elastic_instance = ElasticFlow()
         update_fields = ["finished_at", "status"]
-
-        for project in Project.objects.exclude(flow_id=None):
+        projects = Project.objects.exclude(flow_id=None)
+        for project in projects:
 
             active_contacts = list(
                 elastic_instance.get_contact_detailed(
@@ -133,11 +133,13 @@ def sync_contacts(
 
                 contact.update_channel(temp_channel)
 
-            get_messages.delay(
-                str(temp_channel_uuid),
-                str(manager.before),
-                str(manager.after),
-                str(project.uuid),
+            get_messages.apply_async(
+                args=[
+                    str(temp_channel_uuid),
+                    str(manager.before),
+                    str(manager.after),
+                    str(project.uuid),
+                ]
             )
 
         manager.finished_at = timezone.now()
@@ -172,12 +174,11 @@ def retry_billing_tasks():
     return True
 
 
-@app.task(name="count_contacts")
-def count_contacts(before, after, task_uuid: str = None):
+@app.task(name="count_contacts", ignore_result=True)
+def count_contacts(before, after, project_uuid: str, task_uuid: str = None):
     if task_uuid:
         manager = SyncManagerTask.objects.get(uuid=task_uuid)
     else:
-
         manager = SyncManagerTask.objects.create(
             task_type="count_contacts",
             started_at=pendulum.now(),
@@ -185,23 +186,24 @@ def count_contacts(before, after, task_uuid: str = None):
             after=after,
         )
     try:
-        for project in Project.objects.all():
-            for channel in project.channel.all():
-                amount = Contact.objects.filter(
-                    channel=channel, last_seen_on__range=(after, before)
-                ).count()
-                contact_count = (
-                    ContactCount.objects.filter(
-                        channel=channel, created_at__range=(after, before)
-                    )
-                    .order_by("created_at")
-                    .last()
+        project = Project.objects.get(uuid=project_uuid)
+        channels = project.channel.all()
+        for channel in channels:
+            amount = Contact.objects.filter(
+                channel=channel, last_seen_on__range=(after, before)
+            ).count()
+            contact_count = (
+                ContactCount.objects.filter(
+                    channel=channel, created_at__range=(after, before)
                 )
-                if not contact_count:
-                    contact_count = ContactCount.objects.create(
-                        channel=channel, count=0
-                    )
-                contact_count.increase_contact_count(amount)
+                .order_by("created_at")
+                .last()
+            )
+            if not contact_count:
+                contact_count = ContactCount.objects.create(
+                    channel=channel, count=0
+                )
+            contact_count.increase_contact_count(amount)
         manager.status = True
         manager.finished_at = pendulum.now()
         manager.save(update_fields=["status", "finished_at"])
