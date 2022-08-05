@@ -85,18 +85,11 @@ def sync_contacts(
         sync_after = pendulum.parse(sync_after)
         manager = SyncManagerTask.objects.get(uuid=task_uuid)
     else:
-        last_sync = (
-            SyncManagerTask.objects.filter(task_type="sync_contacts")
-            .order_by("finished_at")
-            .last()
-        )
         manager = SyncManagerTask.objects.create(
             task_type="sync_contacts",
             started_at=pendulum.now(),
             before=pendulum.now(),
-            after=last_sync.before
-            if isinstance(last_sync, SyncManagerTask)
-            else pendulum.now().subtract(hours=1),
+            after=pendulum.now().subtract(hours=1),
         )
 
     try:
