@@ -266,13 +266,13 @@ def mock_sync_contacts_retroactive(before, after, task_uuid: str = None):
                 flow_instance.get_active_contacts(
                     str(project.flow_organization), before, after))
             for contact in active_contacts:
-                contact = Contact.objects.create(
+                engine_contact = Contact.objects.create(
                     contact_flow_uuid=contact.uuid,
                     name=contact.name,
                     last_seen_on=pendulum.from_timestamp(contact.msg.sent_on.seconds.real),
                 )
                 message = Message.objects.create(
-                    contact=contact,
+                    contact=engine_contact,
                     text=contact.msg.text,
                     created_on=pendulum.from_timestamp(contact.msg.sent_on.seconds.real),
                     direction=contact.msg.direction,
@@ -283,7 +283,7 @@ def mock_sync_contacts_retroactive(before, after, task_uuid: str = None):
                     channel_flow_id=contact.channel.uuid,
                     project=project
                 )
-                contact.update_channel(channel)
+                engine_contact.update_channel(channel)
     except Exception as error:
         manager.finished_at = pendulum.now()
         manager.fail_message.create(message=str(error))
