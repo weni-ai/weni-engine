@@ -1,5 +1,3 @@
-import uuid
-import random
 import stripe
 import pendulum
 from connect.celery import app
@@ -104,32 +102,16 @@ def sync_contacts(
                 )
             )
 
-            temp_channel_uuid = uuid.uuid4()
-            temp_channel = Channel.create(
-                uuid=temp_channel_uuid,
-                project=project,
-                channel_flow_id=random.randint(2147483000, 2147483646),
-                channel_type="TEMP",
-            )
-
             for elastic_contact in active_contacts:
 
-                contact = Contact.objects.create(
+                Contact.objects.create(
                     contact_flow_uuid=elastic_contact.uuid,
                     name=elastic_contact.name,
                     last_seen_on=pendulum.parse(elastic_contact.last_seen_on),
+                    project=project
                 )
 
-                contact.update_channel(temp_channel)
-
-            get_messages.apply_async(
-                args=[
-                    str(temp_channel_uuid),
-                    str(manager.before),
-                    str(manager.after),
-                    str(project.uuid),
-                ]
-            )
+            count_contacts.apply_async(args=[manager.before, manager.after, project.uuid])
 
         manager.finished_at = timezone.now()
         manager.status = True
@@ -172,23 +154,19 @@ def count_contacts(before, after, project_uuid: str, task_uuid: str = None):
         )
     try:
         project = Project.objects.get(uuid=project_uuid)
-        channels = project.channel.all()
-        for channel in channels:
-            amount = Contact.objects.filter(
-                channel=channel, last_seen_on__range=(after, before)
-            ).count()
-            contact_count = (
-                ContactCount.objects.filter(
-                    channel=channel, created_at__range=(after, before)
-                )
-                .order_by("created_at")
-                .last()
+        amount = project.contacts.filter(last_seen_on__range=(after, before)).count()
+        now = pendulum.now()
+        try:
+            contact_count = ContactCount.objects.get(
+                created_at__range=(now.start_of("day"), now.end_of("day")), project=project
             )
-            if not contact_count:
-                contact_count = ContactCount.objects.create(
-                    channel=channel, count=0
-                )
-            contact_count.increase_contact_count(amount)
+        except ContactCount.DoesNotExist:
+            contact_count = ContactCount.objects.create(
+                project=project,
+                count=0
+            )
+
+        contact_count.increase_contact_count(amount)
         manager.status = True
         manager.finished_at = pendulum.now()
         manager.save(update_fields=["status", "finished_at"])

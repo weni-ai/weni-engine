@@ -88,6 +88,7 @@ class Contact(models.Model):
     channel = models.ForeignKey(Channel, models.CASCADE, related_name="channel", null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(blank=True, null=True)
+    project = models.ForeignKey(Project, models.CASCADE, related_name="contacts", null=True)
 
     objects = ContactManager()
 
@@ -109,10 +110,11 @@ class Message(models.Model):
 
 class ContactCount(models.Model):
     channel = models.ForeignKey(
-        Channel, models.CASCADE, related_name="contact_count_channel"
+        Channel, models.CASCADE, related_name="contact_count_channel", null=True
     )
     count = models.PositiveIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
+    project = models.ForeignKey(Project, models.CASCADE, related_name="contact_count_project", null=True)
 
     def increase_contact_count(self, contact_count):
         self.count += contact_count
