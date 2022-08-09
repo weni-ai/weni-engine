@@ -79,6 +79,8 @@ env = environ.Env(
     ROCKET_TEST_MODE=(bool, False),
     VERIFICATION_AMOUNT=(float, 1),
     SYNC_CONTACTS_SCHEDULE=(str, "*/1"),
+    SCROLL_SIZE=(int, 500),
+    SCROLL_KEEP_ALIVE=(str, "1m"),
 )
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -463,3 +465,5 @@ ROCKET_TEST_MODE = env.bool("ROCKET_TEST_MODE")
 
 # Elastic Search
 FLOWS_ELASTIC_URL = env.str("FLOWS_ELASTIC_URL")
+SCROLL_SIZE = env.str("SCROLL_SIZE")
+SCROLL_KEEP_ALIVE = env.int("SCROLL_KEEP_ALIVE")

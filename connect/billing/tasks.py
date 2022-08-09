@@ -74,6 +74,20 @@ def get_messages(temp_channel_uuid: str, before: str, after: str, project_uuid: 
     return True
 
 
+@app.task(name="create_contacts", ignore_result=True)
+def create_contacts(active_contacts: list, project_uuid: Project):
+
+    project = Project.objects.get(uuid=project_uuid)
+
+    for elastic_contact in active_contacts:
+        Contact.objects.create(
+            contact_flow_uuid=elastic_contact["_source"].get("uuid"),
+            name=elastic_contact["_source"].get("name"),
+            last_seen_on=pendulum.parse(elastic_contact["_source"].get("last_seen_on")),
+            project=project
+        )
+
+
 @app.task(name="sync_contacts", ignore_result=True)
 def sync_contacts(
     sync_before: str = None, sync_after: str = None, task_uuid: str = None
@@ -96,20 +110,23 @@ def sync_contacts(
         projects = Project.objects.exclude(flow_id=None)
         for project in projects:
 
-            active_contacts = list(
-                elastic_instance.get_contact_detailed(
+            scroll, active_contacts = list(
+                elastic_instance.get_paginated_contacts(
                     str(project.flow_id), str(manager.before), str(manager.after)
                 )
             )
 
-            for elastic_contact in active_contacts:
+            scrolled = 0
 
-                Contact.objects.create(
-                    contact_flow_uuid=elastic_contact.uuid,
-                    name=elastic_contact.name,
-                    last_seen_on=pendulum.parse(elastic_contact.last_seen_on),
-                    project=project
+            while scrolled <= scroll["scroll_size"]:
+                scrolled += len(active_contacts)
+
+                create_contacts.apply_async(args=[active_contacts, str(project.uuid)])
+                active_contacts = elastic_instance.get_paginated_contacts(
+                    str(project.flow_id), str(manager.before), str(manager.after), scroll_id=scroll["scroll_id"]
                 )
+                if scrolled == scroll["scroll_size"]:
+                    break
 
             count_contacts.apply_async(args=[manager.before, manager.after, project.uuid])
 
