@@ -37,21 +37,21 @@ class ElasticFlow(ElasticHandler):
 
         query = {
             "query": {
-                "bool":{
+                "bool": {
                     "must": [
                         {
-                            "match":{
+                            "match": {
                                 "org_id": f"{flow_id}"
                             },
                         },
                         {
-                            "match":{
+                            "match": {
                                 "is_active": "true",
                             }
                         },
                         {
-                            "range":{
-                                "last_seen_on":{
+                            "range": {
+                                "last_seen_on": {
                                     "gte": str(after),
                                     "lte": str(before)
                                 }
