@@ -21,6 +21,7 @@ app.conf.task_routes = {
     'sync_contacts': {'queue': 'billing'},
     'count_contacts': {'queue': 'billing'},
     'retry_billing_tasks': {'queue': 'billing'},
+    'create_contacts': {'queue': 'billing'}
     # 'get_messages': {'queue': 'billing'},
 }
 
