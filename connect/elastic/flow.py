@@ -74,26 +74,3 @@ class ElasticFlow(ElasticHandler):
 
     def clear_scroll(self, scroll_id):
         self.client.clear_scroll(scroll_id=scroll_id)
-
-
-for i in range(3):
-    if scroll:
-        print("scroll["scroll_id"]")
-        elastic_instance.clear_scroll(scroll_id=scroll["scroll_id"])
-    scroll, active_contacts = list(
-        elastic_instance.get_paginated_contacts(
-            str(project.flow_id), str(manager.before), str(manager.after)
-        )
-    )
-
-    scrolled = 0
-
-    while scrolled <= scroll["scroll_size"]:
-        scrolled += len(active_contacts)
-
-        create_contacts.apply_async(args=[active_contacts, str(project.uuid)])
-        active_contacts = elastic_instance.get_paginated_contacts(
-            str(project.flow_id), str(manager.before), str(manager.after), scroll_id=scroll["scroll_id"]
-        )
-        if scrolled == scroll["scroll_size"]:
-            break
