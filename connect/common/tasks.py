@@ -20,7 +20,6 @@ from connect.common.models import (
     Invoice,
     GenericBillingData,
 )
-from connect.billing.models import ContactCount
 
 from connect.api.v1.internal.integrations.integrations_rest_client import IntegrationsRESTClient
 from connect.api.v1.internal.intelligence.intelligence_rest_client import IntelligenceRESTClient
@@ -298,11 +297,11 @@ def sync_active_contacts():
 
 @app.task()
 def sync_total_contact_count():
+    flow_instance = utils.get_grpc_types().get("flow")
     for project in Project.objects.all():
-        contacts_day_count = ContactCount.objects.filter(
-            channel__project=project
-        )
-        project.total_contact_count = sum([day_count.count for day_count in contacts_day_count])
+        response = flow_instance.get_project_statistic(project_uuid=str(project.flow_organization))
+        contacts = response.get("active_contacts", project.total_contact_count)
+        project.total_contact_count = contacts
         project.save(update_fields=["total_contact_count"])
     return True
 
