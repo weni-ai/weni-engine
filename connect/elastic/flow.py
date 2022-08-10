@@ -71,3 +71,6 @@ class ElasticFlow(ElasticHandler):
             "scroll_size": scroll_size
         }
         return scroll, hits
+
+    def clear_scroll(self, scroll_id):
+        self.client.clear_scroll(scroll_id=scroll_id)
