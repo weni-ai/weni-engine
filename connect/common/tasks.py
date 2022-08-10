@@ -20,7 +20,6 @@ from connect.common.models import (
     Invoice,
     GenericBillingData,
 )
-from connect.billing.models import ContactCount
 
 from connect.api.v1.internal.integrations.integrations_rest_client import IntegrationsRESTClient
 from connect.api.v1.internal.intelligence.intelligence_rest_client import IntelligenceRESTClient
