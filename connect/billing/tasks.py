@@ -108,8 +108,10 @@ def sync_contacts(
         elastic_instance = ElasticFlow()
         update_fields = ["finished_at", "status"]
         projects = Project.objects.exclude(flow_id=None)
+        scroll = {}
         for project in projects:
-
+            if scroll != {}:
+                elastic_instance.clear_scroll(scroll_id=scroll["scroll_id"])
             scroll, active_contacts = list(
                 elastic_instance.get_paginated_contacts(
                     str(project.flow_id), str(manager.before), str(manager.after)
