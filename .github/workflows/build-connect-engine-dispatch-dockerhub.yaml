@@ -5,7 +5,7 @@ on:
     inputs:
 
       source-branch:
-        description: 'Source branch in NinaWebApp repository (main, staging, develop, fix/sentry etc.)'
+        description: 'Source branch in Weni Engine repository (main, staging, develop, fix/sentry etc.)'
         required: true
         default: 'main'
 
