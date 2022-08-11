@@ -1,0 +1,60 @@
+name: Build Weni Engine (Connect) in Dockerhub (Dispatch)
+
+on:
+  workflow_dispatch:
+    inputs:
+
+      source-branch:
+        description: 'Source branch in NinaWebApp repository (main, staging, develop, fix/sentry etc.)'
+        required: true
+        default: 'main'
+
+      tag-name:
+        description: 'Tag id (v0.0.1-develop, v0.0.2, etc.)'
+        required: true
+
+      destination-env:
+        description: 'Destination environment (develop, production, staging)'
+        required: true
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Check out the repo
+        uses: actions/checkout@v2
+        with:
+          ref: ${{github.event.inputs.source-branch}}
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      # - name: Login to ECR
+      #   uses: docker/login-action@v1
+      #   with:
+      #     registry: 869898323958.dkr.ecr.us-east-1.amazonaws.com
+      #     username: ${{ secrets.AWS_ACCESS_KEY_ID_SHARED }}
+      #     password: ${{ secrets.AWS_SECRET_ACCESS_KEY_SHARED }}
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push - Weni Engine Image
+        id: docker_build1
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          labels: branch=${{github.event.inputs.source-branch}},commit=${{env.GITHUB_SHA}},repository=https://github.com/Ilhasoft/weni-engine
+          file: Dockerfile
+          push: true
+          tags: connectof/connect-engine:${{github.event.inputs.tag-name}}
+          no-cache: true
+
+    
