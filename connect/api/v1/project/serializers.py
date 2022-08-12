@@ -25,6 +25,7 @@ from connect.common.models import (
 
 
 class ProjectSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Project
         fields = [
@@ -44,6 +45,9 @@ class ProjectSerializer(serializers.ModelSerializer):
             "pending_authorizations",
             "authorization",
             "last_opened_on",
+            "project_type",
+            "flow_uuid",
+            "first_access",
         ]
         ref_name = None
 
@@ -69,6 +73,29 @@ class ProjectSerializer(serializers.ModelSerializer):
     pending_authorizations = serializers.SerializerMethodField(style={"show": False})
     authorization = serializers.SerializerMethodField(style={"show": False})
     last_opened_on = serializers.SerializerMethodField()
+    project_type = serializers.SerializerMethodField()
+    flow_uuid = serializers.SerializerMethodField()
+    first_access = serializers.SerializerMethodField()
+
+    def get_project_type(self, obj):
+        if  obj.template_project.all().exists():
+            return "template"
+        else:
+            return "blank"
+
+    def get_flow_uuid(self, obj):
+        if  obj.template_project.all().exists():
+            email = self.context["request"].user.email
+            template = obj.template_project.get(authorization__user__email=email)
+            return template.flow_uuid
+        ...
+    
+    def get_first_access(self, obj):
+        if  obj.template_project.all().exists():
+            email = self.context["request"].user.email
+            template = obj.template_project.get(authorization__user__email=email)
+            return template.first_access
+        ...
 
     def get_menu(self, obj):
         return {
@@ -289,3 +316,35 @@ class CreateChannelSerializer(serializers.Serializer):
     project_uuid = serializers.CharField(required=True)
     data = serializers.JSONField(required=True)
     channeltype_code = serializers.CharField(required=True)
+
+
+class TemplateProjectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProjectAuthorization
+        fields = [
+            "uuid",
+            "project",
+            "wa_demo_token",
+            "classifier_uuid",
+            "first_access",
+            "authorization",
+            "user",
+        ]
+
+    wa_demo_token = serializers.CharField(required=False)
+    classifier_uuid = serializers.UUIDField(style={"show": False}, required=False)
+    first_access = serializers.BooleanField(default=True)
+    authorization = serializers.PrimaryKeyRelatedField(
+        queryset=ProjectAuthorization.objects,
+        required=True,
+        style={"show": False},
+    )
+    project = serializers.PrimaryKeyRelatedField(
+        queryset=Project.objects,
+        required=True,
+        style={"show": False},
+    )
+    user = serializers.SerializerMethodField()
+
+    def get_user(self, obj):
+        return obj.authorization.user.email

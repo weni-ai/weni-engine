@@ -1,15 +1,49 @@
+from operator import add
 from django.conf import settings
 
+import os
 import requests
 
 from connect.api.v1.internal.internal_authentication import InternalAuthentication
+from connect.api.v1.internal.flows.helpers import add_classifier_to_flow
 
 
 class FlowsRESTClient:
 
+    sample_flow = f"{os.path.join(os.path.dirname(__file__))}/mp9/sample_flow.json"
+
     def __init__(self):
         self.base_url = settings.FLOWS_REST_ENDPOINT
         self.authentication_instance = InternalAuthentication()
+
+    def create_template_project(self, project_name: str, user_email: str, project_timezone: str):
+        body = dict(
+            name=project_name,
+            timezone=project_timezone,
+            user_email=user_email
+        )
+        response = requests.post(
+            url=f"{self.base_url}/api/v2/internals/template-orgs/",
+            headers=self.authentication_instance.get_headers(),
+            json=body
+        )
+        return dict(status=response.status_code, data=response.text)
+
+    def create_flows(self, project_uuid: str, classifier_uuid: str):
+        
+        sample_flow = add_classifier_to_flow(self.sample_flow)
+
+        body = dict(
+            org=project_uuid,
+            sample_flow=sample_flow,
+            classifier_uuid=classifier_uuid
+        )
+        response = requests.post(
+            url=f"{self.base_url}/api/v2/internals/flows/",
+            headers=self.authentication_instance.get_headers(),
+            json=body
+        )
+        return dict(status=response.status_code, data=response.text)
 
     def create_project(self, project_name: str, user_email: str, project_timezone: str):
         body = dict(
@@ -19,12 +53,12 @@ class FlowsRESTClient:
         )
 
         response = requests.post(
-            url=f"{self.base_url}/",
+            url=f"{self.base_url}/api/v2/internals/template-orgs/",
             headers=self.authentication_instance.get_headers(),
             json=body
         )
 
-        return dict(status=response.status_code, data=response.data)
+        return dict(status=response.status_code, data=response.text)
 
     def update_project(self, organization_uuid: int, organization_name: str):
         body = {
@@ -71,7 +105,7 @@ class FlowsRESTClient:
         return dict(status=response.status_code, data=response.data)
 
     def get_classifiers(self, project_uuid: str, classifier_type: str, is_active: bool):
-        result = []
+
         body = dict(
             org_uuid=project_uuid,
             classifier_type=classifier_type,
@@ -103,7 +137,7 @@ class FlowsRESTClient:
         # TODO: check the response data its equals to gRPC endpoint return
         return dict(status=response.status_code, data=response.data)
 
-     def delete_classifier(self, classifier_uuid: str, user_email: str):
+    def delete_classifier(self, classifier_uuid: str, user_email: str):
         body = dict(
             uuid=classifier_uuid,
             user_email=user_email

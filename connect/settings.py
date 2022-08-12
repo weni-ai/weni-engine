@@ -50,6 +50,7 @@ env = environ.Env(
     INTELIGENCE_URL=(str, "https://bothub.it/"),
     FLOWS_URL=(str, "https://new.push.al/"),
     FLOWS_ELASTIC_URL=(str, None),
+    FLOWS_REST_ENDPOINT=(str, "https://flows-staging.weni.ai"),
     INTEGRATIONS_URL=(str, None),
     USE_SENTRY=(bool, False),
     SENTRY_URL=(str, None),
@@ -457,3 +458,4 @@ ROCKET_TEST_MODE = env.bool("ROCKET_TEST_MODE")
 
 # Elastic Search
 FLOWS_ELASTIC_URL = env.str("FLOWS_ELASTIC_URL")
+FLOWS_REST_ENDPOINT = env.str("FLOWS_REST_ENDPOINT")

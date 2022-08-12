@@ -1,3 +1,4 @@
+import uuid
 import pendulum
 from datetime import timedelta
 import requests
@@ -19,10 +20,12 @@ from connect.common.models import (
     BillingPlan,
     Invoice,
     GenericBillingData,
+    TemplateProject,
 )
 from connect.billing.models import ContactCount
 
 from connect.api.v1.internal.integrations.integrations_rest_client import IntegrationsRESTClient
+from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
 
 
 @app.task()
@@ -206,6 +209,21 @@ def create_project(project_name: str, user_email: str, project_timezone: str):
         project_timezone=project_timezone,
     )
     return {"id": project.id, "uuid": project.uuid}
+
+
+@app.task(name="create_template_project")
+def create_template_project(project_name: str, user_email: str, project_timezone: str):
+
+    rest_client = FlowsRESTClient()
+
+    project = rest_client.create_template_project(
+        project_name=project_name,
+        user_email=user_email,
+        project_timezone=project_timezone,
+    )
+    project = {"uuid": uuid.uuid4()}
+
+    return {"uuid": project.get("uuid")}
 
 
 @app.task(
@@ -598,3 +616,28 @@ def create_wac_channel(user, flow_organization, config, phone_number_id):
         )
     except grpc.RpcError as error:
         raise error
+
+
+@app.task(name="whatsapp_demo_integration")
+def whatsapp_demo_integration(template_project_uuid: str, token: str):
+
+    template_project = TemplateProject.objects.get(uuid=template_project_uuid)
+    project_uuid = str(template_project.project.uuid)
+
+    url = f"{settings.INTEGRATIONS_REST_ENDPOINT}/api/v1/apptypes/wpp-demo/apps/"
+
+    headers = {
+        {
+            'Authorization': f'Bearer {token}',
+            'Project-Uuid': project_uuid,
+        }
+    }
+
+    data = {
+        "project_uuid": project_uuid
+    }
+
+    response = requests.post(url, data=data, headers=headers)
+
+    template_project.wa_demo_token = response.get("config").get("routerToken")
+    template_project.save(update_fields=["wa_demo_token"])

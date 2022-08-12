@@ -1,5 +1,5 @@
 import json
-
+import uuid
 from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext_lazy as _
 from django_filters.rest_framework import DjangoFilterBackend
@@ -25,9 +25,11 @@ from connect.api.v1.project.serializers import (
     ListChannelSerializer,
     CreateChannelSerializer,
     CreateWACChannelSerializer,
+    TemplateProjectSerializer,
 )
 from connect.celery import app as celery_app
 from connect.common.models import (
+    Organization,
     OrganizationAuthorization,
     Project,
     RequestPermissionProject,
@@ -35,6 +37,7 @@ from connect.common.models import (
     ProjectAuthorization,
     RocketAuthorization,
     OpenedProject,
+    TemplateProject,
 )
 from connect.authentication.models import User
 
@@ -43,6 +46,12 @@ from connect.common import tasks
 from django.http import JsonResponse
 from django.db.models import Q
 from django.utils import timezone
+
+from connect import utils
+
+from connect.api.grpc.project.serializers import CreateClassifierRequestSerializer
+from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
+from weni.protobuf.flows.classifier_pb2 import ClassifierCreateRequest
 
 
 class ProjectViewSet(
@@ -367,3 +376,124 @@ class RequestPermissionRocketViewSet(
     permission_classes = [IsAuthenticated]
     metadata_class = Metadata
     lookup_field = "pk"
+
+
+class TemplateProjectViewSet(
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.DestroyModelMixin,
+    GenericViewSet,
+):
+    queryset = TemplateProject.objects
+    serializer_class = TemplateProjectSerializer
+    permission_classes = [IsAuthenticated]
+    metadata_class = Metadata
+    lookup_field = "pk"
+
+    def get_queryset(self, *args, **kwargs):
+        if getattr(self, "swagger_fake_view", False):
+            # queryset just for schema generation metadata
+            return TemplateProject.objects.none()  # pragma: no cover
+        auth = (
+            ProjectAuthorization.objects.exclude(role=0)
+            .filter(user=self.request.user)
+        )
+        return self.queryset.filter(authorization__in=auth)
+
+    def get_object(self):
+        lookup_url_kwarg = self.lookup_field
+
+        obj = self.get_queryset().get(authorization__project__uuid=self.kwargs.get(lookup_url_kwarg))
+
+        return obj
+
+    def create(self, request, *args, **kwargs):
+
+        flow_organization = tasks.create_template_project(
+            request.data.get("name"), request.user.email, request.data.get("timezone")
+        ).get("uuid")
+        organization = get_object_or_404(Organization, uuid=request.data.get("organization"))
+
+        # Create blank project
+
+        project = Project.objects.create(
+            date_format=request.data.get("date_format"),
+            name=request.data.get("name"),
+            organization=organization,
+            timezone=request.data.get("timezone"),
+            flow_organization=flow_organization
+        )
+
+        authorization = project.get_user_authorization(request.user)
+
+        # Create template model
+
+        template = self.queryset.create(
+            authorization=authorization,
+            project=project
+        )
+
+        # Get AI access token
+        access_token = "token"
+
+        # Create classifier
+        classifier_request = ClassifierCreateRequest(
+            org=str(template.project.flow_organization),
+            user=request.user.email,
+            classifier_type="bothub",
+            name="name",
+            access_token=access_token
+        )
+
+        classifier_serializer = CreateClassifierRequestSerializer(message=classifier_request)
+
+        grpc_instance = utils.get_grpc_types().get("flow")
+        print("[+] Create classifier [+]")
+        response = {
+            "uuid": uuid.uuid4(),
+            "classifier_type": "bothub",
+            "name": "Test AI",
+            "access_token": "access_token",
+            "is_active": True,
+        }
+
+        # classifier_uuid = grpc_instance.create_classifier(
+        #     project_uuid=str(project.flow_organization),
+        #     user_email=classifier_serializer.validated_data.get("user"),
+        #     classifier_type="bothub",
+        #     classifier_name=classifier_serializer.validated_data.get("name"),
+        #     access_token=classifier_serializer.validated_data.get("access_token"),
+        # ).get("uuid")
+
+        classifier_uuid = response.get("uuid")
+
+        # Create Flow
+        print("[+] Create flow [+]")
+        rest_client = FlowsRESTClient()
+
+        # flows = rest_client.create_flows(str(project.flow_organization), classifier_uuid)
+
+        flows = {
+            "uuid": uuid.uuid4()
+        }
+
+        flow_uuid = flows.get("uuid")
+
+        template.classifier_uuid = classifier_uuid
+        template.flow_uuid = flow_uuid
+        template.save(update_fields=["classifier_uuid", "flow_uuid"])
+
+        # Integrate WhatsApp
+        token = self.request._auth
+        print("[+] Integrate WhatsApp [+]")
+        # tasks.whatsapp_demo_integration.apply_async(args=[str(template.project.flow_organization), token=token])
+
+        data = {
+            "first_acess": template.first_access,
+            "flow_uuid": template.flow_uuid,
+            "project_type": "template"
+        }
+
+        return Response(data, status=status.HTTP_201_CREATED)
