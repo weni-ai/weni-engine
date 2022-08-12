@@ -19,7 +19,7 @@ class IntegrationsRESTClient:
         }
         response = requests.patch(
             url=f"{self.base_url}/api/v1/internal/user-permission/{project_uuid}/",
-            headers=self.authentication_instance.get_headers(),
+            headers=self.authentication_instance.headers,
             json=body
         )
         return dict(status=response.status_code)
@@ -40,7 +40,7 @@ class IntegrationsRESTClient:
 
         response = requests.post(
             url=f"{self.base_url}/api/v1/internal/user/",
-            headers=self.authentication_instance.get_headers(),
+            headers=self.authentication_instance.headers,
             json=body
         )
         response.raise_for_status()

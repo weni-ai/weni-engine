@@ -42,6 +42,8 @@ from connect.common.models import (
 from connect import billing
 from connect.billing.gateways.stripe_gateway import StripeGateway
 from connect.utils import count_contacts
+from connect.api.v1.internal.intelligence.intelligence_rest_client import IntelligenceRESTClient
+import pendulum
 
 
 class OrganizationViewSet(
@@ -70,14 +72,18 @@ class OrganizationViewSet(
         )
         return self.queryset.filter(pk__in=auth)
 
-    def perform_destroy(self, instance):
-        inteligence_organization = instance.inteligence_organization
-        instance.delete()
-
-        celery_app.send_task(
-            "delete_organization",
-            args=[inteligence_organization, self.request.user.email],
+    def list(self, request, *args, **kwargs):
+        page = self.paginate_queryset(
+            self.filter_queryset(self.get_queryset().order_by("name")),
         )
+        organization_serializer = OrganizationSeralizer(page, many=True, context=self.get_serializer_context())
+        return self.get_paginated_response(organization_serializer.data)
+
+    def perform_destroy(self, instance):
+        intelligence_organization = instance.inteligence_organization
+        instance.delete()
+        ai_client = IntelligenceRESTClient()
+        ai_client.delete_organization(organization_id=intelligence_organization, user_email=self.request.user.email)
 
     @action(
         detail=True,
@@ -161,15 +167,16 @@ class OrganizationViewSet(
 
         organization = get_object_or_404(Organization, uuid=organization_uuid)
 
-        self.check_object_permissions(self.request, organization)
-
-        before = str(request.query_params.get("before") + " 00:00")
-        after = str(request.query_params.get("after") + " 00:00")
-
+        before = request.query_params.get("before")
+        after = request.query_params.get("after")
+        print(before, after)
         if not before or not after:
             raise ValidationError(
                 _("Need to pass 'before' and 'after' in query params")
             )
+
+        before = pendulum.parse(before, strict=False).end_of("day")
+        after = pendulum.parse(after, strict=False).start_of("day")
 
         result = {"projects": []}
 
@@ -498,6 +505,27 @@ class OrganizationViewSet(
 
             return JsonResponse(data=response, status=status.HTTP_200_OK)
         return JsonResponse(data={"response": "no customer"}, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(
+        detail=True,
+        methods=["POST"],
+        url_name="organization-retrieve",
+        url_path="internal/retrieve"
+    )
+    def retrieve_organization(self, request):
+        flow_organization_uuid = request.uuid
+        organization = Organization.objects.get(project__flow_organization=flow_organization_uuid)
+        return {
+            "status": status.HTTP_200_OK,
+            "response": {
+                "uuid": str(organization.uuid),
+                "name": organization.name,
+                "description": organization.description,
+                "inteligence_organization": organization.inteligence_organization,
+                "extra_integration": organization.extra_integration,
+                "is_suspended": organization.is_suspended,
+            }
+        }
 
 
 class OrganizationAuthorizationViewSet(

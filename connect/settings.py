@@ -67,6 +67,7 @@ env = environ.Env(
     FLOW_CERTIFICATE_GRPC_CRT=(str, None),
     INTEGRATIONS_CERTIFICATE_GRPC_CRT=(str, None),
     INTEGRATIONS_REST_ENDPOINT=(str, "https://integrations-engine.dev.cloud.weni.ai"),
+    INTELLIGENCE_REST_ENDPOINT=(str, "https://engine-ai.dev.cloud.weni.ai/"),
     SEND_REQUEST_FLOW=(bool, False),
     FLOW_MARKETING_UUID=(str, None),
     TOKEN_AUTHORIZATION_FLOW_MARKETING=(str, None),
@@ -77,7 +78,10 @@ env = environ.Env(
     ROCKET_USERNAME=(str, None),
     ROCKET_PASSWORD=(str, None),
     ROCKET_TEST_MODE=(bool, False),
-    VERIFICATION_AMOUNT=(float, 1)
+    VERIFICATION_AMOUNT=(float, 1),
+    SYNC_CONTACTS_SCHEDULE=(str, "*/1"),
+    SCROLL_SIZE=(int, 500),
+    SCROLL_KEEP_ALIVE=(str, "1m"),
 )
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -372,6 +376,8 @@ CELERY_ACCEPT_CONTENT = ["application/json"]
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TASK_SERIALIZER = "json"
 
+SYNC_CONTACTS_SCHEDULE = env.str("SYNC_CONTACTS_SCHEDULE")
+
 # AWS
 
 AWS_ACCESS_KEY_ID = env.str("AWS_ACCESS_KEY_ID")
@@ -409,7 +415,9 @@ SEND_EMAILS = env.bool("SEND_EMAILS")
 INTELIGENCE_URL = env.str("INTELIGENCE_URL")
 FLOWS_URL = env.str("FLOWS_URL")
 INTEGRATIONS_URL = env.str("INTEGRATIONS_URL")
+
 INTEGRATIONS_REST_ENDPOINT = env.str("INTEGRATIONS_REST_ENDPOINT")
+INTELLIGENCE_REST_ENDPOINT = env.str("INTELLIGENCE_REST_ENDPOINT")
 
 FLOW_GRPC_ENDPOINT = env.str("FLOW_GRPC_ENDPOINT")
 INTELIGENCE_GRPC_ENDPOINT = env.str("INTELIGENCE_GRPC_ENDPOINT")
@@ -458,4 +466,8 @@ ROCKET_TEST_MODE = env.bool("ROCKET_TEST_MODE")
 
 # Elastic Search
 FLOWS_ELASTIC_URL = env.str("FLOWS_ELASTIC_URL")
+
+SCROLL_SIZE = env.str("SCROLL_SIZE")
+SCROLL_KEEP_ALIVE = env.int("SCROLL_KEEP_ALIVE")
+
 FLOWS_REST_ENDPOINT = env.str("FLOWS_REST_ENDPOINT")
