@@ -1,4 +1,3 @@
-from operator import add
 from django.conf import settings
 
 import os
@@ -30,7 +29,7 @@ class FlowsRESTClient:
         return dict(status=response.status_code, data=response.text)
 
     def create_flows(self, project_uuid: str, classifier_uuid: str):
-        
+
         sample_flow = add_classifier_to_flow(self.sample_flow)
 
         body = dict(

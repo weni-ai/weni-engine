@@ -26,6 +26,7 @@ from connect.billing.models import ContactCount
 
 from connect.api.v1.internal.integrations.integrations_rest_client import IntegrationsRESTClient
 from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
+from connect.api.v1.internal.intelligence.intelligence_rest_client import IntelligenceRESTClient
 
 
 @app.task()
@@ -701,5 +702,4 @@ def whatsapp_demo_integration(template_project_uuid: str, token: str):
 
     response = requests.post(url, data=data, headers=headers)
 
-    template_project.wa_demo_token = response.get("config").get("routerToken")
-    template_project.save(update_fields=["wa_demo_token"])
+    return response.get("config").get("routerToken")

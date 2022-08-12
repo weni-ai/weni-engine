@@ -48,6 +48,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             "project_type",
             "flow_uuid",
             "first_access",
+            "wa_demo_token",
         ]
         ref_name = None
 
@@ -76,25 +77,33 @@ class ProjectSerializer(serializers.ModelSerializer):
     project_type = serializers.SerializerMethodField()
     flow_uuid = serializers.SerializerMethodField()
     first_access = serializers.SerializerMethodField()
+    wa_demo_token = serializers.SerializerMethodField()
 
     def get_project_type(self, obj):
-        if  obj.template_project.all().exists():
+        if obj.template_project.all().exists():
             return "template"
         else:
             return "blank"
 
     def get_flow_uuid(self, obj):
-        if  obj.template_project.all().exists():
+        if obj.template_project.all().exists():
             email = self.context["request"].user.email
             template = obj.template_project.get(authorization__user__email=email)
             return template.flow_uuid
         ...
-    
+
     def get_first_access(self, obj):
-        if  obj.template_project.all().exists():
+        if obj.template_project.all().exists():
             email = self.context["request"].user.email
             template = obj.template_project.get(authorization__user__email=email)
             return template.first_access
+        ...
+
+    def get_wa_demo_token(self, obj):
+        if obj.template_project.all().exists():
+            email = self.context["request"].user.email
+            template = obj.template_project.get(authorization__user__email=email)
+            return template.wa_demo_token
         ...
 
     def get_menu(self, obj):

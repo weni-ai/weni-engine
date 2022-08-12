@@ -1,5 +1,4 @@
 import json
-import uuid
 from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext_lazy as _
 from django_filters.rest_framework import DjangoFilterBackend
@@ -58,6 +57,7 @@ from connect import utils
 
 from connect.api.grpc.project.serializers import CreateClassifierRequestSerializer
 from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
+from connect.api.v1.internal.intelligence.intelligence_rest_client import IntelligenceRESTClient
 from weni.protobuf.flows.classifier_pb2 import ClassifierCreateRequest
 
 
@@ -533,7 +533,8 @@ class TemplateProjectViewSet(
         )
 
         # Get AI access token
-        access_token = "token"
+        inteligence_client = IntelligenceRESTClient()
+        access_token = inteligence_client.get_access_token()
 
         # Create classifier
         classifier_request = ClassifierCreateRequest(
@@ -547,50 +548,37 @@ class TemplateProjectViewSet(
         classifier_serializer = CreateClassifierRequestSerializer(message=classifier_request)
 
         grpc_instance = utils.get_grpc_types().get("flow")
-        print("[+] Create classifier [+]")
-        response = {
-            "uuid": uuid.uuid4(),
-            "classifier_type": "bothub",
-            "name": "Test AI",
-            "access_token": "access_token",
-            "is_active": True,
-        }
 
-        # classifier_uuid = grpc_instance.create_classifier(
-        #     project_uuid=str(project.flow_organization),
-        #     user_email=classifier_serializer.validated_data.get("user"),
-        #     classifier_type="bothub",
-        #     classifier_name=classifier_serializer.validated_data.get("name"),
-        #     access_token=classifier_serializer.validated_data.get("access_token"),
-        # ).get("uuid")
-
-        classifier_uuid = response.get("uuid")
+        classifier_uuid = grpc_instance.create_classifier(
+            project_uuid=str(project.flow_organization),
+            user_email=classifier_serializer.validated_data.get("user"),
+            classifier_type="bothub",
+            classifier_name=classifier_serializer.validated_data.get("name"),
+            access_token=classifier_serializer.validated_data.get("access_token"),
+        ).get("uuid")
 
         # Create Flow
-        print("[+] Create flow [+]")
         rest_client = FlowsRESTClient()
 
-        # flows = rest_client.create_flows(str(project.flow_organization), classifier_uuid)
-
-        flows = {
-            "uuid": uuid.uuid4()
-        }
+        flows = rest_client.create_flows(str(project.flow_organization), classifier_uuid)
 
         flow_uuid = flows.get("uuid")
 
         template.classifier_uuid = classifier_uuid
         template.flow_uuid = flow_uuid
-        template.save(update_fields=["classifier_uuid", "flow_uuid"])
 
         # Integrate WhatsApp
         token = self.request._auth
-        print("[+] Integrate WhatsApp [+]")
-        # tasks.whatsapp_demo_integration.apply_async(args=[str(template.project.flow_organization), token=token])
+        wa_demo_token = tasks.whatsapp_demo_integration(str(template.project.flow_organization), token=token)
+
+        template.wa_demo_token = wa_demo_token
+        template.save(update_fields=["classifier_uuid", "flow_uuid", "wa_demo_token"])
 
         data = {
             "first_acess": template.first_access,
             "flow_uuid": template.flow_uuid,
-            "project_type": "template"
+            "project_type": "template",
+            "wa_demo_token": template.wa_demo_token
         }
 
         return Response(data, status=status.HTTP_201_CREATED)
