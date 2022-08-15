@@ -115,7 +115,7 @@ class IntelligenceRESTClient:
             "email": user_email,
         }
         response = requests.get(
-            url=f"{self.base_url}/v2/repository/authorization-by-user/",
+            url=f"{self.base_url}v2/repository/authorization-by-user/",
             headers=self.authentication_instance.headers,
             json=body
         )
