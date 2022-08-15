@@ -536,22 +536,12 @@ class TemplateProjectViewSet(
         access_token = inteligence_client.get_access_token(request.user.email)
 
         # Create classifier
-        classifier_request = ClassifierCreateRequest(
-            org=str(template.project.flow_organization),
-            user=request.user.email,
-            classifier_type="bothub",
-            name="template classifier",
-            access_token=access_token
-        )
-
-        classifier_serializer = CreateClassifierRequestSerializer(message=classifier_request)
 
         classifier_uuid = tasks.create_classifier(
             project_uuid=str(project.flow_organization),
-            user_email=classifier_serializer.validated_data.get("user"),
-            classifier_type="bothub",
-            classifier_name=classifier_serializer.validated_data.get("name"),
-            access_token=classifier_serializer.validated_data.get("access_token"),
+            user_email=request.user.email,
+            classifier_name="template classifier",
+            access_token=access_token,
         ).get("uuid")
 
         # Create Flow
