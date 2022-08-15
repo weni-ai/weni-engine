@@ -23,7 +23,7 @@ class FlowsRESTClient:
         )
         response = requests.post(
             url=f"{self.base_url}/api/v2/internals/template-orgs/",
-            headers=self.authentication_instance.get_headers(),
+            headers=self.authentication_instance.headers,
             json=body
         )
         return dict(status=response.status_code, data=response.text)
@@ -39,7 +39,7 @@ class FlowsRESTClient:
         )
         response = requests.post(
             url=f"{self.base_url}/api/v2/internals/flows/",
-            headers=self.authentication_instance.get_headers(),
+            headers=self.authentication_instance.headers,
             json=body
         )
         return dict(status=response.status_code, data=response.text)
@@ -53,7 +53,7 @@ class FlowsRESTClient:
 
         response = requests.post(
             url=f"{self.base_url}/api/v2/internals/template-orgs/",
-            headers=self.authentication_instance.get_headers(),
+            headers=self.authentication_instance.headers,
             json=body
         )
 
@@ -67,7 +67,7 @@ class FlowsRESTClient:
             body['name'] = organization_name
         response = requests.patch(
             url=f"{self.base_url}/",
-            headers=self.authentication_instance.get_headers(),
+            headers=self.authentication_instance.headers,
             json=body
         )
         return dict(status=response.status_code, data=response.data)
@@ -80,7 +80,7 @@ class FlowsRESTClient:
 
         response = requests.delete(
             url=f"{self.base_url}/",
-            headers=self.authentication_instance.get_headers(),
+            headers=self.authentication_instance.headers,
             json=body
         )
 
@@ -97,7 +97,7 @@ class FlowsRESTClient:
 
         response = requests.delete(
             url=f"{self.base_url}/",
-            headers=self.authentication_instance.get_headers(),
+            headers=self.authentication_instance.headers,
             json=body
         )
 
@@ -113,7 +113,7 @@ class FlowsRESTClient:
 
         response = requests.get(
             url=f"{self.base_url}/",
-            headers=self.authentication_instance.get_headers(),
+            headers=self.authentication_instance.headers,
             json=body
         )
 
@@ -130,7 +130,7 @@ class FlowsRESTClient:
         )
         response = requests.post(
             url=f"{self.base_url}/",
-            headers=self.authentication_instance.get_headers(),
+            headers=self.authentication_instance.headers,
             json=body
         )
         # TODO: check the response data its equals to gRPC endpoint return
@@ -143,7 +143,7 @@ class FlowsRESTClient:
         )
         response = requests.delete(
             url=f"{self.base_url}/",
-            headers=self.authentication_instance.get_headers(),
+            headers=self.authentication_instance.headers,
             json=body
         )
         return dict(status=response.status_code)

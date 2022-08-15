@@ -518,9 +518,6 @@ class Project(models.Model):
         )
         return get
 
-    def is_template_project(self):
-        ...
-
     def send_email_create_project(self, first_name: str, email: str):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover

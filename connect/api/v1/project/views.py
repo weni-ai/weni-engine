@@ -53,8 +53,6 @@ from connect.authentication.models import User
 from connect.common import tasks
 from connect.utils import count_contacts
 
-from connect import utils
-
 from connect.api.grpc.project.serializers import CreateClassifierRequestSerializer
 from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
 from connect.api.v1.internal.intelligence.intelligence_rest_client import IntelligenceRESTClient
@@ -534,22 +532,20 @@ class TemplateProjectViewSet(
 
         # Get AI access token
         inteligence_client = IntelligenceRESTClient()
-        access_token = inteligence_client.get_access_token()
+        access_token = inteligence_client.get_access_token(request.user.email)
 
         # Create classifier
         classifier_request = ClassifierCreateRequest(
             org=str(template.project.flow_organization),
             user=request.user.email,
             classifier_type="bothub",
-            name="name",
+            name="template classifier",
             access_token=access_token
         )
 
         classifier_serializer = CreateClassifierRequestSerializer(message=classifier_request)
 
-        grpc_instance = utils.get_grpc_types().get("flow")
-
-        classifier_uuid = grpc_instance.create_classifier(
+        classifier_uuid = tasks.create_classifier(
             project_uuid=str(project.flow_organization),
             user_email=classifier_serializer.validated_data.get("user"),
             classifier_type="bothub",
