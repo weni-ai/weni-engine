@@ -78,14 +78,17 @@ def get_messages(temp_channel_uuid: str, before: str, after: str, project_uuid: 
 def create_contacts(active_contacts: list, project_uuid: Project):
 
     project = Project.objects.get(uuid=project_uuid)
-
+    contacts_to_save = list()
     for elastic_contact in active_contacts:
-        Contact.objects.create(
-            contact_flow_uuid=elastic_contact["_source"].get("uuid"),
-            name=elastic_contact["_source"].get("name"),
-            last_seen_on=pendulum.parse(elastic_contact["_source"].get("last_seen_on")),
-            project=project
+        contacts_to_save.append(
+            Contact(
+                contact_flow_uuid=elastic_contact["_source"].get("uuid"),
+                name=elastic_contact["_source"].get("name"),
+                last_seen_on=pendulum.parse(elastic_contact["_source"].get("last_seen_on")),
+                project=project
+            )
         )
+    Contact.objects.bulk_create(contacts_to_save)
 
 
 @app.task(name="sync_contacts", ignore_result=True)
