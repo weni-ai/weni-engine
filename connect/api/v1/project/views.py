@@ -518,7 +518,8 @@ class TemplateProjectViewSet(
             name=request.data.get("name"),
             organization=organization,
             timezone=request.data.get("timezone"),
-            flow_organization=flow_organization
+            flow_organization=flow_organization,
+            is_template=True,
         )
 
         authorization = project.get_user_authorization(request.user)
