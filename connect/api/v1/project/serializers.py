@@ -1,3 +1,4 @@
+import uuid
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
@@ -6,6 +7,8 @@ from rest_framework.exceptions import PermissionDenied
 
 from connect.api.v1 import fields
 from connect.api.v1.fields import TextField
+from ..internal.flows.flows_rest_client import FlowsRESTClient
+from ..internal.intelligence.intelligence_rest_client import IntelligenceRESTClient
 from connect.api.v1.project.validators import CanContributeInOrganizationValidator
 from connect.celery import app as celery_app
 from connect.common import tasks
@@ -21,6 +24,7 @@ from connect.common.models import (
     RequestRocketPermission,
     OpenedProject,
     ProjectRole,
+    TemplateProject,
 )
 
 
@@ -385,3 +389,59 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
 
     def get_user(self, obj):
         return obj.authorization.user.email
+
+    def create(self, validated_data, request):
+
+        project = validated_data.get("project")
+
+        authorization = project.get_user_authorization(request.user)
+
+        # Create template model
+
+        template = TemplateProject.objects.create(
+            authorization=authorization,
+            project=project
+        )
+
+        # Get AI access token
+        inteligence_client = IntelligenceRESTClient()
+        access_token = inteligence_client.get_access_token(request.user.email)
+
+        # Create classifier
+        if not settings.TESTING:
+            classifier_uuid = tasks.create_classifier(
+                project_uuid=str(project.flow_organization),
+                user_email=request.user.email,
+                classifier_name="template classifier",
+                access_token=access_token,
+            ).get("uuid")
+        else:
+            classifier_uuid = uuid.uuid4()
+
+        # Create Flow
+        rest_client = FlowsRESTClient()
+        if not settings.TESTING:
+            flows = rest_client.create_flows(str(project.flow_organization), str(classifier_uuid))
+        else:
+            flows = {"uuid": uuid.uuid4()}
+
+        flow_uuid = flows.get("uuid")
+
+        template.classifier_uuid = classifier_uuid
+        template.flow_uuid = flow_uuid
+
+        # Integrate WhatsApp
+        token = request._auth
+
+        wa_demo_token = tasks.whatsapp_demo_integration(str(project.uuid), token=token)
+        template.wa_demo_token = wa_demo_token
+        template.save(update_fields=["classifier_uuid", "flow_uuid", "wa_demo_token"])
+
+        data = {
+            "first_acess": template.first_access,
+            "flow_uuid": str(template.flow_uuid),
+            "project_type": "template",
+            "wa_demo_token": template.wa_demo_token
+        }
+
+        return data

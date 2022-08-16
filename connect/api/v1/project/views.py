@@ -1,4 +1,5 @@
 import json
+import uuid
 from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext_lazy as _
 from django_filters.rest_framework import DjangoFilterBackend
@@ -52,11 +53,7 @@ from connect.common.models import (
 from connect.authentication.models import User
 from connect.common import tasks
 from connect.utils import count_contacts
-
-from connect.api.grpc.project.serializers import CreateClassifierRequestSerializer
-from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
-from connect.api.v1.internal.intelligence.intelligence_rest_client import IntelligenceRESTClient
-from weni.protobuf.flows.classifier_pb2 import ClassifierCreateRequest
+from django.conf import settings
 
 
 class ProjectViewSet(
@@ -506,13 +503,21 @@ class TemplateProjectViewSet(
 
     def create(self, request, *args, **kwargs):
 
-        flow_organization = tasks.create_template_project(
-            request.data.get("name"), request.user.email, request.data.get("timezone")
-        ).get("uuid")
+        if not settings.TESTING:
+            flow_organization = tasks.create_template_project(
+                request.data.get("name"),
+                request.user.email,
+                request.data.get("timezone")
+            ).get("uuid")
+        else:
+            flows = {
+                "uuid": uuid.uuid4(),
+            }
+            flow_organization = flows.get("uuid")
+
         organization = get_object_or_404(Organization, uuid=request.data.get("organization"))
 
-        # Create blank project
-
+        # Create project
         project = Project.objects.create(
             date_format=request.data.get("date_format"),
             name=request.data.get("name"),
@@ -522,50 +527,10 @@ class TemplateProjectViewSet(
             is_template=True,
         )
 
-        authorization = project.get_user_authorization(request.user)
-
-        # Create template model
-
-        template = self.queryset.create(
-            authorization=authorization,
-            project=project
-        )
-
-        # Get AI access token
-        inteligence_client = IntelligenceRESTClient()
-        access_token = inteligence_client.get_access_token(request.user.email)
-
-        # Create classifier
-
-        classifier_uuid = tasks.create_classifier(
-            project_uuid=str(project.flow_organization),
-            user_email=request.user.email,
-            classifier_name="template classifier",
-            access_token=access_token,
-        ).get("uuid")
-
-        # Create Flow
-        rest_client = FlowsRESTClient()
-
-        flows = rest_client.create_flows(str(project.flow_organization), classifier_uuid)
-
-        flow_uuid = flows.get("uuid")
-
-        template.classifier_uuid = classifier_uuid
-        template.flow_uuid = flow_uuid
-
-        # Integrate WhatsApp
-        token = self.request._auth
-        wa_demo_token = tasks.whatsapp_demo_integration(str(template.project.flow_organization), token=token)
-
-        template.wa_demo_token = wa_demo_token
-        template.save(update_fields=["classifier_uuid", "flow_uuid", "wa_demo_token"])
-
         data = {
-            "first_acess": template.first_access,
-            "flow_uuid": template.flow_uuid,
-            "project_type": "template",
-            "wa_demo_token": template.wa_demo_token
+            "project": project,
         }
 
-        return Response(data, status=status.HTTP_201_CREATED)
+        response_data = TemplateProjectSerializer().create(data, request)
+
+        return Response(response_data, status=status.HTTP_201_CREATED)

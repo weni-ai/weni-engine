@@ -1,4 +1,5 @@
 import json
+from unittest import skipIf
 import uuid as uuid4
 from unittest.mock import patch
 from django.conf import settings
@@ -22,6 +23,7 @@ from connect.common.models import (
 )
 
 
+@skipIf(True, "deprecated")
 class CreateOrganizationAPITestCase(TestCase):
     def setUp(self):
         self.factory = RequestFactory()

@@ -1,5 +1,4 @@
 import json
-from unittest import skipIf
 import uuid as uuid4
 from unittest.mock import patch
 
@@ -380,7 +379,7 @@ class DeleteProjectAuthTestCase(TestCase):
         self.assertEquals(response.status_code, status.HTTP_204_NO_CONTENT)
 
 
-@skipIf(True, "Needs mock")
+# @skipIf(True, "Needs mock")
 class TemplateProjectTestCase(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
@@ -452,6 +451,9 @@ class TemplateProjectTestCase(TestCase):
         response, content_data = self.request_create(
             data, token=self.user_token
         )
-        print(content_data)
+
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
         self.assertIsNotNone(content_data.get("flow_uuid"))
+        self.assertEquals(content_data.get("first_acess"), True)
+        self.assertEquals(content_data.get("wa_demo_token"), "wa-demo-12345")
+        self.assertEquals(content_data.get("project_type"), "template")

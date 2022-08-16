@@ -12,5 +12,4 @@ def add_classifier_to_flow(sample_flow, classifier_uuid):
             if "classifier" in actions["actions"][0].keys():
                 classifier = actions["actions"][0].get("classifier")
                 classifier["uuid"] = classifier_uuid
-                print(classifier)
     return sample_flow

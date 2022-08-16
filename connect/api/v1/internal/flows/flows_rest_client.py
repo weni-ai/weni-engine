@@ -30,7 +30,7 @@ class FlowsRESTClient:
 
     def create_flows(self, project_uuid: str, classifier_uuid: str):
 
-        sample_flow = add_classifier_to_flow(self.sample_flow)
+        sample_flow = add_classifier_to_flow(self.sample_flow, classifier_uuid)
 
         body = dict(
             org=project_uuid,

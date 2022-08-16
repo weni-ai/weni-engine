@@ -503,7 +503,7 @@ class Project(models.Model):
     extra_active_integration = models.IntegerField(
         _("Whatsapp Integrations"), default=0
     )
-    is_template = models.BooleanField(default=False) 
+    is_template = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.uuid} - Project: {self.name} - Org: {self.organization.name}"
