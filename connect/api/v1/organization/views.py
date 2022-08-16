@@ -79,6 +79,64 @@ class OrganizationViewSet(
         organization_serializer = OrganizationSeralizer(page, many=True, context=self.get_serializer_context())
         return self.get_paginated_response(organization_serializer.data)
 
+    def create(self, request, *args, **kwargs):
+        serializer_class = None
+        org_info = request.data.get("organization")
+        project_info = request.data.get("project")
+        user_email = user_email
+        try:
+            owner = User.objects.get(email=user_email)
+            if not settings.TESTING:
+                ai_client = IntelligenceRESTClient()
+                ai_org = ai_client.create_organization(
+                    user_email=user_email,
+                    organization_name=org_info.get("name")
+                )
+                org_info.update(dict(intelligence_organization=ai_org.get("id")))
+            cycle = BillingPlan._meta.get_field(
+                "cycle"
+            ).default
+            new_organization = Organization.objects.create(
+                name=org_info.get("name"),
+                description=org_info.get("description"),
+                organization_billing__plan=org_info.get("plan"),
+                organization_billing__cycle=cycle,
+                inteligence_organization=org_info.get("intelligence_organization", 0)
+            )
+
+            flows_info = tasks.create_project.delay(
+                project_name=project_info.get("name"), 
+                user_email=user_email, 
+                project_timezone=project_info.get("timezone")
+            )
+
+            flows_info.wait()
+            
+            project = Project.objects.create(
+                name=project_info.get("name"),
+                flow_id=flows_info.get("flow_id"),
+                flow_organization=flows_info.get("uuid"),
+                organization=new_organization
+            )
+            
+            RequestPermissionOrganization.objects.create(
+                email=owner.email,
+                organization=new_organization,
+                role=OrganizationRole.ADMIN.value,
+                created_by=owner
+            )
+
+            for auth in org_info.get("authorizations"):
+                RequestPermissionOrganization.objects.create(
+                    email=auth.get("email"),
+                    organization=new_organization,
+                    role=auth.get("role"),
+                    created_by=owner
+                )
+        except error:
+            raise ValidationError("check if all data has pass")
+        return Response(data={})
+
     def perform_destroy(self, instance):
         intelligence_organization = instance.inteligence_organization
         instance.delete()
