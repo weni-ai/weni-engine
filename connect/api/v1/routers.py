@@ -15,6 +15,7 @@ from connect.api.v1.project.views import (
     ProjectViewSet,
     RequestPermissionProjectViewSet,
     RequestPermissionRocketViewSet,
+    TemplateProjectViewSet,
 )
 
 
@@ -103,3 +104,4 @@ router.register("organization/request-permission", RequestPermissionOrganization
 router.register("organization/invoice", InvoiceViewSet)
 router.register("project/request-permission", RequestPermissionProjectViewSet),
 router.register("organization/rocket-permission", RequestPermissionRocketViewSet)
+router.register("organization/template-project", TemplateProjectViewSet)

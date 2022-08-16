@@ -1,5 +1,4 @@
 import json
-
 from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext_lazy as _
 from django_filters.rest_framework import DjangoFilterBackend
@@ -35,9 +34,12 @@ from connect.api.v1.project.serializers import (
     RetrieveClassifierSerializer,
     CreateClassifierSerializer,
     ClassifierSerializer,
+    TemplateProjectSerializer,
 )
+
 from connect.celery import app as celery_app
 from connect.common.models import (
+    Organization,
     OrganizationAuthorization,
     Project,
     RequestPermissionProject,
@@ -45,10 +47,16 @@ from connect.common.models import (
     ProjectAuthorization,
     RocketAuthorization,
     OpenedProject,
+    TemplateProject,
 )
 from connect.authentication.models import User
 from connect.common import tasks
 from connect.utils import count_contacts
+
+from connect.api.grpc.project.serializers import CreateClassifierRequestSerializer
+from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
+from connect.api.v1.internal.intelligence.intelligence_rest_client import IntelligenceRESTClient
+from weni.protobuf.flows.classifier_pb2 import ClassifierCreateRequest
 
 
 class ProjectViewSet(
@@ -463,3 +471,101 @@ class RequestPermissionRocketViewSet(
     permission_classes = [IsAuthenticated]
     metadata_class = Metadata
     lookup_field = "pk"
+
+
+class TemplateProjectViewSet(
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.DestroyModelMixin,
+    GenericViewSet,
+):
+    queryset = TemplateProject.objects
+    serializer_class = TemplateProjectSerializer
+    permission_classes = [IsAuthenticated]
+    metadata_class = Metadata
+    lookup_field = "pk"
+
+    def get_queryset(self, *args, **kwargs):
+        if getattr(self, "swagger_fake_view", False):
+            # queryset just for schema generation metadata
+            return TemplateProject.objects.none()  # pragma: no cover
+        auth = (
+            ProjectAuthorization.objects.exclude(role=0)
+            .filter(user=self.request.user)
+        )
+        return self.queryset.filter(authorization__in=auth)
+
+    def get_object(self):
+        lookup_url_kwarg = self.lookup_field
+
+        obj = self.get_queryset().get(authorization__project__uuid=self.kwargs.get(lookup_url_kwarg))
+
+        return obj
+
+    def create(self, request, *args, **kwargs):
+
+        flow_organization = tasks.create_template_project(
+            request.data.get("name"), request.user.email, request.data.get("timezone")
+        ).get("uuid")
+        organization = get_object_or_404(Organization, uuid=request.data.get("organization"))
+
+        # Create blank project
+
+        project = Project.objects.create(
+            date_format=request.data.get("date_format"),
+            name=request.data.get("name"),
+            organization=organization,
+            timezone=request.data.get("timezone"),
+            flow_organization=flow_organization,
+            is_template=True,
+        )
+
+        authorization = project.get_user_authorization(request.user)
+
+        # Create template model
+
+        template = self.queryset.create(
+            authorization=authorization,
+            project=project
+        )
+
+        # Get AI access token
+        inteligence_client = IntelligenceRESTClient()
+        access_token = inteligence_client.get_access_token(request.user.email)
+
+        # Create classifier
+
+        classifier_uuid = tasks.create_classifier(
+            project_uuid=str(project.flow_organization),
+            user_email=request.user.email,
+            classifier_name="template classifier",
+            access_token=access_token,
+        ).get("uuid")
+
+        # Create Flow
+        rest_client = FlowsRESTClient()
+
+        flows = rest_client.create_flows(str(project.flow_organization), classifier_uuid)
+
+        flow_uuid = flows.get("uuid")
+
+        template.classifier_uuid = classifier_uuid
+        template.flow_uuid = flow_uuid
+
+        # Integrate WhatsApp
+        token = self.request._auth
+        wa_demo_token = tasks.whatsapp_demo_integration(str(template.project.flow_organization), token=token)
+
+        template.wa_demo_token = wa_demo_token
+        template.save(update_fields=["classifier_uuid", "flow_uuid", "wa_demo_token"])
+
+        data = {
+            "first_acess": template.first_access,
+            "flow_uuid": template.flow_uuid,
+            "project_type": "template",
+            "wa_demo_token": template.wa_demo_token
+        }
+
+        return Response(data, status=status.HTTP_201_CREATED)

@@ -1,3 +1,4 @@
+import uuid
 import pendulum
 from datetime import timedelta
 import requests
@@ -19,10 +20,12 @@ from connect.common.models import (
     BillingPlan,
     Invoice,
     GenericBillingData,
+    TemplateProject,
 )
 from connect.billing.models import ContactCount
 
 from connect.api.v1.internal.integrations.integrations_rest_client import IntegrationsRESTClient
+from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
 from connect.api.v1.internal.intelligence.intelligence_rest_client import IntelligenceRESTClient
 
 
@@ -205,6 +208,21 @@ def create_project(project_name: str, user_email: str, project_timezone: str):
         project_timezone=project_timezone,
     )
     return {"id": project.id, "uuid": project.uuid}
+
+
+@app.task(name="create_template_project")
+def create_template_project(project_name: str, user_email: str, project_timezone: str):
+
+    rest_client = FlowsRESTClient()
+
+    project = rest_client.create_template_project(
+        project_name=project_name,
+        user_email=user_email,
+        project_timezone=project_timezone,
+    )
+    project = {"uuid": uuid.uuid4()}
+
+    return {"uuid": project.get("uuid")}
 
 
 @app.task(
@@ -661,3 +679,27 @@ def list_classifier(project_uuid: str):
             "uuid": i.get("uuid"),
         })
     return classifiers
+
+
+@app.task(name="whatsapp_demo_integration")
+def whatsapp_demo_integration(template_project_uuid: str, token: str):
+
+    template_project = TemplateProject.objects.get(uuid=template_project_uuid)
+    project_uuid = str(template_project.project.uuid)
+
+    url = f"{settings.INTEGRATIONS_REST_ENDPOINT}/api/v1/apptypes/wpp-demo/apps/"
+
+    headers = {
+        {
+            'Authorization': f'Bearer {token}',
+            'Project-Uuid': project_uuid,
+        }
+    }
+
+    data = {
+        "project_uuid": project_uuid
+    }
+
+    response = requests.post(url, data=data, headers=headers)
+
+    return response.get("config").get("routerToken")

@@ -1,4 +1,5 @@
 import json
+from unittest import skipIf
 import uuid as uuid4
 from unittest.mock import patch
 
@@ -8,7 +9,7 @@ from django.test.client import MULTIPART_CONTENT
 from django.conf import settings
 from rest_framework import status
 
-from connect.api.v1.project.views import ProjectViewSet
+from connect.api.v1.project.views import ProjectViewSet, TemplateProjectViewSet
 from connect.api.v1.tests.utils import create_user_and_token
 from connect.common.models import (
     Project,
@@ -377,3 +378,80 @@ class DeleteProjectAuthTestCase(TestCase):
             self.owner_token,
         )
         self.assertEquals(response.status_code, status.HTTP_204_NO_CONTENT)
+
+
+@skipIf(True, "Needs mock")
+class TemplateProjectTestCase(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+
+        self.user, self.user_token = create_user_and_token("user")
+
+        self.organization = Organization.objects.create(
+            name="test organization",
+            description="",
+            inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan="enterprise",
+        )
+        self.organization_authorization = self.organization.authorizations.create(
+            user=self.user, role=OrganizationRole.ADMIN.value
+        )
+
+    def request(self, project=None, token=None):
+        authorization_header = (
+            {"HTTP_AUTHORIZATION": "Token {}".format(token.key)} if token else {}
+        )
+        if project:
+            ...
+        request = self.factory.get(
+            "/v1/organization/template-project/",
+            **authorization_header,
+        )
+
+        response = TemplateProjectViewSet.as_view({"get": "list"})(
+            request)
+
+        response.render()
+        content_data = json.loads(response.content)
+
+        return response, content_data
+
+    def request_create(self, data, token=None):
+        authorization_header = (
+            {"HTTP_AUTHORIZATION": "Token {}".format(token.key)} if token else {}
+        )
+        request = self.factory.post(
+            "/v1/organization/template-project/",
+            data=json.dumps(data),
+            content_type="application/json",
+            format="json",
+            **authorization_header,
+        )
+
+        response = TemplateProjectViewSet.as_view({"post": "create"})(
+            request, data)
+        response.render()
+        content_data = json.loads(response.content)
+
+        return response, content_data
+
+    def test_get_template_projects(self):
+        response, content_data = self.request(
+            token=self.user_token,
+        )
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+
+    def test_create_template_project(self):
+        data = {
+            "date_format": "D",
+            "name": "Test template project",
+            "organization": str(self.organization.uuid),
+            "timezone": "America/Argentina/Buenos_Aires"
+        }
+        response, content_data = self.request_create(
+            data, token=self.user_token
+        )
+        print(content_data)
+        self.assertEquals(response.status_code, status.HTTP_201_CREATED)
+        self.assertIsNotNone(content_data.get("flow_uuid"))

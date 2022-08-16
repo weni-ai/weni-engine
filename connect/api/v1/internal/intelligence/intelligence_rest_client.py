@@ -1,6 +1,6 @@
 import logging
 import requests
-
+import json
 from django.conf import settings
 
 from connect.api.v1.internal.internal_authentication import InternalAuthentication
@@ -109,3 +109,14 @@ class IntelligenceRESTClient:
             else:
                 logger.error(f"{response.status_code}: classifier not found")
         return {"repositories_count": len(auth_list)}
+
+    def get_access_token(self, user_email):
+        body = {
+            "email": user_email,
+        }
+        response = requests.get(
+            url=f"{self.base_url}v2/repository/authorization-by-user/",
+            headers=self.authentication_instance.headers,
+            json=body
+        )
+        return json.loads(response.text).get("access_token")
