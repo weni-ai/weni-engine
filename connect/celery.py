@@ -13,6 +13,19 @@ app.config_from_object("django.conf:settings", namespace="CELERY")
 
 app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 
+task_create_missing_queues = True
+
+# Billing Tasks
+
+app.conf.task_routes = {
+    # 'sync_contacts': {'queue': 'billing'},
+    # 'count_contacts': {'queue': 'billing'},
+    # 'retry_billing_tasks': {'queue': 'billing'},
+    # 'create_contacts': {'queue': 'billing'}
+    # 'get_messages': {'queue': 'billing'},
+}
+
+
 app.conf.beat_schedule = {
     "check-status-services": {
         "task": "connect.common.tasks.status_service",
@@ -58,14 +71,14 @@ app.conf.beat_schedule = {
         "task": "connect.common.tasks.capture_invoice",
         "schedule": schedules.crontab(hour="8,10,13,15,17", minute=0),
     },
-    "sync_contacts": {
-        "task": "sync_contacts",
-        "schedule": schedules.crontab(hour="*/5", minute=0)
-    },
-    "count_contacts": {
-        "task": "count_contacts",
-        "schedule": schedules.crontab(hour="*/6", minute=0)
-    },
+    # "sync_contacts": {
+    #     "task": "sync_contacts",
+    #     "schedule": schedules.crontab(hour=settings.SYNC_CONTACTS_SCHEDULE, minute=0)
+    # },
+    # "count_contacts": {
+    #     "task": "count_contacts",
+    #     "schedule": schedules.crontab(hour="*/6", minute=0)
+    # },
     # "retry_billing_tasks": {
     #     "task": "retry_billing_tasks",
     #     "schedule": schedules.crontab(hour="1")

@@ -1,11 +1,10 @@
-from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
 from rest_framework import serializers
 from rest_framework.exceptions import PermissionDenied
 
 from connect.api.v1.fields import TextField
 from connect.api.v1.project.validators import CanContributeInOrganizationValidator
-from connect.common import tasks
 from connect.common.models import (
     Organization,
     OrganizationAuthorization,
@@ -14,6 +13,7 @@ from connect.common.models import (
     OrganizationLevelRole,
     OrganizationRole
 )
+from connect.api.v1.internal.intelligence.intelligence_rest_client import IntelligenceRESTClient
 
 
 class BillingPlanSerializer(serializers.ModelSerializer):
@@ -132,14 +132,13 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
     )
 
     def create(self, validated_data):
-        task = tasks.create_organization.delay(  # pragma: no cover
-            validated_data.get("name"),
-            self.context["request"].user.email,
-        )
+        organization = {"id": 0}
         if not settings.TESTING:
-            task.wait()  # pragma: no cover
-
-        organization = task.result
+            ai_client = IntelligenceRESTClient()
+            organization = ai_client.create_organization(
+                user_email=self.context["request"].user.email,
+                organization_name=validated_data.get("name")
+            )
 
         validated_data.update({"inteligence_organization": organization.get("id")})
 
