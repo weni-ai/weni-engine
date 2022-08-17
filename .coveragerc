@@ -3,6 +3,7 @@ source =
     ./connect/api
     ./connect/authentication
     ./connect/common
+    ./connect/billing
 omit =
     ./connect/api/apps.py
     ./connect/common/apps.py
@@ -18,6 +19,10 @@ omit =
     ./connect/common/signals.py
     ./connect/common/management/*
     ./connect/common/migrations/*
+    ./connect/*/__init__.py
+    ./connect/billing/apps.py
+    ./connect/billing/migrations/*
+
 
 [report]
 fail_under = 85

@@ -24,7 +24,6 @@ class ContactDetail:
         letters = string.ascii_letters
         return f"{''.join(random.choice(letters) for i in range(10))}, {''.join(random.choice(letters) for i in range(10))} {''.join(random.choice(letters) for i in range(10))}"
 
-
     @staticmethod
     def direction():
         direction = ["OUTPUT", "INPUT"]
@@ -63,12 +62,15 @@ class ContactDetail:
         return object
 
 
-def get_active_contacts(before, after):
+def get_active_contacts(project_uuid, before, after):
     response = list()
+    before = pendulum.parse(before)
+    after = pendulum.parse(after)
+
     create_contact = ContactDetail(before, after)
     channel = create_contact.channel()
     for i in range(10):
-        if i==5:
+        if i == 5:
             channel = create_contact.channel()
         contact = create_contact.active_contact(channel)
         response.append(contact)

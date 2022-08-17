@@ -9,7 +9,6 @@ from connect.billing.models import (
     ContactCount,
     Channel,
 )
-from connect.billing.models import Contact, Message, SyncManagerTask, ContactCount, Channel
 from connect.elastic.flow import ElasticFlow
 from django.utils import timezone
 from connect import utils
@@ -224,7 +223,7 @@ def problem_capture_invoice():
 
 
 @app.task(name="sync_contacts_retroactive")
-def sync_contacts_retroactive(before, after, task_uuid: str = None):
+def sync_contacts_retroactive(before, after, task_uuid: str = None):  # pragma: no cover
     if task_uuid:
         manager = SyncManagerTask.objects.get(uuid=task_uuid)
     else:
@@ -249,80 +248,22 @@ def sync_contacts_retroactive(before, after, task_uuid: str = None):
         for project in Project.objects.exclude(flow_id=None):
             active_contacts = list(
                 flow_instance.get_active_contacts(
-                    str(project.flow_organization), before, after))
-            for contact in active_contacts:
-                contact = Contact.objects.create(
-                    contact_flow_uuid=contact.uuid,
-                    name=contact.name,
-                    last_seen_on=pendulum.from_timestamp(contact.msg.sent_on.seconds.real),
+                    str(project.flow_organization), str(before), str(after)))
+            bulk_contacts = []
+            for active_contact in active_contacts:
+                ts = f"{active_contact.msg.sent_on.seconds.real}.{active_contact.msg.sent_on.nanos.real}"
+                contact = Contact(
+                    contact_flow_uuid=active_contact.uuid,
+                    name=active_contact.name,
+                    last_seen_on=pendulum.from_timestamp(float(ts)),
+                    project=project,
                 )
-                message = Message.objects.create(
-                    contact=contact,
-                    text=contact.msg.text,
-                    created_on=pendulum.from_timestamp(contact.msg.sent_on.seconds.real),
-                    direction=contact.msg.direction,
-                    message_flow_uuid=contact.msg.uuid
-                )
-                channel = Channel.create(
-                    channel_type=message.channel_type,
-                    channel_flow_id=contact.channel.uuid,
-                    project=project
-                )
-                contact.update_channel(channel)
-    except Exception as error:
+                bulk_contacts.append(contact)
+
+            Contact.objects.bulk_create(bulk_contacts)
         manager.finished_at = pendulum.now()
-        manager.fail_message.create(message=str(error))
-        manager.status = False
+        manager.status = True
         manager.save(update_fields=["finished_at", "status"])
-        return False
-
-
-@app.task(name="mock_sync_contacts_retroactive")
-def mock_sync_contacts_retroactive(before, after, task_uuid: str = None):
-    if task_uuid:
-        manager = SyncManagerTask.objects.get(uuid=task_uuid)
-    else:
-        last_retroactive_sync = SyncManagerTask.objects.filter(
-            task_type="retroactive_sync",
-            status=True,
-        ).order_by("started_at").last()
-
-        if last_retroactive_sync:
-            after = pendulum.instance(last_retroactive_sync.before)
-            before = after.add(hours=3)
-
-        manager = SyncManagerTask.objects.create(
-            task_type="retroactive_sync",
-            started_at=pendulum.now(),
-            before=before,
-            after=after
-        )
-
-    try:
-        flow_instance = utils.get_grpc_types().get("flow")
-        for project in Project.objects.exclude(flow_id=None):
-            active_contacts = list(
-                flow_instance.get_active_contacts(
-                    str(project.flow_organization), before, after))
-            for contact in active_contacts:
-                engine_contact = Contact.objects.create(
-                    contact_flow_uuid=contact.uuid,
-                    name=contact.name,
-                    last_seen_on=pendulum.from_timestamp(contact.msg.sent_on.seconds.real),
-                )
-                message = Message.objects.create(
-                    contact=engine_contact,
-                    text=contact.msg.text,
-                    created_on=pendulum.from_timestamp(contact.msg.sent_on.seconds.real),
-                    direction=contact.msg.direction,
-                    message_flow_uuid=contact.msg.uuid
-                )
-                channel = Channel.create(
-                    channel_type=message.channel_type,
-                    channel_flow_id=contact.channel.uuid,
-                    project=project
-                )
-                engine_contact.update_channel(channel)
     except Exception as error:
         manager.finished_at = pendulum.now()
         manager.fail_message.create(message=str(error))
