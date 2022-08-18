@@ -7,7 +7,7 @@ from rest_framework.exceptions import PermissionDenied
 
 from connect.api.v1 import fields
 from connect.api.v1.fields import TextField
-from ..internal.flows.flows_rest_client import FlowsRESTClient
+from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
 from ..internal.intelligence.intelligence_rest_client import IntelligenceRESTClient
 from connect.api.v1.project.validators import CanContributeInOrganizationValidator
 from connect.celery import app as celery_app
@@ -26,7 +26,7 @@ from connect.common.models import (
     ProjectRole,
     TemplateProject,
 )
-
+import json
 
 class ProjectSerializer(serializers.ModelSerializer):
 
@@ -395,7 +395,7 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
         project = validated_data.get("project")
 
         authorization = project.get_user_authorization(request.user)
-
+        authorization = project.get_user_authorization(user)
         # Create template model
 
         template = TemplateProject.objects.create(
@@ -405,13 +405,13 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
 
         # Get AI access token
         inteligence_client = IntelligenceRESTClient()
-        access_token = inteligence_client.get_access_token(request.user.email)
+        access_token = inteligence_client.get_access_token(user.email)
 
         # Create classifier
         if not settings.TESTING:
             classifier_uuid = tasks.create_classifier(
                 project_uuid=str(project.flow_organization),
-                user_email=request.user.email,
+                user_email=user.email,
                 classifier_name="template classifier",
                 access_token=access_token,
             ).get("uuid")
@@ -422,6 +422,8 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
         rest_client = FlowsRESTClient()
         if not settings.TESTING:
             flows = rest_client.create_flows(str(project.flow_organization), str(classifier_uuid))
+            if flows.get("status") == 201:
+                flows = json.loads(flows.get("data"))
         else:
             flows = {"uuid": uuid.uuid4()}
 
