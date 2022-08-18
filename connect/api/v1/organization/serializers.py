@@ -267,6 +267,7 @@ class RequestPermissionOrganizationSerializer(serializers.ModelSerializer):
             photo=None
         )
         if user.exists():
+            user = user.first()
             user_data = dict(
                 name=f"{user.first_name} {user.last_name}",
                 photo=user.photo_url
