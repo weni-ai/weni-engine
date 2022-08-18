@@ -78,17 +78,14 @@ def get_messages(temp_channel_uuid: str, before: str, after: str, project_uuid: 
 def create_contacts(active_contacts: list, project_uuid: Project):
 
     project = Project.objects.get(uuid=project_uuid)
-    contacts_to_save = list()
+
     for elastic_contact in active_contacts:
-        contacts_to_save.append(
-            Contact(
-                contact_flow_uuid=elastic_contact["_source"].get("uuid"),
-                name=elastic_contact["_source"].get("name"),
-                last_seen_on=pendulum.parse(elastic_contact["_source"].get("last_seen_on")),
-                project=project
-            )
+        Contact.objects.create(
+            contact_flow_uuid=elastic_contact["_source"].get("uuid"),
+            name=elastic_contact["_source"].get("name"),
+            last_seen_on=pendulum.parse(elastic_contact["_source"].get("last_seen_on")),
+            project=project
         )
-    Contact.objects.bulk_create(contacts_to_save)
 
 
 @app.task(name="sync_contacts", ignore_result=True)
@@ -176,7 +173,7 @@ def count_contacts(before, after, project_uuid: str, task_uuid: str = None):
         )
     try:
         project = Project.objects.get(uuid=project_uuid)
-        amount = project.contacts.filter(last_seen_on__range=(after, before)).count()
+        amount = project.contacts.filter(last_seen_on__range=(after, before)).distinct("contact_flow_uuid").count()
         now = pendulum.now()
         try:
             contact_count = ContactCount.objects.get(
