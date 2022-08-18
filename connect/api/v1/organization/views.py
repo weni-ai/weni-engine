@@ -131,15 +131,16 @@ class OrganizationViewSet(
                     )
 
                 flows_info.wait()
+                flows_info = flows_info.result
             else:
                 flows_info = {
-                    "flow_id": randint(1, 100),
+                    "id": randint(1, 100),
                     "uuid": uuid.uuid4()
                 }
 
             project = Project.objects.create(
                 name=project_info.get("name"),
-                flow_id=flows_info.get("flow_id"),
+                flow_id=flows_info.get("id"),
                 flow_organization=flows_info.get("uuid"),
                 organization=new_organization,
                 is_template=True if project_info.get("template") else False
