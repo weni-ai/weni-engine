@@ -454,6 +454,6 @@ class TemplateProjectTestCase(TestCase):
 
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
         self.assertIsNotNone(content_data.get("flow_uuid"))
-        self.assertEquals(content_data.get("first_acess"), True)
+        self.assertEquals(content_data.get("first_access"), True)
         self.assertEquals(content_data.get("wa_demo_token"), "wa-demo-12345")
         self.assertEquals(content_data.get("project_type"), "template")

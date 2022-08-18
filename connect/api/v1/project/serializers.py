@@ -405,7 +405,10 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
 
         # Get AI access token
         inteligence_client = IntelligenceRESTClient()
-        access_token = inteligence_client.get_access_token(request.user.email)
+        if not settings.TESTING:
+            access_token = inteligence_client.get_access_token(request.user.email)
+        else:
+            access_token = str(uuid.uuid4())
 
         # Create classifier
         if not settings.TESTING:
