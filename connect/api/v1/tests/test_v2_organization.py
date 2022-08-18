@@ -57,7 +57,6 @@ class CreateOrganizationAPITestCase(TestCase):
                 "name": "Test Project",
                 "organization": "2575d1f9-f7f8-4a5d-ac99-91972e309511",
                 "timezone": "America/Argentina/Buenos_Aires",
-                "template": True
             }
         }
 
@@ -88,9 +87,9 @@ class CreateOrganizationAPITestCase(TestCase):
         response, content_data = self.request(data, self.owner_token)
 
         self.assertEquals(response.status_code, 201)
-        self.assertEquals(content_data.get("first_acess"), True)
-        self.assertEquals(content_data.get("wa_demo_token"), "wa-demo-12345")
-        self.assertEquals(content_data.get("project_type"), "template")
+        self.assertEquals(content_data.get("project").get("first_access"), True)
+        self.assertEquals(content_data.get("project").get("wa_demo_token"), "wa-demo-12345")
+        self.assertEquals(content_data.get("project").get("project_type"), "template")
         self.assertEquals(OrganizationAuthorization.objects.count(), 1)
         self.assertEquals(RequestPermissionOrganization.objects.count(), 1)
         self.assertEquals(Project.objects.count(), 1)

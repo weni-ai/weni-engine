@@ -395,7 +395,6 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
         project = validated_data.get("project")
 
         authorization = project.get_user_authorization(request.user)
-        authorization = project.get_user_authorization(user)
         # Create template model
 
         template = TemplateProject.objects.create(
@@ -405,13 +404,13 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
 
         # Get AI access token
         inteligence_client = IntelligenceRESTClient()
-        access_token = inteligence_client.get_access_token(user.email)
+        access_token = inteligence_client.get_access_token(request.user.email)
 
         # Create classifier
         if not settings.TESTING:
             classifier_uuid = tasks.create_classifier(
                 project_uuid=str(project.flow_organization),
-                user_email=user.email,
+                user_email=request.user.email,
                 classifier_name="template classifier",
                 access_token=access_token,
             ).get("uuid")
@@ -440,7 +439,7 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
         template.save(update_fields=["classifier_uuid", "flow_uuid", "wa_demo_token"])
 
         data = {
-            "first_acess": template.first_access,
+            "first_access": template.first_access,
             "flow_uuid": str(template.flow_uuid),
             "project_type": "template",
             "wa_demo_token": template.wa_demo_token

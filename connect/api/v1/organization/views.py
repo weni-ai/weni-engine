@@ -169,7 +169,7 @@ class OrganizationViewSet(
 
             response_data = dict(
                 organization=model_to_dict(new_organization),
-                project=model_to_dict(project_data if project_info.get("template") else project)
+                project=project_data if project_info.get("template") else model_to_dict(project)
             )
 
         except Exception as exception:
