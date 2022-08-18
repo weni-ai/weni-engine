@@ -33,7 +33,7 @@ class ElasticSearchTestCase(TestCase):
         before = datetime(2022, 4, 8, 15, 20, 0, 0, pytz.UTC)
 
         response = self.client.get_contact_detailed(self.project.flow_id, str(before), str(after))
-        hit = response[0]
+        hit = list(response)[0]
         last_seen_on = pendulum.parse(hit.last_seen_on)
 
         self.assertEquals(len(response), 1)

@@ -1,3 +1,4 @@
+import uuid
 import pendulum
 from datetime import timedelta
 import requests
@@ -20,9 +21,9 @@ from connect.common.models import (
     Invoice,
     GenericBillingData,
 )
-from connect.billing.models import ContactCount
 
 from connect.api.v1.internal.integrations.integrations_rest_client import IntegrationsRESTClient
+from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
 from connect.api.v1.internal.intelligence.intelligence_rest_client import IntelligenceRESTClient
 
 
@@ -207,6 +208,21 @@ def create_project(project_name: str, user_email: str, project_timezone: str):
     return {"id": project.id, "uuid": project.uuid}
 
 
+@app.task(name="create_template_project")
+def create_template_project(project_name: str, user_email: str, project_timezone: str):
+
+    rest_client = FlowsRESTClient()
+
+    project = rest_client.create_template_project(
+        project_name=project_name,
+        user_email=user_email,
+        project_timezone=project_timezone,
+    )
+    project = {"uuid": uuid.uuid4()}
+
+    return {"uuid": project.get("uuid")}
+
+
 @app.task(
     name="update_user_language",
     autoretry_for=(_InactiveRpcError, Exception),
@@ -298,11 +314,11 @@ def sync_active_contacts():
 
 @app.task()
 def sync_total_contact_count():
+    flow_instance = utils.get_grpc_types().get("flow")
     for project in Project.objects.all():
-        contacts_day_count = ContactCount.objects.filter(
-            channel__project=project
-        )
-        project.total_contact_count = sum([day_count.count for day_count in contacts_day_count])
+        response = flow_instance.get_project_statistic(project_uuid=str(project.flow_organization))
+        contacts = response.get("active_contacts", project.total_contact_count)
+        project.total_contact_count = contacts
         project.save(update_fields=["total_contact_count"])
     return True
 
@@ -661,3 +677,32 @@ def list_classifier(project_uuid: str):
             "uuid": i.get("uuid"),
         })
     return classifiers
+
+
+@app.task(name="whatsapp_demo_integration")
+def whatsapp_demo_integration(project_uuid: str, token: str):
+
+    url = f"{settings.INTEGRATIONS_REST_ENDPOINT}/api/v1/apptypes/wpp-demo/apps/"
+
+    headers = {
+        'Authorization': f'Bearer {token}',
+        'Project-Uuid': project_uuid,
+    }
+
+    data = {
+        "project_uuid": project_uuid
+    }
+
+    if not settings.TESTING:
+
+        response = requests.post(url, data=data, headers=headers)
+
+        if response.status_code != range(200, 299):
+            raise Exception(response.text)
+    else:
+        response = {
+            "config": {
+                "routerToken": "wa-demo-12345"
+            }
+        }
+    return response.get("config").get("routerToken")

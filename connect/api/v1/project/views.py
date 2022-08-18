@@ -1,5 +1,5 @@
 import json
-
+import uuid
 from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext_lazy as _
 from django_filters.rest_framework import DjangoFilterBackend
@@ -35,9 +35,12 @@ from connect.api.v1.project.serializers import (
     RetrieveClassifierSerializer,
     CreateClassifierSerializer,
     ClassifierSerializer,
+    TemplateProjectSerializer,
 )
+
 from connect.celery import app as celery_app
 from connect.common.models import (
+    Organization,
     OrganizationAuthorization,
     Project,
     RequestPermissionProject,
@@ -45,10 +48,12 @@ from connect.common.models import (
     ProjectAuthorization,
     RocketAuthorization,
     OpenedProject,
+    TemplateProject,
 )
 from connect.authentication.models import User
 from connect.common import tasks
 from connect.utils import count_contacts
+from django.conf import settings
 
 
 class ProjectViewSet(
@@ -463,3 +468,69 @@ class RequestPermissionRocketViewSet(
     permission_classes = [IsAuthenticated]
     metadata_class = Metadata
     lookup_field = "pk"
+
+
+class TemplateProjectViewSet(
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.DestroyModelMixin,
+    GenericViewSet,
+):
+    queryset = TemplateProject.objects
+    serializer_class = TemplateProjectSerializer
+    permission_classes = [IsAuthenticated]
+    metadata_class = Metadata
+    lookup_field = "pk"
+
+    def get_queryset(self, *args, **kwargs):
+        if getattr(self, "swagger_fake_view", False):
+            # queryset just for schema generation metadata
+            return TemplateProject.objects.none()  # pragma: no cover
+        auth = (
+            ProjectAuthorization.objects.exclude(role=0)
+            .filter(user=self.request.user)
+        )
+        return self.queryset.filter(authorization__in=auth)
+
+    def get_object(self):
+        lookup_url_kwarg = self.lookup_field
+
+        obj = self.get_queryset().get(authorization__project__uuid=self.kwargs.get(lookup_url_kwarg))
+
+        return obj
+
+    def create(self, request, *args, **kwargs):
+
+        if not settings.TESTING:
+            flow_organization = tasks.create_template_project(
+                request.data.get("name"),
+                request.user.email,
+                request.data.get("timezone")
+            ).get("uuid")
+        else:
+            flows = {
+                "uuid": uuid.uuid4(),
+            }
+            flow_organization = flows.get("uuid")
+
+        organization = get_object_or_404(Organization, uuid=request.data.get("organization"))
+
+        # Create project
+        project = Project.objects.create(
+            date_format=request.data.get("date_format"),
+            name=request.data.get("name"),
+            organization=organization,
+            timezone=request.data.get("timezone"),
+            flow_organization=flow_organization,
+            is_template=True,
+        )
+
+        data = {
+            "project": project,
+        }
+
+        response_data = TemplateProjectSerializer().create(data, request)
+
+        return Response(response_data, status=status.HTTP_201_CREATED)

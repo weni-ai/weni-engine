@@ -1,3 +1,4 @@
+import uuid
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
@@ -6,6 +7,8 @@ from rest_framework.exceptions import PermissionDenied
 
 from connect.api.v1 import fields
 from connect.api.v1.fields import TextField
+from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
+from ..internal.intelligence.intelligence_rest_client import IntelligenceRESTClient
 from connect.api.v1.project.validators import CanContributeInOrganizationValidator
 from connect.celery import app as celery_app
 from connect.common import tasks
@@ -21,10 +24,13 @@ from connect.common.models import (
     RequestRocketPermission,
     OpenedProject,
     ProjectRole,
+    TemplateProject,
 )
+import json
 
 
 class ProjectSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Project
         fields = [
@@ -44,6 +50,10 @@ class ProjectSerializer(serializers.ModelSerializer):
             "pending_authorizations",
             "authorization",
             "last_opened_on",
+            "project_type",
+            "flow_uuid",
+            "first_access",
+            "wa_demo_token",
         ]
         ref_name = None
 
@@ -69,6 +79,37 @@ class ProjectSerializer(serializers.ModelSerializer):
     pending_authorizations = serializers.SerializerMethodField(style={"show": False})
     authorization = serializers.SerializerMethodField(style={"show": False})
     last_opened_on = serializers.SerializerMethodField()
+    project_type = serializers.SerializerMethodField()
+    flow_uuid = serializers.SerializerMethodField()
+    first_access = serializers.SerializerMethodField()
+    wa_demo_token = serializers.SerializerMethodField()
+
+    def get_project_type(self, obj):
+        if obj.is_template:
+            return "template"
+        else:
+            return "blank"
+
+    def get_flow_uuid(self, obj):
+        if obj.is_template:
+            email = self.context["request"].user.email
+            template = obj.template_project.get(authorization__user__email=email)
+            return template.flow_uuid
+        ...
+
+    def get_first_access(self, obj):
+        if obj.is_template:
+            email = self.context["request"].user.email
+            template = obj.template_project.get(authorization__user__email=email)
+            return template.first_access
+        ...
+
+    def get_wa_demo_token(self, obj):
+        if obj.is_template:
+            email = self.context["request"].user.email
+            template = obj.template_project.get(authorization__user__email=email)
+            return template.wa_demo_token
+        ...
 
     def get_menu(self, obj):
         return {
@@ -317,3 +358,95 @@ class ClassifierSerializer(serializers.Serializer):
         except Project.DoesNotExist:
             raise serializers.ValidationError("This project does not exist")
         return value
+
+
+class TemplateProjectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProjectAuthorization
+        fields = [
+            "uuid",
+            "project",
+            "wa_demo_token",
+            "classifier_uuid",
+            "first_access",
+            "authorization",
+            "user",
+        ]
+
+    wa_demo_token = serializers.CharField(required=False)
+    classifier_uuid = serializers.UUIDField(style={"show": False}, required=False)
+    first_access = serializers.BooleanField(default=True)
+    authorization = serializers.PrimaryKeyRelatedField(
+        queryset=ProjectAuthorization.objects,
+        required=True,
+        style={"show": False},
+    )
+    project = serializers.PrimaryKeyRelatedField(
+        queryset=Project.objects,
+        required=True,
+        style={"show": False},
+    )
+    user = serializers.SerializerMethodField()
+
+    def get_user(self, obj):
+        return obj.authorization.user.email
+
+    def create(self, validated_data, request):
+
+        project = validated_data.get("project")
+
+        authorization = project.get_user_authorization(request.user)
+        # Create template model
+
+        template = TemplateProject.objects.create(
+            authorization=authorization,
+            project=project
+        )
+
+        # Get AI access token
+        inteligence_client = IntelligenceRESTClient()
+        if not settings.TESTING:
+            access_token = inteligence_client.get_access_token(request.user.email)
+        else:
+            access_token = str(uuid.uuid4())
+
+        # Create classifier
+        if not settings.TESTING:
+            classifier_uuid = tasks.create_classifier(
+                project_uuid=str(project.flow_organization),
+                user_email=request.user.email,
+                classifier_name="template classifier",
+                access_token=access_token,
+            ).get("uuid")
+        else:
+            classifier_uuid = uuid.uuid4()
+
+        # Create Flow
+        rest_client = FlowsRESTClient()
+        if not settings.TESTING:
+            flows = rest_client.create_flows(str(project.flow_organization), str(classifier_uuid))
+            if flows.get("status") == 201:
+                flows = json.loads(flows.get("data"))
+        else:
+            flows = {"uuid": uuid.uuid4()}
+
+        flow_uuid = flows.get("uuid")
+
+        template.classifier_uuid = classifier_uuid
+        template.flow_uuid = flow_uuid
+
+        # Integrate WhatsApp
+        token = request._auth
+
+        wa_demo_token = tasks.whatsapp_demo_integration(str(project.uuid), token=token)
+        template.wa_demo_token = wa_demo_token
+        template.save(update_fields=["classifier_uuid", "flow_uuid", "wa_demo_token"])
+
+        data = {
+            "first_access": template.first_access,
+            "flow_uuid": str(template.flow_uuid),
+            "project_type": "template",
+            "wa_demo_token": template.wa_demo_token
+        }
+
+        return data
