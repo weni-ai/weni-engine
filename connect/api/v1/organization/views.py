@@ -119,9 +119,9 @@ class OrganizationViewSet(
             if not settings.TESTING:
                 if project_info.get("template"):
                     flows_info = tasks.create_template_project.delay(
-                        request.data.get("name"),
-                        request.user.email,
-                        request.data.get("timezone")
+                        project_info.get("name"),
+                        user.email,
+                        project_info.get("timezone")
                     )
                 else:
                     flows_info = tasks.create_project.delay(
