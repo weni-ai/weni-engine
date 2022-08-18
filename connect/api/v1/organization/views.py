@@ -151,7 +151,7 @@ class OrganizationViewSet(
                     "organization": new_organization
                 }
                 project_data = TemplateProjectSerializer().create(data, request)
-            
+
             RequestPermissionOrganization.objects.create(
                 email=user.email,
                 organization=new_organization,

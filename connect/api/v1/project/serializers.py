@@ -28,6 +28,7 @@ from connect.common.models import (
 )
 import json
 
+
 class ProjectSerializer(serializers.ModelSerializer):
 
     class Meta:
