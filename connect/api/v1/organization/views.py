@@ -3,6 +3,7 @@ import uuid
 from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
+from django.forms.models import model_to_dict
 from django.http import JsonResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import mixins, status
@@ -89,7 +90,6 @@ class OrganizationViewSet(
         org_info = request.data.get("organization")
         project_info = request.data.get("project")
         user = request.user
-        response_data = {}
 
         try:
             if not settings.TESTING:
@@ -98,7 +98,11 @@ class OrganizationViewSet(
                     user_email=user.email,
                     organization_name=org_info.get("name")
                 )
-                org_info.update(dict(intelligence_organization=ai_org.get("id")))
+                org_info.update(
+                    dict(
+                        intelligence_organization=ai_org.get("id", 0)
+                    )
+                )
 
             cycle = BillingPlan._meta.get_field(
                 "cycle"
@@ -113,7 +117,6 @@ class OrganizationViewSet(
             )
 
             if not settings.TESTING:
-
                 if project_info.get("template"):
                     flows_info = tasks.create_template_project.delay(
                         request.data.get("name"),
@@ -142,27 +145,13 @@ class OrganizationViewSet(
                 is_template=True if project_info.get("template") else False
             )
 
-            response_data.update(
-                {
-                    "organization": {
-                        "name": new_organization.name,
-                        "uuid": new_organization.uuid
-                    },
-                    "project": {
-                        "name": project.name,
-                        "uuid": project.uuid
-                    },
-                }
-            )
-
             if project_info.get("template"):
                 data = {
                     "project": project,
                     "organization": new_organization
                 }
-                template_data = TemplateProjectSerializer().create(data, request)
-                response_data.update(template_data)
-
+                project_data = TemplateProjectSerializer().create(data, request)
+            
             RequestPermissionOrganization.objects.create(
                 email=user.email,
                 organization=new_organization,
@@ -170,13 +159,18 @@ class OrganizationViewSet(
                 created_by=user
             )
 
-            for auth in org_info.get("authorizations"):
+            for auth in org_info.get("authorizations", []):
                 RequestPermissionOrganization.objects.create(
                     email=auth.get("user_email"),
                     organization=new_organization,
                     role=auth.get("role"),
                     created_by=user
                 )
+
+            response_data = dict(
+                organization=model_to_dict(new_organization),
+                project=model_to_dict(project_data if project_info.get("template") else project)
+            )
 
         except Exception as exception:
             raise ValidationError(exception)
@@ -273,7 +267,7 @@ class OrganizationViewSet(
 
         before = request.query_params.get("before")
         after = request.query_params.get("after")
-        print(before, after)
+
         if not before or not after:
             raise ValidationError(
                 _("Need to pass 'before' and 'after' in query params")
