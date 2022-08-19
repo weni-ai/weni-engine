@@ -396,6 +396,8 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
         project = validated_data.get("project")
 
         authorization = project.get_user_authorization(request.user)
+        authorization.role = 3
+        authorization.save(update_fields=["role"])
         # Create template model
 
         template = TemplateProject.objects.create(
