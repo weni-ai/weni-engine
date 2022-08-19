@@ -173,7 +173,7 @@ def count_contacts(before, after, project_uuid: str, task_uuid: str = None):
         )
     try:
         project = Project.objects.get(uuid=project_uuid)
-        amount = project.contacts.filter(last_seen_on__range=(after, before)).count()
+        amount = project.contacts.filter(last_seen_on__range=(after, before)).distinct("contact_flow_uuid").count()
         now = pendulum.now()
         try:
             contact_count = ContactCount.objects.get(
