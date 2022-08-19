@@ -1,5 +1,7 @@
-from django.utils.translation import ugettext_lazy as _
+from django.contrib.auth import get_user_model
 from django.conf import settings
+from django.utils.translation import ugettext_lazy as _
+
 from rest_framework import serializers
 from rest_framework.exceptions import PermissionDenied
 
@@ -14,6 +16,8 @@ from connect.common.models import (
     OrganizationRole
 )
 from connect.api.v1.internal.intelligence.intelligence_rest_client import IntelligenceRESTClient
+
+User = get_user_model()
 
 
 class BillingPlanSerializer(serializers.ModelSerializer):
@@ -236,7 +240,7 @@ class OrganizationAuthorizationRoleSerializer(serializers.ModelSerializer):
 class RequestPermissionOrganizationSerializer(serializers.ModelSerializer):
     class Meta:
         model = RequestPermissionOrganization
-        fields = ["id", "email", "organization", "role", "created_by"]
+        fields = ["id", "email", "organization", "role", "created_by", "user_data"]
         ref_name = None
 
     email = serializers.EmailField(max_length=254, required=True)
@@ -249,8 +253,24 @@ class RequestPermissionOrganizationSerializer(serializers.ModelSerializer):
     created_by = serializers.HiddenField(
         default=serializers.CurrentUserDefault(), style={"show": False}
     )
+    user_data = serializers.SerializerMethodField()
 
     def validate(self, attrs):
         if attrs.get("role") == OrganizationLevelRole.NOTHING.value:
             raise PermissionDenied(_("You cannot set user role 0"))
         return attrs
+
+    def get_user_data(self, obj):
+        user = User.objects.filter(email=obj.email)
+        user_data = dict(
+            name=f"{obj.email}",
+            photo=None
+        )
+        if user.exists():
+            user = user.first()
+            user_data = dict(
+                name=f"{user.first_name} {user.last_name}",
+                photo=user.photo_url
+            )
+
+        return user_data
