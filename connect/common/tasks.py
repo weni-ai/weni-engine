@@ -1,4 +1,4 @@
-import uuid
+import json
 import pendulum
 from datetime import timedelta
 import requests
@@ -218,9 +218,9 @@ def create_template_project(project_name: str, user_email: str, project_timezone
         user_email=user_email,
         project_timezone=project_timezone,
     )
-    project = {"uuid": uuid.uuid4()}
-
-    return {"uuid": project.get("uuid")}
+    if project.get("status") == 201:
+        uuid = json.loads(project.get("data")).get("uuid")
+        return {"uuid": uuid}
 
 
 @app.task(
