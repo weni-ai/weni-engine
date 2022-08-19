@@ -57,11 +57,11 @@ class IntelligenceRESTClient:
         return response.json()
 
     def delete_user_permission(self, organization_id, user_email):
-        params=dict(
+        params = dict(
             user_email=user_email,
             org_id=organization_id
         )
-        repsonse = requests.delete(
+        requests.delete(
             url=f"{self.base_url}v2/internal/user/permissions",
             headers=self.authentication_instance.headers,
             params=params

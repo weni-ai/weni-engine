@@ -114,11 +114,11 @@ def org_authorizations(sender, instance, created, **kwargs):
 def delete_authorizations(instance, **kwargs):
     for project in instance.organization.project.all():
         project.project_authorizations.filter(user__email=instance.user.email).delete()
-    
+
     if not settings.TESTING:
         ai_client = IntelligenceRESTClient()
         ai_client.delete_user_permission(
-            organization_id=instance.organization.inteligence_organization, 
+            organization_id=instance.organization.inteligence_organization,
             user_email=instance.user.email
         )
 
