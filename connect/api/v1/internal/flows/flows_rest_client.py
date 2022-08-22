@@ -9,7 +9,7 @@ from connect.api.v1.internal.flows.helpers import add_classifier_to_flow
 
 class FlowsRESTClient:
 
-    sample_flow = f"{os.path.join(os.path.dirname(__file__))}/mp9/sample_flow.json"
+    sample_flow = f"{os.path.join(os.path.dirname(__file__))}/mp9/flows_definition_captura-de-leads.json"
 
     def __init__(self):
         self.base_url = settings.FLOWS_REST_ENDPOINT
