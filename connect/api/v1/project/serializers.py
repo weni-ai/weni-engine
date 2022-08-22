@@ -27,6 +27,10 @@ from connect.common.models import (
     TemplateProject,
 )
 import json
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 class ProjectSerializer(serializers.ModelSerializer):
@@ -392,7 +396,7 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
         return obj.authorization.user.email
 
     def create(self, validated_data, request):
-
+        data = {}
         project = validated_data.get("project")
 
         authorization = project.get_user_authorization(request.user)
@@ -406,29 +410,62 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
         )
 
         # Get AI access token
-        inteligence_client = IntelligenceRESTClient()
+        intelligence_client = IntelligenceRESTClient()
         if not settings.TESTING:
-            access_token = inteligence_client.get_access_token(request.user.email)
+            try:
+                access_token = intelligence_client.get_access_token(request.user.email)
+            except Exception as error:
+                logger.error(error)
+                template.delele()
+                data.update(
+                    {
+                        "message": "Could not get access token",
+                        "status": "FAILED"
+                    }
+                )
+                return data
         else:
             access_token = str(uuid.uuid4())
 
         # Create classifier
         if not settings.TESTING:
-            classifier_uuid = tasks.create_classifier(
-                project_uuid=str(project.flow_organization),
-                user_email=request.user.email,
-                classifier_name="template classifier",
-                access_token=access_token,
-            ).get("uuid")
+            try:
+                classifier_uuid = tasks.create_classifier(
+                    project_uuid=str(project.flow_organization),
+                    user_email=request.user.email,
+                    classifier_name="template classifier",
+                    access_token=access_token,
+                ).get("uuid")
+            except Exception as error:
+                logger.error(error)
+                template.delele()
+                data.update(
+                    {
+                        "message": "Could not create classifier",
+                        "status": "FAILED"
+                    }
+                )
+                return data
         else:
             classifier_uuid = uuid.uuid4()
 
         # Create Flow
         rest_client = FlowsRESTClient()
         if not settings.TESTING:
-            flows = rest_client.create_flows(str(project.flow_organization), str(classifier_uuid))
-            if flows.get("status") == 201:
-                flows = json.loads(flows.get("data"))
+            try:
+                flows = rest_client.create_flows(str(project.flow_organization), str(classifier_uuid))
+                if flows.get("status") == 201:
+                    flows = json.loads(flows.get("data"))
+            except Exception as error:
+                logger.error(error)
+                template.delele()
+                data.update(
+                    {
+                        "message": "Could not create flow",
+                        "status": "FAILED"
+                    }
+                )
+                return data
         else:
             flows = {"uuid": uuid.uuid4()}
 
@@ -439,8 +476,18 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
 
         # Integrate WhatsApp
         token = request._auth
-
-        wa_demo_token = tasks.whatsapp_demo_integration(str(project.uuid), token=token)
+        try:
+            wa_demo_token = tasks.whatsapp_demo_integration(str(project.uuid), token=token)
+        except Exception as error:
+            logger.error(error)
+            template.delele()
+            data.update(
+                {
+                    "message": "Could not integrate Whatsapp demo",
+                    "status": "FAILED"
+                }
+            )
+            return data
         template.wa_demo_token = wa_demo_token
         template.save(update_fields=["classifier_uuid", "flow_uuid", "wa_demo_token"])
 

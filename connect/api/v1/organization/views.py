@@ -51,6 +51,10 @@ from connect.utils import count_contacts
 from connect.api.v1.internal.intelligence.intelligence_rest_client import IntelligenceRESTClient
 import pendulum
 from connect.common import tasks
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 class OrganizationViewSet(
@@ -87,6 +91,7 @@ class OrganizationViewSet(
         return self.get_paginated_response(organization_serializer.data)
 
     def create(self, request, *args, **kwargs):
+        data = {}
         org_info = request.data.get("organization")
         project_info = request.data.get("project")
         user = request.user
@@ -117,21 +122,30 @@ class OrganizationViewSet(
             )
 
             if not settings.TESTING:
-                if project_info.get("template"):
-                    flows_info = tasks.create_template_project.delay(
-                        project_info.get("name"),
-                        user.email,
-                        project_info.get("timezone")
-                    )
-                else:
-                    flows_info = tasks.create_project.delay(
-                        project_name=project_info.get("name"),
-                        user_email=user.email,
-                        project_timezone=project_info.get("timezone")
-                    )
+                try:
+                    if project_info.get("template"):
+                        flows_info = tasks.create_template_project.delay(
+                            project_info.get("name"),
+                            user.email,
+                            project_info.get("timezone")
+                        )
+                    else:
+                        flows_info = tasks.create_project.delay(
+                            project_name=project_info.get("name"),
+                            user_email=user.email,
+                            project_timezone=project_info.get("timezone")
+                        )
 
-                flows_info.wait()
-                flows_info = flows_info.result
+                    flows_info.wait()
+                    flows_info = flows_info.result
+                except Exception as error:
+                    data.update({
+                        "message": "Could not create project",
+                        "status": "FAILED"
+                    })
+                    logger.error(error)
+                    new_organization.delete()
+                    return Response(data, status=status.HTTP_201_CREATED)
             else:
                 flows_info = {
                     "id": randint(1, 100),
@@ -152,6 +166,10 @@ class OrganizationViewSet(
                     "organization": new_organization
                 }
                 project_data = TemplateProjectSerializer().create(data, request)
+                if project_data.get("status") == "FAILED":
+                    new_organization.delete()
+                    project.delete()
+                    return Response(project_data, status=status.HTTP_201_CREATED)
 
             RequestPermissionOrganization.objects.create(
                 email=user.email,
@@ -170,7 +188,9 @@ class OrganizationViewSet(
 
             response_data = dict(
                 organization=model_to_dict(new_organization),
-                project=project_data if project_info.get("template") else model_to_dict(project)
+                project=project_data if project_info.get("template") else model_to_dict(project),
+                status="SUCCESS",
+                message=""
             )
 
         except Exception as exception:
