@@ -416,7 +416,7 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
                 access_token = intelligence_client.get_access_token(request.user.email)
             except Exception as error:
                 logger.error(error)
-                template.delele()
+                template.delete()
                 data.update(
                     {
                         "message": "Could not get access token",
@@ -438,7 +438,7 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
                 ).get("uuid")
             except Exception as error:
                 logger.error(error)
-                template.delele()
+                template.delete()
                 data.update(
                     {
                         "message": "Could not create classifier",
@@ -458,7 +458,7 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
                     flows = json.loads(flows.get("data"))
             except Exception as error:
                 logger.error(error)
-                template.delele()
+                template.delete()
                 data.update(
                     {
                         "message": "Could not create flow",
@@ -480,7 +480,7 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
             wa_demo_token = tasks.whatsapp_demo_integration(str(project.uuid), token=token)
         except Exception as error:
             logger.error(error)
-            template.delele()
+            template.delete()
             data.update(
                 {
                     "message": "Could not integrate Whatsapp demo",
