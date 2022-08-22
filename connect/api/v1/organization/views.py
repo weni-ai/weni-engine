@@ -145,7 +145,7 @@ class OrganizationViewSet(
                     })
                     logger.error(error)
                     new_organization.delete()
-                    return Response(data, status=status.HTTP_502_BAD_GATEWAY)
+                    return Response(data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             else:
                 flows_info = {
                     "id": randint(1, 100),
@@ -169,7 +169,7 @@ class OrganizationViewSet(
                 if project_data.get("status") == "FAILED":
                     new_organization.delete()
                     project.delete()
-                    return Response(project_data, status=status.HTTP_502_BAD_GATEWAY)
+                    return Response(project_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
             RequestPermissionOrganization.objects.create(
                 email=user.email,
