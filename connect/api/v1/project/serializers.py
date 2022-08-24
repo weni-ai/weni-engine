@@ -9,6 +9,7 @@ from connect.api.v1 import fields
 from connect.api.v1.fields import TextField
 from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
 from ..internal.intelligence.intelligence_rest_client import IntelligenceRESTClient
+from connect.api.v1.internal.integrations.integrations_rest_client import IntegrationsRESTClient
 from connect.api.v1.project.validators import CanContributeInOrganizationValidator
 from connect.celery import app as celery_app
 from connect.common import tasks
@@ -477,7 +478,8 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
         # Integrate WhatsApp
         token = request._auth
         try:
-            wa_demo_token = tasks.whatsapp_demo_integration(str(project.uuid), token=token)
+            integrations_client = IntegrationsRESTClient()
+            wa_demo_token = integrations_client.whatsapp_demo_integration(str(project.uuid), token=token)
         except Exception as error:
             logger.error(error)
             template.delete()

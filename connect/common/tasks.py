@@ -677,32 +677,3 @@ def list_classifier(project_uuid: str):
             "uuid": i.get("uuid"),
         })
     return classifiers
-
-
-@app.task(name="whatsapp_demo_integration")
-def whatsapp_demo_integration(project_uuid: str, token: str):
-
-    url = f"{settings.INTEGRATIONS_REST_ENDPOINT}/api/v1/apptypes/wpp-demo/apps/"
-
-    headers = {
-        'Authorization': f'Bearer {token}',
-        'Project-Uuid': project_uuid,
-    }
-
-    data = {
-        "project_uuid": project_uuid
-    }
-
-    if not settings.TESTING:
-
-        response = requests.post(url, data=data, headers=headers)
-
-        if response.status_code != range(200, 299):
-            raise Exception(response.text)
-    else:
-        response = {
-            "config": {
-                "routerToken": "wa-demo-12345"
-            }
-        }
-    return response.get("config").get("routerToken")

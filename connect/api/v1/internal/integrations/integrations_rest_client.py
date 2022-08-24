@@ -1,7 +1,7 @@
 from django.conf import settings
 
 import requests
-
+import json
 from connect.api.v1.internal.internal_authentication import InternalAuthentication
 
 
@@ -45,3 +45,29 @@ class IntegrationsRESTClient:
         )
         response.raise_for_status()
         return dict(status=response.status_code)
+
+    def whatsapp_demo_integration(self, project_uuid, token):
+
+        url = f"{self.base_url}/api/v1/apptypes/wpp-demo/apps/"
+
+        headers = self.authentication_instance.headers
+        headers["Authorization"] = f"Bearer {token}"
+        headers['Project-Uuid'] = project_uuid
+
+        data = {
+            "project_uuid": project_uuid
+        }
+        if not settings.TESTING:
+            response = requests.post(url, data=json.dumps(data), headers=headers)
+
+            if response.status_code != 201:
+                raise Exception(response.text)
+
+            response = json.loads(response.text)
+        else:
+            response = {
+                "config": {
+                    "routerToken": "wa-demo-12345"
+                }
+            }
+        return response.get("config").get("routerToken")
