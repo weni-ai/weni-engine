@@ -1,4 +1,5 @@
 import json
+from multiprocessing import context
 import uuid
 from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext_lazy as _
@@ -531,6 +532,8 @@ class TemplateProjectViewSet(
             "project": project,
         }
 
-        response_data = TemplateProjectSerializer().create(data, request)
+        TemplateProjectSerializer().create(data, request)
 
-        return Response(response_data, status=status.HTTP_201_CREATED)
+        serializer = ProjectSerializer(project, context={"request": request})
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
