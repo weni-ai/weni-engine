@@ -248,10 +248,10 @@ class FlowType(GRPCType):
         )
         return response
 
-    def list_channel(self, project_uuid: str, channel_type: str = "WA"):
+    def list_channel(self, is_active: bool = True, channel_type: str = "WA"):
         stub = channel_pb2_grpc.ChannelControllerStub(self.channel)
         response = stub.List(
-            channel_pb2.ChannelListRequest(org=project_uuid, channel_type=channel_type)
+            channel_pb2.ChannelListRequest(channel_type=channel_type)
         )
         return response
 
