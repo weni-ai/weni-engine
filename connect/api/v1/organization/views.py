@@ -185,14 +185,14 @@ class OrganizationViewSet(
                     role=auth.get("role"),
                     created_by=user
                 )
-
+            serializer = OrganizationSeralizer(new_organization, context={"request": request})
             response_data = dict(
-                organization=model_to_dict(new_organization),
                 project=project_data if project_info.get("template") else model_to_dict(project),
                 status="SUCCESS",
-                message=""
+                message="",
+                organization=serializer.data
             )
-
+            print(str(response_data))
         except Exception as exception:
             raise ValidationError(exception)
 

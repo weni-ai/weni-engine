@@ -55,7 +55,10 @@ from connect.authentication.models import User
 from connect.common import tasks
 from connect.utils import count_contacts
 from django.conf import settings
+import logging
 
+
+logger = logging.getLogger(__name__)
 
 class ProjectViewSet(
     mixins.ListModelMixin,
@@ -503,13 +506,23 @@ class TemplateProjectViewSet(
         return obj
 
     def create(self, request, *args, **kwargs):
-
+        data = {}
         if not settings.TESTING:
-            flow_organization = tasks.create_template_project(
-                request.data.get("name"),
-                request.user.email,
-                request.data.get("timezone")
-            ).get("uuid")
+            try:
+                flow_organization = tasks.create_template_project(
+                    request.data.get("name"),
+                    request.user.email,
+                    request.data.get("timezone")
+                ).get("uuid")
+            except Exception as error:
+                logger.error(error)
+                data.update(
+                    {
+                        "message": "Could not create template project",
+                        "status": "FAILED"
+                    }
+                )
+                return Response(data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
             flows = {
                 "uuid": uuid.uuid4(),
@@ -528,12 +541,18 @@ class TemplateProjectViewSet(
             is_template=True,
         )
 
-        data = {
+        project_data = {
             "project": project,
         }
 
-        TemplateProjectSerializer().create(data, request)
+        TemplateProjectSerializer().create(project_data, request)
 
         serializer = ProjectSerializer(project, context={"request": request})
-
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        data.update(
+            {
+                "message": "",
+                "status": "SUCCESS"
+            }
+        )
+        data.update(serializer.data)
+        return Response(data, status=status.HTTP_201_CREATED)
