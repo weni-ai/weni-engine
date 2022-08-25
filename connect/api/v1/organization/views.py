@@ -3,7 +3,6 @@ import uuid
 from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
-from django.forms.models import model_to_dict
 from django.http import JsonResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import mixins, status
@@ -193,7 +192,7 @@ class OrganizationViewSet(
                 message="",
                 organization=serializer.data
             )
-            print(str(response_data))
+
         except Exception as exception:
             raise ValidationError(exception)
 
