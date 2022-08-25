@@ -31,7 +31,7 @@ from connect.api.v1.organization.serializers import (
     OrganizationAuthorizationRoleSerializer,
     RequestPermissionOrganizationSerializer,
 )
-from ..project.serializers import TemplateProjectSerializer
+from ..project.serializers import ProjectSerializer, TemplateProjectSerializer
 
 from connect.authentication.models import User
 from connect.celery import app as celery_app
@@ -186,8 +186,9 @@ class OrganizationViewSet(
                     created_by=user
                 )
             serializer = OrganizationSeralizer(new_organization, context={"request": request})
+            project_serializer = ProjectSerializer(project, context={"request": request})
             response_data = dict(
-                project=project_data if project_info.get("template") else model_to_dict(project),
+                project=project_serializer.data,
                 status="SUCCESS",
                 message="",
                 organization=serializer.data
