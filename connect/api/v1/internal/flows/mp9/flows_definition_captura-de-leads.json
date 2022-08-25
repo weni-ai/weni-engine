@@ -1570,7 +1570,7 @@
           "actions": [
             {
               "attachments": [],
-              "text": "Seja bem-vindo a central de Atendimento da Empresa X! Vamos iniciar a captura de dados",
+              "text": "Seja bem-vindo a nossa central de atendimento! Vamos iniciar a captura de dados para cadastro",
               "type": "send_msg",
               "quick_replies": [],
               "uuid": "5b6efce9-bf4e-4c15-b485-b124ed2267f0"
@@ -1931,7 +1931,7 @@
       "type": "messaging",
       "uuid": "c00b3a17-d57c-4830-9128-dd9641d157e0",
       "version": "13.0.0",
-      "revision": 252
+      "revision": 253
     }
   ],
   "campaigns": [],
