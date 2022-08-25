@@ -248,12 +248,22 @@ class FlowType(GRPCType):
         )
         return response
 
-    def list_channel(self, is_active: bool = True, channel_type: str = "WA"):
+    def list_channel(self, is_active: bool = True, channel_type: str = "WA", project_uuid: str = None):
         stub = channel_pb2_grpc.ChannelControllerStub(self.channel)
-        response = stub.List(
-            channel_pb2.ChannelListRequest(channel_type=channel_type)
-        )
-        return response
+        grpc_response = None
+        if project_uuid:
+            grpc_response = channel_pb2.ChannelListRequest(
+                is_active=is_active,
+                channel_type=channel_type,
+                org=project_uuid
+            )
+        else:
+            grpc_response = channel_pb2.ChannelListRequest(
+                is_active=is_active,
+                channel_type=channel_type
+            )
+
+        return stub.List(grpc_response)
 
     def get_active_contacts(self, project_uuid, before, after):
         stub = billing_pb2_grpc.BillingControllerStub(self.channel)
