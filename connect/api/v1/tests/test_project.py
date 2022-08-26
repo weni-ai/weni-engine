@@ -385,6 +385,7 @@ class TemplateProjectTestCase(TestCase):
         self.factory = RequestFactory()
 
         self.user, self.user_token = create_user_and_token("user")
+        self.new_user, self.new_user_token = create_user_and_token("new_user")
 
         self.organization = Organization.objects.create(
             name="test organization",
@@ -395,6 +396,10 @@ class TemplateProjectTestCase(TestCase):
         )
         self.organization_authorization = self.organization.authorizations.create(
             user=self.user, role=OrganizationRole.ADMIN.value
+        )
+
+        self.organization_authorization = self.organization.authorizations.create(
+            user=self.new_user, role=OrganizationRole.ADMIN.value
         )
 
     def request(self, project=None, token=None):
@@ -438,6 +443,12 @@ class TemplateProjectTestCase(TestCase):
     def test_get_template_projects(self):
         response, content_data = self.request(
             token=self.user_token,
+        )
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+
+    def test_get_template_projects_new_user(self):
+        response, content_data = self.request(
+            token=self.new_user_token,
         )
         self.assertEquals(response.status_code, status.HTTP_200_OK)
 

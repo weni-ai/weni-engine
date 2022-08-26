@@ -25,6 +25,7 @@ from connect.common.models import (
     RequestRocketPermission,
     OpenedProject,
     ProjectRole,
+    TemplateProject,
 )
 import json
 import logging
@@ -91,36 +92,45 @@ class ProjectSerializer(serializers.ModelSerializer):
     redirect_url = serializers.SerializerMethodField()
 
     def get_project_type(self, obj):
-        if obj.is_template:
+        if obj.is_template and obj.template_project.exists():
             return "template"
         else:
             return "blank"
 
     def get_flow_uuid(self, obj):
         if obj.is_template and obj.template_project.exists():
-            email = self.context["request"].user.email
-            template = obj.template_project.get(authorization__user__email=email)
+            template = obj.template_project.filter(flow_uuid__isnull=False, wa_demo_token__isnull=False, redirect_url__isnull=False).first()
             return template.flow_uuid
         ...
 
     def get_first_access(self, obj):
         if obj.is_template and obj.template_project.exists():
-            email = self.context["request"].user.email
-            template = obj.template_project.get(authorization__user__email=email)
-            return template.first_access
+            user = self.context["request"].user
+            email = user.email
+            authorization = obj.get_user_authorization(user)
+
+            try:
+                template = obj.template_project.get(authorization__user__email=email)
+                return template.first_access
+            except TemplateProject.DoesNotExist:
+                template_project = obj.template_project.filter(flow_uuid__isnull=False, wa_demo_token__isnull=False, redirect_url__isnull=False).first()
+                template = obj.template_project.create(
+                    flow_uuid=template_project.flow_uuid,
+                    wa_demo_token=template_project.wa_demo_token,
+                    redirect_url=template_project.redirect_url,
+                    authorization=authorization
+                )
         ...
 
     def get_wa_demo_token(self, obj):
         if obj.is_template and obj.template_project.exists():
-            email = self.context["request"].user.email
-            template = obj.template_project.get(authorization__user__email=email)
+            template = obj.template_project.filter(flow_uuid__isnull=False, wa_demo_token__isnull=False, redirect_url__isnull=False).first()
             return template.wa_demo_token
         ...
 
     def get_redirect_url(self, obj):
         if obj.is_template and obj.template_project.exists():
-            email = self.context["request"].user.email
-            template = obj.template_project.get(authorization__user__email=email)
+            template = obj.template_project.filter(flow_uuid__isnull=False, wa_demo_token__isnull=False, redirect_url__isnull=False).first()
             return template.redirect_url
         ...
 
