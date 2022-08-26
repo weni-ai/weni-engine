@@ -248,7 +248,7 @@ class FlowType(GRPCType):
         )
         return response
 
-    def list_channel(self, is_active: bool = True, channel_type: str = "WA", project_uuid: str = None):
+    def list_channel(self, is_active: str = "True", channel_type: str = "WA", project_uuid: str = None):
         stub = channel_pb2_grpc.ChannelControllerStub(self.channel)
         grpc_response = None
         if project_uuid:
