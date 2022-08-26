@@ -385,7 +385,7 @@ class ClassifierSerializer(serializers.Serializer):
 
 class TemplateProjectSerializer(serializers.ModelSerializer):
     class Meta:
-        model = ProjectAuthorization
+        model = TemplateProject
         fields = [
             "uuid",
             "project",
