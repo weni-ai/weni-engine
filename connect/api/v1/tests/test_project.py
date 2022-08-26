@@ -452,6 +452,8 @@ class TemplateProjectTestCase(TestCase):
             data, token=self.user_token
         )
 
+        print(response.text)
+
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
         self.assertIsNotNone(content_data.get("flow_uuid"))
         self.assertEquals(content_data.get("first_access"), True)
