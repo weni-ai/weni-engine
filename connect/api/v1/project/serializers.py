@@ -457,7 +457,7 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
                 classifier_uuid = tasks.create_classifier(
                     project_uuid=str(project.flow_organization),
                     user_email=request.user.email,
-                    classifier_name="template classifier",
+                    classifier_name="Farewell & Greetings",
                     access_token=access_token,
                 ).get("uuid")
             except Exception as error:
