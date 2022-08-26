@@ -1547,6 +1547,7 @@ class TemplateProject(models.Model):
     flow_uuid = models.UUIDField(
         _("UUID"), default=uuid4.uuid4
     )
+    redirect_url = models.URLField(null=True)
 
     @property
     def user(self):

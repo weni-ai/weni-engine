@@ -59,6 +59,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             "flow_uuid",
             "first_access",
             "wa_demo_token",
+            "redirect_url"
         ]
         ref_name = None
 
@@ -88,6 +89,7 @@ class ProjectSerializer(serializers.ModelSerializer):
     flow_uuid = serializers.SerializerMethodField()
     first_access = serializers.SerializerMethodField()
     wa_demo_token = serializers.SerializerMethodField()
+    redirect_url = serializers.SerializerMethodField()
 
     def get_project_type(self, obj):
         if obj.is_template:
@@ -114,6 +116,13 @@ class ProjectSerializer(serializers.ModelSerializer):
             email = self.context["request"].user.email
             template = obj.template_project.get(authorization__user__email=email)
             return template.wa_demo_token
+        ...
+
+    def get_redirect_url(self, obj):
+        if obj.is_template:
+            email = self.context["request"].user.email
+            template = obj.template_project.get(authorization__user__email=email)
+            return template.redirect_url
         ...
 
     def get_menu(self, obj):
@@ -375,6 +384,7 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
             "classifier_uuid",
             "first_access",
             "authorization",
+            "redirect_url",
             "user",
         ]
 
@@ -479,7 +489,9 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
         token = request._auth
         try:
             integrations_client = IntegrationsRESTClient()
-            wa_demo_token = integrations_client.whatsapp_demo_integration(str(project.uuid), token=token)
+            response = integrations_client.whatsapp_demo_integration(str(project.uuid), token=token)
+            wa_demo_token = response.get("router_token")
+            redirect_url = response.get("redirect_url")
         except Exception as error:
             logger.error(error)
             template.delete()
@@ -491,13 +503,15 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
             )
             return data
         template.wa_demo_token = wa_demo_token
-        template.save(update_fields=["classifier_uuid", "flow_uuid", "wa_demo_token"])
+        template.redirect_url = redirect_url
+        template.save(update_fields=["classifier_uuid", "flow_uuid", "wa_demo_token", "redirect_url"])
 
         data = {
             "first_access": template.first_access,
             "flow_uuid": str(template.flow_uuid),
             "project_type": "template",
-            "wa_demo_token": template.wa_demo_token
+            "wa_demo_token": template.wa_demo_token,
+            "redirect_url": redirect_url,
         }
 
         return data

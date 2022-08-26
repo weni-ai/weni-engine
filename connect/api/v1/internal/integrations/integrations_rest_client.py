@@ -67,7 +67,11 @@ class IntegrationsRESTClient:
         else:
             response = {
                 "config": {
-                    "routerToken": "wa-demo-12345"
+                    "routerToken": "wa-demo-12345",
+                    "redirect_url": 'https://wa.me/5582123456?text=wa-demo-12345'
                 }
             }
-        return response.get("config").get("routerToken")
+        return {
+            "redirect_url": response.get("config").get("redirect_url"),
+            "router_token": response.get("config").get("routerToken")
+        }

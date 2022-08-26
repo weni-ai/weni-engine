@@ -90,6 +90,7 @@ class CreateOrganizationAPITestCase(TestCase):
         self.assertEquals(content_data.get("project").get("first_access"), True)
         self.assertEquals(content_data.get("project").get("wa_demo_token"), "wa-demo-12345")
         self.assertEquals(content_data.get("project").get("project_type"), "template")
+        self.assertEquals(content_data.get("project").get("redirect_url"), "https://wa.me/5582123456?text=wa-demo-12345")
         self.assertEquals(OrganizationAuthorization.objects.count(), 1)
         self.assertEquals(RequestPermissionOrganization.objects.count(), 1)
         self.assertEquals(Project.objects.count(), 1)
