@@ -535,7 +535,7 @@ def list_channels(channel_type):
     response = list(grpc_instance.list_channel(channel_type=channel_type))
     channels = []
     for channel in response:
-        project = Project.objects.filter(flow_organization=channel.project_uuid)
+        project = Project.objects.filter(flow_organization=channel.org)
         if project:
             project = project.first()
             channels.append(
