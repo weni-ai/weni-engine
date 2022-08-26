@@ -1,3 +1,5 @@
+from random import randint
+import uuid
 from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
@@ -28,6 +30,7 @@ from connect.api.v1.organization.serializers import (
     OrganizationAuthorizationRoleSerializer,
     RequestPermissionOrganizationSerializer,
 )
+from ..project.serializers import ProjectSerializer, TemplateProjectSerializer
 
 from connect.authentication.models import User
 from connect.celery import app as celery_app
@@ -37,13 +40,20 @@ from connect.common.models import (
     RequestPermissionOrganization,
     GenericBillingData,
     OrganizationRole,
-    ProjectRole
+    ProjectRole,
+    BillingPlan,
+    Project,
 )
 from connect import billing
 from connect.billing.gateways.stripe_gateway import StripeGateway
 from connect.utils import count_contacts
 from connect.api.v1.internal.intelligence.intelligence_rest_client import IntelligenceRESTClient
 import pendulum
+from connect.common import tasks
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 class OrganizationViewSet(
@@ -78,6 +88,115 @@ class OrganizationViewSet(
         )
         organization_serializer = OrganizationSeralizer(page, many=True, context=self.get_serializer_context())
         return self.get_paginated_response(organization_serializer.data)
+
+    def create(self, request, *args, **kwargs):
+        data = {}
+        org_info = request.data.get("organization")
+        project_info = request.data.get("project")
+        user = request.user
+
+        try:
+            if not settings.TESTING:
+                ai_client = IntelligenceRESTClient()
+                ai_org = ai_client.create_organization(
+                    user_email=user.email,
+                    organization_name=org_info.get("name")
+                )
+                org_info.update(
+                    dict(
+                        intelligence_organization=ai_org.get("id", 0)
+                    )
+                )
+
+            cycle = BillingPlan._meta.get_field(
+                "cycle"
+            ).default
+
+            new_organization = Organization.objects.create(
+                name=org_info.get("name"),
+                description=org_info.get("description"),
+                organization_billing__plan=org_info.get("plan"),
+                organization_billing__cycle=cycle,
+                inteligence_organization=org_info.get("intelligence_organization", 0)
+            )
+
+            if not settings.TESTING:
+                try:
+                    if project_info.get("template"):
+                        flows_info = tasks.create_template_project.delay(
+                            project_info.get("name"),
+                            user.email,
+                            project_info.get("timezone")
+                        )
+                    else:
+                        flows_info = tasks.create_project.delay(
+                            project_name=project_info.get("name"),
+                            user_email=user.email,
+                            project_timezone=project_info.get("timezone")
+                        )
+
+                    flows_info.wait()
+                    flows_info = flows_info.result
+                except Exception as error:
+                    data.update({
+                        "message": "Could not create project",
+                        "status": "FAILED"
+                    })
+                    logger.error(error)
+                    new_organization.delete()
+                    return Response(data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            else:
+                flows_info = {
+                    "id": randint(1, 100),
+                    "uuid": uuid.uuid4()
+                }
+
+            project = Project.objects.create(
+                name=project_info.get("name"),
+                flow_id=flows_info.get("id"),
+                flow_organization=flows_info.get("uuid"),
+                organization=new_organization,
+                is_template=True if project_info.get("template") else False
+            )
+
+            if project_info.get("template"):
+                data = {
+                    "project": project,
+                    "organization": new_organization
+                }
+                project_data = TemplateProjectSerializer().create(data, request)
+                if project_data.get("status") == "FAILED":
+                    new_organization.delete()
+                    project.delete()
+                    return Response(project_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+            RequestPermissionOrganization.objects.create(
+                email=user.email,
+                organization=new_organization,
+                role=OrganizationRole.ADMIN.value,
+                created_by=user
+            )
+
+            for auth in org_info.get("authorizations", []):
+                RequestPermissionOrganization.objects.create(
+                    email=auth.get("user_email"),
+                    organization=new_organization,
+                    role=auth.get("role"),
+                    created_by=user
+                )
+            serializer = OrganizationSeralizer(new_organization, context={"request": request})
+            project_serializer = ProjectSerializer(project, context={"request": request})
+            response_data = dict(
+                project=project_serializer.data,
+                status="SUCCESS",
+                message="",
+                organization=serializer.data
+            )
+
+        except Exception as exception:
+            raise ValidationError(exception)
+
+        return Response(response_data, status=status.HTTP_201_CREATED)
 
     def perform_destroy(self, instance):
         intelligence_organization = instance.inteligence_organization
@@ -169,7 +288,7 @@ class OrganizationViewSet(
 
         before = request.query_params.get("before")
         after = request.query_params.get("after")
-        print(before, after)
+
         if not before or not after:
             raise ValidationError(
                 _("Need to pass 'before' and 'after' in query params")
