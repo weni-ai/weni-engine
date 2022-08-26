@@ -1542,7 +1542,6 @@ class TemplateProject(models.Model):
         _("UUID"), default=uuid4.uuid4
     )
     first_access = models.BooleanField(default=True)
-    # user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     authorization = models.ForeignKey(ProjectAuthorization, on_delete=models.CASCADE)
     flow_uuid = models.UUIDField(
         _("UUID"), default=uuid4.uuid4

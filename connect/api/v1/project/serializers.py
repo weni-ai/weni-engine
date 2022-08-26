@@ -98,28 +98,28 @@ class ProjectSerializer(serializers.ModelSerializer):
             return "blank"
 
     def get_flow_uuid(self, obj):
-        if obj.is_template:
+        if obj.is_template and obj.template_project.exists():
             email = self.context["request"].user.email
             template = obj.template_project.get(authorization__user__email=email)
             return template.flow_uuid
         ...
 
     def get_first_access(self, obj):
-        if obj.is_template:
+        if obj.is_template and obj.template_project.exists():
             email = self.context["request"].user.email
             template = obj.template_project.get(authorization__user__email=email)
             return template.first_access
         ...
 
     def get_wa_demo_token(self, obj):
-        if obj.is_template:
+        if obj.is_template and obj.template_project.exists():
             email = self.context["request"].user.email
             template = obj.template_project.get(authorization__user__email=email)
             return template.wa_demo_token
         ...
 
     def get_redirect_url(self, obj):
-        if obj.is_template:
+        if obj.is_template and obj.template_project.exists():
             email = self.context["request"].user.email
             template = obj.template_project.get(authorization__user__email=email)
             return template.redirect_url
