@@ -25,7 +25,6 @@ from connect.common.models import (
     RequestRocketPermission,
     OpenedProject,
     ProjectRole,
-    TemplateProject,
 )
 import json
 import logging
@@ -411,18 +410,22 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
         project = validated_data.get("project")
 
         authorization = project.get_user_authorization(request.user)
-        authorization.role = 3
-        authorization.save(update_fields=["role"])
-        # Create template model
 
-        template = TemplateProject.objects.create(
-            authorization=authorization,
-            project=project
-        )
+        if authorization.role == 0:
+            data.update(
+                {
+                    "message": "Project authorization not setted",
+                    "status": "FAILED"
+                }
+            )
+            return data
+
+        # Create template project model
+        template = project.template_project.create(authorization=authorization)
 
         # Get AI access token
-        intelligence_client = IntelligenceRESTClient()
         if not settings.TESTING:
+            intelligence_client = IntelligenceRESTClient()
             try:
                 access_token = intelligence_client.get_access_token(request.user.email)
             except Exception as error:
@@ -461,8 +464,8 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
             classifier_uuid = uuid.uuid4()
 
         # Create Flow
-        rest_client = FlowsRESTClient()
         if not settings.TESTING:
+            rest_client = FlowsRESTClient()
             try:
                 flows = rest_client.create_flows(str(project.flow_organization), str(classifier_uuid))
                 if flows.get("status") == 201:
@@ -487,21 +490,28 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
 
         # Integrate WhatsApp
         token = request._auth
-        try:
-            integrations_client = IntegrationsRESTClient()
-            response = integrations_client.whatsapp_demo_integration(str(project.uuid), token=token)
-            wa_demo_token = response.get("router_token")
-            redirect_url = response.get("redirect_url")
-        except Exception as error:
-            logger.error(error)
-            template.delete()
-            data.update(
-                {
-                    "message": "Could not integrate Whatsapp demo",
-                    "status": "FAILED"
-                }
-            )
-            return data
+        if not settings.TESTING:
+            try:
+                integrations_client = IntegrationsRESTClient()
+                response = integrations_client.whatsapp_demo_integration(str(project.uuid), token=token)
+            except Exception as error:
+                logger.error(error)
+                template.delete()
+                data.update(
+                    {
+                        "message": "Could not integrate Whatsapp demo",
+                        "status": "FAILED"
+                    }
+                )
+                return data
+        else:
+            response = {
+                "router_token": "wa-demo-12345",
+                "redirect_url": 'https://wa.me/5582123456?text=wa-demo-12345'
+            }
+
+        wa_demo_token = response.get("router_token")
+        redirect_url = response.get("redirect_url")
         template.wa_demo_token = wa_demo_token
         template.redirect_url = redirect_url
         template.save(update_fields=["classifier_uuid", "flow_uuid", "wa_demo_token", "redirect_url"])
