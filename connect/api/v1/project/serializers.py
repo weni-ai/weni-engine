@@ -92,36 +92,45 @@ class ProjectSerializer(serializers.ModelSerializer):
     redirect_url = serializers.SerializerMethodField()
 
     def get_project_type(self, obj):
-        if obj.is_template:
+        if obj.is_template and obj.template_project.exists():
             return "template"
         else:
             return "blank"
 
     def get_flow_uuid(self, obj):
-        if obj.is_template:
-            email = self.context["request"].user.email
-            template = obj.template_project.get(authorization__user__email=email)
+        if obj.is_template and obj.template_project.exists():
+            template = obj.template_project.filter(flow_uuid__isnull=False, wa_demo_token__isnull=False, redirect_url__isnull=False).first()
             return template.flow_uuid
         ...
 
     def get_first_access(self, obj):
-        if obj.is_template:
-            email = self.context["request"].user.email
-            template = obj.template_project.get(authorization__user__email=email)
-            return template.first_access
+        if obj.is_template and obj.template_project.exists():
+            user = self.context["request"].user
+            email = user.email
+            authorization = obj.get_user_authorization(user)
+
+            try:
+                template = obj.template_project.get(authorization__user__email=email)
+                return template.first_access
+            except TemplateProject.DoesNotExist:
+                template_project = obj.template_project.filter(flow_uuid__isnull=False, wa_demo_token__isnull=False, redirect_url__isnull=False).first()
+                template = obj.template_project.create(
+                    flow_uuid=template_project.flow_uuid,
+                    wa_demo_token=template_project.wa_demo_token,
+                    redirect_url=template_project.redirect_url,
+                    authorization=authorization
+                )
         ...
 
     def get_wa_demo_token(self, obj):
-        if obj.is_template:
-            email = self.context["request"].user.email
-            template = obj.template_project.get(authorization__user__email=email)
+        if obj.is_template and obj.template_project.exists():
+            template = obj.template_project.filter(flow_uuid__isnull=False, wa_demo_token__isnull=False, redirect_url__isnull=False).first()
             return template.wa_demo_token
         ...
 
     def get_redirect_url(self, obj):
-        if obj.is_template:
-            email = self.context["request"].user.email
-            template = obj.template_project.get(authorization__user__email=email)
+        if obj.is_template and obj.template_project.exists():
+            template = obj.template_project.filter(flow_uuid__isnull=False, wa_demo_token__isnull=False, redirect_url__isnull=False).first()
             return template.redirect_url
         ...
 
@@ -376,7 +385,7 @@ class ClassifierSerializer(serializers.Serializer):
 
 class TemplateProjectSerializer(serializers.ModelSerializer):
     class Meta:
-        model = ProjectAuthorization
+        model = TemplateProject
         fields = [
             "uuid",
             "project",
@@ -411,18 +420,22 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
         project = validated_data.get("project")
 
         authorization = project.get_user_authorization(request.user)
-        authorization.role = 3
-        authorization.save(update_fields=["role"])
-        # Create template model
 
-        template = TemplateProject.objects.create(
-            authorization=authorization,
-            project=project
-        )
+        if authorization.role == 0:
+            data.update(
+                {
+                    "message": "Project authorization not setted",
+                    "status": "FAILED"
+                }
+            )
+            return data
+
+        # Create template project model
+        template = project.template_project.create(authorization=authorization)
 
         # Get AI access token
-        intelligence_client = IntelligenceRESTClient()
         if not settings.TESTING:
+            intelligence_client = IntelligenceRESTClient()
             try:
                 access_token = intelligence_client.get_access_token(request.user.email)
             except Exception as error:
@@ -444,7 +457,7 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
                 classifier_uuid = tasks.create_classifier(
                     project_uuid=str(project.flow_organization),
                     user_email=request.user.email,
-                    classifier_name="template classifier",
+                    classifier_name="Farewell & Greetings",
                     access_token=access_token,
                 ).get("uuid")
             except Exception as error:
@@ -461,8 +474,8 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
             classifier_uuid = uuid.uuid4()
 
         # Create Flow
-        rest_client = FlowsRESTClient()
         if not settings.TESTING:
+            rest_client = FlowsRESTClient()
             try:
                 flows = rest_client.create_flows(str(project.flow_organization), str(classifier_uuid))
                 if flows.get("status") == 201:
@@ -487,21 +500,28 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
 
         # Integrate WhatsApp
         token = request._auth
-        try:
-            integrations_client = IntegrationsRESTClient()
-            response = integrations_client.whatsapp_demo_integration(str(project.uuid), token=token)
-            wa_demo_token = response.get("router_token")
-            redirect_url = response.get("redirect_url")
-        except Exception as error:
-            logger.error(error)
-            template.delete()
-            data.update(
-                {
-                    "message": "Could not integrate Whatsapp demo",
-                    "status": "FAILED"
-                }
-            )
-            return data
+        if not settings.TESTING:
+            try:
+                integrations_client = IntegrationsRESTClient()
+                response = integrations_client.whatsapp_demo_integration(str(project.uuid), token=token)
+            except Exception as error:
+                logger.error(error)
+                template.delete()
+                data.update(
+                    {
+                        "message": "Could not integrate Whatsapp demo",
+                        "status": "FAILED"
+                    }
+                )
+                return data
+        else:
+            response = {
+                "router_token": "wa-demo-12345",
+                "redirect_url": 'https://wa.me/5582123456?text=wa-demo-12345'
+            }
+
+        wa_demo_token = response.get("router_token")
+        redirect_url = response.get("redirect_url")
         template.wa_demo_token = wa_demo_token
         template.redirect_url = redirect_url
         template.save(update_fields=["classifier_uuid", "flow_uuid", "wa_demo_token", "redirect_url"])
