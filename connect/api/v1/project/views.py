@@ -28,7 +28,6 @@ from connect.api.v1.project.serializers import (
     RequestRocketPermissionSerializer,
     RequestPermissionProjectSerializer,
     ReleaseChannelSerializer,
-    ListChannelSerializer,
     CreateChannelSerializer,
     CreateWACChannelSerializer,
     DestroyClassifierSerializer,
@@ -238,21 +237,20 @@ class ProjectViewSet(
     @action(
         detail=True,
         methods=["GET"],
-        url_name="list-channel",
+        url_name="list-channels",
         permission_classes=[ModuleHasPermission],
     )
-    def list_channel(self, request):
-        channel_type = request.data.get('channel_type', None)
+    def list_channels(self, request):
+        channel_type = request.query_params.get('channel_type', None)
         if not channel_type:
             raise ValidationError("Need pass the channel_type")
 
-        page = self.paginate_queryset(
-            self.filter_queryset(self.queryset),
+        task = tasks.list_channels.delay(channel_type)
+        task.wait()
+        response = dict(
+            channels=task.result
         )
-        context = self.get_serializer_context()
-        context["channel_type"] = channel_type
-        channel_serializer = ListChannelSerializer(page, many=True, context=context)
-        return self.get_paginated_response(channel_serializer.data)
+        return JsonResponse(status=status.HTTP_200_OK, data=response)
 
     @action(
         detail=True,
