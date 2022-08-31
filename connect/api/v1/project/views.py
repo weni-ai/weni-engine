@@ -238,7 +238,10 @@ class ProjectViewSet(
 
         task = tasks.list_channels.delay(channel_type)
         task.wait()
-        return JsonResponse(status=status.HTTP_200_OK, data=task.result)
+        response = dict(
+            channels=task.result
+        )
+        return JsonResponse(status=status.HTTP_200_OK, data=response)
 
     @action(
         detail=True,
