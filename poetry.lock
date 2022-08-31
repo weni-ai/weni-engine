@@ -1226,7 +1226,7 @@ python-versions = "*"
 
 [[package]]
 name = "weni-protobuffers"
-version = "1.2.17a1"
+version = "1.2.17"
 description = "Protocol Buffers for Weni Platform"
 category = "main"
 optional = false
@@ -1270,7 +1270,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytes
 [metadata]
 lock-version = "1.1"
 python-versions = "~=3.6.2"
-content-hash = "626869953c2fc691d429e46806c3123f7070a550f0e426c6b047ae6fc5e9bf3e"
+content-hash = "e17056856e951ec418f69abe5a8d67b9603b0b14d5d7619fa21796dfe23ff196"
 
 [metadata.files]
 amqp = [
