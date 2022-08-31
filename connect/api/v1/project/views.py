@@ -228,10 +228,10 @@ class ProjectViewSet(
     @action(
         detail=True,
         methods=["GET"],
-        url_name="list-channel",
+        url_name="list-channels",
         permission_classes=[ModuleHasPermission],
     )
-    def list_channel(self, request):
+    def list_channels(self, request):
         channel_type = request.data.get('channel_type', None)
         if not channel_type:
             raise ValidationError("Need pass the channel_type")
