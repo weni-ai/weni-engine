@@ -667,6 +667,34 @@ class RocketAuthorization(models.Model):
         return request
 
 
+class ChatsRole(Enum):
+    NOT_SETTED, USER, ADMIN = list(range(3))
+
+
+class ChatsRoleLevel(Enum):
+    NOTHING, USER, ADMIN = list(range(3))
+
+
+class ChatsAuthorization(models.Model):
+    ROLE_CHOICES = [
+        (ChatsRole.NOT_SETTED.value, _("not set")),
+        (ChatsRole.USER.value, _("user")),
+        (ChatsRole.ADMIN.value, _("admin")),
+    ]
+    role = models.PositiveIntegerField(
+        _("role"), choices=ROLE_CHOICES, default=ChatsRole.NOT_SETTED.value
+    )
+    created_at = models.DateTimeField(_("created at"), auto_now_add=True)
+
+    @property
+    def level(self):
+        if self.role == RocketRole.USER.value:
+            return RocketRoleLevel.USER.value
+        elif self.role == RocketRole.ADMIN.value:
+            return RocketRoleLevel.ADMIN.value
+        return RocketRoleLevel.NOTHING.value
+
+
 class ProjectRole(Enum):
     NOT_SETTED, VIEWER, CONTRIBUTOR, MODERATOR, SUPPORT = list(range(5))
 
@@ -700,6 +728,9 @@ class ProjectAuthorization(models.Model):
     )
     rocket_authorization = models.ForeignKey(
         RocketAuthorization, models.CASCADE, null=True, default=None
+    )
+    chats_authorization = models.ForeignKey(
+        ChatsAuthorization, models.CASCADE, null=True, default=None
     )
     role = models.PositiveIntegerField(
         _("role"), choices=ROLE_CHOICES, default=ProjectRole.NOT_SETTED.value
@@ -752,6 +783,17 @@ class RequestRocketPermission(models.Model):
         _("role"),
         choices=RocketAuthorization.ROLE_CHOICES,
         default=RocketRole.NOT_SETTED.value,
+    )
+    project = models.ForeignKey(Project, models.CASCADE)
+    created_by = models.ForeignKey(User, models.CASCADE)
+
+
+class RequestChatsPermission(models.Model):
+    email = models.EmailField(_("email"))
+    role = models.PositiveIntegerField(
+        _("role"),
+        choices=ChatsAuthorization.ROLE_CHOICES,
+        default=ChatsRole.NOT_SETTED.value,
     )
     project = models.ForeignKey(Project, models.CASCADE)
     created_by = models.ForeignKey(User, models.CASCADE)

@@ -29,6 +29,7 @@ from connect.common.models import (
     OpenedProject,
     ProjectRole,
     TemplateProject,
+    RequestChatsPermission,
 )
 
 from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
@@ -333,6 +334,26 @@ class RequestRocketPermissionSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         if attrs.get("role") == RocketRole.NOT_SETTED.value:
+            raise PermissionDenied(_("You cannot set user role 0"))
+        return attrs
+
+class RequestChatsPermissionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RequestChatsPermission
+        fields = ["email", "project", "role", "created_by"]
+
+    email = serializers.EmailField(max_length=254, required=True)
+    project = serializers.PrimaryKeyRelatedField(
+        queryset=Project.objects,
+        style={"show": False},
+        required=True,
+    )
+    created_by = serializers.HiddenField(
+        default=serializers.CurrentUserDefault(), style={"show": False}
+    )
+
+    def validate(self, attrs):
+        if attrs.get("role") == ChatsRole.NOT_SETTED.value:
             raise PermissionDenied(_("You cannot set user role 0"))
         return attrs
 

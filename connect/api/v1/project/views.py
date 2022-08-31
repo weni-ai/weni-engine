@@ -404,6 +404,7 @@ class RequestPermissionProjectViewSet(
         email = request.request.data.get('email')
         project_uuid = request.request.data.get('project')
         rocket_role = request.request.data.get('rocket_authorization')
+        chats_role = request.request.data.get('chats_role')
         project = Project.objects.filter(uuid=project_uuid)
 
         if len(email) == 0:
@@ -417,12 +418,16 @@ class RequestPermissionProjectViewSet(
 
         if len([item for item in RocketAuthorization.ROLE_CHOICES if item[0] == rocket_role]) == 0 and rocket_role:
             return Response({"status": 422, "message": f"{rocket_role} is not a valid rocket role!"})
+        if len([item for item in ChatsAuthorization.ROLE_CHOICES if item[0] == chats_role]) == 0 and chats_role:
+            return Response({"status": 422, "message": f"{chats_role} is not a valid chats role!"})
 
         request_permission = RequestPermissionProject.objects.filter(email=email, project=project)
         project_auth = project.project_authorizations.filter(user__email=email)
 
         request_rocket_authorization = RequestRocketPermission.objects.filter(email=email, project=project)
+        request_chats_authorization = RequestChatsPermission.objects.filter(email=email, project=project)
         rocket_authorization = None
+        chats_authorization = None
 
         user_name = ''
         first_name = ''
@@ -438,6 +443,7 @@ class RequestPermissionProjectViewSet(
         elif project_auth.exists():
             project_auth = project_auth.first()
             rocket_authorization = project_auth.rocket_authorization
+            chats_authorization = project_auth.chats_authorization
             user_name = project_auth.user.username
             first_name = project_auth.user.first_name
             last_name = project_auth.user.last_name
@@ -457,6 +463,16 @@ class RequestPermissionProjectViewSet(
             rocket_authorization.save()
         elif rocket_role:
             RequestRocketPermission.objects.create(email=email, role=rocket_role, project=project, created_by=created_by)
+
+        if request_chats_authorization.exists():
+            request_chats_authorization = request_chats_authorization.first()
+            request_chats_authorization.role = chats_role
+            request_chats_authorization.save()
+        elif chats_authorization:
+            chats_authorization.role = chats_role
+            chats_authorization.save()
+        elif rocket_role:
+            RequestChatsPermission.objects.create(email=email, role=chats_role, project=project, created_by=created_by)
 
         return Response({"status": 200, "data": {"created_by": created_by.email, "role": role, "rocket_authorization": rocket_role, "email": email, "project": project_uuid, "username": user_name, "first_name": first_name, "last_name": last_name, "photo_user": photo, "is_pendent": is_pendent}})
 
