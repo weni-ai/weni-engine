@@ -78,7 +78,7 @@ class ChatsRESTClient:
     def create_user_permission(
         self,
         project_uuid: str,
-        user_email: str, 
+        user_email: str,
         permission: int
     ):
         body = dict(

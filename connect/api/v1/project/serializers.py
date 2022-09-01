@@ -17,6 +17,7 @@ from connect.api.v1.project.validators import CanContributeInOrganizationValidat
 from connect.celery import app as celery_app
 from connect.common import tasks
 from connect.common.models import (
+    ChatsRole,
     ProjectAuthorization,
     RocketAuthorization,
     Service,
@@ -336,6 +337,7 @@ class RequestRocketPermissionSerializer(serializers.ModelSerializer):
         if attrs.get("role") == RocketRole.NOT_SETTED.value:
             raise PermissionDenied(_("You cannot set user role 0"))
         return attrs
+
 
 class RequestChatsPermissionSerializer(serializers.ModelSerializer):
     class Meta:

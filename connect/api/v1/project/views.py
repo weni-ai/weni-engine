@@ -41,8 +41,10 @@ from connect.api.v1.project.serializers import (
 from connect.celery import app as celery_app
 from connect.common.models import (
     Organization,
+    ChatsAuthorization,
     OrganizationAuthorization,
     Project,
+    RequestChatsPermission,
     RequestPermissionProject,
     RequestRocketPermission,
     ProjectAuthorization,

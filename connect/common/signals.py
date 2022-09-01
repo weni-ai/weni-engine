@@ -7,6 +7,7 @@ from django.utils import timezone
 
 from connect.authentication.models import User
 from connect.common.models import (
+    ChatsAuthorization,
     Project,
     Service,
     Organization,
@@ -25,6 +26,7 @@ from connect.common.models import (
 )
 from connect.celery import app as celery_app
 from connect.api.v1.internal.intelligence.intelligence_rest_client import IntelligenceRESTClient
+from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
 
 logger = logging.getLogger("connect.common.signals")
 
@@ -260,7 +262,7 @@ def request_chats_permission(sender, instance, created, **kwargs):
         if user.exists():
             user = user.first()
             project_auth = instance.project.project_authorizations.filter(user=user)
-            chats = ChatsRESTClient()
+            chats_instance = ChatsRESTClient()
             if project_auth.exists():
                 project_auth = project_auth.first()
                 if not project_auth.chats_authorization:
