@@ -1,12 +1,15 @@
 {% load i18n %}
-<p>{% trans 'Hi' %}, {{ first_name }}!</p>
-<p>{% trans "Information from the project" %} {{old_project_name}} {% trans "has changed" %}.</p>
-<p><{% trans "User" %} {{user}} {% trans "made the following changes changes to the settings of the project" %} {{old_project_name}}, {% trans "from the organization" %} {{organization_name}} {% trans "that you are part of" %}:</p>
+<p>{% trans "Hi" %}, {{ first_name }}!</p>
+<p>{% trans "Some information from the project" %} {{old_project_name}} {% trans "has changed" %}.</p>
+<p>{% trans "The user" %} <strong>{{user}}</strong> 
+{% trans "made the following changes to the settings of the project" %} 
+<strong>{{old_project_name}}</strong>, {% trans "from the organization" %} 
+<strong>{{organization_name}}</strong> {% trans "that you are part of" %}:</p>
 <p>{% trans "Project Name" %}</p>
 <p>{% trans "Before" %}</p>
 <p>{% trans "Now" %}</p>
 <p>{% trans "Date format" %}</p>
 <p>{% trans "Timezone"  %}</p>
-<p>{% trans 'Country for location support in Flows' %}</p>
-<p>{% trans "Flow Default Language" %}</p>
-<p>{% trans "Secondary Language of Flows" %}</p>
+<p>{% trans "Country for location support in Flows" %}</p>
+<p>{% trans "Flows Default Language" %}</p>
+<p>{% trans "Flows Secondary Language" %}</p>

@@ -124,7 +124,7 @@ if settings.DEBUG:
                     path(
                         "organization-going-out",
                         render_template(
-                            "common/emails/organization/org_going_out.html",
+                            "common/emails/organization/leaving_org.html",
                             base_url=settings.BASE_URL,
                             user_name="João",
                             organization_name="Org Test"

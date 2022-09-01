@@ -164,11 +164,11 @@ class Organization(models.Model):
         }
         mail.send_mail(
             _(f"You are going out of {self.name}"),
-            render_to_string("common/emails/organization/org_going_out.txt", context),
+            render_to_string("common/emails/organization/leaving_org.txt", context),
             None,
             [email],
             html_message=render_to_string(
-                "common/emails/organization/org_going_out.html", context
+                "common/emails/organization/leaving_org.html", context
             ),
         )
         return mail
