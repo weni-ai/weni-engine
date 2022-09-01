@@ -20,6 +20,7 @@ from connect.common.models import (
     ProjectRoleLevel,
     RocketAuthorization,
     RequestRocketPermission,
+    RequestChatsPermission,
     OpenedProject,
 )
 from connect.celery import app as celery_app
@@ -250,3 +251,34 @@ def request_rocket_permission(sender, instance, created, **kwargs):
                 project_auth.save(update_fields=["rocket_authorization"])
                 project_auth.rocket_authorization.update_rocket_permission()
             instance.delete()
+
+
+@receiver(post_save, sender=RequestChatsPermission)
+def request_chats_permission(sender, instance, created, **kwargs):
+    if created:
+        user = User.objects.filter(email=instance.email)
+        if user.exists():
+            user = user.first()
+            project_auth = instance.project.project_authorizations.filter(user=user)
+            chats = ChatsRESTClient()
+            if project_auth.exists():
+                project_auth = project_auth.first()
+                if not project_auth.chats_authorization:
+                    project_auth.chats_authorization = ChatsAuthorization.objects.create(role=instance.role)
+                    if not settings.TESTING:
+                        chats_instance.create_user_permission(
+                            project_uuid=instance.project.uuid,
+                            user_email=user.email,
+                            permission=instance.role
+                        )
+                else:
+                    project_auth.chats_authorization.role = instance.role
+                    project_auth.chats_authorization.save(update_fields=["role"])
+                    if not settings.TESTING:
+                        chats_instance.update_user_permission(
+                            permission=instance.role,
+                            user_email=user.email,
+                            project_uuid=instance.project_uuid
+                        )
+                project_auth.save(update_fields=["chats_authorization"])
+                instance.delete()

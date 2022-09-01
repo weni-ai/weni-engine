@@ -74,3 +74,21 @@ class ChatsRESTClient:
             url=f"{self.base_url}/v1/internal/project/{project_uuid}/",
             headers=self.authentication_instance.headers,
         )
+
+    def create_user_permission(
+        self,
+        project_uuid: str,
+        user_email: str, 
+        permission: int
+    ):
+        body = dict(
+            role=permission,
+            user=user_email,
+            project=project_uuid
+        )
+        requests.post(
+            url=f"{self.base_url}/v1/internal/permission/project/",
+            headers=self.authentication_instance.headers,
+            json=body
+        )
+        return True
