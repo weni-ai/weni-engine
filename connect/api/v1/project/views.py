@@ -164,7 +164,7 @@ class ProjectViewSet(
         after = pendulum.parse(after, strict=False).start_of("day")
 
         contact_count = count_contacts(str(project_uuid), before, after)
-        contacts = Contact.objects.filter(channel__project=project_uuid, last_seen_on__range=(after, before))
+        contacts = Contact.objects.filter(channel__project=project_uuid, last_seen_on__range=(after, before)).distinct("contact_flow_uuid")
 
         project = Project.objects.get(uuid=project_uuid)
 
