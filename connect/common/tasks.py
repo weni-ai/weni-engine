@@ -306,7 +306,7 @@ def sync_active_contacts():
         created_at = project.organization.created_at
         before = timezone.now() if next_due_date is None else next_due_date
         after = created_at if last_invoice_date is None else last_invoice_date
-        contact_count = utils.count_contacts(project=project, after=after, before=before)
+        contact_count = utils.count_contacts(project=project, after=str(after), before=str(before))
         project.contact_count = int(contact_count)
         project.save(update_fields=["contact_count"])
     return True
@@ -419,7 +419,7 @@ def generate_project_invoice():
             )
         )
         for project in org.project.all():
-            contact_count = utils.count_contacts(project=project, after=after, before=before)
+            contact_count = utils.count_contacts(project=project, after=str(after), before=str(before))
 
             invoice.organization_billing_invoice_project.create(
                 project=project,
