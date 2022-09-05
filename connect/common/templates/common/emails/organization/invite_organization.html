@@ -15,7 +15,7 @@
               margin-top: 24px;
             "
           >
-            {% trans 'You have been invited to join the' %} {{ organization_name }} {% trans 'organization' %}
+            {% trans 'You have been invited to join the organization' %} <strong> {{ organization_name }} </strong>
             <span style="margin-left: 1px">
               <img
                 style="max-height: 20px"
@@ -48,6 +48,7 @@
                 />
               </span>
             </p>
+
           </div>
 
           <div
@@ -75,7 +76,7 @@
                 text-decoration: none;
                 color: #FFF;
               " href="{{ webapp_base_url }}"
-              >{% trans 'Click here to join the organization' %}</a>
+              >{% trans "Join org" %}</a>
           </div>
         </section>
 {% endblock %}

@@ -6,12 +6,11 @@
 # Translators:
 # Daniel Yohan <dyohan9@gmail.com>, 2021
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-01 12:47-0300\n"
+"POT-Creation-Date: 2022-09-05 03:33+0000\n"
 "PO-Revision-Date: 2021-06-10 13:36+0000\n"
 "Last-Translator: Daniel Yohan <dyohan9@gmail.com>, 2021\n"
 "Language-Team: Portuguese (Brazil) (https://www.transifex.com/bothub/"
@@ -117,17 +116,17 @@ msgstr "UUID de organização inválido"
 msgid "Invalid Organization UUID"
 msgstr "UUID de organização inválido"
 
-#: connect/api/v1/organization/serializers.py:50 connect/common/models.py:943
+#: connect/api/v1/organization/serializers.py:50 connect/common/models.py:944
 msgid "billing cycle"
 msgstr "ciclo de pagamento"
 
-#: connect/api/v1/organization/serializers.py:55 connect/common/models.py:949
-#: connect/common/models.py:1314
+#: connect/api/v1/organization/serializers.py:55 connect/common/models.py:950
+#: connect/common/models.py:1313
 msgid "payment method"
 msgstr "método de pagamento"
 
 #: connect/api/v1/organization/serializers.py:61
-#: connect/api/v1/organization/serializers.py:120 connect/common/models.py:958
+#: connect/api/v1/organization/serializers.py:120 connect/common/models.py:959
 msgid "plan"
 msgstr "plano"
 
@@ -163,8 +162,6 @@ msgid "Need to pass 'before' and 'after' in query params"
 msgstr "É necessário passar os campos 'before' e 'after' nos query params"
 
 #: connect/api/v1/organization/views.py:378
-#, fuzzy
-#| msgid "request permission organization"
 msgid "Need to pass 'organization_uuid'"
 msgstr "solicitar permissão organização"
 
@@ -185,12 +182,10 @@ msgid "You can't contribute in this organization"
 msgstr "Você não pode contribuir nesta organização"
 
 #: connect/api/v1/project/validators.py:15
-#, fuzzy
-#| msgid "organization name"
 msgid "Your organization is suspended"
-msgstr "nome da organização"
+msgstr "Sua organização está suspensa"
 
-#: connect/authentication/models.py:46 connect/common/models.py:626
+#: connect/authentication/models.py:46 connect/common/models.py:627
 msgid "user"
 msgstr "usuário"
 
@@ -206,8 +201,8 @@ msgstr "primeiro nome"
 msgid "last name"
 msgstr "sobrenome"
 
-#: connect/authentication/models.py:54 connect/common/models.py:750
-#: connect/common/models.py:857 connect/common/models.py:872
+#: connect/authentication/models.py:54 connect/common/models.py:751
+#: connect/common/models.py:858 connect/common/models.py:873
 msgid "email"
 msgstr "email"
 
@@ -286,6 +281,7 @@ msgstr "Nome de usuário alterado"
 #: connect/billing/templates/billing/emails/changed_card.html:7
 #: connect/billing/templates/billing/emails/changed_card.txt:2
 #: connect/billing/templates/billing/emails/finished-plan.html:15
+#: connect/billing/templates/billing/emails/finished-plan.txt:2
 #: connect/billing/templates/billing/emails/free-plan-expired.html:16
 #: connect/billing/templates/billing/emails/free-plan-expired.txt:2
 #: connect/billing/templates/billing/emails/free_plan.html:16
@@ -389,10 +385,10 @@ msgstr " nós esperamos que você goste do seu novo nome de usuário"
 
 #: connect/billing/models.py:18 connect/billing/models.py:40
 #: connect/billing/models.py:83 connect/billing/models.py:102
-#: connect/common/models.py:110 connect/common/models.py:376
-#: connect/common/models.py:480 connect/common/models.py:690
-#: connect/common/models.py:1537 connect/common/models.py:1542
-#: connect/common/models.py:1547
+#: connect/common/models.py:110 connect/common/models.py:377
+#: connect/common/models.py:481 connect/common/models.py:691
+#: connect/common/models.py:1536 connect/common/models.py:1541
+#: connect/common/models.py:1546
 msgid "UUID"
 msgstr "UUID"
 
@@ -413,60 +409,51 @@ msgid "task type"
 msgstr ""
 
 #: connect/billing/models.py:28
-#, fuzzy
-#| msgid "created at"
 msgid "started at"
 msgstr "criado em"
 
 #: connect/billing/models.py:29
-#, fuzzy
-#| msgid "joined at"
 msgid "finished at"
-msgstr "juntou-se a"
+msgstr "terminou em"
 
 #: connect/billing/models.py:30
-#, fuzzy
-#| msgid "Before"
 msgid "before"
-msgstr "Antes"
+msgstr "antes"
 
 #: connect/billing/models.py:31
 msgid "after"
-msgstr ""
+msgstr "depois"
 
 #: connect/billing/models.py:36
 msgid "WhatsApp"
-msgstr ""
+msgstr "WhatsApp"
 
 #: connect/billing/models.py:37
 msgid "Telegram"
-msgstr ""
+msgstr "Telegram"
 
 #: connect/billing/models.py:43
 msgid "channel_type"
-msgstr ""
+msgstr "tipo de canal"
 
 #: connect/billing/models.py:45
 msgid "channel id"
-msgstr ""
+msgstr "id do canal"
 
 #: connect/billing/models.py:85 connect/billing/models.py:108
-#: connect/common/models.py:494
+#: connect/common/models.py:495
 msgid "flow identification UUID"
 msgstr "UUID de identificação de fluxo"
 
 #: connect/billing/models.py:86 connect/billing/models.py:107
-#, fuzzy
-#| msgid "project name"
 msgid "contact name"
-msgstr "Nome do Projeto"
+msgstr "nome do contato"
 
 #: connect/billing/templates/billing/emails/added_card.html:14
 #: connect/billing/templates/billing/emails/added_card.txt:3
-#, fuzzy
-#| msgid "Click here to join the organization"
+#: connect/common/models.py:1141
 msgid "A credit card has been added to the organization"
-msgstr "Clique aqui para ingressar na organização"
+msgstr "Um cartão de crédito foi adicionado à organização"
 
 #: connect/billing/templates/billing/emails/added_card.html:17
 #: connect/billing/templates/billing/emails/added_card.txt:4
@@ -486,8 +473,6 @@ msgstr ""
 "normalmente. É maravilhoso ter sua equipe de volta."
 
 #: connect/billing/templates/billing/emails/changed-plan.html:40
-#: connect/billing/templates/billing/emails/changed-plan.txt:3
-#: connect/billing/templates/billing/emails/finished-plan.html:34
 #: connect/billing/templates/billing/emails/reactived-plan.html:40
 msgid "Your"
 msgstr "Seu"
@@ -497,38 +482,37 @@ msgid "plan has been changed"
 msgstr "plano alterado com sucesso"
 
 #: connect/billing/templates/billing/emails/changed-plan.html:54
-#, fuzzy
-#| msgid "One of the administrators deleted the organization"
-msgid "An administrator updated the"
-msgstr "Um dos administradores excluiu a organização"
+#: connect/billing/templates/billing/emails/changed-plan.txt:3
+#: connect/common/templates/common/emails/organization/change_organization_name.html:21
+#: connect/common/templates/common/emails/organization/change_organization_name.txt:4
+#: connect/common/templates/common/emails/organization/permission_change.html:53
+#: connect/common/templates/common/emails/organization/permission_change.txt:5
+msgid "An administrator of"
+msgstr "Um administrador da"
 
 #: connect/billing/templates/billing/emails/changed-plan.html:55
-#, fuzzy
-#| msgid "organization name"
-msgid "organization's plan"
-msgstr "nome da organização"
+#: connect/billing/templates/billing/emails/changed-plan.txt:4
+msgid "has updated the organization's plan"
+msgstr "atualizou o plano da organização para"
 
-#: connect/billing/templates/billing/emails/changed-plan.html:55
+#: connect/billing/templates/billing/emails/changed-plan.html:56
+#: connect/billing/templates/billing/emails/changed-plan.txt:5
 #: connect/common/templates/common/emails/organization/permission_change.html:54
 #: connect/common/templates/common/emails/organization/permission_change.txt:6
 msgid "from"
 msgstr "de"
 
-#: connect/billing/templates/billing/emails/changed-plan.html:55
+#: connect/billing/templates/billing/emails/changed-plan.html:56
+#: connect/billing/templates/billing/emails/changed-plan.txt:5
 #: connect/common/templates/common/emails/organization/permission_change.html:54
 #: connect/common/templates/common/emails/organization/permission_change.txt:6
 msgid "to"
 msgstr "para"
 
-#: connect/billing/templates/billing/emails/changed-plan.html:56
+#: connect/billing/templates/billing/emails/changed-plan.html:57
+#: connect/billing/templates/billing/emails/changed-plan.txt:6
 msgid "the platform is ready to receive and use our resources"
 msgstr "a plataforma está pronta para receber e usar nossos recursos"
-
-#: connect/billing/templates/billing/emails/changed-plan.txt:3
-#, fuzzy
-#| msgid "organization name"
-msgid "organization's plan has been changed"
-msgstr "nome da organização"
 
 #: connect/billing/templates/billing/emails/changed_card.html:14
 #: connect/billing/templates/billing/emails/changed_card.txt:3
@@ -545,84 +529,24 @@ msgstr ""
 "do plano da organização"
 
 #: connect/billing/templates/billing/emails/finished-plan.html:34
-#, fuzzy
-#| msgid "organization name"
-msgid "organization's plan has ended"
-msgstr "nome da organização"
+#: connect/billing/templates/billing/emails/finished-plan.txt:3
+msgid "The plan for your organization"
+msgstr "O plano para sua organização"
+
+#: connect/billing/templates/billing/emails/finished-plan.html:34
+#: connect/billing/templates/billing/emails/finished-plan.txt:3
+msgid "has ended"
+msgstr "se encerrou"
 
 #: connect/billing/templates/billing/emails/finished-plan.html:46
 #: connect/billing/templates/billing/emails/finished-plan.txt:4
-#, fuzzy
-#| msgid "One of the administrators deleted the organization"
-msgid "An Adminstrator has terminated the organization plan"
-msgstr "Um dos administradores excluiu a organização"
-
-#: connect/billing/templates/billing/emails/finished-plan.html:47
-msgid "At the moment"
-msgstr "No momento"
-
-#: connect/billing/templates/billing/emails/finished-plan.html:47
-msgid "the functioning of your"
-msgstr "o funcionamento do seu"
-
-#: connect/billing/templates/billing/emails/finished-plan.html:48
-#, fuzzy
-#| msgid "Intelligence count"
-msgid "Intelligences"
-msgstr "Contagem de inteligência"
-
-#: connect/billing/templates/billing/emails/finished-plan.html:49
-#, fuzzy
-#| msgid "created at"
-msgid "created Flows"
-msgstr "criado em"
-
-#: connect/billing/templates/billing/emails/finished-plan.html:49
-msgid "and the Chat module are paralyzed"
-msgstr " e o módulo  de Chat estão paralisados"
-
-#: connect/billing/templates/billing/emails/finished-plan.html:61
-#: connect/billing/templates/billing/emails/finished-plan.txt:6
-msgid "To continue using the Weni Platform ask your"
-msgstr "Para continuar usando a plataforma Weni pergunte ao seu"
-
-#: connect/billing/templates/billing/emails/finished-plan.html:62
-#: connect/billing/templates/billing/emails/finished-plan.txt:7
-#, fuzzy
-#| msgid "organization authorization"
-msgid "organization's administrator"
-msgstr "autorização da organização"
-
-#: connect/billing/templates/billing/emails/finished-plan.html:63
-#: connect/billing/templates/billing/emails/finished-plan.txt:8
-msgid "to reactivate or choose a new plan that makes sense for your projects"
-msgstr ""
-"para reativar ou escolher um novo plano que faça sentido para os seus "
-"projetos"
-
-#: connect/billing/templates/billing/emails/finished-plan.html:64
-#: connect/billing/templates/billing/emails/finished-plan.txt:9
-msgid "we want you to stay with us"
-msgstr "nós queremos que você fique conosco"
-
-#: connect/billing/templates/billing/emails/finished-plan.txt:2
-#: connect/billing/templates/billing/emails/reactived-plan.txt:2
-#, fuzzy
-#| msgid "username"
-msgid "Hi {{ user_name }}"
-msgstr "nome do usuário"
-
-#: connect/billing/templates/billing/emails/finished-plan.txt:3
-#, fuzzy
-#| msgid ""
-#| "You have been invited to join the {{ organization_name }} organization"
-msgid "Your {{ organization_name }} organization's plan has ended"
-msgstr "Você foi convidado a ingressar na organização {{ organization_name }}"
+msgid "An administrator has terminated the organization plan"
+msgstr "Um dos administradores encerrou o plano da organização"
 
 #: connect/billing/templates/billing/emails/finished-plan.txt:5
 msgid ""
-"At the moment, the functioning of your Intelligences, created Flows and the "
-"Chat module are paralyzed"
+"At the moment, the functioning of your Intelligences, Flows and the Chat "
+"module are interrupted"
 msgstr ""
 "Nesse momento, o funcionamento de suas inteligências, Fluxos criados e o "
 "Módulo de Chat estão paralisados"
@@ -631,8 +555,6 @@ msgstr ""
 #: connect/billing/templates/billing/emails/free-plan-expired.txt:3
 #: connect/common/templates/common/emails/organization/delete_organization.html:39
 #: connect/common/templates/common/emails/organization/delete_organization.txt:3
-#, fuzzy
-#| msgid "organization"
 msgid "The organization"
 msgstr "A organização"
 
@@ -659,36 +581,29 @@ msgid ""
 "projects, we want you to continue with us"
 msgstr ""
 "No momento o funcionamento das suas inteligências, Fluxos criados e o módulo "
-"de Chat estão paralizados. Para continuar usando a plataforma da Weni, "
+"de Chat estão paralisados. Para continuar usando a plataforma da Weni, "
 "pergunte ao Administrador da organização para escolher um novo plano que "
 "faça sentido para seus projetos, nós queremos que você continue conosco"
 
 #: connect/billing/templates/billing/emails/free_plan.html:40
 #: connect/billing/templates/billing/emails/free_plan.txt:3
-msgid "Your "
-msgstr "Sua "
+msgid "Your organization"
+msgstr "Sua organização"
 
 #: connect/billing/templates/billing/emails/free_plan.html:40
-#, fuzzy
-#| msgid "organization name"
-msgid "organization has the"
-msgstr "nome da organização"
-
-#: connect/billing/templates/billing/emails/free_plan.html:40
-#: connect/billing/templates/billing/emails/free_plan.html:57
-msgid "Plan"
-msgstr "Plano"
-
-#: connect/billing/templates/billing/emails/free_plan.html:57
-msgid "The"
-msgstr "A"
+#: connect/billing/templates/billing/emails/free_plan.txt:3
+msgid "has the following plan"
+msgstr "tem o seguinte plano"
 
 #: connect/billing/templates/billing/emails/free_plan.html:57
 #: connect/billing/templates/billing/emails/free_plan.txt:5
-#, fuzzy
-#| msgid "Invitation to join organization"
-msgid "was chosen for your organization"
-msgstr "Convite para participar de organização"
+msgid "The plan"
+msgstr "O plano"
+
+#: connect/billing/templates/billing/emails/free_plan.html:57
+#: connect/billing/templates/billing/emails/free_plan.txt:5
+msgid "was selected for your organization"
+msgstr "foi selecionado para sua organização"
 
 #: connect/billing/templates/billing/emails/free_plan.html:58
 #: connect/billing/templates/billing/emails/free_plan.txt:6
@@ -699,29 +614,13 @@ msgstr ""
 "Os membros podem agora aproveitar os beneficios e dimensionar a comunicação "
 "com nossas ferramentas"
 
-#: connect/billing/templates/billing/emails/free_plan.txt:3
-#, fuzzy
-#| msgid "organization authorization"
-msgid "organization has the Free Plan"
-msgstr "autorização da organização"
-
-#: connect/billing/templates/billing/emails/free_plan.txt:5
-msgid "The "
-msgstr "O"
-
-#: connect/billing/templates/billing/emails/free_plan.txt:5
-msgid "Free Plan "
-msgstr "Plano grátis"
-
 #: connect/billing/templates/billing/emails/reactived-plan.html:40
 msgid "organization's plan has been reactivated"
 msgstr "plano da organização foi reativado com sucesso"
 
 #: connect/billing/templates/billing/emails/reactived-plan.html:54
-#, fuzzy
-#| msgid "One of the administrators deleted the organization"
 msgid "An Adminstrator has reactivated the organization plan"
-msgstr "Um dos administradores excluiu a organização"
+msgstr "Um dos administradores reativou o plano da organização"
 
 #: connect/billing/templates/billing/emails/reactived-plan.html:55
 msgid "Your Intelligences, created Flows and the Chat module"
@@ -736,6 +635,11 @@ msgstr "volte a tabalhar novamente"
 msgid "It's wonderfull to have your team back"
 msgstr "É maravilhoso ter seu time de volta"
 
+#: connect/billing/templates/billing/emails/reactived-plan.txt:2
+#: connect/common/templates/common/emails/organization/organization_create.txt:2
+msgid "Hi,"
+msgstr "Oi,"
+
 #: connect/billing/templates/billing/emails/reactived-plan.txt:3
 msgid "Your {{ organization_name }} organization's plan has been reactivated"
 msgstr "O plano da {{organization_name}} foi reativado com sucesso"
@@ -748,8 +652,6 @@ msgstr ""
 
 #: connect/billing/templates/billing/emails/removed_card.html:40
 #: connect/billing/templates/billing/emails/removed_card.txt:3
-#, fuzzy
-#| msgid "request permission organization"
 msgid "The credit card of organization "
 msgstr "O cartão de crédito da organização "
 
@@ -765,8 +667,6 @@ msgstr "Um administrador removeu os dados cadastrados do cartão de crédito "
 
 #: connect/billing/templates/billing/emails/removed_card.html:55
 #: connect/billing/templates/billing/emails/removed_card.txt:5
-#, fuzzy
-#| msgid "request permission organization"
 msgid "to perform billing of organization plan"
 msgstr "para realizar o faturamento do plano de organização"
 
@@ -793,22 +693,18 @@ msgid "in the billing section, we want you to stay with us"
 msgstr "na seção de faturamente, nós queremos que você continue conosco"
 
 #: connect/common/models.py:28
-#, fuzzy
-#| msgid "dashboard newsletter"
 msgid "newsletter"
 msgstr "boletim informativo"
 
 #: connect/common/models.py:29
-#, fuzzy
-#| msgid "dashboard newsletter"
 msgid "newsletters"
 msgstr "boletim informativo"
 
 #: connect/common/models.py:31 connect/common/models.py:54
-#: connect/common/models.py:115 connect/common/models.py:385
-#: connect/common/models.py:502 connect/common/models.py:635
-#: connect/common/models.py:707 connect/common/models.py:809
-#: connect/common/models.py:835 connect/common/models.py:846
+#: connect/common/models.py:115 connect/common/models.py:386
+#: connect/common/models.py:503 connect/common/models.py:636
+#: connect/common/models.py:708 connect/common/models.py:810
+#: connect/common/models.py:836 connect/common/models.py:847
 msgid "created at"
 msgstr "criado em"
 
@@ -817,8 +713,6 @@ msgid "dashboard newsletter language"
 msgstr "linguagem do boletim informativo do painel"
 
 #: connect/common/models.py:40
-#, fuzzy
-#| msgid "dashboard newsletter language"
 msgid "newsletter languages"
 msgstr "linguagem do boletim informativo"
 
@@ -835,14 +729,10 @@ msgid "description"
 msgstr "descrição"
 
 #: connect/common/models.py:106
-#: connect/common/templates/common/emails/organization/invite_organization.html:18
-#: connect/common/templates/common/emails/organization/invite_organization.txt:2
 msgid "organization"
 msgstr "organização"
 
 #: connect/common/models.py:107
-#, fuzzy
-#| msgid "organization"
 msgid "organizations"
 msgstr "organizações"
 
@@ -858,509 +748,457 @@ msgstr "descrição da organização"
 msgid "inteligence organization id"
 msgstr "ID da organização de inteligência"
 
-#: connect/common/models.py:119 connect/common/models.py:1335
+#: connect/common/models.py:119 connect/common/models.py:1334
 msgid "Whatsapp Extra Integration"
 msgstr "Integração de whatsapp extra"
 
 #: connect/common/models.py:120
-#, fuzzy
-#| msgid "Click here to join the organization"
 msgid "Only users with 2fa can access the organization"
-msgstr "Clique aqui para ingressar na organização"
+msgstr ""
+"Apenas usuários com autenticação de dois fatores ativada pode acessar a "
+"organização"
 
 #: connect/common/models.py:145
 msgid "Invitation to join organization"
 msgstr "Convite para participar de organização"
 
 #: connect/common/models.py:166
-#, fuzzy, python-brace-format
-#| msgid "You have been removed from the {self.name}"
-msgid "You are going out of {self.name}"
-msgstr "Você foi removido de {self.name}"
+msgid "You are leaving"
+msgstr "Você está deixando a organização "
 
-#: connect/common/models.py:185
-#, fuzzy, python-brace-format
-#| msgid "You have been removed from the {self.name}"
-msgid "You have been removed from {self.name}"
-msgstr "Você foi removido de {self.name}"
+#: connect/common/models.py:185 connect/common/models.py:226
+msgid "You have been removed from"
+msgstr "Você foi removido(a) de "
 
 #: connect/common/models.py:205
 msgid "Organization created!"
 msgstr "Organização criada!"
 
-#: connect/common/models.py:226
-#, python-brace-format
-msgid "You have been removed from the {self.name}"
-msgstr "Você foi removido de {self.name}"
-
 #: connect/common/models.py:248
-#, python-brace-format
-msgid "{self.name} no longer exists!"
-msgstr "{self.name} não existe mais!"
+msgid "no longer exists!"
+msgstr "não existe mais"
 
 #: connect/common/models.py:276
-#, python-brace-format
-msgid "{organization_previous_name} now it's {organization_new_name}"
-msgstr "{organization_previous_name} agora é {organization_new_name}"
+msgid "is now"
+msgstr "agora se chama"
 
 #: connect/common/models.py:297
 msgid "You receive an access code to Weni Platform"
 msgstr "Você recebeu um código de acesso para a plataforma Weni"
 
-#: connect/common/models.py:319
+#: connect/common/models.py:320
 #: connect/common/templates/common/emails/organization/permission_change.html:39
 #: connect/common/templates/common/emails/organization/permission_change.txt:3
 msgid "A new permission has been assigned to you"
 msgstr "Uma nova permissão foi atribuida a você"
 
-#: connect/common/models.py:362
+#: connect/common/models.py:363
 msgid "organization authorization"
 msgstr "autorização da organização"
 
-#: connect/common/models.py:363
+#: connect/common/models.py:364
 msgid "organization authorizations"
 msgstr "autorizações de organização"
 
-#: connect/common/models.py:367 connect/common/models.py:625
-#: connect/common/models.py:683
+#: connect/common/models.py:368 connect/common/models.py:626
+#: connect/common/models.py:684
 msgid "not set"
 msgstr "não configurado"
 
-#: connect/common/models.py:368 connect/common/models.py:685
+#: connect/common/models.py:369 connect/common/models.py:686
 msgid "contributor"
 msgstr "contribuinte"
 
-#: connect/common/models.py:369 connect/common/models.py:627
+#: connect/common/models.py:370 connect/common/models.py:628
 msgid "admin"
 msgstr "administrador"
 
-#: connect/common/models.py:370 connect/common/models.py:684
+#: connect/common/models.py:371 connect/common/models.py:685
 msgid "viewer"
 msgstr "visualizador"
 
-#: connect/common/models.py:371
+#: connect/common/models.py:372
 msgid "financial"
 msgstr ""
 
-#: connect/common/models.py:372 connect/common/models.py:687
+#: connect/common/models.py:373 connect/common/models.py:688
 msgid "support"
 msgstr ""
 
-#: connect/common/models.py:383 connect/common/models.py:633
-#: connect/common/models.py:705 connect/common/models.py:752
-#: connect/common/models.py:860 connect/common/models.py:875
+#: connect/common/models.py:384 connect/common/models.py:634
+#: connect/common/models.py:706 connect/common/models.py:753
+#: connect/common/models.py:861 connect/common/models.py:876
 msgid "role"
 msgstr "função"
 
-#: connect/common/models.py:386
+#: connect/common/models.py:387
 msgid "2 factor authentication"
 msgstr ""
 
-#: connect/common/models.py:469
+#: connect/common/models.py:470
 msgid "project"
 msgstr "projeto"
 
-#: connect/common/models.py:482
+#: connect/common/models.py:483
 msgid "project name"
 msgstr "Nome do Projeto"
 
-#: connect/common/models.py:486
+#: connect/common/models.py:487
 #: connect/common/templates/common/emails/project/project-changed.html:135
 #: connect/common/templates/common/emails/project/project-changed.txt:12
 msgid "Timezone"
 msgstr "Fuso horário"
 
-#: connect/common/models.py:488
+#: connect/common/models.py:489
 msgid "Date Format"
 msgstr "Formato de data"
 
-#: connect/common/models.py:492
+#: connect/common/models.py:493
 msgid "Whether day comes first or month comes first in dates"
 msgstr "Se o dia vem primeiro ou o mês vem primeiro nas datas"
 
-#: connect/common/models.py:495
-#, fuzzy
-#| msgid "flow identification UUID"
-msgid "flow identification ID"
-msgstr "UUID de identificação de fluxo"
-
 #: connect/common/models.py:496
+msgid "flow identification ID"
+msgstr "ID de identificação de fluxo"
+
+#: connect/common/models.py:497
 msgid "Intelligence count"
 msgstr "Contagem de inteligência"
 
-#: connect/common/models.py:497
+#: connect/common/models.py:498
 msgid "Flows count"
 msgstr "Contagem de fluxos"
 
-#: connect/common/models.py:498
+#: connect/common/models.py:499
 msgid "Contacts count"
 msgstr "Contagem de contatos"
 
-#: connect/common/models.py:500
-#, fuzzy
-#| msgid "Contacts count"
+#: connect/common/models.py:501
 msgid "Contacts count of all time"
-msgstr "Contagem de contatos"
+msgstr "Contagem total de contatos"
 
-#: connect/common/models.py:504
+#: connect/common/models.py:505
 msgid "Whatsapp Integrations"
 msgstr "Integrações de Whatsapp"
 
-#: connect/common/models.py:532
+#: connect/common/models.py:533
 #, python-brace-format
 msgid "You have been invited to join the {self.name} organization"
 msgstr "Você foi convidado a ingressar na organização {self.name}"
 
-#: connect/common/models.py:576
+#: connect/common/models.py:577
 #, python-brace-format
 msgid "The project {self.name} has changed"
 msgstr "O projeto {self.name} foi alterado"
 
-#: connect/common/models.py:596
+#: connect/common/models.py:597
 msgid "A project was deleted..."
 msgstr "Um projeto foi apagado..."
 
-#: connect/common/models.py:608
+#: connect/common/models.py:609
 msgid "Day"
-msgstr ""
-
-#: connect/common/models.py:628
-msgid "agent"
-msgstr ""
+msgstr "Dia"
 
 #: connect/common/models.py:629
-#, fuzzy
-#| msgid "service url"
+msgid "agent"
+msgstr "agente"
+
+#: connect/common/models.py:630
 msgid "service manager"
-msgstr "url de serviço"
+msgstr "gestor de serviços"
 
-#: connect/common/models.py:686
+#: connect/common/models.py:687
 msgid "moderator"
-msgstr ""
+msgstr "moderador"
 
-#: connect/common/models.py:762
+#: connect/common/models.py:763
 msgid "service"
 msgstr "serviço"
 
-#: connect/common/models.py:771
+#: connect/common/models.py:772
 msgid "Flows service"
 msgstr "Serviço de fluxos"
 
-#: connect/common/models.py:775
+#: connect/common/models.py:776
 msgid "Inteligence Service"
 msgstr "Serviço de inteligência"
 
-#: connect/common/models.py:779
+#: connect/common/models.py:780
 msgid "Chat Service"
 msgstr "Serviço de chat"
 
-#: connect/common/models.py:790
+#: connect/common/models.py:791
 msgid "Region Ireland"
 msgstr "Região Irlanda"
 
-#: connect/common/models.py:794
+#: connect/common/models.py:795
 msgid "Region Virginia"
 msgstr "Região Virgínia"
 
-#: connect/common/models.py:798
+#: connect/common/models.py:799
 msgid "Region São Paulo"
 msgstr "Região São Paulo"
 
-#: connect/common/models.py:802
+#: connect/common/models.py:803
 msgid "service url"
 msgstr "url de serviço"
 
-#: connect/common/models.py:804
+#: connect/common/models.py:805
 msgid "service type"
 msgstr "tipo de serviço"
 
-#: connect/common/models.py:810
+#: connect/common/models.py:811
 msgid "standard service for all projects"
 msgstr "serviço padrão para todos os projetos"
 
-#: connect/common/models.py:812
+#: connect/common/models.py:813
 msgid "service region"
 msgstr "região de serviço"
 
-#: connect/common/models.py:818
+#: connect/common/models.py:819
 msgid "Define if the service is under maintenance"
 msgstr "Defina se o serviço está em manutenção"
 
-#: connect/common/models.py:821
+#: connect/common/models.py:822
 msgid "date start maintenance"
 msgstr "data de início da manutenção"
 
-#: connect/common/models.py:830
+#: connect/common/models.py:831
 msgid "log service"
 msgstr "serviço de log"
 
-#: connect/common/models.py:831
-#, fuzzy
-#| msgid "log service"
+#: connect/common/models.py:832
 msgid "log services"
 msgstr "serviço de log"
 
-#: connect/common/models.py:834
+#: connect/common/models.py:835
 msgid "status service"
 msgstr "serviço de status"
 
-#: connect/common/models.py:840
+#: connect/common/models.py:841
 msgid "service status"
 msgstr "status do serviço"
 
-#: connect/common/models.py:854
+#: connect/common/models.py:855
 msgid "request permission organization"
 msgstr "solicitar permissão organização"
 
-#: connect/common/models.py:869
-#, fuzzy
-#| msgid "request permission organization"
+#: connect/common/models.py:870
 msgid "request permission project"
-msgstr "solicitar permissão organização"
+msgstr "Requisição de permissão de projeto"
 
-#: connect/common/models.py:887
-#, fuzzy
-#| msgid "organization name"
+#: connect/common/models.py:888
 msgid "organization billing plan"
 msgstr "plano de faturamento da organização"
 
-#: connect/common/models.py:900 connect/common/models.py:934
+#: connect/common/models.py:901 connect/common/models.py:935
 msgid "free"
 msgstr "grátis"
 
-#: connect/common/models.py:901
+#: connect/common/models.py:902
 msgid "single"
 msgstr "único"
 
-#: connect/common/models.py:902
+#: connect/common/models.py:903
 msgid "monthly"
 msgstr "mensal"
 
-#: connect/common/models.py:903
+#: connect/common/models.py:904
 msgid "quarterly"
 msgstr "trimestral"
 
-#: connect/common/models.py:904
+#: connect/common/models.py:905
 msgid "semester"
 msgstr "semestral"
 
-#: connect/common/models.py:905
+#: connect/common/models.py:906
 msgid "annual"
 msgstr "anual"
 
-#: connect/common/models.py:906
+#: connect/common/models.py:907
 msgid "bienal"
 msgstr "bienal"
 
-#: connect/common/models.py:907
+#: connect/common/models.py:908
 msgid "trienal"
 msgstr "trienal"
 
-#: connect/common/models.py:925
+#: connect/common/models.py:926
 msgid "credit card"
 msgstr "cartão de crédito"
 
-#: connect/common/models.py:926
+#: connect/common/models.py:927
 msgid "payment slip"
 msgstr "boleto de pagamento"
 
-#: connect/common/models.py:935
+#: connect/common/models.py:936
 msgid "enterprise"
 msgstr "empresarial"
 
-#: connect/common/models.py:936
+#: connect/common/models.py:937
 msgid "custom"
 msgstr "custumizado"
 
-#: connect/common/models.py:951
-#, fuzzy
-#| msgid "last name"
+#: connect/common/models.py:952
 msgid "last invoice"
 msgstr "última fatura"
 
-#: connect/common/models.py:952
+#: connect/common/models.py:953
 msgid "next due date"
 msgstr "próxima data de vencimento"
 
-#: connect/common/models.py:953
-#, fuzzy
-#| msgid "organization name"
+#: connect/common/models.py:954
 msgid "termination date"
 msgstr "data de finalização"
 
-#: connect/common/models.py:955
+#: connect/common/models.py:956
 msgid "notes administration"
 msgstr "administrador de notas"
 
-#: connect/common/models.py:957
+#: connect/common/models.py:958
 msgid "fixed discount"
 msgstr "desconto fixado"
 
-#: connect/common/models.py:959
+#: connect/common/models.py:960
 msgid "date of contract plan"
 msgstr "data de contratação do plano"
 
-#: connect/common/models.py:960
-#, fuzzy
-#| msgid "active"
+#: connect/common/models.py:961
 msgid "active plan"
 msgstr "plano ativo"
 
-#: connect/common/models.py:962
+#: connect/common/models.py:963
 msgid "Stripe Customer"
 msgstr "Cliente Stripe"
 
-#: connect/common/models.py:966
+#: connect/common/models.py:967
 msgid "Our Stripe customer id for your organization"
 msgstr "Nosso id do cliente do stripe para sua organização"
 
-#: connect/common/models.py:969
+#: connect/common/models.py:970
 msgid "Stripe Customer Configured Card"
 msgstr "Cartãod do cliente no stripe configurado"
 
-#: connect/common/models.py:972
+#: connect/common/models.py:973
 msgid "Final Card Number"
 msgstr "números do final do cartão"
 
-#: connect/common/models.py:975
+#: connect/common/models.py:976
 msgid "Card Expiration Date"
 msgstr "Data de expiração do cartão"
 
-#: connect/common/models.py:978
+#: connect/common/models.py:979
 msgid "Cardholder Name"
 msgstr "Nome no cartão"
 
-#: connect/common/models.py:981
+#: connect/common/models.py:982
 msgid "Card Brand"
 msgstr "Bandeira do cartão"
 
-#: connect/common/models.py:992
+#: connect/common/models.py:993
 msgid "Additional billing information"
 msgstr "Informações adicionais de faturamento"
 
-#: connect/common/models.py:998
-#, fuzzy
-#| msgid "Card Brand"
+#: connect/common/models.py:999
 msgid "Card is valid"
-msgstr "Bandeira do cartão"
+msgstr "Cartão é válido"
 
-#: connect/common/models.py:1047
+#: connect/common/models.py:1048
 msgid "Unable to make payment"
 msgstr "Não pode fazer o pagamento"
 
-#: connect/common/models.py:1141
-#, fuzzy, python-brace-format
-#| msgid ""
-#| "You have been invited to join the {{ organization_name }} organization"
-msgid ""
-"A credit card has been added to the organization {self.organization.name}"
-msgstr ""
-"Um cartão de crédito foi adicionado a organização {self.organization.name}"
+#: connect/common/models.py:1159
+msgid "A credit card has been updated in the organization"
+msgstr "Um cartão de crédito foi atualizado na organização"
 
-#: connect/common/models.py:1160
-#, fuzzy, python-brace-format
-#| msgid ""
-#| "You have been invited to join the {{ organization_name }} organization"
-msgid ""
-"A credit card has been changed to the organization {self.organization.name}"
-msgstr ""
-"Um cartão de crédito foi alterado com sucesso na organização {{ self."
-"organization_name }}"
-
-#: connect/common/models.py:1178
+#: connect/common/models.py:1177
 #, python-brace-format
 msgid "Your {self.organization.name} organization's plan has ended"
 msgstr "O plano da sua organização {self.organization.name} foi encerrado"
 
-#: connect/common/models.py:1196
+#: connect/common/models.py:1195
 #, python-brace-format
 msgid "Your {self.organization.name} organization's plan has been reactivated."
 msgstr ""
 "O plano da sua organização {self.organization.name} foi reativado com sucesso"
 
-#: connect/common/models.py:1216
+#: connect/common/models.py:1215
 #, python-brace-format
 msgid "Your {self.organization.name} organization credit card was removed"
 msgstr ""
 "O cartão de crédito da sua organização {self.organization.name} foi removido "
 "com sucesso"
 
-#: connect/common/models.py:1234
+#: connect/common/models.py:1233
 #, python-brace-format
 msgid ""
 "The organization {self.organization.name} has already surpassed 200 active "
 "contacts"
 msgstr "A organização {self.organization.name} passou de 200 contatos ativos"
 
-#: connect/common/models.py:1256
+#: connect/common/models.py:1255
 msgid "Your {self.organization.name} organization has the {plan.title()} Plan"
 msgstr "Sua organização {self.organization.name} tem o plano {plan.title()}"
 
-#: connect/common/models.py:1276
+#: connect/common/models.py:1275
 #, python-brace-format
 msgid "Your {self.organization.name} organization's plan has been changed."
 msgstr ""
 "O plano da sua organização {self.organization.name} foi alterado com sucesso."
 
-#: connect/common/models.py:1287
-#, fuzzy
-#| msgid "organization name"
+#: connect/common/models.py:1286
 msgid "organization billing invoice"
 msgstr "fatura de cobrança da organização"
 
-#: connect/common/models.py:1295
+#: connect/common/models.py:1294
 msgid "pending"
 msgstr "pendente"
 
-#: connect/common/models.py:1296
+#: connect/common/models.py:1295
 msgid "paid"
 msgstr "pago"
 
-#: connect/common/models.py:1297
+#: connect/common/models.py:1296
 msgid "canceled"
 msgstr "cancelado"
 
-#: connect/common/models.py:1298
+#: connect/common/models.py:1297
 msgid "fraud"
 msgstr "fraude"
 
-#: connect/common/models.py:1304
+#: connect/common/models.py:1303
 msgid "incremental invoice amount"
 msgstr "valor de invoice incrementado"
 
-#: connect/common/models.py:1305
+#: connect/common/models.py:1304
 msgid "due date"
 msgstr "data de vencimento"
 
-#: connect/common/models.py:1306
+#: connect/common/models.py:1305
 msgid "paid date"
 msgstr "data de pagamento"
 
-#: connect/common/models.py:1308
-#, fuzzy
-#| msgid "staff status"
+#: connect/common/models.py:1307
 msgid "payment status"
 msgstr "status do pagamento"
 
-#: connect/common/models.py:1319
-#, fuzzy
-#| msgid "Flows count"
+#: connect/common/models.py:1318
 msgid "discount"
 msgstr "Desconto"
 
-#: connect/common/models.py:1320
+#: connect/common/models.py:1319
 msgid "notes"
 msgstr "Notas"
 
-#: connect/common/models.py:1322
+#: connect/common/models.py:1321
 msgid "Stripe Charge Id"
 msgstr "Código de cobrança do Stripe"
 
-#: connect/common/models.py:1326
+#: connect/common/models.py:1325
 msgid "The Stripe charge id for this charge"
 msgstr "O código de cobrança do stripe para essa cobrança"
 
-#: connect/common/models.py:1331
+#: connect/common/models.py:1330
 msgid ""
 "Controls whether the system will capture the payment, if not successful, the "
 "user will receive an alert to adjust the payment data"
@@ -1368,85 +1206,68 @@ msgstr ""
 "Controla se o sistema irá capturar o pagamento, caso não seja bem sucedido, "
 "oo usuário receberá um alerta para ajustar os dados de pagamento"
 
-#: connect/common/models.py:1337
+#: connect/common/models.py:1336
 msgid "cost per whatsapp"
 msgstr "custo por whatsapp"
 
-#: connect/common/models.py:1380
+#: connect/common/models.py:1379
 msgid "organization billing invoice project"
 msgstr "fatura de cobrança do projeto na organização"
 
-#: connect/common/models.py:1387
+#: connect/common/models.py:1386
 msgid "amount"
 msgstr "valor"
 
-#: connect/common/models.py:1389
-#, fuzzy
-#| msgid "Contacts count"
+#: connect/common/models.py:1388
 msgid "active contact count"
 msgstr "Contagem de contatos ativos"
 
-#: connect/common/models.py:1394
+#: connect/common/models.py:1393
 msgid "Free active contacts limit"
 msgstr "limite de contatos ativos grátis"
 
-#: connect/common/models.py:1397
+#: connect/common/models.py:1396
 msgid "From 1 to 1000 active contacts"
 msgstr "De 1 até 1000 contatos ativos"
 
-#: connect/common/models.py:1403
+#: connect/common/models.py:1402
 msgid "From 1001 to 5000 active contacts"
 msgstr "De 1001 até 5000 contatos ativos"
 
-#: connect/common/models.py:1409
+#: connect/common/models.py:1408
 msgid "From 5001 to 10000 active contacts"
 msgstr "De 5001 até 10000 contatos ativos"
 
-#: connect/common/models.py:1415
+#: connect/common/models.py:1414
 msgid "From 10001 to 30000 active contacts"
 msgstr "De 10001 até 30000 contatos ativos"
 
-#: connect/common/models.py:1421
+#: connect/common/models.py:1420
 msgid "From 30001 to 50000 active contacts"
 msgstr "De 30001 até 50000 contatos ativos"
 
-#: connect/common/models.py:1427
+#: connect/common/models.py:1426
 msgid "From 50001 to 100000 active contacts"
 msgstr "De 50001 até 100000 contatos ativos"
 
-#: connect/common/models.py:1433 connect/common/models.py:1439
+#: connect/common/models.py:1432 connect/common/models.py:1438
 msgid "From 100001 to 250000 active contacts"
 msgstr "De 100001 até 250000 contatos ativos"
 
 #: connect/common/templates/common/emails/organization/change_organization_name.html:14
 #: connect/common/templates/common/emails/organization/change_organization_name.txt:3
-#, fuzzy
-#| msgid "first name"
 msgid "is now named"
 msgstr "agora se chama"
 
-#: connect/common/templates/common/emails/organization/change_organization_name.html:21
-#: connect/common/templates/common/emails/organization/change_organization_name.txt:4
-#: connect/common/templates/common/emails/organization/permission_change.html:53
-#: connect/common/templates/common/emails/organization/permission_change.txt:5
-#, fuzzy
-#| msgid "A administrator of "
-msgid "An administrator of"
-msgstr "Um administrador de "
-
 #: connect/common/templates/common/emails/organization/change_organization_name.html:22
 #: connect/common/templates/common/emails/organization/change_organization_name.txt:4
-#, fuzzy
-#| msgid "inteligence organization id"
 msgid "has updated the name of the organization to"
 msgstr "atualizou o nome da organização para"
 
 #: connect/common/templates/common/emails/organization/change_organization_name.html:23
 #: connect/common/templates/common/emails/organization/change_organization_name.txt:4
-#, fuzzy
-#| msgid " stay tuned when you search him on your organization list"
 msgid "stay tuned when you search for it"
-msgstr " fique atento ao pesquisar em sua lista de organizações"
+msgstr "fique atento(a) ao pesquisar por ela"
 
 #: connect/common/templates/common/emails/organization/change_organization_name.html:25
 #: connect/common/templates/common/emails/organization/change_organization_name.txt:5
@@ -1464,17 +1285,11 @@ msgstr "não existe mais"
 
 #: connect/common/templates/common/emails/organization/delete_organization.html:60
 #: connect/common/templates/common/emails/organization/delete_organization.txt:4
-#, fuzzy
-#| msgid "One of the administrators deleted the organization"
 msgid "One of their administrators deleted this organization"
-msgstr "Um dos administradores excluiu a organização"
+msgstr "Um dos administradores excluiu esta organização"
 
 #: connect/common/templates/common/emails/organization/delete_organization.html:61
 #: connect/common/templates/common/emails/organization/delete_organization.txt:5
-#, fuzzy
-#| msgid ""
-#| "so you can no longer access it through your account. We are saddened by "
-#| "his departure, but we understand that life passes and things change"
 msgid ""
 "so you will no longer be able access it through your account. We were "
 "saddened by your departure, but understand that life goes on and things "
@@ -1491,67 +1306,50 @@ msgstr ""
 #: connect/common/templates/common/emails/organization/org_removed.txt:5
 #: connect/common/templates/common/emails/organization/remove_permission_organization.html:62
 #: connect/common/templates/common/emails/organization/remove_permission_organization.txt:4
-#, fuzzy
-#| msgid ""
-#| "You can still create other organizations and projects if you want to "
-#| "continue with us!"
 msgid ""
 "You can still create new organizations and projects, if you wish to continue "
 "with us"
 msgstr ""
 "Você ainda pode criar outras organizações e projetos se quiser continuar "
-"conosco!"
+"conosco"
 
 #: connect/common/templates/common/emails/organization/invite_organization.html:18
 #: connect/common/templates/common/emails/organization/invite_organization.txt:2
-msgid "You have been invited to join the"
-msgstr "Você foi convidado para participar da"
+msgid "You have been invited to join the organization"
+msgstr "Você foi convidado para participar da organização"
 
 #: connect/common/templates/common/emails/organization/invite_organization.html:39
-#, fuzzy
-#| msgid "Uhuuul, now you can be one of us!"
 msgid "Uhuuul, now you are one of us"
-msgstr "Uhuuul, agora você é um de nós!"
+msgstr "Uhuuul, agora você é um(a) de nós!"
 
 #: connect/common/templates/common/emails/organization/invite_organization.html:42
 #: connect/common/templates/common/emails/organization/invite_organization.txt:4
-#, fuzzy
-#| msgid "organization"
 msgid "A member of the organization"
 msgstr "Um membro da organização"
 
 #: connect/common/templates/common/emails/organization/invite_organization.html:42
 #: connect/common/templates/common/emails/organization/invite_organization.txt:4
-#, fuzzy
-#| msgid ""
-#| "member just sent you an invitation to join the organization. To enter, "
-#| "just click on the button down and you will be redirected to a "
-#| "registration page. Case already have registration, just login"
 msgid ""
 "just sent you an invitation to join them in the organization. To do so, just "
 "click the button below and you will be redirected to the registration page. "
 "In case you are already registered, you don't have to do anything, just "
 "login and you'll be set "
 msgstr ""
-"membro acaba de lhe enviar um convite para ingressar na organização. Para "
-"entrar, basta clicar no botão abaixo e você será redirecionado para uma "
-"página de cadastro. Caso já tenha cadastro, basta fazer o login"
+"acaba de lhe enviar um convite para ingressar na organização. Para isto, "
+"basta clicar no botão abaixo e você será redirecionado para uma página de "
+"cadastro. Caso já tenha cadastro, basta fazer o login"
 
-#: connect/common/templates/common/emails/organization/invite_organization.html:78
+#: connect/common/templates/common/emails/organization/invite_organization.html:79
 #: connect/common/templates/common/emails/organization/invite_organization.txt:5
-msgid "Click here to join the organization"
-msgstr "Clique aqui para ingressar na organização"
+msgid "Join org"
+msgstr "Entrar na organização"
 
 #: connect/common/templates/common/emails/organization/invite_organization.txt:3
-#, fuzzy
-#| msgid "Uhuuul, now you can be one of us!"
 msgid "Uhuuul, now you are one of us!"
-msgstr "Uhuuul, agora você é um de nós!"
+msgstr "Uhuuul, agora você é um(a) de nós!"
 
 #: connect/common/templates/common/emails/organization/leaving_org.html:13
 #: connect/common/templates/common/emails/organization/leaving_org.txt:3
-#, fuzzy
-#| msgid "You can't contribute in this organization"
 msgid "You are leaving the organization "
 msgstr "Você está deixando a organização "
 
@@ -1562,17 +1360,11 @@ msgstr "Você deixou"
 
 #: connect/common/templates/common/emails/organization/leaving_org.html:17
 #: connect/common/templates/common/emails/organization/leaving_org.txt:4
-#, fuzzy
-#| msgid "Nickname successfully changed"
 msgid " successfully."
-msgstr "com sucesso"
+msgstr " com sucesso."
 
 #: connect/common/templates/common/emails/organization/leaving_org.html:18
 #: connect/common/templates/common/emails/organization/leaving_org.txt:5
-#, fuzzy
-#| msgid ""
-#| "was accomplished. We were sad about your departure, but we understand "
-#| "that life goes by and things change"
 msgid ""
 "We are saddened by your departure, but we understand that life passes and "
 "things change"
@@ -1582,32 +1374,24 @@ msgstr ""
 
 #: connect/common/templates/common/emails/organization/org_removed.html:13
 #: connect/common/templates/common/emails/organization/org_removed.txt:3
-#, fuzzy
-#| msgid "You have been removed from the {self.name}"
 msgid "You have been removed from the organization"
-msgstr "Você foi removido da organização"
+msgstr "Você foi removido(a) da organização"
 
 #: connect/common/templates/common/emails/organization/org_removed.html:24
 #: connect/common/templates/common/emails/organization/org_removed.txt:4
-#, fuzzy
-#| msgid "One of the administrators deleted the organization"
 msgid "An administrator of the organization"
-msgstr "Um dos administradores excluiu a organização"
+msgstr "Um dos administradores da organização"
 
 #: connect/common/templates/common/emails/organization/org_removed.html:24
 #: connect/common/templates/common/emails/organization/org_removed.txt:4
-#, fuzzy
-#| msgid ""
-#| "so you can no longer access it through your account. We are saddened by "
-#| "his departure, but we understand that life passes and things change"
 msgid ""
 "has removed you from the organization, so you won't be able to access their "
 "projects anymore. We were saddened by your departure, but understand that "
 "life goes on and things change"
 msgstr ""
-"administrador removou você da organização, então você não pode mais acessá-"
-"lo através de sua conta. Ficamos tristes com sua partida, mas entendemos que "
-"a vida segue e as coisas mudam"
+"removeu você da organização, então você não irá conseguir mais acessarmais "
+"seus projetos. Ficamos tristes com sua partida, mas entendemos que a vida "
+"segue e as coisas mudam"
 
 #: connect/common/templates/common/emails/organization/organization_create.html:39
 #: connect/common/templates/common/emails/organization/organization_create.txt:3
@@ -1616,11 +1400,6 @@ msgstr "Você acaba de dar vida à"
 
 #: connect/common/templates/common/emails/organization/organization_create.html:60
 #: connect/common/templates/common/emails/organization/organization_create.txt:4
-#, fuzzy
-#| msgid ""
-#| "Your organization was successfully created! Now you can invite members to "
-#| "help you build projects and increasingly increase the way you automate "
-#| "your life with our Intelligences and Flows"
 msgid ""
 "Your organization was successfully created! You can now invite members to "
 "help you build projects and increase exponentially the way you automate your "
@@ -1630,14 +1409,8 @@ msgstr ""
 "para te ajudar na construção de projetos e aumentar cada vez mais a maneira "
 "como você automatiza sua vida com nossas Inteligências e Fluxos"
 
-#: connect/common/templates/common/emails/organization/organization_create.txt:2
-msgid "Hi,"
-msgstr "Oi,"
-
 #: connect/common/templates/common/emails/organization/permission_change.html:53
 #: connect/common/templates/common/emails/organization/permission_change.txt:5
-#, fuzzy
-#| msgid " change your permission"
 msgid "has updated your permission"
 msgstr "atualizou sua permissão"
 
@@ -1648,22 +1421,14 @@ msgstr "Use sua nova permissão com responsabilidade"
 
 #: connect/common/templates/common/emails/organization/remove_permission_organization.html:39
 #: connect/common/templates/common/emails/organization/remove_permission_organization.txt:3
-#, fuzzy
-#| msgid "You left the"
 msgid "You have left the"
-msgstr "Você deixou o"
+msgstr "Você deixou"
 
 #: connect/common/templates/common/emails/organization/remove_permission_organization.html:53
-#, fuzzy
-#| msgid "His departure from the"
 msgid "Your departure from"
 msgstr "Sua partida da"
 
 #: connect/common/templates/common/emails/organization/remove_permission_organization.html:53
-#, fuzzy
-#| msgid ""
-#| "was accomplished. We were sad about your departure, but we understand "
-#| "that life goes by and things change"
 msgid ""
 "was accomplished successfully. We were saddened by your departure, but "
 "understand that life goes on and things change"
@@ -1673,29 +1438,21 @@ msgstr ""
 
 #: connect/common/templates/common/emails/project/project-changed.html:39
 #: connect/common/templates/common/emails/project/project-changed.txt:3
-#, fuzzy
-#| msgid "Information from the project"
 msgid "Some information from the project"
-msgstr "Informação do projeto"
+msgstr "Informações do projeto"
 
 #: connect/common/templates/common/emails/project/project-changed.html:39
 #: connect/common/templates/common/emails/project/project-changed.txt:3
-#, fuzzy
-#| msgid "Password changed"
 msgid "has changed"
 msgstr "foi alterada"
 
 #: connect/common/templates/common/emails/project/project-changed.html:53
 #: connect/common/templates/common/emails/project/project-changed.txt:4
-#, fuzzy
-#| msgid "photo user"
 msgid "The user"
 msgstr "O usuário"
 
 #: connect/common/templates/common/emails/project/project-changed.html:54
 #: connect/common/templates/common/emails/project/project-changed.txt:5
-#, fuzzy
-#| msgid "made the following changes changes to the settings of the project"
 msgid "made the following changes to the settings of the project"
 msgstr "fez as seguintes alterações alterações nas configurações do projeto"
 
@@ -1703,8 +1460,6 @@ msgstr "fez as seguintes alterações alterações nas configurações do projet
 #: connect/common/templates/common/emails/project/project-changed.txt:6
 #: connect/common/templates/common/emails/project/project-delete.html:53
 #: connect/common/templates/common/emails/project/project-delete.txt:4
-#, fuzzy
-#| msgid "organization"
 msgid "from the organization"
 msgstr "da organização"
 
@@ -1715,8 +1470,6 @@ msgstr "que você faz parte"
 
 #: connect/common/templates/common/emails/project/project-changed.html:65
 #: connect/common/templates/common/emails/project/project-changed.txt:8
-#, fuzzy
-#| msgid "project name"
 msgid "Project Name"
 msgstr "Nome do Projeto"
 
@@ -1742,8 +1495,6 @@ msgstr "Agora"
 
 #: connect/common/templates/common/emails/project/project-changed.html:100
 #: connect/common/templates/common/emails/project/project-changed.txt:11
-#, fuzzy
-#| msgid "Date Format"
 msgid "Date format"
 msgstr "Formato de data"
 
@@ -1754,22 +1505,16 @@ msgstr "País para a localização do suporte dos Fluxos"
 
 #: connect/common/templates/common/emails/project/project-changed.html:207
 #: connect/common/templates/common/emails/project/project-changed.txt:14
-#, fuzzy
-#| msgid "Flow Default Language"
 msgid "Flows Default Language"
 msgstr "Idioma padrão dos Fluxos"
 
 #: connect/common/templates/common/emails/project/project-changed.html:242
 #: connect/common/templates/common/emails/project/project-changed.txt:15
-#, fuzzy
-#| msgid "Flow Default Language"
 msgid "Flows Secondary Language"
-msgstr "Idioma padrão dos Fluxos"
+msgstr "Idioma secundário dos Fluxos"
 
 #: connect/common/templates/common/emails/project/project-delete.html:39
 #: connect/common/templates/common/emails/project/project-delete.txt:3
-#, fuzzy
-#| msgid "project name"
 msgid "A project has been deleted"
 msgstr "Um projeto foi apagado"
 
@@ -1782,16 +1527,12 @@ msgstr "O projeto"
 
 #: connect/common/templates/common/emails/project/project-delete.html:54
 #: connect/common/templates/common/emails/project/project-delete.txt:4
-#, fuzzy
-#| msgid ""
-#| "we hope that it has built everything it wanted and that our intelligences "
-#| "did a good job"
 msgid ""
 "was deleted. We hope it has accomplished everything you wanted, and that our "
 "intelligences did a good job"
 msgstr ""
-"esperamos que tenha construído tudo o que desejava e que nossas inteligências "
-"tenham feito um bom trabalho"
+"foi deletado. Esperamos que tenha construído tudo o que desejava e que "
+"nossas inteligências tenham feito um bom trabalho"
 
 #: connect/common/templates/common/emails/project/project_create.html:39
 #: connect/common/templates/common/emails/project/project_create.txt:3
@@ -1800,15 +1541,11 @@ msgstr "Seu projeto foi criado com sucesso!"
 
 #: connect/common/templates/common/emails/project/project_create.html:53
 #: connect/common/templates/common/emails/project/project_create.txt:4
-#, fuzzy
-#| msgid ""
-#| "was created and you can now start the creation of Intelligences and Flows "
-#| "to transform the way you work"
 msgid ""
 "was created, and you can now start using our Intelligences and Flows modules "
 "to transform the way you work"
 msgstr ""
-"foi criado e agora você pode iniciar a criação de Inteligências e Fluxos "
+"foi criado, e agora você pode iniciar a criação de Inteligências e Fluxos "
 "para transformar a maneira como você trabalha"
 
 #: connect/common/templates/common/emails/project/project_create.html:62
@@ -1818,10 +1555,8 @@ msgstr "Lembre-se de que todos na organização"
 
 #: connect/common/templates/common/emails/project/project_create.html:62
 #: connect/common/templates/common/emails/project/project_create.txt:5
-#, fuzzy
-#| msgid "on what you created the project can view it, ok ?!"
 msgid "that you created the project in, can view it, ok"
-msgstr " em que você criou o projeto podem visualizar ele, ok ?!"
+msgstr "em que você criou o projeto podem visualizar ele, ok ?!"
 
 #: connect/settings.py:206
 msgid "An error has occurred"
@@ -1838,140 +1573,3 @@ msgstr "Português"
 #: connect/settings.py:216
 msgid "Spanish"
 msgstr "Espanhol"
-
-#~ msgid " now it's "
-#~ msgstr " agora é "
-
-#~ msgid "A administrator of "
-#~ msgstr "Um administrador de "
-
-#~ msgid " changed the name of organization to "
-#~ msgstr " mudou o nome da organização para "
-
-#~ msgid " stay tuned when you search him on your organization list"
-#~ msgstr " fique atento ao pesquisá-lo em sua lista de organizações"
-
-#~ msgid "Uhuuul, now you can be one of us!"
-#~ msgstr "Uhuuul, agora você pode ser um de nós!"
-
-#~ msgid "A"
-#~ msgstr "Um"
-
-#~ msgid ""
-#~ "member just sent you an invitation to join the organization. To enter, "
-#~ "just click on the button down and you will be redirected to a "
-#~ "registration page. Case already have registration, just login"
-#~ msgstr ""
-#~ "membro acaba de lhe enviar um convite para ingressar na organização. Para "
-#~ "entrar, basta clicar no botão abaixo e você será redirecionado para uma "
-#~ "página de cadastro. Caso já tenha cadastro, basta fazer o login"
-
-#~ msgid "You going out of "
-#~ msgstr "Você saiu da "
-
-#~ msgid "your exit from the "
-#~ msgstr "você saiu da "
-
-#, fuzzy
-#~| msgid "organization name"
-#~ msgid " organization has been accomplished."
-#~ msgstr " organização realizada com sucesso."
-
-#, fuzzy
-#~| msgid ""
-#~| "was accomplished. We were sad about your departure, but we understand "
-#~| "that life goes by and things change"
-#~ msgid ""
-#~ "We are sad with your departure, but we understand that life passes and "
-#~ "things change "
-#~ msgstr ""
-#~ "Ficamos tristes com sua saída, mas entendemos que a vida segue e as "
-#~ "coisas mudam"
-
-#~ msgid ""
-#~ "You can still create other organizations and projects if you want to "
-#~ "continue with us!"
-#~ msgstr ""
-#~ "Você ainda pode criar outras organizações e projetos se quiser continuar "
-#~ "conosco!"
-
-#, fuzzy
-#~| msgid "You have been removed from the {self.name}"
-#~ msgid "You have been removed from "
-#~ msgstr "Você foi removido(a) de "
-
-#~ msgid "Some "
-#~ msgstr "Alguma "
-
-#, fuzzy
-#~| msgid ""
-#~| "so you can no longer access it through your account. We are saddened by "
-#~| "his departure, but we understand that life passes and things change"
-#~ msgid ""
-#~ " administrator has removed you from the organization so you can't acess "
-#~ "yours projects. We are sad with your departure, but we understand that "
-#~ "life passes and things change "
-#~ msgstr ""
-#~ "administrador removou você da organização, então você não pode mais "
-#~ "acessá-la através de sua conta. Ficamos tristes com sua partida, mas "
-#~ "entendemos que a vida segue e as coisas mudam"
-
-#~ msgid ""
-#~ "Your organization was successfully created! Now you can invite members to "
-#~ "help you build projects and increasingly increase the way you automate "
-#~ "your life with our Intelligences and Flows"
-#~ msgstr ""
-#~ "Sua organização foi criada com sucesso! Agora você já pode convidar "
-#~ "membros para te ajudar na construção de projetos e aumentar cada vez mais "
-#~ "a maneira como você automatiza sua vida com nossas Inteligências e Fluxos"
-
-#~ msgid "An Admin of "
-#~ msgstr "Um administrador da "
-
-#~ msgid " change your permission"
-#~ msgstr " alterou sua permissão"
-
-#~ msgid "of "
-#~ msgstr "de "
-
-#~ msgid "Information from the project"
-#~ msgstr "Informação do projeto"
-
-#, fuzzy
-#~| msgid "Username"
-#~ msgid "User"
-#~ msgstr "Usuário"
-
-#~ msgid "made the following changes changes to the settings of the project"
-#~ msgstr "fez as seguintes alterações alterações nas configurações do projeto"
-
-#~ msgid "Flow Default Language"
-#~ msgstr "Idioma padrão dos Fluxos"
-
-#~ msgid "Secondary Language of Flows"
-#~ msgstr "Idioma secundário dos Fluxos"
-
-#, fuzzy
-#~| msgid "project name"
-#~ msgid "A project was deleted"
-#~ msgstr "Um projeto foi apagado"
-
-#, fuzzy
-#~| msgid "Click here to join the organization"
-#~ msgid "was deleted from the organization"
-#~ msgstr "foi deletado da organização"
-
-#~ msgid ""
-#~ "we hope that it has built everything it wanted and that our intelligences "
-#~ "did a good job"
-#~ msgstr ""
-#~ "esperamos que tenha construído tudo o que desejava e que nossas "
-#~ "inteligências tenham feito um bom trabalho"
-
-#~ msgid "You are going out of "
-#~ msgstr "Você está saindo de "
-
-#, fuzzy
-#~| msgid "You left the"
-#~ msgid "Your exit from the "
-#~ msgstr "Sua saída da "

@@ -163,7 +163,7 @@ class Organization(models.Model):
             "organization_name": self.name,
         }
         mail.send_mail(
-            _(f"You are going out of {self.name}"),
+            _("You are leaving") + f" {self.name}",
             render_to_string("common/emails/organization/leaving_org.txt", context),
             None,
             [email],
@@ -182,7 +182,7 @@ class Organization(models.Model):
             "organization_name": self.name,
         }
         mail.send_mail(
-            _(f"You have been removed from {self.name}"),
+            _("You have been removed from") + f" {self.name}",
             render_to_string("common/emails/organization/org_removed.txt", context),
             None,
             [email],
@@ -223,7 +223,7 @@ class Organization(models.Model):
             "first_name": first_name,
         }
         mail.send_mail(
-            _(f"You have been removed from the {self.name}"),
+            _("You have been removed from") + f"{self.name}",
             render_to_string(
                 "common/emails/organization/remove_permission_organization.txt", context
             ),
@@ -245,7 +245,7 @@ class Organization(models.Model):
             "first_name": first_name,
         }
         mail.send_mail(
-            _(f"{self.name} no longer exists!"),
+            f"{self.name} " + _("no longer exists!"),
             render_to_string(
                 "common/emails/organization/delete_organization.txt", context
             ),
@@ -273,7 +273,7 @@ class Organization(models.Model):
             "organization_new_name": organization_new_name,
         }
         mail.send_mail(
-            _(f"{organization_previous_name} now it's {organization_new_name}"),
+            f"{organization_previous_name} " + _("is now") + f" {organization_new_name}",
             render_to_string(
                 "common/emails/organization/change_organization_name.txt", context
             ),
@@ -314,6 +314,7 @@ class Organization(models.Model):
             "user_name": user_name,
             "old_permission": old_permission,
             "new_permission": new_permission,
+            "org_name": self.name
         }
         mail.send_mail(
             _("A new permission has been assigned to you"),
@@ -1137,9 +1138,8 @@ class BillingPlan(models.Model):
             "user_name": user_name,
         }
         mail.send_mail(
-            _(
-                f"A credit card has been added to the organization {self.organization.name}"
-            ),
+            _("A credit card has been added to the organization")
+            + f" {self.organization.name}",
             render_to_string("billing/emails/added_card.txt", context),
             None,
             email,
@@ -1156,9 +1156,8 @@ class BillingPlan(models.Model):
             "user_name": user_name,
         }
         mail.send_mail(
-            _(
-                f"A credit card has been changed to the organization {self.organization.name}"
-            ),
+            _("A credit card has been updated in the organization")
+            + f"{self.organization.name}",
             render_to_string("billing/emails/changed_card.txt", context),
             None,
             email,
