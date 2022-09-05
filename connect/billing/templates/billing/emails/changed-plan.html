@@ -51,10 +51,12 @@
               margin-top: 24px;
             "
           >
-            {% trans "An administrator of" %} <strong>{{organization_name}}</strong> 
-            {% trans "has updated the organization's plan"  %} 
-            {% trans "from" %} {{old_plan}} {% trans "to" %} {{actual_plan}}, 
-            {% trans "the platform is ready to receive and use our resources" %}
+            <p>
+              {% trans "An administrator of" %} <strong>{{organization_name}}</strong>
+              {% trans "has updated the organization's plan from"  %}
+              <strong>{{old_plan}}</strong> {% trans "to" %} <strong>{{actual_plan}}</strong>.
+            </p>
+            <p>{% trans "The platform is ready to receive and use our resources" %}</p>
             <span style="margin-left: 1px">
               <img
                 style="max-height: 16px"

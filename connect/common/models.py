@@ -273,7 +273,9 @@ class Organization(models.Model):
             "organization_new_name": organization_new_name,
         }
         mail.send_mail(
-            f"{organization_previous_name} " + _("is now") + f" {organization_new_name}",
+            f"{organization_previous_name} "
+            + _("is now")
+            + f" {organization_new_name}",
             render_to_string(
                 "common/emails/organization/change_organization_name.txt", context
             ),
@@ -314,7 +316,7 @@ class Organization(models.Model):
             "user_name": user_name,
             "old_permission": old_permission,
             "new_permission": new_permission,
-            "org_name": self.name
+            "org_name": self.name,
         }
         mail.send_mail(
             _("A new permission has been assigned to you"),
@@ -1174,7 +1176,7 @@ class BillingPlan(models.Model):
             "user_name": user_name,
         }
         mail.send_mail(
-            _(f"Your {self.organization.name} organization's plan has ended"),
+            _("Your organization's plan has expired"),
             render_to_string("billing/emails/finished-plan.txt", context),
             None,
             email,
@@ -1191,9 +1193,7 @@ class BillingPlan(models.Model):
             "user_name": user_name,
         }
         mail.send_mail(
-            _(
-                f"Your {self.organization.name} organization's plan has been reactivated."
-            ),
+            _("Your organization's plan has been reactivated."),
             render_to_string("billing/emails/reactived-plan.txt", context),
             None,
             email,
@@ -1212,7 +1212,7 @@ class BillingPlan(models.Model):
             "org_name": self.organization.name,
         }
         mail.send_mail(
-            _(f"Your {self.organization.name} organization credit card was removed"),
+            _("Your organization's credit card was removed"),
             render_to_string("billing/emails/removed_card.txt", context),
             None,
             email,
@@ -1229,9 +1229,9 @@ class BillingPlan(models.Model):
             "user_name": user_name,
         }
         mail.send_mail(
-            _(
-                f"The organization {self.organization.name} has already surpassed 200 active contacts"
-            ),
+            _("Your organization")
+            + f" {self.organization.name} "
+            + _("has already surpassed 200 active contacts"),
             render_to_string("billing/emails/free-plan-expired.txt", context),
             None,
             email,
@@ -1251,9 +1251,11 @@ class BillingPlan(models.Model):
             "plan": plan,
         }
         mail.send_mail(
-            _(
-                f"Your {self.organization.name} organization has the {plan.title()} Plan"
-            ),
+            _("Your organization")
+            + f" {self.organization.name} "
+            + _("has the plan")
+            + ": "
+            + f"{plan.title()}.",
             render_to_string("billing/emails/free_plan.txt", context),
             None,
             [email],
@@ -1272,7 +1274,7 @@ class BillingPlan(models.Model):
             "actual_plan": self.plan,
         }
         mail.send_mail(
-            _(f"Your {self.organization.name} organization's plan has been changed."),
+            _("Your organization's plan has been updated"),
             render_to_string("billing/emails/changed-plan.txt", context),
             None,
             email,

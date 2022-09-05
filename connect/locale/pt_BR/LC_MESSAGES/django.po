@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-05 03:33+0000\n"
+"POT-Creation-Date: 2022-09-05 18:08+0000\n"
 "PO-Revision-Date: 2021-06-10 13:36+0000\n"
 "Last-Translator: Daniel Yohan <dyohan9@gmail.com>, 2021\n"
 "Language-Team: Portuguese (Brazil) (https://www.transifex.com/bothub/"
@@ -75,7 +75,7 @@ msgstr "Sistema temporariamente indisponível, tente novamente mais tarde."
 
 #: connect/api/v1/account/views.py:217
 msgid "The search field needed the text to search."
-msgstr ""
+msgstr "O campo de pesquisa precisa do texto para pesquisar."
 
 #: connect/api/v1/dashboard/filters.py:19
 msgid "Project's UUID"
@@ -121,7 +121,7 @@ msgid "billing cycle"
 msgstr "ciclo de pagamento"
 
 #: connect/api/v1/organization/serializers.py:55 connect/common/models.py:950
-#: connect/common/models.py:1313
+#: connect/common/models.py:1311
 msgid "payment method"
 msgstr "método de pagamento"
 
@@ -144,11 +144,13 @@ msgstr "Se esta organização está atualmente suspensa."
 
 #: connect/api/v1/organization/serializers.py:133
 msgid "enforce 2fa"
-msgstr ""
+msgstr "Impor autenticação de dois fatores"
 
 #: connect/api/v1/organization/serializers.py:135
 msgid "if this field is true, only users with 2fa activated can access the org"
 msgstr ""
+"se for verdadeiro, somente usuários com autenticação de dois fatores poderão "
+"acessar a org"
 
 #: connect/api/v1/organization/serializers.py:236
 #: connect/api/v1/organization/serializers.py:260
@@ -258,7 +260,7 @@ msgstr "Permite o recebimento de e-mails de marketing"
 
 #: connect/authentication/models.py:107
 msgid "Two factor authentication"
-msgstr ""
+msgstr "Autenticação de dois fatores"
 
 #: connect/authentication/models.py:123
 msgid "Password changed"
@@ -360,8 +362,8 @@ msgid ""
 "Your password has been changed. Remember not to share it with anyone to "
 "maintain your security and privacy."
 msgstr ""
-"Sua senha foi mudada. Lembre-se de não compartilhar com ninguém para manter "
-"sua segurança e privacidade."
+"Sua senha foi alterada. Lembre-se de não compartilhar com ninguém para "
+"manter sua segurança e privacidade."
 
 #: connect/authentication/templates/authentication/emails/nickname_changed.html:15
 #: connect/authentication/templates/authentication/emails/nickname_changed.txt:3
@@ -387,26 +389,26 @@ msgstr " nós esperamos que você goste do seu novo nome de usuário"
 #: connect/billing/models.py:83 connect/billing/models.py:102
 #: connect/common/models.py:110 connect/common/models.py:377
 #: connect/common/models.py:481 connect/common/models.py:691
-#: connect/common/models.py:1536 connect/common/models.py:1541
-#: connect/common/models.py:1546
+#: connect/common/models.py:1534 connect/common/models.py:1539
+#: connect/common/models.py:1544
 msgid "UUID"
 msgstr "UUID"
 
 #: connect/billing/models.py:21
 msgid "Whether this task succeded or not."
-msgstr ""
+msgstr "Se a tarefa foi bem sucedida."
 
 #: connect/billing/models.py:24
 msgid "Whether this task retry or not."
-msgstr ""
+msgstr "Se a tarefa deve tentar novamente."
 
 #: connect/billing/models.py:26
 msgid "Manager fail messages"
-msgstr ""
+msgstr "Mensagens de erro do gestor"
 
 #: connect/billing/models.py:27
 msgid "task type"
-msgstr ""
+msgstr "tipo de tarefa"
 
 #: connect/billing/models.py:28
 msgid "started at"
@@ -473,16 +475,15 @@ msgstr ""
 "normalmente. É maravilhoso ter sua equipe de volta."
 
 #: connect/billing/templates/billing/emails/changed-plan.html:40
-#: connect/billing/templates/billing/emails/reactived-plan.html:40
 msgid "Your"
 msgstr "Seu"
 
 #: connect/billing/templates/billing/emails/changed-plan.html:40
 msgid "plan has been changed"
-msgstr "plano alterado com sucesso"
+msgstr "plano foi alterado com sucesso"
 
-#: connect/billing/templates/billing/emails/changed-plan.html:54
-#: connect/billing/templates/billing/emails/changed-plan.txt:3
+#: connect/billing/templates/billing/emails/changed-plan.html:55
+#: connect/billing/templates/billing/emails/changed-plan.txt:4
 #: connect/common/templates/common/emails/organization/change_organization_name.html:21
 #: connect/common/templates/common/emails/organization/change_organization_name.txt:4
 #: connect/common/templates/common/emails/organization/permission_change.html:53
@@ -490,29 +491,31 @@ msgstr "plano alterado com sucesso"
 msgid "An administrator of"
 msgstr "Um administrador da"
 
-#: connect/billing/templates/billing/emails/changed-plan.html:55
-#: connect/billing/templates/billing/emails/changed-plan.txt:4
-msgid "has updated the organization's plan"
-msgstr "atualizou o plano da organização para"
-
 #: connect/billing/templates/billing/emails/changed-plan.html:56
-#: connect/billing/templates/billing/emails/changed-plan.txt:5
-#: connect/common/templates/common/emails/organization/permission_change.html:54
-#: connect/common/templates/common/emails/organization/permission_change.txt:6
-msgid "from"
-msgstr "de"
+msgid "has updated the organization's plan from"
+msgstr "atualizou o plano da organização de"
 
-#: connect/billing/templates/billing/emails/changed-plan.html:56
-#: connect/billing/templates/billing/emails/changed-plan.txt:5
+#: connect/billing/templates/billing/emails/changed-plan.html:57
+#: connect/billing/templates/billing/emails/changed-plan.txt:6
 #: connect/common/templates/common/emails/organization/permission_change.html:54
 #: connect/common/templates/common/emails/organization/permission_change.txt:6
 msgid "to"
 msgstr "para"
 
-#: connect/billing/templates/billing/emails/changed-plan.html:57
+#: connect/billing/templates/billing/emails/changed-plan.html:59
+#: connect/billing/templates/billing/emails/changed-plan.txt:8
+msgid "The platform is ready to receive and use our resources"
+msgstr "A plataforma está apta a receber e usar nossos recursos"
+
+#: connect/billing/templates/billing/emails/changed-plan.txt:5
+msgid "has updated the organization's plan"
+msgstr "atualizou o plano da organização para"
+
 #: connect/billing/templates/billing/emails/changed-plan.txt:6
-msgid "the platform is ready to receive and use our resources"
-msgstr "a plataforma está pronta para receber e usar nossos recursos"
+#: connect/common/templates/common/emails/organization/permission_change.html:54
+#: connect/common/templates/common/emails/organization/permission_change.txt:6
+msgid "from"
+msgstr "de"
 
 #: connect/billing/templates/billing/emails/changed_card.html:14
 #: connect/billing/templates/billing/emails/changed_card.txt:3
@@ -530,26 +533,40 @@ msgstr ""
 
 #: connect/billing/templates/billing/emails/finished-plan.html:34
 #: connect/billing/templates/billing/emails/finished-plan.txt:3
+#: connect/billing/templates/billing/emails/reactived-plan.html:40
+#: connect/billing/templates/billing/emails/reactived-plan.txt:3
 msgid "The plan for your organization"
 msgstr "O plano para sua organização"
 
 #: connect/billing/templates/billing/emails/finished-plan.html:34
 #: connect/billing/templates/billing/emails/finished-plan.txt:3
-msgid "has ended"
+msgid "has expired"
 msgstr "se encerrou"
 
-#: connect/billing/templates/billing/emails/finished-plan.html:46
-#: connect/billing/templates/billing/emails/finished-plan.txt:4
+#: connect/billing/templates/billing/emails/finished-plan.html:47
+#: connect/billing/templates/billing/emails/finished-plan.txt:5
 msgid "An administrator has terminated the organization plan"
 msgstr "Um dos administradores encerrou o plano da organização"
 
-#: connect/billing/templates/billing/emails/finished-plan.txt:5
+#: connect/billing/templates/billing/emails/finished-plan.html:51
+#: connect/billing/templates/billing/emails/finished-plan.txt:9
 msgid ""
 "At the moment, the functioning of your Intelligences, Flows and the Chat "
 "module are interrupted"
 msgstr ""
 "Nesse momento, o funcionamento de suas inteligências, Fluxos criados e o "
 "Módulo de Chat estão paralisados"
+
+#: connect/billing/templates/billing/emails/finished-plan.html:65
+#: connect/billing/templates/billing/emails/finished-plan.txt:12
+msgid ""
+"To continue using the Weni Platform ask your organization's administrator to "
+"reactivate the plan or choose a new one, that makes sense for your projects. "
+"We want you to stay with us"
+msgstr ""
+"Para continuar utilizando a plataforma Weni, peça a um administrador da "
+"organização para reativar o plano ou ativar um novo plano, que faça sentido "
+"para seus projetos.Queremos que fiquem conosco"
 
 #: connect/billing/templates/billing/emails/free-plan-expired.html:40
 #: connect/billing/templates/billing/emails/free-plan-expired.txt:3
@@ -560,10 +577,11 @@ msgstr "A organização"
 
 #: connect/billing/templates/billing/emails/free-plan-expired.html:40
 #: connect/billing/templates/billing/emails/free-plan-expired.txt:3
+#: connect/common/models.py:1231
 msgid "has already surpassed 200 active contacts"
 msgstr "já ultrapassou 200 contatos ativos"
 
-#: connect/billing/templates/billing/emails/free-plan-expired.html:54
+#: connect/billing/templates/billing/emails/free-plan-expired.html:55
 #: connect/billing/templates/billing/emails/free-plan-expired.txt:4
 msgid ""
 "This means that many people are interacting with your projects and our free "
@@ -572,7 +590,18 @@ msgstr ""
 "Isso quer dizer que muitas pessoas estão interagindo com seus projetos e "
 "nosso plano grátis não atende mais as necessidades da sua organização"
 
-#: connect/billing/templates/billing/emails/free-plan-expired.html:75
+#: connect/billing/templates/billing/emails/free-plan-expired.html:78
+msgid ""
+"At the moment the functioning of your intelligences, created Flows and the "
+"Chat module is paralyzed. To continue using Weni Platform, ask the "
+"organization's administrador to choose a new plan that makes sense for your "
+"projects, we want you to continue with us"
+msgstr ""
+"No momento o funcionamento das suas inteligências, Fluxos criados e o módulo "
+"de Chat estão paralisados. Para continuar usando a plataforma da Weni, "
+"pergunte ao administrador da organização para escolher um novo plano que "
+"faça sentido para seus projetos, nós queremos que você continue conosco"
+
 #: connect/billing/templates/billing/emails/free-plan-expired.txt:5
 msgid ""
 "At the moment the functioning of your intelligences, created Flows and the "
@@ -582,11 +611,12 @@ msgid ""
 msgstr ""
 "No momento o funcionamento das suas inteligências, Fluxos criados e o módulo "
 "de Chat estão paralisados. Para continuar usando a plataforma da Weni, "
-"pergunte ao Administrador da organização para escolher um novo plano que "
+"pergunte ao administrador da organização para escolher um novo plano que "
 "faça sentido para seus projetos, nós queremos que você continue conosco"
 
 #: connect/billing/templates/billing/emails/free_plan.html:40
 #: connect/billing/templates/billing/emails/free_plan.txt:3
+#: connect/common/models.py:1230 connect/common/models.py:1252
 msgid "Your organization"
 msgstr "Sua organização"
 
@@ -615,24 +645,24 @@ msgstr ""
 "com nossas ferramentas"
 
 #: connect/billing/templates/billing/emails/reactived-plan.html:40
-msgid "organization's plan has been reactivated"
-msgstr "plano da organização foi reativado com sucesso"
+#: connect/billing/templates/billing/emails/reactived-plan.txt:3
+msgid "was reactivated"
+msgstr "foi reativado"
 
 #: connect/billing/templates/billing/emails/reactived-plan.html:54
-msgid "An Adminstrator has reactivated the organization plan"
-msgstr "Um dos administradores reativou o plano da organização"
-
-#: connect/billing/templates/billing/emails/reactived-plan.html:55
-msgid "Your Intelligences, created Flows and the Chat module"
-msgstr "Suas inteligências, Fluxos criados e módulo de Chat"
+#: connect/billing/templates/billing/emails/reactived-plan.txt:4
+msgid "An administrator has reactivated the organization plan for "
+msgstr "Um dos administradores reativou o plano da organização "
 
 #: connect/billing/templates/billing/emails/reactived-plan.html:56
-msgid "came back to work again"
-msgstr "volte a tabalhar novamente"
+#: connect/billing/templates/billing/emails/reactived-plan.txt:6
+msgid "Your Intelligences, created Flows and the Chat module are back again"
+msgstr ""
+"Suas Inteligências, Fluxos criados e módulo de chat voltaram a funcionar"
 
-#: connect/billing/templates/billing/emails/reactived-plan.html:56
-#: connect/billing/templates/billing/emails/reactived-plan.txt:5
-msgid "It's wonderfull to have your team back"
+#: connect/billing/templates/billing/emails/reactived-plan.html:57
+#: connect/billing/templates/billing/emails/reactived-plan.txt:7
+msgid "It's wonderful to have your team back"
 msgstr "É maravilhoso ter seu time de volta"
 
 #: connect/billing/templates/billing/emails/reactived-plan.txt:2
@@ -640,57 +670,48 @@ msgstr "É maravilhoso ter seu time de volta"
 msgid "Hi,"
 msgstr "Oi,"
 
-#: connect/billing/templates/billing/emails/reactived-plan.txt:3
-msgid "Your {{ organization_name }} organization's plan has been reactivated"
-msgstr "O plano da {{organization_name}} foi reativado com sucesso"
-
-#: connect/billing/templates/billing/emails/reactived-plan.txt:4
-msgid ""
-"Your Intelligences, created Flows and the Chat module came back to work again"
-msgstr ""
-"Suas Inteligências, Fluxos criados e módulo de chat voltaram a funcionar"
+#: connect/billing/templates/billing/emails/removed_card.html:40
+#: connect/billing/templates/billing/emails/removed_card.txt:3
+msgid "The credit card linked to the organization"
+msgstr "O cartão de crédito ligado à organização"
 
 #: connect/billing/templates/billing/emails/removed_card.html:40
 #: connect/billing/templates/billing/emails/removed_card.txt:3
-msgid "The credit card of organization "
-msgstr "O cartão de crédito da organização "
-
-#: connect/billing/templates/billing/emails/removed_card.html:40
-#: connect/billing/templates/billing/emails/removed_card.txt:3
-msgid " has been removed"
-msgstr " foi removido com sucesso"
-
-#: connect/billing/templates/billing/emails/removed_card.html:54
-#: connect/billing/templates/billing/emails/removed_card.txt:4
-msgid "An admistrator removed the register data from credit card "
-msgstr "Um administrador removeu os dados cadastrados do cartão de crédito "
+msgid "has been removed"
+msgstr " foi removido"
 
 #: connect/billing/templates/billing/emails/removed_card.html:55
 #: connect/billing/templates/billing/emails/removed_card.txt:5
-msgid "to perform billing of organization plan"
-msgstr "para realizar o faturamento do plano de organização"
-
-#: connect/billing/templates/billing/emails/removed_card.html:56
-#: connect/billing/templates/billing/emails/removed_card.txt:6
-msgid "at the moment the operation of yours "
-msgstr "no momento o funcionamento do seu "
+msgid ""
+"An administrator has removed the credit card associated with your "
+"organization"
+msgstr ""
+"Um administrador removeu o cartão de crédito associado à sua organização"
 
 #: connect/billing/templates/billing/emails/removed_card.html:57
 #: connect/billing/templates/billing/emails/removed_card.txt:7
-msgid "Intelligences and Flows created and the chat module is freeze."
-msgstr "Inteligências e fluxos criados e o módulo de chat está bloquado."
+msgid "preventing the current plan's billing"
+msgstr "impedindo a cobrança do plano atual"
 
-#: connect/billing/templates/billing/emails/removed_card.html:71
-msgid "To continue using the weni platform request the"
-msgstr "Para continuar usando a plataforma weni solicite o"
+#: connect/billing/templates/billing/emails/removed_card.html:60
+#: connect/billing/templates/billing/emails/removed_card.txt:10
+msgid ""
+"At the moment, the status of your Intelligences, created Flows and the Chat "
+"module is frozen"
+msgstr ""
+"Nesse momento, o funcionamento de suas inteligências, Fluxos criados e o "
+"Módulo de Chat estão paralisados"
 
-#: connect/billing/templates/billing/emails/removed_card.html:72
-msgid " organization administrator add a valid credit card "
-msgstr " administrador da organização adicionar um cartão de crédito válido "
-
-#: connect/billing/templates/billing/emails/removed_card.html:73
-msgid "in the billing section, we want you to stay with us"
-msgstr "na seção de faturamente, nós queremos que você continue conosco"
+#: connect/billing/templates/billing/emails/removed_card.html:75
+#: connect/billing/templates/billing/emails/removed_card.txt:13
+msgid ""
+"To continue using the weni platform, request the organization's "
+"administrator to add a valid credit card in the billing section. We want you "
+"to stay with us"
+msgstr ""
+"Para continuar utilizando a plataforma Weni, peça a um administrador da "
+"organização para adicionar um cartão de crédito válido na seção de pagamento."
+"Queremos que fiquem conosco"
 
 #: connect/common/models.py:28
 msgid "newsletter"
@@ -748,7 +769,7 @@ msgstr "descrição da organização"
 msgid "inteligence organization id"
 msgstr "ID da organização de inteligência"
 
-#: connect/common/models.py:119 connect/common/models.py:1334
+#: connect/common/models.py:119 connect/common/models.py:1332
 msgid "Whatsapp Extra Integration"
 msgstr "Integração de whatsapp extra"
 
@@ -819,11 +840,11 @@ msgstr "visualizador"
 
 #: connect/common/models.py:372
 msgid "financial"
-msgstr ""
+msgstr "financeiro"
 
 #: connect/common/models.py:373 connect/common/models.py:688
 msgid "support"
-msgstr ""
+msgstr "suporte"
 
 #: connect/common/models.py:384 connect/common/models.py:634
 #: connect/common/models.py:706 connect/common/models.py:753
@@ -833,7 +854,7 @@ msgstr "função"
 
 #: connect/common/models.py:387
 msgid "2 factor authentication"
-msgstr ""
+msgstr "autenticação de dois fatores"
 
 #: connect/common/models.py:470
 msgid "project"
@@ -1112,93 +1133,78 @@ msgid "A credit card has been updated in the organization"
 msgstr "Um cartão de crédito foi atualizado na organização"
 
 #: connect/common/models.py:1177
-#, python-brace-format
-msgid "Your {self.organization.name} organization's plan has ended"
-msgstr "O plano da sua organização {self.organization.name} foi encerrado"
+msgid "Your organization's plan has expired"
+msgstr "O plano da sua organização expirou"
 
-#: connect/common/models.py:1195
-#, python-brace-format
-msgid "Your {self.organization.name} organization's plan has been reactivated."
-msgstr ""
-"O plano da sua organização {self.organization.name} foi reativado com sucesso"
+#: connect/common/models.py:1194
+msgid "Your organization's plan has been reactivated."
+msgstr "O plano da sua organização foi reativado com sucesso."
 
-#: connect/common/models.py:1215
-#, python-brace-format
-msgid "Your {self.organization.name} organization credit card was removed"
-msgstr ""
-"O cartão de crédito da sua organização {self.organization.name} foi removido "
-"com sucesso"
+#: connect/common/models.py:1213
+msgid "Your organization's credit card was removed"
+msgstr "O cartão de crédito da sua organização foi removido com sucesso"
 
-#: connect/common/models.py:1233
-#, python-brace-format
-msgid ""
-"The organization {self.organization.name} has already surpassed 200 active "
-"contacts"
-msgstr "A organização {self.organization.name} passou de 200 contatos ativos"
+#: connect/common/models.py:1253
+msgid "has the plan"
+msgstr "tem o seguinte plano"
 
-#: connect/common/models.py:1255
-msgid "Your {self.organization.name} organization has the {plan.title()} Plan"
-msgstr "Sua organização {self.organization.name} tem o plano {plan.title()}"
+#: connect/common/models.py:1273
+msgid "Your organization's plan has been updated"
+msgstr "O plano da sua organização foi atualizado"
 
-#: connect/common/models.py:1275
-#, python-brace-format
-msgid "Your {self.organization.name} organization's plan has been changed."
-msgstr ""
-"O plano da sua organização {self.organization.name} foi alterado com sucesso."
-
-#: connect/common/models.py:1286
+#: connect/common/models.py:1284
 msgid "organization billing invoice"
 msgstr "fatura de cobrança da organização"
 
-#: connect/common/models.py:1294
+#: connect/common/models.py:1292
 msgid "pending"
 msgstr "pendente"
 
-#: connect/common/models.py:1295
+#: connect/common/models.py:1293
 msgid "paid"
 msgstr "pago"
 
-#: connect/common/models.py:1296
+#: connect/common/models.py:1294
 msgid "canceled"
 msgstr "cancelado"
 
-#: connect/common/models.py:1297
+#: connect/common/models.py:1295
 msgid "fraud"
 msgstr "fraude"
 
-#: connect/common/models.py:1303
+#: connect/common/models.py:1301
 msgid "incremental invoice amount"
 msgstr "valor de invoice incrementado"
 
-#: connect/common/models.py:1304
+#: connect/common/models.py:1302
 msgid "due date"
 msgstr "data de vencimento"
 
-#: connect/common/models.py:1305
+#: connect/common/models.py:1303
 msgid "paid date"
 msgstr "data de pagamento"
 
-#: connect/common/models.py:1307
+#: connect/common/models.py:1305
 msgid "payment status"
 msgstr "status do pagamento"
 
-#: connect/common/models.py:1318
+#: connect/common/models.py:1316
 msgid "discount"
 msgstr "Desconto"
 
-#: connect/common/models.py:1319
+#: connect/common/models.py:1317
 msgid "notes"
 msgstr "Notas"
 
-#: connect/common/models.py:1321
+#: connect/common/models.py:1319
 msgid "Stripe Charge Id"
 msgstr "Código de cobrança do Stripe"
 
-#: connect/common/models.py:1325
+#: connect/common/models.py:1323
 msgid "The Stripe charge id for this charge"
 msgstr "O código de cobrança do stripe para essa cobrança"
 
-#: connect/common/models.py:1330
+#: connect/common/models.py:1328
 msgid ""
 "Controls whether the system will capture the payment, if not successful, the "
 "user will receive an alert to adjust the payment data"
@@ -1206,51 +1212,51 @@ msgstr ""
 "Controla se o sistema irá capturar o pagamento, caso não seja bem sucedido, "
 "oo usuário receberá um alerta para ajustar os dados de pagamento"
 
-#: connect/common/models.py:1336
+#: connect/common/models.py:1334
 msgid "cost per whatsapp"
 msgstr "custo por whatsapp"
 
-#: connect/common/models.py:1379
+#: connect/common/models.py:1377
 msgid "organization billing invoice project"
 msgstr "fatura de cobrança do projeto na organização"
 
-#: connect/common/models.py:1386
+#: connect/common/models.py:1384
 msgid "amount"
 msgstr "valor"
 
-#: connect/common/models.py:1388
+#: connect/common/models.py:1386
 msgid "active contact count"
 msgstr "Contagem de contatos ativos"
 
-#: connect/common/models.py:1393
+#: connect/common/models.py:1391
 msgid "Free active contacts limit"
 msgstr "limite de contatos ativos grátis"
 
-#: connect/common/models.py:1396
+#: connect/common/models.py:1394
 msgid "From 1 to 1000 active contacts"
 msgstr "De 1 até 1000 contatos ativos"
 
-#: connect/common/models.py:1402
+#: connect/common/models.py:1400
 msgid "From 1001 to 5000 active contacts"
 msgstr "De 1001 até 5000 contatos ativos"
 
-#: connect/common/models.py:1408
+#: connect/common/models.py:1406
 msgid "From 5001 to 10000 active contacts"
 msgstr "De 5001 até 10000 contatos ativos"
 
-#: connect/common/models.py:1414
+#: connect/common/models.py:1412
 msgid "From 10001 to 30000 active contacts"
 msgstr "De 10001 até 30000 contatos ativos"
 
-#: connect/common/models.py:1420
+#: connect/common/models.py:1418
 msgid "From 30001 to 50000 active contacts"
 msgstr "De 30001 até 50000 contatos ativos"
 
-#: connect/common/models.py:1426
+#: connect/common/models.py:1424
 msgid "From 50001 to 100000 active contacts"
 msgstr "De 50001 até 100000 contatos ativos"
 
-#: connect/common/models.py:1432 connect/common/models.py:1438
+#: connect/common/models.py:1430 connect/common/models.py:1436
 msgid "From 100001 to 250000 active contacts"
 msgstr "De 100001 até 250000 contatos ativos"
 
@@ -1573,3 +1579,66 @@ msgstr "Português"
 #: connect/settings.py:216
 msgid "Spanish"
 msgstr "Espanhol"
+
+#~ msgid ""
+#~ "Your Intelligences, created Flows and the Chat module are back again. "
+#~ "It's wonderful to have your team back"
+#~ msgstr ""
+#~ "Suas Inteligências, Fluxos criados e o módulo de chat voltaram a "
+#~ "funcionar normalmente. É maravilhoso ter sua equipe de volta."
+
+#~ msgid "Your Intelligences, created Flows and the Chat module"
+#~ msgstr "Suas inteligências, Fluxos criados e módulo de Chat"
+
+#~ msgid "came back to work again"
+#~ msgstr "volte a tabalhar novamente"
+
+#~ msgid ""
+#~ "Your {{ organization_name }} organization's plan has been reactivated"
+#~ msgstr "O plano da {{organization_name}} foi reativado com sucesso"
+
+#~ msgid "An admistrator removed the register data from credit card "
+#~ msgstr "Um administrador removeu os dados cadastrados do cartão de crédito "
+
+#~ msgid "to perform billing of organization plan"
+#~ msgstr "para realizar o faturamento do plano de organização"
+
+#~ msgid "at the moment the operation of yours "
+#~ msgstr "no momento o funcionamento do seu "
+
+#~ msgid "Intelligences and Flows created and the chat module is freeze."
+#~ msgstr "Inteligências e fluxos criados e o módulo de chat está bloquado."
+
+#~ msgid "To continue using the weni platform request the"
+#~ msgstr "Para continuar usando a plataforma weni solicite o"
+
+#~ msgid " organization administrator add a valid credit card "
+#~ msgstr ""
+#~ " administrador da organização adicionar um cartão de crédito válido "
+
+#~ msgid "in the billing section, we want you to stay with us"
+#~ msgstr "na seção de faturamente, nós queremos que você continue conosco"
+
+#~ msgid "Your {self.organization.name} organization's plan has ended"
+#~ msgstr "O plano da sua organização {self.organization.name} foi encerrado"
+
+#~ msgid ""
+#~ "Your {self.organization.name} organization's plan has been reactivated."
+#~ msgstr ""
+#~ "O plano da sua organização {self.organization.name} foi reativado com "
+#~ "sucesso"
+
+#~ msgid ""
+#~ "The organization {self.organization.name} has already surpassed 200 "
+#~ "active contacts"
+#~ msgstr ""
+#~ "A organização {self.organization.name} passou de 200 contatos ativos"
+
+#~ msgid ""
+#~ "Your {self.organization.name} organization has the {plan.title()} Plan"
+#~ msgstr "Sua organização {self.organization.name} tem o plano {plan.title()}"
+
+#~ msgid "Your {self.organization.name} organization's plan has been changed."
+#~ msgstr ""
+#~ "O plano da sua organização {self.organization.name} foi alterado com "
+#~ "sucesso."
