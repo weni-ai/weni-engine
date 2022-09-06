@@ -668,18 +668,19 @@ class RocketAuthorization(models.Model):
 
 
 class ChatsRole(Enum):
-    NOT_SETTED, USER, ADMIN = list(range(3))
+    NOT_SETTED, ADMIN, AGENT, SERVICE_MANAGER = list(range(4))
 
 
 class ChatsRoleLevel(Enum):
-    NOTHING, USER, ADMIN = list(range(3))
+    NOTHING, ADMIN, AGENT, SERVICE_MANAGER = list(range(4))
 
 
 class ChatsAuthorization(models.Model):
     ROLE_CHOICES = [
         (ChatsRole.NOT_SETTED.value, _("not set")),
-        (ChatsRole.USER.value, _("user")),
+        (ChatsRole.AGENT.value, _("agent")),
         (ChatsRole.ADMIN.value, _("admin")),
+        (ChatsRole.SERVICE_MANAGER.value, _("service_manager")),
     ]
     role = models.PositiveIntegerField(
         _("role"), choices=ROLE_CHOICES, default=ChatsRole.NOT_SETTED.value
@@ -688,11 +689,13 @@ class ChatsAuthorization(models.Model):
 
     @property
     def level(self):
-        if self.role == RocketRole.USER.value:
-            return RocketRoleLevel.USER.value
-        elif self.role == RocketRole.ADMIN.value:
-            return RocketRoleLevel.ADMIN.value
-        return RocketRoleLevel.NOTHING.value
+        if self.role == ChatsRole.AGENT.value:
+            return ChatsRoleLevel.AGENT.value
+        elif self.role == ChatsRole.SERVICE_MANAGER.value:
+            return ChatsRoleLevel.SERVICE_MANAGER.value
+        elif self.role == ChatsRole.ADMIN.value:
+            return ChatsRoleLevel.ADMIN.value
+        return ChatsRoleLevel.NOTHING.value
 
 
 class ProjectRole(Enum):
