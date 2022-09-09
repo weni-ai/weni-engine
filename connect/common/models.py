@@ -670,6 +670,37 @@ class RocketAuthorization(models.Model):
         return request
 
 
+class ChatsRole(Enum):
+    NOT_SETTED, ADMIN, AGENT, SERVICE_MANAGER = list(range(4))
+
+
+class ChatsRoleLevel(Enum):
+    NOTHING, ADMIN, AGENT, SERVICE_MANAGER = list(range(4))
+
+
+class ChatsAuthorization(models.Model):
+    ROLE_CHOICES = [
+        (ChatsRole.NOT_SETTED.value, _("not set")),
+        (ChatsRole.AGENT.value, _("agent")),
+        (ChatsRole.ADMIN.value, _("admin")),
+        (ChatsRole.SERVICE_MANAGER.value, _("service_manager")),
+    ]
+    role = models.PositiveIntegerField(
+        _("role"), choices=ROLE_CHOICES, default=ChatsRole.NOT_SETTED.value
+    )
+    created_at = models.DateTimeField(_("created at"), auto_now_add=True)
+
+    @property
+    def level(self):
+        if self.role == ChatsRole.AGENT.value:
+            return ChatsRoleLevel.AGENT.value
+        elif self.role == ChatsRole.SERVICE_MANAGER.value:
+            return ChatsRoleLevel.SERVICE_MANAGER.value
+        elif self.role == ChatsRole.ADMIN.value:
+            return ChatsRoleLevel.ADMIN.value
+        return ChatsRoleLevel.NOTHING.value
+
+
 class ProjectRole(Enum):
     NOT_SETTED, VIEWER, CONTRIBUTOR, MODERATOR, SUPPORT = list(range(5))
 
@@ -703,6 +734,9 @@ class ProjectAuthorization(models.Model):
     )
     rocket_authorization = models.ForeignKey(
         RocketAuthorization, models.CASCADE, null=True, default=None
+    )
+    chats_authorization = models.ForeignKey(
+        ChatsAuthorization, models.CASCADE, null=True, default=None
     )
     role = models.PositiveIntegerField(
         _("role"), choices=ROLE_CHOICES, default=ProjectRole.NOT_SETTED.value
@@ -755,6 +789,17 @@ class RequestRocketPermission(models.Model):
         _("role"),
         choices=RocketAuthorization.ROLE_CHOICES,
         default=RocketRole.NOT_SETTED.value,
+    )
+    project = models.ForeignKey(Project, models.CASCADE)
+    created_by = models.ForeignKey(User, models.CASCADE)
+
+
+class RequestChatsPermission(models.Model):
+    email = models.EmailField(_("email"))
+    role = models.PositiveIntegerField(
+        _("role"),
+        choices=ChatsAuthorization.ROLE_CHOICES,
+        default=ChatsRole.NOT_SETTED.value,
     )
     project = models.ForeignKey(Project, models.CASCADE)
     created_by = models.ForeignKey(User, models.CASCADE)

@@ -1,4 +1,7 @@
+import json
+import logging
 import uuid
+
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
@@ -14,6 +17,7 @@ from connect.api.v1.project.validators import CanContributeInOrganizationValidat
 from connect.celery import app as celery_app
 from connect.common import tasks
 from connect.common.models import (
+    ChatsRole,
     ProjectAuthorization,
     RocketAuthorization,
     Service,
@@ -26,10 +30,10 @@ from connect.common.models import (
     OpenedProject,
     ProjectRole,
     TemplateProject,
+    RequestChatsPermission,
 )
-import json
-import logging
 
+from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
 
 logger = logging.getLogger(__name__)
 
@@ -135,10 +139,12 @@ class ProjectSerializer(serializers.ModelSerializer):
         ...
 
     def get_menu(self, obj):
+        chats_formatted_url = settings.CHATS_URL + "loginexternal/{{token}}/"
         return {
             "inteligence": settings.INTELIGENCE_URL,
             "flows": settings.FLOWS_URL,
             "integrations": settings.INTEGRATIONS_URL,
+            "chats": chats_formatted_url,
             "chat": list(
                 obj.service_status.filter(
                     service__service_type=Service.SERVICE_TYPE_CHAT
@@ -159,6 +165,15 @@ class ProjectSerializer(serializers.ModelSerializer):
 
         validated_data.update({"flow_organization": project.get("uuid")})
         instance = super().create(validated_data)
+
+        if not settings.TESTING:
+            chats_client = ChatsRESTClient()
+            chats_client.create_chat_project(
+                project_uuid=str(instance.uuid),
+                project_name=instance.name,
+                date_format=instance.date_format,
+                timezone=str(instance.timezone)
+            )
 
         return instance
 
@@ -320,6 +335,27 @@ class RequestRocketPermissionSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         if attrs.get("role") == RocketRole.NOT_SETTED.value:
+            raise PermissionDenied(_("You cannot set user role 0"))
+        return attrs
+
+
+class RequestChatsPermissionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RequestChatsPermission
+        fields = ["email", "project", "role", "created_by"]
+
+    email = serializers.EmailField(max_length=254, required=True)
+    project = serializers.PrimaryKeyRelatedField(
+        queryset=Project.objects,
+        style={"show": False},
+        required=True,
+    )
+    created_by = serializers.HiddenField(
+        default=serializers.CurrentUserDefault(), style={"show": False}
+    )
+
+    def validate(self, attrs):
+        if attrs.get("role") == ChatsRole.NOT_SETTED.value:
             raise PermissionDenied(_("You cannot set user role 0"))
         return attrs
 
