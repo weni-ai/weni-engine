@@ -223,7 +223,7 @@ class Organization(models.Model):
             "first_name": first_name,
         }
         mail.send_mail(
-            _("You have been removed from") + f"{self.name}",
+            _("You have been removed from") + f" {self.name}",
             render_to_string(
                 "common/emails/organization/remove_permission_organization.txt", context
             ),
@@ -1159,7 +1159,7 @@ class BillingPlan(models.Model):
         }
         mail.send_mail(
             _("A credit card has been updated in the organization")
-            + f"{self.organization.name}",
+            + f" {self.organization.name}",
             render_to_string("billing/emails/changed_card.txt", context),
             None,
             email,
@@ -1255,7 +1255,7 @@ class BillingPlan(models.Model):
             + f" {self.organization.name} "
             + _("has the plan")
             + ": "
-            + f"{plan.title()}.",
+            + f"{plan.title()}",
             render_to_string("billing/emails/free_plan.txt", context),
             None,
             [email],
