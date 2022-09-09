@@ -188,6 +188,48 @@ class MyUserProfileViewSet(
             else:
                 return Response(status=status.HTTP_404_NOT_FOUND, data={"response": response})
 
+    @action(
+        detail=True,
+        methods=["PUT"],
+        url_name="additional-information",
+    )
+    def add_additional_information(self, request, **kwargs):
+        try:
+
+            user = User.objects.get(email=request.user.email)
+
+            company_info = request.data.get("company")
+            user_info = request.data.get("user")
+
+            user.company_name = company_info.get("name")
+            user.company_sector = company_info.get("sector")
+            user.number_people = company_info.get("number_people")
+            user.weni_helps = company_info.get("weni_helps")
+            user.phone = user_info.get("phone")
+            user.save(
+                update_fields=[
+                    "company_name",
+                    "company_sector",
+                    "number_people",
+                    "weni_helps",
+                    "phone"
+                ]
+            )
+            response = dict(
+                company=dict(
+                    name=user.company_name,
+                    sector=user.company_sector,
+                    number_people=user.number_people,
+                    weni_helps=user.weni_helps
+                ),
+                user=dict(
+                    phone=user.phone
+                )
+            )
+            return Response(status=200, data=response)
+        except Exception as e:
+            return Response(status=404, data=dict(error=str(e)))
+
 
 class SearchUserViewSet(mixins.ListModelMixin, GenericViewSet):  # pragma: no cover
     serializer_class = SearchUserSerializer
