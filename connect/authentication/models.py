@@ -106,7 +106,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name=_("Allows receiving marketing emails"), default=True
     )
     has_2fa = models.BooleanField(_("Two factor authentication"), default=False)
-    
+
     company_name = models.CharField(
         verbose_name=_("company name"),
         max_length=100,

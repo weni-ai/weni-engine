@@ -195,9 +195,9 @@ class MyUserProfileViewSet(
     )
     def add_additional_information(self, request, **kwargs):
         try:
-            
+
             user = User.objects.get(email=request.user.email)
-            
+
             company_info = request.data.get("company")
             user_info = request.data.get("user")
 
@@ -207,12 +207,12 @@ class MyUserProfileViewSet(
             user.weni_helps = company_info.get("weni_helps")
             user.phone = user_info.get("phone")
             user.save(
-                update_fields = [
+                update_fields=[
                     "company_name",
                     "company_sector",
                     "number_people",
                     "weni_helps",
-                    "phone",
+                    "phone"
                 ]
             )
             response = dict(
