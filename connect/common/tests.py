@@ -395,7 +395,7 @@ class OrganizationTestCase(TestCase):
         self.assertEqual(len(sended_mail.outbox), 1)
         outbox = sended_mail.outbox[0]
         self.assertEqual(
-            outbox.subject, f"You are going out of {self.organization.name}"
+            outbox.subject, f"You are leaving {self.organization.name}"
         )
         self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
         self.assertEqual(outbox.to[0], self.test_email)
@@ -429,7 +429,7 @@ class OrganizationTestCase(TestCase):
         self.assertEqual(len(sended_mail.outbox), 1)
         outbox = sended_mail.outbox[0]
         self.assertEqual(
-            outbox.subject, f"You have been removed from the {self.organization.name}"
+            outbox.subject, f"You have been removed from {self.organization.name}"
         )
         self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
         self.assertEqual(outbox.to[0], self.test_email)
@@ -455,7 +455,7 @@ class OrganizationTestCase(TestCase):
         outbox = sended_email.outbox[0]
         self.assertEqual(
             outbox.subject,
-            f"{self.organization.name} now it's {self.organization_new_name}",
+            f"{self.organization.name} is now {self.organization_new_name}",
         )
         self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
         self.assertEqual(outbox.to[0], self.test_email)
@@ -517,7 +517,7 @@ class BillingPlanTestCase(TestCase):
         outbox = sended_email.outbox[0]
         self.assertEqual(
             outbox.subject,
-            f"A credit card has been changed to the organization {self.organization.name}",
+            f"A credit card has been updated in the organization {self.organization.name}",
         )
         self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
         self.assertEqual(outbox.to[0], self.test_email[0])
@@ -530,7 +530,7 @@ class BillingPlanTestCase(TestCase):
         outbox = sended_email.outbox[0]
         self.assertEqual(
             outbox.subject,
-            f"Your {self.organization.name} organization's plan has ended",
+            "Your organization's plan has expired",
         )
         self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
         self.assertEqual(outbox.to[0], self.test_email[0])
@@ -543,7 +543,7 @@ class BillingPlanTestCase(TestCase):
         outbox = sended_email.outbox[0]
         self.assertEqual(
             outbox.subject,
-            f"Your {self.organization.name} organization's plan has been reactivated.",
+            "Your organization's plan has been reactivated.",
         )
         self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
         self.assertEqual(outbox.to[0], self.test_email[0])
@@ -556,7 +556,7 @@ class BillingPlanTestCase(TestCase):
         outbox = sended_email.outbox[0]
         self.assertEqual(
             outbox.subject,
-            f"Your {self.organization.name} organization credit card was removed",
+            "Your organization's credit card was removed",
         )
         self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
         self.assertEqual(outbox.to[0], self.test_email[0])
@@ -569,7 +569,7 @@ class BillingPlanTestCase(TestCase):
         outbox = sended_email.outbox[0]
         self.assertEqual(
             outbox.subject,
-            f"The organization {self.organization.name} has already surpassed 200 active contacts",
+            f"Your organization {self.organization.name} has already surpassed 200 active contacts",
         )
         self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
         self.assertEqual(outbox.to[0], self.test_email[0])
@@ -583,7 +583,7 @@ class BillingPlanTestCase(TestCase):
         outbox = sended_email.outbox[0]
         self.assertEqual(
             outbox.subject,
-            f"Your {self.organization.name} organization has the {plan.title()} Plan",
+            f"Your organization {self.organization.name} has the plan: {plan.title()}",
         )
         self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
         self.assertEqual(outbox.to[0], self.test_email[0])
@@ -597,7 +597,7 @@ class BillingPlanTestCase(TestCase):
         outbox = sended_email.outbox[0]
         self.assertEqual(
             outbox.subject,
-            f"Your {self.organization.name} organization's plan has been changed.",
+            "Your organization's plan has been updated",
         )
         self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
         self.assertEqual(outbox.to[0], self.test_email[0])

@@ -13,7 +13,7 @@
               color: #808080;
             "
           >
-            {% trans 'Hi,' %}
+            {% trans 'Hi' %},
             <span
               style="
                 font-family: 'Lato', sans-serif;
@@ -36,7 +36,7 @@
               margin-top: 24px;
             "
           >
-            {% trans 'A project was deleted' %}...
+            {% trans 'A project has been deleted' %}...
           </div>
 
           <div
@@ -50,8 +50,8 @@
               margin-top: 24px;
             "
           >
-            {% trans 'The project' %} <strong>{{ project_name }}</strong> {% trans 'was deleted from the organization' %}
-            <strong>{{organization_name}}<strong>, {% trans "we hope that it has built everything it wanted and that our intelligences did a good job" %}
+            {% trans 'The project' %} <strong>{{ project_name }}</strong> {% trans 'from the organization' %}
+            <strong>{{organization_name}}<strong> {% trans "was deleted. We hope it has accomplished everything you wanted, and that our intelligences did a good job" %}.
           </div>
         </section>
 {% endblock %}

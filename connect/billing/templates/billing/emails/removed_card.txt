@@ -1,7 +1,14 @@
 {% load i18n %}
 <p>{%trans "Hi"}, {{user_name}}</p>
-<p>{% trans "The credit card of organization " %} {{ org_name }} {% trans " has been removed" %}</p>
-<p>{% trans "An admistrator removed the register data from credit card " %}
-{% trans "to perform billing of organization plan" %} <strong>{{ org_name }}</strong>.
-{% trans "at the moment the operation of yours " %}
-{% trans "Intelligences and Flows created and the chat module is freeze." %}</p>
+<p>{% trans "The credit card linked to the organization" %} {{ org_name }} {% trans "has been removed" %}</p>
+<p>
+    {% trans "An administrator has removed the credit card associated with your organization" %}
+    <strong>{{ org_name }}</strong>
+    {% trans "preventing the current plan's billing" %}.
+</p>
+<p>
+    {% trans "At the moment, the status of your Intelligences, created Flows and the Chat module is frozen" %}.
+</p>
+<p>
+    {% trans "To continue using the weni platform, request the organization's administrator to add a valid credit card in the billing section. We want you to stay with us" %}.
+</p>

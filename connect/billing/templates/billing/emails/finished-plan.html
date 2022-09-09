@@ -31,7 +31,7 @@
               color: #262626;
               margin-top: 24px;
             ">
-    {% trans "Your" %} {{organization_name}} {% trans "organization's plan has ended" %}
+    {% trans "The plan for your organization" %} <strong>{{organization_name}}</strong> {% trans "has expired" %}
   </div>
 
   <div style="
@@ -43,10 +43,13 @@
               color: #808080;
               margin-top: 24px;
             ">
-    {% trans "An Adminstrator has terminated the organization plan" %}.
-    <strong>{{organization_name}}</strong>. {% trans "At the moment" %}, {% trans "the functioning of your" %}
-    {% trans "Intelligences" %},
-    {% trans "created Flows" %} {% trans "and the Chat module are paralyzed" %}.
+    <p>
+      {% trans "An administrator has terminated the organization plan" %}.
+      <strong>{{organization_name}}</strong>.
+    </p>
+    <p>
+      {% trans "At the moment, the functioning of your Intelligences, Flows and the Chat module are interrupted" %}.
+    </p>
   </div>
 
   <div style="
@@ -58,10 +61,9 @@
               color: #808080;
               margin-top: 24px;
             ">
-    {% trans "To continue using the Weni Platform ask your" %}
-    {% trans "organization's administrator" %}
-    {% trans "to reactivate or choose a new plan that makes sense for your projects" %},
-    {% trans "we want you to stay with us" %}
+    <p>
+      {% trans "To continue using the Weni Platform ask your organization's administrator to reactivate the plan or choose a new one, that makes sense for your projects. We want you to stay with us" %}
+    </p>
     <span style="margin-left: 1px">
       <img style="max-height: 16px" src="{% static 'emojis/winking-face.png' %}" alt="" />
     </span>

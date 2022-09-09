@@ -1,1 +1,4 @@
 {% load i18n %}
+<p>{% trans 'Hi' %}, {{first_name}}!</p>
+<p>{% trans 'You have left the' %} {{ organization_name }}...</p>
+<p>{% trans 'You can still create new organizations and projects, if you wish to continue with us' %}!</p>
