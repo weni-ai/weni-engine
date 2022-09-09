@@ -371,7 +371,7 @@ def sync_repositories_statistics():
         except Exception:
             intelligence_count = 0
 
-        project.intelligence_count = intelligence_count
+        project.inteligence_count = intelligence_count
         project.save(update_fields=["inteligence_count"])
 
 
