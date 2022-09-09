@@ -202,6 +202,7 @@ class MyUserProfileViewSet(
             user_info = request.data.get("user")
 
             user.company_name = company_info.get("name")
+            user.company_segment = company_info.get("segment")
             user.company_sector = company_info.get("sector")
             user.number_people = company_info.get("number_people")
             user.weni_helps = company_info.get("weni_helps")
@@ -219,6 +220,7 @@ class MyUserProfileViewSet(
                 company=dict(
                     name=user.company_name,
                     sector=user.company_sector,
+                    segment=user.company_segment,
                     number_people=user.number_people,
                     weni_helps=user.weni_helps
                 ),

@@ -132,6 +132,13 @@ class User(AbstractBaseUser, PermissionsMixin):
         null=True,
         blank=True
     )
+    company_segment = models.CharField(
+        verbose_name=_("company segment"),
+        help_text=_("the segment of your company"),
+        max_length=100,
+        null=True,
+        blank=True
+    )
 
     objects = UserManager()
 
