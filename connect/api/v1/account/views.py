@@ -1,5 +1,6 @@
 import filetype
 from django.conf import settings
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django_filters.rest_framework import DjangoFilterBackend
 from keycloak import KeycloakGetError
@@ -207,13 +208,15 @@ class MyUserProfileViewSet(
             user.number_people = company_info.get("number_people")
             user.weni_helps = company_info.get("weni_helps")
             user.phone = user_info.get("phone")
+            user.last_update_profile = timezone.now()
             user.save(
                 update_fields=[
                     "company_name",
                     "company_sector",
                     "number_people",
                     "weni_helps",
-                    "phone"
+                    "phone",
+                    "last_update_profile",
                 ]
             )
             response = dict(
@@ -225,7 +228,8 @@ class MyUserProfileViewSet(
                     weni_helps=user.weni_helps
                 ),
                 user=dict(
-                    phone=user.phone
+                    phone=user.phone,
+                    last_update_profile=user.last_update_profile
                 )
             )
             return Response(status=200, data=response)
