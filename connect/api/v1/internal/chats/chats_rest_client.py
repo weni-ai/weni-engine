@@ -55,13 +55,19 @@ class ChatsRESTClient:
         )
 
     def create_chat_project(
-        self, project_uuid: str, project_name: str, date_format: str, timezone: str
+        self,
+        project_uuid: str,
+        project_name: str,
+        date_format: str,
+        timezone: str,
+        is_template: bool
     ):
         body = dict(
             uuid=project_uuid,
             name=project_name,
             date_format=date_format,
             timezone=timezone,
+            is_template=is_template,
         )
         requests.post(
             url=f"{self.base_url}/v1/internal/project/",

@@ -21,6 +21,7 @@ from connect.api.v1.metadata import Metadata
 from connect.api.v1.project.filters import ProjectOrgFilter
 from connect.api.v1.project.permissions import ProjectHasPermission
 from connect.api.v1.internal.permissions import ModuleHasPermission
+from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
 from connect.api.v1.organization.permissions import Has2FA
 from connect.api.v1.project.serializers import (
     ProjectSerializer,
@@ -389,6 +390,27 @@ class ProjectViewSet(
             task.wait()
             return JsonResponse(status=status.HTTP_200_OK, data=task.result)
 
+    @action(
+        detail=True,
+        methods=["POST"]
+        url_name='create-ticketer',
+        permission_classes=[ModuleHasPermission],
+    )
+    def create_ticketer(self, request):
+        project_uuid = request.data.get('project_uuid')
+        ticketer_type = request.data.get('ticketer_type')
+        name = request.data.get('name')
+        config = request.data.get('config')
+        project = Project.objects.get(uuid=project_uuid)
+        if not settings.TESTING:
+            flows_client = FlowsRESTClient()
+            ticketer = flows_client.create_ticketer(
+                project_uuid=project.flow_organization,
+                ticketer_type=ticketer_type,
+                name=name,
+                config=config,
+            )
+
 
 class RequestPermissionProjectViewSet(
     mixins.ListModelMixin,
@@ -559,6 +581,16 @@ class TemplateProjectViewSet(
             flow_organization=flow_organization,
             is_template=True,
         )
+
+        if not settings.TESTING:
+            chats_client = ChatsRESTClient()
+            chats_client.create_chat_project(
+                project_uuid=str(project.uuid),
+                project_name=project.name,
+                date_format=project.date_format,
+                timezone=str(project.timezone),
+                is_template=True
+            )
 
         project_data = {
             "project": project,

@@ -13,6 +13,7 @@ from connect.api.v1.fields import TextField
 from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
 from ..internal.intelligence.intelligence_rest_client import IntelligenceRESTClient
 from connect.api.v1.internal.integrations.integrations_rest_client import IntegrationsRESTClient
+from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
 from connect.api.v1.project.validators import CanContributeInOrganizationValidator
 from connect.celery import app as celery_app
 from connect.common import tasks
@@ -172,7 +173,8 @@ class ProjectSerializer(serializers.ModelSerializer):
                 project_uuid=str(instance.uuid),
                 project_name=instance.name,
                 date_format=instance.date_format,
-                timezone=str(instance.timezone)
+                timezone=str(instance.timezone),
+                is_template=False
             )
 
         return instance

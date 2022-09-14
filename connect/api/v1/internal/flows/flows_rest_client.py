@@ -147,3 +147,19 @@ class FlowsRESTClient:
             json=body
         )
         return dict(status=response.status_code)
+
+    def create_ticketer(self, project_uuid, ticketer_type, name, config):
+        body = dict(
+            project_uuid=project_uuid,
+            ticketer_type=ticketer_type,
+            name=name,
+            config=config
+        )
+
+        response = requests.post(
+            url=f"{self.base_url}/",
+            headers=self.authentication_instance.headers,
+            json=body
+        )
+
+        return response.data
