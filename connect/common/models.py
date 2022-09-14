@@ -668,16 +668,17 @@ class RocketAuthorization(models.Model):
 
 
 class ChatsRole(Enum):
-    NOT_SETTED, ADMIN, AGENT, SERVICE_MANAGER = list(range(4))
+    NOT_SETTED, USER, ADMIN, AGENT, SERVICE_MANAGER = list(range(5))
 
 
 class ChatsRoleLevel(Enum):
-    NOTHING, ADMIN, AGENT, SERVICE_MANAGER = list(range(4))
+    NOTHING, USER, ADMIN, AGENT, SERVICE_MANAGER = list(range(5))
 
 
 class ChatsAuthorization(models.Model):
     ROLE_CHOICES = [
         (ChatsRole.NOT_SETTED.value, _("not set")),
+        (ChatsRole.USER.value, _("user")),
         (ChatsRole.AGENT.value, _("agent")),
         (ChatsRole.ADMIN.value, _("admin")),
         (ChatsRole.SERVICE_MANAGER.value, _("service_manager")),
