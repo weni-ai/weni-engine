@@ -22,7 +22,7 @@ from connect.api.v1.project.filters import ProjectOrgFilter
 from connect.api.v1.project.permissions import ProjectHasPermission
 from connect.api.v1.internal.permissions import ModuleHasPermission
 from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
-from connect.api.v1.internal.chats.chats_rest_clien1t import ChatsRESTClient
+from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
 from connect.api.v1.organization.permissions import Has2FA
 from connect.api.v1.project.serializers import (
     ProjectSerializer,
