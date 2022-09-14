@@ -13,7 +13,11 @@ class ChatsRESTClient:
     def update_user_permission(
         self, permission: int, user_email: str, project_uuid: str
     ):
-        body = dict(role=permission, user=user_email, project=project_uuid)
+        body = dict(
+            role=permission,
+            user=user_email,
+            project=project_uuid
+        )
         requests.put(
             url=f"{self.base_url}/v1/internal/permission/project/{project_uuid}/",
             headers=self.authentication_instance.headers,
@@ -90,7 +94,7 @@ class ChatsRESTClient:
         body = dict(
             role=permission,
             user=user_email,
-            project=project_uuid
+            project=str(project_uuid)
         )
         requests.post(
             url=f"{self.base_url}/v1/internal/permission/project/",

@@ -501,7 +501,21 @@ class RequestPermissionProjectViewSet(
             elif chats_role:
                 RequestChatsPermission.objects.create(email=email, role=chats_role, project=project, created_by=created_by)
 
-        return Response({"status": 200, "data": {"created_by": created_by.email, "role": role, "rocket_authorization": chats_role, "email": email, "project": project_uuid, "username": user_name, "first_name": first_name, "last_name": last_name, "photo_user": photo, "is_pendent": is_pendent}})
+        return Response({
+            "status": 200,
+            "data": {
+                "created_by": created_by.email,
+                "role": role,
+                "chats_role": chats_role,
+                "email": email,
+                "project": str(project_uuid),
+                "username": user_name,
+                "first_name": first_name,
+                "last_name": last_name,
+                "photo_user": photo,
+                "is_pendent": is_pendent
+            }
+        })
 
 
 class RequestPermissionRocketViewSet(

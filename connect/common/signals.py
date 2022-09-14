@@ -269,7 +269,7 @@ def request_chats_permission(sender, instance, created, **kwargs):
                     project_auth.chats_authorization = ChatsAuthorization.objects.create(role=instance.role)
                     if not settings.TESTING:
                         chats_instance.create_user_permission(
-                            project_uuid=instance.project.uuid,
+                            project_uuid=str(instance.project.uuid),
                             user_email=user.email,
                             permission=instance.role
                         )
@@ -280,7 +280,7 @@ def request_chats_permission(sender, instance, created, **kwargs):
                         chats_instance.update_user_permission(
                             permission=instance.role,
                             user_email=user.email,
-                            project_uuid=instance.project_uuid
+                            project_uuid=str(instance.project_uuid)
                         )
                 project_auth.save(update_fields=["chats_authorization"])
                 instance.delete()
