@@ -477,7 +477,7 @@ class RequestPermissionProjectViewSet(
             is_pendent = RequestPermissionProject.objects.filter(email=email, project=project).exists()
 
         if has_rocket:
-            if len([item for item in RocketAuthorization.ROLE_CHOICES if item[0] == rocket_authorization]) == 0 and chats_role:
+            if chats_role and len([item for item in RocketAuthorization.ROLE_CHOICES if item[0] == chats_role]) == 0:
                 return Response({"status": 422, "message": f"{chats_role} is not a valid rocket role!"})
             if request_rocket_authorization.exists():
                 request_rocket_authorization = request_rocket_authorization.first()
@@ -489,7 +489,7 @@ class RequestPermissionProjectViewSet(
             elif chats_role:
                 RequestRocketPermission.objects.create(email=email, role=chats_role, project=project, created_by=created_by)
         else:
-            if len([item for item in ChatsAuthorization.ROLE_CHOICES if item[0] == chats_authorization]) == 0 and chats_role:
+            if chats_role and len([item for item in ChatsAuthorization.ROLE_CHOICES if item[0] == chats_role]) == 0:
                 return Response({"status": 422, "message": f"{chats_role} is not a valid chats role!"})
             if request_chats_authorization.exists():
                 request_chats_authorization = request_chats_authorization.first()
