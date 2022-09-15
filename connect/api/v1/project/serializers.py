@@ -539,7 +539,7 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
 
 class UserAPITokenSerializer(serializers.Serializer):
     user = serializers.EmailField(required=True)
-    project_uuid = project_uuid = serializers.UUIDField(required=True)
+    project_uuid = serializers.UUIDField(required=True)
 
     def validate_project_uuid(self, value):
         try:
