@@ -200,7 +200,7 @@ class ProjectSerializer(serializers.ModelSerializer):
                     "photo_user": i.user.photo_url,
                     "rocket_authorization": i.rocket_authorization.role
                     if i.rocket_authorization
-                    else None,
+                    else i.chats_authorization.role,
                 }
                 for i in obj.project_authorizations.exclude(role__in=exclude_roles)
             ],
