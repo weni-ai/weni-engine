@@ -535,3 +535,15 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
         }
 
         return data
+
+
+class UserAPITokenSerializer(serializers.Serializer):
+    user = serializers.EmailField(required=True)
+    project_uuid = serializers.UUIDField(required=True)
+
+    def validate_project_uuid(self, value):
+        try:
+            Project.objects.get(uuid=value)
+        except Project.DoesNotExist:
+            raise serializers.ValidationError("This project does not exist")
+        return value

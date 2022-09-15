@@ -22,6 +22,7 @@ from connect.api.v1.project.filters import ProjectOrgFilter
 from connect.api.v1.project.permissions import ProjectHasPermission
 from connect.api.v1.internal.permissions import ModuleHasPermission
 from connect.api.v1.organization.permissions import Has2FA
+from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
 from connect.api.v1.project.serializers import (
     ProjectSerializer,
     ProjectSearchSerializer,
@@ -35,6 +36,7 @@ from connect.api.v1.project.serializers import (
     CreateClassifierSerializer,
     ClassifierSerializer,
     TemplateProjectSerializer,
+    UserAPITokenSerializer,
 )
 
 from connect.celery import app as celery_app
@@ -383,6 +385,24 @@ class ProjectViewSet(
             task = tasks.list_classifier.delay(str(project.flow_organization))
             task.wait()
             return JsonResponse(status=status.HTTP_200_OK, data=task.result)
+
+    @action(
+        detail=True,
+        methods=["GET"],
+        url_name='user-api-token',
+    )
+    def user_api_token(self, request):
+        serializer = UserAPITokenSerializer(data=request.query_params)
+        serializer.is_valid(raise_exception=True)
+
+        project_uuid = serializer.validated_data.get("project_uuid")
+        user = serializer.validated_data.get("user")
+        project = Project.objects.get(uuid=project_uuid)
+
+        rest_client = FlowsRESTClient()
+        response = rest_client.get_user_api_token(str(project.flow_organization), user)
+
+        return JsonResponse(status=response.status_code, data=response.json())
 
 
 class RequestPermissionProjectViewSet(
