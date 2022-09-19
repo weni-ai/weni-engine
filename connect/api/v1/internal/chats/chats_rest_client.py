@@ -5,6 +5,7 @@ import requests
 from connect.api.v1.internal.internal_authentication import InternalAuthentication
 from connect.common.models import ChatsRole
 
+
 class ChatsRESTClient:
     def __init__(self):
         self.base_url = settings.CHATS_REST_ENDPOINT
@@ -18,7 +19,6 @@ class ChatsRESTClient:
             ChatsRole.AGENT.value: 2,
             ChatsRole.SERVICE_MANAGER: 3
         }
-        
         body = dict(
             role=permission_mapper.get(permission, 0),
             user=user_email,
@@ -98,9 +98,9 @@ class ChatsRESTClient:
         permission: int
     ):
         permission_mapper = {
-            ChatsRole.ADMIN.value:1,
-            ChatsRole.AGENT.value:2,
-            ChatsRole.SERVICE_MANAGER:3
+            ChatsRole.ADMIN.value: 1,
+            ChatsRole.AGENT.value: 2,
+            ChatsRole.SERVICE_MANAGER: 3
         }
 
         body = dict(
