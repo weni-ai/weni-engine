@@ -235,7 +235,7 @@ class ProjectSerializer(serializers.ModelSerializer):
                     email=i.email,
                     project_role=i.role,
                     created_by=i.created_by.email,
-                    chats_role=rocket_role
+                    chats_role=cahts_role
                 )
             )
         return response
@@ -336,7 +336,6 @@ class ProjectAuthorizationSerializer(serializers.ModelSerializer):
     chats_role = serializers.SerializerMethodField()
 
     def get_chats_role(self, obj):
-        print(obj.rocket_authorization)
         if obj.rocket_authorization:
             return dict(
                 role=obj.rocket_authorization.role,
