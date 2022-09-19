@@ -13,8 +13,13 @@ class ChatsRESTClient:
     def update_user_permission(
         self, permission: int, user_email: str, project_uuid: str
     ):
+        permission_mapper = dict(
+            ChatsRole.ADMIN.value=1
+            ChatsRole.AGENT.value=2,
+            ChatsRole.SERVICE_MANAGER=3
+        )
         body = dict(
-            role=permission,
+            role=permission_mapper.get(permission, 0),
             user=user_email,
             project=project_uuid
         )
@@ -91,8 +96,14 @@ class ChatsRESTClient:
         user_email: str,
         permission: int
     ):
+        permission_mapper = dict(
+            ChatsRole.ADMIN.value=1
+            ChatsRole.AGENT.value=2,
+            ChatsRole.SERVICE_MANAGER=3
+        )
+
         body = dict(
-            role=permission,
+            role=permission_mapper.get(permission, 0),
             user=user_email,
             project=str(project_uuid)
         )
