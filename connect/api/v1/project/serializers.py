@@ -235,7 +235,7 @@ class ProjectSerializer(serializers.ModelSerializer):
                     email=i.email,
                     project_role=i.role,
                     created_by=i.created_by.email,
-                    chats_role=cahts_role
+                    chats_role=chats_role
                 )
             )
         return response
