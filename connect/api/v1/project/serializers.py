@@ -31,6 +31,7 @@ from connect.common.models import (
     ProjectRole,
     TemplateProject,
     RequestChatsPermission,
+    ChatsAuthorization,
 )
 
 from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
@@ -188,11 +189,12 @@ class ProjectSerializer(serializers.ModelSerializer):
 
     def get_authorizations(self, obj):
         exclude_roles = [ProjectRole.SUPPORT.value]
+        queryset = obj.project_authorizations.exclude(role__in=exclude_roles)
         response = dict(
-            count=obj.project_authorizations.count(),
+            count=queryset.count(),
             users=[]
         )
-        for i in obj.project_authorizations.exclude(role__in=exclude_roles):
+        for i in queryset:
             chats_role = None
             if i.rocket_authorization:
                 chats_role = i.rocket_authorization.role
@@ -206,7 +208,7 @@ class ProjectSerializer(serializers.ModelSerializer):
                     last_name=i.user.last_name,
                     project_role=i.role,
                     photo_user=i.user.photo_url,
-                    rocket_authorization=chats_role,
+                    chats_role=chats_role,
                 )
             )
         return response
@@ -218,18 +220,23 @@ class ProjectSerializer(serializers.ModelSerializer):
         }
         for i in obj.requestpermissionproject_set.all():
             rocket_authorization = RequestRocketPermission.objects.filter(email=i.email)
-            rocket_role = None
+            chats_authorization = RequestChatsPermission.objects.filter(email=i.email)
+            chats_role = None
             if(len(rocket_authorization) > 0):
                 rocket_authorization = rocket_authorization.first()
-                rocket_role = rocket_authorization.role
+                chats_role = rocket_authorization.role
+
+            if len(chats_authorization) > 0:
+                chats_authorization = chats_authorization.first()
+                chats_role = chats_authorization.role
 
             response["users"].append(
-                {
-                    "email": i.email,
-                    "project_role": i.role,
-                    "created_by": i.created_by.email,
-                    "rocket_authorization": rocket_role
-                }
+                dict(
+                    email=i.email,
+                    project_role=i.role,
+                    created_by=i.created_by.email,
+                    chats_role=rocket_role
+                )
             )
         return response
 
@@ -259,6 +266,11 @@ class RocketAuthorizationSerializer(serializers.ModelSerializer):
     class Meta:
         model = RocketAuthorization
         fields = ["role", "created_at"]
+
+
+class ChatsAuthorizationSerializer(serializers.ModelSerializer):
+    model = ChatsAuthorization
+    fields = ["role", "created_at"]
 
 
 class ProjectSearchSerializer(serializers.Serializer):
@@ -304,7 +316,7 @@ class ProjectAuthorizationSerializer(serializers.ModelSerializer):
             "user__email",
             "user__photo",
             "project",
-            "rocket_authorization",
+            "chats_role",
             "role",
             "created_at",
         ]
@@ -321,7 +333,21 @@ class ProjectAuthorizationSerializer(serializers.ModelSerializer):
     user__photo = serializers.ImageField(
         source="user.photo", label=_("User photo"), read_only=True
     )
-    rocket_authorization = RocketAuthorizationSerializer()
+    chats_role = serializers.SerializerMethodField()
+
+    def get_chats_role(self, obj):
+        print(obj.rocket_authorization)
+        if obj.rocket_authorization:
+            return dict(
+                role=obj.rocket_authorization.role,
+                created_at=obj.created_at,
+            )
+        if obj.chats_authorization:
+            return dict(
+                role=obj.chats_authorization.role,
+                created_at=obj.chats_authorization.created_at,
+            )
+        return None
 
 
 class RequestRocketPermissionSerializer(serializers.ModelSerializer):
