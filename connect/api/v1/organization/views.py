@@ -203,14 +203,15 @@ class OrganizationViewSet(
                     project.delete()
                     return Response(project_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             else:
-                chats_client = ChatsRESTClient()
-                chats_client.create_chat_project(
-                    project_uuid=str(project.uuid),
-                    project_name=project.name,
-                    date_format=project.date_format,
-                    timezone=project.timezone,
-                    is_template=False
-                )
+                if not settings.TESTING:
+                    chats_client = ChatsRESTClient()
+                    chats_client.create_chat_project(
+                        project_uuid=str(project.uuid),
+                        project_name=project.name,
+                        date_format=project.date_format,
+                        timezone=project.timezone,
+                        is_template=False
+                    )
             serializer = OrganizationSeralizer(new_organization, context={"request": request})
             project_serializer = ProjectSerializer(project, context={"request": request})
             response_data = dict(
