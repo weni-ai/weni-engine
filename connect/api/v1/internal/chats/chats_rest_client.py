@@ -17,7 +17,7 @@ class ChatsRESTClient:
         permission_mapper = {
             ChatsRole.ADMIN.value: 1,
             ChatsRole.AGENT.value: 2,
-            ChatsRole.SERVICE_MANAGER: 3
+            ChatsRole.SERVICE_MANAGER.value: 3
         }
         body = dict(
             role=permission_mapper.get(permission, 0),
@@ -100,7 +100,7 @@ class ChatsRESTClient:
         permission_mapper = {
             ChatsRole.ADMIN.value: 1,
             ChatsRole.AGENT.value: 2,
-            ChatsRole.SERVICE_MANAGER: 3
+            ChatsRole.SERVICE_MANAGER.value: 3
         }
 
         body = dict(

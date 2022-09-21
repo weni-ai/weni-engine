@@ -87,7 +87,7 @@ class FlowsRESTClient:
         return dict(status=response.status_code)
 
     def update_user_permission_project(self, organization_uuid: str, user_email: str, permission: int):
-        permissions = {1: "viewer", 2: "editor", 3: "administrator"}
+        permissions = {1: "viewer", 2: "editor", 3: "administrator", 5: "agent"}
 
         body = dict(
             org_uuid=organization_uuid,

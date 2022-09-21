@@ -8,6 +8,7 @@ from django.utils import timezone
 from connect.authentication.models import User
 from connect.common.models import (
     ChatsAuthorization,
+    ChatsRole,
     Project,
     Service,
     Organization,
@@ -265,20 +266,21 @@ def request_chats_permission(sender, instance, created, **kwargs):
             chats_instance = ChatsRESTClient()
             if project_auth.exists():
                 project_auth = project_auth.first()
+                chats_role = ChatsRole.ADMIN.value if project_auth.is_moderator else instance.role
                 if not project_auth.chats_authorization:
-                    project_auth.chats_authorization = ChatsAuthorization.objects.create(role=instance.role)
+                    project_auth.chats_authorization = ChatsAuthorization.objects.create(role=chats_role)
                     if not settings.TESTING:
                         chats_instance.create_user_permission(
                             project_uuid=str(instance.project.uuid),
                             user_email=user.email,
-                            permission=instance.role
+                            permission=chats_role
                         )
                 else:
-                    project_auth.chats_authorization.role = instance.role
+                    project_auth.chats_authorization.role = chats_role
                     project_auth.chats_authorization.save(update_fields=["role"])
                     if not settings.TESTING:
                         chats_instance.update_user_permission(
-                            permission=instance.role,
+                            permission=chats_role,
                             user_email=user.email,
                             project_uuid=str(instance.project_uuid)
                         )
