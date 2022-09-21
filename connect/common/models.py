@@ -703,11 +703,11 @@ class ChatsAuthorization(models.Model):
 
 
 class ProjectRole(Enum):
-    NOT_SETTED, VIEWER, CONTRIBUTOR, MODERATOR, SUPPORT = list(range(5))
+    NOT_SETTED, VIEWER, CONTRIBUTOR, MODERATOR, SUPPORT, CHAT_USER = list(range(6))
 
 
 class ProjectRoleLevel(Enum):
-    NOTHING, VIEWER, CONTRIBUTOR, MODERATOR, SUPPORT = list(range(5))
+    NOTHING, VIEWER, CONTRIBUTOR, MODERATOR, SUPPORT, CHAT_USER = list(range(6))
 
 
 class ProjectAuthorization(models.Model):
@@ -720,6 +720,7 @@ class ProjectAuthorization(models.Model):
         (ProjectRole.CONTRIBUTOR.value, _("contributor")),
         (ProjectRole.MODERATOR.value, _("moderator")),
         (ProjectRole.SUPPORT.value, _("support")),
+        (ProjectRole.CHAT_USER.value, _("Chat user")),
     ]
     uuid = models.UUIDField(
         _("UUID"), primary_key=True, default=uuid4.uuid4, editable=False
