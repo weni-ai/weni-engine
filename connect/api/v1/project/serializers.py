@@ -34,8 +34,6 @@ from connect.common.models import (
     ChatsAuthorization,
 )
 
-from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
-
 logger = logging.getLogger(__name__)
 
 
@@ -166,16 +164,6 @@ class ProjectSerializer(serializers.ModelSerializer):
 
         validated_data.update({"flow_organization": project.get("uuid")})
         instance = super().create(validated_data)
-
-        if not settings.TESTING:
-            chats_client = ChatsRESTClient()
-            chats_client.create_chat_project(
-                project_uuid=str(instance.uuid),
-                project_name=instance.name,
-                date_format=instance.date_format,
-                timezone=str(instance.timezone),
-                is_template=False
-            )
 
         return instance
 

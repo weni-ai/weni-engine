@@ -22,7 +22,6 @@ from connect.api.v1.project.filters import ProjectOrgFilter
 from connect.api.v1.project.permissions import ProjectHasPermission
 from connect.api.v1.internal.permissions import ModuleHasPermission
 from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
-from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
 from connect.api.v1.organization.permissions import Has2FA
 from connect.api.v1.project.serializers import (
     ProjectSerializer,
@@ -597,16 +596,6 @@ class TemplateProjectViewSet(
             flow_organization=flow_organization,
             is_template=True,
         )
-
-        if not settings.TESTING:
-            chats_client = ChatsRESTClient()
-            chats_client.create_chat_project(
-                project_uuid=str(project.uuid),
-                project_name=project.name,
-                date_format=project.date_format,
-                timezone=str(project.timezone),
-                is_template=True
-            )
 
         project_data = {
             "project": project,
