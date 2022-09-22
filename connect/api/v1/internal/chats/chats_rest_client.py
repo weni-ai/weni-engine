@@ -79,11 +79,12 @@ class ChatsRESTClient:
             timezone=timezone,
             is_template=is_template,
         )
-        requests.post(
+        response = requests.post(
             url=f"{self.base_url}/v1/internal/project/",
             headers=self.authentication_instance.headers,
             json=body,
         )
+        return response
 
     def delete_chat(self, project_uuid: str):
         requests.delete(
