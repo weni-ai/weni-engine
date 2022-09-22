@@ -38,14 +38,16 @@ def create_service_status(sender, instance, created, **kwargs):
         for service in Service.objects.filter(default=True):
             instance.service_status.create(service=service)
         if not settings.TESTING:
+            logger.info('creating chats_project')
             chats_client = ChatsRESTClient()
-            chats_client.create_chat_project(
+            response = chats_client.create_chat_project(
                 project_uuid=str(instance.uuid),
                 project_name=instance.name,
                 date_format=instance.date_format,
-                timezone=instance.timezone,
+                timezone=str(instance.timezone),
                 is_template=instance.is_template
             )
+            logger.info(f'[ * ] {response}')
 
         for permission in instance.project_authorizations.all():
             celery_app.send_task(
