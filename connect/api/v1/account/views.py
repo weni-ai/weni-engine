@@ -197,7 +197,7 @@ class MyUserProfileViewSet(
     def add_additional_information(self, request, **kwargs):
         try:
 
-            user = User.objects.get(email=request.user.email)
+            user = request.user
 
             company_info = request.data.get("company")
             user_info = request.data.get("user")
