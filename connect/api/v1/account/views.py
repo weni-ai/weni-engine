@@ -1,5 +1,6 @@
 import filetype
 from django.conf import settings
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django_filters.rest_framework import DjangoFilterBackend
 from keycloak import KeycloakGetError
@@ -187,6 +188,53 @@ class MyUserProfileViewSet(
                 return Response(status=status.HTTP_200_OK, data={"email": user.email})
             else:
                 return Response(status=status.HTTP_404_NOT_FOUND, data={"response": response})
+
+    @action(
+        detail=True,
+        methods=["PUT"],
+        url_name="additional-information",
+    )
+    def add_additional_information(self, request, **kwargs):
+        try:
+
+            user = request.user
+
+            company_info = request.data.get("company")
+            user_info = request.data.get("user")
+
+            user.company_name = company_info.get("name")
+            user.company_segment = company_info.get("segment")
+            user.company_sector = company_info.get("sector")
+            user.number_people = company_info.get("number_people")
+            user.weni_helps = company_info.get("weni_helps")
+            user.phone = user_info.get("phone")
+            user.last_update_profile = timezone.now()
+            user.save(
+                update_fields=[
+                    "company_name",
+                    "company_sector",
+                    "number_people",
+                    "weni_helps",
+                    "phone",
+                    "last_update_profile",
+                ]
+            )
+            response = dict(
+                company=dict(
+                    name=user.company_name,
+                    sector=user.company_sector,
+                    segment=user.company_segment,
+                    number_people=user.number_people,
+                    weni_helps=user.weni_helps
+                ),
+                user=dict(
+                    phone=user.phone,
+                    last_update_profile=user.last_update_profile
+                )
+            )
+            return Response(status=200, data=response)
+        except Exception as e:
+            return Response(status=404, data=dict(error=str(e)))
 
 
 class SearchUserViewSet(mixins.ListModelMixin, GenericViewSet):  # pragma: no cover

@@ -84,7 +84,8 @@ class TwoFactorAuthTestCase(TestCase):
         )(
             request,
         )
-        print(response.render())
+        return response
+        # print(response.render())
         # content_data = json.loads(response.content)
         # return response, content_data
 

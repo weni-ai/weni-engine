@@ -1,4 +1,5 @@
 import requests
+
 from django.conf import settings
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
@@ -105,6 +106,39 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name=_("Allows receiving marketing emails"), default=True
     )
     has_2fa = models.BooleanField(_("Two factor authentication"), default=False)
+
+    company_name = models.CharField(
+        verbose_name=_("company name"),
+        max_length=100,
+        null=True,
+        blank=True,
+    )
+    number_people = models.IntegerField(
+        verbose_name=_("number of people"),
+        help_text=_("number of people working in this company"),
+        null=True,
+        blank=True,
+    )
+    company_sector = models.CharField(
+        verbose_name=_("company sector"),
+        max_length=100,
+        null=True,
+        blank=True,
+    )
+    weni_helps = models.CharField(
+        verbose_name=_("weni helps"),
+        help_text=_("how the weni platform will help your team"),
+        max_length=100,
+        null=True,
+        blank=True
+    )
+    company_segment = models.CharField(
+        verbose_name=_("company segment"),
+        help_text=_("the segment of your company"),
+        max_length=100,
+        null=True,
+        blank=True
+    )
 
     objects = UserManager()
 
