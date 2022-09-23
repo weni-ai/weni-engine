@@ -209,7 +209,7 @@ def request_permission_project(sender, instance, created, **kwargs):
                 auth_user = auth_user.first()
                 auth_user.role = instance.role
                 auth_user.save(update_fields=["role"])
-            
+
             if not settings.TESTING and auth_user.is_moderator:
                 RequestChatsPermission.objects.create(
                     email=instance.email,
