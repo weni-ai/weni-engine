@@ -309,7 +309,7 @@ def request_chats_permission(sender, instance, created, **kwargs):
                         chats_instance.update_user_permission(
                             permission=chats_role,
                             user_email=user.email,
-                            project_uuid=str(instance.project_uuid)
+                            project_uuid=str(instance.project.uuid)
                         )
                 project_auth.save(update_fields=["chats_authorization"])
                 instance.delete()
