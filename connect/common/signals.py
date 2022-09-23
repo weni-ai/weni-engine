@@ -64,6 +64,13 @@ def create_service_status(sender, instance, created, **kwargs):
                 project_auth = instance.get_user_authorization(authorization.user)
                 project_auth.role = authorization.role
                 project_auth.save()
+                if not settings.TESTING and project_auth.is_moderator:
+                    RequestChatsPermission.objects.create(
+                        email=project_auth.user.email,
+                        role=ChatsRole.ADMIN.value,
+                        project=project_auth.project.project,
+                        created_by=project_auth.user
+                    )
 
 
 @receiver(post_save, sender=Service)
