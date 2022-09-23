@@ -68,7 +68,7 @@ def create_service_status(sender, instance, created, **kwargs):
                     RequestChatsPermission.objects.create(
                         email=project_auth.user.email,
                         role=ChatsRole.ADMIN.value,
-                        project=project_auth.project.project,
+                        project=project_auth.project,
                         created_by=project_auth.user
                     )
 
