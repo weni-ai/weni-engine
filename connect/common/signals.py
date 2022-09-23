@@ -217,13 +217,20 @@ def request_permission_project(sender, instance, created, **kwargs):
                     project=instance.project,
                     created_by=instance.created_by
                 )
-
             instance.delete()
         # todo: send invite project email
 
 
 @receiver(post_save, sender=ProjectAuthorization)
 def project_authorization(sender, instance, created, **kwargs):
+    if created:
+        if not settings.TESTING and instance.is_moderator and not instance.chats_authorization:
+            RequestChatsPermission.objects.create(
+                email=instance.user.email,
+                role=ChatsRole.ADMIN.value,
+                project=instance.project,
+                created_by=instance.user
+            )
     if instance.role is not ProjectRoleLevel.NOTHING.value:
         instance_user = (
             instance.organization_authorization.organization.get_user_authorization(
