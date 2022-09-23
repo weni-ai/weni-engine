@@ -199,7 +199,7 @@ def request_permission_project(sender, instance, created, **kwargs):
             auth = instance.project.project_authorizations
             auth_user = auth.filter(user=user)
             if not auth_user.exists():
-                ProjectAuthorization.objects.create(
+                auth_user = ProjectAuthorization.objects.create(
                     user=user,
                     project=instance.project,
                     organization_authorization=org_auth,
@@ -209,6 +209,15 @@ def request_permission_project(sender, instance, created, **kwargs):
                 auth_user = auth_user.first()
                 auth_user.role = instance.role
                 auth_user.save(update_fields=["role"])
+
+            if not settings.TESTING and auth_user.is_moderator:
+                RequestChatsPermission.objects.create(
+                    email=instance.email,
+                    role=ChatsRole.ADMIN.value,
+                    project=instance.project,
+                    created_by=instance.created_by
+                )
+
             instance.delete()
         # todo: send invite project email
 
