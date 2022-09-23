@@ -229,7 +229,7 @@ def project_authorization(sender, instance, created, **kwargs):
                 email=instance.user.email,
                 role=ChatsRole.ADMIN.value,
                 project=instance.project,
-                created_by=instance.created_by
+                created_by=instance.user
             )
     if instance.role is not ProjectRoleLevel.NOTHING.value:
         instance_user = (
