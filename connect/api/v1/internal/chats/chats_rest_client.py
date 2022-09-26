@@ -25,7 +25,7 @@ class ChatsRESTClient:
             project=project_uuid
         )
         requests.put(
-            url=f"{self.base_url}/v1/internal/permission/project/{project_uuid}/",
+            url=f"{self.base_url}/v1/internal/permission/project/",
             headers=self.authentication_instance.headers,
             json=body,
         )
