@@ -396,7 +396,7 @@ def generate_project_invoice():
         organization_billing__plan='enterprise'
     ):
         invoice = org.organization_billing_invoice.create(
-            due_date=timezone.now() + timedelta(days=30),
+            due_date=pendulum.now().add(months=1),
             invoice_random_id=1
             if org.organization_billing_invoice.last() is None
             else org.organization_billing_invoice.last().invoice_random_id + 1,

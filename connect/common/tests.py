@@ -1,7 +1,7 @@
 import uuid as uuid4
 from unittest import skipIf
 from django.test import TestCase
-
+import pendulum
 from connect.authentication.models import User
 from connect.common.models import (
     Newsletter,
@@ -21,8 +21,6 @@ from connect.common.models import (
     RocketAuthorization,
 )
 from django.conf import settings
-from django.utils import timezone
-from datetime import timedelta
 from connect.common.gateways.rocket_gateway import Rocket
 
 
@@ -333,7 +331,7 @@ class InvoiceTestCase(TestCase):
             organization_billing__plan="enterprise",
         )
         self.invoice = self.organization.organization_billing_invoice.create(
-            due_date=timezone.now() + timedelta(days=30),
+            due_date=pendulum.now().add(months=1),
             invoice_random_id=1
             if self.organization.organization_billing_invoice.last() is None
             else self.organization.organization_billing_invoice.last().invoice_random_id

@@ -223,3 +223,19 @@ def problem_capture_invoice():
                     name="update_suspend_project",
                     args=[project.flow_organization, True],
                 )
+
+
+@app.task(name="daily_contact_count")
+def daily_contact_count():
+    """Daily contacts"""
+    today = pendulum.now().end_of("day")
+
+    for project in Project.objects.all():
+        after = today.start_of("day")
+        before = today
+        total_day_calls = Contact.objects.filter(project=project).filter(last_seen_on__range=(after, before)).distinct("contact_flow_uuid").count()
+        cc, created = ContactCount.objects.get_or_create(
+            project=project,
+            day=after,
+            defaults={"count": total_day_calls}
+        )

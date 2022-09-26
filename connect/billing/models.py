@@ -114,6 +114,7 @@ class ContactCount(models.Model):
     )
     count = models.PositiveIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
+    day = models.DateTimeField(null=True)
     project = models.ForeignKey(Project, models.CASCADE, related_name="contact_count_project", null=True)
 
     def increase_contact_count(self, contact_count):
