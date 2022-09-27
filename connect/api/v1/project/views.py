@@ -494,10 +494,7 @@ class RequestPermissionProjectViewSet(
                 request_chats_authorization = request_chats_authorization.first()
                 request_chats_authorization.role = chats_role
                 request_chats_authorization.save()
-            elif chats_authorization:
-                chats_authorization.role = chats_role
-                chats_authorization.save()
-            elif chats_role:
+            elif chats_authorization or chats_role:
                 RequestChatsPermission.objects.create(email=email, role=chats_role, project=project, created_by=created_by)
 
         return Response({
