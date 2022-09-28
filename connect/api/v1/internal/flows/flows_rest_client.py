@@ -157,7 +157,7 @@ class FlowsRESTClient:
         )
 
         response = requests.post(
-            url=f"{self.base_url}/",
+            url=f"{self.base_url}/api/v2/internals/ticketers/",
             headers=self.authentication_instance.headers,
             json=body
         )
