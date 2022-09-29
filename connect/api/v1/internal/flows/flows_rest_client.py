@@ -150,7 +150,7 @@ class FlowsRESTClient:
 
     def create_ticketer(self, project_uuid, ticketer_type, name, config):
         body = dict(
-            project_uuid=project_uuid,
+            org=project_uuid,
             ticketer_type=ticketer_type,
             name=name,
             config=config
@@ -162,4 +162,4 @@ class FlowsRESTClient:
             json=body
         )
 
-        return response.data
+        return response.json()
