@@ -47,6 +47,7 @@ env = environ.Env(
     CSRF_COOKIE_SECURE=(bool, False),
     BASE_URL=(str, "https://api.weni.ai"),
     WEBAPP_BASE_URL=(str, "https://dash.weni.ai"),
+    CHATS_URL=(str, "https://chats.dev.cloud.weni.ai/"),
     INTELIGENCE_URL=(str, "https://bothub.it/"),
     FLOWS_URL=(str, "https://new.push.al/"),
     FLOWS_ELASTIC_URL=(str, None),
@@ -66,6 +67,7 @@ env = environ.Env(
     INTELIGENCE_CERTIFICATE_GRPC_CRT=(str, None),
     FLOW_CERTIFICATE_GRPC_CRT=(str, None),
     INTEGRATIONS_CERTIFICATE_GRPC_CRT=(str, None),
+    CHATS_REST_ENDPOINT=(str, "https://chats-engine.dev.cloud.weni.ai"),
     INTEGRATIONS_REST_ENDPOINT=(str, "https://integrations-engine.dev.cloud.weni.ai"),
     INTELLIGENCE_REST_ENDPOINT=(str, "https://engine-ai.dev.cloud.weni.ai/"),
     SEND_REQUEST_FLOW=(bool, False),
@@ -415,9 +417,11 @@ SEND_EMAILS = env.bool("SEND_EMAILS")
 INTELIGENCE_URL = env.str("INTELIGENCE_URL")
 FLOWS_URL = env.str("FLOWS_URL")
 INTEGRATIONS_URL = env.str("INTEGRATIONS_URL")
+CHATS_URL = env.str("CHATS_URL")
 
 INTEGRATIONS_REST_ENDPOINT = env.str("INTEGRATIONS_REST_ENDPOINT")
 INTELLIGENCE_REST_ENDPOINT = env.str("INTELLIGENCE_REST_ENDPOINT")
+CHATS_REST_ENDPOINT = env.str("CHATS_REST_ENDPOINT")
 
 FLOW_GRPC_ENDPOINT = env.str("FLOW_GRPC_ENDPOINT")
 INTELIGENCE_GRPC_ENDPOINT = env.str("INTELIGENCE_GRPC_ENDPOINT")

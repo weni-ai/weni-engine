@@ -7,6 +7,8 @@ from django.utils import timezone
 
 from connect.authentication.models import User
 from connect.common.models import (
+    ChatsAuthorization,
+    ChatsRole,
     Project,
     Service,
     Organization,
@@ -20,10 +22,12 @@ from connect.common.models import (
     ProjectRoleLevel,
     RocketAuthorization,
     RequestRocketPermission,
+    RequestChatsPermission,
     OpenedProject,
 )
 from connect.celery import app as celery_app
 from connect.api.v1.internal.intelligence.intelligence_rest_client import IntelligenceRESTClient
+from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
 
 logger = logging.getLogger("connect.common.signals")
 
@@ -33,6 +37,17 @@ def create_service_status(sender, instance, created, **kwargs):
     if created:
         for service in Service.objects.filter(default=True):
             instance.service_status.create(service=service)
+        if not settings.TESTING:
+            logger.info('creating chats_project')
+            chats_client = ChatsRESTClient()
+            response = chats_client.create_chat_project(
+                project_uuid=str(instance.uuid),
+                project_name=instance.name,
+                date_format=instance.date_format,
+                timezone=str(instance.timezone),
+                is_template=instance.is_template
+            )
+            logger.info(f'[ * ] {response}')
 
         for permission in instance.project_authorizations.all():
             celery_app.send_task(
@@ -49,6 +64,13 @@ def create_service_status(sender, instance, created, **kwargs):
                 project_auth = instance.get_user_authorization(authorization.user)
                 project_auth.role = authorization.role
                 project_auth.save()
+                if not settings.TESTING and project_auth.is_moderator:
+                    RequestChatsPermission.objects.create(
+                        email=project_auth.user.email,
+                        role=ChatsRole.ADMIN.value,
+                        project=project_auth.project,
+                        created_by=project_auth.user
+                    )
 
 
 @receiver(post_save, sender=Service)
@@ -184,7 +206,7 @@ def request_permission_project(sender, instance, created, **kwargs):
             auth = instance.project.project_authorizations
             auth_user = auth.filter(user=user)
             if not auth_user.exists():
-                ProjectAuthorization.objects.create(
+                auth_user = ProjectAuthorization.objects.create(
                     user=user,
                     project=instance.project,
                     organization_authorization=org_auth,
@@ -194,12 +216,28 @@ def request_permission_project(sender, instance, created, **kwargs):
                 auth_user = auth_user.first()
                 auth_user.role = instance.role
                 auth_user.save(update_fields=["role"])
+
+            if not settings.TESTING and auth_user.is_moderator:
+                RequestChatsPermission.objects.create(
+                    email=instance.email,
+                    role=ChatsRole.ADMIN.value,
+                    project=instance.project,
+                    created_by=instance.created_by
+                )
             instance.delete()
         # todo: send invite project email
 
 
 @receiver(post_save, sender=ProjectAuthorization)
 def project_authorization(sender, instance, created, **kwargs):
+    if created:
+        if not settings.TESTING and instance.is_moderator and not instance.chats_authorization:
+            RequestChatsPermission.objects.create(
+                email=instance.user.email,
+                role=ChatsRole.ADMIN.value,
+                project=instance.project,
+                created_by=instance.user
+            )
     if instance.role is not ProjectRoleLevel.NOTHING.value:
         instance_user = (
             instance.organization_authorization.organization.get_user_authorization(
@@ -250,3 +288,35 @@ def request_rocket_permission(sender, instance, created, **kwargs):
                 project_auth.save(update_fields=["rocket_authorization"])
                 project_auth.rocket_authorization.update_rocket_permission()
             instance.delete()
+
+
+@receiver(post_save, sender=RequestChatsPermission)
+def request_chats_permission(sender, instance, created, **kwargs):
+    if created:
+        user = User.objects.filter(email=instance.email)
+        if user.exists():
+            user = user.first()
+            project_auth = instance.project.project_authorizations.filter(user=user)
+            chats_instance = ChatsRESTClient()
+            if project_auth.exists():
+                project_auth = project_auth.first()
+                chats_role = ChatsRole.ADMIN.value if project_auth.is_moderator else instance.role
+                if not project_auth.chats_authorization:
+                    project_auth.chats_authorization = ChatsAuthorization.objects.create(role=chats_role)
+                    if not settings.TESTING:
+                        chats_instance.create_user_permission(
+                            project_uuid=str(instance.project.uuid),
+                            user_email=user.email,
+                            permission=chats_role
+                        )
+                else:
+                    project_auth.chats_authorization.role = chats_role
+                    project_auth.chats_authorization.save(update_fields=["role"])
+                    if not settings.TESTING:
+                        chats_instance.update_user_permission(
+                            permission=chats_role,
+                            user_email=user.email,
+                            project_uuid=str(instance.project.uuid)
+                        )
+                project_auth.save(update_fields=["chats_authorization"])
+                instance.delete()

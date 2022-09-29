@@ -87,7 +87,7 @@ class FlowsRESTClient:
         return dict(status=response.status_code)
 
     def update_user_permission_project(self, organization_uuid: str, user_email: str, permission: int):
-        permissions = {1: "viewer", 2: "editor", 3: "administrator"}
+        permissions = {1: "viewer", 2: "editor", 3: "administrator", 5: "agent"}
 
         body = dict(
             org_uuid=organization_uuid,
@@ -156,3 +156,19 @@ class FlowsRESTClient:
             headers=self.authentication_instance.headers
         )
         return response
+
+    def create_ticketer(self, project_uuid, ticketer_type, name, config):
+        body = dict(
+            org=project_uuid,
+            ticketer_type=ticketer_type,
+            name=name,
+            config=config
+        )
+
+        response = requests.post(
+            url=f"{self.base_url}/api/v2/internals/ticketers/",
+            headers=self.authentication_instance.headers,
+            json=body
+        )
+
+        return response.json()
