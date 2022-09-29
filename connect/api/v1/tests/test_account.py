@@ -2,6 +2,7 @@ import json
 
 from django.test import TestCase, RequestFactory
 from django.test.client import MULTIPART_CONTENT
+
 from rest_framework import status
 
 from connect.api.v1.account.views import MyUserProfileViewSet
@@ -78,3 +79,50 @@ class DestroyMyProfileTestCase(TestCase):
     def test_okay(self):
         response = self.request(self.user_token)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+
+class AdditionalUserInfoTestCase(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.user, self.user_token = create_user_and_token()
+
+    def request(self, data, token):
+        authorization_header = {"HTTP_AUTHORIZATION": "Token {}".format(token.key)}
+        request = self.factory.put(
+            "/v1/account/my-profile/add_additional_information/",
+            data=json.dumps(data),
+            content_type="application/json",
+            format="json",
+            **authorization_header,
+        )
+        response = MyUserProfileViewSet.as_view({"put": "add_additional_information"})(
+            request,
+        )
+        response.render()
+        content_data = json.loads(response.content)
+        return (response, content_data)
+
+    def test_okay(self):
+        company_info = {
+            "name": "test",
+            "number_people": "0",
+            "segment": "test",
+            "sector": "ti",
+            "weni_helps": "ti.incidentes"
+        }
+
+        user_info = {
+            "phone": "5582555555555"
+        }
+
+        body = dict(
+            company=company_info,
+            user=user_info
+        )
+
+        response, content_data = self.request(body, self.user_token)
+        company_response = content_data.get('company')
+        user_response = content_data.get('user')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(company_info, company_response)
+        self.assertEqual(user_info.get('phone'), user_response.get('phone'))

@@ -37,7 +37,7 @@
         margin-top: 24px;
       "
     >
-    {% trans "Your" %} {{organization_name}} {% trans "organization's plan has been reactivated" %}.
+    {% trans "The plan for your organization" %} {{organization_name}} {% trans "was reactivated" %}.
     </div>
 
     <div
@@ -51,16 +51,17 @@
         margin-top: 24px;
       "
     >
-    {% trans "An Adminstrator has reactivated the organization plan" %}.
-      <strong>{{organization_name}}</strong>. {% trans "Your Intelligences, created Flows and the Chat module" %}
-      {% trans "came back to work again" %}. {% trans "It's wonderfull to have your team back" %}.
-      <span style="margin-left: 1px">
-        <img
-          style="max-height: 16px"
-          src="{% static 'emojis/blue-heart.png' %}"
-          alt=""
-        />
-      </span>
+    {% trans "An administrator has reactivated the organization plan for " %}
+    <strong>{{organization_name}}</strong>.
+    {% trans "Your Intelligences, created Flows and the Chat module are back again" %}.
+    {% trans "It's wonderful to have your team back" %}.
+    <span style="margin-left: 1px">
+      <img
+        style="max-height: 16px"
+        src="{% static 'emojis/blue-heart.png' %}"
+        alt=""
+      />
+    </span>
     </div>
   </section>
 {% endblock main-content %}

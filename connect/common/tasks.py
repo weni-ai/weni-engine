@@ -307,7 +307,7 @@ def sync_active_contacts():
         created_at = project.organization.created_at
         before = timezone.now() if next_due_date is None else next_due_date
         after = created_at if last_invoice_date is None else last_invoice_date
-        contact_count = utils.count_contacts(project=project, after=after, before=before)
+        contact_count = utils.count_contacts(project=project, after=str(after), before=str(before))
         project.contact_count = int(contact_count)
         project.save(update_fields=["contact_count"])
     return True
@@ -372,7 +372,7 @@ def sync_repositories_statistics():
         except Exception:
             intelligence_count = 0
 
-        project.intelligence_count = intelligence_count
+        project.inteligence_count = intelligence_count
         project.save(update_fields=["inteligence_count"])
 
 
@@ -420,7 +420,7 @@ def generate_project_invoice():
             )
         )
         for project in org.project.all():
-            contact_count = utils.count_contacts(project=project, after=after, before=before)
+            contact_count = utils.count_contacts(project=project, after=str(after), before=str(before))
 
             invoice.organization_billing_invoice_project.create(
                 project=project,
@@ -565,19 +565,24 @@ def delete_user_permission_project(project_uuid: str, user_email: str, permissio
 
 
 @app.task(name="list_channels")
-def list_channels(project_uuid, channel_type):
+def list_channels(channel_type):
     grpc_instance = utils.get_grpc_types().get("flow")
-    response = list(grpc_instance.list_channel(project_uuid=project_uuid, channel_type=channel_type))
+    response = list(grpc_instance.list_channel(channel_type=channel_type))
     channels = []
     for channel in response:
-        channels.append(
-            {
-                "uuid": channel.uuid,
-                "name": channel.name,
-                "config": channel.config,
-                "address": channel.address,
-            }
-        )
+        project = Project.objects.filter(flow_organization=channel.org)
+        if project:
+            project = project.first()
+            channels.append(
+                {
+                    "uuid": str(channel.uuid),
+                    "name": channel.name,
+                    "config": channel.config,
+                    "address": channel.address,
+                    "project_uuid": str(project.uuid),
+                    "is_active": channel.is_active,
+                }
+            )
     return channels
 
 

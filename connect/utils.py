@@ -1,7 +1,7 @@
 import requests
 import pendulum
 from connect.common.models import Project
-from connect.billing.models import ContactCount
+from connect.billing.models import Contact
 
 
 def upload_photo_rocket(server_rocket: str, jwt_token: str, avatar_url: str) -> bool:
@@ -39,8 +39,12 @@ def es_convert_datetime(before: str, after: str):
 
 
 def count_contacts(project: Project, before: str, after: str):
-    contacts_day_count = ContactCount.objects.filter(project=project).filter(created_at__range=(after, before))
-    return sum([day_count.count for day_count in contacts_day_count])
+    # contacts_day_count = ContactCount.objects.filter(project=project).filter(created_at__range=(after, before))
+    tz = pendulum.timezone("America/Maceio")
+    after = pendulum.parse(after).in_timezone(tz)
+    before = pendulum.parse(before).in_timezone(tz)
+    contacts_day_count = Contact.objects.filter(project=project).filter(last_seen_on__range=(after, before)).distinct("contact_flow_uuid").count()
+    return contacts_day_count
 
 
 def check_module_permission(claims, user):

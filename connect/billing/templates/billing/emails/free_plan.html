@@ -37,7 +37,7 @@
               margin-top: 24px;
             "
           >
-              {% trans "Your " %} {{ org_name }} {% trans "organization has the" %} {{plan}} {% trans "Plan" %}
+              {% trans "Your organization" %} {{ org_name }} {% trans "has the following plan" %}: {{plan}}
             <span style="margin-left: 2px">
               <img style="max-height: 20px" src="{% static 'emojis/rocket.png' %}" alt="" />
             </span>
@@ -54,7 +54,7 @@
               margin-top: 24px;
             "
           >
-              {% trans "The" %}<strong> {{plan}} {% trans "Plan" %}</strong> {% trans "was chosen for your organization" %}.
+              {% trans "The plan" %}<strong> {{plan}} </strong> {% trans "was selected for your organization" %}.
               {% trans "The members can now take advantage of the benefits and scale their communication with our tools" %}
             <span style="margin-left: 1px">
               <img

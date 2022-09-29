@@ -29,7 +29,6 @@ from connect.api.v1.project.serializers import (
     RequestRocketPermissionSerializer,
     RequestPermissionProjectSerializer,
     ReleaseChannelSerializer,
-    ListChannelSerializer,
     CreateChannelSerializer,
     CreateWACChannelSerializer,
     DestroyClassifierSerializer,
@@ -37,6 +36,7 @@ from connect.api.v1.project.serializers import (
     CreateClassifierSerializer,
     ClassifierSerializer,
     TemplateProjectSerializer,
+    UserAPITokenSerializer,
 )
 
 from connect.celery import app as celery_app
@@ -168,8 +168,8 @@ class ProjectViewSet(
         before = pendulum.parse(before, strict=False).end_of("day")
         after = pendulum.parse(after, strict=False).start_of("day")
 
-        contact_count = count_contacts(str(project_uuid), before, after)
-        contacts = Contact.objects.filter(channel__project=project_uuid, last_seen_on__range=(after, before))
+        contact_count = count_contacts(str(project_uuid), str(before), (after))
+        contacts = Contact.objects.filter(channel__project=project_uuid, last_seen_on__range=(after, before)).distinct("contact_flow_uuid")
 
         project = Project.objects.get(uuid=project_uuid)
 
@@ -242,21 +242,20 @@ class ProjectViewSet(
     @action(
         detail=True,
         methods=["GET"],
-        url_name="list-channel",
+        url_name="list-channels",
         permission_classes=[ModuleHasPermission],
     )
-    def list_channel(self, request):
-        channel_type = request.data.get('channel_type', None)
+    def list_channels(self, request):
+        channel_type = request.query_params.get('channel_type', None)
         if not channel_type:
             raise ValidationError("Need pass the channel_type")
 
-        page = self.paginate_queryset(
-            self.filter_queryset(self.queryset),
+        task = tasks.list_channels.delay(channel_type)
+        task.wait()
+        response = dict(
+            channels=task.result
         )
-        context = self.get_serializer_context()
-        context["channel_type"] = channel_type
-        channel_serializer = ListChannelSerializer(page, many=True, context=context)
-        return self.get_paginated_response(channel_serializer.data)
+        return JsonResponse(status=status.HTTP_200_OK, data=response)
 
     @action(
         detail=True,
@@ -389,6 +388,24 @@ class ProjectViewSet(
             task = tasks.list_classifier.delay(str(project.flow_organization))
             task.wait()
             return JsonResponse(status=status.HTTP_200_OK, data=task.result)
+
+    @action(
+        detail=True,
+        methods=["GET"],
+        url_name='user-api-token',
+    )
+    def user_api_token(self, request):
+        serializer = UserAPITokenSerializer(data=request.query_params)
+        serializer.is_valid(raise_exception=True)
+
+        project_uuid = serializer.validated_data.get("project_uuid")
+        user = serializer.validated_data.get("user")
+        project = Project.objects.get(uuid=project_uuid)
+
+        rest_client = FlowsRESTClient()
+        response = rest_client.get_user_api_token(str(project.flow_organization), user)
+
+        return JsonResponse(status=response.status_code, data=response.json())
 
     @action(
         detail=True,

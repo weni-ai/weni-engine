@@ -15,21 +15,18 @@ class Rocket:
         self.valid_roles = ['not-set', 'user', 'admin', 'livechat-agent', 'livechat-manager']
 
     def get_keycloak_authorization_token(self):
-        data = {
-            "client_id": self.client_id,
-            "username": self.username,
-            "password": self.password,
-            "grant_type": "password",
-        }
-
+        data = dict(
+            client_id=settings.OIDC_RP_CLIENT_ID,
+            client_secret=settings.OIDC_RP_CLIENT_SECRET,
+            grant_type="client_credentials",
+        )
         r = requests.post(self.keycloak_oidc_url, data)
         data = json.loads(r.text)
-
         if r.status_code == 200:
             return {
                 "status": "SUCCESS",
-                "access_token": data["access_token"],
-                "expires_in": data["expires_in"],
+                "access_token": data.get("access_token"),
+                "expires_in": data.get("expires_in"),
             }
 
         return {"status": "FAILED", "message": data}
