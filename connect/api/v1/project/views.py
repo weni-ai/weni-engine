@@ -410,7 +410,7 @@ class ProjectViewSet(
                 name=name,
                 config=config,
             )
-            return ticketer
+            return JsonResponse(data=ticketer)
 
 
 class RequestPermissionProjectViewSet(
