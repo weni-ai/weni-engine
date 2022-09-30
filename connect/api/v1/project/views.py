@@ -609,6 +609,7 @@ class TemplateProjectViewSet(
             timezone=str(request.data.get("timezone")),
             flow_organization=flow_organization,
             is_template=True,
+            created_by=request.user
         )
 
         project_data = {

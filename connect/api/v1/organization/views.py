@@ -172,7 +172,8 @@ class OrganizationViewSet(
                 flow_organization=flows_info.get("uuid"),
                 timezone=str(project_info.get("timezone")),
                 organization=new_organization,
-                is_template=True if project_info.get("template") else False
+                is_template=True if project_info.get("template") else False,
+                created_by=user
             )
 
             # Create owner's organization authorization

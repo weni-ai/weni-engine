@@ -62,7 +62,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             "flow_uuid",
             "first_access",
             "wa_demo_token",
-            "redirect_url"
+            "redirect_url",
         ]
         ref_name = None
 
@@ -152,9 +152,10 @@ class ProjectSerializer(serializers.ModelSerializer):
         }
 
     def create(self, validated_data):
+        user = self.context["request"].user
         task = tasks.create_project.delay(  # pragma: no cover
             validated_data.get("name"),
-            self.context["request"].user.email,
+            user.email,
             str(validated_data.get("timezone")),
         )
         if not settings.TESTING:
@@ -162,7 +163,12 @@ class ProjectSerializer(serializers.ModelSerializer):
 
         project = task.result
 
-        validated_data.update({"flow_organization": project.get("uuid")})
+        validated_data.update(
+            {
+                "flow_organization": project.get("uuid"),
+                "created_by": user
+            }
+        )
         instance = super().create(validated_data)
 
         return instance

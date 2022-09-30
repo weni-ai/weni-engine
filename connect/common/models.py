@@ -507,6 +507,13 @@ class Project(models.Model):
         _("Whatsapp Integrations"), default=0
     )
     is_template = models.BooleanField(default=False)
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        related_name="projects",
+        blank=True,
+        null=True,
+    )
 
     def __str__(self):
         return f"{self.uuid} - Project: {self.name} - Org: {self.organization.name}"
