@@ -38,14 +38,15 @@ def create_service_status(sender, instance, created, **kwargs):
         for service in Service.objects.filter(default=True):
             instance.service_status.create(service=service)
         if not settings.TESTING:
-            logger.info('creating chats_project')
+            project_auth = instance.project_authorizations.filter(role=ProjectRole.MODERATOR.value).first()
             chats_client = ChatsRESTClient()
             response = chats_client.create_chat_project(
                 project_uuid=str(instance.uuid),
                 project_name=instance.name,
                 date_format=instance.date_format,
                 timezone=str(instance.timezone),
-                is_template=instance.is_template
+                is_template=instance.is_template,
+                user_email=project_auth.user.email
             )
             logger.info(f'[ * ] {response}')
 
