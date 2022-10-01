@@ -22,9 +22,8 @@ from connect.common.models import (
     GenericBillingData,
 )
 
-from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
-from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
 from connect.api.v1.internal.integrations.integrations_rest_client import IntegrationsRESTClient
+from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
 from connect.api.v1.internal.intelligence.intelligence_rest_client import IntelligenceRESTClient
 
 
@@ -495,41 +494,24 @@ def update_suspend_project(project_uuid: str, is_suspended: bool):
 
 @app.task(name="update_user_photo")
 def update_user_photo(user_email: str, photo_url: str):
-
-    chats_client = ChatsRESTClient()
     integrations_client = IntegrationsRESTClient()
-
     user = User.objects.filter(email=user_email)
-
     if user.exists():
         user = user.first()
         integrations_client.update_user(
             user_email=user_email,
             photo_url=photo_url,
         )
-        chats_client.update_user(
-            user_email=user_email,
-            photo_url=photo_url
-        )
     return True
 
 
 @app.task(name="update_user_name")
 def update_user_name(user_email: str, first_name: str, last_name: str):
-
-    chats_client = ChatsRESTClient()
     integrations_client = IntegrationsRESTClient()
-
     user = User.objects.filter(email=user_email)
-
     if user.exists():
         user = user.first()
         integrations_client.update_user(
-            user_email=user_email,
-            first_name=first_name,
-            last_name=last_name
-        )
-        chats_client.update_user(
             user_email=user_email,
             first_name=first_name,
             last_name=last_name

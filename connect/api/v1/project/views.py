@@ -21,8 +21,8 @@ from connect.api.v1.metadata import Metadata
 from connect.api.v1.project.filters import ProjectOrgFilter
 from connect.api.v1.project.permissions import ProjectHasPermission
 from connect.api.v1.internal.permissions import ModuleHasPermission
-from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
 from connect.api.v1.organization.permissions import Has2FA
+from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
 from connect.api.v1.project.serializers import (
     ProjectSerializer,
     ProjectSearchSerializer,
@@ -42,17 +42,14 @@ from connect.api.v1.project.serializers import (
 from connect.celery import app as celery_app
 from connect.common.models import (
     Organization,
-    ChatsAuthorization,
     OrganizationAuthorization,
     Project,
-    RequestChatsPermission,
     RequestPermissionProject,
     RequestRocketPermission,
     ProjectAuthorization,
     RocketAuthorization,
     OpenedProject,
     TemplateProject,
-    Service,
 )
 from connect.authentication.models import User
 from connect.common import tasks
@@ -407,28 +404,6 @@ class ProjectViewSet(
 
         return JsonResponse(status=response.status_code, data=response.json())
 
-    @action(
-        detail=True,
-        methods=["POST"],
-        url_name='create-ticketer',
-        permission_classes=[ModuleHasPermission],
-    )
-    def create_ticketer(self, request):
-        project_uuid = request.data.get('project_uuid')
-        ticketer_type = request.data.get('ticketer_type')
-        name = request.data.get('name')
-        config = request.data.get('config')
-        project = Project.objects.get(uuid=project_uuid)
-        if not settings.TESTING:
-            flows_client = FlowsRESTClient()
-            ticketer = flows_client.create_ticketer(
-                project_uuid=str(project.flow_organization),
-                ticketer_type=ticketer_type,
-                name=name,
-                config=config,
-            )
-            return JsonResponse(data=ticketer)
-
 
 class RequestPermissionProjectViewSet(
     mixins.ListModelMixin,
@@ -446,7 +421,7 @@ class RequestPermissionProjectViewSet(
         role = request.request.data.get('role')
         email = request.request.data.get('email')
         project_uuid = request.request.data.get('project')
-        chats_role = request.request.data.get('chats_role')
+        rocket_role = request.request.data.get('rocket_authorization')
         project = Project.objects.filter(uuid=project_uuid)
 
         if len(email) == 0:
@@ -458,20 +433,20 @@ class RequestPermissionProjectViewSet(
             return Response({"status": 404, "message": f"Project {project_uuid} not found!"})
         project = project.first()
 
+        if len([item for item in RocketAuthorization.ROLE_CHOICES if item[0] == rocket_role]) == 0 and rocket_role:
+            return Response({"status": 422, "message": f"{rocket_role} is not a valid rocket role!"})
+
         request_permission = RequestPermissionProject.objects.filter(email=email, project=project)
         project_auth = project.project_authorizations.filter(user__email=email)
 
         request_rocket_authorization = RequestRocketPermission.objects.filter(email=email, project=project)
-        request_chats_authorization = RequestChatsPermission.objects.filter(email=email, project=project)
         rocket_authorization = None
-        chats_authorization = None
 
         user_name = ''
         first_name = ''
         last_name = ''
         photo = ''
         is_pendent = False
-        has_rocket = project.service_status.filter(service__service_type=Service.SERVICE_TYPE_CHAT).exists()
 
         if request_permission.exists():
             request_permission = request_permission.first()
@@ -481,7 +456,6 @@ class RequestPermissionProjectViewSet(
         elif project_auth.exists():
             project_auth = project_auth.first()
             rocket_authorization = project_auth.rocket_authorization
-            chats_authorization = project_auth.chats_authorization
             user_name = project_auth.user.username
             first_name = project_auth.user.first_name
             last_name = project_auth.user.last_name
@@ -492,43 +466,17 @@ class RequestPermissionProjectViewSet(
             RequestPermissionProject.objects.create(created_by=created_by, email=email, role=role, project=project)
             is_pendent = RequestPermissionProject.objects.filter(email=email, project=project).exists()
 
-        if has_rocket:
-            if chats_role and len([item for item in RocketAuthorization.ROLE_CHOICES if item[0] == chats_role]) == 0:
-                return Response({"status": 422, "message": f"{chats_role} is not a valid rocket role!"})
-            if request_rocket_authorization.exists():
-                request_rocket_authorization = request_rocket_authorization.first()
-                request_rocket_authorization.role = chats_role
-                request_rocket_authorization.save()
-            elif rocket_authorization:
-                rocket_authorization.role = chats_role
-                rocket_authorization.save()
-            elif chats_role:
-                RequestRocketPermission.objects.create(email=email, role=chats_role, project=project, created_by=created_by)
-        else:
-            if chats_role and len([item for item in ChatsAuthorization.ROLE_CHOICES if item[0] == chats_role]) == 0:
-                return Response({"status": 422, "message": f"{chats_role} is not a valid chats role!"})
-            if request_chats_authorization.exists():
-                request_chats_authorization = request_chats_authorization.first()
-                request_chats_authorization.role = chats_role
-                request_chats_authorization.save()
-            elif chats_authorization or chats_role:
-                RequestChatsPermission.objects.create(email=email, role=chats_role, project=project, created_by=created_by)
+        if request_rocket_authorization.exists():
+            request_rocket_authorization = request_rocket_authorization.first()
+            request_rocket_authorization.role = rocket_role
+            request_rocket_authorization.save()
+        elif not (rocket_authorization is None):
+            rocket_authorization.role = rocket_role
+            rocket_authorization.save()
+        elif rocket_role:
+            RequestRocketPermission.objects.create(email=email, role=rocket_role, project=project, created_by=created_by)
 
-        return Response({
-            "status": 200,
-            "data": {
-                "created_by": created_by.email,
-                "role": role,
-                "chats_role": chats_role,
-                "email": email,
-                "project": str(project_uuid),
-                "username": user_name,
-                "first_name": first_name,
-                "last_name": last_name,
-                "photo_user": photo,
-                "is_pendent": is_pendent
-            }
-        })
+        return Response({"status": 200, "data": {"created_by": created_by.email, "role": role, "rocket_authorization": rocket_role, "email": email, "project": project_uuid, "username": user_name, "first_name": first_name, "last_name": last_name, "photo_user": photo, "is_pendent": is_pendent}})
 
 
 class RequestPermissionRocketViewSet(
@@ -606,7 +554,7 @@ class TemplateProjectViewSet(
             date_format=request.data.get("date_format"),
             name=request.data.get("name"),
             organization=organization,
-            timezone=str(request.data.get("timezone")),
+            timezone=request.data.get("timezone"),
             flow_organization=flow_organization,
             is_template=True,
         )
