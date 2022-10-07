@@ -70,7 +70,8 @@ class ChatsRESTClient:
         project_name: str,
         date_format: str,
         timezone: str,
-        is_template: bool
+        is_template: bool,
+        user_email: str
     ):
         body = dict(
             uuid=project_uuid,
@@ -78,6 +79,7 @@ class ChatsRESTClient:
             date_format=date_format,
             timezone=timezone,
             is_template=is_template,
+            user_email=user_email
         )
         response = requests.post(
             url=f"{self.base_url}/v1/internal/project/",
