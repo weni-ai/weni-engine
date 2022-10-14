@@ -34,6 +34,8 @@ class WeniOIDCAuthenticationBackend(OIDCAuthenticationBackend):
     def create_user(self, claims):
         # Override existing create_user method in OIDCAuthenticationBackend
         email = claims.get("email")
+        locale = claims.get("locale")
+
         username = self.get_username(claims)
         user = self.UserModel.objects.create_user(email, username)
 
@@ -42,6 +44,17 @@ class WeniOIDCAuthenticationBackend(OIDCAuthenticationBackend):
         user.first_name = claims.get("given_name", "")
         user.last_name = claims.get("family_name", "")
         user.email = claims.get("email", "")
+
+        if locale:
+            if locale.lower() == "pt-br":
+                language = settings.LANGUAGES[1][0]
+            elif locale.lower() == "es":
+                language = settings.LANGUAGES[2][0]
+            else:
+                language = settings.LANGUAGES[0][0]
+
+            user.language = language
+
         user.save()
 
         check_module_permission(claims, user)
