@@ -181,7 +181,8 @@ class ProjectSerializer(serializers.ModelSerializer):
             args=[instance.flow_organization, name],
         )
         updated_instance = super().update(instance, validated_data)
-        ChatsRESTClient().update_chats_project(instance.uuid)
+        if not settings.TESTING:
+            ChatsRESTClient().update_chats_project(instance.uuid)
         return updated_instance
 
     def get_authorizations(self, obj):
