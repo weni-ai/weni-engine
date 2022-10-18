@@ -2,6 +2,7 @@ from django.conf import settings
 
 import requests
 
+from connect.common.models import Project
 from connect.api.v1.internal.internal_authentication import InternalAuthentication
 from connect.common.models import ChatsRole
 
@@ -113,6 +114,21 @@ class ChatsRESTClient:
         )
         requests.post(
             url=f"{self.base_url}/v1/internal/permission/project/",
+            headers=self.authentication_instance.headers,
+            json=body
+        )
+        return True
+
+    def update_chats_project(self, project_uuid):
+        project = Project.objects.get(uuid=project_uuid)
+        body = dict(
+            project=str(project.uuid),
+            name=project.name,
+            timezone=str(project.timezone),
+            date_format=project.date_format,
+        )
+        requests.patch(
+            url=f"{self.base_url}/v1/internal/project/{project_uuid}/",
             headers=self.authentication_instance.headers,
             json=body
         )

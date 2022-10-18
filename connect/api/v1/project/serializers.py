@@ -4,6 +4,7 @@ import uuid
 
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
+from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
 from rest_framework import serializers
 
 from rest_framework.exceptions import PermissionDenied
@@ -179,7 +180,9 @@ class ProjectSerializer(serializers.ModelSerializer):
             "update_project",
             args=[instance.flow_organization, name],
         )
-        return super().update(instance, validated_data)
+        updated_instance = super().update(instance, validated_data)
+        ChatsRESTClient().update_chats_project(instance.uuid)
+        return updated_instance
 
     def get_authorizations(self, obj):
         exclude_roles = [ProjectRole.SUPPORT.value]
