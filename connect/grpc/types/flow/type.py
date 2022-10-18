@@ -296,3 +296,21 @@ class FlowType(GRPCType):
         response = stub.MessageDetail(request)
 
         return response
+
+    def list_flows(self, flow_organization: str, *args):
+        stub = flow_pb2_grpc.FlowControllerStub(self.channel)
+        flows = []
+
+        try:
+            flows_response = stub.List(flow_pb2.FlowListRequest(org_uuid=flow_organization, *args))
+            for flow in flows_response:
+                flows.append({
+                    "uuid": flow.uuid,
+                    "name": flow.name,
+                    "triggers": flow.triggers, # TODO: Validate is returning valid dict
+                })
+        except grpc.RpcError as e:
+            if e.code() is not grpc.StatusCode.NOT_FOUND:
+                raise e
+
+        return flows
