@@ -354,23 +354,26 @@ def sync_project_statistics():
 
 @app.task()
 def sync_repositories_statistics():
-    flow_instance = utils.get_grpc_types().get("flow")
+    # flow_instance = utils.get_grpc_types().get("flow")
     ai_client = IntelligenceRESTClient()
+    flow_client = FlowsRESTClient()
 
     for project in Project.objects.all():
-        classifiers_project = flow_instance.get_classifiers(
-            project_uuid=str(project.flow_organization),
-            classifier_type="bothub",
-            is_active=True,
-        )
-        try:
-            intelligence_count = int(
-                ai_client.get_count_intelligences_project(
-                    classifiers=classifiers_project,
-                ).get("repositories_count")
+        intelligence_count = 0
+        if not settings.TESTING:
+            classifiers_project = flow_client.get_classifiers(
+                project_uuid=str(project.flow_organization),
+                classifier_type="bothub",
+                is_active=True,
             )
-        except Exception:
-            intelligence_count = 0
+            try:
+                intelligence_count = int(
+                    ai_client.get_count_intelligences_project(
+                        classifiers=classifiers_project,
+                    ).get("repositories_count")
+                )
+            except Exception:
+                intelligence_count = 0
 
         project.inteligence_count = intelligence_count
         project.save(update_fields=["inteligence_count"])
@@ -654,8 +657,8 @@ def retrieve_classifier(classifier_uuid: str):
 
 @app.task(name="destroy_classifier")
 def destroy_classifier(classifier_uuid: str, user_email: str):
-    grpc_instance = utils.get_grpc_types().get("flow")
-    grpc_instance.delete_classifier(
+    flows_client = FlowsRESTClient()
+    flows_client.delete_classifier(
         classifier_uuid=str(classifier_uuid),
         user_email=str(user_email),
     )
@@ -664,21 +667,15 @@ def destroy_classifier(classifier_uuid: str, user_email: str):
 
 @app.task(name="create_classifier")
 def create_classifier(project_uuid: str, user_email: str, classifier_name: str, access_token):
-    grpc_instance = utils.get_grpc_types().get("flow")
-    response = grpc_instance.create_classifier(
+    flows_client = FlowsRESTClient()
+    response = flows_client.create_classifier(
         project_uuid=project_uuid,
         user_email=user_email,
         classifier_type="bothub",
         classifier_name=classifier_name,
         access_token=access_token,
     )
-    return dict(
-        authorization_uuid=response.access_token,
-        classifier_type=response.classifier_type,
-        name=response.name,
-        is_active=response.is_active,
-        uuid=response.uuid,
-    )
+    return response.get("data", {})
 
 
 @app.task(name='list_classifier')
