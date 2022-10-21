@@ -304,10 +304,19 @@ class FlowType(GRPCType):
         try:
             flows_response = stub.List(flow_pb2.FlowListRequest(org_uuid=flow_organization, *args))
             for flow in flows_response:
+                triggers = []
+
+                for trigger in flow.triggers:
+                    triggers.append({
+                        "id": trigger.id,
+                        "keyword": trigger.keyword,
+                        "trigger_type": trigger.trigger_type,
+                    })
+
                 flows.append({
                     "uuid": flow.uuid,
                     "name": flow.name,
-                    "triggers": flow.triggers, # TODO: Validate is returning valid dict
+                    "triggers": triggers,
                 })
         except grpc.RpcError as e:
             if e.code() is not grpc.StatusCode.NOT_FOUND:
