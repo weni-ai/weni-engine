@@ -437,7 +437,7 @@ class ProjectViewSet(
     )
     def list_flows(self, request, **kwargs):
         project_uuid = request.data.get('project_uuid')
-        project = Project.objects.get(uuid=project_uuid)
+        project = get_object_or_404(Project, uuid=project_uuid)
         task = tasks.list_project_flows.delay(str(project.flow_organization))
         task.wait()
         return Response(task.result)
