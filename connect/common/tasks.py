@@ -369,7 +369,7 @@ def sync_repositories_statistics():
             try:
                 intelligence_count = int(
                     ai_client.get_count_intelligences_project(
-                    classifiers=classifiers_project,
+                        classifiers=classifiers_project,
                     ).get("repositories_count")
                 )
             except Exception:
@@ -675,7 +675,7 @@ def create_classifier(project_uuid: str, user_email: str, classifier_name: str, 
         classifier_name=classifier_name,
         access_token=access_token,
     )
-    return response.get("data", {});
+    return response.get("data", {})
 
 
 @app.task(name='list_classifier')

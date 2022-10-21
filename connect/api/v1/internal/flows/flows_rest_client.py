@@ -1,5 +1,3 @@
-from email import header
-from urllib import response
 from django.conf import settings
 
 import os
@@ -108,9 +106,9 @@ class FlowsRESTClient:
     def get_classifiers(self, project_uuid: str, classifier_type: str, is_active: bool):
 
         params = dict(
-            org_uuid = project_uuid,
-            classifier_type = classifier_type,
-            is_active = is_active,
+            org_uuid=project_uuid,
+            classifier_type=classifier_type,
+            is_active=is_active,
         )
 
         response = requests.get(
@@ -124,11 +122,11 @@ class FlowsRESTClient:
 
     def create_classifier(self, project_uuid: str, user_email: str, classifier_type: str, classifier_name: str, access_token: str):
         body = dict(
-            org = project_uuid,
-            user = user_email,
-            classifier_type = classifier_type,
-            name = classifier_name,
-            access_token = access_token,
+            org=project_uuid,
+            user=user_email,
+            classifier_type=classifier_type,
+            name=classifier_name,
+            access_token=access_token,
         )
         response = requests.post(
             url=f"{self.base_url}/api/v2/internals/classifier/",
@@ -136,12 +134,12 @@ class FlowsRESTClient:
             json=body
         )
         # TODO: check the response data its equals to gRPC endpoint return
-        return dict(status=response.status_code, data=response.get("data", {})) 
+        return dict(status=response.status_code, data=response.get("data", {}))
 
     def delete_classifier(self, classifier_uuid: str, user_email: str):
         body = dict(
-            uuid = classifier_uuid,
-            user_email = user_email
+            uuid=classifier_uuid,
+            user_email=user_email
         )
         response = requests.delete(
             url=f"{self.base_url}/api/v2/internals/classifier/",
@@ -174,13 +172,13 @@ class FlowsRESTClient:
         )
 
         return response.json()
-    
+
     def update_language(self, user_email: str, language: str):
         body = dict(
             email=user_email,
             language=language
         )
-        response = requests.patch(
+        requests.patch(
             url=f'{self.base_url}/',
             headers=self.authentication_instance.headers,
             json=body
@@ -188,8 +186,8 @@ class FlowsRESTClient:
 
     def get_project_flows(self, project_uuid, flow_name):
         params = dict(
-            flow_name = flow_name,
-            org_uuid = project_uuid
+            flow_name=flow_name,
+            org_uuid=project_uuid
         )
         response = requests.get(
             url=f"{self.base_url}/api/v2/internals/project-flows/",
@@ -210,7 +208,7 @@ class FlowsRESTClient:
         return response.get("data", [])
 
     def get_project_statistic(self, project_uuid: str):
-        body=dict(
+        body = dict(
             org_uuid=project_uuid
         )
         response = requests.get(
@@ -247,10 +245,10 @@ class FlowsRESTClient:
 
     def create_channel(self, user: str, project_uuid: str, data: str, channeltype_code: str):
         body = dict(
-            user = user,
-            org = project_uuid,
-            data = data,
-            channeltype_code = channeltype_code
+            user=user,
+            org=project_uuid,
+            data=data,
+            channeltype_code=channeltype_code
         )
         response = requests.post(
             url=f'{self.base_url}/api/v2/internals/channels/',
@@ -312,7 +310,7 @@ class FlowsRESTClient:
             after=after
         )
         response = requests.get(
-            url = f'{self.base_url}/api/v2/internals/',
+            url=f'{self.base_url}/api/v2/internals/',
             headers=self.authentication_instance.headers,
             json=body
         )
@@ -323,10 +321,10 @@ class FlowsRESTClient:
         body = dict(
             org_uuid=project_uuid,
             user_email=user_email,
-            permission=self.permissions.get(permission),
+            permission=permissions.get(permission),
         )
         response = requests.delete(
-            url = f'{self.base_url}/',
+            url=f'{self.base_url}/',
             headers=self.authentication_instance.headers,
             json=body
         )
@@ -340,7 +338,7 @@ class FlowsRESTClient:
             after=after
         )
         response = requests.get(
-            url  = f'{self.base_url}/',
+            url=f'{self.base_url}/',
             headers=self.authentication_instance.headers,
             json=body
         )
