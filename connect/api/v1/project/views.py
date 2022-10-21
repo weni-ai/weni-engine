@@ -436,7 +436,7 @@ class ProjectViewSet(
         permission_classes=[ModuleHasPermission],
     )
     def list_flows(self, request, **kwargs):
-        project_uuid = request.data.get('project_uuid')
+        project_uuid = request.query_params.get('project_uuid')
         project = get_object_or_404(Project, uuid=project_uuid)
         task = tasks.list_project_flows.delay(str(project.flow_organization))
         task.wait()
