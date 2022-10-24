@@ -134,7 +134,7 @@ class FlowsRESTClient:
             json=body
         )
         # TODO: check the response data its equals to gRPC endpoint return
-        return dict(status=response.status_code, data=response.get("data", {}))
+        return dict(status=response.status_code, data=response.json())
 
     def delete_classifier(self, classifier_uuid: str, user_email: str):
         body = dict(
@@ -194,7 +194,7 @@ class FlowsRESTClient:
             headers=self.authentication_instance.headers,
             params=params
         )
-        return response.get("data", [])
+        return response.json()
 
     def get_project_info(self, project_uuid: str):
         body = dict(
@@ -205,7 +205,7 @@ class FlowsRESTClient:
             headers=self.authentication_instance.headers,
             json=body
         )
-        return response.get("data", [])
+        return response.json()
 
     def get_project_statistic(self, project_uuid: str):
         body = dict(
@@ -229,7 +229,7 @@ class FlowsRESTClient:
             headers=self.authentication_instance.headers,
             json=body
         )
-        return response.get("data", {})
+        return response.json()
 
     def suspend_or_unsuspend_project(self, project_uuid: str, is_suspended: bool):
         body = dict(
@@ -241,7 +241,7 @@ class FlowsRESTClient:
             headers=self.authentication_instance.headers,
             json=body
         )
-        return response.get("data", {})
+        return response.json()
 
     def create_channel(self, user: str, project_uuid: str, data: str, channeltype_code: str):
         body = dict(
@@ -255,7 +255,7 @@ class FlowsRESTClient:
             headers=self.authentication_instance.headers,
             json=body
         )
-        return response.get("data", {})
+        return response.json()
 
     def create_wac_channel(self, user: str, flow_organization: str, config: str, phone_number_id: str):
         body = dict(
@@ -269,7 +269,7 @@ class FlowsRESTClient:
             headers=self.authentication_instance.headers,
             json=body
         )
-        return response.get("data", {})
+        return response.json()
 
     def release_channel(self, channel_uuid: str, user: str):
         body = dict(
@@ -281,7 +281,7 @@ class FlowsRESTClient:
             headers=self.authentication_instance.headers,
             json=body
         )
-        return response.get("data", {})
+        return response.json()
 
     def list_channel(self, is_active: str = "True", channel_type: str = "WA", project_uuid: str = None):
         params = {}
@@ -328,7 +328,7 @@ class FlowsRESTClient:
             headers=self.authentication_instance.headers,
             json=body
         )
-        return response.get("data", {})
+        return response.json()
 
     def get_message(self, org_uuid: str, contact_uuid: str, before: str, after: str):
         body = dict(
@@ -342,4 +342,4 @@ class FlowsRESTClient:
             headers=self.authentication_instance.headers,
             json=body
         )
-        return response.get("data", {})
+        return response.json()
