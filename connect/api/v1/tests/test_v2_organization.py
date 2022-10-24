@@ -162,3 +162,64 @@ class RetrieveOrganizationProjectsAPITestCase(TestCase):
         print(self.project.is_template)
         response, content_data = self.request2(self.project.uuid, self.owner_token)
         print(content_data)
+
+
+class PlanAPITestCase(TestCase):
+
+    def setUp(self) -> None:
+        self.owner, self.owner_token = create_user_and_token("owner")
+        self.factory = RequestFactory()
+        # Organizations
+        self.organization = Organization.objects.create(
+            name="Nbilling",
+            description="New billing organization",
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan="free",
+            inteligence_organization=1,
+            organization_billing__stripe_customer="cus_MYOrndkgpPHGK9"
+        )
+        # self.trial = Organization.objects.create(
+        #     name="Trial org",
+        #     description="Trial org",
+        #     inteligence_organization=1,
+        #     organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+        #     organization_billing__plan="trial",
+        #     organization_billing__stripe_customer="cus_MYOrndkgpPHGK9",
+        # )
+        # self.basic = Organization.objects.create(
+        #     name="Basic org",
+        #     description="Basic org",
+        #     inteligence_organization=1,
+        #     organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+        #     organization_billing__plan="basic",
+        #     organization_billing__stripe_customer="cus_MYOrndkgpPHGK9",
+        # )
+
+        # # Authorizations
+        self.authorization = self.organization.authorizations.create(
+            user=self.owner, role=OrganizationRole.ADMIN.value
+        )
+        # self.trial_authorization = self.trial.authorizations.create(
+        #     user=self.owner, role=OrganizationRole.ADMIN.value
+        # )
+        # self.basic_authorization = self.basic.authorizations.create(
+        #     user=self.owner, role=OrganizationRole.ADMIN.value
+        # )
+
+    def list(self, organization_uuid, token=None):
+        authorization_header = (
+            {"HTTP_AUTHORIZATION": "Token {}".format(token.key)} if token else {}
+        )
+        request = self.factory.get(
+            f"/v1/organization/org/{organization_uuid}",
+            content_type="application/json",
+            format="json",
+            **authorization_header,
+        )
+        response = OrganizationViewSet.as_view({"get": "list"})(request)
+        response.render()
+        content_data = json.loads(response.content)
+        return response, content_data
+
+    def test_stripe_customer_kwarg(self):
+        self.assertEquals(self.organization.organization_billing.stripe_customer, "cus_MYOrndkgpPHGK9")
