@@ -700,3 +700,9 @@ def list_classifier(project_uuid: str):
             "uuid": i.get("uuid"),
         })
     return classifiers
+
+
+@app.task(name="list_project_flows")
+def list_project_flows(flow_organization: str):
+    flow_type = utils.get_grpc_types().get("flow")
+    return flow_type.list_flows(flow_organization)
