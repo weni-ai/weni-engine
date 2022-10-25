@@ -337,6 +337,9 @@ def sync_project_information():
             project.date_format = str(flow_result.get("date_format"))
             project.flow_id = flow_result.get("id")
             project.save(update_fields=["name", "timezone", "date_format", "flow_id"])
+            if not settings.TESTING:
+                chats_client = ChatsRESTClient()
+                chats_client.update_chats_project(project_uuid=project.uuid)
 
 
 @app.task(name="sync_project_statistics")
