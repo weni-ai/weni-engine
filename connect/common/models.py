@@ -3,13 +3,14 @@ import logging
 import uuid as uuid4
 from datetime import timedelta
 from decimal import Decimal
-
+import pendulum
 from django.conf import settings
 from django.core import mail
 from django.db import models
 from django.db.models import Sum
 from django.template.loader import render_to_string
 from django.utils import timezone
+
 from django.utils.translation import ugettext_lazy as _
 from timezone_field import TimeZoneField
 
@@ -17,8 +18,9 @@ from connect import billing
 from connect.authentication.models import User
 from connect.billing.gateways.stripe_gateway import StripeGateway
 from connect.common.gateways.rocket_gateway import Rocket
-
 from enum import Enum
+from celery import current_app
+
 
 logger = logging.getLogger(__name__)
 
@@ -987,11 +989,19 @@ class BillingPlan(models.Model):
     ]
 
     PLAN_FREE = "free"
+    PLAN_TRIAL = "trial"
+    PLAN_BASIC = "basic"
+    PLAN_PLUS = "plus"
+    PLAN_PREMIUM = "premium"
     PLAN_ENTERPRISE = "enterprise"
     PLAN_CUSTOM = "custom"
 
     PLAN_CHOICES = [
         (PLAN_FREE, _("free")),
+        (PLAN_TRIAL, _("trial")),
+        (PLAN_BASIC, _("basic")),
+        (PLAN_PLUS, _("plus")),
+        (PLAN_PREMIUM, _("premium")),
         (PLAN_ENTERPRISE, _("enterprise")),
         (PLAN_CUSTOM, _("custom")),
     ]
@@ -1056,6 +1066,44 @@ class BillingPlan(models.Model):
     )
 
     card_is_valid = models.BooleanField(_("Card is valid"), default=False)
+    trial_end_date = models.DateTimeField(_("Trial end date"), null=True)
+
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        _adding = self._state.adding
+        if _adding and self.plan == self.PLAN_TRIAL:
+            self.trial_end_date = pendulum.now().end_of("day").add(months=1)
+        return super().save(force_insert, force_update, using, update_fields)
+
+    @staticmethod
+    def plan_info(plan):
+
+        plans_list = [plan[0] for plan in BillingPlan.PLAN_CHOICES]
+
+        if plan in plans_list:
+
+            if plan == BillingPlan.PLAN_BASIC:
+                price = settings.PLAN_BASIC_PRICE
+                limit = settings.PLAN_BASIC_LIMIT
+
+            elif plan == BillingPlan.PLAN_PLUS:
+                price = settings.PLAN_PLUS_PRICE
+                limit = settings.PLAN_PLUS_LIMIT
+
+            elif plan == BillingPlan.PLAN_PREMIUM:
+                price = settings.PLAN_PREMIUM_PRICE
+                limit = settings.PLAN_PREMIUM_LIMIT
+
+            elif plan == BillingPlan.PLAN_ENTERPRISE:
+                price = settings.PLAN_ENTERPRISE_PRICE
+                limit = settings.PLAN_ENTERPRISE_LIMIT
+
+            return {
+                "price": price,
+                "limit": limit,
+                "valid": True
+            }
+
+        return {"valid": False}
 
     @property
     def get_stripe_customer(self):
@@ -1338,6 +1386,42 @@ class BillingPlan(models.Model):
             html_message=render_to_string("billing/emails/changed-plan.html", context),
         )
         return mail
+
+    def send_email_end_trial(self, email: list):
+        if not settings.SEND_EMAILS:
+            return False  # pragma: no cover
+        context = {
+            "base_url": settings.BASE_URL,
+            "webapp_base_url": settings.WEBAPP_BASE_URL,
+            "organization_name": self.organization.name,
+        }
+        mail.send_mail(
+            _("Your trial period has ended"),
+            render_to_string(
+                "common/emails/organization/end_trial.txt", context
+            ),
+            None,
+            email,
+            html_message=render_to_string(
+                "common/emails/organization/end_trial.html", context
+            ),
+        )
+        return mail
+
+    def end_trial_period(self):
+        self.is_active = False
+        self.save(update_fields=["is_active"])
+        self.organization.is_suspended = True
+        self.organization.save(update_fields=["is_suspended"])
+
+        for project in self.organization.project.all():
+            current_app.send_task(  # pragma: no cover
+                name="update_suspend_project", args=[project.flow_organization, True]
+            )
+
+        emails = self.organization.authorizations.values_list("user__email", flat=True)
+
+        self.send_email_end_trial(emails)
 
 
 class Invoice(models.Model):

@@ -136,3 +136,4 @@ dmypy.json
 staticfiles/
 
 weni-script.py
+.vscode/*

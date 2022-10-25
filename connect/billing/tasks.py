@@ -223,3 +223,10 @@ def problem_capture_invoice():
                     name="update_suspend_project",
                     args=[project.flow_organization, True],
                 )
+
+
+@app.task(name="end_trial_plan")
+def end_trial_plan():
+    yesterday = pendulum.yesterday()
+    for organization in Organization.objects.filter(organization_billing__plan=BillingPlan.PLAN_TRIAL, organization_billing__trial_end_date__date=yesterday.date()):
+        organization.organization_billing.end_trial_period()
