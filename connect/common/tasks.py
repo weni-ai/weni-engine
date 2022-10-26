@@ -315,7 +315,8 @@ def sync_active_contacts():
 
 @app.task()
 def sync_total_contact_count():
-    flow_instance = utils.get_grpc_types().get("flow")
+    # flow_instance = utils.get_grpc_types().get("flow")
+    flow_instance = FlowsRESTClient()
     for project in Project.objects.all():
         response = flow_instance.get_project_statistic(project_uuid=str(project.flow_organization))
         contacts = response.get("active_contacts", project.total_contact_count)
@@ -344,7 +345,8 @@ def sync_project_information():
 
 @app.task(name="sync_project_statistics")
 def sync_project_statistics():
-    flow_instance = utils.get_grpc_types().get("flow")
+    # flow_instance = utils.get_grpc_types().get("flow")
+    flow_instance = FlowsRESTClient()
     for project in Project.objects.all():
         statistic_project_result = flow_instance.get_project_statistic(
             project_uuid=str(project.flow_organization),
