@@ -18,6 +18,8 @@ from connect.api.v1.project.views import (
     TemplateProjectViewSet,
 )
 
+from connect.api.v1.billing.views import BillingViewSet
+
 
 class Router(routers.SimpleRouter):  # pragma: no cover
     routes = [
@@ -105,3 +107,4 @@ router.register("organization/invoice", InvoiceViewSet)
 router.register("project/request-permission", RequestPermissionProjectViewSet),
 router.register("organization/rocket-permission", RequestPermissionRocketViewSet)
 router.register("organization/template-project", TemplateProjectViewSet)
+router.register("billing", BillingViewSet, basename="billing")

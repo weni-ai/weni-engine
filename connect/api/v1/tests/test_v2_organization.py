@@ -15,12 +15,16 @@ from connect.common.models import (
     Project,
     ProjectAuthorization,
     RequestPermissionOrganization,
-    BillingPlan
+    BillingPlan,
+    Invoice
 )
 import pendulum
 from freezegun import freeze_time
 from connect.billing.tasks import end_trial_plan
 from rest_framework import status
+import stripe
+from django.conf import settings
+from connect.api.v1.billing.views import BillingViewSet
 
 
 class CreateOrganizationAPITestCase(TestCase):
@@ -344,3 +348,100 @@ class PlanAPITestCase(TestCase):
         self.assertEqual(content_data["status"], "FAILURE")
         self.assertEqual(content_data["message"], "Empty customer")
         self.assertEqual(response.status_code, status.HTTP_304_NOT_MODIFIED)
+
+
+class BillingViewTestCase(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.stripe = stripe
+        self.stripe.api_key = settings.BILLING_SETTINGS.get("stripe", {}).get("API_KEY")
+        self.customer = ""
+        self.owner, self.owner_token = create_user_and_token("owner")
+
+    def request(self, data=None, method=None):
+        request = self.factory.post(
+            f"/v1/billing/{method}",
+            data=json.dumps(data),
+            content_type="application/json",
+            format="json",
+        )
+
+        response = BillingViewSet.as_view({"post": method})(request)
+
+        content_data = json.loads(response.content)
+        return (response, content_data)
+
+    def request_create_org(self, data, token=None):
+        authorization_header = (
+            {"HTTP_AUTHORIZATION": "Token {}".format(token.key)} if token else {}
+        )
+
+        request = self.factory.post(
+            "/v1/organization/org/",
+            json.dumps(data),
+            content_type="application/json",
+            format="json",
+            **authorization_header,
+        )
+
+        response = OrganizationViewSet.as_view({"post": "create"})(request, data)
+        response.render()
+        content_data = json.loads(response.content)
+        return (response, content_data)
+
+    def test_setup_intent(self):
+        response, content_data = self.request(method="setup_intent")
+
+        # setup card
+        stripe.Customer.create_source(
+            content_data.get("customer"),
+            source="tok_visa",
+        )
+        self.customer = content_data.get("customer")
+        self.assertEqual(content_data.get("customer"), "cus_MYOrndkgpPHGK9")
+
+    def test_setup_plan(self):
+        data = {
+            "plan": "basic",
+            "customer": "cus_MYOrndkgpPHGK9",
+        }
+        response, content_data = self.request(data=data, method="setup_plan")
+
+        customer = content_data["customer"]
+        self.assertEqual(content_data["status"], "SUCCESS")
+        # create organization after success at stripe
+        User.objects.create(
+            email="e@mail.com",
+        )
+
+        create_org_data = {
+            "organization": {
+                "name": "basic",
+                "description": "basic",
+                "plan": "basic",
+                "customer": customer,
+                "authorizations": [
+                    {
+                        "user_email": "e@mail.com",
+                        "role": 3
+                    }
+                ]
+            },
+            "project": {
+                "date_format": "D",
+                "name": "Test Project basic",
+                "organization": "2575d1f9-f7f8-4a5d-ac99-91972e309511",
+                "timezone": "America/Argentina/Buenos_Aires",
+            }
+        }
+        response, content_data = self.request_create_org(create_org_data, self.owner_token)
+        self.assertEqual(content_data["organization"]["organization_billing"]["plan"], BillingPlan.PLAN_BASIC)
+        organization = Organization.objects.get(uuid=content_data["organization"]["uuid"])
+        self.assertEqual(organization.organization_billing_invoice.first().payment_status, Invoice.PAYMENT_STATUS_PAID)
+        self.assertEqual(organization.organization_billing_invoice.first().stripe_charge, "ch_teste")
+
+        self.tearDown(organization)
+
+    def tearDown(self, organization: Organization = None):
+        if organization:
+            organization.delete()

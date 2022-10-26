@@ -24,10 +24,14 @@ from connect.common.models import (
     RequestRocketPermission,
     RequestChatsPermission,
     OpenedProject,
+    BillingPlan,
+    Invoice
 )
 from connect.celery import app as celery_app
 from connect.api.v1.internal.intelligence.intelligence_rest_client import IntelligenceRESTClient
 from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
+import stripe
+import pendulum
 
 logger = logging.getLogger("connect.common.signals")
 
@@ -320,3 +324,29 @@ def request_chats_permission(sender, instance, created, **kwargs):
                         )
                 project_auth.save(update_fields=["chats_authorization"])
                 instance.delete()
+
+
+@receiver(post_save, sender=BillingPlan)
+def create_setup_plan_invoice(sender, instance, created, **kwargs):
+    if created:
+        stripe.api_key = settings.BILLING_SETTINGS.get("stripe", {}).get("API_KEY")
+        customer = instance.stripe_customer
+        if settings.TESTING:
+            charges = {
+                "data": [
+                    {
+                        "id": "ch_teste",
+                    }
+                ]
+            }
+        else:
+            charges = stripe.PaymentIntent.list(customer=customer)
+        Invoice.objects.create(
+            organization=instance.organization,
+            stripe_charge=charges["data"][0]["id"],
+            notes="Plan setup",
+            paid_date=pendulum.now(),
+            due_date=pendulum.now(),
+            payment_status=Invoice.PAYMENT_STATUS_PAID,
+            payment_method='credit_card'
+        )
