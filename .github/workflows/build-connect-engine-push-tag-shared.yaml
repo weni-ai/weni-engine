@@ -3,60 +3,59 @@ name: Build Weni Engine (Connect) in Shared (Push Tag)
 on:
   push:
     tags:
-      - 'v*.*.*-develop*'
-      - 'v*.*.*-staging*'
-      - 'v*.*.*'
+      - '*.*.*-develop'
+      - '*.*.*-staging'
+      - '*.*.*'
 
 jobs:
   docker:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest 
     steps:
-
       - name: Set variables
         run: |
             TAG=$(echo $GITHUB_REF|cut -d"/" -f3)
-            if $(echo  $TAG|grep --silent -e 'v*.*.*-develop*')
-            then
+            if $(echo  $TAG|grep --silent -e '^.*.*-develop')
+            then 
               echo "Found environment: DEVELOP - $TAG"
               echo "MANIFESTS_ENVIRONMENT=develop" >> $GITHUB_ENV
               echo "MANIFESTS_ENVIRONMENT=develop"
-              echo "TAG=$TAG" >> $GITHUB_ENV
-              echo "TAG=$TAG"
-              VERSION=${TAG#v}
+              echo "TAG=engine-$TAG" >> $GITHUB_ENV
+              echo "TAG=engine-$TAG"
+              VERSION=${TAG} 
               echo "VERSION=$VERSION" >> $GITHUB_ENV
               echo "VERSION=$VERSION"
               echo "COMMIT_SHA=$GITHUB_SHA" >> $GITHUB_ENV
               echo "COMMIT_SHA=$GITHUB_SHA"
-              echo "IMAGE_TAG=connectof/connect-engine:$TAG" >> $GITHUB_ENV
-              echo "IMAGE_TAG=connectof/connect-engine:$TAG"
-            elif $(echo  $TAG|grep --silent -e 'v*.*.*-staging*')
-            then
+              echo "IMAGE_TAG=${{ secrets.ECR }}/connect:$TAG" >> $GITHUB_ENV
+              echo "IMAGE_TAG=${{ secrets.ECR }}/connect:$TAG"
+            elif $(echo  $TAG|grep --silent -e '^.*.*-staging')
+            then 
               echo "Found environment: STAGING - $TAG"
               echo "MANIFESTS_ENVIRONMENT=staging" >> $GITHUB_ENV
               echo "MANIFESTS_ENVIRONMENT=staging"
-              echo "TAG=$TAG" >> $GITHUB_ENV
-              echo "TAG=$TAG"
-              VERSION=${TAG#v}
+              echo "TAG=engine-$TAG" >> $GITHUB_ENV
+              echo "TAG=engine-$TAG"
+              VERSION=${TAG} 
               echo "VERSION=$VERSION" >> $GITHUB_ENV
               echo "VERSION=$VERSION"
               echo "COMMIT_SHA=$GITHUB_SHA" >> $GITHUB_ENV
               echo "COMMIT_SHA=$GITHUB_SHA"
-              echo "IMAGE_TAG=connectof/connect-engine:$TAG" >> $GITHUB_ENV
-              echo "IMAGE_TAG=connectof/connect-engine:$TAG"
-            elif $(echo  $TAG|grep --silent -e 'v*.*.*')
-            then
+              echo "IMAGE_TAG=${{ secrets.ECR }}/connect:$TAG" >> $GITHUB_ENV
+              echo "IMAGE_TAG=${{ secrets.ECR }}/connect:$TAG"
+            elif $(echo  $TAG|grep --silent -e '^.*.*')
+            then 
               echo "No environment found, assuming: PRODUCTION - $TAG"
               echo "MANIFESTS_ENVIRONMENT=production" >> $GITHUB_ENV
               echo "MANIFESTS_ENVIRONMENT=production"
-              echo "TAG=$TAG" >> $GITHUB_ENV
-              echo "TAG=$TAG"
-              VERSION=${TAG#v}
+              echo "TAG=engine-$TAG" >> $GITHUB_ENV
+              echo "TAG=engine-$TAG"
+              VERSION=${TAG} 
               echo "VERSION=$VERSION" >> $GITHUB_ENV
               echo "VERSION=$VERSION"
               echo "COMMIT_SHA=$GITHUB_SHA" >> $GITHUB_ENV
               echo "COMMIT_SHA=$GITHUB_SHA"
-              echo "IMAGE_TAG=connectof/connect-engine:$TAG" >> $GITHUB_ENV
-              echo "IMAGE_TAG=connectof/connect-engine:$TAG"
+              echo "IMAGE_TAG=${{ secrets.ECR }}/connect:$TAG" >> $GITHUB_ENV
+              echo "IMAGE_TAG=${{ secrets.ECR }}/connect:$TAG"
             else
               echo 'Not a valid tag. Skipping...'
               exit 1
@@ -65,7 +64,7 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v2
         with:
-          ref: ${{env.GITHUB_SHA}}
+          ref: ${{env.GITHUB_SHA}}         # This is how we use an input edit by user
           repository: Ilhasoft/weni-engine
 
       - name: Set up QEMU
@@ -74,37 +73,45 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
 
-      # - name: Login to ECR
-      #   uses: docker/login-action@v1
-      #   with:
-      #     registry: 869898323958.dkr.ecr.us-east-1.amazonaws.com
-      #     username: ${{secrets.AWS_ACCESS_KEY_ID_SHARED}}
-      #     password: ${{secrets.AWS_SECRET_ACCESS_KEY_SHARED}}
-
-      - name: Login to DockerHub
+      - name: Login to ECR
         uses: docker/login-action@v1
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          registry: ${{ secrets.ECR_SHARED }}
+          username: ${{ secrets.AWS_ACCESS_KEY_ID_SHARED }}       # Credentials used to push image to ECR repository
+          password: ${{ secrets.AWS_SECRET_ACCESS_KEY_SHARED }}
 
-      - name: Build and push - Weni Engine Image
+      - name: Set Commit ID
+        id: commit_id
+        run: echo "::set-output commit=$(git rev-parse --short $GITHUB_SHA)"
+
+      - name: Build and push - Weni Engine (Connect) Image
         id: docker_build1
         uses: docker/build-push-action@v2
         with:
           context: .
-          labels: branch=${{env.TAG}},commit=${{env.COMMIT_SHA}},repository=https://github.com/Ilhasoft/weni-engine
+          labels: |
+            tag=${{env.TAG}}
+            commit=${{env.COMMIT_SHA}}
+            repository=https://github.com/Ilhasoft/weni-engine
           file: Dockerfile
           push: true
-          tags: ${{env.IMAGE_TAG}}
+          tags: ${{ secrets.ECR_SHARED }}/connect:${{env.TAG}}
           no-cache: true
 
       - name: Check out Kubernetes Manifests
+        # Now, checkout in kubernetes manifests to update image in deployments patches
         uses: actions/checkout@master
         with:
           ref: main
           repository: Ilhasoft/kubernetes-manifests-connect
-          token: ${{secrets.DEVOPS_GITHUB_PERMANENT_TOKEN}}
+          token: ${{ secrets.DEVOPS_GITHUB_PERMANENT_TOKEN }}
           path: ./kubernetes-manifests/
+          # Its uses other path to not mix with source code repository used to build
+
+      - name: Set variable tag for jq
+        # This is the variable with complete image name
+        run: |
+          echo "IMAGE_TAG=${{ secrets.ECR_SHARED }}/weni-academy:$TAG" >> $GITHUB_ENV
 
       - name: Update image on deployment
         run: |
@@ -117,17 +124,18 @@ jobs:
               [ "$1" = "$2" ] && return 1 || verlte $1 $2
             }
             export PROJECT_DIR="connect-engine" PATCH_TARGET="deployment.json"
-            for e in ${{env.MANIFESTS_ENVIRONMENT}}; do
+            ENV_DIR="kubernetes-manifests/connect-engine/${MANIFESTS_ENVIRONMENT}"
+            for e in ${ENV_DIR}; do
               echo "Update ${e}:"
-              if [ ! -d "kubernetes-manifests/${PROJECT_DIR}/${e}" ] ; then
-                echo "kubernetes-manifests/${PROJECT_DIR}/${e}: Does not exist, skipping"
-              elif [ ! -r "kubernetes-manifests/${PROJECT_DIR}/${e}/kustomization.yaml" ] ; then
-                echo "kubernetes-manifests/${PROJECT_DIR}/${e}/kustomization.yaml: Does not readable, skipping"
-              elif [ ! -r "kubernetes-manifests/${PROJECT_DIR}/${e}/${PATCH_TARGET}" ] ; then
-                echo "kubernetes-manifests/${PROJECT_DIR}/${e}/${PATCH_TARGET}: Does not readable, skipping"
+              if [ ! -d "${e}" ] ; then
+                echo "${e}: Does not exist, skipping"
+              elif [ ! -r "${e}/kustomization.yaml" ] ; then
+                echo "${e}/kustomization.yaml: Does not readable, skipping"
+              elif [ ! -r "${e}/${PATCH_TARGET}" ] ; then
+                echo "${e}/${PATCH_TARGET}: Does not readable, skipping"
               else
                 OLD_IMAGE=$(
-                  cat "kubernetes-manifests/${PROJECT_DIR}/${e}/${PATCH_TARGET}" \
+                  cat "${e}/${PATCH_TARGET}" \
                     | jq '.[] | select(.path == "/spec/template/spec/containers/0/image") | .value'
                 )
                 echo "Old image to replace: ${OLD_IMAGE}"
@@ -137,29 +145,26 @@ jobs:
                     | head -n1
                 )
                 echo "Old image version to compare: ${OLD_VERSION}<=${{env.VERSION}}"
-                if verlte "${OLD_VERSION}" "${{env.VERSION}}" ; then
+                if verlte "${OLD_VERSION}" "${VERSION}" || [[ ! "${OLD_VERSION}" =~ [0-9]+\.[0-9]+\.[0-9]+ ]] ; then
                   echo 'New configurations:'
                   new_configuration=$(
-                    cat "kubernetes-manifests/${PROJECT_DIR}/${e}/${PATCH_TARGET}" \
+                    cat "${e}/${PATCH_TARGET}" \
                       | jq '(..|select(.path == "/spec/template/spec/containers/0/image")?) += {value: "'"${{env.IMAGE_TAG}}"'"}'
                   )
                   echo "${new_configuration}"
-                  echo "${new_configuration}" > "kubernetes-manifests/${PROJECT_DIR}/${e}/${PATCH_TARGET}"
+                  echo "${new_configuration}" > "${e}/${PATCH_TARGET}"
                 else
-                  echo "Version in file is greater than build, skiping update yaml"
+                  echo "Version in file is greater than build, skipping update yaml"
                 fi
               fi
             done
 
       - name: Commit & Push changes
+        # Once made a change, commit new configuration
         uses: actions-js/push@master
         with:
           github_token: ${{ secrets.DEVOPS_GITHUB_PERMANENT_TOKEN }}
           repository: Ilhasoft/kubernetes-manifests-connect
           directory: ./kubernetes-manifests/
           branch: main
-          message: "From Weni Engine Build (Push-Tag)"
-
-      - name: Generated Image
-        run: |
-            echo "IMAGE:      " ${{env.IMAGE_TAG}}
+          message: "From Weni Engine (Connect) Build (Push Tag ${{ env.MANIFESTS_ENVIRONMENT }})"
