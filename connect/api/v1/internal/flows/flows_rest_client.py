@@ -212,11 +212,11 @@ class FlowsRESTClient:
             org_uuid=project_uuid
         )
         response = requests.get(
-            url=f'{self.base_url}/',
+            url=f'{self.base_url}/api/v2/internals/statistic/',
             headers=self.authentication_instance.headers,
-            json=body
+            params=body
         )
-        return response.get("data", [])
+        return response.json()
 
     def get_billing_total_statistics(self, project_uuid: str, before: str, after: str):
         body = dict(
