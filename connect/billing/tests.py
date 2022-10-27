@@ -19,7 +19,7 @@ from connect.billing.models import Contact, Channel, Message, SyncManagerTask
 from connect.common.models import Organization, Project, BillingPlan
 
 from freezegun import freeze_time
-from connect.billing.tasks import sync_contacts
+from connect.billing.tasks import sync_contacts, check_organization_plans
 
 
 @skipIf(not settings.BILLING_SETTINGS.get("stripe", None), "gateway not configured")
@@ -236,3 +236,64 @@ class MessageTestCase(TestCase):
 
     def test_create_message(self):
         self.assertTrue("test message", self.message.text)
+
+
+class CheckPlansTestCase(TestCase):
+    def setUp(self):
+        # Orgs
+        self.basic = Organization.objects.create(
+            name="Basic org",
+            description="Basic org",
+            inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan=BillingPlan.PLAN_BASIC,
+        )
+        self.plus = Organization.objects.create(
+            name="plus org",
+            description="plus org",
+            inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan=BillingPlan.PLAN_PLUS,
+        )
+        self.premium = Organization.objects.create(
+            name="premium org",
+            description="premium org",
+            inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan=BillingPlan.PLAN_PREMIUM,
+        )
+        self.enterprise = Organization.objects.create(
+            name="enterprise org",
+            description="enterprise org",
+            inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan=BillingPlan.PLAN_ENTERPRISE,
+        )
+        # Projects
+        self.basic_project = self.basic.project.create(
+            name="basic",
+            flow_organization=uuid.uuid4(),
+        )
+        self.plus_project = self.plus.project.create(
+            name="plus",
+            flow_organization=uuid.uuid4(),
+        )
+        self.premium_project = self.premium.project.create(
+            name="premium",
+            flow_organization=uuid.uuid4(),
+        )
+        self.enterprise_project = self.enterprise.project.create(
+            name="enterprise",
+            flow_organization=uuid.uuid4(),
+        )
+
+    def test_task_end_trial_plan(self):
+        """
+        Test if 'check_organization_plans' suspends org that should after the trial periods end
+        """
+
+        check_organization_plans()
+
+        for org in Organization.objects.all():
+            self.assertGreater(org.active_contacts, org.organization_billing.plan_limit)
+            self.assertTrue(org.is_suspended)

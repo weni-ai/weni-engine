@@ -230,3 +230,34 @@ def end_trial_plan():
     yesterday = pendulum.yesterday()
     for organization in Organization.objects.filter(organization_billing__plan=BillingPlan.PLAN_TRIAL, organization_billing__trial_end_date__date=yesterday.date()):
         organization.organization_billing.end_trial_period()
+
+
+@app.task(name="check_organization_plans")
+def check_organization_plans():
+    # utc-3 or project_timezone
+    now = pendulum.now()
+    after = now.start_of('month').strftime("%Y-%m-%d %H:%M")
+    before = now.strftime("%Y-%m-%d %H:%M")
+
+    for organization in Organization.objects.filter(is_suspended=False).exclude(organization_billing__plan="custom").exclude(organization_billing__plan="trial"):
+        for project in organization.project.all():
+            # update project contacts
+            if settings.TESTING:
+                contact_count = BillingPlan.plan_info(project.organization.organization_billing.plan)["limit"] + 1
+            else:  # pragma: no cover
+                contact_count = utils.count_contacts(
+                    project=project, before=before, after=after
+                )
+            project.contact_count = int(contact_count)
+            project.save(update_fields=["contact_count"])
+
+        current_active_contacts = organization.active_contacts
+
+        if current_active_contacts > organization.organization_billing.plan_limit:
+            organization.organization_billing.end_trial_period()
+            # send email to offer upgrade
+            # organization.organization_billing.send_email_expired_plan(
+            #     organization.name,
+            #     organization.authorizations.values_list("user__email", flat=True),
+            # )
+    return True

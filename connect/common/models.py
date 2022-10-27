@@ -1106,6 +1106,10 @@ class BillingPlan(models.Model):
         return {"valid": False}
 
     @property
+    def plan_limit(self):
+        return BillingPlan.plan_info(self.plan)["limit"]
+
+    @property
     def get_stripe_customer(self):
         import stripe
 
