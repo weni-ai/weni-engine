@@ -92,6 +92,7 @@ env = environ.Env(
     PLAN_PREMIUM_PRICE=(int, 300),
     PLAN_ENTERPRISE_LIMIT=(int, 4000),
     PLAN_ENTERPRISE_PRICE=(int, 400),
+    DEFAULT_CURRENCY=(str, "BRL")
 )
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -481,6 +482,8 @@ PLAN_PREMIUM_PRICE = env.int("PLAN_PREMIUM_PRICE")
 
 PLAN_ENTERPRISE_LIMIT = env.int("PLAN_ENTERPRISE_LIMIT")
 PLAN_ENTERPRISE_PRICE = env.int("PLAN_ENTERPRISE_PRICE")
+
+DEFAULT_CURRENCY = env.str("DEFAULT_CURRENCY")
 
 # Rocket
 ROCKET_CLIENT_ID = env.str("ROCKET_CLIENT_ID")

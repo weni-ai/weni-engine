@@ -1611,50 +1611,27 @@ class GenericBillingData(models.Model):
     @property
     def precification(self):
         return {
-            "currency": "USD",
+            "currency": settings.DEFAULT_CURRENCY,
             "extra_whatsapp_integration": settings.BILLING_COST_PER_WHATSAPP,
-            "range": [
-                {
-                    "from": 1,
-                    "to": 1000,
-                    "value_per_contact": self._from_1_to_1000,
+            "plans": {
+                "basic": {
+                    "limit": settings.PLAN_BASIC_LIMIT,
+                    "price": settings.PLAN_BASIC_PRICE,
                 },
-                {
-                    "from": 1001,
-                    "to": 5000,
-                    "value_per_contact": self._from_1001_to_5000,
+                "plus": {
+                    "limit": settings.PLAN_PLUS_LIMIT,
+                    "price": settings.PLAN_PLUS_PRICE,
                 },
-                {
-                    "from": 5001,
-                    "to": 10000,
-                    "value_per_contact": self._from_5001_to_10000,
+                "premium": {
+                    "limit": settings.PLAN_PREMIUM_LIMIT,
+                    "price": settings.PLAN_PREMIUM_PRICE,
                 },
-                {
-                    "from": 10001,
-                    "to": 30000,
-                    "value_per_contact": self._from_10001_to_30000,
+                "enterprise": {
+                    "limit": settings.PLAN_ENTERPRISE_LIMIT,
+                    "price": settings.PLAN_ENTERPRISE_PRICE,
                 },
-                {
-                    "from": 30001,
-                    "to": 50000,
-                    "value_per_contact": self._from_30001_to_50000,
-                },
-                {
-                    "from": 50001,
-                    "to": 100000,
-                    "value_per_contact": self._from_50001_to_100000,
-                },
-                {
-                    "from": 100001,
-                    "to": 250000,
-                    "value_per_contact": self._from_100001_to_250000,
-                },
-                {
-                    "from": 250001,
-                    "to": "infinite",
-                    "value_per_contact": self._from_100001_to_250000,
-                },
-            ],
+
+            }
         }
 
     def calculate_active_contacts(self, contact_count):
