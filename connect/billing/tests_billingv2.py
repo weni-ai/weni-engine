@@ -5,8 +5,11 @@ from django.test import TestCase
 from connect.common.models import Project, Organization, BillingPlan
 from connect.billing.models import Contact, ContactCount
 from connect.billing.tasks import daily_contact_count
+from connect.utils import count_contacts
+from freezegun import freeze_time
 
 
+@freeze_time("2022-05-14")
 class CountContactsTestCase(TestCase):
     def setUp(self) -> None:
         self.organization = Organization.objects.create(
@@ -23,6 +26,14 @@ class CountContactsTestCase(TestCase):
             inteligence_organization=1,
             organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
             organization_billing__plan="enterprise",
+        )
+
+        self.custom = Organization.objects.create(
+            name="custom organization",
+            description="custom organization",
+            inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan="custom",
         )
 
         self.project = self.organization.project.create(
@@ -45,6 +56,18 @@ class CountContactsTestCase(TestCase):
 
         self.project4 = self.organization2.project.create(
             name="Project 4",
+            timezone="America/Sao_Paulo",
+            flow_organization=uuid.uuid4(),
+        )
+
+        self.cproject2 = self.custom.project.create(
+            name="Custom Project 3",
+            timezone="America/Sao_Paulo",
+            flow_organization=uuid.uuid4(),
+        )
+
+        self.cproject1 = self.custom.project.create(
+            name="Custom Project 4",
             timezone="America/Sao_Paulo",
             flow_organization=uuid.uuid4(),
         )
@@ -79,8 +102,24 @@ class CountContactsTestCase(TestCase):
     def test_count(self):
         self.mock_contacts()
         daily_contact_count()
-
-        for project in Project.objects.all():
+        for project in Project.objects.exclude(organization__organization_billing__plan=BillingPlan.PLAN_CUSTOM):
             contacts_day_count = ContactCount.objects.filter(project=project, day=pendulum.now().start_of("day"))
             total = sum([day_count.count for day_count in contacts_day_count])
             self.assertEquals(total, 40)
+
+    def test_count_contacts(self):
+        before = pendulum.now().end_of("month")
+        after = pendulum.now().start_of("month")
+
+        for i in range(0, before.day):
+            freezer = freeze_time(after.add(days=i))
+            freezer.start()
+            daily_contact_count()
+            freezer.stop()
+
+        for org in Organization.objects.all():
+            contact_count = 0
+            for project in org.project.all():
+                total = count_contacts(project=project, before=str(before), after=str(after))
+                contact_count += total
+            self.assertEqual(contact_count, 80)
