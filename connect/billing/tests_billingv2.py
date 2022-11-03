@@ -72,42 +72,55 @@ class CountContactsTestCase(TestCase):
             flow_organization=uuid.uuid4(),
         )
 
-        self.mock_contacts()
+        self.create_contacts()
 
         return super().setUp()
 
-    def mock_contacts(self):
-        today = pendulum.now().start_of("day")
+    def create_contacts(self):
+        day = pendulum.now().start_of("day")
+
+        contact_list = []
 
         for project in Project.objects.all():
-            day = today
-            for i in range(1, 3):
-                # daily contacts
-                contacts_list = []
+            for j in range(0, 100):
+                if (j == 0 or j % 5 == 0):
+                    contact_flow_uuid = uuid.uuid4()
+                    last_seen_on = day.add(hours=random.randint(0, 23))
+                    last_seen_on2 = day.add(days=1).add(hours=random.randint(0, 23))
+                    last_seen_on3 = day.add(days=2).add(hours=random.randint(0, 23))
 
-                for j in range(0, 100):
-                    # active contacts multiple times a day
-                    if (j == 0 or j % 5 == 0):
-                        contact_flow_uuid = uuid.uuid4()
-                        last_seen_on = day.add(hours=random.randint(0, 23))
-                    contact = Contact(
-                        contact_flow_uuid=contact_flow_uuid,
-                        last_seen_on=last_seen_on,
-                        project=project,
-                    )
-                    contacts_list.append(contact)
-                Contact.objects.bulk_create(contacts_list)
-                day = today.subtract(days=i)
+                contact = Contact(
+                    contact_flow_uuid=contact_flow_uuid,
+                    last_seen_on=last_seen_on,
+                    project=project,
+                )
+                contact2 = Contact(
+                    contact_flow_uuid=contact_flow_uuid,
+                    last_seen_on=last_seen_on2,
+                    project=project,
+                )
+                contact3 = Contact(
+                    contact_flow_uuid=contact_flow_uuid,
+                    last_seen_on=last_seen_on3,
+                    project=project,
+                )
+
+                contact_list.extend([contact, contact2, contact3])
+
+        Contact.objects.bulk_create(contact_list)
 
     def test_count(self):
-        self.mock_contacts()
         daily_contact_count()
         for project in Project.objects.exclude(organization__organization_billing__plan=BillingPlan.PLAN_CUSTOM):
             contacts_day_count = ContactCount.objects.filter(project=project, day=pendulum.now().start_of("day"))
             total = sum([day_count.count for day_count in contacts_day_count])
-            self.assertEquals(total, 40)
+            self.assertEquals(total, 20)
 
     def test_count_contacts(self):
+        """If organization's plan == Custom, uses the old way of counting contacts (Contact active per month).
+            else use daily contact count.
+        """
+
         before = pendulum.now().end_of("month")
         after = pendulum.now().start_of("month")
 
@@ -118,8 +131,14 @@ class CountContactsTestCase(TestCase):
             freezer.stop()
 
         for org in Organization.objects.all():
+
             contact_count = 0
+
             for project in org.project.all():
                 total = count_contacts(project=project, before=str(before), after=str(after))
                 contact_count += total
-            self.assertEqual(contact_count, 80)
+
+            if org.organization_billing.plan == BillingPlan.PLAN_CUSTOM:
+                self.assertEqual(contact_count, 40)
+            else:
+                self.assertEqual(contact_count, 120)
