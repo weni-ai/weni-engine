@@ -272,7 +272,7 @@ def search_project(organization_id: int, project_uuid: str, text: str):
         project_uuid=project_uuid,
         flow_name=text
     )
-    
+
     inteligence_result = (
         IntelligenceRESTClient().get_organization_intelligences(
             intelligence_name=text,
@@ -344,7 +344,7 @@ def sync_total_contact_count():
         flow_instance = FlowsRESTClient()
     else:
         flow_instance = utils.get_grpc_types().get("flow")
-    
+
     for project in Project.objects.all():
         response = flow_instance.get_project_statistic(project_uuid=str(project.flow_organization))
         contacts = response.get("active_contacts", project.total_contact_count)
@@ -427,7 +427,7 @@ def sync_channels_statistics():
         project.extra_active_integration = len(
             list(
                 flow_instance.list_channel(project_uuid=str(project.flow_organization))
-            ) 
+            )
         )
         project.save(update_fields=["extra_active_integration"])
 

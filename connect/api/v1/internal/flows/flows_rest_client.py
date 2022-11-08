@@ -199,9 +199,6 @@ class FlowsRESTClient:
         return response.json()
 
     def get_project_info(self, project_uuid: str):
-        body = dict(
-            uuid=project_uuid
-        )
         response = requests.get(
             url=f'{self.base_url}/api/v2/internals/orgs/{project_uuid}/',
             headers=self.authentication_instance.headers,
@@ -209,13 +206,9 @@ class FlowsRESTClient:
         return response.json()
 
     def get_project_statistic(self, project_uuid: str):
-        body = dict(
-            org_uuid=project_uuid
-        )
         response = requests.get(
             url=f'{self.base_url}/api/v2/internals/statistic/{project_uuid}/',
             headers=self.authentication_instance.headers,
-            # params=body
         )
         return response.json()
 
@@ -273,12 +266,9 @@ class FlowsRESTClient:
         return response.json()
 
     def release_channel(self, channel_uuid: str):
-        body = dict(
-            uuid=channel_uuid,
-        )
         response = requests.get(
             url=f'{self.base_url}/api/v2/internals/channel/{channel_uuid}/',
-            headers=self.authentication_instance.headers,            
+            headers=self.authentication_instance.headers,
         )
         return response.json()
 
