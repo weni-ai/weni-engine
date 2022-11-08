@@ -20,6 +20,7 @@ from connect.common.models import Organization, Project, BillingPlan
 
 from freezegun import freeze_time
 from connect.billing.tasks import sync_contacts, check_organization_plans
+from connect.api.v1.tests.utils import create_contacts
 
 
 @skipIf(not settings.BILLING_SETTINGS.get("stripe", None), "gateway not configured")
@@ -238,6 +239,7 @@ class MessageTestCase(TestCase):
         self.assertTrue("test message", self.message.text)
 
 
+@skipIf(True, "This test takes a while to run")
 class CheckPlansTestCase(TestCase):
     def setUp(self):
         # Orgs
@@ -291,6 +293,9 @@ class CheckPlansTestCase(TestCase):
         """
         Test if 'check_organization_plans' suspends org that should after the trial periods end
         """
+        for organization in Organization.objects.all():
+            num_contacts = BillingPlan.plan_info(organization.organization_billing.plan)["limit"] * 5 + 1
+            create_contacts(num_contacts)
 
         check_organization_plans()
 

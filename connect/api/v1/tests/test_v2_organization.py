@@ -7,7 +7,7 @@ from connect.api.v1.project.views import ProjectViewSet
 from ..organization.serializers import User
 
 from connect.api.v1.organization.views import OrganizationViewSet
-from connect.api.v1.tests.utils import create_user_and_token
+from connect.api.v1.tests.utils import create_user_and_token, create_contacts
 from connect.common.models import (
     Organization,
     OrganizationAuthorization,
@@ -20,11 +20,12 @@ from connect.common.models import (
 )
 import pendulum
 from freezegun import freeze_time
-from connect.billing.tasks import end_trial_plan
+from connect.billing.tasks import end_trial_plan, check_organization_plans
 from rest_framework import status
 import stripe
 from django.conf import settings
 from connect.api.v1.billing.views import BillingViewSet
+from connect.common.tasks import generate_project_invoice
 
 
 class CreateOrganizationAPITestCase(TestCase):
@@ -445,3 +446,102 @@ class BillingViewTestCase(TestCase):
     def tearDown(self, organization: Organization = None):
         if organization:
             organization.delete()
+
+
+class IntegrationTestCase(TestCase):
+
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.owner, self.owner_token = create_user_and_token("owner")
+
+        self.organization = Organization.objects.create(
+            name="Basic organization",
+            description="New billing organization",
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan=BillingPlan.PLAN_BASIC,
+            inteligence_organization=1,
+            organization_billing__stripe_customer="cus_MYOrndkgpPHGK9"
+        )
+
+        self.billing = self.organization.organization_billing
+
+        self.project = self.organization.project.create(
+            name="project test",
+            timezone="America/Sao_Paulo",
+            flow_organization=uuid.uuid4(),
+        )
+
+        self.authorization = self.organization.authorizations.create(
+            user=self.owner, role=OrganizationRole.ADMIN.value
+        )
+
+    def request_upgrade_plan(self, organization_uuid=None, data=None, token=None):
+        """Request to upgrade plan endpoint"""
+        authorization_header = (
+            {"HTTP_AUTHORIZATION": "Token {}".format(token.key)} if token else {}
+        )
+        request = self.factory.patch(
+            f"/v1/organization/org/billing/upgrade-plan/{organization_uuid}",
+            content_type="application/json",
+            data=json.dumps(data),
+            format="json",
+            **authorization_header,
+        )
+        response = OrganizationViewSet.as_view({"patch": "upgrade_plan"})(request, organization_uuid)
+
+        content_data = json.loads(response.content)
+        return response, content_data
+
+    def test(self):
+        # Creates more contacts than the plan limit allows
+        num_contacts = BillingPlan.plan_info(self.organization.organization_billing.plan)["limit"] * 5 + 1
+        self.assertTrue(self.organization.organization_billing.is_active)
+        self.assertFalse(self.organization.is_suspended)
+        create_contacts(num_contacts)
+
+        # Verify if the organizations have more contacts than the plan limit
+        check_organization_plans()
+        organization = Organization.objects.get(uuid=self.organization.uuid)
+        self.assertFalse(organization.organization_billing.is_active)
+        self.assertTrue(organization.is_suspended)
+
+        self.assertEqual(organization.organization_billing.plan, BillingPlan.PLAN_BASIC)
+        self.assertEqual(self.billing.contract_on, pendulum.now().date())
+        self.assertEqual(self.billing.next_due_date, pendulum.now().add(months=1).date())
+
+        # Upgrade plan, request made in a diferent day to validade
+        # changes in BillingPlan.contract_on and next_due_date
+        data = {
+            "organization_billing_plan": BillingPlan.PLAN_PLUS
+        }
+        freezer = freeze_time(f"{pendulum.now().add(days=5)}")
+        freezer.start()
+        response, content_data = self.request_upgrade_plan(
+            organization_uuid=self.organization.uuid,
+            data=data,
+            token=self.owner_token
+        )
+
+        self.assertEqual(content_data["status"], "SUCCESS")
+        self.assertEqual(content_data["old_plan"], BillingPlan.PLAN_BASIC)
+        self.assertEqual(content_data["plan"], BillingPlan.PLAN_PLUS)
+
+        organization = Organization.objects.get(uuid=self.organization.uuid)
+
+        # New due date, contract on and plan
+        self.assertEqual(organization.organization_billing.contract_on, pendulum.now().date())
+        self.assertEqual(organization.organization_billing.next_due_date, pendulum.now().add(months=1).date())
+        self.assertEqual(organization.organization_billing.plan, BillingPlan.PLAN_PLUS)
+
+        # Check if the org is active again
+        self.assertTrue(organization.organization_billing.is_active)
+        self.assertFalse(organization.is_suspended)
+        check_organization_plans()
+        freezer.stop()
+        freezer = freeze_time(organization.organization_billing.next_due_date)
+        freezer.start()
+
+        generate_project_invoice()
+        invoice = organization.organization_billing_invoice.last()
+        self.assertEqual(invoice.due_date, pendulum.now().date())
+        freezer.stop()

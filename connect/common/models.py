@@ -20,7 +20,7 @@ from connect.billing.gateways.stripe_gateway import StripeGateway
 from connect.common.gateways.rocket_gateway import Rocket
 from enum import Enum
 from celery import current_app
-
+import stripe
 
 logger = logging.getLogger(__name__)
 
@@ -1068,10 +1068,42 @@ class BillingPlan(models.Model):
     card_is_valid = models.BooleanField(_("Card is valid"), default=False)
     trial_end_date = models.DateTimeField(_("Trial end date"), null=True)
 
-    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None, **kwargs):
         _adding = self._state.adding
-        if _adding and self.plan == self.PLAN_TRIAL:
-            self.trial_end_date = pendulum.now().end_of("day").add(months=1)
+        if _adding or kwargs.get("change_plan"):
+            if _adding and self.plan == self.PLAN_TRIAL:
+                self.trial_end_date = pendulum.now().end_of("day").add(months=1)
+            else:
+                stripe.api_key = settings.BILLING_SETTINGS.get("stripe", {}).get("API_KEY")
+
+                customer = self.stripe_customer
+
+                if settings.TESTING:
+                    charges = {
+                        "data": [
+                            {
+                                "id": "ch_teste",
+                            }
+                        ]
+                    }
+
+                else:
+                    charges = stripe.PaymentIntent.list(customer=customer)
+
+                Invoice.objects.create(
+                    organization=self.organization,
+                    stripe_charge=charges["data"][0]["id"],
+                    notes="Plan setup" if _adding else "Upgrade Plan",
+                    paid_date=pendulum.now(),
+                    due_date=pendulum.now(),
+                    payment_status=Invoice.PAYMENT_STATUS_PAID,
+                    payment_method='credit_card'
+                )
+                for project in self.organization.project.all():  # pragma: no cover
+                    current_app.send_task(
+                        name="update_suspend_project", args=[project.flow_organization, False]
+                    )
+
         return super().save(force_insert, force_update, using, update_fields)
 
     @staticmethod
@@ -1080,6 +1112,10 @@ class BillingPlan(models.Model):
         plans_list = [plan[0] for plan in BillingPlan.PLAN_CHOICES]
 
         if plan in plans_list:
+
+            if plan == BillingPlan.PLAN_TRIAL:
+                price = settings.PLAN_TRIAL_PRICE
+                limit = settings.PLAN_TRIAL_LIMIT
 
             if plan == BillingPlan.PLAN_BASIC:
                 price = settings.PLAN_BASIC_PRICE
@@ -1173,7 +1209,7 @@ class BillingPlan(models.Model):
             return True
         return False
 
-    @staticmethod
+    @staticmethod  # PRECISA MUDAR
     def calculate_amount(contact_count: int):
         precification = GenericBillingData.get_generic_billing_data_instance()
         return Decimal(
@@ -1182,7 +1218,7 @@ class BillingPlan(models.Model):
 
     @property
     def is_card_valid(self):  # pragma: no cover
-        if self.plan == self.PLAN_ENTERPRISE:
+        if self.plan != self.PLAN_TRIAL:
             return self.card_is_valid
 
     @property
@@ -1211,13 +1247,34 @@ class BillingPlan(models.Model):
 
         return {"total_contact": contact_count, "amount_currenty": amount_currenty}
 
+    def current_invoice_v2(self):
+        # Total contacts of the organization
+        contact_count = self.organization.project.aggregate(
+            total_contact_count=Sum("contact_count")
+        ).get("total_contact_count")
+
+        amount_currenty = Decimal(
+            BillingPlan.plan_info(self.plan)["price"]
+            + (
+                settings.BILLING_COST_PER_WHATSAPP
+                * self.organization.extra_integration
+            )
+        ).quantize(Decimal(".01"), decimal.ROUND_HALF_UP)
+
+        return {"total_contact": contact_count, "amount_currenty": amount_currenty}
+
     def change_plan(self, plan):
         _is_valid = False
         for choice in self.PLAN_CHOICES:
             if plan in choice:
                 _is_valid = True
                 self.plan = choice[0]
-                self.save()
+                self.contract_on = pendulum.now()
+                self.next_due_date = pendulum.now().add(months=1)
+                self.organization.is_suspended = False
+                self.organization.save(update_fields=["is_suspended"])
+                self.is_active = True
+                self.save(update_fields=["plan", "contract_on", "next_due_date", "is_active"], change_plan=True)
                 # send mail here
                 break
         return _is_valid
@@ -1417,7 +1474,6 @@ class BillingPlan(models.Model):
         self.save(update_fields=["is_active"])
         self.organization.is_suspended = True
         self.organization.save(update_fields=["is_suspended"])
-
         for project in self.organization.project.all():
             current_app.send_task(  # pragma: no cover
                 name="update_suspend_project", args=[project.flow_organization, True]
