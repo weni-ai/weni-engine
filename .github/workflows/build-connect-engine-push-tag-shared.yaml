@@ -60,6 +60,7 @@ jobs:
               echo 'Not a valid tag. Skipping...'
               exit 1
             fi
+
       - name: Check out the repo
         uses: actions/checkout@v2
         with:
@@ -156,6 +157,7 @@ jobs:
                 fi
               fi
             done
+            
       - name: Commit & Push changes
         # Once made a change, commit new configuration
         uses: actions-js/push@master
