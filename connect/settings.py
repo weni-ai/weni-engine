@@ -84,6 +84,7 @@ env = environ.Env(
     SYNC_CONTACTS_SCHEDULE=(str, "*/1"),
     SCROLL_SIZE=(int, 500),
     SCROLL_KEEP_ALIVE=(str, "1m"),
+    USE_FLOW_REST=(bool, True),
 )
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -432,6 +433,9 @@ SYNC_ORGANIZATION_INTELIGENCE = env.bool("SYNC_ORGANIZATION_INTELIGENCE")
 INTELIGENCE_CERTIFICATE_GRPC_CRT = env.str("INTELIGENCE_CERTIFICATE_GRPC_CRT")
 FLOW_CERTIFICATE_GRPC_CRT = env.bool("FLOW_CERTIFICATE_GRPC_CRT")
 INTEGRATIONS_CERTIFICATE_GRPC_CRT = env.str("INTEGRATIONS_CERTIFICATE_GRPC_CRT")
+
+# Internal communication
+USE_FLOW_REST = env.bool("USE_FLOW_REST")
 
 # Flow Marketing Weni
 
