@@ -359,7 +359,7 @@ class BillingViewTestCase(TestCase):
         self.customer = ""
         self.owner, self.owner_token = create_user_and_token("owner")
 
-    def request(self, data=None, method=None):
+    def request(self, data=None, method=None, path=None):
         request = self.factory.post(
             f"/v1/billing/{method}",
             data=json.dumps(data),
@@ -391,7 +391,7 @@ class BillingViewTestCase(TestCase):
         return (response, content_data)
 
     def test_setup_intent(self):
-        response, content_data = self.request(method="setup_intent")
+        response, content_data = self.request(path="setup-intent", method="setup_intent")
 
         # setup card
         stripe.Customer.create_source(
@@ -406,7 +406,7 @@ class BillingViewTestCase(TestCase):
             "plan": BillingPlan.PLAN_START,
             "customer": "cus_MYOrndkgpPHGK9",
         }
-        response, content_data = self.request(data=data, method="setup_plan")
+        response, content_data = self.request(data=data, path="setup-plan", method="setup_plan")
 
         customer = content_data["customer"]
         self.assertEqual(content_data["status"], "SUCCESS")
