@@ -11,7 +11,7 @@ RUN apt-get update \
 RUN pip install -U pip==21.2.2 setuptools==57.4.0
 RUN pip install poetry==1.1.12
 RUN pip install gunicorn==19.9.0
-RUN pip install gevent==1.4.0
+RUN pip install gevent==20.10.2
 RUN pip install psycopg2-binary
 RUN apt-get install -y libjpeg-dev libgpgme-dev linux-libc-dev musl-dev libffi-dev libssl-dev
 ENV LIBRARY_PATH=/lib:/usr/lib
