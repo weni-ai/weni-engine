@@ -1,4 +1,4 @@
-name: Build Weni Engine (Connect) in Shared (Push Tag)
+name: Build Weni Engine (Connect) in Dockerhub (Push Tag)
 
 on:
   push:
@@ -19,43 +19,43 @@ jobs:
               echo "Found environment: DEVELOP - $TAG"
               echo "MANIFESTS_ENVIRONMENT=develop" >> $GITHUB_ENV
               echo "MANIFESTS_ENVIRONMENT=develop"
-              echo "TAG=engine-$TAG" >> $GITHUB_ENV
-              echo "TAG=engine-$TAG"
+              echo "TAG=$TAG" >> $GITHUB_ENV
+              echo "TAG=$TAG"
               VERSION=${TAG} 
               echo "VERSION=$VERSION" >> $GITHUB_ENV
               echo "VERSION=$VERSION"
               echo "COMMIT_SHA=$GITHUB_SHA" >> $GITHUB_ENV
               echo "COMMIT_SHA=$GITHUB_SHA"
-              echo "IMAGE_TAG=${{ secrets.ECR }}/connect:$TAG" >> $GITHUB_ENV
-              echo "IMAGE_TAG=${{ secrets.ECR }}/connect:$TAG"
+              echo "IMAGE_TAG=connectof/connect-engine:$TAG" >> $GITHUB_ENV
+              echo "IMAGE_TAG=connectof/connect-engine:$TAG"
             elif $(echo  $TAG|grep --silent -e '^.*.*-staging')
             then 
               echo "Found environment: STAGING - $TAG"
               echo "MANIFESTS_ENVIRONMENT=staging" >> $GITHUB_ENV
               echo "MANIFESTS_ENVIRONMENT=staging"
-              echo "TAG=engine-$TAG" >> $GITHUB_ENV
-              echo "TAG=engine-$TAG"
+              echo "TAG=$TAG" >> $GITHUB_ENV
+              echo "TAG=$TAG"
               VERSION=${TAG} 
               echo "VERSION=$VERSION" >> $GITHUB_ENV
               echo "VERSION=$VERSION"
               echo "COMMIT_SHA=$GITHUB_SHA" >> $GITHUB_ENV
               echo "COMMIT_SHA=$GITHUB_SHA"
-              echo "IMAGE_TAG=${{ secrets.ECR }}/connect:$TAG" >> $GITHUB_ENV
-              echo "IMAGE_TAG=${{ secrets.ECR }}/connect:$TAG"
+              echo "IMAGE_TAG=connectof/connect-engine:$TAG" >> $GITHUB_ENV
+              echo "IMAGE_TAG=connectof/connect-engine:$TAG"
             elif $(echo  $TAG|grep --silent -e '^.*.*')
             then 
               echo "No environment found, assuming: PRODUCTION - $TAG"
               echo "MANIFESTS_ENVIRONMENT=production" >> $GITHUB_ENV
               echo "MANIFESTS_ENVIRONMENT=production"
-              echo "TAG=engine-$TAG" >> $GITHUB_ENV
-              echo "TAG=engine-$TAG"
+              echo "TAG=$TAG" >> $GITHUB_ENV
+              echo "TAG=$TAG"
               VERSION=${TAG} 
               echo "VERSION=$VERSION" >> $GITHUB_ENV
               echo "VERSION=$VERSION"
               echo "COMMIT_SHA=$GITHUB_SHA" >> $GITHUB_ENV
               echo "COMMIT_SHA=$GITHUB_SHA"
-              echo "IMAGE_TAG=${{ secrets.ECR }}/connect:$TAG" >> $GITHUB_ENV
-              echo "IMAGE_TAG=${{ secrets.ECR }}/connect:$TAG"
+              echo "IMAGE_TAG=connectof/connect-engine:$TAG" >> $GITHUB_ENV
+              echo "IMAGE_TAG=connectof/connect-engine:$TAG"
             else
               echo 'Not a valid tag. Skipping...'
               exit 1
@@ -101,7 +101,7 @@ jobs:
             repository=https://github.com/Ilhasoft/weni-engine
           file: Dockerfile
           push: true
-          tags: connectof/connect:${{env.TAG}}
+          tags: connectof/connect-engine:${{env.TAG}}
           no-cache: true
 
       - name: Check out Kubernetes Manifests
@@ -117,7 +117,7 @@ jobs:
       - name: Set variable tag for jq
         # This is the variable with complete image name
         run: |
-          echo "IMAGE_TAG=connectof/connect:$TAG" >> $GITHUB_ENV
+          echo "IMAGE_TAG=connectof/connect-engine:$TAG" >> $GITHUB_ENV
           
       - name: Update image on deployment
         run: |
