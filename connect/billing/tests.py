@@ -248,21 +248,21 @@ class CheckPlansTestCase(TestCase):
             description="Basic org",
             inteligence_organization=1,
             organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
-            organization_billing__plan=BillingPlan.PLAN_BASIC,
+            organization_billing__plan=BillingPlan.PLAN_START,
         )
         self.plus = Organization.objects.create(
             name="plus org",
             description="plus org",
             inteligence_organization=1,
             organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
-            organization_billing__plan=BillingPlan.PLAN_PLUS,
+            organization_billing__plan=BillingPlan.PLAN_SCALE,
         )
         self.premium = Organization.objects.create(
             name="premium org",
             description="premium org",
             inteligence_organization=1,
             organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
-            organization_billing__plan=BillingPlan.PLAN_PREMIUM,
+            organization_billing__plan=BillingPlan.PLAN_ADVANCED,
         )
         self.enterprise = Organization.objects.create(
             name="enterprise org",
