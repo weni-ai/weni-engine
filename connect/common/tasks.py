@@ -393,8 +393,9 @@ def generate_project_invoice():
         sync_channels_statistics()
 
     for org in Organization.objects.filter(
-        organization_billing__next_due_date__lte=pendulum.now().date(), is_suspended=False
-    ).exclude(organization_billing__plan=BillingPlan.PLAN_CUSTOM).exclude(organization_billing__plan=BillingPlan.PLAN_TRIAL):
+        organization_billing__next_due_date__lte=pendulum.now().date(), is_suspended=False).exclude(
+            organization_billing__plan__in=[BillingPlan.PLAN_TRIAL, BillingPlan.PLAN_CUSTOM, BillingPlan.PLAN_ENTERPRISE]):
+
         invoice = org.organization_billing_invoice.create(
             due_date=pendulum.now(),
             invoice_random_id=1

@@ -236,7 +236,8 @@ def end_trial_plan():
 def check_organization_plans():
     # utc-3 or project_timezone
 
-    for organization in Organization.objects.filter(is_suspended=False).exclude(organization_billing__plan="custom").exclude(organization_billing__plan="trial"):
+    for organization in Organization.objects.filter(is_suspended=False).exclude(organization_billing__plan__in=[
+            BillingPlan.PLAN_TRIAL, BillingPlan.PLAN_CUSTOM, BillingPlan.PLAN_ENTERPRISE]):
 
         next_due_date = pendulum.parse(str(organization.organization_billing.next_due_date))
         after = next_due_date.subtract(months=1).strftime("%Y-%m-%d %H:%M")

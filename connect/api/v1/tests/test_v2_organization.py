@@ -200,7 +200,7 @@ class PlanAPITestCase(TestCase):
             description="Basic org",
             inteligence_organization=1,
             organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
-            organization_billing__plan="basic",
+            organization_billing__plan=BillingPlan.PLAN_START,
         )
 
         # Project
@@ -291,7 +291,7 @@ class PlanAPITestCase(TestCase):
         """Test upgrade plan view"""
         self.assertEqual(self.trial.organization_billing.plan, BillingPlan.PLAN_TRIAL)
         data = {
-            "organization_billing_plan": BillingPlan.PLAN_BASIC
+            "organization_billing_plan": BillingPlan.PLAN_START
         }
         response, content_data = self.request_upgrade_plan(
             organization_uuid=self.trial.uuid,
@@ -303,12 +303,12 @@ class PlanAPITestCase(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(content_data["status"], "SUCCESS")
-        self.assertEqual(upgraded_org.organization_billing.plan, BillingPlan.PLAN_BASIC)
+        self.assertEqual(upgraded_org.organization_billing.plan, BillingPlan.PLAN_START)
 
     def test_upgrade_plan_stripe_failure(self):
         """Test response if stripe charge fails"""
         data = {
-            "organization_billing_plan": "basic",
+            "organization_billing_plan": BillingPlan.PLAN_START,
             "stripe_failure": True
         }
 
@@ -403,7 +403,7 @@ class BillingViewTestCase(TestCase):
 
     def test_setup_plan(self):
         data = {
-            "plan": "basic",
+            "plan": BillingPlan.PLAN_START,
             "customer": "cus_MYOrndkgpPHGK9",
         }
         response, content_data = self.request(data=data, method="setup_plan")
@@ -419,7 +419,7 @@ class BillingViewTestCase(TestCase):
             "organization": {
                 "name": "basic",
                 "description": "basic",
-                "plan": "basic",
+                "plan": BillingPlan.PLAN_START,
                 "customer": customer,
                 "authorizations": [
                     {
@@ -436,7 +436,7 @@ class BillingViewTestCase(TestCase):
             }
         }
         response, content_data = self.request_create_org(create_org_data, self.owner_token)
-        self.assertEqual(content_data["organization"]["organization_billing"]["plan"], BillingPlan.PLAN_BASIC)
+        self.assertEqual(content_data["organization"]["organization_billing"]["plan"], BillingPlan.PLAN_START)
         organization = Organization.objects.get(uuid=content_data["organization"]["uuid"])
         self.assertEqual(organization.organization_billing_invoice.first().payment_status, Invoice.PAYMENT_STATUS_PAID)
         self.assertEqual(organization.organization_billing_invoice.first().stripe_charge, "ch_teste")
@@ -458,7 +458,7 @@ class IntegrationTestCase(TestCase):
             name="Basic organization",
             description="New billing organization",
             organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
-            organization_billing__plan=BillingPlan.PLAN_BASIC,
+            organization_billing__plan=BillingPlan.PLAN_START,
             inteligence_organization=1,
             organization_billing__stripe_customer="cus_MYOrndkgpPHGK9"
         )
@@ -505,14 +505,14 @@ class IntegrationTestCase(TestCase):
         self.assertFalse(organization.organization_billing.is_active)
         self.assertTrue(organization.is_suspended)
 
-        self.assertEqual(organization.organization_billing.plan, BillingPlan.PLAN_BASIC)
+        self.assertEqual(organization.organization_billing.plan, BillingPlan.PLAN_START)
         self.assertEqual(self.billing.contract_on, pendulum.now().date())
         self.assertEqual(self.billing.next_due_date, pendulum.now().add(months=1).date())
 
         # Upgrade plan, request made in a diferent day to validade
         # changes in BillingPlan.contract_on and next_due_date
         data = {
-            "organization_billing_plan": BillingPlan.PLAN_PLUS
+            "organization_billing_plan": BillingPlan.PLAN_SCALE
         }
         freezer = freeze_time(f"{pendulum.now().add(days=5)}")
         freezer.start()
@@ -523,15 +523,15 @@ class IntegrationTestCase(TestCase):
         )
 
         self.assertEqual(content_data["status"], "SUCCESS")
-        self.assertEqual(content_data["old_plan"], BillingPlan.PLAN_BASIC)
-        self.assertEqual(content_data["plan"], BillingPlan.PLAN_PLUS)
+        self.assertEqual(content_data["old_plan"], BillingPlan.PLAN_START)
+        self.assertEqual(content_data["plan"], BillingPlan.PLAN_SCALE)
 
         organization = Organization.objects.get(uuid=self.organization.uuid)
 
         # New due date, contract on and plan
         self.assertEqual(organization.organization_billing.contract_on, pendulum.now().date())
         self.assertEqual(organization.organization_billing.next_due_date, pendulum.now().add(months=1).date())
-        self.assertEqual(organization.organization_billing.plan, BillingPlan.PLAN_PLUS)
+        self.assertEqual(organization.organization_billing.plan, BillingPlan.PLAN_SCALE)
 
         # Check if the org is active again
         self.assertTrue(organization.organization_billing.is_active)

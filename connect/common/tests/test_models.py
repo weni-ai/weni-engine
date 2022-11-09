@@ -23,10 +23,10 @@ class BillingPlanTestCase(TestCase):
 
         # BASIC
         self.basic = Organization.objects.create(
-            name="Test Features (basic)",
+            name="Test Features (start)",
             inteligence_organization=1,
             organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
-            organization_billing__plan=BillingPlan.PLAN_BASIC,
+            organization_billing__plan=BillingPlan.PLAN_START,
             organization_billing__stripe_customer="cus_MYOrndkgpPHGK9"
         )
         self.basic_authorization = self.basic.authorizations.create(
@@ -66,7 +66,7 @@ class BillingPlanTestCase(TestCase):
         print(f'{"calculate amount".upper()}: {billing.calculate_amount(1)}')
         print(f'{"is card valid".upper()}: {billing.is_card_valid}')
         print(f'{"currenty invoice".upper()}: {billing.currenty_invoice}')
-        # print(f'{"change plan".upper()}: {billing.change_plan(BillingPlan.PLAN_BASIC)}')
+        # print(f'{"change plan".upper()}: {billing.change_plan(BillingPlan.PLAN_START)}')
         # print(f'{"add additional information".upper()}: {billing.add_additional_information({})}')
         print(f'{"end trial period".upper()}: {billing.end_trial_period()}')
 
@@ -94,7 +94,7 @@ class BillingPlanTestCase(TestCase):
         print(f'{"calculate amount".upper()}: {billing.calculate_amount(1)}')
         print(f'{"is card valid".upper()}: {billing.is_card_valid}')
         print(f'{"currenty invoice".upper()}: {billing.currenty_invoice}')
-        # print(f'{"change plan".upper()}: {billing.change_plan(BillingPlan.PLAN_BASIC)}')
+        # print(f'{"change plan".upper()}: {billing.change_plan(BillingPlan.PLAN_START)}')
         # print(f'{"add additional information".upper()}: {billing.add_additional_information({})}')
         print(f'{"end trial period".upper()}: {billing.end_trial_period()}')
 

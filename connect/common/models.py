@@ -990,18 +990,18 @@ class BillingPlan(models.Model):
 
     PLAN_FREE = "free"
     PLAN_TRIAL = "trial"
-    PLAN_BASIC = "basic"
-    PLAN_PLUS = "plus"
-    PLAN_PREMIUM = "premium"
+    PLAN_START = "start"
+    PLAN_SCALE = "scale"
+    PLAN_ADVANCED = "advanced"
     PLAN_ENTERPRISE = "enterprise"
     PLAN_CUSTOM = "custom"
 
     PLAN_CHOICES = [
         (PLAN_FREE, _("free")),
         (PLAN_TRIAL, _("trial")),
-        (PLAN_BASIC, _("basic")),
-        (PLAN_PLUS, _("plus")),
-        (PLAN_PREMIUM, _("premium")),
+        (PLAN_START, _("start")),
+        (PLAN_SCALE, _("scale")),
+        (PLAN_ADVANCED, _("advanced")),
         (PLAN_ENTERPRISE, _("enterprise")),
         (PLAN_CUSTOM, _("custom")),
     ]
@@ -1117,17 +1117,17 @@ class BillingPlan(models.Model):
                 price = settings.PLAN_TRIAL_PRICE
                 limit = settings.PLAN_TRIAL_LIMIT
 
-            if plan == BillingPlan.PLAN_BASIC:
-                price = settings.PLAN_BASIC_PRICE
-                limit = settings.PLAN_BASIC_LIMIT
+            if plan == BillingPlan.PLAN_START:
+                price = settings.PLAN_START_PRICE
+                limit = settings.PLAN_START_LIMIT
 
-            elif plan == BillingPlan.PLAN_PLUS:
-                price = settings.PLAN_PLUS_PRICE
-                limit = settings.PLAN_PLUS_LIMIT
+            elif plan == BillingPlan.PLAN_SCALE:
+                price = settings.PLAN_SCALE_PRICE
+                limit = settings.PLAN_SCALE_LIMIT
 
-            elif plan == BillingPlan.PLAN_PREMIUM:
-                price = settings.PLAN_PREMIUM_PRICE
-                limit = settings.PLAN_PREMIUM_LIMIT
+            elif plan == BillingPlan.PLAN_ADVANCED:
+                price = settings.PLAN_ADVANCED_PRICE
+                limit = settings.PLAN_ADVANCED_LIMIT
 
             elif plan == BillingPlan.PLAN_ENTERPRISE:
                 price = settings.PLAN_ENTERPRISE_PRICE
@@ -1670,17 +1670,17 @@ class GenericBillingData(models.Model):
             "currency": settings.DEFAULT_CURRENCY,
             "extra_whatsapp_integration": settings.BILLING_COST_PER_WHATSAPP,
             "plans": {
-                "basic": {
-                    "limit": settings.PLAN_BASIC_LIMIT,
-                    "price": settings.PLAN_BASIC_PRICE,
+                "start": {
+                    "limit": settings.PLAN_START_LIMIT,
+                    "price": settings.PLAN_START_PRICE,
                 },
-                "plus": {
-                    "limit": settings.PLAN_PLUS_LIMIT,
-                    "price": settings.PLAN_PLUS_PRICE,
+                "scale": {
+                    "limit": settings.PLAN_SCALE_LIMIT,
+                    "price": settings.PLAN_SCALE_PRICE,
                 },
-                "premium": {
-                    "limit": settings.PLAN_PREMIUM_LIMIT,
-                    "price": settings.PLAN_PREMIUM_PRICE,
+                "advanced": {
+                    "limit": settings.PLAN_ADVANCED_LIMIT,
+                    "price": settings.PLAN_ADVANCED_PRICE,
                 },
                 "enterprise": {
                     "limit": settings.PLAN_ENTERPRISE_LIMIT,
