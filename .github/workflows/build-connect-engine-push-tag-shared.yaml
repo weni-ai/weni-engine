@@ -73,12 +73,18 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      - name: Login to ECR
+      # - name: Login to ECR
+      #   uses: docker/login-action@v2
+      #   with:
+      #     registry: ${{ secrets.ECR_SHARED }}
+      #     username: ${{ secrets.AWS_ACCESS_KEY_ID_SHARED }}       # Credentials used to push image to ECR repository
+      #     password: ${{ secrets.AWS_SECRET_ACCESS_KEY_SHARED }}
+
+      - name: Login to DockerHub
         uses: docker/login-action@v2
         with:
-          registry: ${{ secrets.ECR_SHARED }}
-          username: ${{ secrets.AWS_ACCESS_KEY_ID_SHARED }}       # Credentials used to push image to ECR repository
-          password: ${{ secrets.AWS_SECRET_ACCESS_KEY_SHARED }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Set Commit ID
         id: commit_id
@@ -95,7 +101,7 @@ jobs:
             repository=https://github.com/Ilhasoft/weni-engine
           file: Dockerfile
           push: true
-          tags: ${{ secrets.ECR_SHARED }}/connect:${{env.TAG}}
+          tags: connectof/connect:${{env.TAG}}
           no-cache: true
 
       - name: Check out Kubernetes Manifests
@@ -111,7 +117,7 @@ jobs:
       - name: Set variable tag for jq
         # This is the variable with complete image name
         run: |
-          echo "IMAGE_TAG=${{ secrets.ECR_SHARED }}/weni-academy:$TAG" >> $GITHUB_ENV
+          echo "IMAGE_TAG=connectof/connect:$TAG" >> $GITHUB_ENV
           
       - name: Update image on deployment
         run: |
