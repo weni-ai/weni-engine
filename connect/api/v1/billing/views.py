@@ -21,7 +21,7 @@ class BillingViewSet(viewsets.ViewSet):
         detail=True,
         methods=["POST"],
         url_name="setup-intent",
-        url_path="setup_plan/",
+        url_path="setup-intent",
     )
     def setup_intent(self, request):
         """
@@ -54,9 +54,10 @@ class BillingViewSet(viewsets.ViewSet):
         detail=True,
         methods=["POST"],
         url_name="setup-plan",
-        url_path="setup_plan/",
+        url_path="setup-plan",
     )
     def setup_plan(self, request):
+        """Make the payment to the selected plan"""
         stripe.api_key = settings.BILLING_SETTINGS.get("stripe", {}).get("API_KEY")
 
         plan = request.data.get("plan")
