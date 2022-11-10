@@ -57,7 +57,7 @@ class FlowsRESTClient:
             json=body
         )
 
-        return dict(status=response.status_code, data=response.text)
+        return response.json()
 
     def update_project(self, organization_uuid: int, organization_name: str):
         body = {

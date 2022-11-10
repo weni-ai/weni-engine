@@ -221,7 +221,7 @@ def create_project(project_name: str, user_email: str, project_timezone: str):
         user_email=user_email,
         project_timezone=project_timezone,
     )
-    return {"id": project.id, "uuid": project.uuid}
+    return {"id": project.get("id"), "uuid": project.get("uuid")}
 
 
 @app.task(name="create_template_project")
