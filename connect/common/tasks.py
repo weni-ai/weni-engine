@@ -211,7 +211,7 @@ def get_contacts_detailed(project_uuid: str, before: str, after: str):
 
 @app.task(name="create_project")
 def create_project(project_name: str, user_email: str, project_timezone: str):
-    if settings.USE_FLOW_INSTANCE:
+    if settings.USE_FLOW_REST:
         flow_instance = FlowsRESTClient()
     else:
         flow_instance = utils.get_grpc_types().get("flow")
