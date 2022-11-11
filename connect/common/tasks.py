@@ -625,7 +625,7 @@ def delete_user_permission_project(project_uuid: str, user_email: str, permissio
 def list_channels(channel_type):
     if settings.USE_FLOW_REST:
         flow_instance = FlowsRESTClient()
-        response = flow_instance.list_channel(channel_type=channel_type).get("results")
+        response = flow_instance.list_channel(channel_type=channel_type)
     else:
         flow_instance = utils.get_grpc_types().get("flow")
         response = list(flow_instance.list_channel(channel_type=channel_type))
