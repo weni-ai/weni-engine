@@ -265,11 +265,10 @@ class FlowsRESTClient:
         return response.json()
 
     def release_channel(self, channel_uuid: str):
-        response = requests.get(
+        requests.delete(
             url=f'{self.base_url}/api/v2/internals/channel/{channel_uuid}/',
             headers=self.authentication_instance.headers,
         )
-        return response.json()
 
     def list_channel(self, is_active: str = "True", channel_type: str = "WA", project_uuid: str = None):
         params = {}
