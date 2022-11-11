@@ -292,7 +292,7 @@ class FlowsRESTClient:
         return response.json()
 
     def delete_channel(self, channel_uuid: str):
-        response = requests.post(
+        response = requests.delete(
             url=f'{self.base_url}/api/v2/internals/channel/{channel_uuid}/',
             headers=self.authentication_instance.headers
         )
