@@ -4,7 +4,7 @@ from django.conf import settings
 
 
 class StripeGateway(Gateway):
-    default_currency = "USD"
+    default_currency = settings.DEFAULT_CURRENCY
     display_name = "Stripe"
     verification_amount = getattr(settings, "VERIFICATION_AMOUNT")
     verification_description = "Card Verification Charge"
