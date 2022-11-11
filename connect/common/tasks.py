@@ -779,6 +779,7 @@ def create_classifier(project_uuid: str, user_email: str, classifier_name: str, 
 
 @app.task(name='list_classifier')
 def list_classifier(project_uuid: str):
+    classifiers = {"data": []}
     if settings.USE_FLOW_REST:
         flow_instance = FlowsRESTClient()
     else:
@@ -789,15 +790,20 @@ def list_classifier(project_uuid: str):
         is_active=True,
     )
 
-    classifiers = {"data": []}
-    for i in response:
-        classifiers["data"].append({
-            "authorization_uuid": i.get("authorization_uuid"),
-            "classifier_type": i.get("classifier_type"),
-            "name": i.get("name"),
-            "is_active": i.get("is_active"),
-            "uuid": i.get("uuid"),
-        })
+    if not settings.USE_FLOW_REST:
+        data = []
+        for i in response:
+            data.append({
+                "authorization_uuid": i.get("authorization_uuid"),
+                "classifier_type": i.get("classifier_type"),
+                "name": i.get("name"),
+                "is_active": i.get("is_active"),
+                "uuid": i.get("uuid"),
+            })
+        classifiers["data"] = data
+    else:
+        classifiers["data"] = response
+        
     return classifiers
 
 

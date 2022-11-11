@@ -115,8 +115,7 @@ class FlowsRESTClient:
             params=params
         )
 
-        # TODO: check if response.data has a list with any element has: authorization_uuid, classifier_type, name, is_active, uuid
-        return dict(status=response.status_code, data=response.get("data", []))
+        return response.json()
 
     def create_classifier(self, project_uuid: str, user_email: str, classifier_type: str, classifier_name: str, access_token: str):
         body = dict(
