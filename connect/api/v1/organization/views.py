@@ -132,7 +132,8 @@ class OrganizationViewSet(
                 description=org_info.get("description"),
                 organization_billing__plan=org_info.get("plan"),
                 organization_billing__cycle=cycle,
-                inteligence_organization=org_info.get("intelligence_organization")
+                inteligence_organization=org_info.get("intelligence_organization"),
+                organization_billing__stripe_customer=org_info.get("customer"),
             )
 
             if not settings.TESTING:

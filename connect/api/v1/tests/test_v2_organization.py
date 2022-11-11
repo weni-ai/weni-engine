@@ -78,6 +78,31 @@ class CreateOrganizationAPITestCase(TestCase):
         response, content_data = self.request(data, self.owner_token)
         self.assertEquals(response.status_code, 201)
 
+    def test_create_org_with_customer(self):
+        data = {
+            "organization": {
+                "name": "Customer",
+                "description": "Customer",
+                "plan": BillingPlan.PLAN_SCALE,
+                "customer": "cus_tomer",
+                "authorizations": [
+                    {
+                        "user_email": "e@mail.com",
+                        "role": 3
+                    }
+                ]
+            },
+            "project": {
+                "date_format": "D",
+                "name": "Test Project",
+                "timezone": "America/Argentina/Buenos_Aires",
+                "template": True
+            }
+        }
+        response, content_data = self.request(data, self.owner_token)
+        org = Organization.objects.get(uuid=content_data["organization"]["uuid"])
+        self.assertEqual(org.organization_billing.stripe_customer, "cus_tomer")
+
     def test_create_template_project(self):
         data = {
             "organization": {
