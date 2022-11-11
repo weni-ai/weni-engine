@@ -267,7 +267,6 @@ def search_project(organization_id: int, project_uuid: str, text: str):
         flows_client = utils.get_grpc_types().get("flow")
     else:
         flows_client = FlowsRESTClient()
-    flows_client = FlowsRESTClient()
     flow_result = flows_client.get_project_flows(
         project_uuid=project_uuid,
         flow_name=text

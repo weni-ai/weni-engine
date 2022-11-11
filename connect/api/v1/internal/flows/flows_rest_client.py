@@ -236,7 +236,7 @@ class FlowsRESTClient:
         )
         return response.json()
 
-    def create_channel(self, user: str, project_uuid: str, data: str, channeltype_code: str):
+    def create_channel(self, user: str, project_uuid: str, data: dict, channeltype_code: str):
         body = dict(
             user=user,
             org=project_uuid,
