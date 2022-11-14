@@ -114,9 +114,7 @@ class FlowsRESTClient:
             headers=self.authentication_instance.headers,
             params=params
         )
-
-        # TODO: check if response.data has a list with any element has: authorization_uuid, classifier_type, name, is_active, uuid
-        return dict(status=response.status_code, data=response.get("data", []))
+        return response.json()
 
     def create_classifier(self, project_uuid: str, user_email: str, classifier_type: str, classifier_name: str, access_token: str):
         body = dict(
@@ -237,7 +235,7 @@ class FlowsRESTClient:
         )
         return response.json()
 
-    def create_channel(self, user: str, project_uuid: str, data: str, channeltype_code: str):
+    def create_channel(self, user: str, project_uuid: str, data: dict, channeltype_code: str):
         body = dict(
             user=user,
             org=project_uuid,
@@ -265,12 +263,12 @@ class FlowsRESTClient:
         )
         return response.json()
 
-    def release_channel(self, channel_uuid: str):
-        response = requests.get(
+    def release_channel(self, user: str, channel_uuid: str):
+        requests.delete(
             url=f'{self.base_url}/api/v2/internals/channel/{channel_uuid}/',
             headers=self.authentication_instance.headers,
+            json={"user": user}
         )
-        return response.json()
 
     def list_channel(self, is_active: str = "True", channel_type: str = "WA", project_uuid: str = None):
         params = {}
@@ -293,7 +291,7 @@ class FlowsRESTClient:
         return response.json()
 
     def delete_channel(self, channel_uuid: str):
-        response = requests.post(
+        response = requests.delete(
             url=f'{self.base_url}/api/v2/internals/channel/{channel_uuid}/',
             headers=self.authentication_instance.headers
         )

@@ -1,4 +1,3 @@
-import json
 import uuid
 from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext_lazy as _
@@ -289,7 +288,7 @@ class ProjectViewSet(
             task = tasks.create_channel.delay(
                 user=serializer.validated_data.get("user"),
                 project_uuid=str(project.flow_organization),
-                data=json.dumps(serializer.validated_data.get("data")),
+                data=serializer.validated_data.get("data"),
                 channeltype_code=serializer.validated_data.get("channeltype_code"),
             )
             task.wait()
@@ -385,17 +384,9 @@ class ProjectViewSet(
         if serializer.is_valid(raise_exception=True):
             project_uuid = serializer.validated_data.get("project_uuid")
             project = Project.objects.get(uuid=project_uuid)
-            # task = tasks.list_classifier.delay(str(project.flow_organization))
-            # task.wait()
-            result = []
-            if not settings.TESTING:
-                flows_client = FlowsRESTClient()
-                result = flows_client.get_classifiers(
-                    project_uuid=str(project.flow_organization),
-                    classifier_type="bothub",
-                    is_active=True,
-                )
-            return JsonResponse(status=status.HTTP_200_OK, data=result)
+            task = tasks.list_classifier.delay(str(project.flow_organization))
+            task.wait()
+            return JsonResponse(status=status.HTTP_200_OK, data=task.result)
 
     @action(
         detail=True,

@@ -267,7 +267,6 @@ def search_project(organization_id: int, project_uuid: str, text: str):
         flows_client = utils.get_grpc_types().get("flow")
     else:
         flows_client = FlowsRESTClient()
-    flows_client = FlowsRESTClient()
     flow_result = flows_client.get_project_flows(
         project_uuid=project_uuid,
         flow_name=text
@@ -623,7 +622,7 @@ def delete_user_permission_project(project_uuid: str, user_email: str, permissio
 def list_channels(channel_type):
     if settings.USE_FLOW_REST:
         flow_instance = FlowsRESTClient()
-        response = flow_instance.list_channel(channel_type=channel_type).get("results")
+        response = flow_instance.list_channel(channel_type=channel_type)
     else:
         flow_instance = utils.get_grpc_types().get("flow")
         response = list(flow_instance.list_channel(channel_type=channel_type))
@@ -776,6 +775,7 @@ def create_classifier(project_uuid: str, user_email: str, classifier_name: str, 
 
 @app.task(name='list_classifier')
 def list_classifier(project_uuid: str):
+    classifiers = {"data": []}
     if settings.USE_FLOW_REST:
         flow_instance = FlowsRESTClient()
     else:
@@ -785,11 +785,10 @@ def list_classifier(project_uuid: str):
         classifier_type="bothub",
         is_active=True,
     )
-
-    classifiers = {"data": []}
     for i in response:
+        authorization = i.get("access_token") if settings.USE_FLOW_REST else i.get("authorization_uuid")
         classifiers["data"].append({
-            "authorization_uuid": i.get("authorization_uuid"),
+            "authorization_uuid": authorization,
             "classifier_type": i.get("classifier_type"),
             "name": i.get("name"),
             "is_active": i.get("is_active"),
