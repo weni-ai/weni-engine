@@ -788,21 +788,15 @@ def list_classifier(project_uuid: str):
         classifier_type="bothub",
         is_active=True,
     )
-
-    if not settings.USE_FLOW_REST:
-        data = []
-        for i in response:
-            data.append({
-                "authorization_uuid": i.get("authorization_uuid"),
-                "classifier_type": i.get("classifier_type"),
-                "name": i.get("name"),
-                "is_active": i.get("is_active"),
-                "uuid": i.get("uuid"),
-            })
-        classifiers["data"] = data
-    else:
-        classifiers["data"] = response
-        
+    for i in response:
+        authorization = i.get("access_token") if settings.USE_FLOW_REST else i.get("authorization_uuid")
+        classifiers["data"].append({
+            "authorization_uuid": authorization,
+            "classifier_type": i.get("classifier_type"),
+            "name": i.get("name"),
+            "is_active": i.get("is_active"),
+            "uuid": i.get("uuid"),
+        })
     return classifiers
 
 
