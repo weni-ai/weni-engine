@@ -934,9 +934,8 @@ class BillingPrecificationAPITestCase(TestCase):
         response, content_data = self.request(
             self.owner_token,
         )
-
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(content_data["currency"], "USD")
+        self.assertEqual(content_data["currency"], settings.DEFAULT_CURRENCY)
         self.assertEqual(
             content_data["extra_whatsapp_integration"],
             settings.BILLING_COST_PER_WHATSAPP,

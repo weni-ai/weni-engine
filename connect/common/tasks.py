@@ -1,6 +1,5 @@
 import json
 import pendulum
-from datetime import timedelta
 import requests
 import grpc
 from grpc._channel import _InactiveRpcError
@@ -390,14 +389,15 @@ def sync_channels_statistics():
 
 @app.task()
 def generate_project_invoice():
-    sync_channels_statistics()
+    if not settings.TESTING:
+        sync_channels_statistics()
+
     for org in Organization.objects.filter(
-        organization_billing__next_due_date__lte=timezone.now().date(),
-        is_suspended=False,
-        organization_billing__plan='enterprise'
-    ):
+        organization_billing__next_due_date__lte=pendulum.now().date(), is_suspended=False).exclude(
+            organization_billing__plan__in=[BillingPlan.PLAN_TRIAL, BillingPlan.PLAN_CUSTOM, BillingPlan.PLAN_ENTERPRISE]):
+
         invoice = org.organization_billing_invoice.create(
-            due_date=timezone.now() + timedelta(days=30),
+            due_date=pendulum.now(),
             invoice_random_id=1
             if org.organization_billing_invoice.last() is None
             else org.organization_billing_invoice.last().invoice_random_id + 1,
@@ -431,10 +431,9 @@ def generate_project_invoice():
             )
 
         obj = BillingPlan.objects.get(id=org.organization_billing.pk)
-        obj.next_due_date = org.organization_billing.next_due_date + timedelta(
-            BillingPlan.BILLING_CYCLE_DAYS.get(org.organization_billing.cycle)
-        )
-        obj.last_invoice_date = timezone.now().date()
+        due_date = pendulum.parse(str(org.organization_billing.next_due_date))
+        obj.next_due_date = due_date.add(months=1)
+        obj.last_invoice_date = pendulum.now().date()
         obj.save(update_fields=["next_due_date", "last_invoice_date"])
 
 

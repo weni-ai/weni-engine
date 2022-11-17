@@ -51,7 +51,7 @@ from connect.api.v1.internal.intelligence.intelligence_rest_client import Intell
 import pendulum
 from connect.common import tasks
 import logging
-
+import stripe
 
 logger = logging.getLogger(__name__)
 
@@ -666,6 +666,76 @@ class OrganizationViewSet(
                 "is_suspended": organization.is_suspended,
             }
         }
+
+    @action(
+        detail=True,
+        methods=["PATCH"],
+        url_name="billing-upgrade-plan",
+        url_path="billing/upgrade-plan/(?P<organization_uuid>[^/.]+)",
+    )
+    def upgrade_plan(self, request, organization_uuid):
+        data = {}
+        plan = request.data.get("organization_billing_plan")
+        organization = get_object_or_404(Organization, uuid=organization_uuid)
+
+        self.check_object_permissions(self.request, organization)
+        if not organization.organization_billing.stripe_customer:
+            return JsonResponse(data={"status": "FAILURE", "message": "Empty customer"}, status=status.HTTP_304_NOT_MODIFIED)
+
+        org_billing = organization.organization_billing
+        old_plan = organization.organization_billing.plan
+
+        plan_info = BillingPlan.plan_info(plan)
+
+        if not plan_info["valid"]:
+            return JsonResponse(
+                data={"status": "FAILURE", "message": "Invalid plan choice"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        price = BillingPlan.plan_info(plan)["price"]
+
+        if settings.TESTING:
+            p_intent = stripe.PaymentIntent(amount_received=price, id="pi_test_id", amount=price, charges={"amount": price, "amount_captured": price})
+            purchase_result = {"status": "SUCCESS", "response": p_intent}
+            if request.data.get("stripe_failure"):
+                data["status"] = "FAILURE"
+            else:
+                data["status"] = "SUCCESS"
+        else:
+            try:
+                gateway = billing.get_gateway("stripe")
+                purchase_result = gateway.purchase(
+                    money=int(price),
+                    identification=org_billing.stripe_customer,
+                )
+                data["status"] = purchase_result["status"]
+            except Exception as error:
+                logger.error(f"Stripe error: {error}")
+                data["status"] = "FAILURE"
+
+        if data["status"] == "SUCCESS":
+
+            change_plan = org_billing.change_plan(plan)
+
+            if change_plan:
+                organization.organization_billing.send_email_changed_plan(
+                    organization.name,
+                    organization.authorizations.values_list("user__email", flat=True),
+                    old_plan,
+                )
+                return JsonResponse(
+                    data={"status": "SUCCESS", "old_plan": old_plan, "plan": org_billing.plan},
+                    status=status.HTTP_200_OK
+                )
+            return JsonResponse(
+                data={"status": "FAILURE", "message": "Invalid plan choice"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        return JsonResponse(
+            data={"status": "FAILURE", "message": "Stripe error"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
 
 
 class OrganizationAuthorizationViewSet(
