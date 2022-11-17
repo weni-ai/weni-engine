@@ -1336,6 +1336,133 @@ class BillingPlan(models.Model):
         )
         return mail
 
+    def send_email_trial_plan_expired_due_time_limit(self, user_name: str, email: list):
+        if not settings.SEND_EMAILS:
+            return False  # pragma: no cover
+        context = {
+            "user_name": user_name,
+            "webapp_billing_url": settings.WEBAPP_BASE_URL + "/orgs/" + self.organization.uuid + "/billing",
+        }
+        mail.send_mail(
+            _("Your trial plan has expired"),
+            render_to_string("billing/emails/trial_plan_expired_due_time_limit.txt", context),
+            None,
+            email,
+            html_message=render_to_string("billing/emails/trial_plan_expired_due_time_limit.html", context),
+        )
+        return mail
+
+    def send_email_trial_plan_expired_due_attendence_limit(self, user_name: str, email: list):
+        if not settings.SEND_EMAILS:
+            return False  # pragma: no cover
+        context = {
+            "user_name": user_name,
+            "webapp_billing_url": settings.WEBAPP_BASE_URL + "/orgs/" + self.organization.uuid + "/billing",
+        }
+        mail.send_mail(
+            _("You reached 100 attendances"),
+            render_to_string("billing/emails/trial_plan_expired_due_attendence_limit.txt", context),
+            None,
+            email,
+            html_message=render_to_string("billing/emails/trial_plan_expired_due_attendence_limit.html", context),
+        )
+        return mail
+
+    def send_email_start_plan_is_about_to_expire(self, user_name: str, email: list):
+        if not settings.SEND_EMAILS:
+            return False  # pragma: no cover
+        context = {
+            "user_name": user_name,
+            "webapp_billing_url": settings.WEBAPP_BASE_URL + "/orgs/" + self.organization.uuid + "/billing",
+        }
+        mail.send_mail(
+            _("You reached 150 attendances"),
+            render_to_string("billing/emails/start_plan_is_about_to_expire.txt", context),
+            None,
+            email,
+            html_message=render_to_string("billing/emails/start_plan_is_about_to_expire.html", context),
+        )
+        return mail
+
+    def send_email_start_plan_expired_due_attendence_limit(self, user_name: str, email: list):
+        if not settings.SEND_EMAILS:
+            return False  # pragma: no cover
+        context = {
+            "user_name": user_name,
+            "webapp_billing_url": settings.WEBAPP_BASE_URL + "/orgs/" + self.organization.uuid + "/billing",
+        }
+        mail.send_mail(
+            _("You reached 200 attendances"),
+            render_to_string("billing/emails/start_plan_expired_due_attendence_limit.txt", context),
+            None,
+            email,
+            html_message=render_to_string("billing/emails/start_plan_expired_due_attendence_limit.html", context),
+        )
+        return mail
+
+    def send_email_scale_plan_is_about_to_expire(self, user_name: str, email: list):
+        if not settings.SEND_EMAILS:
+            return False  # pragma: no cover
+        context = {
+            "user_name": user_name,
+            "webapp_billing_url": settings.WEBAPP_BASE_URL + "/orgs/" + self.organization.uuid + "/billing",
+        }
+        mail.send_mail(
+            _("You reached 450 attendances"),
+            render_to_string("billing/emails/scale_plan_is_about_to_expire.txt", context),
+            None,
+            email,
+            html_message=render_to_string("billing/emails/scale_plan_is_about_to_expire.html", context),
+        )
+        return mail
+
+    def send_email_scale_plan_expired_due_attendence_limit(self, user_name: str, email: list):
+        if not settings.SEND_EMAILS:
+            return False  # pragma: no cover
+        context = {
+            "user_name": user_name,
+            "webapp_billing_url": settings.WEBAPP_BASE_URL + "/orgs/" + self.organization.uuid + "/billing",
+        }
+        mail.send_mail(
+            _("You reached 500 attendances"),
+            render_to_string("billing/emails/scale_plan_expired_due_attendence_limit.txt", context),
+            None,
+            email,
+            html_message=render_to_string("billing/emails/scale_plan_expired_due_attendence_limit.html", context),
+        )
+        return mail
+
+    def send_email_advanced_plan_is_about_to_expire(self, user_name: str, email: list):
+        if not settings.SEND_EMAILS:
+            return False  # pragma: no cover
+        context = {
+            "user_name": user_name,
+            "webapp_billing_url": settings.WEBAPP_BASE_URL + "/orgs/" + self.organization.uuid + "/billing",
+        }
+        mail.send_mail(
+            _("You reached 800 attendances"),
+            render_to_string("billing/emails/advanced_plan_is_about_to_expire.txt", context),
+            None,
+            email,
+            html_message=render_to_string("billing/emails/advanced_plan_is_about_to_expire.html", context),
+        )
+        return mail
+
+    def send_email_advanced_plan_expired_due_attendence_limit(self, user_name: str, email: list):
+        if not settings.SEND_EMAILS:
+            return False  # pragma: no cover
+        context = {
+            "user_name": user_name,
+            "webapp_billing_url": settings.WEBAPP_BASE_URL + "/orgs/" + self.organization.uuid + "/billing",
+        }
+        mail.send_mail(
+            _("You reached 1,000 attendances"),
+            render_to_string("billing/emails/advanced_plan_expired_due_attendence_limit.txt", context),
+            None,
+            email,
+            html_message=render_to_string("billing/emails/advanced_plan_expired_due_attendence_limit.html", context),
+        )
+        return mail
 
 class Invoice(models.Model):
     class Meta:

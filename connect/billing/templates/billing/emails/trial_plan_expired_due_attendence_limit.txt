@@ -1,0 +1,5 @@
+{% load i18n %}
+<p>{% trans 'Hi' %}, {{ user_name }}!</p>
+<p>{% trans 'Your organization has reached the Trial plan's limit of 100 attendances.' %}</p>
+<p>{% trans 'You still have access to the platform, but your chatbot will not be able to fire messages to your users.' %}</p>
+<p>{% trans 'To prevent this from happening, access' %} <a href="{{ webapp_billing_url }}">{% trans 'Billing' %}</a> {% trans 'and choose a plan that fits your business the needs of your business.' %}</p>
