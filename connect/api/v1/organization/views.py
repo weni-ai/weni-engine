@@ -90,6 +90,7 @@ class OrganizationViewSet(
         return self.get_paginated_response(organization_serializer.data)
 
     def create(self, request, *args, **kwargs):
+        print("Entrando no create")
         data = {}
         org_info = request.data.get("organization")
         project_info = request.data.get("project")
@@ -103,6 +104,7 @@ class OrganizationViewSet(
                         user_email=user.email,
                         organization_name=org_info.get("name")
                     )
+                    print("org_ai:", ai_org)
                     org_info.update(
                         dict(
                             intelligence_organization=ai_org.get("id")
@@ -111,7 +113,8 @@ class OrganizationViewSet(
                 except Exception as error:
                     data.update({
                         "message": "Could not create organization in AI module",
-                        "status": "FAILED"
+                        "status": "FAILED",
+                        "error": str(error)
                     })
                     logger.error(error)
                     return Response(data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

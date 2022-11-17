@@ -37,6 +37,8 @@ class IntelligenceRESTClient:
             json={"user_email": user_email, "organization_name": organization_name},
             params={"user_email": user_email},
         )
+        print(response)
+        print(response.json())
         return response.json()
 
     def delete_organization(self, organization_id, user_email):
