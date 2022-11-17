@@ -228,8 +228,10 @@ def problem_capture_invoice():
 @app.task(name="end_trial_plan")
 def end_trial_plan():
     yesterday = pendulum.yesterday()
-    for organization in Organization.objects.filter(organization_billing__plan=BillingPlan.PLAN_TRIAL, organization_billing__trial_end_date__date=yesterday.date()):
+    for organization in Organization.objects.filter(organization_billing__plan=BillingPlan.PLAN_TRIAL,
+                                                    organization_billing__trial_end_date__date=yesterday.date()):
         organization.organization_billing.end_trial_period()
+        organization.organization_billing.send_email_trial_plan_expired_due_time_limit()
 
 
 @app.task(name="check_organization_plans")
@@ -253,9 +255,10 @@ def check_organization_plans():
 
         if current_active_contacts > organization.organization_billing.plan_limit:
             organization.organization_billing.end_trial_period()
-            # send email to offer upgrade
-            # organization.organization_billing.send_email_expired_plan(
-            #     organization.name,
-            #     organization.authorizations.values_list("user__email", flat=True),
-            # )
+
+            organization.organization_billing.send_email_plan_expired_due_attendance_limit()
+
+        elif current_active_contacts > organization.organization_billing.plan_limit - 50:
+            organization.organization_billing.send_email_plan_is_about_to_expire()
+
     return True
