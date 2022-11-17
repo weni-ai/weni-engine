@@ -219,6 +219,7 @@ class MyUserProfileViewSet(
                     "last_update_profile",
                 ]
             )
+            user.send_request_flow_user_info()
             response = dict(
                 company=dict(
                     name=user.company_name,
