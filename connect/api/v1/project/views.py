@@ -429,6 +429,27 @@ class ProjectViewSet(
             )
             return JsonResponse(data=ticketer)
 
+    @action(
+        detail=False,
+        methods=["GET"],
+        url_name='channels-availables'
+    )
+    def list_channels_availables(self):
+        rest_client = FlowsRESTClient()
+        response = rest_client.get_list_channels_availables()
+        return JsonResponse(status=response.status_code, data=response.json())
+    
+    @action(
+        detail=True,
+        methods=["GET"],
+        url_name='channel-available'
+    )
+    def detail_channel_available(self, request):
+        channel_code = request.data.get("code")
+        rest_client = FlowsRESTClient()
+        response = rest_client.get_channel_available(str(channel_code))
+        return JsonResponse(status=response.status_code, data=response.json())
+
 
 class RequestPermissionProjectViewSet(
     mixins.ListModelMixin,
