@@ -461,7 +461,9 @@ class BillingViewTestCase(TestCase):
             }
         }
         response, content_data = self.request_create_org(create_org_data, self.owner_token)
+
         self.assertEqual(content_data["organization"]["organization_billing"]["plan"], BillingPlan.PLAN_START)
+        self.assertEqual(content_data["organization"]["organization_billing"]["final_card_number"], '42')
         organization = Organization.objects.get(uuid=content_data["organization"]["uuid"])
         self.assertEqual(organization.organization_billing_invoice.first().payment_status, Invoice.PAYMENT_STATUS_PAID)
         self.assertEqual(organization.organization_billing_invoice.first().stripe_charge, "ch_teste")

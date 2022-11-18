@@ -61,13 +61,13 @@ class NewsletterLanguage(models.Model):
 
 class OrganizationManager(models.Manager):
     def create(
-        self,
-        organization_billing__cycle,
-        organization_billing__plan,
-        organization_billing__payment_method=None,
-        organization_billing__stripe_customer=None,
-        *args,
-        **kwargs,
+            self,
+            organization_billing__cycle,
+            organization_billing__plan,
+            organization_billing__payment_method=None,
+            organization_billing__stripe_customer=None,
+            *args,
+            **kwargs,
     ):
         instance = super().create(*args, **kwargs)
         new_kwargs = {}
@@ -80,8 +80,8 @@ class OrganizationManager(models.Manager):
             )
 
             if (
-                BillingPlan.BILLING_CYCLE_DAYS.get(organization_billing__cycle)
-                is not None
+                    BillingPlan.BILLING_CYCLE_DAYS.get(organization_billing__cycle)
+                    is not None
             ):
                 new_kwargs.update(
                     {
@@ -263,11 +263,11 @@ class Organization(models.Model):
         return mail
 
     def send_email_change_organization_name(
-        self,
-        user_name: str,
-        email: str,
-        organization_previous_name: str,
-        organization_new_name: str,
+            self,
+            user_name: str,
+            email: str,
+            organization_previous_name: str,
+            organization_new_name: str,
     ):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
@@ -312,7 +312,7 @@ class Organization(models.Model):
         return mail
 
     def send_email_permission_change(
-        self, user_name: str, old_permission: str, new_permission: str, email: str
+            self, user_name: str, old_permission: str, new_permission: str, email: str
     ):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
@@ -1071,9 +1071,24 @@ class BillingPlan(models.Model):
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None, **kwargs):
         _adding = self._state.adding
         if _adding or kwargs.get("change_plan"):
+            from connect import billing
+
+            card = billing.get_gateway("stripe")
+
+            card_data = card.get_card_data(self.stripe_customer)
+
+            if card_data.get("status") == "SUCCESS" and len(card_data["response"]) > 0:
+                card_info = card_data["response"][0]
+                self.stripe_configured_card = True
+                self.final_card_number = card_info.get("last2")
+                self.cardholder_name = card_info.get("cardholder_name")
+                self.card_brand = card_info.get("brand")
+                self.card_expiration_date = card_info.get("card_expiration_date")
+
             if _adding and self.plan == self.PLAN_TRIAL:
                 self.trial_end_date = pendulum.now().end_of("day").add(months=1)
             else:
+                # Create invoice for charges
                 stripe.api_key = settings.BILLING_SETTINGS.get("stripe", {}).get("API_KEY")
 
                 customer = self.stripe_customer
@@ -1448,6 +1463,79 @@ class BillingPlan(models.Model):
         )
         return mail
 
+    def send_email_trial_plan_expired_due_time_limit(self, user_names: list = None, emails: list = None):
+        if not settings.SEND_EMAILS:
+            return False  # pragma: no cover
+
+        if not emails:
+            emails = self.organization.authorizations.exclude(role=OrganizationRole.VIEWER.value).values_list(
+                "user__email", flat=True)
+        if not user_names:
+            user_names = self.organization.authorizations.exclude(role=OrganizationRole.VIEWER.value).values_list(
+                "user__username", flat=True)
+        context = {
+            "user_name": user_names,
+            "webapp_billing_url": f"{settings.WEBAPP_BASE_URL}/orgs/{self.organization.uuid}/billing"
+        }
+        mail.send_mail(
+            _("Your trial plan has expired"),
+            render_to_string("billing/emails/trial_plan_expired_due_time_limit.txt", context),
+            None,
+            emails,
+            html_message=render_to_string("billing/emails/trial_plan_expired_due_time_limit.html", context),
+        )
+        return mail
+
+    def send_email_plan_expired_due_attendance_limit(self, user_names: str = None, emails: list = None):
+        if not settings.SEND_EMAILS:
+            return False  # pragma: no cover
+
+        if not emails:
+            emails = self.organization.authorizations.exclude(role=OrganizationRole.VIEWER.value).values_list(
+                "user__email", flat=True)
+        if not user_names:
+            user_names = self.organization.authorizations.exclude(role=OrganizationRole.VIEWER.value).values_list(
+                "user__username", flat=True)
+
+        context = {
+            "user_name": user_names,
+            "webapp_billing_url": f"settings.WEBAPP_BASE_URL/orgs/{self.organization.uuid}/billing",
+            "plan": self.plan
+        }
+        mail.send_mail(
+            _(f"You reached {self.plan_limit} attendances"),
+            render_to_string("billing/emails/plan_expired_due_attendence_limit.txt", context),
+            None,
+            emails,
+            html_message=render_to_string("billing/emails/plan_expired_due_attendence_limit.html", context),
+        )
+        return mail
+
+    def send_email_plan_is_about_to_expire(self, user_names: str = None, emails: list = None):
+        if not settings.SEND_EMAILS:
+            return False  # pragma: no cover
+
+        if not emails:
+            emails = self.organization.authorizations.exclude(role=OrganizationRole.VIEWER.value).values_list(
+                "user__email", flat=True)
+        if not user_names:
+            user_names = self.organization.authorizations.exclude(role=OrganizationRole.VIEWER.value).values_list(
+                "user__username", flat=True)
+
+        context = {
+            "user_name": user_names,
+            "limit": self.plan_limit,
+            "webapp_billing_url": settings.WEBAPP_BASE_URL + "/orgs/" + self.organization.uuid + "/billing",
+        }
+        mail.send_mail(
+            _(f"You reached {self.plan_limit} attendances"),
+            render_to_string("billing/emails/plan_is_about_to_expire.txt", context),
+            None,
+            emails,
+            html_message=render_to_string("billing/emails/plan_is_about_to_expire.html", context),
+        )
+        return mail
+
     def send_email_end_trial(self, email: list):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
@@ -1478,10 +1566,6 @@ class BillingPlan(models.Model):
             current_app.send_task(  # pragma: no cover
                 name="update_suspend_project", args=[project.flow_organization, True]
             )
-
-        emails = self.organization.authorizations.values_list("user__email", flat=True)
-
-        self.send_email_end_trial(emails)
 
 
 class Invoice(models.Model):
@@ -1555,9 +1639,9 @@ class Invoice(models.Model):
             card_data["response"]["final_card_number"] = str(
                 card_data["response"]["final_card_number"]
             )
-            card_data["response"]["final_card_number"] = card_data["response"][
-                "final_card_number"
-            ][len(card_data["response"]["final_card_number"]) - 2 :]
+            card_data["response"]["final_card_number"] = card_data[
+                "response"
+            ]["final_card_number"][len(card_data["response"]["final_card_number"]) - 2:]
         return card_data
 
     @property
