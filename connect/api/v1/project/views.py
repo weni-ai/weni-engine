@@ -384,9 +384,8 @@ class ProjectViewSet(
         if serializer.is_valid(raise_exception=True):
             project_uuid = serializer.validated_data.get("project_uuid")
             project = Project.objects.get(uuid=project_uuid)
-            task = tasks.list_classifier.delay(str(project.flow_organization))
-            task.wait()
-            return JsonResponse(status=status.HTTP_200_OK, data=task.result)
+            task = tasks.list_classifier(str(project.flow_organization))
+            return JsonResponse(status=status.HTTP_200_OK, data=task)
 
     @action(
         detail=True,
