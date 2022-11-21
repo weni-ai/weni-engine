@@ -20,7 +20,7 @@ from connect.common.models import (
 )
 import pendulum
 from freezegun import freeze_time
-from connect.billing.tasks import end_trial_plan, check_organization_plans
+from connect.billing.tasks import end_trial_plan, check_organization_plans, daily_contact_count
 from rest_framework import status
 import stripe
 from django.conf import settings
@@ -525,6 +525,9 @@ class IntegrationTestCase(TestCase):
         self.assertTrue(self.organization.organization_billing.is_active)
         self.assertFalse(self.organization.is_suspended)
         create_contacts(num_contacts)
+
+        # Count contacts
+        daily_contact_count()
 
         # Verify if the organizations have more contacts than the plan limit
         check_organization_plans()

@@ -9,6 +9,7 @@ from django.conf import settings
 from django.db import transaction
 
 from connect import utils, billing
+from connect.api.v1.internal.integrations.integrations_rest_client import IntegrationsRESTClient
 from connect.authentication.models import User
 from connect.celery import app
 from connect.common.models import (
@@ -23,7 +24,6 @@ from connect.common.models import (
 
 from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
 from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
-from connect.api.v1.internal.integrations.integrations_rest_client import IntegrationsRESTClient
 from connect.api.v1.internal.intelligence.intelligence_rest_client import IntelligenceRESTClient
 
 

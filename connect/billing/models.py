@@ -3,7 +3,7 @@ import uuid as uuid4
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
-
+from connect.common.models import Project
 
 logger = logging.getLogger(__name__)
 
@@ -114,6 +114,8 @@ class ContactCount(models.Model):
     )
     count = models.PositiveIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
+    day = models.DateTimeField(null=True)
+    project = models.ForeignKey(Project, models.CASCADE, related_name="contact_count_project", null=True)
     project = models.ForeignKey("common.Project", models.CASCADE, related_name="contact_count_project", null=True)
 
     def increase_contact_count(self, contact_count):

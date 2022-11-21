@@ -438,7 +438,7 @@ class ProjectViewSet(
         rest_client = FlowsRESTClient()
         response = rest_client.get_list_channels_availables()
         return JsonResponse(status=response.status_code, data=response.json())
-    
+
     @action(
         detail=True,
         methods=["GET"],

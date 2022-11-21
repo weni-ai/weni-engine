@@ -248,6 +248,7 @@ def check_organization_plans():
             contact_count = utils.count_contacts(
                 project=project, before=before, after=after
             )
+
             project.contact_count = int(contact_count)
             project.save(update_fields=["contact_count"])
 
@@ -262,3 +263,19 @@ def check_organization_plans():
             organization.organization_billing.send_email_plan_is_about_to_expire()
 
     return True
+
+
+@app.task(name="daily_contact_count")
+def daily_contact_count():
+    """Daily contacts"""
+    today = pendulum.now().end_of("day")
+
+    for project in Project.objects.exclude(organization__organization_billing__plan=BillingPlan.PLAN_CUSTOM):
+        after = today.start_of("day")
+        before = today
+        total_day_calls = Contact.objects.filter(project=project).filter(last_seen_on__range=(after, before)).distinct("contact_flow_uuid").count()
+        cc, created = ContactCount.objects.get_or_create(
+            project=project,
+            day=after,
+            defaults={"count": total_day_calls}
+        )
