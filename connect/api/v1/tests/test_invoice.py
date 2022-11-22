@@ -1,4 +1,5 @@
 import json
+import pendulum
 import uuid as uuid4
 from unittest.mock import patch
 from datetime import timedelta
@@ -108,7 +109,7 @@ class InvoiceDataTestCase(TestCase):
             flow_organization=uuid4.uuid4(),
         )
         self.invoice = self.invoice = self.organization.organization_billing_invoice.create(
-            due_date=timezone.now() + timedelta(days=30),
+            due_date=pendulum.now().add(months=1),
             invoice_random_id=1
             if self.organization.organization_billing_invoice.last() is None else self.organization.organization_billing_invoice.last().invoice_random_id + 1,
             discount=self.organization.organization_billing.fixed_discount,
