@@ -13,59 +13,36 @@ jobs:
     steps:
       - name: Set variables
         run: |
-            TAG=$(echo $GITHUB_REF|cut -d"/" -f3)
-            if $(echo  $TAG|grep --silent -e '^.*.*-develop')
-            then 
-              echo "Found environment: DEVELOP - $TAG"
-              echo "MANIFESTS_ENVIRONMENT=develop" >> $GITHUB_ENV
-              echo "MANIFESTS_ENVIRONMENT=develop"
-              echo "TAG=$TAG" >> $GITHUB_ENV
-              echo "TAG=$TAG"
-              VERSION=${TAG} 
-              echo "VERSION=$VERSION" >> $GITHUB_ENV
-              echo "VERSION=$VERSION"
-              echo "COMMIT_SHA=$GITHUB_SHA" >> $GITHUB_ENV
-              echo "COMMIT_SHA=$GITHUB_SHA"
-              echo "IMAGE_TAG=connectof/connect-engine:$TAG" >> $GITHUB_ENV
-              echo "IMAGE_TAG=connectof/connect-engine:$TAG"
-            elif $(echo  $TAG|grep --silent -e '^.*.*-staging')
-            then 
-              echo "Found environment: STAGING - $TAG"
-              echo "MANIFESTS_ENVIRONMENT=staging" >> $GITHUB_ENV
-              echo "MANIFESTS_ENVIRONMENT=staging"
-              echo "TAG=$TAG" >> $GITHUB_ENV
-              echo "TAG=$TAG"
-              VERSION=${TAG} 
-              echo "VERSION=$VERSION" >> $GITHUB_ENV
-              echo "VERSION=$VERSION"
-              echo "COMMIT_SHA=$GITHUB_SHA" >> $GITHUB_ENV
-              echo "COMMIT_SHA=$GITHUB_SHA"
-              echo "IMAGE_TAG=connectof/connect-engine:$TAG" >> $GITHUB_ENV
-              echo "IMAGE_TAG=connectof/connect-engine:$TAG"
-            elif $(echo  $TAG|grep --silent -e '^.*.*')
-            then 
-              echo "No environment found, assuming: PRODUCTION - $TAG"
-              echo "MANIFESTS_ENVIRONMENT=production" >> $GITHUB_ENV
-              echo "MANIFESTS_ENVIRONMENT=production"
-              echo "TAG=$TAG" >> $GITHUB_ENV
-              echo "TAG=$TAG"
-              VERSION=${TAG} 
-              echo "VERSION=$VERSION" >> $GITHUB_ENV
-              echo "VERSION=$VERSION"
-              echo "COMMIT_SHA=$GITHUB_SHA" >> $GITHUB_ENV
-              echo "COMMIT_SHA=$GITHUB_SHA"
-              echo "IMAGE_TAG=connectof/connect-engine:$TAG" >> $GITHUB_ENV
-              echo "IMAGE_TAG=connectof/connect-engine:$TAG"
+            TAG="$( echo "${GITHUB_REF}" | cut -d'/' -f3 )"
+            if grep -qs -e '^.*.*-develop' <<< "${TAG}" ; then
+              echo "Found environment: DEVELOP - ${TAG}"
+              echo "MANIFESTS_ENVIRONMENT=develop" | tee "${GITHUB_ENV}"
+            elif grep -qs -e '^.*.*-staging' <<< "${TAG}" ; then
+              echo "Found environment: STAGING - ${TAG}"
+              echo "MANIFESTS_ENVIRONMENT=staging" | tee -a "${GITHUB_ENV}"
+            elif grep -qs -e '^.*.*' <<< "${TAG}" ; then
+              echo "No environment found, assuming: PRODUCTION - ${TAG}"
+              echo "MANIFESTS_ENVIRONMENT=production" | tee -a "${GITHUB_ENV}"
             else
               echo 'Not a valid tag. Skipping...'
               exit 1
             fi
+            echo "TAG=$TAG" | tee -a "${GITHUB_ENV}"
+            VERSION="${TAG}"
+            echo "VERSION=${VERSION}" | tee -a "${GITHUB_ENV}"
+            echo "COMMIT_SHA=$GITHUB_SHA" | tee -a "${GITHUB_ENV}"
+            echo "IMAGE_TAG=connectof/connect-engine:$TAG" | tee -a "${GITHUB_ENV}"
+            echo "IMAGE_SOURCE_URL=https://github.com/Ilhasoft/weni-engine" | tee -a "${GITHUB_ENV}"
+            echo "MANIFESTS_REPOSITORY=Ilhasoft/kubernetes-manifests-connect" | tee -a "${GITHUB_ENV}"
+            echo "MANIFESTS_APPLICATION=connect-engine" | tee -a "${GITHUB_ENV}"
+            echo "MANIFESTS_PATCH_TARGET=deployment.json" | tee -a "${GITHUB_ENV}"
             
       - name: Check out the repo
         uses: actions/checkout@v3
         with:
-          ref: ${{env.GITHUB_SHA}}         # This is how we use an input edit by user
-          repository: Ilhasoft/weni-engine
+          ref: "${{env.GITHUB_SHA}}"         # This is how we use an input edit by user
+          # On non dispatch build not need the repo
+          #repository: Ilhasoft/weni-engine
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
@@ -86,22 +63,17 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Set Commit ID
-        id: commit_id
-        run: echo "::set-output commit=$(git rev-parse --short $GITHUB_SHA)"
-
       - name: Build and push - Weni Engine (Connect) Image
-        id: docker_build1
         uses: docker/build-push-action@v3
         with:
           context: .
           labels: |
             tag=${{env.TAG}}
             commit=${{env.COMMIT_SHA}}
-            repository=https://github.com/Ilhasoft/weni-engine
+            repository=${{env.IMAGE_SOURCE_URL}}
           file: Dockerfile
           push: true
-          tags: connectof/connect-engine:${{env.TAG}}
+          tags: "${{env.IMAGE_TAG}}"
           no-cache: true
 
       - name: Check out Kubernetes Manifests
@@ -109,15 +81,10 @@ jobs:
         uses: actions/checkout@master
         with:
           ref: main
-          repository: Ilhasoft/kubernetes-manifests-connect
-          token: ${{ secrets.DEVOPS_GITHUB_PERMANENT_TOKEN }}
+          repository: "${{ env.MANIFESTS_REPOSITORY }}"
+          token: "${{ secrets.DEVOPS_GITHUB_PERMANENT_TOKEN }}"
           path: ./kubernetes-manifests/
           # Its uses other path to not mix with source code repository used to build
-
-      - name: Set variable tag for jq
-        # This is the variable with complete image name
-        run: |
-          echo "IMAGE_TAG=connectof/connect-engine:$TAG" >> $GITHUB_ENV
           
       - name: Update image on deployment
         run: |
@@ -129,8 +96,8 @@ jobs:
             verlt(){
               [ "$1" = "$2" ] && return 1 || verlte $1 $2
             }
-            export PROJECT_DIR="connect-engine" PATCH_TARGET="deployment.json"
-            ENV_DIR="kubernetes-manifests/connect-engine/${MANIFESTS_ENVIRONMENT}"
+            export PROJECT_DIR="${{ env.MANIFESTS_APPLICATION }}"
+            ENV_DIR="kubernetes-manifests/${{ env.MANIFESTS_APPLICATION }}/${MANIFESTS_ENVIRONMENT}"
             for e in ${ENV_DIR}; do
               echo "Update ${e}:"
               if [ ! -d "${e}" ] ; then
@@ -141,7 +108,7 @@ jobs:
                 echo "${e}/${PATCH_TARGET}: Does not readable, skipping"
               else
                 OLD_IMAGE=$(
-                  cat "${e}/${PATCH_TARGET}" \
+                  cat "${e}/${{ env.MANIFESTS_PATCH_TARGET }}" \
                     | jq '.[] | select(.path == "/spec/template/spec/containers/0/image") | .value'
                 )
                 echo "Old image to replace: ${OLD_IMAGE}"
@@ -154,11 +121,11 @@ jobs:
                 if verlte "${OLD_VERSION}" "${VERSION}" || [[ ! "${OLD_VERSION}" =~ [0-9]+\.[0-9]+\.[0-9]+ ]] ; then
                   echo 'New configurations:'
                   new_configuration=$(
-                    cat "${e}/${PATCH_TARGET}" \
+                    cat "${e}/${{ env.MANIFESTS_PATCH_TARGET }}" \
                       | jq '(..|select(.path == "/spec/template/spec/containers/0/image")?) += {value: "'"${{env.IMAGE_TAG}}"'"}'
                   )
                   echo "${new_configuration}"
-                  echo "${new_configuration}" > "${e}/${PATCH_TARGET}"
+                  echo "${new_configuration}" > "${e}/${{ env.MANIFESTS_PATCH_TARGET }}"
                 else
                   echo "Version in file is greater than build, skipping update yaml"
                 fi
@@ -169,8 +136,8 @@ jobs:
         # Once made a change, commit new configuration
         uses: actions-js/push@master
         with:
-          github_token: ${{ secrets.DEVOPS_GITHUB_PERMANENT_TOKEN }}
-          repository: Ilhasoft/kubernetes-manifests-connect
+          github_token: "${{ secrets.DEVOPS_GITHUB_PERMANENT_TOKEN }}"
+          repository: "${{ env.MANIFESTS_REPOSITORY }}"
           directory: ./kubernetes-manifests/
           branch: main
           message: "From Weni Engine (Connect) Build (Push Tag ${{ env.MANIFESTS_ENVIRONMENT }})"
