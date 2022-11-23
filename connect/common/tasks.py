@@ -735,7 +735,7 @@ def retrieve_classifier(classifier_uuid: str):
         flow_instance = FlowsRESTClient()
     else:
         flow_instance = utils.get_grpc_types().get("flow")
-    response = flow_instance.get_classifier(
+    response = flow_instance.get_classifiers(
         classifier_uuid=str(classifier_uuid),
     )
     return dict(
