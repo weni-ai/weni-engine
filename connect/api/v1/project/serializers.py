@@ -409,7 +409,7 @@ class ListChannelSerializer(serializers.Serializer):
 class CreateWACChannelSerializer(serializers.Serializer):
     user = serializers.CharField(required=True)
     project_uuid = serializers.CharField(required=True)
-    config = serializers.CharField(required=True)
+    config = serializers.JSONField(required=True)
     phone_number_id = serializers.CharField(required=True)
 
 
