@@ -432,22 +432,22 @@ class ProjectViewSet(
     @action(
         detail=False,
         methods=["GET"],
-        url_name='channels-availables'
+        url_name='list-channels-availables'
     )
     def list_channels_availables(self):
         rest_client = FlowsRESTClient()
-        response = rest_client.get_list_channels_availables()
+        response = rest_client.list_channels_availables()
         return JsonResponse(status=response.status_code, data=response.json())
     
     @action(
         detail=True,
         methods=["GET"],
-        url_name='channel-available'
+        url_name='detail-channel-available'
     )
     def detail_channel_available(self, request):
         channel_code = request.data.get("code")
         rest_client = FlowsRESTClient()
-        response = rest_client.get_channel_available(str(channel_code))
+        response = rest_client.detail_channel_available(str(channel_code))
         return JsonResponse(status=response.status_code, data=response.json())
 
 
