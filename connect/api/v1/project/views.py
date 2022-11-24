@@ -432,7 +432,7 @@ class ProjectViewSet(
     @action(
         detail=False,
         methods=["GET"],
-        url_name='list-channels-availables'
+        url_name='list_channels_availables_test_zk'
     )
     def list_channels_availables(self):
         rest_client = FlowsRESTClient()
@@ -442,7 +442,7 @@ class ProjectViewSet(
     @action(
         detail=True,
         methods=["GET"],
-        url_name='detail-channel-available'
+        url_name='detail_channel_available_test_zk'
     )
     def detail_channel_available(self, request):
         channel_code = request.data.get("code")
