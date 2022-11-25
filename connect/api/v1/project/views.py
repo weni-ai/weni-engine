@@ -432,7 +432,8 @@ class ProjectViewSet(
     @action(
         detail=False,
         methods=["GET"],
-        url_name='list_channels_availables_test_zk'
+        url_name='list_channels_availables_test_zk',
+        permission_classes=[ModuleHasPermission],
     )
     def list_channels_availables(self):
         rest_client = FlowsRESTClient()
@@ -442,7 +443,8 @@ class ProjectViewSet(
     @action(
         detail=True,
         methods=["GET"],
-        url_name='detail_channel_available_test_zk'
+        url_name='detail_channel_available_test_zk',
+        permission_classes=[ModuleHasPermission],
     )
     def detail_channel_available(self, request):
         channel_code = request.data.get("code")
@@ -452,17 +454,26 @@ class ProjectViewSet(
 
     @action(
         detail=True,
-        methods=["GET"],
-        url_name="list-telegram-channel-zky",
+        methods=["POST"],
+        url_name='create-ticketer-2',
         permission_classes=[ModuleHasPermission],
     )
-    def list_telegram_channel_zky(self, request):
-        task = tasks.list_channels.delay("tg")
-        task.wait()
-        response = dict(
-            channels=task.result
-        )
-        return JsonResponse(status=status.HTTP_200_OK, data=response)
+    def create_ticketer_2(self, request):
+        project_uuid = request.data.get('project_uuid')
+        ticketer_type = request.data.get('ticketer_type')
+        name = request.data.get('name')
+        config = request.data.get('config')
+        project = Project.objects.get(uuid=project_uuid)
+        if not settings.TESTING:
+            flows_client = FlowsRESTClient()
+            ticketer = flows_client.create_ticketer(
+                project_uuid=str(project.flow_organization),
+                ticketer_type=ticketer_type,
+                name=name,
+                config=config,
+            )
+            return JsonResponse(data=ticketer)
+
 
 class RequestPermissionProjectViewSet(
     mixins.ListModelMixin,
