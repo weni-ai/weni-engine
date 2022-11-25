@@ -434,7 +434,7 @@ class ProjectViewSet(
         methods=["GET"],
         url_name='list-channels-availables',
     )
-    def list_channels_availables(self):
+    def list_channels_availables(self, request):
         rest_client = FlowsRESTClient()
         response = rest_client.list_channels_availables()
         return JsonResponse(status=response.status_code, data=response.json())
@@ -446,8 +446,12 @@ class ProjectViewSet(
     )
     def detail_channel_available(self, request):
         channel_code = request.data.get("code")
+        print(channel_code)
+        print(request.data)
+        print("----")
         rest_client = FlowsRESTClient()
         response = rest_client.detail_channel_available(str(channel_code))
+        print(response.content)
         return JsonResponse(status=response.status_code, data=response.json())
 
 
