@@ -450,6 +450,19 @@ class ProjectViewSet(
         response = rest_client.detail_channel_available(str(channel_code))
         return JsonResponse(status=response.status_code, data=response.json())
 
+    @action(
+        detail=True,
+        methods=["GET"],
+        url_name="list-telegram-channel-zky",
+        permission_classes=[ModuleHasPermission],
+    )
+    def list_telegram_channel_zky(self, request):
+        task = tasks.list_channels.delay("tg")
+        task.wait()
+        response = dict(
+            channels=task.result
+        )
+        return JsonResponse(status=status.HTTP_200_OK, data=response)
 
 class RequestPermissionProjectViewSet(
     mixins.ListModelMixin,
