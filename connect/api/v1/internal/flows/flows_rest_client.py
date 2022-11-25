@@ -181,13 +181,16 @@ class FlowsRESTClient:
         )
         return response
 
-    def detail_channel_available(self, channel_code: str):
-        if channel_code:
-            response = requests.get(
-                url=f"{self.base_url}/api/v2/internals/channels/{channel_code}",
-                headers=self.authentication_instance.headers,
-                timeout=60
-            )
-            return response
+    def list_channel_types(self, channel_code):
 
-        return None
+        if channel_code:
+            request_url=f"{self.base_url}/api/v2/internals/channels/{str(channel_code)}"
+        else:
+            request_url=f"{self.base_url}/api/v2/internals/channels"
+
+        response = requests.get(
+            url=request_url,
+            headers=self.authentication_instance.headers,
+            timeout=60
+        )
+        return response
