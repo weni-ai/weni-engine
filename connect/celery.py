@@ -53,7 +53,7 @@ app.conf.beat_schedule = {
     },
     "generate_project_invoice": {
         "task": "connect.common.tasks.generate_project_invoice",
-        "schedule": schedules.crontab(minute="*/5"),
+        "schedule": schedules.crontab(hour="12", minute=0),
     },
     "sync-total-active-contacts": {
         "task": "connect.common.tasks.sync_total_contact_count",
