@@ -432,8 +432,7 @@ class ProjectViewSet(
     @action(
         detail=False,
         methods=["GET"],
-        url_name='list_channels_availables_test_zk',
-        permission_classes=[ModuleHasPermission],
+        url_name='list-channels-availables',
     )
     def list_channels_availables(self):
         rest_client = FlowsRESTClient()
@@ -441,38 +440,15 @@ class ProjectViewSet(
         return JsonResponse(status=response.status_code, data=response.json())
 
     @action(
-        detail=True,
+        detail=False,
         methods=["GET"],
-        url_name='detail_channel_available_test_zk',
-        permission_classes=[ModuleHasPermission],
+        url_name='detail-channel-available',
     )
     def detail_channel_available(self, request):
         channel_code = request.data.get("code")
         rest_client = FlowsRESTClient()
         response = rest_client.detail_channel_available(str(channel_code))
         return JsonResponse(status=response.status_code, data=response.json())
-
-    @action(
-        detail=True,
-        methods=["POST"],
-        url_name='create-ticketer-2',
-        permission_classes=[ModuleHasPermission],
-    )
-    def create_ticketer_2(self, request):
-        project_uuid = request.data.get('project_uuid')
-        ticketer_type = request.data.get('ticketer_type')
-        name = request.data.get('name')
-        config = request.data.get('config')
-        project = Project.objects.get(uuid=project_uuid)
-        if not settings.TESTING:
-            flows_client = FlowsRESTClient()
-            ticketer = flows_client.create_ticketer(
-                project_uuid=str(project.flow_organization),
-                ticketer_type=ticketer_type,
-                name=name,
-                config=config,
-            )
-            return JsonResponse(data=ticketer)
 
 
 class RequestPermissionProjectViewSet(
