@@ -71,10 +71,10 @@ app.conf.beat_schedule = {
         "task": "sync_contacts",
         "schedule": schedules.crontab(hour=settings.SYNC_CONTACTS_SCHEDULE, minute=0)
     },
-    "sync-repositories-statistics": {
-        "task": "connect.common.tasks.sync_repositories_statistics",
-        "schedule": schedules.crontab(minute="*/8")
-    },
+    # "sync-repositories-statistics": {
+    #     "task": "connect.common.tasks.sync_repositories_statistics",
+    #     "schedule": schedules.crontab(minute="*/8")
+    # },
     "count_contacts": {
         "task": "count_contacts",
         "schedule": schedules.crontab(hour="*/6", minute=0)
