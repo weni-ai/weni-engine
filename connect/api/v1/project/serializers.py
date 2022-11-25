@@ -154,15 +154,13 @@ class ProjectSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user = self.context["request"].user
-        task = tasks.create_project.delay(  # pragma: no cover
+        task = tasks.create_project(  # pragma: no cover
             validated_data.get("name"),
             user.email,
             str(validated_data.get("timezone")),
         )
-        if not settings.TESTING:
-            task.wait()  # pragma: no cover
 
-        project = task.result
+        project = task
 
         validated_data.update(
             {
