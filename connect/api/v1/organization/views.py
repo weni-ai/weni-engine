@@ -139,20 +139,17 @@ class OrganizationViewSet(
             if not settings.TESTING:
                 try:
                     if project_info.get("template"):
-                        flows_info = tasks.create_template_project.delay(
+                        flows_info = tasks.create_template_project(
                             project_info.get("name"),
                             user.email,
                             project_info.get("timezone")
                         )
                     else:
-                        flows_info = tasks.create_project.delay(
+                        flows_info = tasks.create_project(
                             project_name=project_info.get("name"),
                             user_email=user.email,
                             project_timezone=project_info.get("timezone")
                         )
-
-                    flows_info.wait()
-                    flows_info = flows_info.result
                 except Exception as error:
                     data.update({
                         "message": "Could not create project",

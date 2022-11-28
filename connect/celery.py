@@ -54,7 +54,7 @@ app.conf.beat_schedule = {
     },
     "generate_project_invoice": {
         "task": "connect.common.tasks.generate_project_invoice",
-        "schedule": schedules.crontab(minute="*/5"),
+        "schedule": schedules.crontab(hour="12", minute=0),
     },
     "sync-total-active-contacts": {
         "task": "connect.common.tasks.sync_total_contact_count",
@@ -72,10 +72,10 @@ app.conf.beat_schedule = {
         "task": "sync_contacts",
         "schedule": schedules.crontab(hour=settings.SYNC_CONTACTS_SCHEDULE, minute=0)
     },
-    "sync-repositories-statistics": {
-        "task": "connect.common.tasks.sync_repositories_statistics",
-        "schedule": schedules.crontab(minute="*/8")
-    },
+    # "sync-repositories-statistics": {
+    #     "task": "connect.common.tasks.sync_repositories_statistics",
+    #     "schedule": schedules.crontab(minute="*/8")
+    # },
     "count_contacts": {
         "task": "count_contacts",
         "schedule": schedules.crontab(hour="*/6", minute=0)

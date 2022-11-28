@@ -1,4 +1,3 @@
-import json
 import uuid
 from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext_lazy as _
@@ -286,14 +285,14 @@ class ProjectViewSet(
         if serializer.is_valid(raise_exception=True):
             project_uuid = serializer.validated_data.get("project_uuid")
             project = Project.objects.get(uuid=project_uuid)
-            task = tasks.create_channel.delay(
+            rest_client = FlowsRESTClient()
+            response = rest_client.create_channel(
                 user=serializer.validated_data.get("user"),
                 project_uuid=str(project.flow_organization),
-                data=json.dumps(serializer.validated_data.get("data")),
+                data=serializer.validated_data.get("data"),
                 channeltype_code=serializer.validated_data.get("channeltype_code"),
             )
-            task.wait()
-            return JsonResponse(status=status.HTTP_200_OK, data=task.result)
+            return JsonResponse(status=response.status_code, data=response.json())
 
     @action(
         detail=True,
@@ -385,9 +384,8 @@ class ProjectViewSet(
         if serializer.is_valid(raise_exception=True):
             project_uuid = serializer.validated_data.get("project_uuid")
             project = Project.objects.get(uuid=project_uuid)
-            task = tasks.list_classifier.delay(str(project.flow_organization))
-            task.wait()
-            return JsonResponse(status=status.HTTP_200_OK, data=task.result)
+            task = tasks.list_classifier(str(project.flow_organization))
+            return JsonResponse(status=status.HTTP_200_OK, data=task)
 
     @action(
         detail=True,
@@ -428,6 +426,19 @@ class ProjectViewSet(
                 config=config,
             )
             return JsonResponse(data=ticketer)
+
+    @action(
+        detail=True,
+        methods=["GET"],
+        url_name='list-flows',
+        permission_classes=[ModuleHasPermission],
+    )
+    def list_flows(self, request, **kwargs):
+        project_uuid = request.query_params.get('project_uuid')
+        project = get_object_or_404(Project, uuid=project_uuid)
+        task = tasks.list_project_flows.delay(str(project.flow_organization))
+        task.wait()
+        return Response(task.result)
 
 
 class RequestPermissionProjectViewSet(
