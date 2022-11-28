@@ -173,14 +173,6 @@ class FlowsRESTClient:
 
         return response.json()
 
-    def list_channels_availables(self):
-        response = requests.get(
-            url=f"{self.base_url}/api/v2/internals/channels",
-            headers=self.authentication_instance.headers,
-            timeout=60
-        )
-        return response
-
     def list_channel_types(self, channel_code):
 
         if channel_code:
