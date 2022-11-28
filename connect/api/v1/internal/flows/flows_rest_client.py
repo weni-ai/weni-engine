@@ -248,7 +248,7 @@ class FlowsRESTClient:
             headers=self.authentication_instance.headers,
             json=body
         )
-        return response.json()
+        return response
 
     def create_wac_channel(self, user: str, flow_organization: str, config: str, phone_number_id: str):
         body = dict(

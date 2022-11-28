@@ -285,14 +285,14 @@ class ProjectViewSet(
         if serializer.is_valid(raise_exception=True):
             project_uuid = serializer.validated_data.get("project_uuid")
             project = Project.objects.get(uuid=project_uuid)
-            task = tasks.create_channel.delay(
+            rest_client = FlowsRESTClient()
+            response = rest_client.create_channel(
                 user=serializer.validated_data.get("user"),
                 project_uuid=str(project.flow_organization),
                 data=serializer.validated_data.get("data"),
                 channeltype_code=serializer.validated_data.get("channeltype_code"),
             )
-            task.wait()
-            return JsonResponse(status=status.HTTP_200_OK, data=task.result)
+            return JsonResponse(status=response.status_code, data=response.json())
 
     @action(
         detail=True,
