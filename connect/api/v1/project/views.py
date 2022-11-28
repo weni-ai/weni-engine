@@ -438,7 +438,7 @@ class ProjectViewSet(
         channel_type_code = request.query_params.get('channel_type_code', None)
         rest_client = FlowsRESTClient()
         response = rest_client.list_channel_types(channel_type_code)
-        return JsonResponse(status=response.status_code, data=response)
+        return JsonResponse(status=response.status_code, data=response.json())
 
 
 class RequestPermissionProjectViewSet(
