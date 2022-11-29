@@ -60,7 +60,7 @@ class StripeHandler(View):  # pragma: no cover
 
             if charge.description == "Card Verification Charge":
                 cvc_check = charge.payment_method_details.card.checks.cvc_check
-                billing_tasks.refund_validation_charge.delay(charge.id)
+                billing_tasks.refund_validation_charge(charge.id)
                 if cvc_check == "pass":
                     return HttpResponse("CVC check passed")
                 else:
