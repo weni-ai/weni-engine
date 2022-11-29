@@ -134,14 +134,13 @@ class FlowsRESTClient:
         return dict(status=response.status_code, data=response.json())
 
     def delete_classifier(self, classifier_uuid: str, user_email: str):
-        body = dict(
-            uuid=classifier_uuid,
-            user_email=user_email
+        params = dict(
+            user_email=user_email,
         )
         response = requests.delete(
-            url=f"{self.base_url}/api/v2/internals/classifier/",
+            url=f"{self.base_url}/api/v2/internals/classifier/{classifier_uuid}/",
             headers=self.authentication_instance.headers,
-            json=body
+            params=params,
         )
         return dict(status=response.status_code)
 
