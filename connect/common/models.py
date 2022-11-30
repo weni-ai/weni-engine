@@ -1745,6 +1745,10 @@ class GenericBillingData(models.Model):
             "currency": settings.DEFAULT_CURRENCY,
             "extra_whatsapp_integration": settings.BILLING_COST_PER_WHATSAPP,
             "plans": {
+                "trial": {
+                    "limit": settings.PLAN_TRIAL_LIMIT,
+                    "price": settings.PLAN_TRIAL_PRICE,
+                },
                 "start": {
                     "limit": settings.PLAN_START_LIMIT,
                     "price": settings.PLAN_START_PRICE,
