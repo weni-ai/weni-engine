@@ -94,7 +94,7 @@ app.conf.beat_schedule = {
         "schedule": schedules.crontab(hour="20", minute=0)
     },
     "check_organization_plans": {
-        "task": "end_trial_plan",
+        "task": "check_organization_plans",
         "schedule": schedules.crontab(hour="23", minute=0)
     }
 }
