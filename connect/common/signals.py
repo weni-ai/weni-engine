@@ -28,6 +28,8 @@ from connect.common.models import (
 from connect.celery import app as celery_app
 from connect.api.v1.internal.intelligence.intelligence_rest_client import IntelligenceRESTClient
 from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
+from connect.common.tasks import update_user_permission_project
+
 
 
 logger = logging.getLogger("connect.common.signals")
@@ -51,15 +53,21 @@ def create_service_status(sender, instance, created, **kwargs):
             logger.info(f'[ * ] {response}')
 
         for permission in instance.project_authorizations.all():
-            celery_app.send_task(
-                "update_user_permission_project",
-                args=[
-                    instance.flow_organization,
-                    instance.uuid,
-                    permission.user.email,
-                    permission.role,
-                ],
+            update_user_permission_project(
+                flow_organization=str(instance.flow_organization),
+                project_uuid=str(instance.uuid),
+                user_email=permission.user.email,
+                permission=permission.role
             )
+            # celery_app.send_task(
+            #     "update_user_permission_project",
+            #     args=[
+            #         instance.flow_organization,
+            #         instance.uuid,
+            #         permission.user.email,
+            #         permission.role,
+            #     ],
+            # )
         for authorization in instance.organization.authorizations.all():
             if authorization.can_contribute:
                 project_auth = instance.get_user_authorization(authorization.user)
@@ -260,15 +268,21 @@ def project_authorization(sender, instance, created, **kwargs):
             instance_user.role = OrganizationRole.VIEWER.value
             instance_user.save(update_fields=["role"])
 
-        celery_app.send_task(
-            "update_user_permission_project",
-            args=[
-                instance.project.flow_organization,
-                instance.project.uuid,
-                instance.user.email,
-                instance.role,
-            ],
+        update_user_permission_project(
+            flow_organization=str(instance.project.flow_organization),
+            project_uuid=str(instance.project.uuid),
+            user_email=instance.user.email,
+            permission=instance.role
         )
+        # celery_app.send_task(
+        #     "update_user_permission_project",
+        #     args=[
+        #         instance.project.flow_organization,
+        #         instance.project.uuid,
+        #         instance.user.email,
+        #         instance.role,
+        #     ],
+        # )
 
 
 @receiver(post_save, sender=RequestRocketPermission)

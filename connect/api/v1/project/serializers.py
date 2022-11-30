@@ -396,12 +396,11 @@ class ListChannelSerializer(serializers.Serializer):
     channel_data = serializers.SerializerMethodField()
 
     def get_channel_data(self, obj):
-        task = tasks.list_channels.delay(
+        task = tasks.list_channels(
             project_uuid=str(obj.flow_organization),
             channel_type=self.context["channel_type"],
         )
-        task.wait()
-        return dict(project_uuid=obj.uuid, channels=task.result)
+        return dict(project_uuid=obj.uuid, channels=task)
 
 
 class CreateWACChannelSerializer(serializers.Serializer):
