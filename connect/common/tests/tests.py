@@ -347,6 +347,7 @@ class InvoiceTestCase(TestCase):
             GenericBillingData.get_generic_billing_data_instance()
         )
 
+    @skipIf(True, "not needed anymore, will be removed after the refactor")
     def test_if_invoice_project_null(self):
         self.assertTrue(not self.invoice.organization_billing_invoice_project.all())
         self.assertEqual(
