@@ -1649,19 +1649,7 @@ class Invoice(models.Model):
 
     @property
     def total_invoice_amount(self):
-        generic_billing_data = GenericBillingData.get_generic_billing_data_instance()
-
-        contact_count = self.organization_billing_invoice_project.aggregate(
-            total_contact_count=Sum("contact_count")
-        ).get("total_contact_count")
-
-        amount = generic_billing_data.calculate_active_contacts(
-            contact_count if contact_count else 0
-        )
-        integration_cost = float(self.cost_per_whatsapp * self.extra_integration)
-        return Decimal(
-            float(amount + integration_cost) * float(1 - self.discount / 100)
-        ).quantize(Decimal(".01"), decimal.ROUND_HALF_UP)
+        return self.invoice_amount
 
 
 class InvoiceProject(models.Model):
