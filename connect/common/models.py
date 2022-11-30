@@ -1098,6 +1098,7 @@ class BillingPlan(models.Model):
                         "data": [
                             {
                                 "id": "ch_teste",
+                                "amount": 39000
                             }
                         ]
                     }
@@ -1112,7 +1113,8 @@ class BillingPlan(models.Model):
                     paid_date=pendulum.now(),
                     due_date=pendulum.now(),
                     payment_status=Invoice.PAYMENT_STATUS_PAID,
-                    payment_method='credit_card'
+                    payment_method='credit_card',
+                    invoice_amount=(charges["data"][0]["amount"] / 100)
                 )
                 for project in self.organization.project.all():  # pragma: no cover
                     current_app.send_task(
@@ -1622,6 +1624,7 @@ class Invoice(models.Model):
     cost_per_whatsapp = models.DecimalField(
         _("cost per whatsapp"), decimal_places=2, max_digits=11, default=0
     )
+    invoice_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True)
 
     @property
     def card_data(self):

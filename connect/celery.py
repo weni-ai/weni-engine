@@ -22,6 +22,9 @@ app.conf.task_routes = {
     'count_contacts': {'queue': 'billing'},
     'retry_billing_tasks': {'queue': 'billing'},
     'create_contacts': {'queue': 'billing'},
+    # 'get_messages': {'queue': 'billing'},
+    "end_trial_plan": {'queue': 'billing'},
+    "check_organization_plans": {'queue': 'billing'},
     'get_messages': {'queue': 'billing'},
     "daily_contact_count": {'queue': 'billing'},
 }
@@ -92,6 +95,14 @@ app.conf.beat_schedule = {
         "task": "daily_contact_count",
         "schedule": schedules.crontab(hour="23", minute=59)
     },
+    "end_trial_plan": {
+        "task": "end_trial_plan",
+        "schedule": schedules.crontab(hour="20", minute=0)
+    },
+    "check_organization_plans": {
+        "task": "check_organization_plans",
+        "schedule": schedules.crontab(hour="22", minute=0)
+    }
 }
 
 

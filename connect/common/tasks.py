@@ -490,7 +490,7 @@ def capture_invoice():
     ):
         gateway = billing.get_gateway("stripe")
         purchase_result = gateway.purchase(
-            money=invoice.total_invoice_amount,
+            money=invoice.invoice_amount,
             identification=invoice.organization.organization_billing.stripe_customer,
             options={"id": invoice.pk},
         )
