@@ -31,7 +31,6 @@ from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
 from connect.common.tasks import update_user_permission_project
 
 
-
 logger = logging.getLogger("connect.common.signals")
 
 

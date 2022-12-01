@@ -138,7 +138,7 @@ class CountContactsTestCase(TestCase):
                 total = count_contacts(project=project, before=str(before), after=str(after))
                 contact_count += total
 
-            if org.organization_billing.plan == BillingPlan.PLAN_CUSTOM:
+            if org.organization_billing.plan in [BillingPlan.PLAN_CUSTOM, BillingPlan.PLAN_ENTERPRISE]:
                 self.assertEqual(contact_count, 40)
             else:
                 self.assertEqual(contact_count, 120)

@@ -475,6 +475,7 @@ class BillingViewTestCase(TestCase):
             organization.delete()
 
 
+@freeze_time("2022-11-14")
 class IntegrationTestCase(TestCase):
 
     def setUp(self):

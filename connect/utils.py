@@ -45,7 +45,7 @@ def count_contacts(project: Project, before: str, after: str):
     after = pendulum.parse(after).in_timezone(tz)
     before = pendulum.parse(before).in_timezone(tz)
 
-    if project.organization.organization_billing.plan == BillingPlan.PLAN_CUSTOM:
+    if project.organization.organization_billing.plan in [BillingPlan.PLAN_CUSTOM, BillingPlan.PLAN_ENTERPRISE]:
         total_for_custom = Contact.objects.filter(project=project).filter(last_seen_on__range=(after, before)).distinct("contact_flow_uuid").count()
         return total_for_custom
 
