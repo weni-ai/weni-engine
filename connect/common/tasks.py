@@ -25,6 +25,10 @@ from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
 from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
 from connect.api.v1.internal.integrations.integrations_rest_client import IntegrationsRESTClient
 from connect.api.v1.internal.intelligence.intelligence_rest_client import IntelligenceRESTClient
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 @app.task()
@@ -324,12 +328,19 @@ def check_organization_free_plan():
 
 @app.task()
 def sync_active_contacts():
-    for project in Project.objects.all():
-        last_invoice_date = project.organization.organization_billing.last_invoice_date
-        next_due_date = project.organization.organization_billing.next_due_date
-        created_at = project.organization.created_at
-        before = timezone.now() if next_due_date is None else next_due_date
-        after = created_at if last_invoice_date is None else last_invoice_date
+    for project in Project.objects.all()[:10]:
+        try:
+            if project.organization.organization_billing.plan in [BillingPlan.PLAN_CUSTOM, BillingPlan.PLAN_ENTERPRISE]:
+                before = pendulum.now().end_of("month")
+                after = pendulum.now().start_of("month")
+            else:
+                last_invoice_date = project.organization.organization_billing.last_invoice_date
+                next_due_date = project.organization.organization_billing.next_due_date
+                created_at = project.organization.created_at
+                before = timezone.now() if next_due_date is None else next_due_date
+                after = created_at if last_invoice_date is None else last_invoice_date
+        except BillingPlan.DoesNotExist:
+            logger.error("Org: {project.organization} does not have a billing plan object")
         contact_count = utils.count_contacts(project=project, after=str(after), before=str(before))
         project.contact_count = int(contact_count)
         project.save(update_fields=["contact_count"])
