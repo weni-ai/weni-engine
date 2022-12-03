@@ -84,9 +84,14 @@ class BillingViewSet(viewsets.ViewSet):
             data["status"] = "SUCCESS"
         else:
             try:
+                from decimal import Decimal
+                import decimal
+
+                price -= price * (4.18 / 100)
+                final_price = Decimal(price).quantize(Decimal(".01"), decimal.ROUND_HALF_UP)
                 gateway = billing.get_gateway("stripe")
                 purchase_result = gateway.purchase(
-                    money=int(price),
+                    money=int(final_price),
                     identification=customer,
                 )
                 data["status"] = purchase_result["status"]
