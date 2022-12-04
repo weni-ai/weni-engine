@@ -32,7 +32,7 @@ jobs:
             echo "VERSION=${VERSION}" | tee -a "${GITHUB_ENV}"
             echo "COMMIT_SHA=$GITHUB_SHA" | tee -a "${GITHUB_ENV}"
             echo "IMAGE_TAG=connectof/connect-engine:$TAG" | tee -a "${GITHUB_ENV}"
-            echo "IMAGE_SOURCE_URL=https://github.com/Ilhasoft/weni-engine" | tee -a "${GITHUB_ENV}"
+            echo "IMAGE_SOURCE_URL=https://github.com/weni-ai/weni-engine" | tee -a "${GITHUB_ENV}"
             echo "MANIFESTS_REPOSITORY=Ilhasoft/kubernetes-manifests-connect" | tee -a "${GITHUB_ENV}"
             echo "MANIFESTS_APPLICATION=connect-engine" | tee -a "${GITHUB_ENV}"
             echo "MANIFESTS_PATCH_TARGET=deployment.json" | tee -a "${GITHUB_ENV}"
