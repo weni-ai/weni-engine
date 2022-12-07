@@ -1003,7 +1003,6 @@ class BillingPlan(models.Model):
         (PLAN_SCALE, _("scale")),
         (PLAN_ADVANCED, _("advanced")),
         (PLAN_ENTERPRISE, _("enterprise")),
-        (PLAN_CUSTOM, _("custom")),
     ]
 
     organization = models.OneToOneField(
@@ -1066,7 +1065,7 @@ class BillingPlan(models.Model):
     )
 
     card_is_valid = models.BooleanField(_("Card is valid"), default=False)
-    trial_end_date = models.DateTimeField(_("Trial end date"), null=True)
+    trial_end_date = models.DateTimeField(_("Trial end date"), null=True, blank=True)
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None, **kwargs):
         _adding = self._state.adding
