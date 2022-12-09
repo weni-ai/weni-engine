@@ -94,7 +94,7 @@ class Router(routers.SimpleRouter):  # pragma: no cover
         return super().get_lookup_regex(viewset, lookup_prefix)
 
 
-router = routers.SimpleRouter()
+router = Router()
 router.register("dashboard/newsletter", NewsletterViewSet)
 router.register("dashboard/status-service", StatusServiceViewSet)
 router.register("account/my-profile", MyUserProfileViewSet)
