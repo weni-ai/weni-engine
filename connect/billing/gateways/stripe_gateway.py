@@ -4,7 +4,7 @@ from django.conf import settings
 
 
 class StripeGateway(Gateway):
-    default_currency = "USD"
+    default_currency = settings.DEFAULT_CURRENCY
     display_name = "Stripe"
     verification_amount = getattr(settings, "VERIFICATION_AMOUNT")
     verification_description = "Card Verification Charge"
@@ -76,8 +76,14 @@ class StripeGateway(Gateway):
             cards = stripe.PaymentMethod.list(customer=identification, type="card")
             response = []
             for card in cards.get("data"):
+                # print(F"CARD: {card}")
                 response.append(
-                    {"last2": card["card"]["last4"][2:], "brand": card["card"]["brand"]}
+                    {
+                        "last2": card["card"]["last4"][2:],
+                        "brand": card["card"]["brand"],
+                        "cardholder_name": card["billing_details"]["name"],
+                        "card_expiration_date": f"{card['card']['exp_month']}/{str(card['card']['exp_year'])[2:]}"
+                    }
                 )
         except self.stripe.error.CardError as error:
             return {"status": "FAILURE", "response": error}

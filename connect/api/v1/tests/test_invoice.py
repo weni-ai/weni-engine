@@ -1,4 +1,5 @@
 import json
+import pendulum
 import uuid as uuid4
 from unittest.mock import patch
 from datetime import timedelta
@@ -81,7 +82,7 @@ class ListInvoiceAPITestCase(TestCase):
             self.owner_token,
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(content_data.get("count"), 1)
+        self.assertEqual(content_data.get("count"), 2)
 
 
 class InvoiceDataTestCase(TestCase):
@@ -108,7 +109,7 @@ class InvoiceDataTestCase(TestCase):
             flow_organization=uuid4.uuid4(),
         )
         self.invoice = self.invoice = self.organization.organization_billing_invoice.create(
-            due_date=timezone.now() + timedelta(days=30),
+            due_date=pendulum.now().add(months=1),
             invoice_random_id=1
             if self.organization.organization_billing_invoice.last() is None else self.organization.organization_billing_invoice.last().invoice_random_id + 1,
             discount=self.organization.organization_billing.fixed_discount,
@@ -143,4 +144,4 @@ class InvoiceDataTestCase(TestCase):
             self.owner_token,
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(content_data['payment_data'], {'payment_method': 'credit_card', 'card_data': {'brand': 'visa', 'final_card_number': '4242'}, 'projects': [{'project_name': 'project test', 'contact_count': 0}], 'price': '267.00'})
+        self.assertEqual(content_data['payment_data']['payment_method'], 'credit_card')

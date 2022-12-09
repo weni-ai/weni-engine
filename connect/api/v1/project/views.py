@@ -1,4 +1,3 @@
-import json
 import uuid
 from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext_lazy as _
@@ -137,17 +136,13 @@ class ProjectViewSet(
                 _("You can't contribute in this organization")
             )  # pragma: no cover
 
-        task = celery_app.send_task(  # pragma: no cover
-            name="search_project",
-            args=[
-                project.organization.inteligence_organization,
-                str(project.flow_organization),
-                serializer.data.get("text"),
-            ],
+        task = tasks.search_project(
+            organization_id=project.organization.inteligence_organization,
+            project_uuid=str(project.flow_organization),
+            text=serializer.data.get("text")
         )
-        task.wait()  # pragma: no cover
 
-        return Response(task.result)
+        return Response(task)
 
     @action(
         detail=True,
@@ -250,10 +245,9 @@ class ProjectViewSet(
         if not channel_type:
             raise ValidationError("Need pass the channel_type")
 
-        task = tasks.list_channels.delay(channel_type)
-        task.wait()
+        task = tasks.list_channels(channel_type)
         response = dict(
-            channels=task.result
+            channels=task
         )
         return JsonResponse(status=status.HTTP_200_OK, data=response)
 
@@ -267,12 +261,11 @@ class ProjectViewSet(
     def release_channel(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        task = tasks.realease_channel.delay(
+        task = tasks.realease_channel(
             channel_uuid=serializer.validated_data.get("channel_uuid"),
             user=serializer.validated_data.get("user"),
         )
-        task.wait()
-        return JsonResponse(status=status.HTTP_200_OK, data={"release": task.result})
+        return JsonResponse(status=status.HTTP_200_OK, data={"release": task})
 
     @action(
         detail=True,
@@ -286,14 +279,14 @@ class ProjectViewSet(
         if serializer.is_valid(raise_exception=True):
             project_uuid = serializer.validated_data.get("project_uuid")
             project = Project.objects.get(uuid=project_uuid)
-            task = tasks.create_channel.delay(
+            rest_client = FlowsRESTClient()
+            response = rest_client.create_channel(
                 user=serializer.validated_data.get("user"),
                 project_uuid=str(project.flow_organization),
-                data=json.dumps(serializer.validated_data.get("data")),
+                data=serializer.validated_data.get("data"),
                 channeltype_code=serializer.validated_data.get("channeltype_code"),
             )
-            task.wait()
-            return JsonResponse(status=status.HTTP_200_OK, data=task.result)
+            return JsonResponse(status=response.status_code, data=response.json())
 
     @action(
         detail=True,
@@ -307,15 +300,14 @@ class ProjectViewSet(
         if serializer.is_valid(raise_exception=True):
             project_uuid = serializer.validated_data.get("project_uuid")
             project = Project.objects.get(uuid=project_uuid)
-            task = tasks.create_wac_channel.delay(
+            task = tasks.create_wac_channel(
                 user=serializer.validated_data.get("user"),
                 flow_organization=str(project.flow_organization),
                 config=serializer.validated_data.get("config"),
                 phone_number_id=serializer.validated_data.get("phone_number_id"),
             )
 
-            task.wait()
-            return JsonResponse(status=status.HTTP_200_OK, data=task.result)
+            return JsonResponse(status=status.HTTP_200_OK, data=task)
 
     @action(
         detail=True,
@@ -330,8 +322,7 @@ class ProjectViewSet(
             classifier_uuid = serializer.validated_data.get("uuid")
             user_email = serializer.validated_data.get("user_email")
 
-            task = tasks.destroy_classifier.delay(str(classifier_uuid), user_email)
-            task.wait()
+            tasks.destroy_classifier(str(classifier_uuid), user_email)
             return JsonResponse(status=status.HTTP_200_OK)
 
     @action(
@@ -347,9 +338,8 @@ class ProjectViewSet(
         if serializer.is_valid(raise_exception=True):
             classifier_uuid = serializer.validated_data.get("uuid")
 
-            task = tasks.retrieve_classifier.delay(str(classifier_uuid))
-            task.wait()
-            return JsonResponse(status=status.HTTP_200_OK, data=task.result)
+            task = tasks.retrieve_classifier(str(classifier_uuid))
+            return JsonResponse(status=status.HTTP_200_OK, data=task)
 
     @action(
         detail=True,
@@ -364,14 +354,13 @@ class ProjectViewSet(
         if serializer.is_valid(raise_exception=True):
             project_uuid = serializer.validated_data.get("project_uuid")
             project = Project.objects.get(uuid=project_uuid)
-            task = tasks.create_classifier.delay(
+            task = tasks.create_classifier(
                 project_uuid=str(project.flow_organization),
                 user_email=serializer.validated_data.get("user"),
                 classifier_name=serializer.validated_data.get("name"),
                 access_token=serializer.validated_data.get("access_token"),
             )
-            task.wait()
-            return JsonResponse(status=status.HTTP_200_OK, data=task.result)
+            return JsonResponse(status=status.HTTP_200_OK, data=task)
 
     @action(
         detail=True,
@@ -385,9 +374,8 @@ class ProjectViewSet(
         if serializer.is_valid(raise_exception=True):
             project_uuid = serializer.validated_data.get("project_uuid")
             project = Project.objects.get(uuid=project_uuid)
-            task = tasks.list_classifier.delay(str(project.flow_organization))
-            task.wait()
-            return JsonResponse(status=status.HTTP_200_OK, data=task.result)
+            task = tasks.list_classifier(str(project.flow_organization))
+            return JsonResponse(status=status.HTTP_200_OK, data=task)
 
     @action(
         detail=True,
@@ -428,6 +416,18 @@ class ProjectViewSet(
                 config=config,
             )
             return JsonResponse(data=ticketer)
+
+    @action(
+        detail=True,
+        methods=["GET"],
+        url_name='list-flows',
+        permission_classes=[ModuleHasPermission],
+    )
+    def list_flows(self, request, **kwargs):
+        project_uuid = request.query_params.get('project_uuid')
+        project = get_object_or_404(Project, uuid=project_uuid)
+        task = tasks.list_project_flows(str(project.flow_organization))
+        return Response(task)
 
 
 class RequestPermissionProjectViewSet(

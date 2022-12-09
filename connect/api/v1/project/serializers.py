@@ -4,6 +4,7 @@ import uuid
 
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
+from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
 from rest_framework import serializers
 
 from rest_framework.exceptions import PermissionDenied
@@ -153,15 +154,13 @@ class ProjectSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user = self.context["request"].user
-        task = tasks.create_project.delay(  # pragma: no cover
+        task = tasks.create_project(  # pragma: no cover
             validated_data.get("name"),
             user.email,
             str(validated_data.get("timezone")),
         )
-        if not settings.TESTING:
-            task.wait()  # pragma: no cover
 
-        project = task.result
+        project = task
 
         validated_data.update(
             {
@@ -179,7 +178,10 @@ class ProjectSerializer(serializers.ModelSerializer):
             "update_project",
             args=[instance.flow_organization, name],
         )
-        return super().update(instance, validated_data)
+        updated_instance = super().update(instance, validated_data)
+        if not settings.TESTING:
+            ChatsRESTClient().update_chats_project(instance.uuid)
+        return updated_instance
 
     def get_authorizations(self, obj):
         exclude_roles = [ProjectRole.SUPPORT.value]
@@ -394,18 +396,17 @@ class ListChannelSerializer(serializers.Serializer):
     channel_data = serializers.SerializerMethodField()
 
     def get_channel_data(self, obj):
-        task = tasks.list_channels.delay(
+        task = tasks.list_channels(
             project_uuid=str(obj.flow_organization),
             channel_type=self.context["channel_type"],
         )
-        task.wait()
-        return dict(project_uuid=obj.uuid, channels=task.result)
+        return dict(project_uuid=obj.uuid, channels=task)
 
 
 class CreateWACChannelSerializer(serializers.Serializer):
     user = serializers.CharField(required=True)
     project_uuid = serializers.CharField(required=True)
-    config = serializers.CharField(required=True)
+    config = serializers.JSONField(required=True)
     phone_number_id = serializers.CharField(required=True)
 
 

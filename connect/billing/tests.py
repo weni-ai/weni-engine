@@ -16,10 +16,11 @@ from django.conf import settings
 from connect.billing import get_gateway
 
 from connect.billing.models import Contact, Channel, Message, SyncManagerTask
-from connect.common.models import Organization, Project, BillingPlan
+from connect.common.models import Organization, Project, BillingPlan, OrganizationRole
 
 from freezegun import freeze_time
-from connect.billing.tasks import sync_contacts
+from connect.billing.tasks import sync_contacts, check_organization_plans
+from connect.api.v1.tests.utils import create_contacts, create_user_and_token
 
 
 @skipIf(not settings.BILLING_SETTINGS.get("stripe", None), "gateway not configured")
@@ -157,7 +158,6 @@ class SyncContactsTestCase(TestCase):
 class ContactTestCase(TestCase):
 
     def setUp(self):
-
         self.organization = Organization.objects.create(
             name='org test',
             description='desc',
@@ -196,7 +196,6 @@ class ContactTestCase(TestCase):
 class MessageTestCase(TestCase):
 
     def setUp(self):
-
         self.organization = Organization.objects.create(
             name='org test',
             description='desc',
@@ -236,3 +235,104 @@ class MessageTestCase(TestCase):
 
     def test_create_message(self):
         self.assertTrue("test message", self.message.text)
+
+
+class CheckPlansTestCase(TestCase):
+    def setUp(self):
+        # Orgs
+        self.start = Organization.objects.create(
+            name="Start org",
+            description="Basic org",
+            inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan=BillingPlan.PLAN_START,
+        )
+        self.scale = Organization.objects.create(
+            name="Scale org",
+            description="plus org",
+            inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan=BillingPlan.PLAN_SCALE,
+        )
+        self.advanced = Organization.objects.create(
+            name="Advanced org",
+            description="advanced org",
+            inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan=BillingPlan.PLAN_ADVANCED,
+        )
+        self.enterprise = Organization.objects.create(
+            name="enterprise org",
+            description="enterprise org",
+            inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan=BillingPlan.PLAN_ENTERPRISE,
+        )
+        # Projects
+        self.start_project = self.start.project.create(
+            name="start",
+            flow_organization=uuid.uuid4(),
+        )
+        self.scale_project = self.scale.project.create(
+            name="scale",
+            flow_organization=uuid.uuid4(),
+        )
+        self.advanced_project = self.advanced.project.create(
+            name="advanced",
+            flow_organization=uuid.uuid4(),
+        )
+        self.enterprise_project = self.enterprise.project.create(
+            name="enterprise",
+            flow_organization=uuid.uuid4(),
+        )
+
+        # Users
+        self.admin, self.admin_token = create_user_and_token("admin")
+        self.admin2, self.owner_token = create_user_and_token("admin2")
+        self.financial, self.admin_token = create_user_and_token("financial")
+        self.support, self.admin_token = create_user_and_token("support")
+        self.contributor, self.admin_token = create_user_and_token("contributor")
+        self.viewer, self.admin_token = create_user_and_token("viewer")
+
+        # Authorizations
+        self.start.authorizations.create(
+            user=self.admin, role=OrganizationRole.ADMIN.value
+        )
+
+        self.start.authorizations.create(
+            user=self.admin2, role=OrganizationRole.ADMIN.value
+        )
+
+        self.start.authorizations.create(
+            user=self.financial, role=OrganizationRole.FINANCIAL.value
+        )
+
+        self.start.authorizations.create(
+            user=self.support, role=OrganizationRole.SUPPORT.value
+        )
+
+        self.start.authorizations.create(
+            user=self.contributor, role=OrganizationRole.CONTRIBUTOR.value
+        )
+
+        self.start.authorizations.create(
+            user=self.viewer, role=OrganizationRole.VIEWER.value
+        )
+
+    @skipIf(True, "This test takes a while to run")
+    def test_task_end_trial_plan(self):
+        """
+        Test if 'check_organization_plans' suspends org that should after the trial periods end
+        """
+        for organization in Organization.objects.all():
+            num_contacts = BillingPlan.plan_info(organization.organization_billing.plan)["limit"] * 5 + 1
+            create_contacts(num_contacts)
+
+        check_organization_plans()
+
+        for org in Organization.objects.all():
+            self.assertGreater(org.active_contacts, org.organization_billing.plan_limit)
+            self.assertTrue(org.is_suspended)
+
+    def test_billing_emails(self):
+        self.start.organization_billing.send_email_trial_plan_expired_due_time_limit()

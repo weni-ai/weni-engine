@@ -223,3 +223,58 @@ def problem_capture_invoice():
                     name="update_suspend_project",
                     args=[project.flow_organization, True],
                 )
+
+
+@app.task(name="end_trial_plan")
+def end_trial_plan():
+    yesterday = pendulum.yesterday()
+    for organization in Organization.objects.filter(organization_billing__plan=BillingPlan.PLAN_TRIAL,
+                                                    organization_billing__trial_end_date__date=yesterday.date()):
+        organization.organization_billing.end_trial_period()
+        organization.organization_billing.send_email_trial_plan_expired_due_time_limit()
+
+
+@app.task(name="check_organization_plans")
+def check_organization_plans():
+    # utc-3 or project_timezone
+
+    for organization in Organization.objects.filter(is_suspended=False).exclude(organization_billing__plan__in=[
+            BillingPlan.PLAN_TRIAL, BillingPlan.PLAN_CUSTOM, BillingPlan.PLAN_ENTERPRISE]):
+
+        next_due_date = pendulum.parse(str(organization.organization_billing.next_due_date))
+        after = next_due_date.subtract(months=1).strftime("%Y-%m-%d %H:%M")
+        before = next_due_date.strftime("%Y-%m-%d %H:%M")
+        for project in organization.project.all():
+            contact_count = utils.count_contacts(
+                project=project, before=before, after=after
+            )
+            project.contact_count = int(contact_count)
+            project.save(update_fields=["contact_count"])
+
+        current_active_contacts = organization.active_contacts
+
+        if current_active_contacts > organization.organization_billing.plan_limit:
+            organization.organization_billing.end_trial_period()
+
+            organization.organization_billing.send_email_plan_expired_due_attendance_limit()
+
+        elif current_active_contacts > organization.organization_billing.plan_limit - 50:
+            organization.organization_billing.send_email_plan_is_about_to_expire()
+
+    return True
+
+
+@app.task(name="daily_contact_count")
+def daily_contact_count():
+    """Daily contacts"""
+    today = pendulum.now().end_of("day")
+
+    for project in Project.objects.exclude(organization__organization_billing__plan=BillingPlan.PLAN_CUSTOM):
+        after = today.start_of("day")
+        before = today
+        total_day_calls = Contact.objects.filter(project=project).filter(last_seen_on__range=(after, before)).distinct("contact_flow_uuid").count()
+        cc, created = ContactCount.objects.get_or_create(
+            project=project,
+            day=after,
+            defaults={"count": total_day_calls}
+        )

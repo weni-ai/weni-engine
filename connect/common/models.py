@@ -3,13 +3,14 @@ import logging
 import uuid as uuid4
 from datetime import timedelta
 from decimal import Decimal
-
+import pendulum
 from django.conf import settings
 from django.core import mail
 from django.db import models
 from django.db.models import Sum
 from django.template.loader import render_to_string
 from django.utils import timezone
+
 from django.utils.translation import ugettext_lazy as _
 from timezone_field import TimeZoneField
 
@@ -17,8 +18,9 @@ from connect import billing
 from connect.authentication.models import User
 from connect.billing.gateways.stripe_gateway import StripeGateway
 from connect.common.gateways.rocket_gateway import Rocket
-
 from enum import Enum
+from celery import current_app
+import stripe
 
 logger = logging.getLogger(__name__)
 
@@ -59,12 +61,13 @@ class NewsletterLanguage(models.Model):
 
 class OrganizationManager(models.Manager):
     def create(
-        self,
-        organization_billing__cycle,
-        organization_billing__plan,
-        organization_billing__payment_method=None,
-        *args,
-        **kwargs,
+            self,
+            organization_billing__cycle,
+            organization_billing__plan,
+            organization_billing__payment_method=None,
+            organization_billing__stripe_customer=None,
+            *args,
+            **kwargs,
     ):
         instance = super().create(*args, **kwargs)
         new_kwargs = {}
@@ -77,8 +80,8 @@ class OrganizationManager(models.Manager):
             )
 
             if (
-                BillingPlan.BILLING_CYCLE_DAYS.get(organization_billing__cycle)
-                is not None
+                    BillingPlan.BILLING_CYCLE_DAYS.get(organization_billing__cycle)
+                    is not None
             ):
                 new_kwargs.update(
                     {
@@ -96,6 +99,8 @@ class OrganizationManager(models.Manager):
             new_kwargs.update({"payment_method": organization_billing__payment_method})
         if organization_billing__plan:
             new_kwargs.update({"plan": organization_billing__plan})
+        if organization_billing__stripe_customer:
+            new_kwargs.update({"stripe_customer": organization_billing__stripe_customer})
 
         BillingPlan.objects.create(organization=instance, **new_kwargs)
         return instance
@@ -258,11 +263,11 @@ class Organization(models.Model):
         return mail
 
     def send_email_change_organization_name(
-        self,
-        user_name: str,
-        email: str,
-        organization_previous_name: str,
-        organization_new_name: str,
+            self,
+            user_name: str,
+            email: str,
+            organization_previous_name: str,
+            organization_new_name: str,
     ):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
@@ -307,7 +312,7 @@ class Organization(models.Model):
         return mail
 
     def send_email_permission_change(
-        self, user_name: str, old_permission: str, new_permission: str, email: str
+            self, user_name: str, old_permission: str, new_permission: str, email: str
     ):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
@@ -984,13 +989,20 @@ class BillingPlan(models.Model):
     ]
 
     PLAN_FREE = "free"
+    PLAN_TRIAL = "trial"
+    PLAN_START = "start"
+    PLAN_SCALE = "scale"
+    PLAN_ADVANCED = "advanced"
     PLAN_ENTERPRISE = "enterprise"
     PLAN_CUSTOM = "custom"
 
     PLAN_CHOICES = [
         (PLAN_FREE, _("free")),
+        (PLAN_TRIAL, _("trial")),
+        (PLAN_START, _("start")),
+        (PLAN_SCALE, _("scale")),
+        (PLAN_ADVANCED, _("advanced")),
         (PLAN_ENTERPRISE, _("enterprise")),
-        (PLAN_CUSTOM, _("custom")),
     ]
 
     organization = models.OneToOneField(
@@ -1053,6 +1065,101 @@ class BillingPlan(models.Model):
     )
 
     card_is_valid = models.BooleanField(_("Card is valid"), default=False)
+    trial_end_date = models.DateTimeField(_("Trial end date"), null=True, blank=True)
+
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None, **kwargs):
+        _adding = self._state.adding
+        if _adding or kwargs.get("change_plan"):
+            from connect import billing
+
+            card = billing.get_gateway("stripe")
+
+            card_data = card.get_card_data(self.stripe_customer)
+
+            if card_data.get("status") == "SUCCESS" and len(card_data["response"]) > 0:
+                card_info = card_data["response"][0]
+                self.stripe_configured_card = True
+                self.final_card_number = card_info.get("last2")
+                self.cardholder_name = card_info.get("cardholder_name")
+                self.card_brand = card_info.get("brand")
+                self.card_expiration_date = card_info.get("card_expiration_date")
+
+            if _adding and self.plan == self.PLAN_TRIAL:
+                self.trial_end_date = pendulum.now().end_of("day").add(months=1)
+            else:
+                # Create invoice for charges
+                stripe.api_key = settings.BILLING_SETTINGS.get("stripe", {}).get("API_KEY")
+
+                customer = self.stripe_customer
+
+                if settings.TESTING:
+                    charges = {
+                        "data": [
+                            {
+                                "id": "ch_teste",
+                                "amount": 39000
+                            }
+                        ]
+                    }
+
+                else:
+                    charges = stripe.PaymentIntent.list(customer=customer)
+
+                Invoice.objects.create(
+                    organization=self.organization,
+                    stripe_charge=charges["data"][0]["id"],
+                    notes="Plan setup" if _adding else "Upgrade Plan",
+                    paid_date=pendulum.now(),
+                    due_date=pendulum.now(),
+                    payment_status=Invoice.PAYMENT_STATUS_PAID,
+                    payment_method='credit_card',
+                    invoice_amount=(charges["data"][0]["amount"] / 100)
+                )
+                for project in self.organization.project.all():  # pragma: no cover
+                    current_app.send_task(
+                        name="update_suspend_project", args=[project.flow_organization, False]
+                    )
+
+        return super().save(force_insert, force_update, using, update_fields)
+
+    @staticmethod
+    def plan_info(plan):
+
+        plans_list = [plan[0] for plan in BillingPlan.PLAN_CHOICES]
+
+        if plan in plans_list:
+
+            if plan == BillingPlan.PLAN_TRIAL:
+                price = settings.PLAN_TRIAL_PRICE
+                limit = settings.PLAN_TRIAL_LIMIT
+
+            if plan == BillingPlan.PLAN_START:
+                price = settings.PLAN_START_PRICE
+                limit = settings.PLAN_START_LIMIT
+
+            elif plan == BillingPlan.PLAN_SCALE:
+                price = settings.PLAN_SCALE_PRICE
+                limit = settings.PLAN_SCALE_LIMIT
+
+            elif plan == BillingPlan.PLAN_ADVANCED:
+                price = settings.PLAN_ADVANCED_PRICE
+                limit = settings.PLAN_ADVANCED_LIMIT
+
+            elif plan == BillingPlan.PLAN_ENTERPRISE:
+                price = settings.PLAN_ENTERPRISE_PRICE
+                limit = settings.PLAN_ENTERPRISE_LIMIT
+
+            return {
+                "price": price,
+                "limit": limit,
+                "valid": True
+            }
+
+        return {"valid": False}
+
+    @property
+    def plan_limit(self):
+        return BillingPlan.plan_info(self.plan)["limit"]
 
     @property
     def get_stripe_customer(self):
@@ -1118,7 +1225,7 @@ class BillingPlan(models.Model):
             return True
         return False
 
-    @staticmethod
+    @staticmethod  # PRECISA MUDAR
     def calculate_amount(contact_count: int):
         precification = GenericBillingData.get_generic_billing_data_instance()
         return Decimal(
@@ -1127,7 +1234,7 @@ class BillingPlan(models.Model):
 
     @property
     def is_card_valid(self):  # pragma: no cover
-        if self.plan == self.PLAN_ENTERPRISE:
+        if self.plan != self.PLAN_TRIAL:
             return self.card_is_valid
 
     @property
@@ -1156,13 +1263,34 @@ class BillingPlan(models.Model):
 
         return {"total_contact": contact_count, "amount_currenty": amount_currenty}
 
+    def current_invoice_v2(self):
+        # Total contacts of the organization
+        contact_count = self.organization.project.aggregate(
+            total_contact_count=Sum("contact_count")
+        ).get("total_contact_count")
+
+        amount_currenty = Decimal(
+            BillingPlan.plan_info(self.plan)["price"]
+            + (
+                settings.BILLING_COST_PER_WHATSAPP
+                * self.organization.extra_integration
+            )
+        ).quantize(Decimal(".01"), decimal.ROUND_HALF_UP)
+
+        return {"total_contact": contact_count, "amount_currenty": amount_currenty}
+
     def change_plan(self, plan):
         _is_valid = False
         for choice in self.PLAN_CHOICES:
             if plan in choice:
                 _is_valid = True
                 self.plan = choice[0]
-                self.save()
+                self.contract_on = pendulum.now()
+                self.next_due_date = pendulum.now().add(months=1)
+                self.organization.is_suspended = False
+                self.organization.save(update_fields=["is_suspended"])
+                self.is_active = True
+                self.save(update_fields=["plan", "contract_on", "next_due_date", "is_active"], change_plan=True)
                 # send mail here
                 break
         return _is_valid
@@ -1336,6 +1464,110 @@ class BillingPlan(models.Model):
         )
         return mail
 
+    def send_email_trial_plan_expired_due_time_limit(self, user_names: list = None, emails: list = None):
+        if not settings.SEND_EMAILS:
+            return False  # pragma: no cover
+
+        if not emails:
+            emails = self.organization.authorizations.exclude(role=OrganizationRole.VIEWER.value).values_list(
+                "user__email", flat=True)
+        if not user_names:
+            user_names = self.organization.authorizations.exclude(role=OrganizationRole.VIEWER.value).values_list(
+                "user__username", flat=True)
+        context = {
+            "user_name": user_names,
+            "webapp_billing_url": f"{settings.WEBAPP_BASE_URL}/orgs/{self.organization.uuid}/billing"
+        }
+        mail.send_mail(
+            _("Your trial plan has expired"),
+            render_to_string("billing/emails/trial_plan_expired_due_time_limit.txt", context),
+            None,
+            emails,
+            html_message=render_to_string("billing/emails/trial_plan_expired_due_time_limit.html", context),
+        )
+        return mail
+
+    def send_email_plan_expired_due_attendance_limit(self, user_names: str = None, emails: list = None):
+        if not settings.SEND_EMAILS:
+            return False  # pragma: no cover
+
+        if not emails:
+            emails = self.organization.authorizations.exclude(role=OrganizationRole.VIEWER.value).values_list(
+                "user__email", flat=True)
+        if not user_names:
+            user_names = self.organization.authorizations.exclude(role=OrganizationRole.VIEWER.value).values_list(
+                "user__username", flat=True)
+
+        context = {
+            "user_name": user_names,
+            "webapp_billing_url": f"settings.WEBAPP_BASE_URL/orgs/{self.organization.uuid}/billing",
+            "plan": self.plan
+        }
+        mail.send_mail(
+            _(f"You reached {self.plan_limit} attendances"),
+            render_to_string("billing/emails/plan_expired_due_attendence_limit.txt", context),
+            None,
+            emails,
+            html_message=render_to_string("billing/emails/plan_expired_due_attendence_limit.html", context),
+        )
+        return mail
+
+    def send_email_plan_is_about_to_expire(self, user_names: str = None, emails: list = None):
+        if not settings.SEND_EMAILS:
+            return False  # pragma: no cover
+
+        if not emails:
+            emails = self.organization.authorizations.exclude(role=OrganizationRole.VIEWER.value).values_list(
+                "user__email", flat=True)
+        if not user_names:
+            user_names = self.organization.authorizations.exclude(role=OrganizationRole.VIEWER.value).values_list(
+                "user__username", flat=True)
+
+        context = {
+            "user_name": user_names,
+            "limit": self.plan_limit,
+            "webapp_billing_url": settings.WEBAPP_BASE_URL + "/orgs/" + self.organization.uuid + "/billing",
+        }
+        mail.send_mail(
+            _(f"You reached {self.plan_limit} attendances"),
+            render_to_string("billing/emails/plan_is_about_to_expire.txt", context),
+            None,
+            emails,
+            html_message=render_to_string("billing/emails/plan_is_about_to_expire.html", context),
+        )
+        return mail
+
+    def send_email_end_trial(self, email: list):
+        if not settings.SEND_EMAILS:
+            return False  # pragma: no cover
+        context = {
+            "base_url": settings.BASE_URL,
+            "webapp_base_url": settings.WEBAPP_BASE_URL,
+            "organization_name": self.organization.name,
+        }
+        mail.send_mail(
+            _("Your trial period has ended"),
+            render_to_string(
+                "common/emails/organization/end_trial.txt", context
+            ),
+            None,
+            email,
+            html_message=render_to_string(
+                "common/emails/organization/end_trial.html", context
+            ),
+        )
+        return mail
+
+    def end_trial_period(self):
+        self.is_active = False
+        self.save(update_fields=["is_active"])
+        self.organization.is_suspended = True
+        self.organization.save(update_fields=["is_suspended"])
+        for project in self.organization.project.all():
+            current_app.send_task(  # pragma: no cover
+                name="update_suspend_project", args=[project.flow_organization, True]
+            )
+
 
 class Invoice(models.Model):
     class Meta:
@@ -1391,6 +1623,7 @@ class Invoice(models.Model):
     cost_per_whatsapp = models.DecimalField(
         _("cost per whatsapp"), decimal_places=2, max_digits=11, default=0
     )
+    invoice_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True)
 
     @property
     def card_data(self):
@@ -1408,26 +1641,14 @@ class Invoice(models.Model):
             card_data["response"]["final_card_number"] = str(
                 card_data["response"]["final_card_number"]
             )
-            card_data["response"]["final_card_number"] = card_data["response"][
-                "final_card_number"
-            ][len(card_data["response"]["final_card_number"]) - 2 :]
+            card_data["response"]["final_card_number"] = card_data[
+                "response"
+            ]["final_card_number"][len(card_data["response"]["final_card_number"]) - 2:]
         return card_data
 
     @property
     def total_invoice_amount(self):
-        generic_billing_data = GenericBillingData.get_generic_billing_data_instance()
-
-        contact_count = self.organization_billing_invoice_project.aggregate(
-            total_contact_count=Sum("contact_count")
-        ).get("total_contact_count")
-
-        amount = generic_billing_data.calculate_active_contacts(
-            contact_count if contact_count else 0
-        )
-        integration_cost = float(self.cost_per_whatsapp * self.extra_integration)
-        return Decimal(
-            float(amount + integration_cost) * float(1 - self.discount / 100)
-        ).quantize(Decimal(".01"), decimal.ROUND_HALF_UP)
+        return self.invoice_amount
 
 
 class InvoiceProject(models.Model):
@@ -1520,50 +1741,31 @@ class GenericBillingData(models.Model):
     @property
     def precification(self):
         return {
-            "currency": "USD",
+            "currency": settings.DEFAULT_CURRENCY,
             "extra_whatsapp_integration": settings.BILLING_COST_PER_WHATSAPP,
-            "range": [
-                {
-                    "from": 1,
-                    "to": 1000,
-                    "value_per_contact": self._from_1_to_1000,
+            "plans": {
+                "trial": {
+                    "limit": settings.PLAN_TRIAL_LIMIT,
+                    "price": settings.PLAN_TRIAL_PRICE,
                 },
-                {
-                    "from": 1001,
-                    "to": 5000,
-                    "value_per_contact": self._from_1001_to_5000,
+                "start": {
+                    "limit": settings.PLAN_START_LIMIT,
+                    "price": settings.PLAN_START_PRICE,
                 },
-                {
-                    "from": 5001,
-                    "to": 10000,
-                    "value_per_contact": self._from_5001_to_10000,
+                "scale": {
+                    "limit": settings.PLAN_SCALE_LIMIT,
+                    "price": settings.PLAN_SCALE_PRICE,
                 },
-                {
-                    "from": 10001,
-                    "to": 30000,
-                    "value_per_contact": self._from_10001_to_30000,
+                "advanced": {
+                    "limit": settings.PLAN_ADVANCED_LIMIT,
+                    "price": settings.PLAN_ADVANCED_PRICE,
                 },
-                {
-                    "from": 30001,
-                    "to": 50000,
-                    "value_per_contact": self._from_30001_to_50000,
+                "enterprise": {
+                    "limit": settings.PLAN_ENTERPRISE_LIMIT,
+                    "price": settings.PLAN_ENTERPRISE_PRICE,
                 },
-                {
-                    "from": 50001,
-                    "to": 100000,
-                    "value_per_contact": self._from_50001_to_100000,
-                },
-                {
-                    "from": 100001,
-                    "to": 250000,
-                    "value_per_contact": self._from_100001_to_250000,
-                },
-                {
-                    "from": 250001,
-                    "to": "infinite",
-                    "value_per_contact": self._from_100001_to_250000,
-                },
-            ],
+
+            }
         }
 
     def calculate_active_contacts(self, contact_count):

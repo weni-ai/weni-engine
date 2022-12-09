@@ -1,0 +1,74 @@
+{% extends 'authentication/emails/base.html' %}
+{% load static i18n %}
+
+{% block main-content %}
+<section style="width: 574px; margin: 48px">
+  <div
+    style="
+      font-family: 'Lato', sans-serif;
+      font-style: normal;
+      font-weight: normal;
+      font-size: 20px;
+      line-height: 28px;
+      color: #808080;
+    "
+  >
+    {% trans 'Hi' %},
+    <span
+      style="
+        font-family: 'Lato', sans-serif;
+        color: #262626;
+        font-size: 20px;
+        font-weight: bold;
+        line-height: 28px;
+        font-style: normal;
+      "
+    >
+      {{ user_name }}!
+    </span>
+  </div>
+
+  <div
+    style="
+      font-family: 'Lato', sans-serif;
+      font-weight: bold;
+      font-size: 20px;
+      line-height: 28px;
+      color: #262626;
+      margin-top: 24px;
+    "
+  >
+    {% trans "Your organization has reached the" %} {{ plan }} {% trans "plan's limit of 100 attendances." %}
+  </div>
+
+  <div
+    style="
+      font-family: 'Lato', sans-serif;
+      font-style: normal;
+      font-weight: normal;
+      font-size: 16px;
+      line-height: 24px;
+      color: #808080;
+      margin-top: 24px;
+    "
+  >
+    {% trans 'You still have access to the platform, but your chatbot will not be able to fire messages to your users.' %}
+  </div>
+
+  <div
+    style="
+      font-family: 'Lato', sans-serif;
+      font-style: normal;
+      font-weight: normal;
+      font-size: 16px;
+      line-height: 24px;
+      color: #808080;
+      margin-top: 24px;
+    "
+  >
+    {% trans 'To prevent this from happening, access ' %}
+    <a href="{{ webapp_billing_url }}" style="color: #009E96; text-decoration: underline; text-underline-offset: 4px;">{% trans 'Billing' %}</a>
+    {% trans ' and choose a plan that fits your business the needs of your business.' %}
+  </div>
+</section>
+{% endblock %}

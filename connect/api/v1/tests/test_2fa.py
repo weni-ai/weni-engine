@@ -85,9 +85,6 @@ class TwoFactorAuthTestCase(TestCase):
             request,
         )
         return response
-        # print(response.render())
-        # content_data = json.loads(response.content)
-        # return response, content_data
 
     def test_ok(self):
         data = {"2fa_required": True}

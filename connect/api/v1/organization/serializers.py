@@ -41,6 +41,7 @@ class BillingPlanSerializer(serializers.ModelSerializer):
             "problem_capture_invoice",
             "currenty_invoice",
             "contract_on",
+            "trial_end_date"
         ]
         ref_name = None
 
@@ -88,6 +89,7 @@ class BillingPlanSerializer(serializers.ModelSerializer):
         read_only=True,
         help_text=_("Total active contacts and current invoice amount before closing"),
     )
+    trial_end_date = serializers.DateTimeField(read_only=True)
 
 
 class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):

@@ -3,7 +3,7 @@ import uuid as uuid4
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
-from connect.common.models import Project
+
 
 logger = logging.getLogger(__name__)
 
@@ -43,7 +43,7 @@ class Channel(models.Model):
         _("channel_type"), max_length=150, choices=CHANNEL_CHOICES
     )
     channel_flow_id = models.PositiveIntegerField(_("channel id"), unique=True)
-    project = models.ForeignKey(Project, models.CASCADE, related_name="channel")
+    project = models.ForeignKey("common.Project", models.CASCADE, related_name="channel")
 
     @staticmethod
     def create(*args, **kwargs):
@@ -88,7 +88,7 @@ class Contact(models.Model):
     channel = models.ForeignKey(Channel, models.CASCADE, related_name="channel", null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(blank=True, null=True)
-    project = models.ForeignKey(Project, models.CASCADE, related_name="contacts", null=True)
+    project = models.ForeignKey("common.Project", models.CASCADE, related_name="contacts", null=True)
 
     objects = ContactManager()
 
@@ -114,7 +114,8 @@ class ContactCount(models.Model):
     )
     count = models.PositiveIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
-    project = models.ForeignKey(Project, models.CASCADE, related_name="contact_count_project", null=True)
+    day = models.DateTimeField(null=True)
+    project = models.ForeignKey("common.Project", models.CASCADE, related_name="contact_count_project", null=True)
 
     def increase_contact_count(self, contact_count):
         self.count += contact_count

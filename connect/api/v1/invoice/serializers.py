@@ -30,7 +30,7 @@ class InvoiceSerializer(serializers.ModelSerializer):
             "payment_status",
             "payment_method",
             "invoice_details",
-            "total_invoice_amount",
+            "invoice_amount",
             "notes",
             "extra_integration",
             "cost_per_whatsapp",
