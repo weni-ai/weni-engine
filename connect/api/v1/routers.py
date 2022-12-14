@@ -19,7 +19,7 @@ from connect.api.v1.project.views import (
 )
 
 from connect.api.v1.billing.views import BillingViewSet
-from connect.api.v1.channel_types.views import ChannelTypesViewSet
+
 
 class Router(routers.SimpleRouter):  # pragma: no cover
     routes = [
@@ -104,8 +104,7 @@ router.register("organization/project", ProjectViewSet)
 router.register("organization/authorizations", OrganizationAuthorizationViewSet)
 router.register("organization/request-permission", RequestPermissionOrganizationViewSet)
 router.register("organization/invoice", InvoiceViewSet)
-router.register("project/request-permission", RequestPermissionProjectViewSet),
+router.register("project/request-permission", RequestPermissionProjectViewSet)
 router.register("organization/rocket-permission", RequestPermissionRocketViewSet)
 router.register("organization/template-project", TemplateProjectViewSet)
 router.register("billing", BillingViewSet, basename="billing")
-router.register("channel-types", ChannelTypesViewSet, basename="channel-types" )
