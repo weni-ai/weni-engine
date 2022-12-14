@@ -6,7 +6,7 @@ from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
 from django.http import JsonResponse
 
 
-class ChannelTypesViewSet(viewsets.Viewset):
+class ChannelTypesViewSet(viewsets.ViewSet):
     """ Viewset for rp-apps channels_types listing and retrieve channels types"""
 
     @action(
