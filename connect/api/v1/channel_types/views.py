@@ -2,12 +2,14 @@ from rest_framework import views
 from rest_framework.decorators import action
 from rest_framework import mixins, permissions
 
+from connect.api.v1.internal.permissions import ModuleHasPermission
 from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
 
 from django.http import JsonResponse
 
+
 class ChannelTypesAPIView(views.APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [ModuleHasPermission]
 
     def get(self, request):
         """ Returns rapidpro channel listing and detail """
