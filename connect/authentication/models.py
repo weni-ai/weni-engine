@@ -209,7 +209,6 @@ class User(AbstractBaseUser, PermissionsMixin):
                     "company_sector": self.company_sector,
                     "company_segment": self.company_segment,
                     "weni_helps": self.weni_helps,
-                    
                 },
                 "urns": [f"mailto:{self.email}"],
             },
