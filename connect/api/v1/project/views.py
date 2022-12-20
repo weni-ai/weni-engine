@@ -612,6 +612,14 @@ class TemplateProjectViewSet(
             created_by=request.user
         )
 
+        if len(Project.objects.filter(created_by=project.created_by)) == 1:
+            data = dict(
+                send_request_flow=settings.SEND_REQUEST_FLOW_PRODUCT,
+                flow_uuid=settings.FLOW_PRODUCT_UUID,
+                token_authorization=settings.TOKEN_AUTHORIZATION_FLOW_PRODUCT
+            )
+            project.created_by.send_request_flow_user_info(data)
+
         project_data = {
             "project": project,
         }

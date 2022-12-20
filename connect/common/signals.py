@@ -49,6 +49,13 @@ def create_service_status(sender, instance, created, **kwargs):
                 is_template=instance.is_template,
                 user_email=instance.created_by.email
             )
+            if len(Project.objects.filter(created_by=instance.created_by)) == 1:
+                data = dict(
+                    send_request_flow=settings.SEND_REQUEST_FLOW_PRODUCT,
+                    flow_uuid=settings.FLOW_PRODUCT_UUID,
+                    token_authorization=settings.TOKEN_AUTHORIZATION_FLOW_PRODUCT
+                )
+                instance.created_by.send_request_flow_user_info(data)
             logger.info(f'[ * ] {response}')
 
         for permission in instance.project_authorizations.all():

@@ -55,7 +55,12 @@ class UserSerializer(serializers.ModelSerializer):
             instance=instance, validated_data=validated_data
         )
         if "phone" in validated_data or "short_phone_prefix" in validated_data:
-            instance.send_request_flow_user_info()
+            data = dict(
+                send_request_flow=settings.SEND_REQUEST_FLOW,
+                flow_uuid=settings.FLOW_MARKETING_UUID,
+                token_authorization=settings.TOKEN_AUTHORIZATION_FLOW_MARKETING
+            )
+            instance.send_request_flow_user_info(data)
 
         if "first_name" in validated_data or "last_name" in validated_data:
 

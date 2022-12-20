@@ -174,6 +174,14 @@ class OrganizationViewSet(
                 created_by=user
             )
 
+            if len(Project.objects.filter(created_by=user)) == 1:
+                data = dict(
+                    send_request_flow=settings.SEND_REQUEST_FLOW_PRODUCT,
+                    flow_uuid=settings.FLOW_PRODUCT_UUID,
+                    token_authorization=settings.TOKEN_AUTHORIZATION_FLOW_PRODUCT
+                )
+                user.send_request_flow_user_info(data)
+
             # Create owner's organization authorization
             RequestPermissionOrganization.objects.create(
                 email=user.email,
