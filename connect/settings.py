@@ -95,7 +95,10 @@ env = environ.Env(
     PLAN_ADVANCED_PRICE=(int, 999),
     PLAN_ENTERPRISE_LIMIT=(str, "limitless"),
     PLAN_ENTERPRISE_PRICE=(str, "Contact the suport team"),
-    DEFAULT_CURRENCY=(str, "BRL")
+    DEFAULT_CURRENCY=(str, "BRL"),
+    SEND_REQUEST_FLOW_PRODUCT=(bool, False),
+    FLOW_PRODUCT_UUID=(str, None),
+    TOKEN_AUTHORIZATION_FLOW_PRODUCT=(str, None)
 )
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -454,6 +457,10 @@ SEND_REQUEST_FLOW = env.bool("SEND_REQUEST_FLOW")
 FLOW_MARKETING_UUID = env.str("FLOW_MARKETING_UUID")
 TOKEN_AUTHORIZATION_FLOW_MARKETING = env.str("TOKEN_AUTHORIZATION_FLOW_MARKETING")
 
+# Flow Product Weni
+SEND_REQUEST_FLOW_PRODUCT = env.bool("SEND_REQUEST_FLOW_PRODUCT")
+FLOW_PRODUCT_UUID = env.str("FLOW_PRODUCT_UUID")
+TOKEN_AUTHORIZATION_FLOW_PRODUCT = env.str("TOKEN_AUTHORIZATION_FLOW_PRODUCT")
 
 # Billing
 """
