@@ -219,7 +219,12 @@ class MyUserProfileViewSet(
                     "last_update_profile",
                 ]
             )
-            user.send_request_flow_user_info()
+            data=dict(
+                send_request_flow=settings.SEND_REQUEST_FLOW,
+                flow_uuid=settings.FLOW_MARKETING_UUID,
+                token_authorization=settings.TOKEN_AUTHORIZATION_FLOW_MARKETING
+            )
+            user.send_request_flow_user_info(data)
             response = dict(
                 company=dict(
                     name=user.company_name,
