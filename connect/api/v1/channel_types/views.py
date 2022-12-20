@@ -13,4 +13,7 @@ class ChannelTypesAPIView(views.APIView):
         channel_type_code = request.query_params.get('channel_type_code', None)
         rest_client = FlowsRESTClient()
         response = rest_client.list_channel_types(channel_type_code)
-        return Response(status=response.status_code, data=response.json())
+        if response.status_code == 200:
+            return Response(status=response.status_code, data=response.json())
+
+        return Response(status=response.status_code, data=response)
