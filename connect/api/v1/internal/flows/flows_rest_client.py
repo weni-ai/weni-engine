@@ -9,8 +9,6 @@ from connect.api.v1.internal.flows.helpers import add_classifier_to_flow
 
 class FlowsRESTClient:
 
-    sample_flow = f"{os.path.join(os.path.dirname(__file__))}/mp9/flows_definition_captura-de-leads.json"
-
     def __init__(self):
         self.base_url = settings.FLOWS_REST_ENDPOINT
         self.authentication_instance = InternalAuthentication()
@@ -28,9 +26,11 @@ class FlowsRESTClient:
         )
         return dict(status=response.status_code, data=response.text)
 
-    def create_flows(self, project_uuid: str, classifier_uuid: str):
+    def create_flows(self, project_uuid: str, classifier_uuid: str, template_type: str, ticketer: str = None):
 
-        sample_flow = add_classifier_to_flow(self.sample_flow, classifier_uuid)
+        flow = self.template_flow(template_type)
+
+        sample_flow = add_classifier_to_flow(flow, classifier_uuid, template_type, ticketer)
 
         body = dict(
             org=project_uuid,
@@ -337,3 +337,10 @@ class FlowsRESTClient:
             json=body
         )
         return response.json()
+
+    def template_flow(self, template_type):
+        templates = {
+            "lead_capture": f"{os.path.join(os.path.dirname(__file__))}/mp9/flows_definition_captura-de-leads.json",
+            "support": f"{os.path.join(os.path.dirname(__file__))}/mp9/fluxos_atendimento_humano.json",
+        }
+        return templates.get(template_type)

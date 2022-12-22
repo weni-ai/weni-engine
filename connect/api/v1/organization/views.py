@@ -93,6 +93,7 @@ class OrganizationViewSet(
         data = {}
         org_info = request.data.get("organization")
         project_info = request.data.get("project")
+
         user = request.user
 
         try:
@@ -171,7 +172,8 @@ class OrganizationViewSet(
                 timezone=str(project_info.get("timezone")),
                 organization=new_organization,
                 is_template=True if project_info.get("template") else False,
-                created_by=user
+                created_by=user,
+                template_type=project_info.get("template_type")
             )
 
             # Create owner's organization authorization

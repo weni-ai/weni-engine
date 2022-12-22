@@ -159,8 +159,9 @@ class ProjectSerializer(serializers.ModelSerializer):
             user.email,
             str(validated_data.get("timezone")),
         )
-
         project = task
+        print("[+][-]", project)
+        print(settings.FLOWS_REST_ENDPOINT)
 
         validated_data.update(
             {
@@ -519,7 +520,7 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
                 classifier_uuid = tasks.create_classifier(
                     project_uuid=str(project.flow_organization),
                     user_email=request.user.email,
-                    classifier_name="Farewell & Greetings",
+                    classifier_name="Farewell & Greetings" if project.template_type == Project.TYPE_LEAD_CAPTURE else "Binary Answers",
                     access_token=access_token,
                 ).get("uuid")
             except Exception as error:
@@ -535,11 +536,27 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
         else:
             classifier_uuid = uuid.uuid4()
 
-        # Create Flow
+        # Create Flow and Ticketer
         if not settings.TESTING:
             rest_client = FlowsRESTClient()
             try:
-                flows = rest_client.create_flows(str(project.flow_organization), str(classifier_uuid))
+                if project.template_type == Project.TYPE_SUPPORT:
+                    chats_client = ChatsRESTClient()
+                    chats_response = chats_client.create_chat_project(
+                        project_uuid=str(project.uuid),
+                        project_name=project.name,
+                        date_format=project.date_format,
+                        timezone=str(project.timezone),
+                        is_template=True,
+                        user_email=project.created_by.email
+                    )
+
+                flows = rest_client.create_flows(
+                    str(project.flow_organization),
+                    str(classifier_uuid),
+                    project.template_type,
+                    ticketer=chats_response.get("ticketer")
+                )
                 if flows.get("status") == 201:
                     flows = json.loads(flows.get("data"))
             except Exception as error:
