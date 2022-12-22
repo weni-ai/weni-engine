@@ -160,8 +160,6 @@ class ProjectSerializer(serializers.ModelSerializer):
             str(validated_data.get("timezone")),
         )
         project = task
-        print("[+][-]", project)
-        print(settings.FLOWS_REST_ENDPOINT)
 
         validated_data.update(
             {
