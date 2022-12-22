@@ -30,7 +30,7 @@ class FlowsRESTClient:
 
         flow = self.template_flow(template_type)
 
-        sample_flow = add_classifier_to_flow(flow, classifier_uuid, template_type, ticketer)
+        sample_flow = add_classifier_to_flow(flow, classifier_uuid, ticketer)
 
         body = dict(
             org=project_uuid,

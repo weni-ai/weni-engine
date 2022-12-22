@@ -548,7 +548,7 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
                         is_template=True,
                         user_email=project.created_by.email
                     )
-
+                    chats_response = json.loads(chats_response.text)
                 flows = rest_client.create_flows(
                     str(project.flow_organization),
                     str(classifier_uuid),
