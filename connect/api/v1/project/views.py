@@ -212,7 +212,7 @@ class ProjectViewSet(
                 self.perform_project_authorization_destroy(project_permission.first(), False)
                 return Response(status=status.HTTP_204_NO_CONTENT)
             else:
-                return Response(status=status.HTTP_401_UNAUTHORIZATED)
+                return Response(status=status.HTTP_401_UNAUTHORIZED)
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     @action(
@@ -611,6 +611,14 @@ class TemplateProjectViewSet(
             is_template=True,
             created_by=request.user
         )
+
+        if len(Project.objects.filter(created_by=project.created_by)) == 1:
+            data = dict(
+                send_request_flow=settings.SEND_REQUEST_FLOW_PRODUCT,
+                flow_uuid=settings.FLOW_PRODUCT_UUID,
+                token_authorization=settings.TOKEN_AUTHORIZATION_FLOW_PRODUCT
+            )
+            project.created_by.send_request_flow_user_info(data)
 
         project_data = {
             "project": project,

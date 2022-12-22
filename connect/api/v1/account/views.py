@@ -219,7 +219,7 @@ class MyUserProfileViewSet(
                     "last_update_profile",
                 ]
             )
-            data=dict(
+            data = dict(
                 send_request_flow=settings.SEND_REQUEST_FLOW,
                 flow_uuid=settings.FLOW_MARKETING_UUID,
                 token_authorization=settings.TOKEN_AUTHORIZATION_FLOW_MARKETING
