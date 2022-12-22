@@ -457,7 +457,9 @@ class TemplateProjectTestCase(TestCase):
             "date_format": "D",
             "name": "Test template project",
             "organization": str(self.organization.uuid),
-            "timezone": "America/Argentina/Buenos_Aires"
+            "timezone": "America/Argentina/Buenos_Aires",
+            "template": True,
+            "template_type": "support",
         }
         response, content_data = self.request_create(
             data, token=self.user_token

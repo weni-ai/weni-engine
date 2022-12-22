@@ -577,6 +577,9 @@ class TemplateProjectViewSet(
 
     def create(self, request, *args, **kwargs):
         data = {}
+        if not request.data.get("template_type"):
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)
+
         if not settings.TESTING:
             try:
                 flow_organization = tasks.create_template_project(
@@ -609,7 +612,8 @@ class TemplateProjectViewSet(
             timezone=str(request.data.get("timezone")),
             flow_organization=flow_organization,
             is_template=True,
-            created_by=request.user
+            created_by=request.user,
+            template_type=request.data.get("template_type")
         )
 
         if len(Project.objects.filter(created_by=project.created_by)) == 1:

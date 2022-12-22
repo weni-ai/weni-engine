@@ -1,0 +1,2695 @@
+{
+  "version": "13",
+  "site": "https://flows.weni.ai",
+  "flows": [
+    {
+      "_ui": {
+        "nodes": {
+          "0b75218e-b03f-4fdb-9526-7340af9bc23e": {
+            "config": {
+              "cases": {}
+            },
+            "position": {
+              "left": 700,
+              "top": 440
+            },
+            "type": "wait_for_response"
+          },
+          "5cd30237-9d7c-44d4-a975-9a8b7c7f1763": {
+            "position": {
+              "left": 700,
+              "top": 100
+            },
+            "type": "execute_actions"
+          },
+          "6cb49b4d-f41c-4c99-a948-dd5ef91b4139": {
+            "position": {
+              "left": 560,
+              "top": 720
+            },
+            "type": "execute_actions"
+          },
+          "8d918d3f-206d-4062-9297-37f95641494e": {
+            "position": {
+              "left": 260,
+              "top": 720
+            },
+            "type": "execute_actions"
+          },
+          "e540cd23-1c91-4c45-80d4-9b3e0b780575": {
+            "position": {
+              "left": 1140,
+              "top": 600
+            },
+            "type": "execute_actions"
+          }
+        },
+        "stickies": {
+          "0536aa49-c0a6-489a-81ef-2504e6f6ffd6": {
+            "body": "Caso a numera\u00e7\u00e3o corresponda a um CPF o chatbot poder\u00e1 enviar uma mensagem espec\u00edfica, basta editar o texto no cart\u00e3o \u00e0 direita.",
+            "color": "green",
+            "position": {
+              "bottom": -20,
+              "left": 60,
+              "right": 0,
+              "top": 720
+            },
+            "title": "CPF"
+          },
+          "34b13b2f-f038-4137-b867-59c13d57f0ef": {
+            "body": "Caso o dado que o usu\u00e1rio informar n\u00e3o seja nem um CPF nem um CNPJ, poderemos sinalizar e pedir novamente uma numera\u00e7\u00e3o correta.\n\nO texto poder\u00e1 ser editado no cart\u00e3o \u00e0 esquerda.",
+            "color": "blue",
+            "position": {
+              "bottom": null,
+              "left": 1360,
+              "right": null,
+              "top": 600
+            },
+            "title": "Tratamento"
+          },
+          "79f675fd-e850-4e38-96a5-94db8abe8d6b": {
+            "body": "Caso a numera\u00e7\u00e3o corresponda a um CNPJ o chatbot poder\u00e1 enviar uma mensagem espec\u00edfica, basta editar o texto no cart\u00e3o \u00e0 esquerda.",
+            "color": "yellow",
+            "position": {
+              "bottom": null,
+              "left": 780,
+              "right": null,
+              "top": 720
+            },
+            "title": "CNPJ"
+          },
+          "8957d498-a3e2-4b91-8a39-722df5eb3e20": {
+            "body": "Mensagem que \u00e9 enviada para que o usu\u00e1rio informe o seu CPF ou CNPJ.\n\nEssa mensagem poder\u00e1 ser editada a partir do cart\u00e3o \u00e0 esquerda.",
+            "color": "green",
+            "position": {
+              "bottom": null,
+              "left": 920,
+              "right": null,
+              "top": 120
+            },
+            "title": "In\u00edcio"
+          },
+          "eccf9212-0117-4b67-a3a3-feafa538a4ac": {
+            "body": "Nesta etapa existe um mecanismo para identificar se a numera\u00e7\u00e3o que o usu\u00e1rio informou corresponde a um CPF ou CNPJ.",
+            "color": "purple",
+            "position": {
+              "bottom": 40,
+              "left": 500,
+              "right": 0,
+              "top": 440
+            },
+            "title": "Valida\u00e7\u00e3o de CPF/CNPJ"
+          }
+        }
+      },
+      "expire_after_minutes": 10080,
+      "language": "base",
+      "localization": {},
+      "metadata": {
+        "expires": 10080
+      },
+      "name": "3- Coleta de dados - CNPJ/CPF",
+      "nodes": [
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "@(title(fields.nomeusuario)), por favor, agora me informe o seu *CPF* ou *CNPJ*:\n\n*Ex:* \nCPF: 000.000.000-00\nCNPJ: 00. 000. 000/0000-00",
+              "type": "send_msg",
+              "uuid": "c6d95d47-a2ff-4195-b810-3d59e3f14fe4"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "0b75218e-b03f-4fdb-9526-7340af9bc23e",
+              "uuid": "f4ec50df-d128-4a95-8e69-547977b7a0b7"
+            }
+          ],
+          "uuid": "5cd30237-9d7c-44d4-a975-9a8b7c7f1763"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "8d918d3f-206d-4062-9297-37f95641494e",
+              "uuid": "71b9986a-0c7c-4d35-8221-48ea2ebf052c"
+            },
+            {
+              "destination_uuid": "6cb49b4d-f41c-4c99-a948-dd5ef91b4139",
+              "uuid": "9d1be06e-94a7-4966-9c9f-b561240fbaa8"
+            },
+            {
+              "destination_uuid": "e540cd23-1c91-4c45-80d4-9b3e0b780575",
+              "uuid": "9679a04b-125e-4ef3-b686-a771b7945a7b"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "^\\d{3}.?\\d{3}.?\\d{3}-?\\d{2}$"
+                ],
+                "category_uuid": "fc9ab940-4b49-461a-9e8f-134d7c300794",
+                "type": "has_pattern",
+                "uuid": "a2f68343-1767-4a3f-882a-362c6f9ff761"
+              },
+              {
+                "arguments": [
+                  "((\\d{2}).(\\d{3}).(\\d{3})|(\\d{4})-(\\d{2}))"
+                ],
+                "category_uuid": "886e8c3d-9a17-4563-a8de-9aa6553d9c09",
+                "type": "has_pattern",
+                "uuid": "816544cc-eba6-4934-9c84-93be3d4d64bf"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "71b9986a-0c7c-4d35-8221-48ea2ebf052c",
+                "name": "CPF",
+                "uuid": "fc9ab940-4b49-461a-9e8f-134d7c300794"
+              },
+              {
+                "exit_uuid": "9d1be06e-94a7-4966-9c9f-b561240fbaa8",
+                "name": "CNPJ",
+                "uuid": "886e8c3d-9a17-4563-a8de-9aa6553d9c09"
+              },
+              {
+                "exit_uuid": "9679a04b-125e-4ef3-b686-a771b7945a7b",
+                "name": "Other",
+                "uuid": "61e7733f-d39e-4276-badd-c66f4e02fe61"
+              }
+            ],
+            "default_category_uuid": "61e7733f-d39e-4276-badd-c66f4e02fe61",
+            "operand": "@input.text",
+            "result_name": "CpfOuCnpj",
+            "type": "switch",
+            "wait": {
+              "type": "msg"
+            }
+          },
+          "uuid": "0b75218e-b03f-4fdb-9526-7340af9bc23e"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "\ud83d\udd0e Infelizmente n\u00e3o consegui identificar um CPF ou CNPJ.",
+              "type": "send_msg",
+              "uuid": "f27061e8-d707-48a9-9ddd-60e1f1a6c3b8"
+            },
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Por favor, informe a numera\u00e7\u00e3o do seu CPF ou CNPJ da seguinte forma:\n\nCPF: 000.000.000-00\nCNPJ: 00. 000. 000/0000-00",
+              "type": "send_msg",
+              "uuid": "ca127261-c105-4543-86b7-8f8a7ba06925"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "0b75218e-b03f-4fdb-9526-7340af9bc23e",
+              "uuid": "db39c67c-9fac-4666-85bc-16861ff5ac82"
+            }
+          ],
+          "uuid": "e540cd23-1c91-4c45-80d4-9b3e0b780575"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "\ud83d\ude0a Obrigado por me informar seu CPF.",
+              "type": "send_msg",
+              "uuid": "57af4e53-2373-40ae-bc08-4ae7208479fc"
+            },
+            {
+              "field": {
+                "key": "cpf",
+                "name": "CPF"
+              },
+              "type": "set_contact_field",
+              "uuid": "6bb17870-f8a1-400c-8c6a-ad0f0a16f7a8",
+              "value": "@results.cpfoucnpj.category"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "0e8be297-c12c-426e-88c9-3053532466e3"
+            }
+          ],
+          "uuid": "8d918d3f-206d-4062-9297-37f95641494e"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "\ud83d\ude0a Obrigado por me informar seu CNPJ.",
+              "type": "send_msg",
+              "uuid": "280cb9ba-791d-44c4-8c58-0c02e259badd"
+            },
+            {
+              "field": {
+                "key": "cnpj",
+                "name": "CNPJ"
+              },
+              "type": "set_contact_field",
+              "uuid": "9ad4429a-3f15-49fa-b9f4-3500fcaf9869",
+              "value": "@results.cpfoucnpj.category"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "d9d49849-4559-491f-af2e-c2e51249e34f"
+            }
+          ],
+          "uuid": "6cb49b4d-f41c-4c99-a948-dd5ef91b4139"
+        }
+      ],
+      "spec_version": "13.1.0",
+      "type": "messaging",
+      "uuid": "9bf9faf7-ca0c-4f42-91cf-a44b321cbe69",
+      "revision": 1
+    },
+    {
+      "_ui": {
+        "nodes": {
+          "fac53835-b154-447c-95d1-f2ae4d465041": {
+            "position": {
+              "left": 340,
+              "top": 20
+            },
+            "type": "execute_actions"
+          },
+          "f650e74a-422b-4679-b14a-909a05c8eb33": {
+            "config": {
+              "cases": {}
+            },
+            "position": {
+              "left": 700,
+              "top": 240
+            },
+            "type": "wait_for_response"
+          },
+          "5bdf69ca-dfe4-4cd0-88d7-7326aea9d40c": {
+            "type": "split_by_intent",
+            "position": {
+              "left": 280,
+              "top": 440
+            },
+            "config": {}
+          },
+          "fae011f1-e00f-4efd-b7ef-872d68b2c989": {
+            "position": {
+              "left": 700,
+              "top": 460
+            },
+            "type": "execute_actions"
+          },
+          "b8d87597-a325-4ae6-b95a-2754c5e9deec": {
+            "position": {
+              "left": 700,
+              "top": 640
+            },
+            "type": "execute_actions"
+          },
+          "94a61209-1b16-42dd-8025-d9ee0a4e076b": {
+            "position": {
+              "left": 440,
+              "top": 660
+            },
+            "type": "execute_actions"
+          },
+          "ce192279-a7c9-4cfd-b318-f0a1df0c4ab9": {
+            "config": {
+              "cases": {},
+              "operand": {
+                "id": "setor",
+                "name": "Setor",
+                "type": "field"
+              }
+            },
+            "position": {
+              "left": 400,
+              "top": 1060
+            },
+            "type": "split_by_contact_field"
+          },
+          "664a3ed4-e708-4fa3-9cb6-e0699c29b1bd": {
+            "config": {},
+            "position": {
+              "left": 180,
+              "top": 1220
+            },
+            "type": "split_by_subflow"
+          }
+        },
+        "stickies": {
+          "195d81c0-63e9-48ec-983f-5f6ac7cf10e9": {
+            "body": "Etapa onde \u00e9 aguardada e armazenada a resposta do usu\u00e1rio.",
+            "color": "purple",
+            "position": {
+              "bottom": null,
+              "left": 920,
+              "right": null,
+              "top": 240
+            },
+            "title": "Armazenamento"
+          },
+          "28e3218b-e024-40a3-bf7e-11522c7768b0": {
+            "body": "Aqui \u00e9 feito o direcionamento dos setores existentes. Esse direcionamento \u00e9 realizado com base na escolha do usu\u00e1rio na etapa de categoriza\u00e7\u00e3o.",
+            "color": "yellow",
+            "position": {
+              "bottom": null,
+              "left": 200,
+              "right": null,
+              "top": 1000
+            },
+            "title": "Setores"
+          },
+          "65ab615f-aacf-4821-b394-a82f3ce7b66a": {
+            "body": "Nesta etapa usamos uma intelig\u00eancia artificial para classificar a resposta do usu\u00e1rio, sendo ela positiva ou negativa.",
+            "color": "yellow",
+            "position": {
+              "bottom": null,
+              "left": 80,
+              "right": null,
+              "top": 440
+            },
+            "title": "Intelig\u00eancia artificial"
+          },
+          "744b488f-3dd7-4ffc-bf42-1dc090c67e30": {
+            "body": "Caso o usu\u00e1rio tenha escolhido a categoria \"comercial\" ele falar\u00e1 com atendentes do setor comercial.",
+            "color": "green",
+            "position": {
+              "bottom": null,
+              "left": 420,
+              "right": null,
+              "top": 1360
+            },
+            "title": "Setor comercial"
+          },
+          "b14d4fec-b60f-4902-b832-83eeddd2a26e": {
+            "body": "Caso o usu\u00e1rio tenha escolhido a categoria \"financeiro\" ele falar\u00e1 com atendentes do setor financeiro.",
+            "color": "purple",
+            "position": {
+              "bottom": null,
+              "left": 200,
+              "right": null,
+              "top": 1360
+            },
+            "title": "Setor financeiro"
+          },
+          "b3a12a6c-af5e-4b48-814f-fc689e5ce062": {
+            "body": "Caso o usu\u00e1rio n\u00e3o pretenda mais seguir para o atendimento humano ele receber\u00e1 essa mensagem.",
+            "color": "green",
+            "position": {
+              "bottom": null,
+              "left": 240,
+              "right": null,
+              "top": 660
+            },
+            "title": "Nega\u00e7\u00e3o"
+          },
+          "ce0bce31-3b7e-4370-92d1-ff66ff5e6bf3": {
+            "body": "Os setores que foram citados tanto na etapa de escolha de usu\u00e1rio quanto nessa s\u00e3o totalmente personaliz\u00e1veis, voc\u00ea poder\u00e1 criar os setores de sua prefer\u00eancia.",
+            "color": "blue",
+            "position": {
+              "bottom": null,
+              "left": 760,
+              "right": null,
+              "top": 1000
+            },
+            "title": "\ud83d\udcccTome nota"
+          },
+          "d7ba9de3-c4b6-487d-aba2-c5c3daa886a2": {
+            "body": "Caso o usu\u00e1rio tenha escolhido a categoria \"administrativo\" ele falar\u00e1 com atendentes do setor administrativo.",
+            "color": "blue",
+            "position": {
+              "bottom": null,
+              "left": 640,
+              "right": null,
+              "top": 1360
+            },
+            "title": "Setor administrativo"
+          },
+          "eb62b052-1d2c-4dce-af0e-0cd1823d0d03": {
+            "body": "Mensagem que \u00e9 enviada para o usu\u00e1rio caso haja algum problema no sistema da intelig\u00eancia artificial.",
+            "color": "blue",
+            "position": {
+              "bottom": null,
+              "left": 920,
+              "right": null,
+              "top": 460
+            },
+            "title": "Tratamento de erro"
+          },
+          "feeb46d5-13e0-4e2e-b4aa-0a37ff708b97": {
+            "body": "Mensagem de confirma\u00e7\u00e3o para que o chatbot possa encaminhar o usu\u00e1rio para um atendente dispon\u00edvel no momento.",
+            "color": "green",
+            "position": {
+              "left": 580,
+              "top": 20
+            },
+            "title": "In\u00edcio"
+          }
+        }
+      },
+      "expire_after_minutes": 10080,
+      "language": "base",
+      "localization": {},
+      "metadata": {
+        "expires": 10080
+      },
+      "name": "5- Abrir Atendimento",
+      "nodes": [
+        {
+          "actions": [
+            {
+              "all_urns": false,
+              "attachments": [],
+              "quick_replies": [
+                "Sim",
+                "N\u00e3o"
+              ],
+              "text": "Tudo pronto! Posso abrir uma sala com um atendente?",
+              "type": "send_msg",
+              "uuid": "93a1ae3a-13bc-4304-8cec-c9f630027c00"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "f650e74a-422b-4679-b14a-909a05c8eb33",
+              "uuid": "cae1793a-2ee0-426c-b4c8-a23a3349b762"
+            }
+          ],
+          "uuid": "fac53835-b154-447c-95d1-f2ae4d465041"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "5bdf69ca-dfe4-4cd0-88d7-7326aea9d40c",
+              "uuid": "8896b13c-be4e-44b5-91ae-216e6d1f9fbf"
+            }
+          ],
+          "router": {
+            "cases": [],
+            "categories": [
+              {
+                "exit_uuid": "8896b13c-be4e-44b5-91ae-216e6d1f9fbf",
+                "name": "All Responses",
+                "uuid": "ee52ba55-d1cd-4717-880b-40ae50dcac7d"
+              }
+            ],
+            "default_category_uuid": "ee52ba55-d1cd-4717-880b-40ae50dcac7d",
+            "operand": "@input.text",
+            "result_name": "respostaUsuario",
+            "type": "switch",
+            "wait": {
+              "type": "msg"
+            }
+          },
+          "uuid": "f650e74a-422b-4679-b14a-909a05c8eb33"
+        },
+        {
+          "uuid": "5bdf69ca-dfe4-4cd0-88d7-7326aea9d40c",
+          "actions": [
+            {
+              "uuid": "a625249b-7360-4108-b694-a53b0b24be0e",
+              "type": "call_classifier",
+              "result_name": "_classificacaoBinaria Classification",
+              "input": "@input.text",
+              "classifier": {
+                "uuid": "287367f4-dff4-4fa2-8185-f0f323814cd2",
+                "name": "Binary Answers"
+              }
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "affirmative",
+                  ".9"
+                ],
+                "type": "has_top_intent",
+                "uuid": "ce65dc9a-cd45-4cca-b0c4-f8ba2a356679",
+                "category_uuid": "2cb4a457-95be-4355-b8b4-4a5b898794fe"
+              },
+              {
+                "arguments": [
+                  "negative",
+                  ".9"
+                ],
+                "type": "has_top_intent",
+                "uuid": "6d2d47fe-5260-4b27-ac7d-339bc57bf826",
+                "category_uuid": "9b699c50-4059-468d-ab38-0172db289eeb"
+              },
+              {
+                "arguments": [
+                  "Success",
+                  "Skipped"
+                ],
+                "category_uuid": "38a662e1-a479-49d0-ad93-491d3b165d79",
+                "type": "has_category",
+                "uuid": "a727baa5-b182-4dcf-8080-1b9f366fade2"
+              }
+            ],
+            "operand": "@results._classificacaobinaria_classification",
+            "categories": [
+              {
+                "exit_uuid": "a9868cbf-0ffa-4d1d-98d3-8f5bc5a5e7a9",
+                "name": "Afirma\u00e7\u00e3o",
+                "uuid": "2cb4a457-95be-4355-b8b4-4a5b898794fe"
+              },
+              {
+                "exit_uuid": "1f2638e7-4e56-4f29-9bde-2c5cc03e4738",
+                "name": "Nega\u00e7\u00e3o",
+                "uuid": "9b699c50-4059-468d-ab38-0172db289eeb"
+              },
+              {
+                "exit_uuid": "183f9b7b-216f-45ed-be0e-e609339825be",
+                "name": "Other",
+                "uuid": "38a662e1-a479-49d0-ad93-491d3b165d79"
+              },
+              {
+                "exit_uuid": "9e527f06-2c02-4740-b4f6-cafc6a008a66",
+                "name": "Failure",
+                "uuid": "9dc96118-5dcd-4ee0-b0f8-6a1aa2cde881"
+              }
+            ],
+            "type": "switch",
+            "default_category_uuid": "9dc96118-5dcd-4ee0-b0f8-6a1aa2cde881",
+            "result_name": "classificacaoBinaria"
+          },
+          "exits": [
+            {
+              "destination_uuid": "ce192279-a7c9-4cfd-b318-f0a1df0c4ab9",
+              "uuid": "a9868cbf-0ffa-4d1d-98d3-8f5bc5a5e7a9"
+            },
+            {
+              "destination_uuid": "94a61209-1b16-42dd-8025-d9ee0a4e076b",
+              "uuid": "1f2638e7-4e56-4f29-9bde-2c5cc03e4738"
+            },
+            {
+              "destination_uuid": "b8d87597-a325-4ae6-b95a-2754c5e9deec",
+              "uuid": "183f9b7b-216f-45ed-be0e-e609339825be"
+            },
+            {
+              "destination_uuid": "fae011f1-e00f-4efd-b7ef-872d68b2c989",
+              "uuid": "9e527f06-2c02-4740-b4f6-cafc6a008a66"
+            }
+          ]
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "\ud83d\ude15 Infelizmente meus sistemas est\u00e3o indispon\u00edveis no momento. Por favor, tente novamente em instantes!",
+              "type": "send_msg",
+              "uuid": "cf189773-16be-4db0-8461-49d1874888b1"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "5b101028-dad2-45c3-9c33-786bd253b1cd"
+            }
+          ],
+          "uuid": "fae011f1-e00f-4efd-b7ef-872d68b2c989"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "\ud83d\ude15N\u00e3o consegui entender o que voc\u00ea quis me dizer.",
+              "type": "send_msg",
+              "uuid": "94e93c9a-ad59-41fa-a275-386ac12a8806"
+            },
+            {
+              "attachments": [],
+              "quick_replies": [
+                "Sim",
+                "N\u00e3o"
+              ],
+              "text": "Posso abrir uma sala com um atendente?",
+              "type": "send_msg",
+              "uuid": "ee01c1d5-3971-4a5e-9db5-9e7913df9ad7"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "f650e74a-422b-4679-b14a-909a05c8eb33",
+              "uuid": "d5598a6c-51c1-4b30-b9d2-3597a6dcea3d"
+            }
+          ],
+          "uuid": "b8d87597-a325-4ae6-b95a-2754c5e9deec"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Sem problemas! Voc\u00ea poder\u00e1 voltar aqui sempre que quiser\ud83d\udc4b",
+              "type": "send_msg",
+              "uuid": "68733c92-ae67-4449-ad0b-d3fb63fa2371"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "5c057a83-26fb-4a06-8f94-d7f7c02cc65e"
+            }
+          ],
+          "uuid": "94a61209-1b16-42dd-8025-d9ee0a4e076b"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "664a3ed4-e708-4fa3-9cb6-e0699c29b1bd",
+              "uuid": "02b29240-eba0-4842-905c-0e6c8a544b96"
+            },
+            {
+              "destination_uuid": null,
+              "uuid": "6843fd79-8a18-4432-9165-aef508add714"
+            },
+            {
+              "destination_uuid": null,
+              "uuid": "8eb891ef-3bc5-49dc-a8e8-ecf778be39cc"
+            },
+            {
+              "destination_uuid": null,
+              "uuid": "a22cb5f8-2740-4234-b76f-449dd5f536ea"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "Financeiro"
+                ],
+                "category_uuid": "28544315-8edc-46c5-9835-e416e43f9103",
+                "type": "has_any_word",
+                "uuid": "1808c5f1-f2c9-4bbf-80fb-0cca5f1cbcdf"
+              },
+              {
+                "arguments": [
+                  "Comercial"
+                ],
+                "category_uuid": "668e4a3d-191e-452e-8fe7-481f7416648d",
+                "type": "has_any_word",
+                "uuid": "c6dbe38f-6b19-4628-b710-c18410cf85bf"
+              },
+              {
+                "arguments": [
+                  "Administrativo"
+                ],
+                "category_uuid": "b42ade3d-6a75-45ba-9c20-4f8b47090262",
+                "type": "has_any_word",
+                "uuid": "e9bd27a5-dba1-4392-be57-de04897d1f6c"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "02b29240-eba0-4842-905c-0e6c8a544b96",
+                "name": "Financeiro",
+                "uuid": "28544315-8edc-46c5-9835-e416e43f9103"
+              },
+              {
+                "exit_uuid": "6843fd79-8a18-4432-9165-aef508add714",
+                "name": "Comercial",
+                "uuid": "668e4a3d-191e-452e-8fe7-481f7416648d"
+              },
+              {
+                "exit_uuid": "8eb891ef-3bc5-49dc-a8e8-ecf778be39cc",
+                "name": "Admnistrativo",
+                "uuid": "b42ade3d-6a75-45ba-9c20-4f8b47090262"
+              },
+              {
+                "exit_uuid": "a22cb5f8-2740-4234-b76f-449dd5f536ea",
+                "name": "Other",
+                "uuid": "26e64f7f-2517-457b-8a54-7775c44ab6ff"
+              }
+            ],
+            "default_category_uuid": "26e64f7f-2517-457b-8a54-7775c44ab6ff",
+            "operand": "@fields.setor",
+            "type": "switch"
+          },
+          "uuid": "ce192279-a7c9-4cfd-b318-f0a1df0c4ab9"
+        },
+        {
+          "actions": [
+            {
+              "flow": {
+                "name": "Setor Financeiro",
+                "uuid": "c690b39c-7fba-4410-933f-ce00005d9966"
+              },
+              "type": "enter_flow",
+              "uuid": "741adf5c-3974-481f-8d6e-37b865e7534b"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "7cd9c5cf-df01-4d72-b1a6-b8defde4a143"
+            },
+            {
+              "destination_uuid": null,
+              "uuid": "507cc3f3-2b0b-4c81-a42d-165829216fde"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "completed"
+                ],
+                "category_uuid": "2a49fba5-4ebc-4b89-8412-28c8ad9d6cd5",
+                "type": "has_only_text",
+                "uuid": "b8b71e9f-c07f-4720-97e1-fe397f30205e"
+              },
+              {
+                "arguments": [
+                  "expired"
+                ],
+                "category_uuid": "4612dc7a-135e-4208-ba66-aef4a7fe85f8",
+                "type": "has_only_text",
+                "uuid": "d229e895-15cf-4230-b3dc-561e44bab67e"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "7cd9c5cf-df01-4d72-b1a6-b8defde4a143",
+                "name": "Complete",
+                "uuid": "2a49fba5-4ebc-4b89-8412-28c8ad9d6cd5"
+              },
+              {
+                "exit_uuid": "507cc3f3-2b0b-4c81-a42d-165829216fde",
+                "name": "Expired",
+                "uuid": "4612dc7a-135e-4208-ba66-aef4a7fe85f8"
+              }
+            ],
+            "default_category_uuid": "4612dc7a-135e-4208-ba66-aef4a7fe85f8",
+            "operand": "@child.status",
+            "type": "switch"
+          },
+          "uuid": "664a3ed4-e708-4fa3-9cb6-e0699c29b1bd"
+        }
+      ],
+      "spec_version": "13.1.0",
+      "type": "messaging",
+      "uuid": "27ef355e-f44d-4a72-8e13-bf80b92930d5",
+      "revision": 3
+    },
+    {
+      "_ui": {
+        "nodes": {
+          "05d2ad9b-0705-4d50-a82b-ff1ff8c285c5": {
+            "position": {
+              "left": 560,
+              "top": 440
+            },
+            "type": "execute_actions"
+          },
+          "65452bac-114a-4396-8861-b66f374ae4b9": {
+            "position": {
+              "left": 900,
+              "top": 440
+            },
+            "type": "execute_actions"
+          },
+          "bd685b3f-53d8-4764-a9d4-df662e0e8be1": {
+            "position": {
+              "left": 560,
+              "top": 680
+            },
+            "type": "execute_actions"
+          },
+          "c6d27fc6-6c73-44c9-92c0-af0778fa8cc9": {
+            "config": {},
+            "position": {
+              "left": 740,
+              "top": 160
+            },
+            "type": "split_by_ticket"
+          }
+        },
+        "stickies": {
+          "016ab3c0-d7e8-4b8f-affa-447324dc6c14": {
+            "body": "Cart\u00e3o respons\u00e1vel por abrir uma sala com um agente do setor especificado nas configura\u00e7\u00f5es do cart\u00e3o.\n\nPara acessar as configura\u00e7\u00f5es do cart\u00e3o basta clicar no mesmo.",
+            "color": "blue",
+            "position": {
+              "bottom": null,
+              "left": 960,
+              "right": null,
+              "top": 160
+            },
+            "title": "Abertura atendimento"
+          },
+          "3715c9ce-416f-4f39-bf77-e0028e4a9f5e": {
+            "body": "Mensagem que \u00e9 enviada para o usu\u00e1rio caso haja algum problema na abertura de uma sala.",
+            "color": "purple",
+            "position": {
+              "bottom": 120,
+              "left": 1120,
+              "right": 0,
+              "top": 440
+            },
+            "title": "Tratamento de erro"
+          },
+          "45837582-5a3e-411e-9c07-e41a30bbabbc": {
+            "body": "Configura\u00e7\u00f5es aplicadas para que a conversa entre o atendente e o usu\u00e1rio n\u00e3o seja interrompida pelo chatbot. Dessa forma, quando o usu\u00e1rio estiver conversando com um atendente, ele n\u00e3o receber\u00e1 as mensagens do chatbot e sim do pr\u00f3prio agente.",
+            "color": "green",
+            "position": {
+              "bottom": 120,
+              "left": 780,
+              "right": 0,
+              "top": 680
+            },
+            "title": "Configura\u00e7\u00f5es"
+          },
+          "4dfcc40c-c0e7-4178-9572-d9843fa0e0c0": {
+            "body": "Mensagem que \u00e9 enviada para o usu\u00e1rio quando uma sala com um agente \u00e9 aberta.",
+            "color": "yellow",
+            "position": {
+              "bottom": 140,
+              "left": 360,
+              "right": 0,
+              "top": 440
+            },
+            "title": "Mensagem de abertura"
+          }
+        }
+      },
+      "expire_after_minutes": 10080,
+      "language": "base",
+      "localization": {},
+      "metadata": {
+        "expires": 10080
+      },
+      "name": "6.3- Setor Comercial",
+      "nodes": [
+        {
+          "actions": [
+            {
+              "assignee": {
+                "created_on": "2021-09-14T14:41:21.840192Z",
+                "email": "hugo.carvalho@weni.ai",
+                "first_name": "Jos\u00e9 Hugo",
+                "last_name": "de Carvalho",
+                "role": "administrator"
+              },
+              "body": "@results",
+              "result_name": "AbrirAtendimento",
+              "ticketer": {
+                "name": "Setor de Exemplo",
+                "uuid": "e514a770-accc-4512-b84f-225bbc2db810"
+              },
+              "topic": {
+                "created_on": "2022-11-30T16:47:03.940629-03:00",
+                "name": "Financeiro",
+                "uuid": "f66a0ad0-0822-4c4f-99e6-35e56aac41a6"
+              },
+              "type": "open_ticket",
+              "uuid": "d4fcaea3-09d6-4bd7-8149-585c4cda0828"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "05d2ad9b-0705-4d50-a82b-ff1ff8c285c5",
+              "uuid": "913c475e-359e-4c70-835c-74b54ceb9e23"
+            },
+            {
+              "destination_uuid": "65452bac-114a-4396-8861-b66f374ae4b9",
+              "uuid": "fa00af2e-ecf0-4bb4-88b0-f879d79b5402"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "Success"
+                ],
+                "category_uuid": "47fae940-8c44-4ec9-8c74-b959c53369dc",
+                "type": "has_category",
+                "uuid": "129fa131-2621-45f1-805f-38083a893563"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "913c475e-359e-4c70-835c-74b54ceb9e23",
+                "name": "Success",
+                "uuid": "47fae940-8c44-4ec9-8c74-b959c53369dc"
+              },
+              {
+                "exit_uuid": "fa00af2e-ecf0-4bb4-88b0-f879d79b5402",
+                "name": "Failure",
+                "uuid": "2eaab309-24e9-4654-83c7-66bbcd209ac2"
+              }
+            ],
+            "default_category_uuid": "2eaab309-24e9-4654-83c7-66bbcd209ac2",
+            "operand": "@results.abriratendimento",
+            "type": "switch"
+          },
+          "uuid": "c6d27fc6-6c73-44c9-92c0-af0778fa8cc9"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Vou chamar algu\u00e9m para te atender\ud83c\udfc3\u200d\u2642\ufe0f\nPor favor, aguarde.",
+              "type": "send_msg",
+              "uuid": "8bcc1c62-1ca3-45aa-ab32-456b8a9db0f7"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "bd685b3f-53d8-4764-a9d4-df662e0e8be1",
+              "uuid": "5f05f53a-705d-4293-8cbe-45d05cadfb64"
+            }
+          ],
+          "uuid": "05d2ad9b-0705-4d50-a82b-ff1ff8c285c5"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "\ud83d\ude15Tive um problema ao procurar um agente para te atender. Por favor, tente novamente mais tarde.",
+              "type": "send_msg",
+              "uuid": "a909e035-50af-4a98-8344-c2bf54842313"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "36e44265-88d4-4843-aa84-a26fee21d4d8"
+            }
+          ],
+          "uuid": "65452bac-114a-4396-8861-b66f374ae4b9"
+        },
+        {
+          "actions": [
+            {
+              "all_groups": false,
+              "groups": [
+                {
+                  "name": "Bot",
+                  "uuid": "ad903e78-c439-434d-aee0-29b40c34f487"
+                }
+              ],
+              "type": "remove_contact_groups",
+              "uuid": "a2c1b281-b9bd-4aa9-9d7e-da42cbe1aa9a"
+            },
+            {
+              "groups": [
+                {
+                  "count": 0,
+                  "name": "atendimentoHumano",
+                  "query": null,
+                  "status": "ready",
+                  "uuid": "695f960c-555f-433b-86e7-51e1b4a7bdaa"
+                }
+              ],
+              "type": "add_contact_groups",
+              "uuid": "a707d137-f6e9-48f3-8fdf-a5f5b192329c"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "f4a85edd-4b90-4285-88f5-faa126a174b1"
+            }
+          ],
+          "uuid": "bd685b3f-53d8-4764-a9d4-df662e0e8be1"
+        }
+      ],
+      "spec_version": "13.1.0",
+      "type": "messaging",
+      "uuid": "d8f005ae-0c97-495a-84cb-21f72dc63af7",
+      "revision": 1
+    },
+    {
+      "_ui": {
+        "nodes": {
+          "87d83526-2ee7-47e9-9edf-72c2c06f011a": {
+            "position": {
+              "left": 560,
+              "top": 680
+            },
+            "type": "execute_actions"
+          },
+          "b7fb841b-54f9-4362-b9d2-08e8beabc453": {
+            "position": {
+              "left": 560,
+              "top": 440
+            },
+            "type": "execute_actions"
+          },
+          "c2410a54-f6a9-4f54-a20e-26c97502a0bf": {
+            "position": {
+              "left": 900,
+              "top": 440
+            },
+            "type": "execute_actions"
+          },
+          "d2009e98-bcca-424b-88e5-122718b28641": {
+            "config": {},
+            "position": {
+              "left": 760,
+              "top": 160
+            },
+            "type": "split_by_ticket"
+          }
+        },
+        "stickies": {
+          "2bfaa50b-ec67-4070-b9e5-a789acb8daca": {
+            "body": "Cart\u00e3o respons\u00e1vel por abrir uma sala com um agente do setor especificado nas configura\u00e7\u00f5es do cart\u00e3o.\n\nPara acessar as configura\u00e7\u00f5es do cart\u00e3o basta clicar no mesmo.",
+            "color": "blue",
+            "position": {
+              "bottom": null,
+              "left": 980,
+              "right": null,
+              "top": 160
+            },
+            "title": "Abertura atendimento"
+          },
+          "2fed4c95-2afd-4bae-800f-034bdc65f4cd": {
+            "body": "Mensagem que \u00e9 enviada para o usu\u00e1rio caso haja algum problema na abertura de uma sala.",
+            "color": "purple",
+            "position": {
+              "bottom": 120,
+              "left": 1120,
+              "right": 0,
+              "top": 440
+            },
+            "title": "Tratamento de erro"
+          },
+          "7463554a-b223-4c17-9f84-ab5a9eace7c7": {
+            "body": "Mensagem que \u00e9 enviada para o usu\u00e1rio quando uma sala com um agente \u00e9 aberta.",
+            "color": "yellow",
+            "position": {
+              "bottom": 140,
+              "left": 360,
+              "right": 0,
+              "top": 440
+            },
+            "title": "Mensagem de abertura"
+          },
+          "e16d1341-da07-420a-8dd9-15dff6007846": {
+            "body": "Configura\u00e7\u00f5es aplicadas para que a conversa entre o atendente e o usu\u00e1rio n\u00e3o seja interrompida pelo chatbot. Dessa forma, quando o usu\u00e1rio estiver conversando com um atendente, ele n\u00e3o receber\u00e1 as mensagens do chatbot e sim do pr\u00f3prio agente.",
+            "color": "green",
+            "position": {
+              "bottom": 120,
+              "left": 780,
+              "right": 0,
+              "top": 680
+            },
+            "title": "Configura\u00e7\u00f5es"
+          }
+        }
+      },
+      "expire_after_minutes": 10080,
+      "language": "base",
+      "localization": {},
+      "metadata": {
+        "expires": 10080
+      },
+      "name": "6.2- Setor Administrativo",
+      "nodes": [
+        {
+          "actions": [
+            {
+              "assignee": {
+                "created_on": "2021-09-14T14:41:21.840192Z",
+                "email": "hugo.carvalho@weni.ai",
+                "first_name": "Jos\u00e9 Hugo",
+                "last_name": "de Carvalho",
+                "role": "administrator"
+              },
+              "body": "@results",
+              "result_name": "AbrirAtendimento",
+              "ticketer": {
+                "name": "Setor de Exemplo",
+                "uuid": "e514a770-accc-4512-b84f-225bbc2db810"
+              },
+              "topic": {
+                "created_on": "2022-11-30T16:47:03.940629-03:00",
+                "name": "Financeiro",
+                "uuid": "f66a0ad0-0822-4c4f-99e6-35e56aac41a6"
+              },
+              "type": "open_ticket",
+              "uuid": "532efd6b-4e78-428e-b94b-fdc4b86bc101"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "b7fb841b-54f9-4362-b9d2-08e8beabc453",
+              "uuid": "d3df940d-bc46-4a74-b99b-5a0a60770f54"
+            },
+            {
+              "destination_uuid": "c2410a54-f6a9-4f54-a20e-26c97502a0bf",
+              "uuid": "026cf323-5286-4e8b-89e5-876122d3d81c"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "Success"
+                ],
+                "category_uuid": "55f08d9e-8850-4c41-973c-86266ca50b94",
+                "type": "has_category",
+                "uuid": "893ec29d-b4e5-4289-a3c1-5ad8c9df0cea"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "d3df940d-bc46-4a74-b99b-5a0a60770f54",
+                "name": "Success",
+                "uuid": "55f08d9e-8850-4c41-973c-86266ca50b94"
+              },
+              {
+                "exit_uuid": "026cf323-5286-4e8b-89e5-876122d3d81c",
+                "name": "Failure",
+                "uuid": "e9698246-9fef-4191-befe-b54cb639c34c"
+              }
+            ],
+            "default_category_uuid": "e9698246-9fef-4191-befe-b54cb639c34c",
+            "operand": "@results.abriratendimento",
+            "type": "switch"
+          },
+          "uuid": "d2009e98-bcca-424b-88e5-122718b28641"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Vou chamar algu\u00e9m para te atender\ud83c\udfc3\u200d\u2642\ufe0f\nPor favor, aguarde.",
+              "type": "send_msg",
+              "uuid": "b2deae56-4c12-4131-a3c5-0f2ab55cfaa5"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "87d83526-2ee7-47e9-9edf-72c2c06f011a",
+              "uuid": "5e651871-117d-40aa-9f5b-f32344804e3f"
+            }
+          ],
+          "uuid": "b7fb841b-54f9-4362-b9d2-08e8beabc453"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "\ud83d\ude15Tive um problema ao procurar um agente para te atender. Por favor, tente novamente mais tarde.",
+              "type": "send_msg",
+              "uuid": "c4b286c5-0ad5-464a-9e1b-ca91ffa93b02"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "f6c587f6-ce31-4fd1-bad2-8f4955fd08f4"
+            }
+          ],
+          "uuid": "c2410a54-f6a9-4f54-a20e-26c97502a0bf"
+        },
+        {
+          "actions": [
+            {
+              "all_groups": false,
+              "groups": [
+                {
+                  "name": "Bot",
+                  "uuid": "ad903e78-c439-434d-aee0-29b40c34f487"
+                }
+              ],
+              "type": "remove_contact_groups",
+              "uuid": "a6f7de9d-4877-4112-b959-12a46a30b66c"
+            },
+            {
+              "groups": [
+                {
+                  "count": 0,
+                  "name": "atendimentoHumano",
+                  "query": null,
+                  "status": "ready",
+                  "uuid": "695f960c-555f-433b-86e7-51e1b4a7bdaa"
+                }
+              ],
+              "type": "add_contact_groups",
+              "uuid": "0e65690c-52e2-4a92-a3a5-2b0de005e7a3"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "17c5cd34-357c-4e13-bc7e-da45608017f6"
+            }
+          ],
+          "uuid": "87d83526-2ee7-47e9-9edf-72c2c06f011a"
+        }
+      ],
+      "spec_version": "13.1.0",
+      "type": "messaging",
+      "uuid": "95981a7d-7969-4261-bb57-712b8a191ad0",
+      "revision": 1
+    },
+    {
+      "_ui": {
+        "nodes": {
+          "84b2c908-5b3a-4b7d-a4a4-bff0dc4ee8ab": {
+            "config": {
+              "cases": {}
+            },
+            "position": {
+              "left": 720,
+              "top": 140
+            },
+            "type": "split_by_groups"
+          },
+          "8b35c088-102f-4ac6-a57f-5ed8a4a650cf": {
+            "config": {},
+            "position": {
+              "left": 620,
+              "top": 400
+            },
+            "type": "split_by_subflow"
+          },
+          "9fea8733-3682-4b58-b1d3-deeaa2c00af7": {
+            "position": {
+              "left": 720,
+              "top": 40
+            },
+            "type": "execute_actions"
+          },
+          "bf33486e-7b97-4c47-9a6e-f2184863aeda": {
+            "config": {},
+            "position": {
+              "left": 620,
+              "top": 800
+            },
+            "type": "split_by_subflow"
+          },
+          "f31ae705-f466-4da0-9e10-14294624afbe": {
+            "config": {},
+            "position": {
+              "left": 620,
+              "top": 1000
+            },
+            "type": "split_by_subflow"
+          },
+          "facc8ae4-4e68-4a68-bbbd-4b7d14e82d9d": {
+            "config": {},
+            "position": {
+              "left": 620,
+              "top": 600
+            },
+            "type": "split_by_subflow"
+          }
+        },
+        "stickies": {
+          "568b37b9-0abb-45eb-88c6-604f37821589": {
+            "body": "Configura\u00e7\u00f5es aplicadas para que a conversa entre o atendente e o usu\u00e1rio n\u00e3o seja interrompida pelo chatbot. Dessa forma, quando o usu\u00e1rio estiver conversando com um atendente, ele n\u00e3o receber\u00e1 as mensagens do chatbot e sim do pr\u00f3prio agente.",
+            "color": "yellow",
+            "position": {
+              "bottom": null,
+              "left": 940,
+              "right": null,
+              "top": 40
+            },
+            "title": "Configura\u00e7\u00f5es"
+          },
+          "810acc43-834a-462b-ac88-3c4430c984b9": {
+            "body": "Nessa etapa \u00e9 capturado o CPF ou CNPJ do usu\u00e1rio por meio de uma express\u00e3o regular (Regex) j\u00e1 configurado.",
+            "color": "blue",
+            "position": {
+              "bottom": null,
+              "left": 840,
+              "right": null,
+              "top": 620
+            },
+            "title": "Coleta de CPF|CNPJ"
+          },
+          "879ed169-ca74-4df3-a47b-1308244b42b4": {
+            "body": "Aqui \u00e9 onde o usu\u00e1rio informa a categoria que mais se encaixa na sua solicita\u00e7\u00e3o, para que dessa forma o atendimento com um agente possa ser melhor direcionado.",
+            "color": "purple",
+            "position": {
+              "bottom": null,
+              "left": 840,
+              "right": null,
+              "top": 800
+            },
+            "title": "Categorias de atendimento"
+          },
+          "87d4efd3-b244-4ec0-a5a5-1a3a75eab0d6": {
+            "body": "Por \u00faltimo, esse \u00e9 o fluxo respons\u00e1vel por abrir um novo atendimento com um agente.",
+            "color": "yellow",
+            "position": {
+              "bottom": null,
+              "left": 840,
+              "right": null,
+              "top": 1020
+            },
+            "title": "Abertura de atendimento"
+          },
+          "f506c8c8-113b-444e-b092-0aca6dc64614": {
+            "body": "Aqui \u00e9 iniciado o fluxo para que o usu\u00e1rio informe seu nome e a intelig\u00eancia artificial trate e salve o mesmo em um campo de contato.",
+            "color": "green",
+            "position": {
+              "bottom": null,
+              "left": 860,
+              "right": null,
+              "top": 400
+            },
+            "title": "Coleta de Nome"
+          }
+        }
+      },
+      "expire_after_minutes": 10080,
+      "language": "base",
+      "localization": {},
+      "metadata": {
+        "expires": 10080
+      },
+      "name": "1- Atendimento Humano",
+      "nodes": [
+        {
+          "actions": [
+            {
+              "groups": [
+                {
+                  "count": 0,
+                  "name": "Bot",
+                  "query": null,
+                  "status": "ready",
+                  "uuid": "ad903e78-c439-434d-aee0-29b40c34f487"
+                }
+              ],
+              "type": "add_contact_groups",
+              "uuid": "054ec400-1026-4f20-89ef-f099cae9e608"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "84b2c908-5b3a-4b7d-a4a4-bff0dc4ee8ab",
+              "uuid": "78132339-562c-4f41-b937-a51535c297e2"
+            }
+          ],
+          "uuid": "9fea8733-3682-4b58-b1d3-deeaa2c00af7"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "a15f16d8-f5dc-4dc3-9e1c-e3566b116f63"
+            },
+            {
+              "destination_uuid": "8b35c088-102f-4ac6-a57f-5ed8a4a650cf",
+              "uuid": "de25ab41-7f73-4cc3-85b9-85d00876305b"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "695f960c-555f-433b-86e7-51e1b4a7bdaa",
+                  "atendimentoHumano"
+                ],
+                "category_uuid": "efb60463-e23b-4f6c-a698-9b620af09d1d",
+                "type": "has_group",
+                "uuid": "a3cdf358-7370-407f-9e75-ad7d0cf9b106"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "a15f16d8-f5dc-4dc3-9e1c-e3566b116f63",
+                "name": "atendimentoHumano",
+                "uuid": "efb60463-e23b-4f6c-a698-9b620af09d1d"
+              },
+              {
+                "exit_uuid": "de25ab41-7f73-4cc3-85b9-85d00876305b",
+                "name": "Other",
+                "uuid": "7269ba88-5746-4dc3-a591-62d1c95ce0b5"
+              }
+            ],
+            "default_category_uuid": "7269ba88-5746-4dc3-a591-62d1c95ce0b5",
+            "operand": "@contact.groups",
+            "result_name": "",
+            "type": "switch"
+          },
+          "uuid": "84b2c908-5b3a-4b7d-a4a4-bff0dc4ee8ab"
+        },
+        {
+          "actions": [
+            {
+              "flow": {
+                "name": "Coleta de dados - Nome",
+                "uuid": "65743c09-5ccd-4517-9952-21b9eb841f6c"
+              },
+              "type": "enter_flow",
+              "uuid": "9182c73b-45d0-437e-8306-5b85ad1091c4"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "facc8ae4-4e68-4a68-bbbd-4b7d14e82d9d",
+              "uuid": "4966640a-3b9b-4c89-b5e1-3fd5f72fa42d"
+            },
+            {
+              "destination_uuid": null,
+              "uuid": "abcfc077-92d7-4fe8-b8b3-0133e09acfb1"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "completed"
+                ],
+                "category_uuid": "4c14ce90-37c9-4a9b-a927-5830b37acc58",
+                "type": "has_only_text",
+                "uuid": "fae0037d-a06c-46df-9988-f9323718908a"
+              },
+              {
+                "arguments": [
+                  "expired"
+                ],
+                "category_uuid": "ff4b9651-1856-41ac-bce7-286f2cebc8f2",
+                "type": "has_only_text",
+                "uuid": "1b3ba21e-e4ec-4a80-aa0b-0e459ec70671"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "4966640a-3b9b-4c89-b5e1-3fd5f72fa42d",
+                "name": "Complete",
+                "uuid": "4c14ce90-37c9-4a9b-a927-5830b37acc58"
+              },
+              {
+                "exit_uuid": "abcfc077-92d7-4fe8-b8b3-0133e09acfb1",
+                "name": "Expired",
+                "uuid": "ff4b9651-1856-41ac-bce7-286f2cebc8f2"
+              }
+            ],
+            "default_category_uuid": "ff4b9651-1856-41ac-bce7-286f2cebc8f2",
+            "operand": "@child.status",
+            "type": "switch"
+          },
+          "uuid": "8b35c088-102f-4ac6-a57f-5ed8a4a650cf"
+        },
+        {
+          "actions": [
+            {
+              "flow": {
+                "name": "Coleta de dados - CNPJ/CPF",
+                "uuid": "9bf9faf7-ca0c-4f42-91cf-a44b321cbe69"
+              },
+              "type": "enter_flow",
+              "uuid": "66b5ebec-a4c7-47f2-b457-fc18ebd3a5f1"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "bf33486e-7b97-4c47-9a6e-f2184863aeda",
+              "uuid": "76feaa0e-5360-4d0b-92d1-2f1ab316bce2"
+            },
+            {
+              "destination_uuid": null,
+              "uuid": "7a1ec273-c2d9-478e-8ecb-873eb5ff1bb9"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "completed"
+                ],
+                "category_uuid": "bb809ccd-4261-41cc-b2ab-8bc0cc8dd688",
+                "type": "has_only_text",
+                "uuid": "25aef8bc-d839-4a99-9236-d23bc5339874"
+              },
+              {
+                "arguments": [
+                  "expired"
+                ],
+                "category_uuid": "e8c494ae-5a04-41bf-ac81-b13fef2836ee",
+                "type": "has_only_text",
+                "uuid": "a1865224-e17d-46d6-9a0e-bb5769b21975"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "76feaa0e-5360-4d0b-92d1-2f1ab316bce2",
+                "name": "Complete",
+                "uuid": "bb809ccd-4261-41cc-b2ab-8bc0cc8dd688"
+              },
+              {
+                "exit_uuid": "7a1ec273-c2d9-478e-8ecb-873eb5ff1bb9",
+                "name": "Expired",
+                "uuid": "e8c494ae-5a04-41bf-ac81-b13fef2836ee"
+              }
+            ],
+            "default_category_uuid": "e8c494ae-5a04-41bf-ac81-b13fef2836ee",
+            "operand": "@child.status",
+            "type": "switch"
+          },
+          "uuid": "facc8ae4-4e68-4a68-bbbd-4b7d14e82d9d"
+        },
+        {
+          "actions": [
+            {
+              "flow": {
+                "name": "Categoriza\u00e7\u00e3o de atendimento",
+                "uuid": "781c453f-16da-47bc-b5e7-d5a13b3c6e04"
+              },
+              "type": "enter_flow",
+              "uuid": "bb44da62-cfc9-47de-b909-1dfce3b799af"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "f31ae705-f466-4da0-9e10-14294624afbe",
+              "uuid": "6fa0a9bc-48ab-4e1c-8dbf-a89158b9d29c"
+            },
+            {
+              "destination_uuid": null,
+              "uuid": "f2eeb34a-02ed-4316-8f80-6ff4d3cac47c"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "completed"
+                ],
+                "category_uuid": "c4244433-5e9a-46e1-a8dc-bddad215a145",
+                "type": "has_only_text",
+                "uuid": "f9729871-621e-449b-9d78-0ea86771a5be"
+              },
+              {
+                "arguments": [
+                  "expired"
+                ],
+                "category_uuid": "5ea24ad4-550f-4989-b863-3d19229735c1",
+                "type": "has_only_text",
+                "uuid": "76332e53-06d9-45cf-a18e-e50f8c97dd18"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "6fa0a9bc-48ab-4e1c-8dbf-a89158b9d29c",
+                "name": "Complete",
+                "uuid": "c4244433-5e9a-46e1-a8dc-bddad215a145"
+              },
+              {
+                "exit_uuid": "f2eeb34a-02ed-4316-8f80-6ff4d3cac47c",
+                "name": "Expired",
+                "uuid": "5ea24ad4-550f-4989-b863-3d19229735c1"
+              }
+            ],
+            "default_category_uuid": "5ea24ad4-550f-4989-b863-3d19229735c1",
+            "operand": "@child.status",
+            "type": "switch"
+          },
+          "uuid": "bf33486e-7b97-4c47-9a6e-f2184863aeda"
+        },
+        {
+          "actions": [
+            {
+              "flow": {
+                "name": "Abrir Atendimento",
+                "uuid": "27ef355e-f44d-4a72-8e13-bf80b92930d5"
+              },
+              "type": "enter_flow",
+              "uuid": "68c09430-5213-4d5f-81d5-58becd4a7657"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "c423322e-5a33-47fb-b181-7a51cfa50b4b"
+            },
+            {
+              "destination_uuid": null,
+              "uuid": "2b77f059-b5a3-41cd-a631-7c0ae20d3498"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "completed"
+                ],
+                "category_uuid": "34372bfa-3dab-40be-9dfa-28c2bdf57e15",
+                "type": "has_only_text",
+                "uuid": "d76656a4-9530-4cbf-bb8b-003682ef6060"
+              },
+              {
+                "arguments": [
+                  "expired"
+                ],
+                "category_uuid": "2725c3a1-c5e1-4cfc-bacd-1d9204575c03",
+                "type": "has_only_text",
+                "uuid": "c165a28e-0631-455d-9a6c-c24c060fad35"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "c423322e-5a33-47fb-b181-7a51cfa50b4b",
+                "name": "Complete",
+                "uuid": "34372bfa-3dab-40be-9dfa-28c2bdf57e15"
+              },
+              {
+                "exit_uuid": "2b77f059-b5a3-41cd-a631-7c0ae20d3498",
+                "name": "Expired",
+                "uuid": "2725c3a1-c5e1-4cfc-bacd-1d9204575c03"
+              }
+            ],
+            "default_category_uuid": "2725c3a1-c5e1-4cfc-bacd-1d9204575c03",
+            "operand": "@child.status",
+            "type": "switch"
+          },
+          "uuid": "f31ae705-f466-4da0-9e10-14294624afbe"
+        }
+      ],
+      "spec_version": "13.1.0",
+      "type": "messaging",
+      "uuid": "5ca998fa-6e29-4c5c-9f2b-3d6a597c7e41",
+      "revision": 1
+    },
+    {
+      "_ui": {
+        "nodes": {
+          "1416c629-b3aa-4c93-82cc-7201c0e228a4": {
+            "position": {
+              "left": 760,
+              "top": 40
+            },
+            "type": "execute_actions"
+          },
+          "b7e6a2d9-00ce-45de-9430-db2a1f6a1894": {
+            "position": {
+              "left": 760,
+              "top": 200
+            },
+            "type": "execute_actions"
+          }
+        },
+        "stickies": {
+          "0c122d92-9c01-4563-ac1d-099a864df6c3": {
+            "body": "Mensagem que \u00e9 enviada para o usu\u00e1rio quando a comunica\u00e7\u00e3o com o atendente \u00e9 encerrada.",
+            "color": "green",
+            "position": {
+              "bottom": null,
+              "left": 1000,
+              "right": null,
+              "top": 60
+            },
+            "title": "Mensagem de Encerramento"
+          },
+          "8dcee1bc-7779-4227-bd9a-45108b36740b": {
+            "body": "Configura\u00e7\u00f5es para que a comunica\u00e7\u00e3o entre o usu\u00e1rio e o chatbot flua normalmente ap\u00f3s o atendimento com um agente.",
+            "color": "yellow",
+            "position": {
+              "bottom": null,
+              "left": 560,
+              "right": null,
+              "top": 220
+            },
+            "title": "Configura\u00e7\u00f5es"
+          }
+        }
+      },
+      "expire_after_minutes": 10080,
+      "language": "base",
+      "localization": {},
+      "metadata": {
+        "expires": 10080
+      },
+      "name": "7- Encerrar atendimento",
+      "nodes": [
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "O seu atendimento humano foi encerrado, voc\u00ea poder\u00e1 abrir um novo ticket sempre que precisar!",
+              "type": "send_msg",
+              "uuid": "eb2f307c-35f9-49f4-8618-55a303bc63cc"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "b7e6a2d9-00ce-45de-9430-db2a1f6a1894",
+              "uuid": "7acc49d8-1bce-4aa2-854e-004bb2a4e8c6"
+            }
+          ],
+          "uuid": "1416c629-b3aa-4c93-82cc-7201c0e228a4"
+        },
+        {
+          "actions": [
+            {
+              "all_groups": false,
+              "groups": [
+                {
+                  "name": "atendimentoHumano",
+                  "uuid": "695f960c-555f-433b-86e7-51e1b4a7bdaa"
+                }
+              ],
+              "type": "remove_contact_groups",
+              "uuid": "83926dfb-f7af-4b24-a681-39a7fa640e41"
+            },
+            {
+              "groups": [
+                {
+                  "count": 1,
+                  "name": "Bot",
+                  "query": null,
+                  "status": "ready",
+                  "uuid": "ad903e78-c439-434d-aee0-29b40c34f487"
+                }
+              ],
+              "type": "add_contact_groups",
+              "uuid": "88ad2b2e-e1e9-451f-a3d4-cf063f34b267"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "e6ff3253-0f12-45f3-ac8d-763e69e0a7da"
+            }
+          ],
+          "uuid": "b7e6a2d9-00ce-45de-9430-db2a1f6a1894"
+        }
+      ],
+      "spec_version": "13.1.0",
+      "type": "messaging",
+      "uuid": "5a9d0877-92ac-4fcb-a5c0-58e614d8dfd2",
+      "revision": 1
+    },
+    {
+      "_ui": {
+        "nodes": {
+          "59dff2f9-b213-4c2c-b64f-5b50951a2915": {
+            "config": {
+              "cases": {}
+            },
+            "position": {
+              "left": 440,
+              "top": 280
+            },
+            "type": "wait_for_response"
+          },
+          "87b5aba6-5b54-4eb1-b8a4-80ee4a23a775": {
+            "position": {
+              "left": 460,
+              "top": 500
+            },
+            "type": "execute_actions"
+          },
+          "c3847fd8-abe4-4bbd-81d2-490a48de2621": {
+            "position": {
+              "left": 720,
+              "top": 0
+            },
+            "type": "execute_actions"
+          },
+          "e6a09d5a-b4c2-4fbd-951d-97feacba17a0": {
+            "position": {
+              "left": 880,
+              "top": 440
+            },
+            "type": "execute_actions"
+          }
+        },
+        "stickies": {
+          "041986fc-1936-47cb-b21e-23e0eca56f10": {
+            "body": "Aqui o usu\u00e1rio poder\u00e1 escolher a categoria que mais se encaixa com a sua solicita\u00e7\u00e3o.\n\nEssas categorias s\u00e3o totalmente customiz\u00e1veis e podem ser alteradas no cart\u00e3o de texto \u00e0 esquerda.",
+            "color": "green",
+            "position": {
+              "bottom": 0,
+              "left": 960,
+              "right": 0,
+              "top": 0
+            },
+            "title": "In\u00edcio"
+          },
+          "17220195-0d58-4945-81ec-6f7425631701": {
+            "body": "Aqui \u00e9 classificado a categoria que foi escolhida pelo usu\u00e1rio, neste exemplo: \"Financeiro\", \"Comercial\" e \"Administrativo\".",
+            "color": "blue",
+            "position": {
+              "bottom": null,
+              "left": 240,
+              "right": null,
+              "top": 300
+            },
+            "title": "Classifica\u00e7\u00e3o"
+          },
+          "89ba0843-9779-4d82-9fb0-2039076fc3e7": {
+            "body": "Caso o usu\u00e1rio digite algo que n\u00e3o corresponde a nenhuma das op\u00e7\u00f5es, ele ser\u00e1 informado e poder\u00e1 tentar novamente.\n\nEssa mensagem pode ser modificada no cart\u00e3o \u00e0 esquerda.",
+            "color": "purple",
+            "position": {
+              "left": 1140,
+              "top": 500
+            },
+            "title": "Tratamento"
+          },
+          "f26cd4fc-e45b-416a-be56-e2b76864f1f2": {
+            "body": "Aqui \u00e9 onde \u00e9 armazenada a categoria escolhida pelo usu\u00e1rio caso ela se encaixe em uma das apresentadas no texto inicial.",
+            "color": "yellow",
+            "position": {
+              "bottom": 20,
+              "left": 480,
+              "right": 0,
+              "top": 600
+            },
+            "title": "Armazenamento"
+          }
+        }
+      },
+      "expire_after_minutes": 10080,
+      "language": "base",
+      "localization": {},
+      "metadata": {
+        "expires": 10080
+      },
+      "name": "4- Categoriza\u00e7\u00e3o de atendimento",
+      "nodes": [
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [
+                "Financeiro",
+                "Comercial",
+                "Administrativo"
+              ],
+              "text": "Por favor, escolha uma categoria para prosseguir com o seu atendimento:\n\n1. Financeiro\n2. Comercial\n3. Administrativo",
+              "type": "send_msg",
+              "uuid": "12310055-dbf2-4343-a373-12c3b2645c52"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "59dff2f9-b213-4c2c-b64f-5b50951a2915",
+              "uuid": "919355c6-42ef-45b2-9685-fee636423d5d"
+            }
+          ],
+          "uuid": "c3847fd8-abe4-4bbd-81d2-490a48de2621"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "87b5aba6-5b54-4eb1-b8a4-80ee4a23a775",
+              "uuid": "5015fe8d-54b1-4640-a5a7-010e23c94eca"
+            },
+            {
+              "destination_uuid": "87b5aba6-5b54-4eb1-b8a4-80ee4a23a775",
+              "uuid": "c53faae4-67bf-4272-911e-d5baf7997019"
+            },
+            {
+              "destination_uuid": "87b5aba6-5b54-4eb1-b8a4-80ee4a23a775",
+              "uuid": "f3e383c8-4218-4c38-9d21-1fd35f02b0e0"
+            },
+            {
+              "destination_uuid": "e6a09d5a-b4c2-4fbd-951d-97feacba17a0",
+              "uuid": "95778209-52f7-4a9a-b945-e83b19c79683"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "1 Financeiro"
+                ],
+                "category_uuid": "3070524d-4be6-4bae-8551-3659f32ff0f1",
+                "type": "has_any_word",
+                "uuid": "eeab4b19-2c6b-494f-8a37-07aca1459e78"
+              },
+              {
+                "arguments": [
+                  "2 Comercial"
+                ],
+                "category_uuid": "c793dc76-a99f-4612-93f2-660ec0238dff",
+                "type": "has_any_word",
+                "uuid": "14549d96-02ef-40a5-b231-289967ad72d6"
+              },
+              {
+                "arguments": [
+                  "3 Administrativo"
+                ],
+                "category_uuid": "f7489766-919b-41b2-a600-2781e0431cfa",
+                "type": "has_any_word",
+                "uuid": "aada74fb-bcff-4c27-ac8f-f93e0f0b956e"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "5015fe8d-54b1-4640-a5a7-010e23c94eca",
+                "name": "Financeiro",
+                "uuid": "3070524d-4be6-4bae-8551-3659f32ff0f1"
+              },
+              {
+                "exit_uuid": "c53faae4-67bf-4272-911e-d5baf7997019",
+                "name": "Comercial",
+                "uuid": "c793dc76-a99f-4612-93f2-660ec0238dff"
+              },
+              {
+                "exit_uuid": "f3e383c8-4218-4c38-9d21-1fd35f02b0e0",
+                "name": "Administrativo",
+                "uuid": "f7489766-919b-41b2-a600-2781e0431cfa"
+              },
+              {
+                "exit_uuid": "95778209-52f7-4a9a-b945-e83b19c79683",
+                "name": "Other",
+                "uuid": "1fb7f791-b286-446d-8f09-2f6a13e40fa6"
+              }
+            ],
+            "default_category_uuid": "1fb7f791-b286-446d-8f09-2f6a13e40fa6",
+            "operand": "@input.text",
+            "result_name": "escolhaCategoria",
+            "type": "switch",
+            "wait": {
+              "type": "msg"
+            }
+          },
+          "uuid": "59dff2f9-b213-4c2c-b64f-5b50951a2915"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "\u2757\ufe0fN\u00e3o consegui entender a categoria informada",
+              "type": "send_msg",
+              "uuid": "a3e81fe5-359c-47d4-8b4f-cd2e8d88ebf0"
+            },
+            {
+              "attachments": [],
+              "quick_replies": [
+                "Financeiro",
+                "Comercial",
+                "Administrativo"
+              ],
+              "text": "Por favor, selecione uma das categorias para dar continuidade com o seu atendimento:\n\n1. Financeiro\n2. Comercial\n3. Administrativo",
+              "type": "send_msg",
+              "uuid": "d94af033-0b94-4474-a049-bbe5c6d1336d"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "59dff2f9-b213-4c2c-b64f-5b50951a2915",
+              "uuid": "08f4fe52-018f-42f7-b719-92026cda02d8"
+            }
+          ],
+          "uuid": "e6a09d5a-b4c2-4fbd-951d-97feacba17a0"
+        },
+        {
+          "actions": [
+            {
+              "field": {
+                "key": "setor",
+                "name": "Setor"
+              },
+              "type": "set_contact_field",
+              "uuid": "81dc38cd-06b7-4ea7-853d-48cd1f0e6907",
+              "value": "@results.escolhacategoria.category"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "8bff8a3b-68ad-4574-b533-805c8b391f25"
+            }
+          ],
+          "uuid": "87b5aba6-5b54-4eb1-b8a4-80ee4a23a775"
+        }
+      ],
+      "spec_version": "13.1.0",
+      "type": "messaging",
+      "uuid": "781c453f-16da-47bc-b5e7-d5a13b3c6e04",
+      "revision": 1
+    },
+    {
+      "_ui": {
+        "nodes": {
+          "46d7cf16-0431-4ff6-9e15-299b1a43c07c": {
+            "position": {
+              "left": 560,
+              "top": 440
+            },
+            "type": "execute_actions"
+          },
+          "5149f84e-10ce-4b83-8f73-b19578ef7ebf": {
+            "config": {},
+            "position": {
+              "left": 740,
+              "top": 120
+            },
+            "type": "split_by_ticket"
+          },
+          "a15524f9-2e9e-46e1-b5cf-2109e8fe2e54": {
+            "position": {
+              "left": 560,
+              "top": 680
+            },
+            "type": "execute_actions"
+          },
+          "f77f856e-2561-4a2f-b3b3-733a2ca21101": {
+            "position": {
+              "left": 900,
+              "top": 440
+            },
+            "type": "execute_actions"
+          }
+        },
+        "stickies": {
+          "4b278141-88a8-4615-bb0d-867cfa53be5a": {
+            "body": "Configura\u00e7\u00f5es aplicadas para que a conversa entre o atendente e o usu\u00e1rio n\u00e3o seja interrompida pelo chatbot. Dessa forma, quando o usu\u00e1rio estiver conversando com um atendente, ele n\u00e3o receber\u00e1 as mensagens do chatbot e sim do pr\u00f3prio agente.",
+            "color": "green",
+            "position": {
+              "bottom": 120,
+              "left": 780,
+              "right": 0,
+              "top": 680
+            },
+            "title": "Configura\u00e7\u00f5es"
+          },
+          "c2752d32-40e1-424c-b7d4-24b3a7b32729": {
+            "body": "Mensagem que \u00e9 enviada para o usu\u00e1rio quando uma sala com um agente \u00e9 aberta.",
+            "color": "yellow",
+            "position": {
+              "bottom": 140,
+              "left": 360,
+              "right": 0,
+              "top": 440
+            },
+            "title": "Mensagem de abertura"
+          },
+          "cda9a24d-68e3-4687-a35f-0f993e1f98da": {
+            "body": "Mensagem que \u00e9 enviada para o usu\u00e1rio caso haja algum problema na abertura de uma sala.",
+            "color": "purple",
+            "position": {
+              "bottom": 120,
+              "left": 1120,
+              "right": 0,
+              "top": 440
+            },
+            "title": "Tratamento de erro"
+          },
+          "d2b411c2-be8a-4fdc-985a-8ca8ceea4544": {
+            "body": "Cart\u00e3o respons\u00e1vel por abrir uma sala com um agente do setor especificado nas configura\u00e7\u00f5es do cart\u00e3o.\n\nPara acessar as configura\u00e7\u00f5es do cart\u00e3o basta clicar no mesmo.",
+            "color": "blue",
+            "position": {
+              "bottom": null,
+              "left": 960,
+              "right": null,
+              "top": 120
+            },
+            "title": "Abertura atendimento"
+          }
+        }
+      },
+      "expire_after_minutes": 10080,
+      "language": "base",
+      "localization": {},
+      "metadata": {
+        "expires": 10080
+      },
+      "name": "6.1- Setor Financeiro",
+      "nodes": [
+        {
+          "actions": [
+            {
+              "assignee": {
+                "created_on": "2021-09-14T14:41:21.840192Z",
+                "email": "hugo.carvalho@weni.ai",
+                "first_name": "Jos\u00e9 Hugo",
+                "last_name": "de Carvalho",
+                "role": "administrator"
+              },
+              "body": "@results",
+              "result_name": "AbrirAtendimento",
+              "ticketer": {
+                "name": "Setor de Exemplo",
+                "uuid": "e514a770-accc-4512-b84f-225bbc2db810"
+              },
+              "topic": {
+                "created_on": "2022-11-30T16:47:03.940629-03:00",
+                "name": "Financeiro",
+                "uuid": "f66a0ad0-0822-4c4f-99e6-35e56aac41a6"
+              },
+              "type": "open_ticket",
+              "uuid": "8f9865ff-e208-4724-bc7c-b05cfdf31f81"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "46d7cf16-0431-4ff6-9e15-299b1a43c07c",
+              "uuid": "3bf44d5a-771b-43bc-823e-97622825c508"
+            },
+            {
+              "destination_uuid": "f77f856e-2561-4a2f-b3b3-733a2ca21101",
+              "uuid": "93ac15b0-daae-4317-ad85-4dcc510f02c4"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "Success"
+                ],
+                "category_uuid": "d31b8d60-0496-4e80-94d8-27f35823d391",
+                "type": "has_category",
+                "uuid": "a26d8c20-5b91-4b03-9df3-d3cf8c113025"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "3bf44d5a-771b-43bc-823e-97622825c508",
+                "name": "Success",
+                "uuid": "d31b8d60-0496-4e80-94d8-27f35823d391"
+              },
+              {
+                "exit_uuid": "93ac15b0-daae-4317-ad85-4dcc510f02c4",
+                "name": "Failure",
+                "uuid": "9e235917-72d9-4fc0-99b3-c831b61541f8"
+              }
+            ],
+            "default_category_uuid": "9e235917-72d9-4fc0-99b3-c831b61541f8",
+            "operand": "@results.abriratendimento",
+            "type": "switch"
+          },
+          "uuid": "5149f84e-10ce-4b83-8f73-b19578ef7ebf"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Vou chamar algu\u00e9m para te atender\ud83c\udfc3\u200d\u2642\ufe0f\nPor favor, aguarde.",
+              "type": "send_msg",
+              "uuid": "d62e5208-0ab4-431c-be89-8aed0a23b74e"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "a15524f9-2e9e-46e1-b5cf-2109e8fe2e54",
+              "uuid": "0e6a075e-8120-4b0f-9ab5-a6d6092edd5f"
+            }
+          ],
+          "uuid": "46d7cf16-0431-4ff6-9e15-299b1a43c07c"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "\ud83d\ude15Tive um problema ao procurar um agente para te atender. Por favor, tente novamente mais tarde.",
+              "type": "send_msg",
+              "uuid": "6f154105-4caa-461a-b47d-1f29327ba6ac"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "b5dcc0cb-6fe8-484e-8a02-5e8ab15c2ba8"
+            }
+          ],
+          "uuid": "f77f856e-2561-4a2f-b3b3-733a2ca21101"
+        },
+        {
+          "actions": [
+            {
+              "all_groups": false,
+              "groups": [
+                {
+                  "name": "Bot",
+                  "uuid": "ad903e78-c439-434d-aee0-29b40c34f487"
+                }
+              ],
+              "type": "remove_contact_groups",
+              "uuid": "7feba3bd-bf64-4116-b638-26aeb6f2df2e"
+            },
+            {
+              "groups": [
+                {
+                  "count": 0,
+                  "name": "atendimentoHumano",
+                  "query": null,
+                  "status": "ready",
+                  "uuid": "695f960c-555f-433b-86e7-51e1b4a7bdaa"
+                }
+              ],
+              "type": "add_contact_groups",
+              "uuid": "26154b97-005a-4058-89ab-9e3c12e623a5"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "2cbd8143-db32-42f1-8a53-c92fd8c472d8"
+            }
+          ],
+          "uuid": "a15524f9-2e9e-46e1-b5cf-2109e8fe2e54"
+        }
+      ],
+      "spec_version": "13.1.0",
+      "type": "messaging",
+      "uuid": "c690b39c-7fba-4410-933f-ce00005d9966",
+      "revision": 1
+    },
+    {
+      "_ui": {
+        "nodes": {
+          "66b4c9bc-7cc5-432f-b302-e63abe458252": {
+            "position": {
+              "left": 700,
+              "top": 1100
+            },
+            "type": "execute_actions"
+          },
+          "878b4dd1-4131-4319-803f-fcf263cc276f": {
+            "position": {
+              "left": 1100,
+              "top": 380
+            },
+            "type": "execute_actions"
+          },
+          "a929db3d-db05-409c-905f-1c9c97b49ac8": {
+            "position": {
+              "left": 540,
+              "top": 0
+            },
+            "type": "execute_actions"
+          },
+          "ad5cc0fc-38d9-48d4-8a3e-366641ccfdf6": {
+            "config": {
+              "cases": {}
+            },
+            "position": {
+              "left": 720,
+              "top": 360
+            },
+            "type": "wait_for_response"
+          },
+          "d3d40f7d-fdf4-4bc5-acf9-997ef52b11b1": {
+            "position": {
+              "left": 380,
+              "top": 1100
+            },
+            "type": "execute_actions"
+          },
+          "d93a72b9-44c3-4b37-bfa3-429ed8e22ef4": {
+            "config": {},
+            "position": {
+              "left": 520,
+              "top": 840
+            },
+            "type": "split_by_webhook"
+          },
+          "dc4a89be-d23b-4430-a2f8-c401537f1f37": {
+            "position": {
+              "left": 740,
+              "top": 640
+            },
+            "type": "execute_actions"
+          }
+        },
+        "stickies": {
+          "1686845f-2f40-4c40-87db-1790da17c7ca": {
+            "body": "Mensagem que \u00e9 enviada para o usu\u00e1rio caso haja algum problema no sistema da intelig\u00eancia artificial.",
+            "color": "green",
+            "position": {
+              "bottom": -100,
+              "left": 940,
+              "right": 60,
+              "top": 1100
+            },
+            "title": "Tratamento de erro"
+          },
+          "360bbfc5-4b53-4956-86fb-d896c3569d6a": {
+            "body": "Caso o usu\u00e1rio n\u00e3o digite um texto, o chatbot enviar\u00e1 uma mensagem de aten\u00e7\u00e3o e ele poder\u00e1 informar seu nome novamente.",
+            "color": "purple",
+            "position": {
+              "bottom": -140,
+              "left": 1340,
+              "right": 40,
+              "top": 380
+            },
+            "title": "Tratamento"
+          },
+          "539b2a46-6cdc-4143-8153-e35cf5da2570": {
+            "body": "\u00c9 feito uma verifica\u00e7\u00e3o para saber se a entrada do usu\u00e1rio corresponde a um texto.",
+            "color": "green",
+            "position": {
+              "bottom": -60,
+              "left": 500,
+              "right": -20,
+              "top": 360
+            },
+            "title": "Verifica\u00e7\u00e3o"
+          },
+          "54368e8a-7caa-47cf-84a7-89eafe46b043": {
+            "body": "Nessa etapa \u00e9 utilizado uma I.A para classificar e tratar o nome do usu\u00e1rio.\n\nCaso o usu\u00e1rio fale \"Meu nome \u00e9 Carlos\" a IA s\u00f3 ira capturar \"Carlos\".",
+            "color": "yellow",
+            "position": {
+              "left": 760,
+              "top": 840
+            },
+            "title": "Intelig\u00eancia artificial"
+          },
+          "ac982d76-cb2f-4ae9-9b5a-9004a2eb7d62": {
+            "body": "Mensagem que \u00e9 enviada para obter o nome do usu\u00e1rio.",
+            "color": "yellow",
+            "position": {
+              "bottom": 20,
+              "left": 760,
+              "right": 0,
+              "top": 20
+            },
+            "title": "In\u00edcio"
+          },
+          "b90aae45-093c-4f76-aad2-4627c194c0f7": {
+            "body": "Aqui \u00e9 salvo em um campo de contato a mensagem do usu\u00e1rio.",
+            "color": "blue",
+            "position": {
+              "bottom": null,
+              "left": 540,
+              "right": null,
+              "top": 640
+            },
+            "title": "Armazenamento"
+          },
+          "cf1c59f5-75ce-41ce-97f8-1748487086dd": {
+            "body": "Aqui \u00e9 a etapa onde \u00e9 de fato salvo o nome do usu\u00e1rio que foi tratado pela intelig\u00eancia artificial.",
+            "color": "purple",
+            "position": {
+              "bottom": -20,
+              "left": 180,
+              "right": 40,
+              "top": 1100
+            },
+            "title": "Retorno "
+          }
+        }
+      },
+      "expire_after_minutes": 10080,
+      "language": "base",
+      "localization": {},
+      "metadata": {
+        "expires": 10080
+      },
+      "name": "2- Coleta de dados - Nome",
+      "nodes": [
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Vamos l\u00e1 \ud83d\ude0a",
+              "type": "send_msg",
+              "uuid": "c54bd614-8a52-496f-a8e1-fda689a48c55"
+            },
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Para come\u00e7ar, por favor, me informe o seu nome:",
+              "type": "send_msg",
+              "uuid": "605d39a9-c719-44ee-8b2e-52d848b9689b"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "ad5cc0fc-38d9-48d4-8a3e-366641ccfdf6",
+              "uuid": "5fd39c32-cd40-4f01-b696-3e2e08d257ed"
+            }
+          ],
+          "uuid": "a929db3d-db05-409c-905f-1c9c97b49ac8"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "dc4a89be-d23b-4430-a2f8-c401537f1f37",
+              "uuid": "53d589f6-1a06-4f85-9ee5-529f5e415961"
+            },
+            {
+              "destination_uuid": "878b4dd1-4131-4319-803f-fcf263cc276f",
+              "uuid": "d9e44d9c-b676-4cda-8f74-a31abdf848e9"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [],
+                "category_uuid": "2af2ff4b-f664-4218-aed5-ae4565a3242d",
+                "type": "has_text",
+                "uuid": "4a05eb24-d559-4fcd-80ee-0ba416da3011"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "53d589f6-1a06-4f85-9ee5-529f5e415961",
+                "name": "Has Text",
+                "uuid": "2af2ff4b-f664-4218-aed5-ae4565a3242d"
+              },
+              {
+                "exit_uuid": "d9e44d9c-b676-4cda-8f74-a31abdf848e9",
+                "name": "Other",
+                "uuid": "04011c14-859e-410c-9c04-60789a70c7d4"
+              }
+            ],
+            "default_category_uuid": "04011c14-859e-410c-9c04-60789a70c7d4",
+            "operand": "@input.text",
+            "result_name": "nomeUsuario",
+            "type": "switch",
+            "wait": {
+              "type": "msg"
+            }
+          },
+          "uuid": "ad5cc0fc-38d9-48d4-8a3e-366641ccfdf6"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "\ud83d\udd0e Infelizmente n\u00e3o consegui identificar um nome.",
+              "type": "send_msg",
+              "uuid": "ae1b8a97-cc25-435a-89df-5f486c94709a"
+            },
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Por favor, me informe o seu nome para darmos continuidade na sua solicita\u00e7\u00e3o:",
+              "type": "send_msg",
+              "uuid": "be128450-f4ad-4832-a7da-f3f0ebe2833a"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "ad5cc0fc-38d9-48d4-8a3e-366641ccfdf6",
+              "uuid": "9c273462-c78e-49a1-9966-bc20310e5137"
+            }
+          ],
+          "uuid": "878b4dd1-4131-4319-803f-fcf263cc276f"
+        },
+        {
+          "actions": [
+            {
+              "field": {
+                "key": "mensagem",
+                "name": "Mensagem"
+              },
+              "type": "set_contact_field",
+              "uuid": "30d62d1e-401e-4b76-87b5-8952c6349638",
+              "value": "@results.nomeusuario"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "d93a72b9-44c3-4b37-bfa3-429ed8e22ef4",
+              "uuid": "0fe97be0-84d3-44be-bc43-fdb57e489d19"
+            }
+          ],
+          "uuid": "dc4a89be-d23b-4430-a2f8-c401537f1f37"
+        },
+        {
+          "actions": [
+            {
+              "body": "@(json(object(\"language\", \"pt_br\", \"text\", fields.mensagem)))",
+              "headers": {
+                "Accept": "application/json",
+                "Authorization": "Bearer 0af73991-8176-40bc-98e8-b3364ffb31f8",
+                "Content-type": "application/json"
+              },
+              "method": "POST",
+              "result_name": "classificacaoNomes",
+              "type": "call_webhook",
+              "url": "https://nlp.bothub.it/v2/parse/",
+              "uuid": "c4658083-f587-42f5-9f9d-6e18905766ce"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "d3d40f7d-fdf4-4bc5-acf9-997ef52b11b1",
+              "uuid": "c8d4da51-8a83-4513-8b4e-22864c85ad29"
+            },
+            {
+              "destination_uuid": "66b4c9bc-7cc5-432f-b302-e63abe458252",
+              "uuid": "b5fd538d-b561-4f14-8b72-acac71e1f780"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "Success"
+                ],
+                "category_uuid": "0a76d89e-877f-4fe8-9ceb-db7b7c3b731d",
+                "type": "has_only_text",
+                "uuid": "c77e711f-2fe3-4d38-90b3-63ee36a1eaab"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "c8d4da51-8a83-4513-8b4e-22864c85ad29",
+                "name": "Success",
+                "uuid": "0a76d89e-877f-4fe8-9ceb-db7b7c3b731d"
+              },
+              {
+                "exit_uuid": "b5fd538d-b561-4f14-8b72-acac71e1f780",
+                "name": "Failure",
+                "uuid": "6545937d-e7d1-478a-a574-8702d88e3b61"
+              }
+            ],
+            "default_category_uuid": "6545937d-e7d1-478a-a574-8702d88e3b61",
+            "operand": "@results.classificacaonomes.category",
+            "type": "switch"
+          },
+          "uuid": "d93a72b9-44c3-4b37-bfa3-429ed8e22ef4"
+        },
+        {
+          "actions": [
+            {
+              "field": {
+                "key": "nomeusuario",
+                "name": "nomeUsuario"
+              },
+              "type": "set_contact_field",
+              "uuid": "cc6ed4a0-d047-4274-a956-0d42b5430b52",
+              "value": "@results.classificacaonomes.extra.entities.other.0.value"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "3737c1ab-c633-4d6d-979d-f0f073c61f5f"
+            }
+          ],
+          "uuid": "d3d40f7d-fdf4-4bc5-acf9-997ef52b11b1"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "\ud83d\ude15 Infelizmente meus sistemas est\u00e3o indispon\u00edveis no momento. Por favor, tente novamente em instantes!",
+              "type": "send_msg",
+              "uuid": "746c8b82-6dd1-4140-8d22-af7ed0dd6273"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "cc0f6b9a-f94f-41c6-a328-9074fe9ab854"
+            }
+          ],
+          "uuid": "66b4c9bc-7cc5-432f-b302-e63abe458252"
+        }
+      ],
+      "spec_version": "13.1.0",
+      "type": "messaging",
+      "uuid": "65743c09-5ccd-4517-9952-21b9eb841f6c",
+      "revision": 1
+    }
+  ],
+  "campaigns": [],
+  "triggers": [
+    {
+      "trigger_type": "C",
+      "flow": {
+        "uuid": "5ca998fa-6e29-4c5c-9f2b-3d6a597c7e41",
+        "name": "1- Atendimento Humano"
+      },
+      "groups": [],
+      "exclude_groups": [],
+      "keyword": null
+    },
+    {
+      "trigger_type": "T",
+      "flow": {
+        "uuid": "5a9d0877-92ac-4fcb-a5c0-58e614d8dfd2",
+        "name": "7- Encerrar atendimento"
+      },
+      "groups": [],
+      "exclude_groups": [],
+      "keyword": null
+    }
+  ],
+  "fields": [
+    {
+      "key": "cnpj",
+      "name": "CNPJ",
+      "type": "text"
+    },
+    {
+      "key": "cpf",
+      "name": "CPF",
+      "type": "text"
+    },
+    {
+      "key": "mensagem",
+      "name": "Mensagem",
+      "type": "text"
+    },
+    {
+      "key": "nomeusuario",
+      "name": "nomeUsuario",
+      "type": "text"
+    },
+    {
+      "key": "setor",
+      "name": "Setor",
+      "type": "text"
+    }
+  ],
+  "groups": [
+    {
+      "uuid": "ad903e78-c439-434d-aee0-29b40c34f487",
+      "name": "Bot",
+      "query": null
+    },
+    {
+      "uuid": "695f960c-555f-433b-86e7-51e1b4a7bdaa",
+      "name": "atendimentoHumano",
+      "query": null
+    }
+  ]
+}
