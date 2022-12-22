@@ -104,7 +104,7 @@ router.register("organization/project", ProjectViewSet)
 router.register("organization/authorizations", OrganizationAuthorizationViewSet)
 router.register("organization/request-permission", RequestPermissionOrganizationViewSet)
 router.register("organization/invoice", InvoiceViewSet)
-router.register("project/request-permission", RequestPermissionProjectViewSet),
+router.register("project/request-permission", RequestPermissionProjectViewSet)
 router.register("organization/rocket-permission", RequestPermissionRocketViewSet)
 router.register("organization/template-project", TemplateProjectViewSet)
 router.register("billing", BillingViewSet, basename="billing")
