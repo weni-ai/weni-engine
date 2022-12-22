@@ -33,4 +33,3 @@ class RecentActivityAPIView(views.APIView):
             entity_name=entity_name
         )
         return Response(status=status.HTTP_200_OK)
-
