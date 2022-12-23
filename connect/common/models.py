@@ -1890,4 +1890,3 @@ class RecentActivity(models.Model):
             return f"{self.user.first_name} {self.user.last_name}"
 
         return self.user.email
-
