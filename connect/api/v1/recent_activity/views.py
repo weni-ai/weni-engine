@@ -17,10 +17,12 @@ class RecentActivityAPIView(views.APIView):
             project = Project.objects.filter(flow_organization=request.data.get("flow_organization"))
         else:
             project = Project.objects.filter(uuid=request.data.get("project_uuid"))
+
         if len(project) > 0:
             project = project.first()
         else:
             return Response(status=status.HTTP_404_NOT_FOUND, data=dict(message="error: Project not found"))
+
         action = request.data.get("action")
         entity = request.data.get("entity")
         entity_name = request.data.get("entity_name")
