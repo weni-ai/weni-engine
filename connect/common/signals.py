@@ -228,13 +228,6 @@ def request_permission_project(sender, instance, created, **kwargs):
                     organization_authorization=org_auth,
                     role=instance.role,
                 )
-                RecentActivity.objects.create(
-                    action="ADD",
-                    entity="USER",
-                    user=user,
-                    project=instance.project,
-                    entity_name=instance.project.name
-                )
             else:
                 auth_user = auth_user.first()
                 auth_user.role = instance.role
@@ -261,6 +254,13 @@ def project_authorization(sender, instance, created, **kwargs):
                 project=instance.project,
                 created_by=instance.user
             )
+        RecentActivity.objects.create(
+            action="ADD",
+            entity="USER",
+            user=instance.user,
+            project=instance.project,
+            entity_name=instance.project.name
+        )
     if instance.role is not ProjectRoleLevel.NOTHING.value:
         instance_user = (
             instance.organization_authorization.organization.get_user_authorization(
