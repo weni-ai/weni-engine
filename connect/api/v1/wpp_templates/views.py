@@ -12,8 +12,8 @@ from connect.common.models import TemplateMessage
 
 User = get_user_model()
 
-
-class TemplateMessageViewSet(viewsets.Viewset):
+                    
+class TemplateMessageViewSet(viewsets.ViewSet):
     lookup_field = "uuid"
     queryset = TemplateMessage.objects.all()
 
