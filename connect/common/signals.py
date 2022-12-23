@@ -24,6 +24,7 @@ from connect.common.models import (
     RequestRocketPermission,
     RequestChatsPermission,
     OpenedProject,
+    RecentActivity
 )
 from connect.celery import app as celery_app
 from connect.api.v1.internal.intelligence.intelligence_rest_client import IntelligenceRESTClient
@@ -253,6 +254,13 @@ def project_authorization(sender, instance, created, **kwargs):
                 project=instance.project,
                 created_by=instance.user
             )
+        RecentActivity.objects.create(
+            action="ADD",
+            entity="USER",
+            user=instance.user,
+            project=instance.project,
+            entity_name=instance.project.name
+        )
     if instance.role is not ProjectRoleLevel.NOTHING.value:
         instance_user = (
             instance.organization_authorization.organization.get_user_authorization(
