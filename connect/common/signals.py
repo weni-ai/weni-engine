@@ -24,6 +24,7 @@ from connect.common.models import (
     RequestRocketPermission,
     RequestChatsPermission,
     OpenedProject,
+    RecentActivity
 )
 from connect.celery import app as celery_app
 from connect.api.v1.internal.intelligence.intelligence_rest_client import IntelligenceRESTClient
@@ -230,6 +231,13 @@ def request_permission_project(sender, instance, created, **kwargs):
                     project=instance.project,
                     organization_authorization=org_auth,
                     role=instance.role,
+                )
+                RecentActivity.objects.create(
+                    action="ADD",
+                    entity="USER",
+                    user=user,
+                    project=instance.project,
+                    entity_name=instance.project.name
                 )
             else:
                 auth_user = auth_user.first()

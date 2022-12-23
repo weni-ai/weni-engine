@@ -1861,3 +1861,29 @@ class RecentActivity(models.Model):
     )
     entity_name = models.CharField(max_length=255, null=True)
     created_on = models.DateTimeField(_("created on"), auto_now_add=True)
+
+    @property
+    def action_description_key(self) -> str:
+        actions = dict(
+            ADD=dict(
+                USER="joined-project"
+            ),
+            CREATE=dict(
+                TRIGGER="created-trigger",
+                CAMPAIGN="created-campaign",
+                FLOW="created-flow",
+                CHANNEL="created-channel"
+            ),
+            UPDATE=dict(
+                TRIGGER="edited-trigger",
+                CAMPAIGN="edited-campaign",
+                FLOW="edited-flow",
+                CHANNEL="edited-channel"
+            )
+        )
+        return actions[self.action][self.entity]
+
+    @property
+    def user_name(self):
+        # TODO: move to User model
+        return self.user.first_name + " " + self.user.last_name if self.user.first_name and self.user.last_name else self.user.email
