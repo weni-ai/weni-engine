@@ -26,11 +26,11 @@ class FlowsRESTClient:
         )
         return dict(status=response.status_code, data=response.text)
 
-    def create_flows(self, project_uuid: str, classifier_uuid: str, template_type: str, ticketer: str = None):
+    def create_flows(self, project_uuid: str, classifier_uuid: str, template_type: str, ticketer: dict = None, queue: dict = None):
 
         flow = self.template_flow(template_type)
 
-        sample_flow = add_classifier_to_flow(flow, classifier_uuid, ticketer)
+        sample_flow = add_classifier_to_flow(flow, classifier_uuid, ticketer, queue)
 
         body = dict(
             org=project_uuid,

@@ -97,7 +97,7 @@ class ProjectSerializer(serializers.ModelSerializer):
 
     def get_project_type(self, obj):
         if obj.is_template and obj.template_project.exists():
-            return "template"
+            return f"template:{obj.template_type}"
         else:
             return "blank"
 
@@ -538,7 +538,8 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
         if not settings.TESTING:
             rest_client = FlowsRESTClient()
             try:
-                if project.template_type == Project.TYPE_SUPPORT:
+                is_support = project.template_type == Project.TYPE_SUPPORT
+                if is_support:
                     chats_client = ChatsRESTClient()
                     chats_response = chats_client.create_chat_project(
                         project_uuid=str(project.uuid),
@@ -553,7 +554,8 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
                     str(project.flow_organization),
                     str(classifier_uuid),
                     project.template_type,
-                    ticketer=chats_response.get("ticketer")
+                    ticketer=chats_response.get("ticketer") if is_support else None,
+                    queue=chats_response.get("queue") if is_support else None,
                 )
                 if flows.get("status") == 201:
                     flows = json.loads(flows.get("data"))
