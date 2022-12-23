@@ -49,7 +49,7 @@ class RecentActivityListAPIView(views.APIView):
         if not project.project_authorizations.filter(user__email=request.user.email).exists():
             raise PermissionDenied()
 
-        recent_activities = RecentActivity.objects.filter(project__uuid=project_uuid).order_by("created_on")
+        recent_activities = RecentActivity.objects.filter(project__uuid=project_uuid).order_by("-created_on")
         data = []
         for recent_activity in recent_activities:
             data.append(
