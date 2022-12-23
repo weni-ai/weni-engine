@@ -181,13 +181,20 @@ class User(AbstractBaseUser, PermissionsMixin):
             ),
         )
 
-    def send_request_flow_user_info(self):
-        if not settings.SEND_REQUEST_FLOW:
+    def send_request_flow_user_info(self, flow_data):
+        if not flow_data.get('send_request_flow'):
             return False  # pragma: no cover
+        company_size = [
+            "1 - 20",
+            "21 - 50",
+            "51 - 300",
+            "301 - 1000",
+            "1001+"
+        ]
         requests.post(
             url=f"{settings.FLOWS_URL}api/v2/flow_starts.json",
             json={
-                "flow": settings.FLOW_MARKETING_UUID,
+                "flow": flow_data.get('flow_uuid'),
                 "params": {
                     "first_name": self.first_name,
                     "last_name": self.last_name,
@@ -197,11 +204,16 @@ class User(AbstractBaseUser, PermissionsMixin):
                     "phone": self.phone,
                     "utm": self.utm,
                     "email_marketing": self.email_marketing,
+                    "company_colaborators": company_size[self.number_people],
+                    "company_name": self.company_name,
+                    "company_sector": self.company_sector,
+                    "company_segment": self.company_segment,
+                    "weni_helps": self.weni_helps,
                 },
                 "urns": [f"mailto:{self.email}"],
             },
             headers={
-                "Authorization": f"Token {settings.TOKEN_AUTHORIZATION_FLOW_MARKETING}"
+                "Authorization": f"Token {flow_data.get('token_authorization')}"
             },
         )
 

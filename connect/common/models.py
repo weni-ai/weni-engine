@@ -1808,3 +1808,70 @@ class TemplateProject(models.Model):
     @property
     def user(self):
         return self.authorization.user
+
+
+class RecentActivity(models.Model):
+    ADD = "ADD"
+    CREATE = "CREATE"
+    UPDATE = "UPDATE"
+
+    ACTIONS_CHOICES = {
+        (ADD, "Add"),
+        (CREATE, "Entity Created"),
+        (UPDATE, "Entity updated")
+    }
+
+    USER = "USER"
+    FLOW = "FLOW"
+    CHANNEL = "CHANNEL"
+    TRIGGER = "TRIGGER"
+    CAMPAIGN = "CAMPAIGN"
+
+    ENTITY_CHOICES = (
+        (USER, "User Entity"),
+        (FLOW, "Flow Entity"),
+        (CHANNEL, "Channel Entity"),
+        (TRIGGER, "Trigger Entity"),
+        (CAMPAIGN, "Campaign Entity")
+    )
+
+    project = models.ForeignKey(
+        Project, on_delete=models.PROTECT, related_name="project_recent_activity"
+    )
+    action = models.CharField(max_length=15, choices=ACTIONS_CHOICES)
+    entity = models.CharField(max_length=20, choices=ENTITY_CHOICES)
+    user = models.ForeignKey(
+        User, on_delete=models.PROTECT, related_name="user_recent_activy"
+    )
+    entity_name = models.CharField(max_length=255, null=True)
+    created_on = models.DateTimeField(_("created on"), auto_now_add=True)
+
+    @property
+    def action_description_key(self) -> str:
+        actions = dict(
+            ADD=dict(
+                USER="joined-project"
+            ),
+            CREATE=dict(
+                TRIGGER="created-trigger",
+                CAMPAIGN="created-campaign",
+                FLOW="created-flow",
+                CHANNEL="created-channel"
+            ),
+            UPDATE=dict(
+                TRIGGER="edited-trigger",
+                CAMPAIGN="edited-campaign",
+                FLOW="edited-flow",
+                CHANNEL="edited-channel"
+            )
+        )
+        return actions[self.action][self.entity]
+
+    @property
+    def user_name(self):
+        # TODO: move to User model
+        if self.user.first_name and self.user.last_name:
+            return f"{self.user.first_name} {self.user.last_name}"
+
+        return self.user.email
+
