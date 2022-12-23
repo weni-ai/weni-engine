@@ -15,16 +15,24 @@ def add_classifier_to_flow(sample_flow: str, classifier_uuid: str, ticketer: dic
         queue_name = queue.get("name")
 
         classifier = sample_flow["flows"][1]["nodes"][2]["actions"][0]["classifier"]
-        ticketer_json = sample_flow["flows"][2]["nodes"][0]["actions"][0]["ticketer"]
-        queue_json = sample_flow["flows"][2]["nodes"][0]["actions"][0]["topic"]
 
-        # add ticketer to json
-        ticketer_json["uuid"] = ticketer_uuid
-        ticketer_json["name"] = ticketer_name
+        commercial_sector = sample_flow["flows"][2]
+        administrative_sector = sample_flow["flows"][3]
+        financial_sector = sample_flow["flows"][7]
 
-        # add queue to json
-        queue_json["uuid"] = queue_uuid
-        queue_json["name"] = queue_name
+        sectors = [commercial_sector, administrative_sector, financial_sector]
+
+        for sector in sectors:
+            ticketer_json = sector["nodes"][0]["actions"][0]["ticketer"]
+            queue_json = sector["nodes"][0]["actions"][0]["topic"]
+
+            # add ticketer to json
+            ticketer_json["uuid"] = ticketer_uuid
+            ticketer_json["name"] = ticketer_name
+
+            # add queue to json
+            queue_json["uuid"] = queue_uuid
+            queue_json["name"] = queue_name
 
     else:
         classifier = sample_flow["flows"][3]["nodes"][0]["actions"][0]["classifier"]
