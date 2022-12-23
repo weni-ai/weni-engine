@@ -1886,4 +1886,8 @@ class RecentActivity(models.Model):
     @property
     def user_name(self):
         # TODO: move to User model
-        return self.user.first_name + " " + self.user.last_name if self.user.first_name and self.user.last_name else self.user.email
+        if self.user.first_name and self.user.last_name:
+            return f"{self.user.first_name} {self.user.last_name}"
+
+        return self.user.email
+
