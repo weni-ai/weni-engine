@@ -554,7 +554,8 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
                     str(project.flow_organization),
                     str(classifier_uuid),
                     project.template_type,
-                    ticketer=chats_response.get("ticketer") if is_support else None
+                    ticketer=chats_response.get("ticketer") if is_support else None,
+                    queue=chats_response.get("queue") if is_support else None,
                 )
                 if flows.get("status") == 201:
                     flows = json.loads(flows.get("data"))

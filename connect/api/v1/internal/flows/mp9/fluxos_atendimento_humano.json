@@ -2136,13 +2136,7 @@
         {
           "actions": [
             {
-              "assignee": {
-                "created_on": "2021-09-14T14:41:21.840192Z",
-                "email": "hugo.carvalho@weni.ai",
-                "first_name": "Jos\u00e9 Hugo",
-                "last_name": "de Carvalho",
-                "role": "administrator"
-              },
+              "assignee": null,
               "body": "@results",
               "result_name": "AbrirAtendimento",
               "ticketer": {
