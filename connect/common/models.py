@@ -1875,3 +1875,14 @@ class RecentActivity(models.Model):
 
         return self.user.email
 
+    @property
+    def to_json(self):
+        data = {
+            "user": self.user_name,
+            "created_at": self.created_on,
+            "action": self.action_description_key
+        }
+        if self.entity_name:
+            data.update({"name": self.entity_name })
+        
+        return data
