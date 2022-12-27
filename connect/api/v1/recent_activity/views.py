@@ -50,14 +50,5 @@ class RecentActivityListAPIView(views.APIView):
             raise PermissionDenied()
 
         recent_activities = RecentActivity.objects.filter(project__uuid=project_uuid).order_by("-created_on")
-        data = []
-        for recent_activity in recent_activities:
-            data.append(
-                {
-                    "name": recent_activity.entity_name,
-                    "user": recent_activity.user_name,
-                    "created_at": recent_activity.created_on,
-                    "action": recent_activity.action_description_key
-                }
-            )
+        data = [recent_activity.to_json for recent_activity in recent_activities]
         return Response(status=status.HTTP_200_OK, data=data)
