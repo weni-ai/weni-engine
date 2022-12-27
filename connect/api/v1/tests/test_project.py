@@ -457,7 +457,9 @@ class TemplateProjectTestCase(TestCase):
             "date_format": "D",
             "name": "Test template project",
             "organization": str(self.organization.uuid),
-            "timezone": "America/Argentina/Buenos_Aires"
+            "timezone": "America/Argentina/Buenos_Aires",
+            "template": True,
+            "template_type": "support",
         }
         response, content_data = self.request_create(
             data, token=self.user_token
@@ -467,4 +469,4 @@ class TemplateProjectTestCase(TestCase):
         self.assertIsNotNone(content_data.get("flow_uuid"))
         self.assertEquals(content_data.get("first_access"), True)
         self.assertEquals(content_data.get("wa_demo_token"), "wa-demo-12345")
-        self.assertEquals(content_data.get("project_type"), "template")
+        self.assertEquals(content_data.get("project_type"), "template:support")

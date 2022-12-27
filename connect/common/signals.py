@@ -31,7 +31,6 @@ from connect.api.v1.internal.intelligence.intelligence_rest_client import Intell
 from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
 from connect.common.tasks import update_user_permission_project
 
-
 logger = logging.getLogger("connect.common.signals")
 
 
@@ -42,14 +41,20 @@ def create_service_status(sender, instance, created, **kwargs):
             instance.service_status.create(service=service)
         if not settings.TESTING:
             chats_client = ChatsRESTClient()
-            response = chats_client.create_chat_project(
-                project_uuid=str(instance.uuid),
-                project_name=instance.name,
-                date_format=instance.date_format,
-                timezone=str(instance.timezone),
-                is_template=instance.is_template,
-                user_email=instance.created_by.email
-            )
+
+            template = instance.is_template and instance.template_type == Project.TYPE_SUPPORT
+
+            if not template:
+                response = chats_client.create_chat_project(
+                    project_uuid=str(instance.uuid),
+                    project_name=instance.name,
+                    date_format=instance.date_format,
+                    timezone=str(instance.timezone),
+                    is_template=template,
+                    user_email=instance.created_by.email
+                )
+                logger.info(f'[ * ] {response}')
+
             if len(Project.objects.filter(created_by=instance.created_by)) == 1:
                 data = dict(
                     send_request_flow=settings.SEND_REQUEST_FLOW_PRODUCT,

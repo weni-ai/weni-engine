@@ -121,20 +121,44 @@ class CreateOrganizationAPITestCase(TestCase):
                 "name": "Test Project",
                 "organization": "2575d1f9-f7f8-4a5d-ac99-91972e309511",
                 "timezone": "America/Argentina/Buenos_Aires",
-                "template": True
+                "template": True,
+                "template_type": "support"
             }
         }
         response, content_data = self.request(data, self.owner_token)
-
         self.assertEquals(response.status_code, 201)
         self.assertEquals(content_data.get("project").get("first_access"), True)
         self.assertEquals(content_data.get("project").get("wa_demo_token"), "wa-demo-12345")
-        self.assertEquals(content_data.get("project").get("project_type"), "template")
+        self.assertEquals(content_data.get("project").get("project_type"), "template:support")
         self.assertEquals(content_data.get("project").get("redirect_url"), "https://wa.me/5582123456?text=wa-demo-12345")
         self.assertEquals(OrganizationAuthorization.objects.count(), 1)
         self.assertEquals(RequestPermissionOrganization.objects.count(), 1)
         self.assertEquals(Project.objects.count(), 1)
         self.assertEquals(ProjectAuthorization.objects.count(), 1)
+
+    def test_create_template_project_type_support(self):
+        data = {
+            "organization": {
+                "name": "name",
+                "description": "desc",
+                "plan": "plan",
+                "authorizations": [
+                    {
+                        "user_email": "e@mail.com",
+                        "role": 3
+                    }
+                ]
+            },
+            "project": {
+                "date_format": "D",
+                "name": "Test Project",
+                "organization": "2575d1f9-f7f8-4a5d-ac99-91972e309511",
+                "timezone": "America/Argentina/Buenos_Aires",
+                "template": True,
+                "template_type": Project.TYPE_SUPPORT
+            }
+        }
+        response, content_data = self.request(data, self.owner_token)
 
 
 class RetrieveOrganizationProjectsAPITestCase(TestCase):
@@ -193,7 +217,6 @@ class RetrieveOrganizationProjectsAPITestCase(TestCase):
         return response, content_data
 
     def test_is_template_project(self):
-        print(self.project.is_template)
         response, content_data = self.request2(self.project.uuid, self.owner_token)
         print(content_data)
 

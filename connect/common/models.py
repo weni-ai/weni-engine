@@ -484,6 +484,14 @@ class Project(models.Model):
         (DATE_FORMAT_MONTH_FIRST, "MM-DD-YYYY"),
     )
 
+    TYPE_SUPPORT = "support"
+    TYPE_LEAD_CAPTURE = "lead_capture"
+
+    TEMPLATE_TYPES = (
+        (TYPE_SUPPORT, _("support")),
+        (TYPE_LEAD_CAPTURE, _("lead capture"))
+    )
+
     uuid = models.UUIDField(
         _("UUID"), primary_key=True, default=uuid4.uuid4, editable=False
     )
@@ -518,6 +526,14 @@ class Project(models.Model):
         related_name="projects",
         blank=True,
         null=True,
+    )
+    template_type = models.CharField(
+        verbose_name=_("Template type"),
+        max_length=20,
+        choices=TEMPLATE_TYPES,
+        help_text=_("Project template type"),
+        null=True,
+        blank=True,
     )
 
     def __str__(self):
@@ -1883,6 +1899,6 @@ class RecentActivity(models.Model):
             "action": self.action_description_key
         }
         if self.entity_name:
-            data.update({"name": self.entity_name })
-        
+            data.update({"name": self.entity_name})
+
         return data
