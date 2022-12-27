@@ -1836,12 +1836,12 @@ class RecentActivity(models.Model):
     )
 
     project = models.ForeignKey(
-        Project, on_delete=models.PROTECT, related_name="project_recent_activity"
+        Project, on_delete=models.CASCADE, related_name="project_recent_activity"
     )
     action = models.CharField(max_length=15, choices=ACTIONS_CHOICES)
     entity = models.CharField(max_length=20, choices=ENTITY_CHOICES)
     user = models.ForeignKey(
-        User, on_delete=models.PROTECT, related_name="user_recent_activy"
+        User, on_delete=models.CASCADE, related_name="user_recent_activy"
     )
     entity_name = models.CharField(max_length=255, null=True)
     created_on = models.DateTimeField(_("created on"), auto_now_add=True)
