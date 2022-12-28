@@ -498,7 +498,8 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
         if not settings.TESTING:
             intelligence_client = IntelligenceRESTClient()
             try:
-                access_token = intelligence_client.get_access_token(request.user.email)
+                repository_uuid = settings.REPOSITORY_IDS.get(project.template_type)
+                access_token = intelligence_client.get_access_token(request.user.email, repository_uuid)
             except Exception as error:
                 logger.error(error)
                 template.delete()
