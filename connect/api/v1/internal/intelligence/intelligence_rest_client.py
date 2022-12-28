@@ -127,7 +127,7 @@ class IntelligenceRESTClient:
             "repository_uuid": repository_uuid
         }
         response = requests.get(
-            url=f"{self.base_url}v2/repository/authorization-by-user/?user_email={user_email}&repository_uuid={repository_uuid}",
+            url=f"{self.base_url}v2/repository/authorization-by-user",
             headers=self.authentication_instance.headers,
             params=body
         )
