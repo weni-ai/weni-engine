@@ -62,7 +62,6 @@ def create_service_status(sender, instance, created, **kwargs):
                     token_authorization=settings.TOKEN_AUTHORIZATION_FLOW_PRODUCT
                 )
                 instance.created_by.send_request_flow_user_info(data)
-            logger.info(f'[ * ] {response}')
 
         for permission in instance.project_authorizations.all():
             update_user_permission_project(
