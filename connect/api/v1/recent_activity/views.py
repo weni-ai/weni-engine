@@ -14,7 +14,7 @@ class RecentActivityAPIView(views.APIView):
     permission_classes = [ModuleHasPermission]
 
     def post(self, request):
-        
+
         action = request.data.get("action")
         entity = request.data.get("entity")
         entity_name = request.data.get("entity_name")
@@ -40,7 +40,7 @@ class RecentActivityAPIView(views.APIView):
             project = project.first()
         else:
             return Response(status=status.HTTP_404_NOT_FOUND, data=dict(message="error: Project not found"))
-        
+
         RecentActivity.objects.create(
             action=action,
             entity=entity,
