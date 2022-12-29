@@ -1480,77 +1480,100 @@ class BillingPlan(models.Model):
         )
         return mail
 
-    def send_email_trial_plan_expired_due_time_limit(self, user_names: list = None, emails: list = None):
+    def send_email_trial_plan_expired_due_time_limit(self, emails: list = None):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
 
         if not emails:
             emails = self.organization.authorizations.exclude(role=OrganizationRole.VIEWER.value).values_list(
-                "user__email", flat=True)
-        if not user_names:
-            user_names = self.organization.authorizations.exclude(role=OrganizationRole.VIEWER.value).values_list(
-                "user__username", flat=True)
-        context = {
-            "user_name": user_names,
-            "webapp_billing_url": f"{settings.WEBAPP_BASE_URL}/orgs/{self.organization.uuid}/billing"
-        }
-        mail.send_mail(
-            _("Your trial plan has expired"),
-            render_to_string("billing/emails/trial_plan_expired_due_time_limit.txt", context),
-            None,
-            emails,
-            html_message=render_to_string("billing/emails/trial_plan_expired_due_time_limit.html", context),
-        )
+                "user__email", "user__username")
+
+        subject = _("Your trial plan has expired")
+        from_email = None
+
+        msg_list = []
+        for email in emails:
+
+            username = email[1]
+
+            context = {
+                "user_name": username,
+                "webapp_billing_url": f"{settings.WEBAPP_BASE_URL}/orgs/{self.organization.uuid}/billing"
+            }
+            # message = render_to_string("billing/emails/trial_plan_expired_due_time_limit.txt", context)
+            recipient_list = [email[0]]
+            html_message = render_to_string("billing/emails/trial_plan_expired_due_time_limit.html", context)
+
+            msg = (subject, html_message, from_email, recipient_list)
+            msg_list.append(msg)
+
+        mail.send_mass_mail(msg_list, fail_silently=False)
+
         return mail
 
-    def send_email_plan_expired_due_attendance_limit(self, user_names: str = None, emails: list = None):
+    def send_email_plan_expired_due_attendance_limit(self, emails: list = None):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
 
         if not emails:
             emails = self.organization.authorizations.exclude(role=OrganizationRole.VIEWER.value).values_list(
-                "user__email", flat=True)
-        if not user_names:
-            user_names = self.organization.authorizations.exclude(role=OrganizationRole.VIEWER.value).values_list(
-                "user__username", flat=True)
+                "user__email", "user__username")
 
-        context = {
-            "user_name": user_names,
-            "webapp_billing_url": f"settings.WEBAPP_BASE_URL/orgs/{self.organization.uuid}/billing",
-            "plan": self.plan
-        }
-        mail.send_mail(
-            _(f"You reached {self.plan_limit} attendances"),
-            render_to_string("billing/emails/plan_expired_due_attendence_limit.txt", context),
-            None,
-            emails,
-            html_message=render_to_string("billing/emails/plan_expired_due_attendence_limit.html", context),
-        )
+        subject = _(f"You reached {self.plan_limit} attendances")
+        from_email = None
+        msg_list = []
+
+        for email in emails:
+
+            username = email[1]
+
+            context = {
+                "user_name": username,
+                "webapp_billing_url": f"settings.WEBAPP_BASE_URL/orgs/{self.organization.uuid}/billing",
+                "plan": self.plan
+            }
+            # message = render_to_string("billing/emails/plan_expired_due_attendence_limit.txt", context)
+            recipient_list = [email[0]]
+            html_message = render_to_string("billing/emails/plan_expired_due_attendence_limit.html", context)
+
+            msg = (subject, html_message, from_email, recipient_list)
+            msg_list.append(msg)
+
+        mail.send_mass_mail(msg_list, fail_silently=False)
+
         return mail
 
-    def send_email_plan_is_about_to_expire(self, user_names: str = None, emails: list = None):
+    def send_email_plan_is_about_to_expire(self, emails: list = None):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
 
         if not emails:
             emails = self.organization.authorizations.exclude(role=OrganizationRole.VIEWER.value).values_list(
-                "user__email", flat=True)
-        if not user_names:
-            user_names = self.organization.authorizations.exclude(role=OrganizationRole.VIEWER.value).values_list(
-                "user__username", flat=True)
+                "user__email", "user__username")
 
-        context = {
-            "user_name": user_names,
-            "limit": self.plan_limit,
-            "webapp_billing_url": settings.WEBAPP_BASE_URL + "/orgs/" + self.organization.uuid + "/billing",
-        }
-        mail.send_mail(
-            _(f"You reached {self.plan_limit} attendances"),
-            render_to_string("billing/emails/plan_is_about_to_expire.txt", context),
-            None,
-            emails,
-            html_message=render_to_string("billing/emails/plan_is_about_to_expire.html", context),
-        )
+        subject = _(f"Your organization is close to {self.plan_limit} attendances")
+        from_email = None
+        msg_list = []
+
+        for email in emails:
+
+            username = email[1]
+
+            context = {
+                "user_name": username,
+                "limit": self.plan_limit,
+                "webapp_billing_url": f"settings.WEBAPP_BASE_URL/orgs/{self.organization.uuid}/billing",
+            }
+
+            # message = render_to_string("billing/emails/plan_is_about_to_expire.txt", context)
+            recipient_list = [email[0]]
+            html_message = render_to_string("billing/emails/plan_is_about_to_expire.html", context)
+
+            msg = (subject, html_message, from_email, recipient_list)
+            msg_list.append(msg)
+
+        mail.send_mass_mail(msg_list, fail_silently=False)
+
         return mail
 
     def send_email_end_trial(self, email: list):
