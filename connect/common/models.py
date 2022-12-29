@@ -1830,11 +1830,15 @@ class RecentActivity(models.Model):
     ADD = "ADD"
     CREATE = "CREATE"
     UPDATE = "UPDATE"
+    INTEGRATE = "INTEGRATE"
+    TRAIN = "TRAIN"
 
     ACTIONS_CHOICES = {
         (ADD, "Add"),
         (CREATE, "Entity Created"),
-        (UPDATE, "Entity updated")
+        (UPDATE, "Entity updated"),
+        (INTEGRATE, "Entity integrated"),
+        (TRAIN, "Entity Trained")
     }
 
     USER = "USER"
@@ -1842,13 +1846,14 @@ class RecentActivity(models.Model):
     CHANNEL = "CHANNEL"
     TRIGGER = "TRIGGER"
     CAMPAIGN = "CAMPAIGN"
-
+    AI = "AI"
     ENTITY_CHOICES = (
         (USER, "User Entity"),
         (FLOW, "Flow Entity"),
         (CHANNEL, "Channel Entity"),
         (TRIGGER, "Trigger Entity"),
-        (CAMPAIGN, "Campaign Entity")
+        (CAMPAIGN, "Campaign Entity"),
+        (AI, "Artificial Intelligence Entity")
     )
 
     project = models.ForeignKey(
@@ -1872,13 +1877,20 @@ class RecentActivity(models.Model):
                 TRIGGER="created-trigger",
                 CAMPAIGN="created-campaign",
                 FLOW="created-flow",
-                CHANNEL="created-channel"
+                CHANNEL="created-channel",
+                AI="created-ai"
             ),
             UPDATE=dict(
                 TRIGGER="edited-trigger",
                 CAMPAIGN="edited-campaign",
                 FLOW="edited-flow",
                 CHANNEL="edited-channel"
+            ),
+            INTEGRATE=dict(
+                AI="integrated-ai"
+            ),
+            TRAIN=dict(
+                AI="trained-ai"
             )
         )
         return actions[self.action][self.entity]
