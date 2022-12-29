@@ -121,13 +121,15 @@ class IntelligenceRESTClient:
                 logger.error(f"{response.status_code}: classifier not found")
         return {"repositories_count": len(auth_list)}
 
-    def get_access_token(self, user_email):
+    def get_access_token(self, user_email: str, repository_uuid: str):
         body = {
-            "email": user_email,
+            "user_email": user_email,
+            "repository_uuid": repository_uuid
         }
         response = requests.get(
-            url=f"{self.base_url}v2/repository/authorization-by-user/",
+            url=f"{self.base_url}v2/repository/authorization-by-user",
             headers=self.authentication_instance.headers,
-            json=body
+            params=body
         )
+
         return json.loads(response.text).get("access_token")
