@@ -21,6 +21,8 @@ from connect.common.gateways.rocket_gateway import Rocket
 from enum import Enum
 from celery import current_app
 import stripe
+from connect.common.helpers import send_mass_html_mail
+
 
 logger = logging.getLogger(__name__)
 
@@ -1491,25 +1493,26 @@ class BillingPlan(models.Model):
         subject = _("Your trial plan has expired")
         from_email = None
 
+        context = {
+            "webapp_billing_url": f"{settings.WEBAPP_BASE_URL}/orgs/{self.organization.uuid}/billing",
+            "org_name": self.organization.name
+        }
+
         msg_list = []
         for email in emails:
 
             username = email[1]
 
-            context = {
-                "user_name": username,
-                "webapp_billing_url": f"{settings.WEBAPP_BASE_URL}/orgs/{self.organization.uuid}/billing"
-            }
-            # message = render_to_string("billing/emails/trial_plan_expired_due_time_limit.txt", context)
+            context["user_name"] = username
+            message = render_to_string("billing/emails/trial_plan_expired_due_time_limit.txt", context)
             recipient_list = [email[0]]
             html_message = render_to_string("billing/emails/trial_plan_expired_due_time_limit.html", context)
 
-            msg = (subject, html_message, from_email, recipient_list)
+            msg = (subject, message, html_message, from_email, recipient_list)
             msg_list.append(msg)
 
-        mail.send_mass_mail(msg_list, fail_silently=False)
-
-        return mail
+        html_mail = send_mass_html_mail(msg_list, fail_silently=False)
+        return html_mail
 
     def send_email_plan_expired_due_attendance_limit(self, emails: list = None):
         if not settings.SEND_EMAILS:
@@ -1523,25 +1526,27 @@ class BillingPlan(models.Model):
         from_email = None
         msg_list = []
 
+        context = {
+            "webapp_billing_url": f"settings.WEBAPP_BASE_URL/orgs/{self.organization.uuid}/billing",
+            "plan": self.plan,
+            "org_name": self.organization.name
+        }
+
         for email in emails:
 
             username = email[1]
 
-            context = {
-                "user_name": username,
-                "webapp_billing_url": f"settings.WEBAPP_BASE_URL/orgs/{self.organization.uuid}/billing",
-                "plan": self.plan
-            }
-            # message = render_to_string("billing/emails/plan_expired_due_attendence_limit.txt", context)
+            context["user_name"] = username
+            message = render_to_string("billing/emails/plan_expired_due_attendence_limit.txt", context)
             recipient_list = [email[0]]
             html_message = render_to_string("billing/emails/plan_expired_due_attendence_limit.html", context)
 
-            msg = (subject, html_message, from_email, recipient_list)
+            msg = (subject, message, html_message, from_email, recipient_list)
             msg_list.append(msg)
 
-        mail.send_mass_mail(msg_list, fail_silently=False)
+        html_mail = send_mass_html_mail(msg_list, fail_silently=False)
 
-        return mail
+        return html_mail
 
     def send_email_plan_is_about_to_expire(self, emails: list = None):
         if not settings.SEND_EMAILS:
@@ -1555,26 +1560,27 @@ class BillingPlan(models.Model):
         from_email = None
         msg_list = []
 
+        context = {
+            "limit": self.plan_limit,
+            "webapp_billing_url": f"settings.WEBAPP_BASE_URL/orgs/{self.organization.uuid}/billing",
+            "org_name": self.organization.name
+        }
+
         for email in emails:
 
             username = email[1]
 
-            context = {
-                "user_name": username,
-                "limit": self.plan_limit,
-                "webapp_billing_url": f"settings.WEBAPP_BASE_URL/orgs/{self.organization.uuid}/billing",
-            }
+            context["user_name"] = username
 
-            # message = render_to_string("billing/emails/plan_is_about_to_expire.txt", context)
+            message = render_to_string("billing/emails/plan_is_about_to_expire.txt", context)
             recipient_list = [email[0]]
             html_message = render_to_string("billing/emails/plan_is_about_to_expire.html", context)
 
-            msg = (subject, html_message, from_email, recipient_list)
+            msg = (subject, message, html_message, from_email, recipient_list)
             msg_list.append(msg)
 
-        mail.send_mass_mail(msg_list, fail_silently=False)
-
-        return mail
+        html_mail = send_mass_html_mail(msg_list, fail_silently=False)
+        return html_mail
 
     def send_email_end_trial(self, email: list):
         if not settings.SEND_EMAILS:
