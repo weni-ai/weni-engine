@@ -21,7 +21,7 @@ class RecentActivityAPIView(views.APIView):
         user = User.objects.get(email=request.data.get("user"))
 
         if(request.data.get("intelligence_id")):
-            organization = Organization.objects.get(inteligence_id=request.data.get("intelligence_id"))
+            organization = Organization.objects.get(inteligence_organization=request.data.get("intelligence_id"))
             for project in organization.project.all():
                 RecentActivity.objects.create(
                     action=action,
