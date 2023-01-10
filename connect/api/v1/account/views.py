@@ -19,6 +19,8 @@ from connect.api.v1.account.serializers import (
     SearchUserSerializer,
 )
 from connect.api.v1.keycloak import KeycloakControl
+from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
+from connect.api.v1.internal.intelligence.intelligence_rest_client import IntelligenceRESTClient
 from connect.authentication.models import User
 from connect.common.models import OrganizationAuthorization, Service
 from connect.utils import upload_photo_rocket
@@ -155,17 +157,17 @@ class MyUserProfileViewSet(
     def change_language(self, request, **kwargs):  # pragma: no cover
         serializer = ChangeLanguageSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-
+        language = serializer.data.get("language")
         user = request.user
-        user.language = serializer.data.get("language")
+        user.language = language
         user.save(update_fields=["language"])
-
-        celery_app.send_task(
-            "update_user_language",
-            args=[
-                user.email,
-                user.language,
-            ],
+        FlowsRESTClient().update_language(
+            user_email=user.email,
+            language=language
+        )
+        IntelligenceRESTClient().update_language(
+            user_email=user.email,
+            language=language,
         )
 
         return Response({"language": user.language})
