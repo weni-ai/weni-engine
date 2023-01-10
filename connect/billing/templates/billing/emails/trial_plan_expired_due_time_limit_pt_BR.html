@@ -1,0 +1,77 @@
+{% extends 'authentication/emails/base.html' %}
+{% load static i18n %}
+
+{% block main-content %}
+<section style="width: 574px; margin: 48px">
+  <div style="
+      font-family: 'Lato', sans-serif;
+      font-style: normal;
+      font-weight: normal;
+      font-size: 20px;
+      line-height: 28px;
+      color: #808080;
+    ">
+    {% trans 'Olá' %},
+    <span style="
+        font-family: 'Lato', sans-serif;
+        color: #262626;
+        font-size: 20px;
+        font-weight: bold;
+        line-height: 28px;
+        font-style: normal;
+      ">
+      {{ user_name }}!
+    </span>
+  </div>
+
+  <div style="
+      font-family: 'Lato', sans-serif;
+      font-weight: bold;
+      font-size: 20px;
+      line-height: 28px;
+      color: #262626;
+      margin-top: 24px;
+    ">
+    Sua organização {{org_name}} atingiu o limite atingiu o tempo limite do plano Trial.
+  </div>
+
+  <div style="
+      font-family: 'Lato', sans-serif;
+      font-style: normal;
+      font-weight: normal;
+      font-size: 16px;
+      line-height: 24px;
+      color: #808080;
+      margin-top: 24px;
+    ">
+    Você atingiu o limite de 30 dias para usar todas as features da plataforma Weni de graça
+  </div>
+
+  <div style="
+      font-family: 'Lato', sans-serif;
+      font-style: normal;
+      font-weight: normal;
+      font-size: 16px;
+      line-height: 24px;
+      color: #808080;
+      margin-top: 24px;
+    ">
+    Seu acesso à plataforma continua, mas seu chatbot não será capaz disparar mensagens para seus usuários
+  </div>
+
+  <div style="
+      font-family: 'Lato', sans-serif;
+      font-style: normal;
+      font-weight: normal;
+      font-size: 16px;
+      line-height: 24px;
+      color: #808080;
+      margin-top: 24px;
+    ">
+    Evite o bloqueio de seu chatbot acessando
+    <a href="{{ webapp_billing_url }}"
+      style="color: #009E96; text-decoration: underline; text-underline-offset: 4px;">{% trans 'Billing' %}</a>
+    e escolha um plano que se adapte às suas necessidades comerciais.
+  </div>
+</section>
+{% endblock %}
