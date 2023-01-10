@@ -24,13 +24,16 @@ from rest_framework import permissions
 
 from connect.api.v1 import urls as rookly_api_v1_urls
 from connect.api.grpc.project.handlers import grpc_handlers as grpc_project_handlers
-from connect.api.grpc.organization.handlers import grpc_handlers as grpc_organization_handlers
+from connect.api.grpc.organization.handlers import (
+    grpc_handlers as grpc_organization_handlers,
+)
 from connect.billing.views import StripeHandler
+
 # V2 EXample
-# from connect.app import urls as app_urls
+# from connect.api.v2 import routers as api_v2_urls
 
 
-# api_v2_urls = [include(app_urls), ainclude urls here]
+# api_v2_urls = [path("", include(api_v2_urls))]
 
 
 schema_view = get_schema_view(
@@ -125,7 +128,7 @@ if settings.DEBUG:
                             base_url=settings.BASE_URL,
                             webapp_base_url=settings.WEBAPP_BASE_URL,
                             organization_name="Org Test",
-                        )
+                        ),
                     ),
                     path(
                         "organization-going-out",
@@ -133,8 +136,8 @@ if settings.DEBUG:
                             "common/emails/organization/leaving_org.html",
                             base_url=settings.BASE_URL,
                             user_name="João",
-                            organization_name="Org Test"
-                        )
+                            organization_name="Org Test",
+                        ),
                     ),
                     path(
                         "organization-removed",
@@ -142,8 +145,8 @@ if settings.DEBUG:
                             "common/emails/organization/org_removed.html",
                             base_url=settings.BASE_URL,
                             user_name="João",
-                            organization_name="Org Test"
-                        )
+                            organization_name="Org Test",
+                        ),
                     ),
                     path(
                         "organization-created",
@@ -152,8 +155,8 @@ if settings.DEBUG:
                             base_url=settings.BASE_URL,
                             first_name="João",
                             webapp_base_url=settings.WEBAPP_BASE_URL,
-                            organization_name="Org Test"
-                        )
+                            organization_name="Org Test",
+                        ),
                     ),
                     path(
                         "remove-permission",
@@ -161,8 +164,8 @@ if settings.DEBUG:
                             "common/emails/organization/remove_permission_organization.html",
                             base_url=settings.BASE_URL,
                             first_name="João",
-                            organization_name="Org Test"
-                        )
+                            organization_name="Org Test",
+                        ),
                     ),
                     path(
                         "delete-organization",
@@ -170,8 +173,8 @@ if settings.DEBUG:
                             "common/emails/organization/delete_organization.html",
                             base_url=settings.BASE_URL,
                             first_name="João",
-                            organization_name="Org Test"
-                        )
+                            organization_name="Org Test",
+                        ),
                     ),
                     path(
                         "change-organization-name",
@@ -180,8 +183,8 @@ if settings.DEBUG:
                             base_url=settings.BASE_URL,
                             user_name="João",
                             organization_previous_name="Old Test",
-                            organization_new_name="New Org"
-                        )
+                            organization_new_name="New Org",
+                        ),
                     ),
                     path(
                         "access-code",
@@ -189,7 +192,7 @@ if settings.DEBUG:
                             "authentication/emails/access_code.html",
                             base_url=settings.BASE_URL,
                             access_code="AEIJKY",
-                        )
+                        ),
                     ),
                     path(
                         "permission-change",
@@ -198,8 +201,8 @@ if settings.DEBUG:
                             base_url=settings.BASE_URL,
                             user_name="João",
                             old_permission="Viewer",
-                            new_permission="Administrator"
-                        )
+                            new_permission="Administrator",
+                        ),
                     ),
                 ]
             ),
