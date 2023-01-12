@@ -4,6 +4,17 @@ from rest_framework import mixins
 from connect.common.models import Organization, OrganizationAuthorization, OrganizationRole
 from connect.api.v1.organization.serializers import OrganizationSeralizer
 
+from drf_yasg2.utils import swagger_auto_schema
+from connect.api.v2.organizations.api_schemas import (
+    create_organization_schema,
+)
+
+from rest_framework.permissions import IsAuthenticated
+from connect.api.v1.organization.permissions import (
+    Has2FA,
+    OrganizationHasPermission,
+)
+
 
 class OrganizationViewSet(
     mixins.RetrieveModelMixin,
@@ -16,6 +27,7 @@ class OrganizationViewSet(
     queryset = Organization.objects.all()
     serializer_class = OrganizationSeralizer
     lookup_field = "uuid"
+    permission_classes = [IsAuthenticated, OrganizationHasPermission, Has2FA]
 
     def get_queryset(self, *args, **kwargs):
         if getattr(self, "swagger_fake_view", False):
@@ -30,6 +42,7 @@ class OrganizationViewSet(
 
         return self.queryset.filter(pk__in=auth)
 
+    @swagger_auto_schema(request_body=create_organization_schema)
     def create(self, request, *args, **kwargs):
         return super(OrganizationViewSet, self).create(request, *args, **kwargs)
 
