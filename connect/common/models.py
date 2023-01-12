@@ -21,6 +21,7 @@ from connect.common.gateways.rocket_gateway import Rocket
 from enum import Enum
 from celery import current_app
 import stripe
+from connect.api.v1.internal.intelligence.intelligence_rest_client import IntelligenceRESTClient
 
 logger = logging.getLogger(__name__)
 
@@ -137,6 +138,14 @@ class Organization(models.Model):
             **kwargs,
         )
         return get
+
+    def perform_destroy_ai_organization(self, user_email):
+        intelligence_organization = self.inteligence_organization
+        ai_client = IntelligenceRESTClient()
+        ai_client.delete_organization(
+            organization_id=intelligence_organization,
+            user_email=user_email,
+        )
 
     def send_email_invite_organization(self, email):
         if not settings.SEND_EMAILS:
