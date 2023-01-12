@@ -286,7 +286,10 @@ class ProjectViewSet(
                 data=serializer.validated_data.get("data"),
                 channeltype_code=serializer.validated_data.get("channeltype_code"),
             )
-            return JsonResponse(status=response.status_code, data=response.json())
+            if response.status_code == 200:
+                return Response(status=response.status_code, data=response.json())
+
+            return Response(status=response.status_code, data={response.reason})
 
     @action(
         detail=True,
