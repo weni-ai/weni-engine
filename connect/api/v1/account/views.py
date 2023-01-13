@@ -60,7 +60,7 @@ class MyUserProfileViewSet(
 
     def _get_photo_url(self, user: User) -> str:
         photo = user.photo
-        domain = f"https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/"
+        domain = f"https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.{settings.AWS_S3_REGION_NAME}.amazonaws.com/"
         endpoint = photo.storage.location + photo.name
         return domain + endpoint
 
