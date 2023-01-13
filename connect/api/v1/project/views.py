@@ -288,8 +288,8 @@ class ProjectViewSet(
             )
             if response.status_code == 200:
                 return Response(status=response.status_code, data=response.json())
-
-            return Response(status=response.status_code, data={response.reason})
+            reason = response.text if response.text else response.reason
+            return Response(status=response.status_code, data={reason})
 
     @action(
         detail=True,
