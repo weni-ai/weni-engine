@@ -22,6 +22,7 @@ from enum import Enum
 from celery import current_app
 import stripe
 from connect.api.v1.internal.intelligence.intelligence_rest_client import IntelligenceRESTClient
+from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
 
 logger = logging.getLogger(__name__)
 
@@ -559,9 +560,37 @@ class Project(models.Model):
         )
         return get
 
+    def project_search(self, text: str):
+        """Searches for project in flows and intelligence"""
+
+        flows_client = FlowsRESTClient()
+        intelligence_client = IntelligenceRESTClient()
+
+        flows_result = flows_client.get_project_flows(
+            project_uuid=self.flow_organization,
+            flow_name=text
+        )
+        intelligence_result = intelligence_client.get_organization_intelligences(
+            intelligence_name=text,
+            organization_id=self.organization.inteligence_organization
+        )
+
+        return {
+            "flow": flows_result,
+            "intelligence": intelligence_result
+        }
+
+    def perform_destroy_flows_project(self, user_email: str):
+        flow_organization = self.flow_organization
+
+        current_app.send_task(
+            "delete_project",
+            args=[flow_organization, user_email]
+        )
+
     def send_email_create_project(self, first_name: str, email: str):
         if not settings.SEND_EMAILS:
-            return False  # pragma: no cover
+            return False  # pragma: no cos/tests.pver
         context = {
             "base_url": settings.BASE_URL,
             "organization_name": self.organization.name,

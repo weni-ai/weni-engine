@@ -2,9 +2,9 @@ import json
 
 from rest_framework import status
 from rest_framework.test import APIRequestFactory, force_authenticate
+from rest_framework.response import Response
 
 from django.test import TestCase
-from django.http import JsonResponse
 from unittest.mock import patch
 
 from connect.api.v1.tests.utils import create_user_and_token
@@ -161,7 +161,7 @@ class OrganizationViewSetTestCase(TestCase):
 
     @patch("connect.api.v1.internal.intelligence.intelligence_rest_client.IntelligenceRESTClient.delete_organization")
     def test_perform_destroy(self, ai_destroy):
-        ai_destroy.side_effect = [JsonResponse(data={}, status=status.HTTP_204_NO_CONTENT)]
+        ai_destroy.side_effect = [Response(data={}, status=status.HTTP_204_NO_CONTENT)]
         pk = str(self.org_1.uuid)
         path = "/v2/organizations/"
         method = {"delete": "destroy"}
