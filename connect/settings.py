@@ -98,7 +98,8 @@ env = environ.Env(
     DEFAULT_CURRENCY=(str, "BRL"),
     SEND_REQUEST_FLOW_PRODUCT=(bool, False),
     FLOW_PRODUCT_UUID=(str, None),
-    TOKEN_AUTHORIZATION_FLOW_PRODUCT=(str, None)
+    TOKEN_AUTHORIZATION_FLOW_PRODUCT=(str, None),
+    CSRF_TRUSTED_ORIGINS=(lambda v: [s.strip() for s in v.split(",")], "*"),
 )
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -115,6 +116,7 @@ SECRET_KEY = env.str("SECRET_KEY")
 DEBUG = env.bool("DEBUG")
 
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")
+CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS")
 
 BASE_URL = env.str("BASE_URL")
 
@@ -227,11 +229,7 @@ LANGUAGE_CODE = env.str("LANGUAGE_CODE")
 # -----------------------------------------------------------------------------------
 # Available languages for translation
 # -----------------------------------------------------------------------------------
-LANGUAGES = (
-    ("en-us", _("English")),
-    ("pt-br", _("Portuguese")),
-    ("es", _("Spanish"))
-)
+LANGUAGES = (("en-us", _("English")), ("pt-br", _("Portuguese")), ("es", _("Spanish")))
 
 MODELTRANSLATION_DEFAULT_LANGUAGE = "en-us"
 
@@ -520,7 +518,4 @@ FLOWS_REST_ENDPOINT = env.str("FLOWS_REST_ENDPOINT")
 AI_FAREWELL_N_GREETINGS = env.str("AI_FAREWELL_N_GREETINGS")
 AI_BINARY_ANSWERS = env.str("AI_BINARY_ANSWERS")
 
-REPOSITORY_IDS = {
-    "lead_capture": AI_FAREWELL_N_GREETINGS,
-    "support": AI_BINARY_ANSWERS
-}
+REPOSITORY_IDS = {"lead_capture": AI_FAREWELL_N_GREETINGS, "support": AI_BINARY_ANSWERS}
