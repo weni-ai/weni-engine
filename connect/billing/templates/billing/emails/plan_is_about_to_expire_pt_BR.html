@@ -3,46 +3,39 @@
 
 {% block main-content %}
 <section style="width: 574px; margin: 48px">
-  <div
-    style="
+  <div style="
       font-family: 'Lato', sans-serif;
       font-style: normal;
       font-weight: normal;
       font-size: 20px;
       line-height: 28px;
       color: #808080;
-    "
-  >
-    {% trans 'Hi' %},
-    <span
-      style="
+    ">
+    Olá,
+    <span style="
         font-family: 'Lato', sans-serif;
         color: #262626;
         font-size: 20px;
         font-weight: bold;
         line-height: 28px;
         font-style: normal;
-      "
-    >
+      ">
       {{ user_name }}!
     </span>
   </div>
 
-  <div
-    style="
+  <div style="
       font-family: 'Lato', sans-serif;
       font-weight: bold;
       font-size: 20px;
       line-height: 28px;
       color: #262626;
       margin-top: 24px;
-    "
-  >
-    {% trans 'Your organization has reached the Start plan's limit of 200 attendances.' %}
+    ">
+    Sua organização está perto de atingir {{limit}} atendimentos.
   </div>
 
-  <div
-    style="
+  <div style="
       font-family: 'Lato', sans-serif;
       font-style: normal;
       font-weight: normal;
@@ -50,13 +43,12 @@
       line-height: 24px;
       color: #808080;
       margin-top: 24px;
-    "
-  >
-    {% trans 'You still have access to the platform, but your chatbot will not be able to fire messages to your users.' %}
+    ">
+    Quando você completar {{limit}} atendimentos, seu acesso à plataforma continua, mas seu chatbot não será capaz de
+    disparar mensagens para seus usuários.
   </div>
 
-  <div
-    style="
+  <div style="
       font-family: 'Lato', sans-serif;
       font-style: normal;
       font-weight: normal;
@@ -64,11 +56,11 @@
       line-height: 24px;
       color: #808080;
       margin-top: 24px;
-    "
-  >
-    {% trans 'To prevent this from happening, access ' %}
-    <a href="{{ webapp_billing_url }}" style="color: #009E96; text-decoration: underline; text-underline-offset: 4px;">{% trans 'Billing' %}</a>
-    {% trans ' and choose a plan that fits your business the needs of your business.' %}
+    ">
+    Evite o bloqueio de seu chatbot acessando
+    <a href="{{ webapp_billing_url }}"
+      style="color: #009E96; text-decoration: underline; text-underline-offset: 4px;">{% trans 'Billing' %}</a>
+    e escolha um plano que se adapte às suas necessidades comerciais.
   </div>
 </section>
 {% endblock %}
