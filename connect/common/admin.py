@@ -35,6 +35,10 @@ class OrganizationAuthorizationInline(admin.TabularInline):
     extra = 1
     min_num = 1
     can_delete = False
+    raw_id_fields = ("user",)
+
+    def user(self, obj):
+        return obj.user.email
 
 
 class OrganizationAdmin(admin.ModelAdmin):
