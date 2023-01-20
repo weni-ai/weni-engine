@@ -1,0 +1,5 @@
+{% load i18n %}
+<p>Olá, {{ user_name }}</p>
+<p>Sua organização {{org_name}} atingiu o limite do plano {{plan}} de {{plan_limit}} atendimentos</p>
+<p>Você ainda tem acesso à plataforma, mas seu chatbot não será capaz de disparar mensagens para seus usuários.</p>
+<p>Para evitar que isso aconteça, acesse <a href="{{ webapp_billing_url }}">{% trans 'Billing' %} e escolha um plano que se adapte às necessidades de seu negócio.</a>

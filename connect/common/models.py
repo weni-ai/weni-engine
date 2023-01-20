@@ -1525,12 +1525,22 @@ class BillingPlan(models.Model):
             context["user_name"] = username
 
             if email[2] == "en-us":
-                message = render_to_string("billing/emails/trial_plan_expired_due_time_limit_en.txt", context)
-                html_message = render_to_string("billing/emails/trial_plan_expired_due_time_limit_en.html", context)
+                message = render_to_string(
+                    "billing/emails/trial_plan_expired_due_time_limit_en.txt", context
+                )
+                html_message = render_to_string(
+                    "billing/emails/trial_plan_expired_due_time_limit_en.html", context
+                )
                 subject = _("Your trial plan has expired")
             else:
-                message = render_to_string("billing/emails/trial_plan_expired_due_time_limit_pt_BR.txt", context)
-                html_message = render_to_string("billing/emails/trial_plan_expired_due_time_limit_pt_BR.html", context)
+                message = render_to_string(
+                    "billing/emails/trial_plan_expired_due_time_limit_pt_BR.txt",
+                    context,
+                )
+                html_message = render_to_string(
+                    "billing/emails/trial_plan_expired_due_time_limit_pt_BR.html",
+                    context,
+                )
                 subject = "Seu plano Trial expirou"
 
             recipient_list = [email[0]]
@@ -1545,33 +1555,50 @@ class BillingPlan(models.Model):
             return False  # pragma: no cover
 
         if not emails:
-            emails = self.organization.authorizations.exclude(
-                role=OrganizationRole.VIEWER.value
-            ).values_list("user__email", "user__username")
+            emails = (
+                self.organization.authorizations.exclude(
+                    role=OrganizationRole.VIEWER.value
+                )
+                .values_list("user__email", "user__username", "user__language")
+                .order_by("user__language")
+            )
 
-        subject = _(f"You reached {self.plan_limit} attendances")
         from_email = None
         msg_list = []
 
         context = {
-            "webapp_billing_url": f"settings.WEBAPP_BASE_URL/orgs/{self.organization.uuid}/billing",
+            "webapp_billing_url": f"{settings.WEBAPP_BASE_URL}/orgs/{self.organization.uuid}/billing",
             "plan": self.plan,
+            "plan_limit": self.plan_limit,
             "org_name": self.organization.name,
         }
 
         for email in emails:
 
             username = email[1]
-
             context["user_name"] = username
-            message = render_to_string(
-                "billing/emails/plan_expired_due_attendence_limit.txt", context
-            )
-            recipient_list = [email[0]]
-            html_message = render_to_string(
-                "billing/emails/plan_expired_due_attendence_limit.html", context
-            )
 
+            if email[2] == "en-us":
+                message = render_to_string(
+                    "billing/emails/plan_expired_due_attendence_limit_en.txt", context
+                )
+                html_message = render_to_string(
+                    "billing/emails/plan_expired_due_attendence_limit_en.html", context
+                )
+                subject = _(f"You reached {self.plan_limit} attendances")
+
+            else:
+                message = render_to_string(
+                    "billing/emails/plan_expired_due_attendence_limit_pt_BR.txt",
+                    context,
+                )
+                html_message = render_to_string(
+                    "billing/emails/plan_expired_due_attendence_limit_pt_BR.html",
+                    context,
+                )
+                subject = _(f"Você atingiu {self.plan_limit} atendimentos")
+
+            recipient_list = [email[0]]
             msg = (subject, message, html_message, from_email, recipient_list)
             msg_list.append(msg)
 
@@ -1584,34 +1611,50 @@ class BillingPlan(models.Model):
             return False  # pragma: no cover
 
         if not emails:
-            emails = self.organization.authorizations.exclude(
-                role=OrganizationRole.VIEWER.value
-            ).values_list("user__email", "user__username")
+            emails = (
+                self.organization.authorizations.exclude(
+                    role=OrganizationRole.VIEWER.value
+                )
+                .values_list("user__email", "user__username", "user__language")
+                .order_by("user__language")
+            )
 
-        subject = _(f"Your organization is close to {self.plan_limit} attendances")
         from_email = None
         msg_list = []
 
         context = {
             "limit": self.plan_limit,
-            "webapp_billing_url": f"settings.WEBAPP_BASE_URL/orgs/{self.organization.uuid}/billing",
+            "webapp_billing_url": f"{settings.WEBAPP_BASE_URL}/orgs/{self.organization.uuid}/billing",
             "org_name": self.organization.name,
         }
 
         for email in emails:
 
             username = email[1]
-
             context["user_name"] = username
 
-            message = render_to_string(
-                "billing/emails/plan_is_about_to_expire.txt", context
-            )
-            recipient_list = [email[0]]
-            html_message = render_to_string(
-                "billing/emails/plan_is_about_to_expire.html", context
-            )
+            if email[2] == "en-us":
+                subject = _(
+                    f"Your organization is close to {self.plan_limit} attendances"
+                )
+                message = render_to_string(
+                    "billing/emails/plan_is_about_to_expire_en.txt", context
+                )
+                html_message = render_to_string(
+                    "billing/emails/plan_is_about_to_expire_en.html", context
+                )
+            else:
+                subject = _(
+                    f"Sua organização estã proxima de {self.plan_limit} atendimentos"
+                )
+                message = render_to_string(
+                    "billing/emails/plan_is_about_to_expire_pt_BR.txt", context
+                )
+                html_message = render_to_string(
+                    "billing/emails/plan_is_about_to_expire_pt_BR.html", context
+                )
 
+            recipient_list = [email[0]]
             msg = (subject, message, html_message, from_email, recipient_list)
             msg_list.append(msg)
 
