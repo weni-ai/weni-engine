@@ -9,11 +9,6 @@ router = routers.SimpleRouter()
 router.register(
     "organizations", organization_views.OrganizationViewSet, basename="organizations"
 )
-router.register(
-    "internals/connect/project",
-    connect_internal_views.AIGetProjectViewSet,
-    basename="connect-internals",
-)
 
 projects_router = routers.NestedSimpleRouter(
     router, r"organizations", lookup="organization"
@@ -22,4 +17,11 @@ projects_router.register(
     "projects", project_views.ProjectViewSet, basename="organization-projects"
 )
 
-urlpatterns = [path("", include(router.urls)), path("", include(projects_router.urls))]
+urlpatterns = [
+    path("", include(router.urls)),
+    path("", include(projects_router.urls)),
+    path(
+        "internals/connect/organizations/",
+        connect_internal_views.AIGetOrganizationView.as_view(),
+    ),
+]
