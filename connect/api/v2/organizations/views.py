@@ -2,7 +2,7 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework import mixins
 
 from connect.common.models import Organization, OrganizationAuthorization, OrganizationRole
-from connect.api.v1.organization.serializers import OrganizationSeralizer
+from connect.api.v2.organizations.serializers import OrganizationSeralizer
 
 from drf_yasg2.utils import swagger_auto_schema
 from connect.api.v2.organizations.api_schemas import (

@@ -120,24 +120,7 @@ class OrganizationViewSetTestCase(TestCase):
         self.assertEquals(response.status_code, status.HTTP_200_OK)
         self.assertEquals(content_data.get("count"), 2)
 
-    @patch("connect.api.v1.internal.intelligence.intelligence_rest_client.IntelligenceRESTClient.create_organization")
-    def test_create_organization(self, ai_create):
-        mock_id = 555
-        ai_create.side_effect = [
-            {
-                "id": mock_id,
-                "name": "V2",
-                "user": [
-                    {
-                        "org_user_id": mock_id,
-                        "org_user_email": "user@user.com",
-                        "org_user_nickname": "user@user.com",
-                        "org_user_name": "",
-                    }
-                ],
-            }
-        ]
-
+    def test_create_organization(self):
         data = {
             "name": "V2",
             "description": "V2 desc",
@@ -155,9 +138,7 @@ class OrganizationViewSetTestCase(TestCase):
             user=user,
             data=data
         )
-
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
-        self.assertEquals(content_data.get("inteligence_organization"), mock_id)
 
     @patch("connect.api.v1.internal.intelligence.intelligence_rest_client.IntelligenceRESTClient.delete_organization")
     def test_perform_destroy(self, ai_destroy):
