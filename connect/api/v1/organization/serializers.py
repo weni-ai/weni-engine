@@ -1,9 +1,11 @@
+import re
+
 from django.contrib.auth import get_user_model
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
 from rest_framework import serializers
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import PermissionDenied, ValidationError
 
 from connect.api.v1.fields import TextField
 from connect.api.v1.project.validators import CanContributeInOrganizationValidator
@@ -260,6 +262,19 @@ class RequestPermissionOrganizationSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         if attrs.get("role") == OrganizationLevelRole.NOTHING.value:
             raise PermissionDenied(_("You cannot set user role 0"))
+
+        email = attrs.get("email")
+
+        if ' ' in email:
+            raise ValidationError(
+                _("Email field cannot have spaces")
+            )
+        
+        if bool(re.match('[A-Z]', email)):
+            raise ValidationError(
+                _("Email field cannot have uppercase characters")
+            )
+
         return attrs
 
     def get_user_data(self, obj):
