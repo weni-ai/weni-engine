@@ -1,5 +1,7 @@
 import logging
+
 from django.contrib.auth import get_user_model
+from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
 from rest_framework import serializers
@@ -84,6 +86,11 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
         authorizations = self.context["request"].data.get("organization").get("authorizations")
 
         self.create_authorizations(instance, authorizations, user)
+
+        if settings.CREATE_AI_ORGANIZATION:
+            created, data = instance.create_ai_organization(user.email)
+            if not created:
+                return data
 
         return instance
 

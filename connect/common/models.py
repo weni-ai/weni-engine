@@ -394,6 +394,31 @@ class Organization(models.Model):
             }
         return ok, data
 
+    def create_ai_organization(self, user_email: str):
+        ai_client = IntelligenceRESTClient()
+        created = False
+
+        try:
+            ai_org = ai_client.create_organization(
+                user_email=user_email,
+                organization_name=self.name
+            )
+            data = ai_org.get("id")
+
+            created = True
+
+            self.inteligence_organization = int(ai_org.get("id"))
+            self.save(update_fields=["inteligence_organization"])
+
+        except Exception as error:
+            data = {
+                "message": "Could not create organization in AI module",
+                "status": status.HTTP_500_INTERNAL_SERVER_ERROR
+            }
+            logger.error(error)
+
+        return created, data
+
 
 class OrganizationLevelRole(Enum):
     NOTHING, VIEWER, CONTRIBUTOR, ADMIN, FINANCIAL, SUPPORT = list(range(6))

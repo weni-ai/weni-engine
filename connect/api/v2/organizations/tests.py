@@ -13,6 +13,8 @@ from connect.api.v1.tests.utils import create_user_and_token
 from connect.common.models import Organization, BillingPlan, OrganizationRole, Project
 from connect.api.v2.organizations.views import OrganizationViewSet
 
+from django.conf import settings
+
 
 class OrganizationViewSetTestCase(TestCase):
     def setUp(self):
@@ -123,10 +125,13 @@ class OrganizationViewSetTestCase(TestCase):
         self.assertEquals(response.status_code, status.HTTP_200_OK)
         self.assertEquals(content_data.get("count"), 2)
 
+    @patch("connect.api.v1.internal.intelligence.intelligence_rest_client.IntelligenceRESTClient.create_organization")
     @patch("connect.authentication.models.User.send_request_flow_user_info")
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_project")
-    def test_create_organization_blank_project(self, flows_info, send_request_flow_user_info):
-        flows_info.side_effect = [{"id": 1, "uuid": uuid.uuid4()}]
+    def test_create_organization_blank_project(self, create_project, send_request_flow_user_info, create_organization):
+        intelligence_organization = 555
+        create_project.side_effect = [{"id": 1, "uuid": uuid.uuid4()}]
+        create_organization.side_effect = [{"id": intelligence_organization}]
         send_request_flow_user_info.side_effect = [True]
         org_data = {
             "name": "V2",
@@ -165,13 +170,58 @@ class OrganizationViewSetTestCase(TestCase):
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
         self.assertEquals(organization["authorizations"]["count"], 2)
 
+    @patch("connect.api.v1.internal.intelligence.intelligence_rest_client.IntelligenceRESTClient.create_organization")
+    @patch("connect.authentication.models.User.send_request_flow_user_info")
+    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_project")
+    def test_create_organization_ai_blank_project(self, create_project, send_request_flow_user_info, create_organization):
+        intelligence_organization = 555
+        create_project.side_effect = [{"id": 1, "uuid": uuid.uuid4()}]
+        create_organization.side_effect = [{"id": intelligence_organization}]
+        send_request_flow_user_info.side_effect = [True]
+        org_data = {
+            "name": "V2",
+            "description": "V2 desc",
+            "organization_billing_plan": BillingPlan.PLAN_TRIAL,
+            "authorizations": [
+                {"user_email": "e@mail.com", "role": 3},
+                {"user_email": "user_1@user.com", "role": 3}
+            ],
+        }
+
+        project_data = {
+            "date_format": "D",
+            "name": "Test Project",
+            "timezone": "America/Argentina/Buenos_Aires",
+        }
+
+        data = {
+            "organization": org_data,
+            "project": project_data
+        }
+
+        path = "/v2/organizations/"
+        method = {"post": "create"}
+        user = self.user
+
+        settings.CREATE_AI_ORGANIZATION = True
+        response, content_data = self.request(
+            path,
+            method,
+            user=user,
+            data=data
+        )
+        organization = content_data.get("organization")
+
+        self.assertEquals(response.status_code, status.HTTP_201_CREATED)
+        self.assertEquals(organization["inteligence_organization"], intelligence_organization)
+
     @patch("connect.api.v1.internal.integrations.integrations_rest_client.IntegrationsRESTClient.whatsapp_demo_integration")
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_flows")
     @patch("connect.api.v1.internal.chats.chats_rest_client.ChatsRESTClient.create_chat_project")
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_classifier")
     @patch("connect.common.models.Organization.get_ai_access_token")
     @patch("connect.authentication.models.User.send_request_flow_user_info")
-    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_project")
+    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_template_project")
     def test_create_organization_lead_project(self, flows_info, send_request_flow_user_info, get_ai_access_token, create_classifier, create_chat_project, create_flows, wpp_integration):
         data = {
             "redirect_url": "https://example.com",
@@ -546,3 +596,39 @@ class OrganizationViewSetTestCase(TestCase):
             pk=pk,
             user=user
         )
+
+
+class OrganizationTestCase(TestCase):
+    def setUp(self):
+        self.factory = APIRequestFactory()
+        self.user, self.user_token = create_user_and_token("user")
+
+        self.org = Organization.objects.create(
+            name="V2 Org 1",
+            description="V2 Org 1",
+            inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan=BillingPlan.PLAN_TRIAL,
+        )
+
+        self.auth = self.org.authorizations.create(
+            user=self.user, role=OrganizationRole.ADMIN.value
+        )
+
+    @patch("connect.api.v1.internal.intelligence.intelligence_rest_client.IntelligenceRESTClient.create_organization")
+    def test_create_ai_organization(self, create_organization):
+        intelligence_organization = 555
+        create_organization.side_effect = [{"id": intelligence_organization}]
+        organization = self.org
+        created, data = organization.create_ai_organization(self.auth.user.email)
+        self.assertTrue(created)
+        self.assertEquals(intelligence_organization, data)
+
+    @patch("connect.api.v1.internal.intelligence.intelligence_rest_client.IntelligenceRESTClient.create_organization")
+    def test_error_create_ai_organization(self, create_organization):
+        organization = self.org
+        create_organization.side_effect = [Exception("Error")]
+        created, data = organization.create_ai_organization(self.auth.user.email)
+        self.assertFalse(created)
+        self.assertEquals(data.get("status"), status.HTTP_500_INTERNAL_SERVER_ERROR)
+        self.assertEquals(data.get("message"), "Could not create organization in AI module")

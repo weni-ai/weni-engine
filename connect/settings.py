@@ -98,7 +98,8 @@ env = environ.Env(
     DEFAULT_CURRENCY=(str, "BRL"),
     SEND_REQUEST_FLOW_PRODUCT=(bool, False),
     FLOW_PRODUCT_UUID=(str, None),
-    TOKEN_AUTHORIZATION_FLOW_PRODUCT=(str, None)
+    TOKEN_AUTHORIZATION_FLOW_PRODUCT=(str, None),
+    CREATE_AI_ORGANIZATION=(bool, False),
 )
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -524,3 +525,6 @@ REPOSITORY_IDS = {
     "lead_capture": AI_FAREWELL_N_GREETINGS,
     "support": AI_BINARY_ANSWERS
 }
+
+
+CREATE_AI_ORGANIZATION = env.bool("CREATE_AI_ORGANIZATION")
