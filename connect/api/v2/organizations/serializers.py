@@ -1,6 +1,5 @@
 import logging
 from django.contrib.auth import get_user_model
-from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
 from rest_framework import serializers
@@ -9,9 +8,7 @@ from connect.common.models import (
     Organization,
     BillingPlan,
     OrganizationRole,
-)
-from connect.api.v1.internal.intelligence.intelligence_rest_client import (
-    IntelligenceRESTClient,
+    RequestPermissionOrganization,
 )
 from connect.api.v1.organization.serializers import (
     BillingPlanSerializer,
@@ -69,34 +66,6 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
         ),
     )
 
-    def create_organization(self, validated_data):
-        organization = {"id": 0}
-        if not settings.TESTING:
-            ai_client = IntelligenceRESTClient()
-            organization = ai_client.create_organization(
-                user_email=self.context["request"].user.email,
-                organization_name=validated_data.get("name"),
-            )
-
-        validated_data.update({"inteligence_organization": organization.get("id")})
-
-        # Added for the manager to set the date when the next invoice will be generated
-        validated_data.update(
-            {
-                "organization_billing__cycle": BillingPlan._meta.get_field(
-                    "cycle"
-                ).default
-            }
-        )
-
-        instance = super(OrganizationSeralizer, self).create(validated_data)
-
-        instance.authorizations.create(
-            user=self.context["request"].user, role=OrganizationRole.ADMIN.value
-        )
-
-        return instance
-
     def create(self, validated_data):
         # Billing Cycle
         # Added for the manager to set the date when new invoice will be generated
@@ -110,10 +79,12 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
         # create organization object
         instance = super(OrganizationSeralizer, self).create(validated_data)
 
-        # Create authorization for the organization owner
-        instance.authorizations.create(
-            user=self.context["request"].user, role=OrganizationRole.ADMIN.value
-        )
+        user = self.context["request"].user
+
+        authorizations = self.context["request"].data.get("organization").get("authorizations")
+
+        self.create_authorizations(instance, authorizations, user)
+
         return instance
 
     def get_authorizations(self, obj):
@@ -145,3 +116,18 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
             obj.get_user_authorization(request.user)
         ).data
         return data
+
+    def create_authorizations(self, instance: Organization, authorizations: list, user: User):
+        # Create authorization for the organization owner
+        instance.authorizations.create(
+            user=user, role=OrganizationRole.ADMIN.value
+        )
+
+        # Other users
+        for authorization in authorizations:
+            RequestPermissionOrganization.objects.create(
+                email=authorization.get("user_email"),
+                organization=instance,
+                role=authorization.get("role"),
+                created_by=user
+            )

@@ -1,5 +1,6 @@
 import decimal
 import logging
+import json
 import uuid as uuid4
 from datetime import timedelta
 from decimal import Decimal
@@ -25,6 +26,8 @@ from connect.api.v1.internal.intelligence.intelligence_rest_client import (
     IntelligenceRESTClient,
 )
 from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
+# from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
+from rest_framework import status
 
 logger = logging.getLogger(__name__)
 
@@ -374,6 +377,23 @@ class Organization(models.Model):
         self.enforce_2fa = flag
         self.save()
 
+    def get_ai_access_token(self, user_email: str):
+        ok = False
+        data = {}
+        intelligence_client = IntelligenceRESTClient()
+        try:
+            repository_uuid = settings.REPOSITORY_IDS.get(self.project.template_type)
+            access_token = intelligence_client.get_access_token(user_email, repository_uuid)
+            data = access_token
+            ok = True
+        except Exception as error:
+            logger.error(error)
+            data = {
+                "message": "Could not get access token",
+                "status": status.HTTP_500_INTERNAL_SERVER_ERROR
+            }
+        return ok, data
+
 
 class OrganizationLevelRole(Enum):
     NOTHING, VIEWER, CONTRIBUTOR, ADMIN, FINANCIAL, SUPPORT = list(range(6))
@@ -680,6 +700,106 @@ class Project(models.Model):
             ),
         )
         return mail
+
+    def create_classifier(self, authorization, template_type: str, access_token: str):
+        flow_instance = FlowsRESTClient()
+        created = False
+        classifier_name = {
+            "lead_capture": "Farewell & Greetings",
+            "support": "Binary Answers",
+        }
+
+        try:
+            response = flow_instance.create_classifier(
+                project_uuid=str(self.uuid),
+                user_email=authorization.user.email,
+                classifier_type="bothub",
+                classifier_name=classifier_name.get(template_type),
+                access_token=access_token,
+            )
+            created = True
+            data = response.get("data").get("uuid")
+        except Exception as error:
+            logger.error(error)
+            data = {
+                "message": "Could not create classifier",
+                "status": status.HTTP_500_INTERNAL_SERVER_ERROR
+            }
+        return created, data
+
+    def create_chats_project(self):
+        from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient  # to avoid circular import
+        created = False
+        chats_client = ChatsRESTClient()
+        try:
+            chats_response = chats_client.create_chat_project(
+                project_uuid=str(self.uuid),
+                project_name=self.name,
+                date_format=self.date_format,
+                timezone=str(self.timezone),
+                is_template=True,
+                user_email=self.created_by.email
+            )
+            chats_response = json.loads(chats_response.text)
+            data = chats_response
+            created = True
+        except Exception as error:
+            logger.error(error)
+            data = {
+                "message": "Could not create classifier",
+                "status": status.HTTP_500_INTERNAL_SERVER_ERROR
+            }
+        return created, data
+
+    def create_flows(self, classifier_uuid: str):
+        data = {}
+        chats_response = {}
+        created = False
+
+        flow_instance = FlowsRESTClient()
+
+        is_support = self.template_type == Project.TYPE_SUPPORT
+
+        if is_support:
+            chats_created, chats_response = self.create_chats_project()
+            if not chats_created:
+                return chats_response
+        try:
+            flows = flow_instance.create_flows(
+                str(self.flow_organization),
+                str(classifier_uuid),
+                self.template_type,
+                ticketer=chats_response.get("ticketer"),
+                queue=chats_response.get("queue"),
+            )
+            data = json.loads(flows.get("data"))
+            created = True
+        except Exception as error:
+            logger.error(error)
+            data.update(
+                {
+                    "message": "Could not create flow",
+                    "status": status.HTTP_500_INTERNAL_SERVER_ERROR
+                }
+            )
+        return created, data
+
+    def whatsapp_demo_integration(self, token):
+        from connect.api.v1.internal.integrations.integrations_rest_client import IntegrationsRESTClient
+        created = False
+        integrations_client = IntegrationsRESTClient()
+        data = {}
+        try:
+            response = integrations_client.whatsapp_demo_integration(str(self.uuid), token=token)
+            created = True
+            data = response
+        except Exception as error:
+            logger.error(error)
+            data = {
+                "message": "Could not integrate Whatsapp demo",
+                "status": status.HTTP_500_INTERNAL_SERVER_ERROR,
+            }
+        return created, data
 
 
 class OpenedProject(models.Model):

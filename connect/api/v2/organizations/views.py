@@ -1,8 +1,10 @@
 from rest_framework.viewsets import GenericViewSet
-from rest_framework import mixins
+from rest_framework import mixins, status
+from rest_framework.response import Response
 
 from connect.common.models import Organization, OrganizationAuthorization, OrganizationRole
 from connect.api.v2.organizations.serializers import OrganizationSeralizer
+from connect.api.v2.projects.serializers import ProjectSerializer
 
 from drf_yasg2.utils import swagger_auto_schema
 from connect.api.v2.organizations.api_schemas import (
@@ -44,7 +46,32 @@ class OrganizationViewSet(
 
     @swagger_auto_schema(request_body=create_organization_schema)
     def create(self, request, *args, **kwargs):
-        return super(OrganizationViewSet, self).create(request, *args, **kwargs)
+        org_data = request.data.get("organization")
+        project_data = request.data.get("project")
+
+        # Organization
+        serializer = self.get_serializer(data=org_data)
+        serializer.is_valid()
+        instance = serializer.save()
+
+        # Project
+        project_data.update(
+            {"organization": instance.uuid}
+        )
+        project_serializer = ProjectSerializer(data=project_data, context={"request": request})
+        project_serializer.is_valid()
+        project_instance = project_serializer.save()
+
+        if type(project_instance) == dict:
+            instance.delete()
+            return Response(project_instance.get("message"), status=int(project_instance.get("status")))
+
+        data = {
+            "organization": serializer.data,
+            "project": project_serializer.data
+        }
+
+        return Response(data, status.HTTP_201_CREATED)
 
     def perform_destroy(self, instance):
         # TODO implement soft delete for organization

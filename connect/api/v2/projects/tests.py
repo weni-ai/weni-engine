@@ -215,3 +215,136 @@ class ProjectViewSetTestCase(TestCase):
         )
 
         self.assertEquals(response.status_code, status.HTTP_204_NO_CONTENT)
+
+
+class ProjectTestCase(TestCase):
+    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.update_user_permission_project")
+    def setUp(self, update_user_permission_project):
+        update_user_permission_project.side_effect = [True]
+        self.organization = Organization.objects.create(
+            name="Test project methods",
+            description="",
+            inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__payment_method=BillingPlan.PAYMENT_METHOD_CREDIT_CARD,
+            organization_billing__plan=BillingPlan.PLAN_ENTERPRISE,
+        )
+        self.user, self.user_token = create_user_and_token("user")
+        self.organization_authorization = self.organization.authorizations.create(
+            user=self.user, role=OrganizationRole.ADMIN.value
+        )
+
+        self.project = self.organization.project.create(
+            name="project test methods",
+            timezone="America/Sao_Paulo",
+            flow_organization=uuid.uuid4(),
+            is_template=True,
+            template_type=Project.TYPE_SUPPORT,
+            created_by=self.user
+        )
+
+    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_classifier")
+    def test_create_classifier(self, create_classifier):
+        response_data = uuid.uuid4()
+        create_classifier.side_effect = [{"data": {"uuid": response_data}}]
+
+        project = self.project
+        authorization = project.get_user_authorization(self.user)
+        access_token = uuid.uuid4()
+
+        created, data = self.project.create_classifier(authorization, project.template_type, access_token)
+
+        self.assertTrue(created)
+        self.assertEquals(data, response_data)
+
+    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_classifier")
+    def test_error_create_classifier(self, create_classifier):
+        create_classifier.side_effect = [Exception("Error")]
+
+        project = self.project
+        authorization = project.get_user_authorization(self.user)
+        access_token = uuid.uuid4()
+
+        created, data = self.project.create_classifier(authorization, project.template_type, access_token)
+
+        self.assertFalse(created)
+        self.assertEquals(data.get("status"), status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    @patch("connect.api.v1.internal.chats.chats_rest_client.ChatsRESTClient.create_chat_project")
+    def test_create_chats_project(self, create_chat_project):
+        ticketer = uuid.uuid4()
+
+        class Response:
+            text = json.dumps({"ticketer": str(ticketer), "queue": "default"})
+
+        chats_response = Response()
+        create_chat_project.side_effect = [chats_response]
+        project = self.project
+        created, data = project.create_chats_project()
+        self.assertTrue(created)
+
+    @patch("connect.api.v1.internal.chats.chats_rest_client.ChatsRESTClient.create_chat_project")
+    def test_error_create_chats_project(self, create_chat_project):
+        create_chat_project.side_effect = [Exception("Error")]
+        created, data = self.project.create_chats_project()
+        self.assertFalse(created)
+        self.assertEquals(data.get("status"), status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_flows")
+    @patch("connect.api.v1.internal.chats.chats_rest_client.ChatsRESTClient.create_chat_project")
+    def test_create_flows(self, create_chat_project, create_flows):
+        data = {
+            "ticketer": {"uuid": str(uuid.uuid4()), "name": "Test Ticketer"},
+            "queue": {"uuid": str(uuid.uuid4()), "name": "Test Queue"},
+        }
+
+        class Response:
+            text = json.dumps(data)
+
+        flows_response = '{"uuid": "9785a273-37de-4658-bfa2-d8028dc06c84"}'
+        create_chat_project.side_effect = [Response()]
+
+        create_flows.side_effect = [dict(status=201, data=flows_response)]
+        classifier_uuid = uuid.uuid4()
+        project = self.project
+        created, data = project.create_flows(classifier_uuid)
+        self.assertTrue(created)
+
+    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_flows")
+    @patch("connect.api.v1.internal.chats.chats_rest_client.ChatsRESTClient.create_chat_project")
+    def test_error_create_flows(self, create_chat_project, create_flows):
+        data = {
+            "ticketer": {"uuid": str(uuid.uuid4()), "name": "Test Ticketer"},
+            "queue": {"uuid": str(uuid.uuid4()), "name": "Test Queue"},
+        }
+
+        class Response:
+            text = json.dumps(data)
+
+        create_chat_project.side_effect = [Response()]
+        create_flows.side_effect = [Exception()]
+        classifier_uuid = uuid.uuid4()
+        project = self.project
+        created, data = project.create_flows(classifier_uuid)
+        self.assertFalse(created)
+
+    @patch("connect.api.v1.internal.integrations.integrations_rest_client.IntegrationsRESTClient.whatsapp_demo_integration")
+    def test_whatsapp_demo_integration(self, wpp_integration):
+        data = {
+            "redirect_url": "https://example.com",
+            "router_token": "rt_token"
+        }
+        wpp_integration.side_effect = [data]
+        project = self.project
+        token = "token"
+        created, response_data = project.whatsapp_demo_integration(token)
+        self.assertTrue(created)
+        self.assertEquals(data, response_data)
+
+    @patch("connect.api.v1.internal.integrations.integrations_rest_client.IntegrationsRESTClient.whatsapp_demo_integration")
+    def test_error_whatsapp_demo_integration(self, wpp_integration):
+        wpp_integration.side_effect = [Exception("Error")]
+        project = self.project
+        token = "token"
+        created, response_data = project.whatsapp_demo_integration(token)
+        self.assertFalse(created)
