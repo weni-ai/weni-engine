@@ -147,8 +147,9 @@ class ProjectSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = self.context["request"].user
         extra_data = self.context["request"].data.get("project")
+        is_template = extra_data.get("template")
 
-        created, flows_info = self.create_flows_project(validated_data, user)
+        created, flows_info = self.create_flows_project(validated_data, user, is_template)
 
         if not created:
             return flows_info
@@ -172,7 +173,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             )
             user.send_request_flow_user_info(data)
 
-        if extra_data.get("template"):
+        if is_template:
             extra_data.update(
                 {
                     "project": instance.uuid,
@@ -273,15 +274,15 @@ class ProjectSerializer(serializers.ModelSerializer):
             response = opened.day
         return response
 
-    def create_flows_project(self, data: dict, user: User):
+    def create_flows_project(self, data: dict, user: User, is_template: bool):
         flow_instance = FlowsRESTClient()
         created = False
         try:
-            if data.get("template"):
+            if is_template:
                 flows_info = flow_instance.create_template_project(
                     data.get("name"),
                     user.email,
-                    data.get("timezone")
+                    str(data.get("timezone"))
                 )
             else:
                 flows_info = flow_instance.create_project(

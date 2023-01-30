@@ -76,3 +76,24 @@ class AIGetOrganizationViewTestCase(TestCase):
 
         response, content_data = self.request(project_uuid=project_uuid)
         self.assertEquals(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    @patch("connect.api.v1.internal.permissions.ModuleHasPermission.has_permission")
+    def test_update_organization(self, module_has_permission):
+        module_has_permission.side_effect = [True, True]
+        project_uuid = str(self.project1.uuid)
+        query_params = {"project_uuid": project_uuid}
+
+        path = f"/v2/internals/connect/organizations/?project_uuid={project_uuid}"
+
+        data = {"intelligence_organization": 1}
+
+        request = self.factory.patch(path, data=json.dumps(data), format="json",)
+
+        response = AIGetOrganizationView.as_view()(request, query_params=query_params, data=data)
+        response.render()
+        content_data = json.loads(response.content)
+
+        organization = Organization.objects.get(uuid=content_data.get("organization").get("uuid"))
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(organization.inteligence_organization, data.get("intelligence_organization"))

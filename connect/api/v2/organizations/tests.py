@@ -211,7 +211,7 @@ class OrganizationViewSetTestCase(TestCase):
             data=data
         )
         organization = content_data.get("organization")
-
+        settings.CREATE_AI_ORGANIZATION = False
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
         self.assertEquals(organization["inteligence_organization"], intelligence_organization)
 
@@ -288,7 +288,7 @@ class OrganizationViewSetTestCase(TestCase):
 
     @patch("connect.api.v2.projects.serializers.TemplateProjectSerializer.validate_project_authorization")
     @patch("connect.authentication.models.User.send_request_flow_user_info")
-    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_project")
+    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_template_project")
     def test_create_organization_lead_project_fail_auth(self, flows_info, send_request_flow_user_info, validate_authorization=None):
         flows_info.side_effect = [{"id": 1, "uuid": uuid.uuid4()}]
         send_request_flow_user_info.side_effect = [True]
@@ -337,7 +337,7 @@ class OrganizationViewSetTestCase(TestCase):
 
     @patch("connect.common.models.Organization.get_ai_access_token")
     @patch("connect.authentication.models.User.send_request_flow_user_info")
-    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_project")
+    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_template_project")
     def test_create_organization_lead_project_fail_access_token(self, flows_info, send_request_flow_user_info, get_ai_access_token):
         flows_info.side_effect = [{"id": 1, "uuid": uuid.uuid4()}]
         send_request_flow_user_info.side_effect = [True]
@@ -421,7 +421,7 @@ class OrganizationViewSetTestCase(TestCase):
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_classifier")
     @patch("connect.common.models.Organization.get_ai_access_token")
     @patch("connect.authentication.models.User.send_request_flow_user_info")
-    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_project")
+    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_template_project")
     def test_create_organization_lead_project_fail_create_classifier(self, flows_info, send_request_flow_user_info, get_ai_access_token, create_classifier):
         flows_info.side_effect = [{"id": 1, "uuid": uuid.uuid4()}]
         send_request_flow_user_info.side_effect = [True]
@@ -466,7 +466,7 @@ class OrganizationViewSetTestCase(TestCase):
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_classifier")
     @patch("connect.common.models.Organization.get_ai_access_token")
     @patch("connect.authentication.models.User.send_request_flow_user_info")
-    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_project")
+    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_template_project")
     def test_create_organization_lead_project_fail_create_flows(self, flows_info, send_request_flow_user_info, get_ai_access_token, create_classifier, create_flows):
         flows_info.side_effect = [{"id": 1, "uuid": uuid.uuid4()}]
         send_request_flow_user_info.side_effect = [True]
@@ -519,7 +519,7 @@ class OrganizationViewSetTestCase(TestCase):
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_classifier")
     @patch("connect.common.models.Organization.get_ai_access_token")
     @patch("connect.authentication.models.User.send_request_flow_user_info")
-    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_project")
+    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_template_project")
     def test_create_organization_lead_project_fail_integrate_wpp(self, flows_info, send_request_flow_user_info, get_ai_access_token, create_classifier, create_chat_project, create_flows, wpp_integration):
         response_data = {
             "message": "Could not create flow",

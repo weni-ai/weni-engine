@@ -54,6 +54,9 @@ class OrganizationViewSet(
         serializer.is_valid()
         instance = serializer.save()
 
+        if type(instance) == dict:
+            return instance
+
         # Project
         project_data.update(
             {"organization": instance.uuid}
