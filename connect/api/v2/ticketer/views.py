@@ -9,8 +9,8 @@ from connect.common.models import Project
 class TicketerAPIView(views.APIView):
     permission_classes = [ModuleHasPermission]
 
-    def post(self, request):
-        project_uuid = request.data.get("project_uuid")
+    def post(self, request, *args, **kwargs):
+        project_uuid = kwargs.get("project_uuid")
         ticketer_type = request.data.get("ticketer_type")
         name = request.data.get("name")
         config = request.data.get("config")
