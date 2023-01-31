@@ -13,8 +13,9 @@ from connect.common.models import Project
 class CreateClassifierAPIView(views.APIView):
     permission_classes = [ModuleHasPermission]
 
-    def post(self, request):
+    def post(self, request, *args, **kwargs):
         request_data = request.query_params
+        request_data.update({"project_uuid": kwargs.get("project_uuid")})
         serializer = CreateClassifierSerializer(data=request_data)
         serializer.is_valid(raise_exception=True)
 
@@ -37,9 +38,10 @@ class CreateClassifierAPIView(views.APIView):
 
 class ListClassifierAPIView(views.APIView):
     permission_classes = [ModuleHasPermission]
-    def get(self, request):
+    def get(self, request, *args, **kwargs):
         request_data = request.query_params
-        serializer = ListClassifierSerializer(data=request.data)
+        request_data.update({"project_uuid": kwargs.get("project_uuid")})
+        serializer = ListClassifierSerializer(data=request_data)
         serializer.is_valid(raise_exception=True)
 
         project_uuid = serializer.validated_data.get("project_uuid")
@@ -71,8 +73,10 @@ class RetrieveClassfierAPIView(views.APIView):
 
     permission_classes = [ModuleHasPermission]
 
-    def get(self, request):
-        serializer = RetrieveClassifierSerializer(data=request.query_params)
+    def get(self, request, *args, **kwargs):
+        request_data = request.query_params
+        request_data.update({"project_uuid": kwargs.get("project_uuid")})
+        serializer = RetrieveClassifierSerializer(data=request_data)
         serializer.is_valid(raise_exception=True)
         classifier_uuid = serializer.validated_data.get("uuid")
         flow_instance = FlowsRESTClient()

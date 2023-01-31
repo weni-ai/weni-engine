@@ -11,7 +11,7 @@ from connect.common.models import Project
 class ChannelsAPIView(views.APIView):
     permission_classes = [ModuleHasPermission]
 
-    def get(self, request):
+    def get(self, request, *args, **kwargs):
         channel_type = request.query_params.get("channel_type", None)
         if not channel_type:
             raise ValidationError("Need pass the channel_type")
@@ -34,7 +34,7 @@ class ChannelsAPIView(views.APIView):
                 channels.append(channel_data)
         return JsonResponse(data={"channels": channels}, status=status.HTTP_200_OK)
 
-    def delete(self, request):
+    def delete(self, request, *args, **kwargs):
         serializer = ReleaseChannelSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -49,13 +49,15 @@ class ChannelsAPIView(views.APIView):
 
         return JsonResponse(status=status.HTTP_200_OK, data={"release": True})
 
-    def post(self, request):
-        serializer = CreateChannelSerializer(data=request.data)
+    def post(self, request, *args, **kwargs):
+        data = request.data
+        data.update({"project_uuid": kwargs.get("project_uuid")})
+        serializer = CreateChannelSerializer(data=data)
         serializer.is_valid(raise_exception=True)
-
+        print(serializer.validated_data)
         project_uuid = serializer.validated_data.get("project_uuid")
         project = Project.objects.get(uuid=project_uuid)
-
+        print(project.flow_organization)
         flows_instance = FlowsRESTClient()
         response = flows_instance.create_channel(
             user=serializer.validated_data.get("user"),
@@ -70,8 +72,11 @@ class ChannelsAPIView(views.APIView):
 class CreateWACChannelAPIView(views.APIView):
     permission_classes = [ModuleHasPermission]
 
-    def post(self, request):
-        serializer = CreateWACChannelSerializer(data=request.data)
+    def post(self, request, *args, **kwargs):
+
+        data = request.data
+        data.update({"project_uuid": kwargs.get("project_uuid")})
+        serializer = CreateWACChannelSerializer(data=data)
         serializer.is_valid(raise_exception=True)
 
         project_uuid = serializer.validated_data.get("project_uuid")

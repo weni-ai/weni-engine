@@ -30,7 +30,7 @@ from connect.api.grpc.organization.handlers import (
 from connect.billing.views import StripeHandler
 
 # V2 EXample
-# from connect.api.v2 import routers as api_v2_urls
+from connect.api.v2 import routers as api_v2_urls
 
 
 # api_v2_urls = [path("", include(api_v2_urls))]
@@ -50,7 +50,7 @@ urlpatterns = [
     path("", schema_view.with_ui("redoc")),
     path("admin/", admin.site.urls),
     path("v1/", include(rookly_api_v1_urls)),
-    # path("v2/", include(api_v2_urls)),
+    path("v2/", include(api_v2_urls)),
     url(r"^handlers/stripe/$", StripeHandler.as_view(), name="handlers.stripe_handler"),
 ]
 
