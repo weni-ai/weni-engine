@@ -33,7 +33,7 @@ from connect.billing.views import StripeHandler
 from connect.api.v2 import routers as api_v2_urls
 
 
-# api_v2_urls = [path("", include(api_v2_urls))]
+api_v2_urls = [path("", include(api_v2_urls))]
 
 
 schema_view = get_schema_view(

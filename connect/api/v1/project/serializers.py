@@ -154,12 +154,14 @@ class ProjectSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user = self.context["request"].user
-        task = tasks.create_project(  # pragma: no cover
-            validated_data.get("name"),
-            user.email,
-            str(validated_data.get("timezone")),
+
+        flow_instance = FlowsRESTClient()
+
+        project = flow_instance.create_project(
+            project_name=validated_data.get("name"),
+            user_email=user.email,
+            project_timezone=validated_data.get("timezone"),
         )
-        project = task
 
         validated_data.update(
             {
@@ -172,6 +174,7 @@ class ProjectSerializer(serializers.ModelSerializer):
         return instance
 
     def update(self, instance, validated_data):
+        print("Aqu =i")
         name = validated_data.get("name", instance.name)
         celery_app.send_task(
             "update_project",

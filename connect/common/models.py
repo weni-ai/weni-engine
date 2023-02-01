@@ -1,5 +1,6 @@
 import decimal
 import logging
+import json
 import uuid as uuid4
 from datetime import timedelta
 from decimal import Decimal
@@ -21,6 +22,12 @@ from connect.common.gateways.rocket_gateway import Rocket
 from enum import Enum
 from celery import current_app
 import stripe
+from connect.api.v1.internal.intelligence.intelligence_rest_client import (
+    IntelligenceRESTClient,
+)
+from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
+# from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
+from rest_framework import status
 
 logger = logging.getLogger(__name__)
 
@@ -61,13 +68,13 @@ class NewsletterLanguage(models.Model):
 
 class OrganizationManager(models.Manager):
     def create(
-            self,
-            organization_billing__cycle,
-            organization_billing__plan,
-            organization_billing__payment_method=None,
-            organization_billing__stripe_customer=None,
-            *args,
-            **kwargs,
+        self,
+        organization_billing__cycle,
+        organization_billing__plan,
+        organization_billing__payment_method=None,
+        organization_billing__stripe_customer=None,
+        *args,
+        **kwargs,
     ):
         instance = super().create(*args, **kwargs)
         new_kwargs = {}
@@ -80,8 +87,8 @@ class OrganizationManager(models.Manager):
             )
 
             if (
-                    BillingPlan.BILLING_CYCLE_DAYS.get(organization_billing__cycle)
-                    is not None
+                BillingPlan.BILLING_CYCLE_DAYS.get(organization_billing__cycle)
+                is not None
             ):
                 new_kwargs.update(
                     {
@@ -100,7 +107,9 @@ class OrganizationManager(models.Manager):
         if organization_billing__plan:
             new_kwargs.update({"plan": organization_billing__plan})
         if organization_billing__stripe_customer:
-            new_kwargs.update({"stripe_customer": organization_billing__stripe_customer})
+            new_kwargs.update(
+                {"stripe_customer": organization_billing__stripe_customer}
+            )
 
         BillingPlan.objects.create(organization=instance, **new_kwargs)
         return instance
@@ -116,13 +125,17 @@ class Organization(models.Model):
     )
     name = models.CharField(_("organization name"), max_length=150)
     description = models.TextField(_("organization description"))
-    inteligence_organization = models.IntegerField(_("inteligence organization id"))
+    inteligence_organization = models.IntegerField(
+        _("inteligence organization id"), null=True, blank=True
+    )
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
     is_suspended = models.BooleanField(
         default=False, help_text=_("Whether this organization is currently suspended.")
     )
     extra_integration = models.IntegerField(_("Whatsapp Extra Integration"), default=0)
-    enforce_2fa = models.BooleanField(_("Only users with 2fa can access the organization"), default=False)
+    enforce_2fa = models.BooleanField(
+        _("Only users with 2fa can access the organization"), default=False
+    )
     objects = OrganizationManager()
 
     def __str__(self):
@@ -137,6 +150,14 @@ class Organization(models.Model):
             **kwargs,
         )
         return get
+
+    def perform_destroy_ai_organization(self, user_email):
+        intelligence_organization = self.inteligence_organization
+        ai_client = IntelligenceRESTClient()
+        ai_client.delete_organization(
+            organization_id=intelligence_organization,
+            user_email=user_email,
+        )
 
     def send_email_invite_organization(self, email):
         if not settings.SEND_EMAILS:
@@ -263,11 +284,11 @@ class Organization(models.Model):
         return mail
 
     def send_email_change_organization_name(
-            self,
-            user_name: str,
-            email: str,
-            organization_previous_name: str,
-            organization_new_name: str,
+        self,
+        user_name: str,
+        email: str,
+        organization_previous_name: str,
+        organization_new_name: str,
     ):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
@@ -312,7 +333,7 @@ class Organization(models.Model):
         return mail
 
     def send_email_permission_change(
-            self, user_name: str, old_permission: str, new_permission: str, email: str
+        self, user_name: str, old_permission: str, new_permission: str, email: str
     ):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
@@ -355,6 +376,48 @@ class Organization(models.Model):
     def set_2fa_required(self, flag: bool):
         self.enforce_2fa = flag
         self.save()
+
+    def get_ai_access_token(self, user_email: str):
+        ok = False
+        data = {}
+        intelligence_client = IntelligenceRESTClient()
+        try:
+            repository_uuid = settings.REPOSITORY_IDS.get(self.project.template_type)
+            access_token = intelligence_client.get_access_token(user_email, repository_uuid)
+            data = access_token
+            ok = True
+        except Exception as error:
+            logger.error(error)
+            data = {
+                "message": "Could not get access token",
+                "status": status.HTTP_500_INTERNAL_SERVER_ERROR
+            }
+        return ok, data
+
+    def create_ai_organization(self, user_email: str):
+        ai_client = IntelligenceRESTClient()
+        created = False
+
+        try:
+            ai_org = ai_client.create_organization(
+                user_email=user_email,
+                organization_name=self.name
+            )
+            data = ai_org.get("id")
+
+            created = True
+
+            self.inteligence_organization = int(ai_org.get("id"))
+            self.save(update_fields=["inteligence_organization"])
+
+        except Exception as error:
+            data = {
+                "message": "Could not create organization in AI module",
+                "status": status.HTTP_500_INTERNAL_SERVER_ERROR
+            }
+            logger.error(error)
+
+        return created, data
 
 
 class OrganizationLevelRole(Enum):
@@ -436,11 +499,17 @@ class OrganizationAuthorization(models.Model):
 
     @property
     def can_write(self):
-        return self.level in [OrganizationLevelRole.ADMIN.value, OrganizationLevelRole.SUPPORT.value]
+        return self.level in [
+            OrganizationLevelRole.ADMIN.value,
+            OrganizationLevelRole.SUPPORT.value,
+        ]
 
     @property
     def is_admin(self):
-        return self.level in [OrganizationLevelRole.ADMIN.value, OrganizationLevelRole.SUPPORT.value]
+        return self.level in [
+            OrganizationLevelRole.ADMIN.value,
+            OrganizationLevelRole.SUPPORT.value,
+        ]
 
     @property
     def is_financial(self):
@@ -489,7 +558,7 @@ class Project(models.Model):
 
     TEMPLATE_TYPES = (
         (TYPE_SUPPORT, _("support")),
-        (TYPE_LEAD_CAPTURE, _("lead capture"))
+        (TYPE_LEAD_CAPTURE, _("lead capture")),
     )
 
     uuid = models.UUIDField(
@@ -508,7 +577,9 @@ class Project(models.Model):
         help_text=_("Whether day comes first or month comes first in dates"),
     )
     flow_organization = models.UUIDField(_("flow identification UUID"), unique=True)
-    flow_id = models.PositiveIntegerField(_("flow identification ID"), unique=True, null=True)
+    flow_id = models.PositiveIntegerField(
+        _("flow identification ID"), unique=True, null=True
+    )
     inteligence_count = models.IntegerField(_("Intelligence count"), default=0)
     flow_count = models.IntegerField(_("Flows count"), default=0)
     contact_count = models.IntegerField(_("Contacts count"), default=0)
@@ -550,9 +621,30 @@ class Project(models.Model):
         )
         return get
 
+    def project_search(self, text: str):
+        """Searches for project in flows and intelligence"""
+
+        flows_client = FlowsRESTClient()
+        intelligence_client = IntelligenceRESTClient()
+
+        flows_result = flows_client.get_project_flows(
+            project_uuid=self.flow_organization, flow_name=text
+        )
+        intelligence_result = intelligence_client.get_organization_intelligences(
+            intelligence_name=text,
+            organization_id=self.organization.inteligence_organization,
+        )
+
+        return {"flow": flows_result, "intelligence": intelligence_result}
+
+    def perform_destroy_flows_project(self, user_email: str):
+        flow_organization = self.flow_organization
+
+        current_app.send_task("delete_project", args=[flow_organization, user_email])
+
     def send_email_create_project(self, first_name: str, email: str):
         if not settings.SEND_EMAILS:
-            return False  # pragma: no cover
+            return False  # pragma: no cos/tests.pver
         context = {
             "base_url": settings.BASE_URL,
             "organization_name": self.organization.name,
@@ -634,12 +726,110 @@ class Project(models.Model):
         )
         return mail
 
+    def create_classifier(self, authorization, template_type: str, access_token: str):
+        flow_instance = FlowsRESTClient()
+        created = False
+        classifier_name = {
+            "lead_capture": "Farewell & Greetings",
+            "support": "Binary Answers",
+        }
+
+        try:
+            response = flow_instance.create_classifier(
+                project_uuid=str(self.uuid),
+                user_email=authorization.user.email,
+                classifier_type="bothub",
+                classifier_name=classifier_name.get(template_type),
+                access_token=access_token,
+            )
+            created = True
+            data = response.get("data").get("uuid")
+        except Exception as error:
+            logger.error(error)
+            data = {
+                "message": "Could not create classifier",
+                "status": status.HTTP_500_INTERNAL_SERVER_ERROR
+            }
+        return created, data
+
+    def create_chats_project(self):
+        from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient  # to avoid circular import
+        created = False
+        chats_client = ChatsRESTClient()
+        try:
+            chats_response = chats_client.create_chat_project(
+                project_uuid=str(self.uuid),
+                project_name=self.name,
+                date_format=self.date_format,
+                timezone=str(self.timezone),
+                is_template=True,
+                user_email=self.created_by.email
+            )
+            chats_response = json.loads(chats_response.text)
+            data = chats_response
+            created = True
+        except Exception as error:
+            logger.error(error)
+            data = {
+                "message": "Could not create classifier",
+                "status": status.HTTP_500_INTERNAL_SERVER_ERROR
+            }
+        return created, data
+
+    def create_flows(self, classifier_uuid: str):
+        data = {}
+        chats_response = {}
+        created = False
+
+        flow_instance = FlowsRESTClient()
+
+        is_support = self.template_type == Project.TYPE_SUPPORT
+
+        if is_support:
+            chats_created, chats_response = self.create_chats_project()
+            if not chats_created:
+                return chats_response
+        try:
+            flows = flow_instance.create_flows(
+                str(self.flow_organization),
+                str(classifier_uuid),
+                self.template_type,
+                ticketer=chats_response.get("ticketer"),
+                queue=chats_response.get("queue"),
+            )
+            data = json.loads(flows.get("data"))
+            created = True
+        except Exception as error:
+            logger.error(error)
+            data.update(
+                {
+                    "message": "Could not create flow",
+                    "status": status.HTTP_500_INTERNAL_SERVER_ERROR
+                }
+            )
+        return created, data
+
+    def whatsapp_demo_integration(self, token):
+        from connect.api.v1.internal.integrations.integrations_rest_client import IntegrationsRESTClient
+        created = False
+        integrations_client = IntegrationsRESTClient()
+        data = {}
+        try:
+            response = integrations_client.whatsapp_demo_integration(str(self.uuid), token=token)
+            created = True
+            data = response
+        except Exception as error:
+            logger.error(error)
+            data = {
+                "message": "Could not integrate Whatsapp demo",
+                "status": status.HTTP_500_INTERNAL_SERVER_ERROR,
+            }
+        return created, data
+
 
 class OpenedProject(models.Model):
     day = models.DateTimeField(_("Day"))
-    project = models.ForeignKey(
-        Project, models.CASCADE, related_name="opened_project"
-    )
+    project = models.ForeignKey(Project, models.CASCADE, related_name="opened_project")
     user = models.ForeignKey(User, models.CASCADE, related_name="user")
 
 
@@ -789,11 +979,17 @@ class ProjectAuthorization(models.Model):
 
     @property
     def is_moderator(self):
-        return self.level in [ProjectRoleLevel.MODERATOR.value, ProjectRoleLevel.SUPPORT.value]
+        return self.level in [
+            ProjectRoleLevel.MODERATOR.value,
+            ProjectRoleLevel.SUPPORT.value,
+        ]
 
     @property
     def can_write(self):
-        return self.level in [ProjectRoleLevel.MODERATOR.value, ProjectRoleLevel.SUPPORT.value]
+        return self.level in [
+            ProjectRoleLevel.MODERATOR.value,
+            ProjectRoleLevel.SUPPORT.value,
+        ]
 
     @property
     def can_read(self):
@@ -1083,7 +1279,14 @@ class BillingPlan(models.Model):
     card_is_valid = models.BooleanField(_("Card is valid"), default=False)
     trial_end_date = models.DateTimeField(_("Trial end date"), null=True, blank=True)
 
-    def save(self, force_insert=False, force_update=False, using=None, update_fields=None, **kwargs):
+    def save(
+        self,
+        force_insert=False,
+        force_update=False,
+        using=None,
+        update_fields=None,
+        **kwargs,
+    ):
         _adding = self._state.adding
         if _adding or kwargs.get("change_plan"):
             from connect import billing
@@ -1104,19 +1307,14 @@ class BillingPlan(models.Model):
                 self.trial_end_date = pendulum.now().end_of("day").add(months=1)
             else:
                 # Create invoice for charges
-                stripe.api_key = settings.BILLING_SETTINGS.get("stripe", {}).get("API_KEY")
+                stripe.api_key = settings.BILLING_SETTINGS.get("stripe", {}).get(
+                    "API_KEY"
+                )
 
                 customer = self.stripe_customer
 
                 if settings.TESTING:
-                    charges = {
-                        "data": [
-                            {
-                                "id": "ch_teste",
-                                "amount": 39000
-                            }
-                        ]
-                    }
+                    charges = {"data": [{"id": "ch_teste", "amount": 39000}]}
 
                 else:
                     charges = stripe.PaymentIntent.list(customer=customer)
@@ -1128,12 +1326,13 @@ class BillingPlan(models.Model):
                     paid_date=pendulum.now(),
                     due_date=pendulum.now(),
                     payment_status=Invoice.PAYMENT_STATUS_PAID,
-                    payment_method='credit_card',
-                    invoice_amount=(charges["data"][0]["amount"] / 100)
+                    payment_method="credit_card",
+                    invoice_amount=(charges["data"][0]["amount"] / 100),
                 )
                 for project in self.organization.project.all():  # pragma: no cover
                     current_app.send_task(
-                        name="update_suspend_project", args=[project.flow_organization, False]
+                        name="update_suspend_project",
+                        args=[project.flow_organization, False],
                     )
 
         return super().save(force_insert, force_update, using, update_fields)
@@ -1165,11 +1364,7 @@ class BillingPlan(models.Model):
                 price = settings.PLAN_ENTERPRISE_PRICE
                 limit = settings.PLAN_ENTERPRISE_LIMIT
 
-            return {
-                "price": price,
-                "limit": limit,
-                "valid": True
-            }
+            return {"price": price, "limit": limit, "valid": True}
 
         return {"valid": False}
 
@@ -1287,10 +1482,7 @@ class BillingPlan(models.Model):
 
         amount_currenty = Decimal(
             BillingPlan.plan_info(self.plan)["price"]
-            + (
-                settings.BILLING_COST_PER_WHATSAPP
-                * self.organization.extra_integration
-            )
+            + (settings.BILLING_COST_PER_WHATSAPP * self.organization.extra_integration)
         ).quantize(Decimal(".01"), decimal.ROUND_HALF_UP)
 
         return {"total_contact": contact_count, "amount_currenty": amount_currenty}
@@ -1306,7 +1498,10 @@ class BillingPlan(models.Model):
                 self.organization.is_suspended = False
                 self.organization.save(update_fields=["is_suspended"])
                 self.is_active = True
-                self.save(update_fields=["plan", "contract_on", "next_due_date", "is_active"], change_plan=True)
+                self.save(
+                    update_fields=["plan", "contract_on", "next_due_date", "is_active"],
+                    change_plan=True,
+                )
                 # send mail here
                 break
         return _is_valid
@@ -1485,8 +1680,9 @@ class BillingPlan(models.Model):
             return False  # pragma: no cover
 
         if not emails:
-            emails = self.organization.authorizations.exclude(role=OrganizationRole.VIEWER.value).values_list(
-                "user__email", "user__username")
+            emails = self.organization.authorizations.exclude(
+                role=OrganizationRole.VIEWER.value
+            ).values_list("user__email", "user__username")
 
         subject = _("Your trial plan has expired")
         from_email = None
@@ -1498,11 +1694,13 @@ class BillingPlan(models.Model):
 
             context = {
                 "user_name": username,
-                "webapp_billing_url": f"{settings.WEBAPP_BASE_URL}/orgs/{self.organization.uuid}/billing"
+                "webapp_billing_url": f"{settings.WEBAPP_BASE_URL}/orgs/{self.organization.uuid}/billing",
             }
             # message = render_to_string("billing/emails/trial_plan_expired_due_time_limit.txt", context)
             recipient_list = [email[0]]
-            html_message = render_to_string("billing/emails/trial_plan_expired_due_time_limit.html", context)
+            html_message = render_to_string(
+                "billing/emails/trial_plan_expired_due_time_limit.html", context
+            )
 
             msg = (subject, html_message, from_email, recipient_list)
             msg_list.append(msg)
@@ -1516,8 +1714,9 @@ class BillingPlan(models.Model):
             return False  # pragma: no cover
 
         if not emails:
-            emails = self.organization.authorizations.exclude(role=OrganizationRole.VIEWER.value).values_list(
-                "user__email", "user__username")
+            emails = self.organization.authorizations.exclude(
+                role=OrganizationRole.VIEWER.value
+            ).values_list("user__email", "user__username")
 
         subject = _(f"You reached {self.plan_limit} attendances")
         from_email = None
@@ -1530,11 +1729,13 @@ class BillingPlan(models.Model):
             context = {
                 "user_name": username,
                 "webapp_billing_url": f"settings.WEBAPP_BASE_URL/orgs/{self.organization.uuid}/billing",
-                "plan": self.plan
+                "plan": self.plan,
             }
             # message = render_to_string("billing/emails/plan_expired_due_attendence_limit.txt", context)
             recipient_list = [email[0]]
-            html_message = render_to_string("billing/emails/plan_expired_due_attendence_limit.html", context)
+            html_message = render_to_string(
+                "billing/emails/plan_expired_due_attendence_limit.html", context
+            )
 
             msg = (subject, html_message, from_email, recipient_list)
             msg_list.append(msg)
@@ -1548,8 +1749,9 @@ class BillingPlan(models.Model):
             return False  # pragma: no cover
 
         if not emails:
-            emails = self.organization.authorizations.exclude(role=OrganizationRole.VIEWER.value).values_list(
-                "user__email", "user__username")
+            emails = self.organization.authorizations.exclude(
+                role=OrganizationRole.VIEWER.value
+            ).values_list("user__email", "user__username")
 
         subject = _(f"Your organization is close to {self.plan_limit} attendances")
         from_email = None
@@ -1567,7 +1769,9 @@ class BillingPlan(models.Model):
 
             # message = render_to_string("billing/emails/plan_is_about_to_expire.txt", context)
             recipient_list = [email[0]]
-            html_message = render_to_string("billing/emails/plan_is_about_to_expire.html", context)
+            html_message = render_to_string(
+                "billing/emails/plan_is_about_to_expire.html", context
+            )
 
             msg = (subject, html_message, from_email, recipient_list)
             msg_list.append(msg)
@@ -1586,9 +1790,7 @@ class BillingPlan(models.Model):
         }
         mail.send_mail(
             _("Your trial period has ended"),
-            render_to_string(
-                "common/emails/organization/end_trial.txt", context
-            ),
+            render_to_string("common/emails/organization/end_trial.txt", context),
             None,
             email,
             html_message=render_to_string(
@@ -1680,9 +1882,9 @@ class Invoice(models.Model):
             card_data["response"]["final_card_number"] = str(
                 card_data["response"]["final_card_number"]
             )
-            card_data["response"]["final_card_number"] = card_data[
-                "response"
-            ]["final_card_number"][len(card_data["response"]["final_card_number"]) - 2:]
+            card_data["response"]["final_card_number"] = card_data["response"][
+                "final_card_number"
+            ][len(card_data["response"]["final_card_number"]) - 2 :]
         return card_data
 
     @property
@@ -1803,8 +2005,7 @@ class GenericBillingData(models.Model):
                     "limit": settings.PLAN_ENTERPRISE_LIMIT,
                     "price": settings.PLAN_ENTERPRISE_PRICE,
                 },
-
-            }
+            },
         }
 
     def calculate_active_contacts(self, contact_count):
@@ -1832,16 +2033,14 @@ class TemplateProject(models.Model):
     uuid = models.UUIDField(
         _("UUID"), primary_key=True, default=uuid4.uuid4, editable=False
     )
-    project = models.ForeignKey(Project, models.CASCADE, related_name="template_project")
-    wa_demo_token = models.CharField(max_length=30)
-    classifier_uuid = models.UUIDField(
-        _("UUID"), default=uuid4.uuid4
+    project = models.ForeignKey(
+        Project, models.CASCADE, related_name="template_project"
     )
+    wa_demo_token = models.CharField(max_length=30)
+    classifier_uuid = models.UUIDField(_("UUID"), default=uuid4.uuid4)
     first_access = models.BooleanField(default=True)
     authorization = models.ForeignKey(ProjectAuthorization, on_delete=models.CASCADE)
-    flow_uuid = models.UUIDField(
-        _("UUID"), default=uuid4.uuid4
-    )
+    flow_uuid = models.UUIDField(_("UUID"), default=uuid4.uuid4)
     redirect_url = models.URLField(null=True)
 
     @property
@@ -1857,7 +2056,7 @@ class RecentActivity(models.Model):
     ACTIONS_CHOICES = {
         (ADD, "Add"),
         (CREATE, "Entity Created"),
-        (UPDATE, "Entity updated")
+        (UPDATE, "Entity updated"),
     }
 
     USER = "USER"
@@ -1871,7 +2070,7 @@ class RecentActivity(models.Model):
         (FLOW, "Flow Entity"),
         (CHANNEL, "Channel Entity"),
         (TRIGGER, "Trigger Entity"),
-        (CAMPAIGN, "Campaign Entity")
+        (CAMPAIGN, "Campaign Entity"),
     )
 
     project = models.ForeignKey(
@@ -1888,21 +2087,19 @@ class RecentActivity(models.Model):
     @property
     def action_description_key(self) -> str:
         actions = dict(
-            ADD=dict(
-                USER="joined-project"
-            ),
+            ADD=dict(USER="joined-project"),
             CREATE=dict(
                 TRIGGER="created-trigger",
                 CAMPAIGN="created-campaign",
                 FLOW="created-flow",
-                CHANNEL="created-channel"
+                CHANNEL="created-channel",
             ),
             UPDATE=dict(
                 TRIGGER="edited-trigger",
                 CAMPAIGN="edited-campaign",
                 FLOW="edited-flow",
-                CHANNEL="edited-channel"
-            )
+                CHANNEL="edited-channel",
+            ),
         )
         return actions[self.action][self.entity]
 
@@ -1919,7 +2116,7 @@ class RecentActivity(models.Model):
         data = {
             "user": self.user_name,
             "created_at": self.created_on,
-            "action": self.action_description_key
+            "action": self.action_description_key,
         }
         if self.entity_name:
             data.update({"name": self.entity_name})
