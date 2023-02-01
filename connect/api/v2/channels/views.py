@@ -11,29 +11,6 @@ from connect.common.models import Project
 class ChannelsAPIView(views.APIView):
     permission_classes = [ModuleHasPermission]
 
-    def get(self, request):
-        channel_type = request.query_params.get("channel_type", None)
-        if not channel_type:
-            raise ValidationError("Need pass the channel_type")
-        flow_instance = FlowsRESTClient()
-        response = flow_instance.list_channel(channel_type=channel_type)
-        channels = []
-        for channel in response:
-            org = channel.get("org")
-            project = Project.objects.filter(flow_organization=org)
-            if project:
-                project = project.first()
-                channel_data = dict(
-                    uuid=str(channel.get("uuid")),
-                    name=channel.get("name"),
-                    config=channel.get("config"),
-                    address=channel.get("address"),
-                    project_uuid=str(project.uuid),
-                    is_active=channel.get("is_active")
-                )
-                channels.append(channel_data)
-        return JsonResponse(data={"channels": channels}, status=status.HTTP_200_OK)
-
     def delete(self, request):
         serializer = ReleaseChannelSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -65,6 +42,33 @@ class ChannelsAPIView(views.APIView):
         )
 
         return JsonResponse(status=response.status_code, data=response.json())
+
+
+class ListChannelsAPIView(views.APIView):
+    permission_classes = [ModuleHasPermission]
+
+    def get(self, request):
+        channel_type = request.query_params.get("channel_type", None)
+        if not channel_type:
+            raise ValidationError("Need pass the channel_type")
+        flow_instance = FlowsRESTClient()
+        response = flow_instance.list_channel(channel_type=channel_type)
+        channels = []
+        for channel in response:
+            org = channel.get("org")
+            project = Project.objects.filter(flow_organization=org)
+            if project:
+                project = project.first()
+                channel_data = dict(
+                    uuid=str(channel.get("uuid")),
+                    name=channel.get("name"),
+                    config=channel.get("config"),
+                    address=channel.get("address"),
+                    project_uuid=str(project.uuid),
+                    is_active=channel.get("is_active")
+                )
+                channels.append(channel_data)
+        return JsonResponse(data={"channels": channels}, status=status.HTTP_200_OK)
 
 
 class CreateWACChannelAPIView(views.APIView):
