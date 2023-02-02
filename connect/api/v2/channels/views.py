@@ -11,7 +11,7 @@ from connect.common.models import Project
 class ChannelsAPIView(views.APIView):
     permission_classes = [ModuleHasPermission]
 
-    def delete(self, request):
+    def delete(self, request, *args, **kwargs):
         serializer = ReleaseChannelSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -26,7 +26,9 @@ class ChannelsAPIView(views.APIView):
 
         return JsonResponse(status=status.HTTP_200_OK, data={"release": True})
 
-    def post(self, request):
+    def post(self, request, *args, **kwargs):
+        data = request.data
+        data.update({"project_uuid": kwargs.get("project_uuid")})
         serializer = CreateChannelSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
