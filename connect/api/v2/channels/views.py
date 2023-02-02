@@ -42,7 +42,8 @@ class ChannelsAPIView(views.APIView):
             data=serializer.validated_data.get("data"),
             channeltype_code=serializer.validated_data.get("channeltype_code"),
         )
-
+        if response.status_code != status.HTTP_200_OK:
+            return JsonResponse(status=response.status_code, data={"message": response.text})
         return JsonResponse(status=response.status_code, data=response.json())
 
 
