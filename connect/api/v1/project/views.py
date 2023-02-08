@@ -167,7 +167,6 @@ class ProjectViewSet(
         contact_count = count_contacts(project, str(before), str(after))
         contacts = Contact.objects.filter(channel__project=project_uuid, last_seen_on__range=(after, before)).distinct("contact_flow_uuid")
 
-
         active_contacts_info = []
         for contact in contacts:
             active_contacts_info.append({"name": contact.name, "uuid": contact.contact_flow_uuid})
