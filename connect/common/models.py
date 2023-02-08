@@ -377,17 +377,18 @@ class Organization(models.Model):
         self.enforce_2fa = flag
         self.save()
 
-    def get_ai_access_token(self, user_email: str):
+    def get_ai_access_token(self, user_email: str, project):
         ok = False
         data = {}
         intelligence_client = IntelligenceRESTClient()
+
         try:
-            repository_uuid = settings.REPOSITORY_IDS.get(self.project.template_type)
+            repository_uuid = settings.REPOSITORY_IDS.get(project.template_type)
             access_token = intelligence_client.get_access_token(user_email, repository_uuid)
             data = access_token
             ok = True
         except Exception as error:
-            logger.error(error)
+            logger.error(f"GET AI {error}")
             data = {
                 "message": "Could not get access token",
                 "status": status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -415,7 +416,7 @@ class Organization(models.Model):
                 "message": "Could not create organization in AI module",
                 "status": status.HTTP_500_INTERNAL_SERVER_ERROR
             }
-            logger.error(error)
+            logger.error("askldfhaskjfhakjsfbhajkserror")
 
         return created, data
 
@@ -732,6 +733,7 @@ class Project(models.Model):
         classifier_name = {
             "lead_capture": "Farewell & Greetings",
             "support": "Binary Answers",
+            "omie": "OMIE",
         }
 
         try:
@@ -745,7 +747,7 @@ class Project(models.Model):
             created = True
             data = response.get("data").get("uuid")
         except Exception as error:
-            logger.error(error)
+            logger.error("AAAAAAAAAAAAAAAAAAAAAAAAAAerror")
             data = {
                 "message": "Could not create classifier",
                 "status": status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -819,7 +821,7 @@ class Project(models.Model):
             created = True
             data = response
         except Exception as error:
-            logger.error(error)
+            logger.error("errorasdasdasdasdasdgereh r thrthrthrthrthtr")
             data = {
                 "message": "Could not integrate Whatsapp demo",
                 "status": status.HTTP_500_INTERNAL_SERVER_ERROR,

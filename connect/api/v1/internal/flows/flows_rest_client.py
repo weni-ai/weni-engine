@@ -342,6 +342,7 @@ class FlowsRESTClient:
         templates = {
             "lead_capture": f"{os.path.join(os.path.dirname(__file__))}/mp9/flows_definition_captura-de-leads.json",
             "support": f"{os.path.join(os.path.dirname(__file__))}/mp9/fluxos_atendimento_humano.json",
+            "omie": "mockpath",
         }
         return templates.get(template_type)
 

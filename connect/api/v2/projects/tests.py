@@ -131,6 +131,47 @@ class ProjectViewSetTestCase(TestCase):
         Project.objects.get(uuid=content_data.get("uuid"))
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
 
+    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_classifier")
+    @patch("connect.api.v1.internal.integrations.integrations_rest_client.IntegrationsRESTClient.whatsapp_demo_integration")
+    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_flows")
+    @patch("connect.api.v1.internal.intelligence.intelligence_rest_client.IntelligenceRESTClient.get_access_token")
+    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_template_project")
+    def test_create_omie_project(self, create_project, get_access_token, create_flows, wpp_integration, create_classifier):
+        data = {
+            "redirect_url": "https://example.com",
+            "router_token": "rt_token"
+        }
+        response_data = uuid.uuid4()
+
+        create_project.side_effect = [{"id": 1, "uuid": str(uuid.uuid4())}]
+        get_access_token.side_effect = [str(uuid.uuid4())]
+        organization_uuid = str(self.org_1.uuid)
+        flows_response = '{"uuid": "9785a273-37de-4658-bfa2-d8028dc06c84"}'
+        create_flows.side_effect = [dict(status=201, data=flows_response)]
+        create_classifier.side_effect = [{"data": {"uuid": response_data}}]
+        wpp_integration.side_effect = [data]
+
+        body = {
+            "date_format": "D",
+            "name": "Test Omie",
+            "timezone": "America/Argentina/Buenos_Aires",
+            "template": True,
+            "template_type": "omie"
+        }
+        path = f"/v2/organizations/{organization_uuid}projects/"
+        method = {"post": "create"}
+        user = self.user
+
+        response, content_data = self.request(
+            path,
+            method,
+            user=user,
+            pk=organization_uuid,
+            data=body
+        )
+        Project.objects.get(uuid=content_data.get("uuid"))
+        self.assertEquals(response.status_code, status.HTTP_201_CREATED)
+
     @patch("connect.api.v1.internal.chats.chats_rest_client.ChatsRESTClient.update_chats_project")
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.update_project")
     def test_update_project(self, flows_update_project, update_chats_project):

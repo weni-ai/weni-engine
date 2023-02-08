@@ -8,7 +8,7 @@ from connect.common.models import (
     Project,
     OpenedProject,
 )
-from connect.api.v1.project.serializers import (
+from connect.api.v2.projects.serializers import (
     ProjectSerializer,
 )
 

@@ -60,7 +60,7 @@ class ProjectSerializer(serializers.ModelSerializer):
         ref_name = None
 
     uuid = serializers.UUIDField(style={"show": False}, read_only=True)
-    name = serializers.CharField(max_length=40, required=True)
+    name = serializers.CharField(max_length=500, required=True)
     organization = serializers.PrimaryKeyRelatedField(
         queryset=Organization.objects,
         validators=[CanContributeInOrganizationValidator()],
@@ -147,6 +147,18 @@ class ProjectSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = self.context["request"].user
         extra_data = self.context["request"].data.get("project")
+
+        extra_data = {
+            "template": True,
+            "template_type": "omie"
+        }
+
+        # if not extra_data:
+        #     extra_data = {
+        #         "template": self.context["request"].data.get("template"),
+        #         "template_type": self.context["request"].data.get("template_type"),
+        #     }
+
         is_template = extra_data.get("template")
 
         created, flows_info = self.create_flows_project(validated_data, user, is_template)
@@ -296,7 +308,7 @@ class ProjectSerializer(serializers.ModelSerializer):
                 "message": "Could not create project",
                 "status": status.HTTP_500_INTERNAL_SERVER_ERROR
             }
-            logger.error(error)
+            logger.error("porra 2 {error}")
 
         return created, flows_info
 
@@ -351,12 +363,11 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
             # Project delete
             return message
 
-        ok, access_token = project.organization.get_ai_access_token(authorization.user.email)
+        ok, access_token = project.organization.get_ai_access_token(authorization.user.email, project)
 
         if not ok:
             # Project delete
             return access_token
-
         created, classifier_uuid = project.create_classifier(
             authorization,
             project.template_type,
@@ -392,128 +403,3 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
         )
 
         return template
-
-        # # Create template project model
-        # template = project.template_project.create(authorization=authorization)
-
-        # # Get AI access token
-        # if not settings.TESTING:
-        #     intelligence_client = IntelligenceRESTClient()
-        #     try:
-        #         repository_uuid = settings.REPOSITORY_IDS.get(project.template_type)
-        #         access_token = intelligence_client.get_access_token(request.user.email, repository_uuid)
-        #     except Exception as error:
-        #         logger.error(error)
-        #         template.delete()
-        #         data.update(
-        #             {
-        #                 "message": "Could not get access token",
-        #                 "status": "FAILED"
-        #             }
-        #         )
-        #         return data
-        # else:
-        #     access_token = str(uuid.uuid4())
-
-        # # Create classifier
-        # if not settings.TESTING:
-        #     try:
-        #         classifier_uuid = tasks.create_classifier(
-        #             project_uuid=str(project.flow_organization),
-        #             user_email=request.user.email,
-        #             classifier_name="Farewell & Greetings" if project.template_type == Project.TYPE_LEAD_CAPTURE else "Binary Answers",
-        #             access_token=access_token,
-        #         ).get("uuid")
-        #     except Exception as error:
-        #         logger.error(error)
-        #         template.delete()
-        #         data.update(
-        #             {
-        #                 "message": "Could not create classifier",
-        #                 "status": "FAILED"
-        #             }
-        #         )
-        #         return data
-        # else:
-        #     classifier_uuid = uuid.uuid4()
-
-        # # Create Flow and Ticketer
-        # if not settings.TESTING:
-        #     rest_client = FlowsRESTClient()
-        #     try:
-        #         is_support = project.template_type == Project.TYPE_SUPPORT
-        #         if is_support:
-        #             chats_client = ChatsRESTClient()
-        #             chats_response = chats_client.create_chat_project(
-        #                 project_uuid=str(project.uuid),
-        #                 project_name=project.name,
-        #                 date_format=project.date_format,
-        #                 timezone=str(project.timezone),
-        #                 is_template=True,
-        #                 user_email=project.created_by.email
-        #             )
-        #             chats_response = json.loads(chats_response.text)
-        #         flows = rest_client.create_flows(
-        #             str(project.flow_organization),
-        #             str(classifier_uuid),
-        #             project.template_type,
-        #             ticketer=chats_response.get("ticketer") if is_support else None,
-        #             queue=chats_response.get("queue") if is_support else None,
-        #         )
-        #         if flows.get("status") == 201:
-        #             flows = json.loads(flows.get("data"))
-        #     except Exception as error:
-        #         logger.error(error)
-        #         template.delete()
-        #         data.update(
-        #             {
-        #                 "message": "Could not create flow",
-        #                 "status": "FAILED"
-        #             }
-        #         )
-        #         return data
-        # else:
-        #     flows = {"uuid": uuid.uuid4()}
-
-        # flow_uuid = flows.get("uuid")
-
-        # template.classifier_uuid = classifier_uuid
-        # template.flow_uuid = flow_uuid
-
-        # # Integrate WhatsApp
-        # token = request._auth
-        # if not settings.TESTING:
-        #     try:
-        #         integrations_client = IntegrationsRESTClient()
-        #         response = integrations_client.whatsapp_demo_integration(str(project.uuid), token=token)
-        #     except Exception as error:
-        #         logger.error(error)
-        #         template.delete()
-        #         data.update(
-        #             {
-        #                 "message": "Could not integrate Whatsapp demo",
-        #                 "status": "FAILED"
-        #             }
-        #         )
-        #         return data
-        # else:
-        #     response = {
-        #         "router_token": "wa-demo-12345",
-        #         "redirect_url": 'https://wa.me/5582123456?text=wa-demo-12345'
-        #     }
-
-        # wa_demo_token = response.get("router_token")
-        # redirect_url = response.get("redirect_url")
-        # template.wa_demo_token = wa_demo_token
-        # template.redirect_url = redirect_url
-        # template.save(update_fields=["classifier_uuid", "flow_uuid", "wa_demo_token", "redirect_url"])
-
-        # data = {
-        #     "first_access": template.first_access,
-        #     "flow_uuid": str(template.flow_uuid),
-        #     "project_type": "template",
-        #     "wa_demo_token": template.wa_demo_token,
-        #     "redirect_url": redirect_url,
-        # }
-
-        # return data

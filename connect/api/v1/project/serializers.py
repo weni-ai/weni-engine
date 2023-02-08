@@ -504,7 +504,7 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
                 repository_uuid = settings.REPOSITORY_IDS.get(project.template_type)
                 access_token = intelligence_client.get_access_token(request.user.email, repository_uuid)
             except Exception as error:
-                logger.error(error)
+                logger.error(f" REPOSITORY IDS {error}")
                 template.delete()
                 data.update(
                     {
@@ -526,7 +526,7 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
                     access_token=access_token,
                 ).get("uuid")
             except Exception as error:
-                logger.error(error)
+                logger.error(f"CREATE CLASSIFIER {error}")
                 template.delete()
                 data.update(
                     {
@@ -564,7 +564,7 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
                 if flows.get("status") == 201:
                     flows = json.loads(flows.get("data"))
             except Exception as error:
-                logger.error(error)
+                logger.error(" create chats project {error}")
                 template.delete()
                 data.update(
                     {
@@ -588,7 +588,7 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
                 integrations_client = IntegrationsRESTClient()
                 response = integrations_client.whatsapp_demo_integration(str(project.uuid), token=token)
             except Exception as error:
-                logger.error(error)
+                logger.error("porra {error}")
                 template.delete()
                 data.update(
                     {
