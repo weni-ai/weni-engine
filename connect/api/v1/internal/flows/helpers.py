@@ -1,13 +1,18 @@
 import json
 
 
-def add_classifier_to_flow(sample_flow: str, classifier_uuid: str, ticketer: dict = None, queue: dict = None):
+def add_classifier_to_flow(
+    sample_flow: str, classifier_uuid: str, template_type: str,
+    ticketer: dict = None, queue: dict = None,
+):
+    from connect.common.models import Project
+
     with open(sample_flow) as f:
         sample = f.read()
 
     sample_flow = json.loads(sample)
 
-    if ticketer and queue:
+    if template_type == Project.TYPE_SUPPORT:
         ticketer_uuid = ticketer.get("uuid")
         ticketer_name = ticketer.get("name")
 
@@ -34,9 +39,21 @@ def add_classifier_to_flow(sample_flow: str, classifier_uuid: str, ticketer: dic
             queue_json["uuid"] = queue_uuid
             queue_json["name"] = queue_name
 
-    else:
+        classifier["uuid"] = classifier_uuid
+
+    elif template_type == Project.TYPE_OMIE:
+        classifiers = [
+            sample_flow["flows"][5]["nodes"][6]["actions"][0]["classifier"],
+            sample_flow["flows"][5]["nodes"][13]["actions"][0]["classifier"],
+            sample_flow["flows"][10]["nodes"][3]["actions"][0]["classifier"]
+        ]
+
+        for classifier in classifiers:
+            classifier["uuid"] = classifier_uuid
+
+    elif template_type == Project.TYPE_LEAD_CAPTURE:
         classifier = sample_flow["flows"][3]["nodes"][0]["actions"][0]["classifier"]
 
-    classifier["uuid"] = classifier_uuid
+        classifier["uuid"] = classifier_uuid
 
     return sample_flow

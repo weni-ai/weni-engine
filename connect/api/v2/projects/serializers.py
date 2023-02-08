@@ -148,16 +148,11 @@ class ProjectSerializer(serializers.ModelSerializer):
         user = self.context["request"].user
         extra_data = self.context["request"].data.get("project")
 
-        extra_data = {
-            "template": True,
-            "template_type": "omie"
-        }
-
-        # if not extra_data:
-        #     extra_data = {
-        #         "template": self.context["request"].data.get("template"),
-        #         "template_type": self.context["request"].data.get("template_type"),
-        #     }
+        if not extra_data:
+            extra_data = {
+                "template": self.context["request"].data.get("template"),
+                "template_type": self.context["request"].data.get("template_type"),
+            }
 
         is_template = extra_data.get("template")
 
@@ -308,7 +303,7 @@ class ProjectSerializer(serializers.ModelSerializer):
                 "message": "Could not create project",
                 "status": status.HTTP_500_INTERNAL_SERVER_ERROR
             }
-            logger.error("porra 2 {error}")
+            logger.error(error)
 
         return created, flows_info
 

@@ -416,7 +416,7 @@ class Organization(models.Model):
                 "message": "Could not create organization in AI module",
                 "status": status.HTTP_500_INTERNAL_SERVER_ERROR
             }
-            logger.error("askldfhaskjfhakjsfbhajkserror")
+            logger.error(error)
 
         return created, data
 
@@ -556,10 +556,12 @@ class Project(models.Model):
 
     TYPE_SUPPORT = "support"
     TYPE_LEAD_CAPTURE = "lead_capture"
+    TYPE_OMIE = "omie"
 
     TEMPLATE_TYPES = (
         (TYPE_SUPPORT, _("support")),
         (TYPE_LEAD_CAPTURE, _("lead capture")),
+        (TYPE_OMIE, "omie"),
     )
 
     uuid = models.UUIDField(
@@ -747,7 +749,7 @@ class Project(models.Model):
             created = True
             data = response.get("data").get("uuid")
         except Exception as error:
-            logger.error("AAAAAAAAAAAAAAAAAAAAAAAAAAerror")
+            logger.error(error)
             data = {
                 "message": "Could not create classifier",
                 "status": status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -821,7 +823,7 @@ class Project(models.Model):
             created = True
             data = response
         except Exception as error:
-            logger.error("errorasdasdasdasdasdgereh r thrthrthrthrthtr")
+            logger.error(error)
             data = {
                 "message": "Could not integrate Whatsapp demo",
                 "status": status.HTTP_500_INTERNAL_SERVER_ERROR,

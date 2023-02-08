@@ -174,7 +174,6 @@ class ProjectSerializer(serializers.ModelSerializer):
         return instance
 
     def update(self, instance, validated_data):
-        print("Aqu =i")
         name = validated_data.get("name", instance.name)
         celery_app.send_task(
             "update_project",
@@ -588,7 +587,7 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
                 integrations_client = IntegrationsRESTClient()
                 response = integrations_client.whatsapp_demo_integration(str(project.uuid), token=token)
             except Exception as error:
-                logger.error("porra {error}")
+                logger.error(error)
                 template.delete()
                 data.update(
                     {

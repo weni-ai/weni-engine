@@ -30,7 +30,7 @@ class FlowsRESTClient:
 
         flow = self.template_flow(template_type)
 
-        sample_flow = add_classifier_to_flow(flow, classifier_uuid, ticketer, queue)
+        sample_flow = add_classifier_to_flow(flow, classifier_uuid, template_type, ticketer, queue)
 
         body = dict(
             org=project_uuid,
@@ -342,7 +342,7 @@ class FlowsRESTClient:
         templates = {
             "lead_capture": f"{os.path.join(os.path.dirname(__file__))}/mp9/flows_definition_captura-de-leads.json",
             "support": f"{os.path.join(os.path.dirname(__file__))}/mp9/fluxos_atendimento_humano.json",
-            "omie": "mockpath",
+            "omie": f"{os.path.join(os.path.dirname(__file__))}/mp9/cristal-omie.json",
         }
         return templates.get(template_type)
 

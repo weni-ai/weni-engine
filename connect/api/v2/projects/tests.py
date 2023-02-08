@@ -10,6 +10,8 @@ from connect.api.v1.tests.utils import create_user_and_token
 from connect.common.models import Organization, BillingPlan, OrganizationRole, Project
 from connect.api.v2.projects.views import ProjectViewSet
 
+from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
+
 
 class ProjectViewSetTestCase(TestCase):
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.update_user_permission_project")
@@ -389,3 +391,11 @@ class ProjectTestCase(TestCase):
         token = "token"
         created, response_data = project.whatsapp_demo_integration(token)
         self.assertFalse(created)
+
+    @patch("requests.post")
+    def test_create_flows_json(self, post):
+        flows = FlowsRESTClient()
+        project_uuid = uuid.uuid4()
+        classifier_uuid = uuid.uuid4()
+        template_type = "omie"
+        flows.create_flows(project_uuid, classifier_uuid, template_type)
