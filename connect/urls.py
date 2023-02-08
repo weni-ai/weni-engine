@@ -200,8 +200,6 @@ if settings.DEBUG:
                             old_permission="Viewer",
                             new_permission="Administrator",
                         ),
-                            new_permission="Administrator",
-                        ),
                     ),
                     path(
                         "trial-end",
