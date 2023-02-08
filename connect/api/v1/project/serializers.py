@@ -563,7 +563,7 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
                 if flows.get("status") == 201:
                     flows = json.loads(flows.get("data"))
             except Exception as error:
-                logger.error(" create chats project {error}")
+                logger.error(error)
                 template.delete()
                 data.update(
                     {
