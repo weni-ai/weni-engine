@@ -1155,7 +1155,7 @@ class BillingPlan(models.Model):
                 for project in self.organization.project.all():  # pragma: no cover
                     current_app.send_task(
                         name="update_suspend_project",
-                        args=[project.flow_organization, False],
+                        args=[project.uuid, False],
                     )
 
         return super().save(force_insert, force_update, using, update_fields)
@@ -1688,7 +1688,7 @@ class BillingPlan(models.Model):
         self.organization.save(update_fields=["is_suspended"])
         for project in self.organization.project.all():
             current_app.send_task(  # pragma: no cover
-                name="update_suspend_project", args=[project.flow_organization, True]
+                name="update_suspend_project", args=[project.uuid, True]
             )
 
 

@@ -31,7 +31,7 @@ class CreateClassifierAPIView(views.APIView):
 
         flow_instance = FlowsRESTClient()
         classifier_data = flow_instance.create_classifier(
-            project_uuid=str(project.flow_organization),
+            project_uuid=str(project.uuid),
             user_email=user_email,
             classifier_type="bothub",
             classifier_name=classifier_name,
@@ -56,7 +56,7 @@ class ListClassifierAPIView(views.APIView):
         flow_instance = FlowsRESTClient()
 
         response = flow_instance.get_classifiers(
-            project_uuid=str(project.flow_organization), classifier_type="bothub", is_active=True
+            project_uuid=str(project.uuid), classifier_type="bothub", is_active=True
         )
 
         for i in response:

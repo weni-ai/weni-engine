@@ -20,7 +20,7 @@ class TicketerAPIView(views.APIView):
         if not settings.TESTING:
             flows_client = FlowsRESTClient()
             ticketer = flows_client.create_ticketer(
-                project_uuid=str(project.flow_organization),
+                project_uuid=str(project.uuid),
                 ticketer_type=ticketer_type,
                 name=name,
                 config=config,

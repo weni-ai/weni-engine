@@ -299,14 +299,14 @@ class RequestPermissionProjectSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         if attrs.get("role") == ProjectRoleLevel.NOTHING.value:
             raise PermissionDenied(_("You cannot set user role 0"))
-        
+
         email = attrs.get("email")
 
         if ' ' in email:
             raise ValidationError(
                 _("Email field cannot have spaces")
             )
-        
+
         if bool(re.match('[A-Z]', email)):
             raise ValidationError(
                 _("Email field cannot have uppercase characters")
@@ -532,7 +532,7 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
         if not settings.TESTING:
             try:
                 classifier_uuid = tasks.create_classifier(
-                    project_uuid=str(project.flow_organization),
+                    project_uuid=str(project.uuid),
                     user_email=request.user.email,
                     classifier_name="Farewell & Greetings" if project.template_type == Project.TYPE_LEAD_CAPTURE else "Binary Answers",
                     access_token=access_token,
@@ -567,7 +567,7 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
                     )
                     chats_response = json.loads(chats_response.text)
                 flows = rest_client.create_flows(
-                    str(project.flow_organization),
+                    str(project.uuid),
                     str(classifier_uuid),
                     project.template_type,
                     ticketer=chats_response.get("ticketer") if is_support else None,

@@ -106,7 +106,7 @@ def update_organization(instance, **kwargs):
         celery_app.send_task(  # pragma: no cover
             name="update_suspend_project",
             args=[
-                str(project.flow_organization),
+                str(project.uuid),
                 instance.is_suspended,
             ],
         )
@@ -301,20 +301,11 @@ def project_authorization(sender, instance, created, **kwargs):
             instance_user.save(update_fields=["role"])
 
         update_user_permission_project(
-            flow_organization=str(instance.project.flow_organization),
+            flow_organization=str(instance.project.uuid),
             project_uuid=str(instance.project.uuid),
             user_email=instance.user.email,
             permission=instance.role
         )
-        # celery_app.send_task(
-        #     "update_user_permission_project",
-        #     args=[
-        #         instance.project.flow_organization,
-        #         instance.project.uuid,
-        #         instance.user.email,
-        #         instance.role,
-        #     ],
-        # )
 
 
 @receiver(post_save, sender=RequestRocketPermission)
