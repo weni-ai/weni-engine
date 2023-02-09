@@ -662,7 +662,7 @@ class OrganizationViewSet(
     )
     def retrieve_organization(self, request):
         flow_organization_uuid = request.uuid
-        organization = Organization.objects.get(project__flow_organization=flow_organization_uuid)
+        organization = Organization.objects.get(project__uuid=flow_organization_uuid)
         return {
             "status": status.HTTP_200_OK,
             "response": {
