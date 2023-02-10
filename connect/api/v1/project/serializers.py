@@ -299,14 +299,14 @@ class RequestPermissionProjectSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         if attrs.get("role") == ProjectRoleLevel.NOTHING.value:
             raise PermissionDenied(_("You cannot set user role 0"))
-        
+
         email = attrs.get("email")
 
         if ' ' in email:
             raise ValidationError(
                 _("Email field cannot have spaces")
             )
-        
+
         if bool(re.match('[A-Z]', email)):
             raise ValidationError(
                 _("Email field cannot have uppercase characters")

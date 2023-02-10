@@ -269,7 +269,7 @@ class RequestPermissionOrganizationSerializer(serializers.ModelSerializer):
             raise ValidationError(
                 _("Email field cannot have spaces")
             )
-        
+
         if bool(re.match('[A-Z]', email)):
             raise ValidationError(
                 _("Email field cannot have uppercase characters")
