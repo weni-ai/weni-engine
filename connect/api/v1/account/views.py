@@ -19,8 +19,6 @@ from connect.api.v1.account.serializers import (
     SearchUserSerializer,
 )
 from connect.api.v1.keycloak import KeycloakControl
-from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
-from connect.api.v1.internal.intelligence.intelligence_rest_client import IntelligenceRESTClient
 from connect.authentication.models import User
 from connect.common.models import OrganizationAuthorization, Service
 from connect.utils import upload_photo_rocket
@@ -159,16 +157,7 @@ class MyUserProfileViewSet(
         serializer.is_valid(raise_exception=True)
         language = serializer.data.get("language")
         user = request.user
-        user.language = language
-        user.save(update_fields=["language"])
-        FlowsRESTClient().update_language(
-            user_email=user.email,
-            language=language
-        )
-        IntelligenceRESTClient().update_language(
-            user_email=user.email,
-            language=language,
-        )
+        user.update_language(language)
 
         return Response({"language": user.language})
 

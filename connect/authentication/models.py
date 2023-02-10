@@ -221,3 +221,18 @@ class User(AbstractBaseUser, PermissionsMixin):
     def photo_url(self):
         if self.photo and hasattr(self.photo, "url"):
             return self.photo.url
+
+    def update_language(self, language: str):
+        from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
+        from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
+        from connect.api.v1.internal.intelligence.intelligence_rest_client import IntelligenceRESTClient
+
+        chats_rest = ChatsRESTClient()
+        flows_rest = FlowsRESTClient()
+        intelligence_rest = IntelligenceRESTClient()
+        self.language = language
+        self.save(update_fields=["language"])
+
+        chats_rest.update_user_language(self.email, self.language)
+        flows_rest.update_language(self.email, self.language)
+        intelligence_rest.update_language(self.email, self.language)
