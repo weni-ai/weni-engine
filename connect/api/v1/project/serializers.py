@@ -173,6 +173,25 @@ class ProjectSerializer(serializers.ModelSerializer):
 
         return instance
 
+    def create(self, validated_data):
+        user = self.context["request"].user
+        project = task
+
+        validated_data.update(
+            {
+                "created_by": user
+            }
+        )
+        instance = super().create(validated_data)
+        task = tasks.create_project(  # pragma: no cover
+            validated_data.get("name"),
+            user.email,
+            str(validated_data.get("timezone")),
+            instance.uuid
+        )
+
+        return instance
+
     def update(self, instance, validated_data):
         name = validated_data.get("name", instance.name)
         celery_app.send_task(

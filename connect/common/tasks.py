@@ -214,7 +214,7 @@ def get_contacts_detailed(project_uuid: str, before: str, after: str):
 
 
 @app.task(name="create_project")
-def create_project(project_name: str, user_email: str, project_timezone: str):
+def create_project(project_name: str, user_email: str, project_timezone: str, project_uuid: str):
     if settings.USE_FLOW_REST:
         flow_instance = FlowsRESTClient()
     else:
@@ -224,6 +224,7 @@ def create_project(project_name: str, user_email: str, project_timezone: str):
         project_name=project_name,
         user_email=user_email,
         project_timezone=project_timezone,
+        project_uuid=project_uuid
     )
     return {"id": project.get("id"), "uuid": project.get("uuid")}
 
