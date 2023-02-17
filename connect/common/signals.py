@@ -347,11 +347,11 @@ def request_chats_permission(sender, instance, created, **kwargs):
             chats_instance = ChatsRESTClient()
             if project_auth.exists():
                 project_auth = project_auth.first()
-                chats_role = ChatsRole.ADMIN.value if project_auth.is_moderator else instance.role
+                chats_role = ChatsRole.ADMIN.value if project_auth.is_moderator or project_auth.role == ProjectRole.CONTRIBUTOR.value else ChatsRole.AGENT.value
                 if not project_auth.chats_authorization:
                     project_auth.chats_authorization = ChatsAuthorization.objects.create(role=chats_role)
                     if not settings.TESTING:
-                        chats_instance.create_user_permission(
+                        chats_instance.update_user_permission(
                             project_uuid=str(instance.project.uuid),
                             user_email=user.email,
                             permission=chats_role
