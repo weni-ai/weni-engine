@@ -154,7 +154,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             ),
         }
 
-    def create(self, validated_data):
+    def create_project(self, validated_data):
         user = self.context["request"].user
         task = tasks.create_project(  # pragma: no cover
             validated_data.get("name"),
@@ -175,7 +175,6 @@ class ProjectSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user = self.context["request"].user
-        project = task
 
         validated_data.update(
             {
@@ -183,7 +182,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             }
         )
         instance = super().create(validated_data)
-        task = tasks.create_project(  # pragma: no cover
+        tasks.create_project(  # pragma: no cover
             validated_data.get("name"),
             user.email,
             str(validated_data.get("timezone")),
