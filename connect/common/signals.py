@@ -245,7 +245,7 @@ def request_permission_project(sender, instance, created, **kwargs):
                     created_by=instance.created_by
                 )
             instance.delete()
-        # todo: send invite project email
+        instance.project.send_email_invite_project(email=instance.email)
 
 
 @receiver(post_save, sender=ProjectAuthorization)

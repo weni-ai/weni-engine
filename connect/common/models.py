@@ -648,6 +648,28 @@ class Project(models.Model):
         )
         return mail
 
+    def send_email_invite_project(self, email):
+        if not settings.SEND_EMAILS:
+            return False  # pragma: no cover
+        context = {
+            "base_url": settings.BASE_URL,
+            "webapp_base_url": settings.WEBAPP_BASE_URL,
+            "organization_name": self.organization.name,
+            "project_name": self.name,
+        }
+        mail.send_mail(
+            _("Invitation to join organization"),
+            render_to_string(
+                "common/emails/project/invite_project.txt", context
+            ),
+            None,
+            [email],
+            html_message=render_to_string(
+                "common/emails/project/invite_project.html", context
+            ),
+        )
+        return mail
+
 
 class OpenedProject(models.Model):
     day = models.DateTimeField(_("Day"))
