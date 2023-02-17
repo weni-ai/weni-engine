@@ -4,6 +4,7 @@ from rest_framework_nested import routers
 from connect.api.v2.channels.views import ChannelsAPIView, CreateWACChannelAPIView, ListChannelsAPIView
 from connect.api.v2.classifier.views import CreateClassifierAPIView, ListClassifierAPIView, RetrieveClassfierAPIView, DeleteClassifierAPIView
 from connect.api.v2.ticketer.views import TicketerAPIView
+from connect.api.v2.user.views import UserAPIToken
 
 
 router = routers.SimpleRouter()
@@ -18,4 +19,5 @@ urlpatterns = [
     path("projects/<project_uuid>/channel", ChannelsAPIView.as_view(), name="channels"),
     path("projects/channels", ListChannelsAPIView.as_view(), name="list-channels"),
     path("projects/<project_uuid>/create-wac-channel", CreateWACChannelAPIView.as_view(), name="create-wac-channel"),
+    path("projects/<project_uuid>/user-api-token", UserAPIToken.as_view(), name="user-api-token")
 ]
