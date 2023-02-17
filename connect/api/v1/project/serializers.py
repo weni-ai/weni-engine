@@ -186,7 +186,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             validated_data.get("name"),
             user.email,
             str(validated_data.get("timezone")),
-            instance.uuid
+            str(instance.uuid)
         )
 
         return instance
