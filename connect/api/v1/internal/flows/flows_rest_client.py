@@ -44,11 +44,12 @@ class FlowsRESTClient:
         )
         return dict(status=response.status_code, data=response.text)
 
-    def create_project(self, project_name: str, user_email: str, project_timezone: str):
+    def create_project(self, project_name: str, user_email: str, project_timezone: str, project_uuid: str):
         body = dict(
             name=project_name,
             timezone=project_timezone,
-            user_email=user_email
+            user_email=user_email,
+            project_uuid=project_uuid
         )
 
         response = requests.post(

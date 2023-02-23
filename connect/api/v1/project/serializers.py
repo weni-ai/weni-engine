@@ -1,6 +1,7 @@
 import json
 import logging
 import uuid
+import re
 
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
@@ -8,6 +9,7 @@ from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
 from rest_framework import serializers
 
 from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import ValidationError
 
 from connect.api.v1 import fields
 from connect.api.v1.fields import TextField
@@ -152,7 +154,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             ),
         }
 
-    def create(self, validated_data):
+    def create_project(self, validated_data):
         user = self.context["request"].user
 
         flow_instance = FlowsRESTClient()
@@ -170,6 +172,24 @@ class ProjectSerializer(serializers.ModelSerializer):
             }
         )
         instance = super().create(validated_data)
+
+        return instance
+
+    def create(self, validated_data):
+        user = self.context["request"].user
+
+        validated_data.update(
+            {
+                "created_by": user
+            }
+        )
+        instance = super().create(validated_data)
+        tasks.create_project(  # pragma: no cover
+            validated_data.get("name"),
+            user.email,
+            str(validated_data.get("timezone")),
+            str(instance.uuid)
+        )
 
         return instance
 
@@ -300,6 +320,19 @@ class RequestPermissionProjectSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         if attrs.get("role") == ProjectRoleLevel.NOTHING.value:
             raise PermissionDenied(_("You cannot set user role 0"))
+
+        email = attrs.get("email")
+
+        if ' ' in email:
+            raise ValidationError(
+                _("Email field cannot have spaces")
+            )
+
+        if bool(re.match('[A-Z]', email)):
+            raise ValidationError(
+                _("Email field cannot have uppercase characters")
+            )
+
         return attrs
 
 
@@ -520,7 +553,7 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
         if not settings.TESTING:
             try:
                 classifier_uuid = tasks.create_classifier(
-                    project_uuid=str(project.flow_organization),
+                    project_uuid=str(project.uuid),
                     user_email=request.user.email,
                     classifier_name="Farewell & Greetings" if project.template_type == Project.TYPE_LEAD_CAPTURE else "Binary Answers",
                     access_token=access_token,
@@ -555,7 +588,7 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
                     )
                     chats_response = json.loads(chats_response.text)
                 flows = rest_client.create_flows(
-                    str(project.flow_organization),
+                    str(project.uuid),
                     str(classifier_uuid),
                     project.template_type,
                     ticketer=chats_response.get("ticketer") if is_support else None,

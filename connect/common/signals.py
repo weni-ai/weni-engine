@@ -106,7 +106,7 @@ def update_organization(instance, **kwargs):
         celery_app.send_task(  # pragma: no cover
             name="update_suspend_project",
             args=[
-                str(project.flow_organization),
+                str(project.uuid),
                 instance.is_suspended,
             ],
         )
@@ -258,6 +258,20 @@ def project_authorization(sender, instance, created, **kwargs):
                 project=instance.project,
                 created_by=instance.user
             )
+        if instance.role == ProjectRole.VIEWER.value:
+            RequestChatsPermission.objects.create(
+                email=instance.user.email,
+                role=ChatsRole.AGENT.value,
+                project=instance.project,
+                created_by=instance.user
+            )
+        if instance.role == ProjectRole.CONTRIBUTOR.value:
+            RequestChatsPermission.objects.create(
+                email=instance.user.email,
+                role=ChatsRole.ADMIN.value,
+                project=instance.project,
+                created_by=instance.user
+            )
         RecentActivity.objects.create(
             action="ADD",
             entity="USER",
@@ -287,20 +301,11 @@ def project_authorization(sender, instance, created, **kwargs):
             instance_user.save(update_fields=["role"])
 
         update_user_permission_project(
-            flow_organization=str(instance.project.flow_organization),
+            flow_organization=str(instance.project.uuid),
             project_uuid=str(instance.project.uuid),
             user_email=instance.user.email,
             permission=instance.role
         )
-        # celery_app.send_task(
-        #     "update_user_permission_project",
-        #     args=[
-        #         instance.project.flow_organization,
-        #         instance.project.uuid,
-        #         instance.user.email,
-        #         instance.role,
-        #     ],
-        # )
 
 
 @receiver(post_save, sender=RequestRocketPermission)

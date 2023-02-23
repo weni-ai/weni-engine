@@ -7,7 +7,7 @@ class OrganizationService(generics.GenericService):
     def Retrieve(self, request, context):
 
         flow_organization_uuid = request.uuid
-        organization = Organization.objects.get(project__flow_organization=flow_organization_uuid)
+        organization = Organization.objects.get(project__uuid=flow_organization_uuid)
 
         return OrganizationResponse(
             uuid=str(organization.uuid),

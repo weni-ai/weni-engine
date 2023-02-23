@@ -22,6 +22,8 @@ from connect.common.gateways.rocket_gateway import Rocket
 from enum import Enum
 from celery import current_app
 import stripe
+from connect.common.helpers import send_mass_html_mail
+
 from connect.api.v1.internal.intelligence.intelligence_rest_client import (
     IntelligenceRESTClient,
 )
@@ -576,7 +578,8 @@ class Project(models.Model):
         default=DATE_FORMAT_DAY_FIRST,
         help_text=_("Whether day comes first or month comes first in dates"),
     )
-    flow_organization = models.UUIDField(_("flow identification UUID"), unique=True)
+    flow_organization = models.UUIDField(_("flow identification UUID"),
+                                         unique=True, null=True, blank=True)
     flow_id = models.PositiveIntegerField(
         _("flow identification ID"), unique=True, null=True
     )
@@ -644,7 +647,7 @@ class Project(models.Model):
 
     def send_email_create_project(self, first_name: str, email: str):
         if not settings.SEND_EMAILS:
-            return False  # pragma: no cos/tests.pver
+            return False  # pragma: no cover
         context = {
             "base_url": settings.BASE_URL,
             "organization_name": self.organization.name,
@@ -1314,7 +1317,14 @@ class BillingPlan(models.Model):
                 customer = self.stripe_customer
 
                 if settings.TESTING:
-                    charges = {"data": [{"id": "ch_teste", "amount": 39000}]}
+                    charges = {
+                        "data": [
+                            {
+                                "id": "ch_teste",
+                                "amount": 39000
+                            }
+                        ]
+                    }
 
                 else:
                     charges = stripe.PaymentIntent.list(customer=customer)
@@ -1326,13 +1336,13 @@ class BillingPlan(models.Model):
                     paid_date=pendulum.now(),
                     due_date=pendulum.now(),
                     payment_status=Invoice.PAYMENT_STATUS_PAID,
-                    payment_method="credit_card",
-                    invoice_amount=(charges["data"][0]["amount"] / 100),
+                    payment_method='credit_card',
+                    invoice_amount=(charges["data"][0]["amount"] / 100)
                 )
                 for project in self.organization.project.all():  # pragma: no cover
                     current_app.send_task(
                         name="update_suspend_project",
-                        args=[project.flow_organization, False],
+                        args=[project.uuid, False],
                     )
 
         return super().save(force_insert, force_update, using, update_fields)
@@ -1364,7 +1374,11 @@ class BillingPlan(models.Model):
                 price = settings.PLAN_ENTERPRISE_PRICE
                 limit = settings.PLAN_ENTERPRISE_LIMIT
 
-            return {"price": price, "limit": limit, "valid": True}
+            return {
+                "price": price,
+                "limit": limit,
+                "valid": True
+            }
 
         return {"valid": False}
 
@@ -1482,7 +1496,10 @@ class BillingPlan(models.Model):
 
         amount_currenty = Decimal(
             BillingPlan.plan_info(self.plan)["price"]
-            + (settings.BILLING_COST_PER_WHATSAPP * self.organization.extra_integration)
+            + (
+                settings.BILLING_COST_PER_WHATSAPP
+                * self.organization.extra_integration
+            )
         ).quantize(Decimal(".01"), decimal.ROUND_HALF_UP)
 
         return {"total_contact": contact_count, "amount_currenty": amount_currenty}
@@ -1498,10 +1515,7 @@ class BillingPlan(models.Model):
                 self.organization.is_suspended = False
                 self.organization.save(update_fields=["is_suspended"])
                 self.is_active = True
-                self.save(
-                    update_fields=["plan", "contract_on", "next_due_date", "is_active"],
-                    change_plan=True,
-                )
+                self.save(update_fields=["plan", "contract_on", "next_due_date", "is_active"], change_plan=True)
                 # send mail here
                 break
         return _is_valid
@@ -1680,105 +1694,164 @@ class BillingPlan(models.Model):
             return False  # pragma: no cover
 
         if not emails:
-            emails = self.organization.authorizations.exclude(
-                role=OrganizationRole.VIEWER.value
-            ).values_list("user__email", "user__username")
+            emails = (
+                self.organization.authorizations.exclude(
+                    role=OrganizationRole.VIEWER.value
+                )
+                .values_list("user__email", "user__username", "user__language")
+                .order_by("user__language")
+            )
 
         subject = _("Your trial plan has expired")
         from_email = None
+
+        context = {
+            "webapp_billing_url": f"{settings.WEBAPP_BASE_URL}/orgs/{self.organization.uuid}/billing",
+            "org_name": self.organization.name,
+        }
 
         msg_list = []
         for email in emails:
 
             username = email[1]
+            context["user_name"] = username
 
-            context = {
-                "user_name": username,
-                "webapp_billing_url": f"{settings.WEBAPP_BASE_URL}/orgs/{self.organization.uuid}/billing",
-            }
-            # message = render_to_string("billing/emails/trial_plan_expired_due_time_limit.txt", context)
+            if email[2] == "en-us":
+                message = render_to_string(
+                    "billing/emails/trial_plan_expired_due_time_limit_en.txt", context
+                )
+                html_message = render_to_string(
+                    "billing/emails/trial_plan_expired_due_time_limit_en.html", context
+                )
+                subject = _("Your trial plan has expired")
+            else:
+                message = render_to_string(
+                    "billing/emails/trial_plan_expired_due_time_limit_pt_BR.txt",
+                    context,
+                )
+                html_message = render_to_string(
+                    "billing/emails/trial_plan_expired_due_time_limit_pt_BR.html",
+                    context,
+                )
+                subject = "Seu plano Trial expirou"
+
             recipient_list = [email[0]]
-            html_message = render_to_string(
-                "billing/emails/trial_plan_expired_due_time_limit.html", context
-            )
-
-            msg = (subject, html_message, from_email, recipient_list)
+            msg = (subject, message, html_message, from_email, recipient_list)
             msg_list.append(msg)
 
-        mail.send_mass_mail(msg_list, fail_silently=False)
-
-        return mail
+        html_mail = send_mass_html_mail(msg_list, fail_silently=False)
+        return html_mail
 
     def send_email_plan_expired_due_attendance_limit(self, emails: list = None):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
 
         if not emails:
-            emails = self.organization.authorizations.exclude(
-                role=OrganizationRole.VIEWER.value
-            ).values_list("user__email", "user__username")
+            emails = (
+                self.organization.authorizations.exclude(
+                    role=OrganizationRole.VIEWER.value
+                )
+                .values_list("user__email", "user__username", "user__language")
+                .order_by("user__language")
+            )
 
-        subject = _(f"You reached {self.plan_limit} attendances")
         from_email = None
         msg_list = []
+
+        context = {
+            "webapp_billing_url": f"{settings.WEBAPP_BASE_URL}/orgs/{self.organization.uuid}/billing",
+            "plan": self.plan,
+            "plan_limit": self.plan_limit,
+            "org_name": self.organization.name,
+        }
 
         for email in emails:
 
             username = email[1]
+            context["user_name"] = username
 
-            context = {
-                "user_name": username,
-                "webapp_billing_url": f"settings.WEBAPP_BASE_URL/orgs/{self.organization.uuid}/billing",
-                "plan": self.plan,
-            }
-            # message = render_to_string("billing/emails/plan_expired_due_attendence_limit.txt", context)
+            if email[2] == "en-us":
+                message = render_to_string(
+                    "billing/emails/plan_expired_due_attendence_limit_en.txt", context
+                )
+                html_message = render_to_string(
+                    "billing/emails/plan_expired_due_attendence_limit_en.html", context
+                )
+                subject = _(f"You reached {self.plan_limit} attendances")
+
+            else:
+                message = render_to_string(
+                    "billing/emails/plan_expired_due_attendence_limit_pt_BR.txt",
+                    context,
+                )
+                html_message = render_to_string(
+                    "billing/emails/plan_expired_due_attendence_limit_pt_BR.html",
+                    context,
+                )
+                subject = _(f"Você atingiu {self.plan_limit} atendimentos")
+
             recipient_list = [email[0]]
-            html_message = render_to_string(
-                "billing/emails/plan_expired_due_attendence_limit.html", context
-            )
-
-            msg = (subject, html_message, from_email, recipient_list)
+            msg = (subject, message, html_message, from_email, recipient_list)
             msg_list.append(msg)
 
-        mail.send_mass_mail(msg_list, fail_silently=False)
+        html_mail = send_mass_html_mail(msg_list, fail_silently=False)
 
-        return mail
+        return html_mail
 
     def send_email_plan_is_about_to_expire(self, emails: list = None):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
 
         if not emails:
-            emails = self.organization.authorizations.exclude(
-                role=OrganizationRole.VIEWER.value
-            ).values_list("user__email", "user__username")
+            emails = (
+                self.organization.authorizations.exclude(
+                    role=OrganizationRole.VIEWER.value
+                )
+                .values_list("user__email", "user__username", "user__language")
+                .order_by("user__language")
+            )
 
-        subject = _(f"Your organization is close to {self.plan_limit} attendances")
         from_email = None
         msg_list = []
+
+        context = {
+            "limit": self.plan_limit,
+            "webapp_billing_url": f"{settings.WEBAPP_BASE_URL}/orgs/{self.organization.uuid}/billing",
+            "org_name": self.organization.name,
+        }
 
         for email in emails:
 
             username = email[1]
+            context["user_name"] = username
 
-            context = {
-                "user_name": username,
-                "limit": self.plan_limit,
-                "webapp_billing_url": f"settings.WEBAPP_BASE_URL/orgs/{self.organization.uuid}/billing",
-            }
+            if email[2] == "en-us":
+                subject = _(
+                    f"Your organization is close to {self.plan_limit} attendances"
+                )
+                message = render_to_string(
+                    "billing/emails/plan_is_about_to_expire_en.txt", context
+                )
+                html_message = render_to_string(
+                    "billing/emails/plan_is_about_to_expire_en.html", context
+                )
+            else:
+                subject = _(
+                    f"Sua organização estã proxima de {self.plan_limit} atendimentos"
+                )
+                message = render_to_string(
+                    "billing/emails/plan_is_about_to_expire_pt_BR.txt", context
+                )
+                html_message = render_to_string(
+                    "billing/emails/plan_is_about_to_expire_pt_BR.html", context
+                )
 
-            # message = render_to_string("billing/emails/plan_is_about_to_expire.txt", context)
             recipient_list = [email[0]]
-            html_message = render_to_string(
-                "billing/emails/plan_is_about_to_expire.html", context
-            )
-
-            msg = (subject, html_message, from_email, recipient_list)
+            msg = (subject, message, html_message, from_email, recipient_list)
             msg_list.append(msg)
 
-        mail.send_mass_mail(msg_list, fail_silently=False)
-
-        return mail
+        html_mail = send_mass_html_mail(msg_list, fail_silently=False)
+        return html_mail
 
     def send_email_end_trial(self, email: list):
         if not settings.SEND_EMAILS:
@@ -1806,7 +1879,7 @@ class BillingPlan(models.Model):
         self.organization.save(update_fields=["is_suspended"])
         for project in self.organization.project.all():
             current_app.send_task(  # pragma: no cover
-                name="update_suspend_project", args=[project.flow_organization, True]
+                name="update_suspend_project", args=[project.uuid, True]
             )
 
 
@@ -2052,11 +2125,15 @@ class RecentActivity(models.Model):
     ADD = "ADD"
     CREATE = "CREATE"
     UPDATE = "UPDATE"
+    INTEGRATE = "INTEGRATE"
+    TRAIN = "TRAIN"
 
     ACTIONS_CHOICES = {
         (ADD, "Add"),
         (CREATE, "Entity Created"),
         (UPDATE, "Entity updated"),
+        (INTEGRATE, "Entity integrated"),
+        (TRAIN, "Entity Trained"),
     }
 
     USER = "USER"
@@ -2064,13 +2141,14 @@ class RecentActivity(models.Model):
     CHANNEL = "CHANNEL"
     TRIGGER = "TRIGGER"
     CAMPAIGN = "CAMPAIGN"
-
+    AI = "AI"
     ENTITY_CHOICES = (
         (USER, "User Entity"),
         (FLOW, "Flow Entity"),
         (CHANNEL, "Channel Entity"),
         (TRIGGER, "Trigger Entity"),
         (CAMPAIGN, "Campaign Entity"),
+        (AI, "Artificial Intelligence Entity"),
     )
 
     project = models.ForeignKey(
@@ -2093,6 +2171,7 @@ class RecentActivity(models.Model):
                 CAMPAIGN="created-campaign",
                 FLOW="created-flow",
                 CHANNEL="created-channel",
+                AI="created-ai",
             ),
             UPDATE=dict(
                 TRIGGER="edited-trigger",
@@ -2100,6 +2179,8 @@ class RecentActivity(models.Model):
                 FLOW="edited-flow",
                 CHANNEL="edited-channel",
             ),
+            INTEGRATE=dict(AI="integrated-ai"),
+            TRAIN=dict(AI="trained-ai"),
         )
         return actions[self.action][self.entity]
 

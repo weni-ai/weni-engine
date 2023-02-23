@@ -1,0 +1,6 @@
+{% load i18n %}
+<p>Olá, {{ user_name }}!</p>
+<p>Sua organização {{org_name}} atingiu o limite atingiu o tempo limite do plano Trial.</p>
+<p>Você atingiu o limite de 30 dias para usar todas as features da plataforma Weni de graça</p>
+<p>Seu acesso à plataforma continua, mas seu chatbot não será capaz disparar mensagens para seus usuários</p>
+<p>Evite o bloqueio de seu chatbot acessando <a href="{{ webapp_billing_url }}"> e escolha um plano que se adapte às suas necessidades comerciais.</p>

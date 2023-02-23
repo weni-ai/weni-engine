@@ -24,6 +24,7 @@
         font-style: normal;
       "
     >
+      {{emails}}
       {{ user_name }}!
     </span>
   </div>
@@ -38,7 +39,7 @@
       margin-top: 24px;
     "
   >
-    {% trans 'Your organization has reached the Advanced plan's limit of 1,000 attendances.' %}
+    {% trans 'Your organization' %} {{org_name}} {% trans 'has reached the time limit of the Trial plan.' %}
   </div>
 
   <div
@@ -52,7 +53,7 @@
       margin-top: 24px;
     "
   >
-    {% trans 'You still have access to the platform, but your chatbot will not be able to fire messages to your users.' %}
+    {% trans 'You have reached the 30-day limit to use all features of the Weni platform for free.' %}
   </div>
 
   <div
@@ -66,9 +67,23 @@
       margin-top: 24px;
     "
   >
-    {% trans 'To prevent this from happening, access ' %}
+    {% trans 'Your access to the platform continues, but your chatbot will not be able to trigger messages to your users.' %}
+  </div>
+
+  <div
+    style="
+      font-family: 'Lato', sans-serif;
+      font-style: normal;
+      font-weight: normal;
+      font-size: 16px;
+      line-height: 24px;
+      color: #808080;
+      margin-top: 24px;
+    "
+  >
+    {% trans 'Avoid blocking your chatbot by accessing ' %}
     <a href="{{ webapp_billing_url }}" style="color: #009E96; text-decoration: underline; text-underline-offset: 4px;">{% trans 'Billing' %}</a>
-    {% trans ' and choose a plan that fits your business the needs of your business.' %}
+    {% trans ' and choose a plan that fits according to your business needs.' %}
   </div>
 </section>
 {% endblock %}

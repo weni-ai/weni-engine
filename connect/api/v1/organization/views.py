@@ -412,7 +412,7 @@ class OrganizationViewSet(
         for project in organization.project.all():
             celery_app.send_task(
                 "update_suspend_project",
-                args=[str(project.flow_organization), True],
+                args=[str(project.uuid), True],
             )
         user_name = (
             org_billing.organization.name
@@ -450,7 +450,7 @@ class OrganizationViewSet(
         for project in organization.project.all():
             celery_app.send_task(
                 "update_suspend_project",
-                args=[str(project.flow_organization), False],
+                args=[str(project.uuid), False],
             )
         user_name = (
             org_billing.organization.name
@@ -662,7 +662,7 @@ class OrganizationViewSet(
     )
     def retrieve_organization(self, request):
         flow_organization_uuid = request.uuid
-        organization = Organization.objects.get(project__flow_organization=flow_organization_uuid)
+        organization = Organization.objects.get(project__uuid=flow_organization_uuid)
         return {
             "status": status.HTTP_200_OK,
             "response": {

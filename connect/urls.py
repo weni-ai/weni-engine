@@ -35,7 +35,6 @@ from connect.api.v2 import routers as api_v2_urls
 
 api_v2_urls = [path("", include(api_v2_urls))]
 
-
 schema_view = get_schema_view(
     openapi.Info(
         title="API Documentation",
@@ -202,6 +201,16 @@ if settings.DEBUG:
                             user_name="João",
                             old_permission="Viewer",
                             new_permission="Administrator",
+                        ),
+                    ),
+                    path(
+                        "trial-end",
+                        render_template(
+                            "billing/emails/trial_plan_expired_due_time_limit_pt_BR.html",
+                            base_url=settings.BASE_URL,
+                            user_name="João",
+                            org_name="Bilo",
+                            webapp_billing_url="Administrator",
                         ),
                     ),
                 ]
