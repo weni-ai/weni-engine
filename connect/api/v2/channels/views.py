@@ -1,6 +1,7 @@
 from django.http import JsonResponse
 from rest_framework import views, status
 from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import APIException
 
 from connect.api.v1.internal.permissions import ModuleHasPermission
 from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
@@ -35,15 +36,21 @@ class ChannelsAPIView(views.APIView):
         project_uuid = serializer.validated_data.get("project_uuid")
         project = Project.objects.get(uuid=project_uuid)
 
-        flows_instance = FlowsRESTClient()
-        response = flows_instance.create_channel(
-            user=serializer.validated_data.get("user"),
-            project_uuid=str(project.flow_organization),
-            data=serializer.validated_data.get("data"),
-            channeltype_code=serializer.validated_data.get("channeltype_code"),
-        )
-        if response.status_code != status.HTTP_200_OK:
-            return JsonResponse(status=response.status_code, data={"message": response.text})
+        try:
+            flows_instance = FlowsRESTClient()
+            response = flows_instance.create_channel(
+                user=serializer.validated_data.get("user"),
+                project_uuid=str(project.flow_organization),
+                data=serializer.validated_data.get("data"),
+                channeltype_code=serializer.validated_data.get("channeltype_code"),
+            )
+            response.raise_for_status()
+
+        except Exception as _error:
+            error_message = str(_error)
+            status_code = getattr(_error, "response", {}).status_code or 500
+            raise APIException(error_message, code=status_code) from _error
+
         return JsonResponse(status=response.status_code, data=response.json())
 
 
@@ -54,23 +61,32 @@ class ListChannelsAPIView(views.APIView):
         channel_type = request.query_params.get("channel_type", None)
         if not channel_type:
             raise ValidationError("Need pass the channel_type")
-        flow_instance = FlowsRESTClient()
-        response = flow_instance.list_channel(channel_type=channel_type)
-        channels = []
-        for channel in response:
-            org = channel.get("org")
-            project = Project.objects.filter(flow_organization=org)
-            if project:
-                project = project.first()
-                channel_data = dict(
-                    uuid=str(channel.get("uuid")),
-                    name=channel.get("name"),
-                    config=channel.get("config"),
-                    address=channel.get("address"),
-                    project_uuid=str(project.uuid),
-                    is_active=channel.get("is_active")
-                )
-                channels.append(channel_data)
+        try:
+            flow_instance = FlowsRESTClient()
+            response = flow_instance.list_channel(channel_type=channel_type)
+            response.raise_for_status()
+            
+            channels = []
+            for channel in response:
+                org = channel.get("org")
+                project = Project.objects.filter(flow_organization=org)
+                if project:
+                    project = project.first()
+                    channel_data = dict(
+                        uuid=str(channel.get("uuid")),
+                        name=channel.get("name"),
+                        config=channel.get("config"),
+                        address=channel.get("address"),
+                        project_uuid=str(project.uuid),
+                        is_active=channel.get("is_active")
+                    )
+                    channels.append(channel_data)
+    
+        except Exception as _error:
+            error_message = str(_error)
+            status_code = getattr(_error, "response", {}).status_code or 500
+            raise APIException(error_message, code=status_code) from _error
+
         return JsonResponse(data={"channels": channels}, status=status.HTTP_200_OK)
 
 
