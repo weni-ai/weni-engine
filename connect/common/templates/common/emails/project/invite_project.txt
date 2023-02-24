@@ -1,0 +1,5 @@
+{% load i18n %}
+<p>{% trans 'You have been invited to join the project' %} <strong> {{ project_name }} </strong> {% trans 'from the organization' %} <strong> {{ organization_name }} </strong></p>
+<p>{% trans 'Uhuuul, now you are one of us!' %}</p>
+<p>{% trans 'A member of the organization' %} <strong> {{ organization_name }} </strong> {% trans "just sent you an invitation to join them in the organization. To do so, just click the button below and you will be redirected to the registration page. In case you are already registered, you don't have to do anything, just login and you'll be set " %}.</p>
+<p><a href="{{ webapp_base_url }}"> {% trans "Join org" %} </a></p>

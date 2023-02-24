@@ -5,7 +5,81 @@
 [![Python Version](https://img.shields.io/badge/python-3.6-blue.svg)](https://www.python.org/)
 [![License: MPL 2.0](https://img.shields.io/badge/License-MPL_2.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0)
 
-## Environment Variables
+## Index
+
+[Running locally](#running)
+
+[Environment Variables List](#environment-variables-list)
+
+[License](#license)
+
+[Contributing](#contributing)
+
+## Running
+
+```sh
+git clone https://github.com/weni-ai/weni-engine.git
+```
+
+### Keycloak
+
+[Docs](https://www.keycloak.org/guides#getting-started) | [Docker](https://hub.docker.com/r/jboss/keycloak/)
+
+```sh
+docker run -p 8080:8080 -e KEYCLOAK_USER=<USERNAME> -e KEYCLOAK_PASSWORD=<PASSWORD> jboss/keycloak
+```
+
+Keycloak will be running on `http://localhost:8080`
+
+#### Setting up the clients
+
+1. [Create a new realm](https://www.keycloak.org/getting-started/getting-started-docker#_create_a_realm), not recommended to use master realm
+
+2. Setup the clients 
+
+Each service uses a client
+
+- Backend:
+    1. Create a client for the back-end
+    2. Set your access type to `confidential`
+    3. Standard Flow Enabled: On
+    4. Service Account Enabled: On
+    5. Service Account Roles --> Client Roles --> realm-management (user related roles)
+- Frontend:
+    1. Create a client for the front-end
+    2. Access Type: public
+    3. Standard Flow Enabled: on
+    4. Direct Access Grants Enabled: On
+
+### Environment Variables
+
+`OIDC_RP_CLIENT_ID` and `OIDC_RP_CLIENT_SECRET` refers to backend client credentials 
+
+`<KEYCLOAK-SERVER-URL>` could be `https://<your-keycloak-host>/` or `https://your-keycloak-host/auth/` depending on the keycloak version
+
+You can get the `OIDC_RP_*` variables at: `https://your-keycloak-host/realms/<realm-name>/.well-known/openid-configuration`
+> Ex for keycloak 16.1: `http://127.0.0.1:8080/auth/realms/engine_realm/.well-known/openid-configuration`
+
+engine_realm as realm name
+
+### Required environment variables
+
+```
+SECRET_KEY=<SECRET_KEY>
+OIDC_RP_REALM_NAME=<KEYCLOAK-REALM-NAME>
+OIDC_RP_CLIENT_ID=<KEYCLOAK-CLIENT-ID>
+OIDC_RP_CLIENT_SECRET=<KEYCLOAK-CLIENT-SECRET>
+OIDC_OP_LOGOUT_ENDPOINT=<KEYCLOAK-SERVER-URL>/realms/<KEYCLOAK-REALM-NAME>/protocol/openid-connect/logout
+OIDC_OP_TOKEN_ENDPOINT=<KEYCLOAK-SERVER-URL>/auth/realms/<KEYCLOAK-REALM-NAME>/protocol/openid-connect/token
+OIDC_RP_SCOPES=email profile openid offline_access
+OIDC_OP_AUTHORIZATION_ENDPOINT=<KEYCLOAK-SERVER-URL>/realms/<KEYCLOAK-REALM-NAME>/protocol/openid-connect/auth
+OIDC_RP_SIGN_ALGO= Sets the algorithm the IdP uses to sign ID tokens.
+OIDC_RP_SERVER_URL=<KEYCLOAK-SERVER-URL>
+OIDC_OP_USER_ENDPOINT=<KEYCLOAK-SERVER-URL>/auth/realms/<KEYCLOAK-REALM-NAME>/protocol/openid-connect/userinfo
+OIDC_OP_JWKS_ENDPOINT=<KEYCLOAK-SERVER-URL>/auth/realms/<KEYCLOAK-REALM-NAME>/protocol/openid-connect/certs
+```
+
+## Environment Variables List
 
 You can set environment variables in your OS, write on ```.env``` file or pass via Docker config.
 
