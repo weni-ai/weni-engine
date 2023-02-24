@@ -33,9 +33,9 @@ class ChatsRESTClient:
         return True
 
     def update_user_language(self, user_email: str, language: str):
-        body = dict(user_email=user_email, language=language)
+        body = dict(language=language)
         requests.put(
-            url=f"{self.base_url}/v1/internal/user/language/",
+            url=f"{self.base_url}/v1/internal/user/language/?email={user_email}",
             headers=self.authentication_instance.headers,
             json=body,
         )

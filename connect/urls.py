@@ -213,6 +213,16 @@ if settings.DEBUG:
                             webapp_billing_url="Administrator",
                         ),
                     ),
+                    path(
+                        "invite-project",
+                        render_template(
+                            "common/emails/project/invite_project.html",
+                            base_url=settings.BASE_URL,
+                            webapp_base_url=settings.WEBAPP_BASE_URL,
+                            organization_name="Teste",
+                            project_name="TestProject",
+                        )
+                    ),
                 ]
             ),
         )

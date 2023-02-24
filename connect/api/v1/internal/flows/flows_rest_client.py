@@ -289,7 +289,7 @@ class FlowsRESTClient:
             headers=self.authentication_instance.headers,
             params=params
         )
-        return response.json()
+        return response
 
     def delete_channel(self, channel_uuid: str):
         response = requests.delete(
