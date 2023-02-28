@@ -524,3 +524,11 @@ REPOSITORY_IDS = {
     "lead_capture": AI_FAREWELL_N_GREETINGS,
     "support": AI_BINARY_ANSWERS
 }
+
+# Keycloak
+
+KC_DB_NAME = env.str("KC_DB_NAME")
+KC_DB_USER = env.str("KC_DB_USER")
+KC_DB_PASSWORD = env.str("KC_DB_PASSWORD")
+KC_DB_HOST = env.str("KC_DB_HOST")
+KC_DB_PORT = env.str("KC_DB_PORT")

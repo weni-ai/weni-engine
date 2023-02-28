@@ -1,4 +1,10 @@
+import logging
+import pendulum
+import psycopg2
 from django.core.mail import get_connection, EmailMultiAlternatives
+from django.conf import settings
+
+logger = logging.getLogger(__name__)
 
 
 def send_mass_html_mail(datatuple, fail_silently=False, user=None, password=None,
@@ -22,3 +28,69 @@ def send_mass_html_mail(datatuple, fail_silently=False, user=None, password=None
         message.attach_alternative(html, 'text/html')
         messages.append(message)
     return connection.send_messages(messages)
+
+
+class KeycloakCleanup:
+
+    dbname = settings.KC_DB_NAME
+    user = settings.KC_DB_USER
+    password = settings.KC_DB_PASSWORD
+    host = settings.KC_DB_HOST
+    port = settings.KC_DB_PORT
+
+    def __init__(self):
+        self.conn = self.connection()
+        self.cur = self.cursor()
+
+    def connection(self):
+        try:
+            conn = psycopg2.connect(dbname=self.dbname, user=self.user, password=self.password, host=self.host, port=self.port)
+            return conn
+        except psycopg2.OperationalError as error:
+            logger.error(error)
+            return False
+
+    def cursor(self):
+        if self.conn:
+            cur = self.conn.cursor()
+            return cur
+
+    def fetch(self):
+
+        event_time = pendulum.now().end_of("day").timestamp() * 1000
+
+        self.cur.execute(f"SELECT * FROM event_entity WHERE realm_id='weni' AND event_time < {event_time}")
+        results = self.cur.fetchall()
+
+        for r in results:
+            print(r[7])
+            print(pendulum.from_timestamp(r[7] / 1000))
+
+    def delete(self, event_time=None):
+        if not event_time:
+            time = pendulum.now().end_of("day")
+            event_time = time.timestamp() * 1000
+
+        query = f"DELETE FROM event_entity WHERE realm_id='weni' AND event_time < {event_time}"
+
+        print(f"{query} ({time})")
+
+        self.cur.execute(query)
+        self.conn.commit()
+
+    def vacuum(self):
+
+        self.conn.autocommit = True
+        cur = self.cur
+
+        query = "VACUUM FULL VERBOSE event_entity;"
+
+        print(query)
+
+        cur.execute(query)
+
+        self.close_connection()
+
+    def close_connection(self):
+        self.cur.close()
+        self.conn.close()

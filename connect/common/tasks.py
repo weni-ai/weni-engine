@@ -1,6 +1,7 @@
 import json
 import pendulum
 import requests
+import psycopg2
 import grpc
 from grpc._channel import _InactiveRpcError
 
@@ -28,6 +29,7 @@ from connect.api.v1.internal.integrations.integrations_rest_client import Integr
 from connect.api.v1.internal.intelligence.intelligence_rest_client import IntelligenceRESTClient
 import logging
 
+from connect.common.helpers import KeycloakCleanup
 
 logger = logging.getLogger(__name__)
 
@@ -817,7 +819,33 @@ def list_project_flows(flow_organization: str):
     return flow_type.list_flows(flow_organization)
 
 
+def cursor():
+    dbname = "keycloak"
+    user = "weni"
+    password = "weni"
+    host = "localhost"
+    port = "5432"
+
+    conn = psycopg2.connect(dbname=dbname, user=user, password=password, host=host, port=port)
+    cur = conn.cursor()
+    return cur
+
+
 @app.task(name="delete_recent_activities")
 def delete_recent_activities():
     date_limit = pendulum.now().start_of("day").subtract(30)
     RecentActivity.objects.filter(created_on__lte=date_limit).delete()
+
+
+@app.task(name="keycloak_cleanup_routine")
+def delete_event_entity(event_time=None):
+    k = KeycloakCleanup()
+    k.delete()
+    k.close_connection()
+
+
+@app.task(name="vacuum_keycloak_table")
+def vacuum_keycloak_table():
+    k = KeycloakCleanup()
+    k.vacuum()
+    k.close_connection()

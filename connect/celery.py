@@ -26,7 +26,9 @@ app.conf.task_routes = {
     "end_trial_plan": {'queue': 'billing'},
     "check_organization_plans": {'queue': 'billing'},
     'get_messages': {'queue': 'billing'},
-    "daily_contact_count": {'queue': 'billing'},
+    'daily_contact_count': {'queue': 'billing'},
+    'keycloak_cleanup_routine': {'queue': 'cleanup'},
+    'vacuum_keycloak_table': {'queue': 'cleanup'}
 }
 
 
@@ -102,7 +104,7 @@ app.conf.beat_schedule = {
     "check_organization_plans": {
         "task": "check_organization_plans",
         "schedule": schedules.crontab(hour="22", minute=0)
-    }
+    },
 }
 
 
