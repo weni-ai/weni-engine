@@ -13,11 +13,12 @@ class FlowsRESTClient:
         self.base_url = settings.FLOWS_REST_ENDPOINT
         self.authentication_instance = InternalAuthentication()
 
-    def create_template_project(self, project_name: str, user_email: str, project_timezone: str):
+    def create_template_project(self, project_name: str, user_email: str, project_timezone: str, project_uuid):
         body = dict(
             name=project_name,
             timezone=project_timezone,
-            user_email=user_email
+            user_email=user_email,
+            project_uuid=project_uuid
         )
         response = requests.post(
             url=f"{self.base_url}/api/v2/internals/template-orgs/",
