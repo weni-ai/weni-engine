@@ -48,12 +48,15 @@ class FlowsRESTClient:
         )
         return dict(status=response.status_code, data=response.text)
 
-    def create_project(self, project_name: str, user_email: str, project_timezone: str):
+    def create_project(self, project_name: str, user_email: str, project_timezone: str, project_uuid: str = None):
         body = dict(
             name=project_name,
             timezone=project_timezone,
             user_email=user_email
         )
+
+        if project_uuid:
+            body.update({"project_uuid": project_uuid})
 
         response = requests.post(
             url=f"{self.base_url}/api/v2/internals/orgs/",
