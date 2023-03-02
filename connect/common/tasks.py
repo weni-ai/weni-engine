@@ -230,7 +230,7 @@ def create_project(project_name: str, user_email: str, project_timezone: str, pr
 
 
 @app.task(name="create_template_project")
-def create_template_project(project_name: str, user_email: str, project_timezone: str):
+def create_template_project(project_name: str, user_email: str, project_timezone: str, project_uuid: str):
 
     rest_client = FlowsRESTClient()
 
@@ -238,6 +238,7 @@ def create_template_project(project_name: str, user_email: str, project_timezone
         project_name=project_name,
         user_email=user_email,
         project_timezone=project_timezone,
+        project_uuid=project_uuid,
     )
     if project.get("status") == 201:
         uuid = json.loads(project.get("data")).get("uuid")

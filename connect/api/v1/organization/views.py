@@ -137,6 +137,15 @@ class OrganizationViewSet(
                 organization_billing__stripe_customer=org_info.get("customer"),
             )
 
+            project = Project.objects.create(
+                name=project_info.get("name"),
+                timezone=str(project_info.get("timezone")),
+                organization=new_organization,
+                is_template=True if project_info.get("template") else False,
+                created_by=user,
+                template_type=project_info.get("template_type")
+            )
+
             if not settings.TESTING:
                 try:
                     if project_info.get("template"):
@@ -149,7 +158,8 @@ class OrganizationViewSet(
                         flows_info = tasks.create_project(
                             project_name=project_info.get("name"),
                             user_email=user.email,
-                            project_timezone=project_info.get("timezone")
+                            project_timezone=project_info.get("timezone"),
+                            project_uuid=str(project.uuid)
                         )
                 except Exception as error:
                     data.update({
@@ -165,16 +175,8 @@ class OrganizationViewSet(
                     "uuid": uuid.uuid4()
                 }
 
-            project = Project.objects.create(
-                name=project_info.get("name"),
-                flow_id=flows_info.get("id"),
-                flow_organization=flows_info.get("uuid"),
-                timezone=str(project_info.get("timezone")),
-                organization=new_organization,
-                is_template=True if project_info.get("template") else False,
-                created_by=user,
-                template_type=project_info.get("template_type")
-            )
+            project.flow_id = flows_info.get("id")
+            project.save(update_fields=["flow_id"])
 
             if len(Project.objects.filter(created_by=user)) == 1:
                 data = dict(
