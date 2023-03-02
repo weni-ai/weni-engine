@@ -194,7 +194,7 @@ def get_contacts_detailed(project_uuid: str, before: str, after: str):
     response = []
     try:
         contacts = flow_instance.get_active_contacts(
-            str(project.flow_organization), before, after
+            str(project.uuid), before, after
         )
         active_contacts_info = []
         for contact in contacts:
@@ -307,7 +307,7 @@ def check_organization_free_plan():
             after = now.start_of('month').strftime("%Y-%m-%d %H:%M")
 
             contact_count = flow_instance.get_billing_total_statistics(
-                project_uuid=str(project.flow_organization), before=before, after=after
+                project_uuid=str(project.uuid), before=before, after=after
             ).get("active_contacts")
             project.contact_count = int(contact_count)
             project.save(update_fields=["contact_count"])
@@ -317,7 +317,7 @@ def check_organization_free_plan():
             for project in organization.project.all():
                 app.send_task(
                     "update_suspend_project",
-                    args=[str(project.flow_organization), True],
+                    args=[str(project.uuid), True],
                 )
             organization.save(update_fields=["is_suspended"])
             organization.organization_billing.send_email_expired_free_plan(
@@ -356,7 +356,7 @@ def sync_total_contact_count():
         flow_instance = utils.get_grpc_types().get("flow")
 
     for project in Project.objects.all():
-        response = flow_instance.get_project_statistic(project_uuid=str(project.flow_organization))
+        response = flow_instance.get_project_statistic(project_uuid=str(project.uuid))
         contacts = response.get("active_contacts", project.total_contact_count)
         project.total_contact_count = contacts
         project.save(update_fields=["total_contact_count"])
@@ -371,7 +371,7 @@ def sync_project_information():
         flow_instance = utils.get_grpc_types().get("flow")
     for project in Project.objects.all():
         flow_result = flow_instance.get_project_info(
-            project_uuid=str(project.flow_organization)
+            project_uuid=str(project.uuid)
         )
         if len(flow_result) > 0:
             project.name = flow_result.get("name")
@@ -392,7 +392,7 @@ def sync_project_statistics():
         flow_instance = utils.get_grpc_types().get("flow")
     for project in Project.objects.all():
         statistic_project_result = flow_instance.get_project_statistic(
-            project_uuid=str(project.flow_organization),
+            project_uuid=str(project.uuid),
         )
 
         if len(statistic_project_result) > 0:
@@ -413,7 +413,7 @@ def sync_repositories_statistics():
         intelligence_count = 0
         if not settings.TESTING:
             classifiers_project = flow_instance.get_classifiers(
-                project_uuid=str(project.flow_organization),
+                project_uuid=str(project.uuid),
                 classifier_type="bothub",
                 is_active=True,
             )
@@ -439,7 +439,7 @@ def sync_channels_statistics():
     for project in Project.objects.all():
         project.extra_active_integration = len(
             list(
-                flow_instance.list_channel(project_uuid=str(project.flow_organization))
+                flow_instance.list_channel(project_uuid=str(project.uuid))
             )
         )
         project.save(update_fields=["extra_active_integration"])
@@ -712,12 +712,12 @@ def create_channel(user, project_uuid, data, channeltype_code):
 
 
 @app.task(name="create_wac_channel")
-def create_wac_channel(user, flow_organization, config, phone_number_id):
+def create_wac_channel(user, project_uuid, config, phone_number_id):
     if settings.USE_FLOW_REST:
         flow_instance = FlowsRESTClient()
         return flow_instance.create_wac_channel(
             user=user,
-            flow_organization=str(flow_organization),
+            project_uuid=str(project_uuid),
             config=config,
             phone_number_id=phone_number_id,
         )
@@ -726,7 +726,7 @@ def create_wac_channel(user, flow_organization, config, phone_number_id):
     try:
         response = flow_instance.create_wac_channel(
             user=user,
-            flow_organization=str(flow_organization),
+            project_uuid=str(project_uuid),
             config=config,
             phone_number_id=phone_number_id,
         )

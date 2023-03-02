@@ -13,12 +13,16 @@ class FlowsRESTClient:
         self.base_url = settings.FLOWS_REST_ENDPOINT
         self.authentication_instance = InternalAuthentication()
 
-    def create_template_project(self, project_name: str, user_email: str, project_timezone: str):
+    def create_template_project(self, project_name: str, user_email: str, project_timezone: str, project_uuid: str = None):
         body = dict(
             name=project_name,
             timezone=project_timezone,
-            user_email=user_email
+            user_email=user_email,
         )
+
+        if project_uuid:
+            body.update({"project_uuid": project_uuid})
+
         response = requests.post(
             url=f"{self.base_url}/api/v2/internals/template-orgs/",
             headers=self.authentication_instance.headers,
@@ -249,10 +253,10 @@ class FlowsRESTClient:
         )
         return response
 
-    def create_wac_channel(self, user: str, flow_organization: str, config: str, phone_number_id: str):
+    def create_wac_channel(self, user: str, project_uuid: str, config: str, phone_number_id: str):
         body = dict(
             user=user,
-            org=flow_organization,
+            org=project_uuid,
             config=config,
             phone_number_id=phone_number_id,
         )

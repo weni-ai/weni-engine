@@ -108,11 +108,11 @@ class ProjectViewSet(
         )
 
     def perform_project_authorization_destroy(self, instance, is_request_permission):
-        flow_organization = instance.project.flow_organization
+        project_uuid = instance.project.uuid
         if not is_request_permission:
             celery_app.send_task(
                 "delete_user_permission_project",
-                args=[flow_organization, instance.user.email, instance.role],
+                args=[project_uuid, instance.user.email, instance.role],
             )
         instance.delete()
 
@@ -138,7 +138,7 @@ class ProjectViewSet(
 
         task = tasks.search_project(
             organization_id=project.organization.inteligence_organization,
-            project_uuid=str(project.flow_organization),
+            project_uuid=str(project.uuid),
             text=serializer.data.get("text")
         )
 
@@ -282,7 +282,7 @@ class ProjectViewSet(
             rest_client = FlowsRESTClient()
             response = rest_client.create_channel(
                 user=serializer.validated_data.get("user"),
-                project_uuid=str(project.flow_organization),
+                project_uuid=str(project.uuid),
                 data=serializer.validated_data.get("data"),
                 channeltype_code=serializer.validated_data.get("channeltype_code"),
             )
@@ -302,7 +302,7 @@ class ProjectViewSet(
             project = Project.objects.get(uuid=project_uuid)
             task = tasks.create_wac_channel(
                 user=serializer.validated_data.get("user"),
-                flow_organization=str(project.flow_organization),
+                project_uuid=str(project.uuid),
                 config=serializer.validated_data.get("config"),
                 phone_number_id=serializer.validated_data.get("phone_number_id"),
             )
@@ -355,7 +355,7 @@ class ProjectViewSet(
             project_uuid = serializer.validated_data.get("project_uuid")
             project = Project.objects.get(uuid=project_uuid)
             task = tasks.create_classifier(
-                project_uuid=str(project.flow_organization),
+                project_uuid=str(project.uuid),
                 user_email=serializer.validated_data.get("user"),
                 classifier_name=serializer.validated_data.get("name"),
                 access_token=serializer.validated_data.get("access_token"),
@@ -374,7 +374,7 @@ class ProjectViewSet(
         if serializer.is_valid(raise_exception=True):
             project_uuid = serializer.validated_data.get("project_uuid")
             project = Project.objects.get(uuid=project_uuid)
-            task = tasks.list_classifier(str(project.flow_organization))
+            task = tasks.list_classifier(str(project.uuid))
             return JsonResponse(status=status.HTTP_200_OK, data=task)
 
     @action(
@@ -391,7 +391,7 @@ class ProjectViewSet(
         project = Project.objects.get(uuid=project_uuid)
 
         rest_client = FlowsRESTClient()
-        response = rest_client.get_user_api_token(str(project.flow_organization), user)
+        response = rest_client.get_user_api_token(str(project.uuid), user)
 
         return JsonResponse(status=response.status_code, data=response.json())
 
@@ -410,7 +410,7 @@ class ProjectViewSet(
         if not settings.TESTING:
             flows_client = FlowsRESTClient()
             ticketer = flows_client.create_ticketer(
-                project_uuid=str(project.flow_organization),
+                project_uuid=str(project.uuid),
                 ticketer_type=ticketer_type,
                 name=name,
                 config=config,
@@ -426,7 +426,7 @@ class ProjectViewSet(
     def list_flows(self, request, **kwargs):
         project_uuid = request.query_params.get('project_uuid')
         project = get_object_or_404(Project, uuid=project_uuid)
-        task = tasks.list_project_flows(str(project.flow_organization))
+        task = tasks.list_project_flows(str(project.uuid))
         return Response(task)
 
 

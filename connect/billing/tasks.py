@@ -33,7 +33,7 @@ def get_messages(temp_channel_uuid: str, before: str, after: str, project_uuid: 
     contacts = Contact.objects.filter(channel__uuid=temp_channel_uuid, last_seen_on__range=(after, before))
     for contact in contacts:
         message = flow_instance.get_message(
-            str(project.flow_organization), str(contact.contact_flow_uuid), before, after
+            str(project.uuid), str(contact.contact_flow_uuid), before, after
         )
 
         if not message:
@@ -221,7 +221,7 @@ def problem_capture_invoice():
             for project in organization.project.all():
                 current_app.send_task(  # pragma: no cover
                     name="update_suspend_project",
-                    args=[project.flow_organization, True],
+                    args=[project.uuid, True],
                 )
 
 

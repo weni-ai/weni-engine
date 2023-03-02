@@ -65,20 +65,12 @@ def create_service_status(sender, instance, created, **kwargs):
 
         for permission in instance.project_authorizations.all():
             update_user_permission_project(
-                flow_organization=str(instance.flow_organization),
+                flow_organization=str(instance.uuid),
                 project_uuid=str(instance.uuid),
                 user_email=permission.user.email,
                 permission=permission.role
             )
-            # celery_app.send_task(
-            #     "update_user_permission_project",
-            #     args=[
-            #         instance.flow_organization,
-            #         instance.uuid,
-            #         permission.user.email,
-            #         permission.role,
-            #     ],
-            # )
+
         for authorization in instance.organization.authorizations.all():
             if authorization.can_contribute:
                 project_auth = instance.get_user_authorization(authorization.user)
@@ -106,7 +98,7 @@ def update_organization(instance, **kwargs):
         celery_app.send_task(  # pragma: no cover
             name="update_suspend_project",
             args=[
-                str(project.flow_organization),
+                str(project.uuid),
                 instance.is_suspended,
             ],
         )
@@ -287,20 +279,11 @@ def project_authorization(sender, instance, created, **kwargs):
             instance_user.save(update_fields=["role"])
 
         update_user_permission_project(
-            flow_organization=str(instance.project.flow_organization),
+            flow_organization=str(instance.project.uuid),
             project_uuid=str(instance.project.uuid),
             user_email=instance.user.email,
             permission=instance.role
         )
-        # celery_app.send_task(
-        #     "update_user_permission_project",
-        #     args=[
-        #         instance.project.flow_organization,
-        #         instance.project.uuid,
-        #         instance.user.email,
-        #         instance.role,
-        #     ],
-        # )
 
 
 @receiver(post_save, sender=RequestRocketPermission)
