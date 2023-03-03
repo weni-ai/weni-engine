@@ -237,13 +237,27 @@ def request_permission_project(sender, instance, created, **kwargs):
                     created_by=instance.created_by
                 )
             instance.delete()
-        # todo: send invite project email
+        instance.project.send_email_invite_project(email=instance.email)
 
 
 @receiver(post_save, sender=ProjectAuthorization)
 def project_authorization(sender, instance, created, **kwargs):
     if created:
         if not settings.TESTING and instance.is_moderator and not instance.chats_authorization:
+            RequestChatsPermission.objects.create(
+                email=instance.user.email,
+                role=ChatsRole.ADMIN.value,
+                project=instance.project,
+                created_by=instance.user
+            )
+        if instance.role == ProjectRole.VIEWER.value:
+            RequestChatsPermission.objects.create(
+                email=instance.user.email,
+                role=ChatsRole.AGENT.value,
+                project=instance.project,
+                created_by=instance.user
+            )
+        if instance.role == ProjectRole.CONTRIBUTOR.value:
             RequestChatsPermission.objects.create(
                 email=instance.user.email,
                 role=ChatsRole.ADMIN.value,
@@ -316,11 +330,11 @@ def request_chats_permission(sender, instance, created, **kwargs):
             chats_instance = ChatsRESTClient()
             if project_auth.exists():
                 project_auth = project_auth.first()
-                chats_role = ChatsRole.ADMIN.value if project_auth.is_moderator else instance.role
+                chats_role = ChatsRole.ADMIN.value if project_auth.is_moderator or project_auth.role == ProjectRole.CONTRIBUTOR.value else ChatsRole.AGENT.value
                 if not project_auth.chats_authorization:
                     project_auth.chats_authorization = ChatsAuthorization.objects.create(role=chats_role)
                     if not settings.TESTING:
-                        chats_instance.create_user_permission(
+                        chats_instance.update_user_permission(
                             project_uuid=str(instance.project.uuid),
                             user_email=user.email,
                             permission=chats_role

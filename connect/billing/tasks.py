@@ -16,21 +16,20 @@ from celery import current_app
 from django.conf import settings
 
 
-@app.task(
-    name="get_messages",
-    ignore_result=True
-)
+@app.task(name="get_messages", ignore_result=True)
 def get_messages(temp_channel_uuid: str, before: str, after: str, project_uuid: str):
     manager = SyncManagerTask.objects.create(
         task_type="get_messages",
         started_at=pendulum.now(),
         before=pendulum.parse(before),
-        after=pendulum.parse(after)
+        after=pendulum.parse(after),
     )
 
     flow_instance = utils.get_grpc_types().get("flow")
     project = Project.objects.get(uuid=project_uuid)
-    contacts = Contact.objects.filter(channel__uuid=temp_channel_uuid, last_seen_on__range=(after, before))
+    contacts = Contact.objects.filter(
+        channel__uuid=temp_channel_uuid, last_seen_on__range=(after, before)
+    )
     for contact in contacts:
         message = flow_instance.get_message(
             str(project.uuid), str(contact.contact_flow_uuid), before, after
@@ -183,10 +182,7 @@ def count_contacts(before, after, project_uuid: str, task_uuid: str = None):
                 created_at__range=(now.start_of("day"), now.end_of("day")), project=project
             )
         except ContactCount.DoesNotExist:
-            contact_count = ContactCount.objects.create(
-                project=project,
-                count=0
-            )
+            contact_count = ContactCount.objects.create(project=project, count=0)
 
         contact_count.increase_contact_count(amount)
         manager.status = True
@@ -210,9 +206,17 @@ def refund_validation_charge(charge_id):  # pragma: no cover
 
 @app.task(name="problem_capture_invoice")
 def problem_capture_invoice():
-    for organization in Organization.objects.filter(
-        organization_billing__plan=BillingPlan.PLAN_ENTERPRISE, is_suspended=False
-    ):
+    plan_list = [
+        BillingPlan.PLAN_START,
+        BillingPlan.PLAN_SCALE,
+        BillingPlan.PLAN_ADVANCED,
+    ]
+
+    organizations = organizations = Organization.objects.filter(
+        organization_billing__plan__in=plan_list, is_suspended=False
+    )
+
+    for organization in organizations:
         if organization.organization_billing.problem_capture_invoice:
             organization.is_suspended = True
             organization.save(update_fields=["is_suspended"])
@@ -228,8 +232,10 @@ def problem_capture_invoice():
 @app.task(name="end_trial_plan")
 def end_trial_plan():
     yesterday = pendulum.yesterday()
-    for organization in Organization.objects.filter(organization_billing__plan=BillingPlan.PLAN_TRIAL,
-                                                    organization_billing__trial_end_date__date=yesterday.date()):
+    for organization in Organization.objects.filter(
+        organization_billing__plan=BillingPlan.PLAN_TRIAL,
+        organization_billing__trial_end_date__date=yesterday.date(),
+    ):
         organization.organization_billing.end_trial_period()
         organization.organization_billing.send_email_trial_plan_expired_due_time_limit()
 
@@ -238,10 +244,17 @@ def end_trial_plan():
 def check_organization_plans():
     # utc-3 or project_timezone
 
-    for organization in Organization.objects.filter(is_suspended=False).exclude(organization_billing__plan__in=[
-            BillingPlan.PLAN_TRIAL, BillingPlan.PLAN_CUSTOM, BillingPlan.PLAN_ENTERPRISE]):
+    for organization in Organization.objects.filter(is_suspended=False).exclude(
+        organization_billing__plan__in=[
+            BillingPlan.PLAN_TRIAL,
+            BillingPlan.PLAN_CUSTOM,
+            BillingPlan.PLAN_ENTERPRISE,
+        ]
+    ):
 
-        next_due_date = pendulum.parse(str(organization.organization_billing.next_due_date))
+        next_due_date = pendulum.parse(
+            str(organization.organization_billing.next_due_date)
+        )
         after = next_due_date.subtract(months=1).strftime("%Y-%m-%d %H:%M")
         before = next_due_date.strftime("%Y-%m-%d %H:%M")
         for project in organization.project.all():
@@ -269,12 +282,17 @@ def daily_contact_count():
     """Daily contacts"""
     today = pendulum.now().end_of("day")
 
-    for project in Project.objects.exclude(organization__organization_billing__plan=BillingPlan.PLAN_CUSTOM):
+    for project in Project.objects.exclude(
+        organization__organization_billing__plan=BillingPlan.PLAN_CUSTOM
+    ):
         after = today.start_of("day")
         before = today
-        total_day_calls = Contact.objects.filter(project=project).filter(last_seen_on__range=(after, before)).distinct("contact_flow_uuid").count()
+        total_day_calls = (
+            Contact.objects.filter(project=project)
+            .filter(last_seen_on__range=(after, before))
+            .distinct("contact_flow_uuid")
+            .count()
+        )
         cc, created = ContactCount.objects.get_or_create(
-            project=project,
-            day=after,
-            defaults={"count": total_day_calls}
+            project=project, day=after, defaults={"count": total_day_calls}
         )

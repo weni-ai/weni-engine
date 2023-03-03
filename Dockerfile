@@ -1,4 +1,4 @@
-FROM python:3.6-slim
+FROM python:3.8-slim
 
 ENV WORKDIR /home/app
 WORKDIR $WORKDIR
@@ -6,10 +6,10 @@ WORKDIR $WORKDIR
 RUN apt-get update \
  && apt-get install --no-install-recommends --no-install-suggests -y apt-utils \
  && apt-get install --no-install-recommends --no-install-suggests -y gcc bzip2 git curl nginx libpq-dev gettext \
-    libgdal-dev python3-cffi python3-gdal vim build-essential
+    libgdal-dev python3-cffi python3-gdal vim build-essential python-setuptools
 
-RUN pip install -U pip==21.2.2 setuptools==57.4.0
-RUN pip install poetry==1.1.12
+RUN pip install -U pip==22.3.1
+RUN pip install poetry==1.2.1
 RUN pip install gunicorn==19.9.0
 RUN pip install gevent==22.10.2
 RUN pip install psycopg2-binary

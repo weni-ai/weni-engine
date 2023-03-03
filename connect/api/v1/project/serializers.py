@@ -1,6 +1,7 @@
 import json
 import logging
 import uuid
+import re
 
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
@@ -8,6 +9,7 @@ from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
 from rest_framework import serializers
 
 from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import ValidationError
 
 from connect.api.v1 import fields
 from connect.api.v1.fields import TextField
@@ -299,6 +301,19 @@ class RequestPermissionProjectSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         if attrs.get("role") == ProjectRoleLevel.NOTHING.value:
             raise PermissionDenied(_("You cannot set user role 0"))
+
+        email = attrs.get("email")
+
+        if ' ' in email:
+            raise ValidationError(
+                _("Email field cannot have spaces")
+            )
+
+        if bool(re.match('[A-Z]', email)):
+            raise ValidationError(
+                _("Email field cannot have uppercase characters")
+            )
+
         return attrs
 
 

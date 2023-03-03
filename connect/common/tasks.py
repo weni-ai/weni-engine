@@ -19,6 +19,7 @@ from connect.common.models import (
     BillingPlan,
     Invoice,
     GenericBillingData,
+    RecentActivity
 )
 
 from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
@@ -224,7 +225,6 @@ def create_project(project_name: str, user_email: str, project_timezone: str):
         user_email=user_email,
         project_timezone=project_timezone,
     )
-
     return {"id": project.get("id"), "uuid": project.get("uuid")}
 
 
@@ -815,3 +815,9 @@ def list_classifier(project_uuid: str):
 def list_project_flows(flow_organization: str):
     flow_type = utils.get_grpc_types().get("flow")
     return flow_type.list_flows(flow_organization)
+
+
+@app.task(name="delete_recent_activities")
+def delete_recent_activities():
+    date_limit = pendulum.now().start_of("day").subtract(30)
+    RecentActivity.objects.filter(created_on__lte=date_limit).delete()
