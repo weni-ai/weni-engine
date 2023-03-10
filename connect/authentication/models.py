@@ -139,6 +139,13 @@ class User(AbstractBaseUser, PermissionsMixin):
         null=True,
         blank=True
     )
+    position = models.CharField(
+        verbose_name=_("company position"),
+        help_text=_("Your position in the company"),
+        max_length=100,
+        null=True,
+        blank=True
+    )
 
     objects = UserManager()
 
@@ -184,12 +191,15 @@ class User(AbstractBaseUser, PermissionsMixin):
     def send_request_flow_user_info(self, flow_data):
         if not flow_data.get('send_request_flow'):
             return False  # pragma: no cover
-        company_size = [
+        company_size_mapping = [
             "1 - 20",
             "21 - 50",
             "51 - 300",
             "301 - 1000",
-            "1001+"
+            "1001+",
+            "somente eu",
+            "2 - 10",
+            "11 - 20"
         ]
         requests.post(
             url=f"{settings.FLOWS_URL}api/v2/flow_starts.json",
@@ -204,7 +214,7 @@ class User(AbstractBaseUser, PermissionsMixin):
                     "phone": self.phone,
                     "utm": self.utm,
                     "email_marketing": self.email_marketing,
-                    "company_colaborators": company_size[self.number_people],
+                    "company_colaborators": company_size_mapping[self.number_people] if self.number_people else None,
                     "company_name": self.company_name,
                     "company_sector": self.company_sector,
                     "company_segment": self.company_segment,
