@@ -842,6 +842,7 @@ class ProjectAuthorization(models.Model):
             ProjectRoleLevel.CONTRIBUTOR.value,
             ProjectRoleLevel.VIEWER.value,
             ProjectRoleLevel.SUPPORT.value,
+            ProjectRoleLevel.CHAT_USER.value
         ]
 
     @property
