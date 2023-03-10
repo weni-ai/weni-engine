@@ -112,7 +112,8 @@ class AdditionalUserInfoTestCase(TestCase):
         }
 
         user_info = {
-            "phone": "5582555555555"
+            "phone": "5582555555555",
+            "position": "test_manager",
         }
 
         body = dict(

@@ -199,6 +199,7 @@ class MyUserProfileViewSet(
             user.number_people = company_info.get("number_people")
             user.weni_helps = company_info.get("weni_helps")
             user.phone = user_info.get("phone")
+            user.position = user_info.get("position")
             user.last_update_profile = timezone.now()
             user.save(
                 update_fields=[
@@ -208,6 +209,7 @@ class MyUserProfileViewSet(
                     "weni_helps",
                     "phone",
                     "last_update_profile",
+                    "position"
                 ]
             )
             data = dict(
