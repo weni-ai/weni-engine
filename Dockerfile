@@ -9,7 +9,7 @@ RUN apt-get update \
     libgdal-dev python3-cffi python3-gdal vim build-essential python-setuptools
 
 RUN pip install -U pip==22.3.1
-RUN pip install poetry==1.2.1
+RUN pip install poetry==1.2.2
 RUN pip install gunicorn==19.9.0
 RUN pip install gevent==22.10.2
 RUN pip install psycopg2-binary
