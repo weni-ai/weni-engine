@@ -13,6 +13,11 @@ class FlowsRESTClient:
         self.base_url = settings.FLOWS_REST_ENDPOINT
         self.authentication_instance = InternalAuthentication()
 
+    def _get_url(self, endpoint: str) -> str:
+        # TODO: refactor all clients to use this method
+        assert endpoint.startswith("/"), "the endpoint needs to start with: /"
+        return self.base_url + endpoint
+
     def create_template_project(self, project_name: str, user_email: str, project_timezone: str):
         body = dict(
             name=project_name,
@@ -358,3 +363,12 @@ class FlowsRESTClient:
             timeout=60
         )
         return response
+
+    def create_external_service(self, user: str, flow_organization: str, type_fields: dict, type_code: str):
+        body = dict(user=user, org=flow_organization, type_fields=type_fields, type_code=type_code)
+
+        return requests.post(
+            self._get_url("/api/v2/internals/externals"),
+            headers=self.authentication_instance.headers,
+            json=body,
+        )
