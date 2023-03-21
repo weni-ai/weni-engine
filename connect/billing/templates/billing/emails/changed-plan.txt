@@ -5,4 +5,4 @@
     {% trans "has updated the organization's plan"  %}
     {% trans "from" %} <strong>{{old_plan}}</strong> {% trans "to" %} <strong>{{actual_plan}}</strong>.
 </p>
-<p>{% trans "The platform is ready to receive and use our resources" %}</p>
+<p>{% trans "The plan" %} {{actual_plan}} {% trans "features are now available for use" %}.</p>

@@ -37,7 +37,7 @@
               margin-top: 24px;
             "
           >
-            {% trans "Your" %} {{organization_name}} {% trans "plan has been changed" %}.
+            {% trans "The plan of the organization" %} {{organization_name}} {% trans "has been changed" %}.
           </div>
 
           <div
@@ -56,7 +56,7 @@
               {% trans "has updated the organization's plan from"  %}
               <strong>{{old_plan}}</strong> {% trans "to" %} <strong>{{actual_plan}}</strong>.
             </p>
-            <p>{% trans "The platform is ready to receive and use our resources" %}</p>
+            <p>{% trans "The plan" %} {{actual_plan}} {% trans "features are now available for use" %}.</p>
             <span style="margin-left: 1px">
               <img
                 style="max-height: 16px"
