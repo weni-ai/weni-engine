@@ -34,7 +34,7 @@ class ChannelsAPIView(views.APIView):
         data = request.data
         data.update({"project_uuid": kwargs.get("project_uuid")})
         logger.info(f"[ * ] {data}")
-        serializer = CreateChannelSerializer(data=request.data)
+        serializer = CreateChannelSerializer(data=data)
         serializer.is_valid(raise_exception=True)
 
         project_uuid = serializer.validated_data.get("project_uuid")
