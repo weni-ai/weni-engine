@@ -22,6 +22,7 @@ from connect.common.models import (
 )
 from django.conf import settings
 from connect.common.gateways.rocket_gateway import Rocket
+from freezegun import freeze_time
 
 
 class NewsletterTestCase(TestCase):
@@ -478,6 +479,21 @@ class OrganizationTestCase(TestCase):
         self.assertEqual(outbox.subject, "A new permission has been assigned to you")
         self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
         self.assertEqual(outbox.to[0], self.test_email)
+
+    def test_days_till_trial_end(self):
+        organization = Organization.objects.create(
+            name="Test Organization Trial",
+            inteligence_organization=0,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan=BillingPlan.PLAN_TRIAL,
+        )
+        
+        today = pendulum.now()
+
+        with freeze_time(today.add(months=1)):
+            print(organization.organization_billing.days_till_trial_end)
+            self.assertEquals(organization.organization_billing.days_till_trial_end, 0)
+
 
 
 class BillingPlanTestCase(TestCase):
