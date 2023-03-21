@@ -11,13 +11,13 @@ router = routers.SimpleRouter()
 
 urlpatterns = [
     path("", include(router.urls)),
-    path("projects/<project_uuid>/create-classifier", CreateClassifierAPIView.as_view(), name="create-classifier"),
-    path("projects/<project_uuid>/list-classifier", ListClassifierAPIView.as_view(), name="list-classifier"),
-    path("projects/<project_uuid>/retrieve-classifier", RetrieveClassfierAPIView.as_view(), name="retrieve-classifier"),
-    path("projects/<project_uuid>/delete-classifier", DeleteClassifierAPIView.as_view(), name="delete-classifier"),
-    path("projects/<project_uuid>/ticketer", TicketerAPIView.as_view(), name="ticketer"),
-    path("projects/<project_uuid>/channel", ChannelsAPIView.as_view(), name="channels"),
+    path("projects/<uuid:project_uuid>/create-classifier", CreateClassifierAPIView.as_view(), name="create-classifier"),
+    path("projects/<uuid:project_uuid>/list-classifier", ListClassifierAPIView.as_view(), name="list-classifier"),
+    path("projects/<uuid:project_uuid>/retrieve-classifier", RetrieveClassfierAPIView.as_view(), name="retrieve-classifier"),
+    path("projects/<uuid:project_uuid>/delete-classifier", DeleteClassifierAPIView.as_view(), name="delete-classifier"),
+    path("projects/<uuid:project_uuid>/ticketer", TicketerAPIView.as_view(), name="ticketer"),
+    path("projects/<uuid:project_uuid>/channel", ChannelsAPIView.as_view(), name="channels"),
     path("projects/channels", ListChannelsAPIView.as_view(), name="list-channels"),
-    path("projects/<project_uuid>/create-wac-channel", CreateWACChannelAPIView.as_view(), name="create-wac-channel"),
-    path("projects/<project_uuid>/user-api-token", UserAPIToken.as_view(), name="user-api-token")
+    path("projects/<uuid:project_uuid>/create-wac-channel", CreateWACChannelAPIView.as_view(), name="create-wac-channel"),
+    path("projects/<uuid:project_uuid>/user-api-token", UserAPIToken.as_view(), name="user-api-token")
 ]
