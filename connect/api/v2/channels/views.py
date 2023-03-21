@@ -1,3 +1,5 @@
+import logging
+
 from django.http import JsonResponse
 from rest_framework import views, status
 from rest_framework.exceptions import ValidationError
@@ -6,6 +8,8 @@ from connect.api.v1.internal.permissions import ModuleHasPermission
 from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
 from connect.api.v2.channels.serializers import ReleaseChannelSerializer, CreateChannelSerializer, CreateWACChannelSerializer
 from connect.common.models import Project
+
+logger = logging.getLogger(__name__)
 
 
 class ChannelsAPIView(views.APIView):
@@ -29,11 +33,13 @@ class ChannelsAPIView(views.APIView):
     def post(self, request, *args, **kwargs):
         data = request.data
         data.update({"project_uuid": kwargs.get("project_uuid")})
+        logger.info(f"[ * ] {data}")
         serializer = CreateChannelSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         project_uuid = serializer.validated_data.get("project_uuid")
         project = Project.objects.get(uuid=project_uuid)
+        logger.info(f"project its found {project.name}")
 
         flows_instance = FlowsRESTClient()
         response = flows_instance.create_channel(
@@ -42,6 +48,7 @@ class ChannelsAPIView(views.APIView):
             data=serializer.validated_data.get("data"),
             channeltype_code=serializer.validated_data.get("channeltype_code"),
         )
+        logger.info(f"status = {response.status_code}")
         if response.status_code != status.HTTP_200_OK:
             return JsonResponse(status=response.status_code, data={"message": response.text})
         return JsonResponse(status=response.status_code, data=response.json())
