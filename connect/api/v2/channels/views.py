@@ -29,7 +29,7 @@ class ChannelsAPIView(views.APIView):
     def post(self, request, *args, **kwargs):
         data = request.data
         data.update({"project_uuid": kwargs.get("project_uuid")})
-        serializer = CreateChannelSerializer(data=request.data)
+        serializer = CreateChannelSerializer(data=data)
         serializer.is_valid(raise_exception=True)
 
         project_uuid = serializer.validated_data.get("project_uuid")
