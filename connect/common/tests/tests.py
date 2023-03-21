@@ -487,13 +487,11 @@ class OrganizationTestCase(TestCase):
             organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
             organization_billing__plan=BillingPlan.PLAN_TRIAL,
         )
-        
         today = pendulum.now()
 
         with freeze_time(today.add(months=1)):
             print(organization.organization_billing.days_till_trial_end)
             self.assertEquals(organization.organization_billing.days_till_trial_end, 0)
-
 
 
 class BillingPlanTestCase(TestCase):
