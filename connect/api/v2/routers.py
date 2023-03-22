@@ -5,13 +5,13 @@ from connect.api.v2.channels.views import ChannelsAPIView, CreateWACChannelAPIVi
 from connect.api.v2.classifier.views import CreateClassifierAPIView, ListClassifierAPIView, RetrieveClassfierAPIView, DeleteClassifierAPIView
 from connect.api.v2.ticketer.views import TicketerAPIView
 from connect.api.v2.user.views import UserAPIToken
-from connect.api.v2.template_projects.views import TemplateTypeViewSet, TemplateAIViewSet, TemplateFeaturesViewSet
+from connect.api.v2.template_projects.views import TemplateTypeViewSet, TemplateFeatureViewSet
 
 
 router = routers.SimpleRouter()
 router.register(r"projects/template-type", TemplateTypeViewSet, basename="template-type")
-router.register(r"projects/template-ai", TemplateAIViewSet, basename="template-ai")
-router.register(r"projects/template-features", TemplateFeaturesViewSet, basename="template-features")
+# router.register(r"projects/template-ai", TemplateAIViewSet, basename="template-ai")
+router.register(r"projects/template-features", TemplateFeatureViewSet, basename="template-features")
 
 urlpatterns = [
     path("", include(router.urls)),
