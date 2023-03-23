@@ -33,7 +33,6 @@ class TemplateTypeViewSet(ModelViewSet):
 
         instance = self.get_object()
         serializer = RetrieveTemplateSerializer(instance)
-        print("alo")
 
         return Response(serializer.data)
 
