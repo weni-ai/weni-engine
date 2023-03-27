@@ -187,6 +187,7 @@ class ProjectSerializer(serializers.ModelSerializer):
                     "authorization": instance.get_user_authorization(user).uuid
                 }
             )
+
             template_serializer = TemplateProjectSerializer(data=extra_data, context=self.context["request"])
             template_serializer.is_valid()
             template_project = template_serializer.save()
@@ -348,9 +349,45 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
             }
         return True, {}
 
+    def create_globals_omie(self, flow_organization: str, user_email: str):
+        from connect.api.v1.internal.flows.mp9.client_omie import Omie
+
+        response_data = {}
+        created = False
+
+        omie = Omie()
+        
+        data = self.context._data
+        globals_dict = data.get("project").get("globals")
+
+        try:
+            omie.create_globals(
+                flow_organization,
+                user_email,
+                globals_dict
+            )
+            created = True
+        except Exception as error:
+            logger.error(f"Create globals: {error}")
+            response_data = {
+                "message": "Could not create global",
+                "status": status.HTTP_500_INTERNAL_SERVER_ERROR
+            }
+        return created, response_data
+
     def create(self, validated_data):
         project = validated_data.get("project")
         authorization = validated_data.get("authorization")
+
+        if project.template_type in [Project.TYPE_OMIE_DUPLICATE, Project.TYPE_OMIE_LEAD_CAPTURE]:
+
+            created, data = self.create_globals_omie(
+                str(project.flow_organization),
+                str(authorization.user.email)
+            )
+
+            if not created:
+                return data
 
         is_valid, message = self.validate_project_authorization(authorization)
 
@@ -363,6 +400,7 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
         if not ok:
             # Project delete
             return access_token
+
         created, classifier_uuid = project.create_classifier(
             authorization,
             project.template_type,
@@ -393,8 +431,6 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
             redirect_url=whatsapp_data.get("redirect_url"),
             flow_uuid=flow_uuid,
             classifier_uuid=classifier_uuid
-
-
         )
 
         return template

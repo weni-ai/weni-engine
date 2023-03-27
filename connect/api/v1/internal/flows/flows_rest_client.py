@@ -359,3 +359,14 @@ class FlowsRESTClient:
             timeout=60
         )
         return response
+
+    # def create_globals(self, project_uuid:str, user_email: str, global_key: str, global_value: str):
+    def create_globals(self, omie_body: list):
+
+        response = requests.post(
+            url=f'{self.base_url}/api/v2/internals/globals/',
+            headers=self.authentication_instance.headers,
+            json=omie_body
+        )
+
+        return response

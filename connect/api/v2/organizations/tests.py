@@ -597,6 +597,173 @@ class OrganizationViewSetTestCase(TestCase):
             user=user
         )
 
+    @patch("connect.api.v1.internal.integrations.integrations_rest_client.IntegrationsRESTClient.whatsapp_demo_integration")
+    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_flows")
+    @patch("connect.api.v1.internal.chats.chats_rest_client.ChatsRESTClient.create_chat_project")
+    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_classifier")
+    @patch("connect.common.models.Organization.get_ai_access_token")
+    @patch("connect.authentication.models.User.send_request_flow_user_info")
+    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_template_project")
+    def test_create_organization_omie_lead_project(self, flows_info, send_request_flow_user_info, get_ai_access_token, create_classifier, create_chat_project, create_flows, wpp_integration):
+        data = {
+            "redirect_url": "https://example.com",
+            "router_token": "rt_token"
+        }
+
+        flows_info.side_effect = [{"id": 1, "uuid": uuid.uuid4()}]
+        send_request_flow_user_info.side_effect = [True]
+        get_ai_access_token.side_effect = [(True, str(uuid.uuid4()))]
+        create_classifier.side_effect = [{"data": {"uuid": uuid.uuid4()}}]
+        wpp_integration.side_effect = [data]
+
+        chats_data = {
+            "ticketer": {"uuid": str(uuid.uuid4()), "name": "Test Ticketer"},
+            "queue": {"uuid": str(uuid.uuid4()), "name": "Test Queue"},
+        }
+
+        class Response:
+            text = json.dumps(chats_data)
+
+        flows_response = '{"uuid": "9785a273-37de-4658-bfa2-d8028dc06c84"}'
+        create_chat_project.side_effect = [Response()]
+
+        create_flows.side_effect = [dict(status=201, data=flows_response)]
+
+        org_data = {
+            "name": "V2",
+            "description": "V2 desc",
+            "organization_billing_plan": BillingPlan.PLAN_TRIAL,
+            "authorizations": [
+                {"user_email": "e@mail.com", "role": 3},
+                {"user_email": "user_1@user.com", "role": 3}
+            ],
+        }
+
+        project_data = {
+            "date_format": "D",
+            "name": "Test Project",
+            "timezone": "America/Argentina/Buenos_Aires",
+            "template": True,
+            "template_type": Project.TYPE_OMIE_LEAD_CAPTURE,
+            "globals": {
+                "appkey": 2349317317347,
+                "appsecret": "03cc3bb753a58f4628e63ef8b606dafd",
+                "nome_da_empresa": "Empresa Teste",
+                "nome_do_bot": "Botinho",
+                "status_boleto_para_desconsiderar": "Recebido",
+                "tipo_credenciamento": "email"
+            }
+        }
+
+        data = {
+            "organization": org_data,
+            "project": project_data
+        }
+
+        path = "/v2/organizations/"
+        method = {"post": "create"}
+        user = self.user
+
+        response, content_data = self.request(
+            path,
+            method,
+            user=user,
+            data=data
+        )
+
+        organization = content_data.get("organization")
+
+        self.assertEquals(response.status_code, status.HTTP_201_CREATED)
+        # self.assertEquals(organization["authorizations"]["count"], 2)
+
+    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_globals")
+    @patch("connect.api.v1.internal.integrations.integrations_rest_client.IntegrationsRESTClient.whatsapp_demo_integration")
+    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_flows")
+    @patch("connect.api.v1.internal.chats.chats_rest_client.ChatsRESTClient.create_chat_project")
+    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_classifier")
+    @patch("connect.common.models.Organization.get_ai_access_token")
+    @patch("connect.authentication.models.User.send_request_flow_user_info")
+    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_template_project")
+    def test_create_organization_omie_duplicate(self, flows_info, send_request_flow_user_info, get_ai_access_token, create_classifier, create_chat_project, create_flows, wpp_integration, create_globals):
+        data = {
+            "redirect_url": "https://example.com",
+            "router_token": "rt_token"
+        }
+
+        flows_info.side_effect = [{"id": 1, "uuid": uuid.uuid4()}]
+        send_request_flow_user_info.side_effect = [True]
+        get_ai_access_token.side_effect = [(True, str(uuid.uuid4()))]
+        create_classifier.side_effect = [{"data": {"uuid": uuid.uuid4()}}]
+        wpp_integration.side_effect = [data]
+
+        chats_data = {
+            "ticketer": {"uuid": str(uuid.uuid4()), "name": "Test Ticketer"},
+            "queue": {"uuid": str(uuid.uuid4()), "name": "Test Queue"},
+        }
+
+        class Response:
+            text = json.dumps(chats_data)
+        
+        class ResponseRequest:
+            status_code = 201
+
+            def json():
+                return {}
+
+        res = ResponseRequest()
+
+        flows_response = '{"uuid": "9785a273-37de-4658-bfa2-d8028dc06c84"}'
+        create_chat_project.side_effect = [Response()]
+
+        create_flows.side_effect = [dict(status=201, data=flows_response)]
+        create_globals.side_effect = [res]
+
+        org_data = {
+            "name": "V2",
+            "description": "V2 desc",
+            "organization_billing_plan": BillingPlan.PLAN_TRIAL,
+            "authorizations": [
+                {"user_email": "e@mail.com", "role": 3},
+                {"user_email": "user_1@user.com", "role": 3}
+            ],
+        }
+
+        project_data = {
+            "date_format": "D",
+            "name": "Test Project",
+            "timezone": "America/Argentina/Buenos_Aires",
+            "template": True,
+            "template_type": Project.TYPE_OMIE_DUPLICATE,
+            "globals": {
+                "appkey": 2349317317347,
+                "appsecret": "03cc3bb753a58f4628e63ef8b606dafd",
+                "nome_da_empresa": "Empresa Teste",
+                "nome_do_bot": "Botinho",
+                "status_boleto_para_desconsiderar": "Recebido",
+                "tipo_credenciamento": "email"
+            }
+        }
+
+        data = {
+            "organization": org_data,
+            "project": project_data
+        }
+
+        path = "/v2/organizations/"
+        method = {"post": "create"}
+        user = self.user
+
+        response, content_data = self.request(
+            path,
+            method,
+            user=user,
+            data=data
+        )
+
+        # organization = content_data.get("organization")
+        print(content_data)
+        self.assertEquals(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
+        # self.assertEquals(organization["authorizations"]["count"], 2)
 
 class OrganizationTestCase(TestCase):
     def setUp(self):

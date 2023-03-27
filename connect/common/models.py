@@ -556,12 +556,14 @@ class Project(models.Model):
 
     TYPE_SUPPORT = "support"
     TYPE_LEAD_CAPTURE = "lead_capture"
-    TYPE_OMIE = "omie"
+    TYPE_OMIE_LEAD_CAPTURE = "omie_lead_capture"
+    TYPE_OMIE_DUPLICATE = "omie_duplicate"
 
     TEMPLATE_TYPES = (
         (TYPE_SUPPORT, _("support")),
         (TYPE_LEAD_CAPTURE, _("lead capture")),
-        (TYPE_OMIE, "omie"),
+        (TYPE_OMIE_LEAD_CAPTURE, "omie_lead_capture"),
+        (TYPE_OMIE_DUPLICATE, "omie_duplicate"),
     )
 
     uuid = models.UUIDField(
@@ -787,9 +789,9 @@ class Project(models.Model):
 
         flow_instance = FlowsRESTClient()
 
-        is_support = self.template_type == Project.TYPE_SUPPORT
+        has_chats = self.template_type in [Project.TYPE_SUPPORT, Project.TYPE_OMIE_DUPLICATE]
 
-        if is_support:
+        if has_chats:
             chats_created, chats_response = self.create_chats_project()
             if not chats_created:
                 return chats_response
