@@ -43,7 +43,8 @@ class BillingPlanSerializer(serializers.ModelSerializer):
             "problem_capture_invoice",
             "currenty_invoice",
             "contract_on",
-            "trial_end_date"
+            "trial_end_date",
+            "days_till_trial_end"
         ]
         ref_name = None
 

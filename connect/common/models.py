@@ -1713,6 +1713,13 @@ class BillingPlan(models.Model):
                 name="update_suspend_project", args=[project.flow_organization, True]
             )
 
+    @property
+    def days_till_trial_end(self):
+        if self.plan == BillingPlan.PLAN_TRIAL:
+            today = pendulum.now()
+            trial_end = pendulum.instance(self.trial_end_date)
+            return today.diff(trial_end, False).in_days()
+
 
 class Invoice(models.Model):
     class Meta:
