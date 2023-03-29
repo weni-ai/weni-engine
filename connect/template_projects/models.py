@@ -9,6 +9,7 @@ class TemplateType(models.Model):
     description = models.TextField(blank=True, null=True)
     name = models.CharField(max_length=255, null=True, blank=True)
     level = models.CharField(max_length=255, choices=level_field)
+    setup = models.JSONField(blank=True, null=True)
 
     def __str__(self):
         return f"{self.id}"

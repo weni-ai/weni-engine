@@ -25,7 +25,7 @@ class TemplateTypeSerializer(ModelSerializer):
 
     class Meta:
         model = TemplateType
-        fields = ['id', 'category', 'description', 'name', 'level', 'features', 'ais']
+        fields = ['id', 'category', 'description', 'name', 'level', 'setup', 'features', 'ais']
 
     def get_features(self, obj):
         return TemplateFeatureSerializer(obj.template_features.all(), many=True).data
