@@ -1704,6 +1704,15 @@ class BillingPlan(models.Model):
         return mail
 
     def end_trial_period(self):
+        newsletter = Newsletter.objects.create()
+
+        NewsletterOrganization.objects.create(
+            newsletter=newsletter,
+            title="trial-ended",
+            description=f"Your trial period of the organization {self.organization.name}, has ended, do an upgrade.",
+            organization=self.organization
+        )
+
         self.is_active = False
         self.save(update_fields=["is_active"])
         self.organization.is_suspended = True
@@ -2034,3 +2043,26 @@ class RecentActivity(models.Model):
             data.update({"name": self.entity_name})
 
         return data
+
+
+class NewsletterOrganization(models.Model):
+    title = models.CharField(_("title"), max_length=50)
+    description = models.TextField(_("description"))
+    organization = models.ForeignKey(
+        Organization, models.CASCADE, related_name="org_newsletter"
+    )
+    newsletter = models.ForeignKey(
+        Newsletter, models.CASCADE
+    )
+    created_at = models.DateTimeField(_("created at"), auto_now_add=True)
+
+    def __str__(self):
+        return f"Newsletter PK: {self.newsletter.pk} - {self.organization} - {self.title}"
+
+    @property
+    def organization_name(self):
+        return self.organization.name
+
+    def trial_end_date(self):
+        return self.organization.organization_billing.trial_end_date
+
