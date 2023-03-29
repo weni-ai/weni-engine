@@ -1,15 +1,19 @@
 import stripe
 import pendulum
 from connect.celery import app
-from connect.common.models import Organization, Project, BillingPlan
+from connect.common.models import (
+    Organization,
+    Project,
+    BillingPlan,
+    NewsletterOrganization,
+    Newsletter
+)
 from connect.billing.models import (
     Contact,
     Message,
     SyncManagerTask,
     ContactCount,
     Channel,
-    NewsletterOrganization,
-    Newsletter
 )
 from connect.elastic.flow import ElasticFlow
 from django.utils import timezone
