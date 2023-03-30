@@ -1,4 +1,5 @@
 from django.db import models
+from .storage import TemplateTypeImageStorage
 
 
 class TemplateType(models.Model):
@@ -10,6 +11,8 @@ class TemplateType(models.Model):
     name = models.CharField(max_length=255, null=True, blank=True)
     level = models.CharField(max_length=255, choices=level_field)
     setup = models.JSONField(blank=True, null=True)
+
+    photo = models.ImageField(storage=TemplateTypeImageStorage(), blank=True, null=True)
 
     def __str__(self):
         return f"{self.id}"
