@@ -1,11 +1,15 @@
 import re
 
+import logging
+from django.http import JsonResponse
 from django.contrib.auth import get_user_model
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
 from rest_framework import serializers
 from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework.exceptions import PermissionDenied
+from rest_framework import status
 
 from connect.api.v1.fields import TextField
 from connect.api.v1.project.validators import CanContributeInOrganizationValidator
@@ -20,6 +24,7 @@ from connect.common.models import (
 from connect.api.v1.internal.intelligence.intelligence_rest_client import IntelligenceRESTClient
 
 User = get_user_model()
+logger = logging.getLogger(__name__)
 
 
 class BillingPlanSerializer(serializers.ModelSerializer):
@@ -140,7 +145,7 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
         help_text=_("if this field is true, only users with 2fa activated can access the org")
     )
 
-    def create(self, validated_data):
+    def create_organization(self, validated_data):
         organization = {"id": 0}
         if not settings.TESTING:
             ai_client = IntelligenceRESTClient()
@@ -166,6 +171,43 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
             user=self.context["request"].user, role=OrganizationRole.ADMIN.value
         )
 
+        return instance
+
+    def create(self, validated_data):
+        data = {}
+        try:
+            ai_client = IntelligenceRESTClient()
+            Organization = ai_client.create_organization(
+                user_email=self.context["request"].user.email,
+                organization_name=validated_data.get("name"),
+            )
+        except Exception as error:
+            data.update(
+                {
+                    "message": "Could not create organization in AI module",
+                    "status": "FAILED",
+                }
+            )
+            logger.error(error)
+            return JsonResponse(data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        # Billing Cycle
+        # Added for the manager to set the date when new invoice will be generated
+        billing_cycle = BillingPlan._meta.get_field("cycle").default
+
+        validated_data.update(
+            {
+                "inteligence_organization": Organization.get("id"),
+                "organization_billing__cycle": billing_cycle,
+            }
+        )
+        # create organization object
+        instance = super(OrganizationSeralizer, self).create(validated_data)
+
+        # Create authorization for the organization owner
+        instance.authorizations.create(
+            user=self.context["request"].user, role=OrganizationRole.ADMIN.value
+        )
         return instance
 
     def get_authorizations(self, obj):

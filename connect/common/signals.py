@@ -120,7 +120,7 @@ def delete_opened_project(sender, instance, **kwargs):
 
 @receiver(post_save, sender=OrganizationAuthorization)
 def org_authorizations(sender, instance, created, **kwargs):
-
+    # if settings.CREATE_AI_ORGANIZATION:
     if instance.role is not OrganizationLevelRole.NOTHING.value:
         if created:
             organization_permission_mapper = {
