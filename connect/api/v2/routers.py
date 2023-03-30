@@ -8,8 +8,13 @@ from connect.api.v2.user.views import UserAPIToken
 from connect.api.v2.organizations import views as organization_views
 from connect.api.v2.projects import views as project_views
 from connect.api.v2.internals import views as connect_internal_views
+from connect.api.v2.template_projects.views import TemplateTypeViewSet, TemplateFeatureViewSet, TemplateAIViewSet
+
 
 router = routers.SimpleRouter()
+router.register(r"projects/template-type", TemplateTypeViewSet, basename="template-type")
+router.register(r"projects/template-ai", TemplateAIViewSet, basename="template-ai")
+router.register(r"projects/template-features", TemplateFeatureViewSet, basename="template-features")
 
 router.register(
     "organizations", organization_views.OrganizationViewSet, basename="organizations"
@@ -32,6 +37,7 @@ urlpatterns = [
     path("projects/<project_uuid>/channel", ChannelsAPIView.as_view(), name="channels"),
     path("projects/channels", ListChannelsAPIView.as_view(), name="list-channels"),
     path("projects/<project_uuid>/create-wac-channel", CreateWACChannelAPIView.as_view(), name="create-wac-channel"),
+    path("projects/<project_uuid>/user-api-token", UserAPIToken.as_view(), name="user-api-token"),
     path("projects/<project_uuid>/user-api-token", UserAPIToken.as_view(), name="user-api-token")
 ]
 urlpatterns += [

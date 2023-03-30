@@ -142,6 +142,7 @@ INSTALLED_APPS = [
     "connect.authentication.apps.AuthenticationConfig",
     "connect.common.apps.CommonConfig",
     "connect.billing",
+    "connect.template_projects",
     "django_celery_results",
     "django_celery_beat",
     "storages",
