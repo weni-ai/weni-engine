@@ -1,5 +1,5 @@
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser, SAFE_METHODS
 from connect.template_projects.models import TemplateType, TemplateFeature, TemplateAI
 from .serializers import TemplateTypeSerializer, RetrieveTemplateSerializer, TemplateFeatureSerializer, TemplateAISerializer
 from rest_framework.response import Response
@@ -9,7 +9,12 @@ class TemplateTypeViewSet(ModelViewSet):
 
     queryset = TemplateType.objects.all()
     serializer_class = TemplateTypeSerializer
-    permission_classes = [IsAuthenticated]
+
+    def get_permissions(self):
+        if self.request.method in SAFE_METHODS:
+            return [IsAuthenticated()]
+        else:
+            return [IsAdminUser()]
 
     def get_queryset(self):
 
@@ -40,7 +45,12 @@ class TemplateTypeViewSet(ModelViewSet):
 class TemplateAIViewSet(ModelViewSet):
     queryset = TemplateAI.objects.all()
     serializer_class = TemplateAISerializer
-    permission_classes = [IsAuthenticated]
+
+    def get_permissions(self):
+        if self.request.method in SAFE_METHODS:
+            return [IsAuthenticated()]
+        else:
+            return [IsAdminUser()]
 
     def get_queryset(self):
         queryset = self.queryset
@@ -56,7 +66,12 @@ class TemplateAIViewSet(ModelViewSet):
 class TemplateFeatureViewSet(ModelViewSet):
     queryset = TemplateFeature.objects.all()
     serializer_class = TemplateFeatureSerializer
-    permission_classes = [IsAuthenticated]
+
+    def get_permissions(self):
+        if self.request.method in SAFE_METHODS:
+            return [IsAuthenticated()]
+        else:
+            return [IsAdminUser()]
 
     def get_queryset(self):
         queryset = self.queryset
