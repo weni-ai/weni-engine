@@ -487,7 +487,7 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
         if authorization.role == 0:
             data.update(
                 {
-                    "message": "Project authorization not setted",
+                    "data": {"message": "Project authorization not setted"},
                     "status": "FAILED"
                 }
             )
@@ -507,7 +507,7 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
                 template.delete()
                 data.update(
                     {
-                        "message": "Could not get access token",
+                        "data": {"message": "Could not get access token"},
                         "status": "FAILED"
                     }
                 )

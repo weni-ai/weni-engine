@@ -1,4 +1,4 @@
-from django.conf import settings;from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient;from connect.common.models import Project
+from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
 
 
 class Omie:
@@ -27,7 +27,7 @@ class Omie:
             omie_globals.append(payload)
 
         response = self.flows_rest.create_globals(omie_globals)
-        
+
         if response.status_code == 201:
             return response.json()
 

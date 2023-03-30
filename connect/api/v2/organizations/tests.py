@@ -222,16 +222,17 @@ class OrganizationViewSetTestCase(TestCase):
     @patch("connect.common.models.Organization.get_ai_access_token")
     @patch("connect.authentication.models.User.send_request_flow_user_info")
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_template_project")
-    def test_create_organization_lead_project(self, flows_info, send_request_flow_user_info, get_ai_access_token, create_classifier, create_chat_project, create_flows, wpp_integration):
+    @patch("connect.api.v1.internal.intelligence.intelligence_rest_client.IntelligenceRESTClient.create_organization")
+    def test_create_organization_lead_project(self, create_organization, flows_info, send_request_flow_user_info, get_ai_access_token, create_classifier, create_chat_project, create_flows, wpp_integration):
         data = {
             "redirect_url": "https://example.com",
             "router_token": "rt_token"
         }
-
+        create_organization.side_effect = [{"id": 1}]
         flows_info.side_effect = [{"id": 1, "uuid": uuid.uuid4()}]
         send_request_flow_user_info.side_effect = [True]
         get_ai_access_token.side_effect = [(True, str(uuid.uuid4()))]
-        create_classifier.side_effect = [{"data": {"uuid": uuid.uuid4()}}]
+        create_classifier.side_effect = [{"status": 201, "data": {"uuid": "fdd4a7bb-fe5a-41b1-96a2-96d95c4e7aab"}}]
         wpp_integration.side_effect = [data]
 
         chats_data = {
@@ -293,7 +294,7 @@ class OrganizationViewSetTestCase(TestCase):
         flows_info.side_effect = [{"id": 1, "uuid": uuid.uuid4()}]
         send_request_flow_user_info.side_effect = [True]
         validate_authorization.side_effect = [(False, {
-            "message": "Project authorization not setted",
+            "data": {"message": "Project authorization not setted"},
             "status": status.HTTP_500_INTERNAL_SERVER_ERROR
         })]
 
@@ -333,16 +334,16 @@ class OrganizationViewSetTestCase(TestCase):
 
         self.assertEquals(int(response.status_code), status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    # @patch("connect.api.v2.projects.serializers.TemplateProjectSerializer.validate_project_authorization")
-
     @patch("connect.common.models.Organization.get_ai_access_token")
     @patch("connect.authentication.models.User.send_request_flow_user_info")
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_template_project")
-    def test_create_organization_lead_project_fail_access_token(self, flows_info, send_request_flow_user_info, get_ai_access_token):
+    @patch("connect.api.v1.internal.intelligence.intelligence_rest_client.IntelligenceRESTClient.create_organization")
+    def test_create_organization_lead_project_fail_access_token(self, create_organization, flows_info, send_request_flow_user_info, get_ai_access_token):
+        create_organization.side_effect = [{"id": 1}]
         flows_info.side_effect = [{"id": 1, "uuid": uuid.uuid4()}]
         send_request_flow_user_info.side_effect = [True]
         get_ai_access_token.side_effect = [(False, {
-            "message": "Could not get access token",
+            "data": {"message": "Could not get access token"},
             "status": status.HTTP_500_INTERNAL_SERVER_ERROR
         })]
 
@@ -379,7 +380,6 @@ class OrganizationViewSetTestCase(TestCase):
             user=user,
             data=data
         )
-
         self.assertEquals(int(response.status_code), status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_project")
@@ -471,9 +471,9 @@ class OrganizationViewSetTestCase(TestCase):
         flows_info.side_effect = [{"id": 1, "uuid": uuid.uuid4()}]
         send_request_flow_user_info.side_effect = [True]
         get_ai_access_token.side_effect = [(True, str(uuid.uuid4()))]
-        create_classifier.side_effect = [{"data": {"uuid": uuid.uuid4()}}]
+        create_classifier.side_effect = [{"status": 201, "data": {"uuid": "fdd4a7bb-fe5a-41b1-96a2-96d95c4e7aab"}}]
         response_data = {
-            "message": "Could not create flow",
+            "data": {"message": "Could not create flow"},
             "status": status.HTTP_500_INTERNAL_SERVER_ERROR
         }
         create_flows.side_effect = [(False, response_data)]
@@ -511,7 +511,7 @@ class OrganizationViewSetTestCase(TestCase):
             data=data
         )
         self.assertEquals(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
-        self.assertEquals(content_data, response_data.get("message"))
+        self.assertEquals(content_data, response_data.get("data"))
 
     @patch("connect.common.models.Project.whatsapp_demo_integration")
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_flows")
@@ -522,14 +522,14 @@ class OrganizationViewSetTestCase(TestCase):
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_template_project")
     def test_create_organization_lead_project_fail_integrate_wpp(self, flows_info, send_request_flow_user_info, get_ai_access_token, create_classifier, create_chat_project, create_flows, wpp_integration):
         response_data = {
-            "message": "Could not create flow",
+            "data": {"message": "Could not create flow"},
             "status": status.HTTP_500_INTERNAL_SERVER_ERROR
         }
 
         flows_info.side_effect = [{"id": 1, "uuid": uuid.uuid4()}]
         send_request_flow_user_info.side_effect = [True]
         get_ai_access_token.side_effect = [(True, str(uuid.uuid4()))]
-        create_classifier.side_effect = [{"data": {"uuid": uuid.uuid4()}}]
+        create_classifier.side_effect = [{"status": 201, "data": {"uuid": "fdd4a7bb-fe5a-41b1-96a2-96d95c4e7aab"}}]
         wpp_integration.side_effect = [(False, response_data)]
 
         chats_data = {
@@ -580,7 +580,7 @@ class OrganizationViewSetTestCase(TestCase):
         )
 
         self.assertEquals(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
-        self.assertEquals(content_data, response_data.get("message"))
+        self.assertEquals(content_data, response_data.get("data"))
 
     @patch("connect.api.v1.internal.intelligence.intelligence_rest_client.IntelligenceRESTClient.delete_organization")
     def test_perform_destroy(self, ai_destroy):
@@ -601,33 +601,58 @@ class OrganizationViewSetTestCase(TestCase):
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_flows")
     @patch("connect.api.v1.internal.chats.chats_rest_client.ChatsRESTClient.create_chat_project")
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_classifier")
-    @patch("connect.common.models.Organization.get_ai_access_token")
-    @patch("connect.authentication.models.User.send_request_flow_user_info")
+    @patch("connect.api.v1.internal.intelligence.intelligence_rest_client.IntelligenceRESTClient.get_access_token")
+    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_globals")
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_template_project")
-    def test_create_organization_omie_lead_project(self, flows_info, send_request_flow_user_info, get_ai_access_token, create_classifier, create_chat_project, create_flows, wpp_integration):
-        data = {
-            "redirect_url": "https://example.com",
-            "router_token": "rt_token"
-        }
+    @patch("connect.api.v1.internal.intelligence.intelligence_rest_client.IntelligenceRESTClient.create_organization")
+    def test_create_organization_financial(
+        self,
+        create_organization,
+        create_template_project,
+        create_globals,
+        get_access_token,
+        create_classifier,
+        create_chat_project,
+        create_flows,
+        whatsapp_demo_integration
+    ):
 
-        flows_info.side_effect = [{"id": 1, "uuid": uuid.uuid4()}]
-        send_request_flow_user_info.side_effect = [True]
-        get_ai_access_token.side_effect = [(True, str(uuid.uuid4()))]
-        create_classifier.side_effect = [{"data": {"uuid": uuid.uuid4()}}]
-        wpp_integration.side_effect = [data]
+        class GlobalResponse:
+            status_code = 201
+
+            @staticmethod
+            def json():
+                return {
+                    "org": "75694862-7dee-411f-a2d1-8a48fad743d2",
+                    "name": "appkey",
+                    "value": "1234567"
+                }
 
         chats_data = {
             "ticketer": {"uuid": str(uuid.uuid4()), "name": "Test Ticketer"},
             "queue": {"uuid": str(uuid.uuid4()), "name": "Test Queue"},
         }
 
-        class Response:
+        class ChatsResponse:
             text = json.dumps(chats_data)
 
         flows_response = '{"uuid": "9785a273-37de-4658-bfa2-d8028dc06c84"}'
-        create_chat_project.side_effect = [Response()]
 
+        wpp_data = {
+            "redirect_url": "https://example.com",
+            "router_token": "rt_token"
+        }
+
+        # side effects
+
+        create_organization.side_effect = [{"id": 1}]
+        create_template_project.side_effect = [{"id": 1, "uuid": "6b6a8c8b-6734-4110-81c9-287eaeab8e26"}]
+        create_globals.side_effect = [GlobalResponse]
+        get_access_token.side_effect = ["6b6a8c8b-6734-tokn-81c9-287eaeab8e26"]
+        create_classifier.side_effect = [{"status": 201, "data": {"uuid": "fdd4a7bb-fe5a-41b1-96a2-96d95c4e7aab"}}]
+        create_chat_project.side_effect = [ChatsResponse()]
         create_flows.side_effect = [dict(status=201, data=flows_response)]
+        whatsapp_demo_integration.side_effect = [wpp_data]
 
         org_data = {
             "name": "V2",
@@ -644,7 +669,7 @@ class OrganizationViewSetTestCase(TestCase):
             "name": "Test Project",
             "timezone": "America/Argentina/Buenos_Aires",
             "template": True,
-            "template_type": Project.TYPE_OMIE_LEAD_CAPTURE,
+            "template_type": Project.TYPE_OMIE_PAYMENT_FINANCIAL_CHAT_GPT,
             "globals": {
                 "appkey": 2349317317347,
                 "appsecret": "03cc3bb753a58f4628e63ef8b606dafd",
@@ -674,96 +699,8 @@ class OrganizationViewSetTestCase(TestCase):
         organization = content_data.get("organization")
 
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
-        # self.assertEquals(organization["authorizations"]["count"], 2)
+        self.assertEquals(organization["authorizations"]["count"], 2)
 
-    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_globals")
-    @patch("connect.api.v1.internal.integrations.integrations_rest_client.IntegrationsRESTClient.whatsapp_demo_integration")
-    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_flows")
-    @patch("connect.api.v1.internal.chats.chats_rest_client.ChatsRESTClient.create_chat_project")
-    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_classifier")
-    @patch("connect.common.models.Organization.get_ai_access_token")
-    @patch("connect.authentication.models.User.send_request_flow_user_info")
-    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_template_project")
-    def test_create_organization_omie_duplicate(self, flows_info, send_request_flow_user_info, get_ai_access_token, create_classifier, create_chat_project, create_flows, wpp_integration, create_globals):
-        data = {
-            "redirect_url": "https://example.com",
-            "router_token": "rt_token"
-        }
-
-        flows_info.side_effect = [{"id": 1, "uuid": uuid.uuid4()}]
-        send_request_flow_user_info.side_effect = [True]
-        get_ai_access_token.side_effect = [(True, str(uuid.uuid4()))]
-        create_classifier.side_effect = [{"data": {"uuid": uuid.uuid4()}}]
-        wpp_integration.side_effect = [data]
-
-        chats_data = {
-            "ticketer": {"uuid": str(uuid.uuid4()), "name": "Test Ticketer"},
-            "queue": {"uuid": str(uuid.uuid4()), "name": "Test Queue"},
-        }
-
-        class Response:
-            text = json.dumps(chats_data)
-        
-        class ResponseRequest:
-            status_code = 201
-
-            def json():
-                return {}
-
-        res = ResponseRequest()
-
-        flows_response = '{"uuid": "9785a273-37de-4658-bfa2-d8028dc06c84"}'
-        create_chat_project.side_effect = [Response()]
-
-        create_flows.side_effect = [dict(status=201, data=flows_response)]
-        create_globals.side_effect = [res]
-
-        org_data = {
-            "name": "V2",
-            "description": "V2 desc",
-            "organization_billing_plan": BillingPlan.PLAN_TRIAL,
-            "authorizations": [
-                {"user_email": "e@mail.com", "role": 3},
-                {"user_email": "user_1@user.com", "role": 3}
-            ],
-        }
-
-        project_data = {
-            "date_format": "D",
-            "name": "Test Project",
-            "timezone": "America/Argentina/Buenos_Aires",
-            "template": True,
-            "template_type": Project.TYPE_OMIE_DUPLICATE,
-            "globals": {
-                "appkey": 2349317317347,
-                "appsecret": "03cc3bb753a58f4628e63ef8b606dafd",
-                "nome_da_empresa": "Empresa Teste",
-                "nome_do_bot": "Botinho",
-                "status_boleto_para_desconsiderar": "Recebido",
-                "tipo_credenciamento": "email"
-            }
-        }
-
-        data = {
-            "organization": org_data,
-            "project": project_data
-        }
-
-        path = "/v2/organizations/"
-        method = {"post": "create"}
-        user = self.user
-
-        response, content_data = self.request(
-            path,
-            method,
-            user=user,
-            data=data
-        )
-
-        # organization = content_data.get("organization")
-        print(content_data)
-        self.assertEquals(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
-        # self.assertEquals(organization["authorizations"]["count"], 2)
 
 class OrganizationTestCase(TestCase):
     def setUp(self):

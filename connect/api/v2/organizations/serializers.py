@@ -80,7 +80,6 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
         )
         # create organization object
         instance = super(OrganizationSeralizer, self).create(validated_data)
-
         user = self.context["request"].user
 
         authorizations = self.context["request"].data.get("organization").get("authorizations")

@@ -301,7 +301,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             created = True
         except Exception as error:
             flows_info = {
-                "message": "Could not create project",
+                "data": {"message": "Could not create project"},
                 "status": status.HTTP_500_INTERNAL_SERVER_ERROR
             }
             logger.error(error)
@@ -356,7 +356,7 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
         created = False
 
         omie = Omie()
-        
+
         data = self.context._data
         globals_dict = data.get("project").get("globals")
 
@@ -370,7 +370,7 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
         except Exception as error:
             logger.error(f"Create globals: {error}")
             response_data = {
-                "message": "Could not create global",
+                "data": {"message": "Could not create global"},
                 "status": status.HTTP_500_INTERNAL_SERVER_ERROR
             }
         return created, response_data
@@ -379,7 +379,7 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
         project = validated_data.get("project")
         authorization = validated_data.get("authorization")
 
-        if project.template_type in [Project.TYPE_OMIE_DUPLICATE, Project.TYPE_OMIE_LEAD_CAPTURE]:
+        if project.template_type in Project.HAS_GLOBALS:
 
             created, data = self.create_globals_omie(
                 str(project.flow_organization),
@@ -396,7 +396,6 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
             return message
 
         ok, access_token = project.organization.get_ai_access_token(authorization.user.email, project)
-
         if not ok:
             # Project delete
             return access_token
@@ -406,7 +405,6 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
             project.template_type,
             access_token
         )
-
         if not created:
             # Project delete
             return classifier_uuid

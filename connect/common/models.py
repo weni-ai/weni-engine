@@ -385,12 +385,16 @@ class Organization(models.Model):
         try:
             repository_uuid = settings.REPOSITORY_IDS.get(project.template_type)
             access_token = intelligence_client.get_access_token(user_email, repository_uuid)
+
+            if not access_token:
+                raise(Exception("access token is None"))
+
             data = access_token
             ok = True
         except Exception as error:
-            logger.error(f"GET AI {error}")
+            logger.error(f"GET AI: {error}")
             data = {
-                "message": "Could not get access token",
+                "data": {"message": "Could not get access token"},
                 "status": status.HTTP_500_INTERNAL_SERVER_ERROR
             }
         return ok, data
@@ -398,7 +402,6 @@ class Organization(models.Model):
     def create_ai_organization(self, user_email: str):
         ai_client = IntelligenceRESTClient()
         created = False
-
         try:
             ai_org = ai_client.create_organization(
                 user_email=user_email,
@@ -406,14 +409,17 @@ class Organization(models.Model):
             )
             data = ai_org.get("id")
 
-            created = True
+            if not data:
+                raise(Exception(ai_org))
 
             self.inteligence_organization = int(ai_org.get("id"))
             self.save(update_fields=["inteligence_organization"])
 
+            created = True
+
         except Exception as error:
             data = {
-                "message": "Could not create organization in AI module",
+                "data": {"message": "Could not create organization in AI module"},
                 "status": status.HTTP_500_INTERNAL_SERVER_ERROR
             }
             logger.error(error)
@@ -557,14 +563,19 @@ class Project(models.Model):
     TYPE_SUPPORT = "support"
     TYPE_LEAD_CAPTURE = "lead_capture"
     TYPE_OMIE_LEAD_CAPTURE = "omie_lead_capture"
-    TYPE_OMIE_DUPLICATE = "omie_duplicate"
+    TYPE_OMIE_PAYMENT_FINANCIAL = "omie_financial"
+    TYPE_OMIE_PAYMENT_FINANCIAL_CHAT_GPT = "omie_financial+chatgpt"
 
     TEMPLATE_TYPES = (
         (TYPE_SUPPORT, _("support")),
         (TYPE_LEAD_CAPTURE, _("lead capture")),
         (TYPE_OMIE_LEAD_CAPTURE, "omie_lead_capture"),
-        (TYPE_OMIE_DUPLICATE, "omie_duplicate"),
+        (TYPE_OMIE_PAYMENT_FINANCIAL, "omie_financial"),
+        (TYPE_OMIE_PAYMENT_FINANCIAL_CHAT_GPT, "omie_financial+chatgpt"),
     )
+
+    HAS_GLOBALS = [TYPE_OMIE_LEAD_CAPTURE, TYPE_OMIE_PAYMENT_FINANCIAL, TYPE_OMIE_PAYMENT_FINANCIAL_CHAT_GPT]
+    HAS_CHATS = [TYPE_OMIE_LEAD_CAPTURE, TYPE_OMIE_PAYMENT_FINANCIAL, TYPE_OMIE_PAYMENT_FINANCIAL_CHAT_GPT, TYPE_SUPPORT]
 
     uuid = models.UUIDField(
         _("UUID"), primary_key=True, default=uuid4.uuid4, editable=False
@@ -605,7 +616,7 @@ class Project(models.Model):
     )
     template_type = models.CharField(
         verbose_name=_("Template type"),
-        max_length=20,
+        max_length=30,
         choices=TEMPLATE_TYPES,
         help_text=_("Project template type"),
         null=True,
@@ -734,10 +745,13 @@ class Project(models.Model):
     def create_classifier(self, authorization, template_type: str, access_token: str):
         flow_instance = FlowsRESTClient()
         created = False
+
         classifier_name = {
             "lead_capture": "Farewell & Greetings",
             "support": "Binary Answers",
             "omie": "OMIE",
+            "omie_financial": "Cristal",
+            "omie_financial+chatgpt": "Cristal"
         }
 
         try:
@@ -748,12 +762,19 @@ class Project(models.Model):
                 classifier_name=classifier_name.get(template_type),
                 access_token=access_token,
             )
+
+            status_code = response.get("status")
+
+            if status_code not in range(200, 299):
+                raise(Exception(f"Status: {status_code}"))
+
             created = True
             data = response.get("data").get("uuid")
+
         except Exception as error:
             logger.error(error)
             data = {
-                "message": "Could not create classifier",
+                "data": {"message": "Could not create classifier"},
                 "status": status.HTTP_500_INTERNAL_SERVER_ERROR
             }
         return created, data
@@ -777,7 +798,7 @@ class Project(models.Model):
         except Exception as error:
             logger.error(error)
             data = {
-                "message": "Could not create classifier",
+                "data": {"message": "Could not create chats"},
                 "status": status.HTTP_500_INTERNAL_SERVER_ERROR
             }
         return created, data
@@ -788,13 +809,13 @@ class Project(models.Model):
         created = False
 
         flow_instance = FlowsRESTClient()
-
-        has_chats = self.template_type in [Project.TYPE_SUPPORT, Project.TYPE_OMIE_DUPLICATE]
+        has_chats = self.template_type in Project.HAS_CHATS
 
         if has_chats:
             chats_created, chats_response = self.create_chats_project()
             if not chats_created:
-                return chats_response
+                return chats_created, chats_response
+
         try:
             flows = flow_instance.create_flows(
                 str(self.flow_organization),
@@ -809,7 +830,7 @@ class Project(models.Model):
             logger.error(error)
             data.update(
                 {
-                    "message": "Could not create flow",
+                    "data": {"message": "Could not create flow"},
                     "status": status.HTTP_500_INTERNAL_SERVER_ERROR
                 }
             )
@@ -827,7 +848,7 @@ class Project(models.Model):
         except Exception as error:
             logger.error(error)
             data = {
-                "message": "Could not integrate Whatsapp demo",
+                "data": {"message": "Could not integrate Whatsapp demo"},
                 "status": status.HTTP_500_INTERNAL_SERVER_ERROR,
             }
         return created, data

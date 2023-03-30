@@ -29,7 +29,6 @@ class FlowsRESTClient:
     def create_flows(self, project_uuid: str, classifier_uuid: str, template_type: str, ticketer: dict = None, queue: dict = None):
 
         flow = self.template_flow(template_type)
-
         sample_flow = add_classifier_to_flow(flow, classifier_uuid, template_type, ticketer, queue)
 
         body = dict(
@@ -343,6 +342,8 @@ class FlowsRESTClient:
             "lead_capture": f"{os.path.join(os.path.dirname(__file__))}/mp9/flows_definition_captura-de-leads.json",
             "support": f"{os.path.join(os.path.dirname(__file__))}/mp9/fluxos_atendimento_humano.json",
             "omie": f"{os.path.join(os.path.dirname(__file__))}/mp9/cristal-omie.json",
+            "omie_financial": f"{os.path.join(os.path.dirname(__file__))}/mp9/omie_2_via_boleto_sem_chatgpt.json",
+            "omie_financial+chatgpt": f"{os.path.join(os.path.dirname(__file__))}/mp9/omie_2_via_boleto_chatgpt.json",
         }
         return templates.get(template_type)
 

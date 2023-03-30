@@ -55,7 +55,7 @@ class OrganizationViewSet(
         instance = serializer.save()
 
         if type(instance) == dict:
-            return instance
+            return Response(**instance)
 
         # Project
         project_data.update(
@@ -67,7 +67,7 @@ class OrganizationViewSet(
 
         if type(project_instance) == dict:
             instance.delete()
-            return Response(project_instance.get("message"), status=int(project_instance.get("status")))
+            return Response(**project_instance)
 
         data = {
             "organization": serializer.data,
