@@ -349,7 +349,7 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
             }
         return True, {}
 
-    def create_globals_omie(self, flow_organization: str, user_email: str):
+    def create_globals_omie(self, project: Project, user_email: str):
         from connect.api.v1.internal.flows.mp9.client_omie import Omie
 
         response_data = {}
@@ -360,6 +360,16 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
         data = self.context._data
         globals_dict = data.get("project").get("globals")
 
+        default_globals = {
+            "nome_da_empresa": f"{project.name}",
+            "nome_do_bot": f"{project.name}",
+            "status_boleto_para_desconsiderar": "Recebido, Cancelado",
+            "tipo_credenciamento": "email"
+        }
+
+        globals_dict.update(default_globals)
+
+        flow_organization = str(project.flow_organization)
         try:
             omie.create_globals(
                 flow_organization,
@@ -382,7 +392,7 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
         if project.template_type in Project.HAS_GLOBALS:
 
             created, data = self.create_globals_omie(
-                str(project.flow_organization),
+                project,
                 str(authorization.user.email)
             )
 

@@ -671,12 +671,8 @@ class OrganizationViewSetTestCase(TestCase):
             "template": True,
             "template_type": Project.TYPE_OMIE_PAYMENT_FINANCIAL_CHAT_GPT,
             "globals": {
-                "appkey": 2349317317347,
-                "appsecret": "03cc3bb753a58f4628e63ef8b606dafd",
-                "nome_da_empresa": "Empresa Teste",
-                "nome_do_bot": "Botinho",
-                "status_boleto_para_desconsiderar": "Recebido",
-                "tipo_credenciamento": "email"
+                "appkey": 1234567890,
+                "appsecret": "0abcdefghjkl",
             }
         }
 
