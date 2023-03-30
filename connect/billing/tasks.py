@@ -1,7 +1,13 @@
 import stripe
 import pendulum
 from connect.celery import app
-from connect.common.models import Organization, Project, BillingPlan
+from connect.common.models import (
+    Organization,
+    Project,
+    BillingPlan,
+    NewsletterOrganization,
+    Newsletter
+)
 from connect.billing.models import (
     Contact,
     Message,
@@ -290,6 +296,13 @@ def check_organization_plans():
             current_active_contacts > organization.organization_billing.plan_limit - 50
         ):
             organization.organization_billing.send_email_plan_is_about_to_expire()
+
+            NewsletterOrganization.objects.create(
+                newsletter=Newsletter.objects.create(),
+                title="trial-about-to-end",
+                description=f"Your trial period of the organization {organization.name}, is about to expire.",
+                organization=organization
+            )
 
     return True
 
