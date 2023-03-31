@@ -756,7 +756,7 @@ class Project(models.Model):
 
         try:
             response = flow_instance.create_classifier(
-                project_uuid=str(self.uuid),
+                project_uuid=str(self.flow_organization),
                 user_email=authorization.user.email,
                 classifier_type="bothub",
                 classifier_name=classifier_name.get(template_type),
