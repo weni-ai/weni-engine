@@ -306,7 +306,7 @@ class ProjectSerializer(serializers.ModelSerializer):
                 "data": {"message": "Could not create project"},
                 "status": status.HTTP_500_INTERNAL_SERVER_ERROR
             }
-            logger.error("Could not create project", error)
+            logger.error(f"Could not create project {error}")
 
         return created, flows_info
 

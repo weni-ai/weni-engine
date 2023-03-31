@@ -796,7 +796,7 @@ class Project(models.Model):
             data = chats_response
             created = True
         except Exception as error:
-            logger.error("Could not create chats", error)
+            logger.error(f"Could not create chats {error}")
             data = {
                 "data": {"message": "Could not create chats"},
                 "status": status.HTTP_500_INTERNAL_SERVER_ERROR

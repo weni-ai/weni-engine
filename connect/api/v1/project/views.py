@@ -588,7 +588,7 @@ class TemplateProjectViewSet(
                     request.data.get("timezone")
                 ).get("uuid")
             except Exception as error:
-                logger.error("CREATE TEMPL", error)
+                logger.error(f"Could not create template project: {error}", )
                 data.update(
                     {
                         "message": "Could not create template project",
