@@ -761,8 +761,8 @@ class Project(models.Model):
             "lead_capture": "Farewell & Greetings",
             "support": "Binary Answers",
             "omie": "OMIE",
-            "omie_financial": "Cristal",
-            "omie_financial+chatgpt": "Cristal"
+            "omie_financial": "Cristal - Assistente Financeiro",
+            "omie_financial+chatgpt": "Cristal - Assistente Financeiro"
         }
 
         try:
