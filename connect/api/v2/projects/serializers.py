@@ -306,7 +306,7 @@ class ProjectSerializer(serializers.ModelSerializer):
                 "data": {"message": "Could not create project"},
                 "status": status.HTTP_500_INTERNAL_SERVER_ERROR
             }
-            logger.error(error)
+            logger.error("Could not create project", error)
 
         return created, flows_info
 
@@ -360,7 +360,17 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
         omie = Omie()
 
         data = self.context._data
-        globals_dict = data.get("project").get("globals")
+
+        if data:
+            try:
+                project_data = data.get("project")
+                assert project_data is not None
+                globals_dict = project_data.get("globals")
+            except AssertionError:
+                globals_dict = data.get("globals")
+                assert globals_dict is not None
+            else:
+                raise(Exception("globals field cannot be null"))
 
         default_globals = {
             "nome_da_empresa": f"{project.name}",
