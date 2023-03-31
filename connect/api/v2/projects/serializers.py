@@ -162,8 +162,6 @@ class ProjectSerializer(serializers.ModelSerializer):
         if not created:
             return flows_info
 
-        flows_info = json.loads(flows_info)
-
         instance = Project.objects.create(
             name=validated_data.get("name"),
             flow_id=flows_info.get("id"),
