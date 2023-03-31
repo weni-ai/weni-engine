@@ -69,7 +69,7 @@ def add_classifier_to_flow(
         queue_json["uuid"] = queue_uuid
         queue_json["name"] = queue_name
 
-    elif Project.TYPE_OMIE_PAYMENT_FINANCIAL_CHAT_GPT:
+    elif template_type == Project.TYPE_OMIE_PAYMENT_FINANCIAL_CHAT_GPT:
         ticketer_uuid = ticketer.get("uuid")
         ticketer_name = ticketer.get("name")
 
