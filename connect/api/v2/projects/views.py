@@ -71,7 +71,8 @@ class ProjectViewSet(
     def create(self, request, *args, **kwargs):
         request.data.update(
             {
-                "organization": kwargs.get("organization_uuid")
+                "organization": kwargs.get("organization_uuid"),
+                "project_view": True
             }
         )
         return super(ProjectViewSet, self).create(request, *args, **kwargs)
