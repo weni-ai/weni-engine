@@ -767,7 +767,7 @@ class Project(models.Model):
 
         try:
             response = flow_instance.create_classifier(
-                project_uuid=str(self.uuid),
+                project_uuid=str(self.flow_organization),
                 user_email=authorization.user.email,
                 classifier_type="bothub",
                 classifier_name=classifier_name.get(template_type),
@@ -783,7 +783,7 @@ class Project(models.Model):
             data = response.get("data").get("uuid")
 
         except Exception as error:
-            logger.error(error)
+            logger.error(f"Could not create classifier {error}")
             data = {
                 "data": {"message": "Could not create classifier"},
                 "status": status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -807,7 +807,7 @@ class Project(models.Model):
             data = chats_response
             created = True
         except Exception as error:
-            logger.error(error)
+            logger.error("Could not create chats", error)
             data = {
                 "data": {"message": "Could not create chats"},
                 "status": status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -838,7 +838,7 @@ class Project(models.Model):
             data = json.loads(flows.get("data"))
             created = True
         except Exception as error:
-            logger.error(error)
+            logger.error(f"Could not create flow {error}")
             data.update(
                 {
                     "data": {"message": "Could not create flow"},
@@ -857,7 +857,7 @@ class Project(models.Model):
             created = True
             data = response
         except Exception as error:
-            logger.error(error)
+            logger.error(f"Could not integrate Whatsapp demo {error}")
             data = {
                 "data": {"message": "Could not integrate Whatsapp demo"},
                 "status": status.HTTP_500_INTERNAL_SERVER_ERROR,

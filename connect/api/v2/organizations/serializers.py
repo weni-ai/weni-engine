@@ -84,7 +84,6 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
 
         authorizations = self.context["request"].data.get("organization").get("authorizations")
 
-
         if settings.CREATE_AI_ORGANIZATION:
             created, data = instance.create_ai_organization(user.email)
             if not created:
