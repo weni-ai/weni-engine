@@ -1,4 +1,5 @@
 import logging
+import json
 
 from django.contrib.auth import get_user_model
 from django.conf import settings
@@ -161,6 +162,8 @@ class ProjectSerializer(serializers.ModelSerializer):
         if not created:
             return flows_info
 
+        flows_info = json.loads(flows_info)
+
         instance = Project.objects.create(
             name=validated_data.get("name"),
             flow_id=flows_info.get("id"),
@@ -292,6 +295,7 @@ class ProjectSerializer(serializers.ModelSerializer):
                     user.email,
                     str(data.get("timezone"))
                 )
+                flows_info = json.loads(flows_info.get("data"))
             else:
                 flows_info = flow_instance.create_project(
                     project_name=data.get("name"),
