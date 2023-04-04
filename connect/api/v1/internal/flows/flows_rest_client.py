@@ -347,8 +347,8 @@ class FlowsRESTClient:
             "lead_capture": f"{os.path.join(os.path.dirname(__file__))}/mp9/flows_definition_captura-de-leads.json",
             "support": f"{os.path.join(os.path.dirname(__file__))}/mp9/fluxos_atendimento_humano.json",
             "omie": f"{os.path.join(os.path.dirname(__file__))}/mp9/cristal-omie.json",
-            "omie_financial": f"{os.path.join(os.path.dirname(__file__))}/mp9/omie_2_via_boleto_sem_chatgpt.json",
-            "omie_financial+chatgpt": f"{os.path.join(os.path.dirname(__file__))}/mp9/omie_2_via_boleto_chatgpt.json",
+            "omie_financial": f"{os.path.join(os.path.dirname(__file__))}/mp9/omie_2_via_boleto_sem_chatgpt_v2.json",
+            "omie_financial+chatgpt": f"{os.path.join(os.path.dirname(__file__))}/mp9/omie_2_via_boleto_chatgpt_v2.json",
         }
         return templates.get(template_type)
 
