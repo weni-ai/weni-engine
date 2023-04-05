@@ -2072,4 +2072,3 @@ class NewsletterOrganization(models.Model):
 
     def trial_end_date(self):
         return self.organization.organization_billing.trial_end_date
-
