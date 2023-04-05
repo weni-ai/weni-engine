@@ -34,8 +34,7 @@ class FlowsRESTClient:
     def create_flows(self, project_uuid: str, classifier_uuid: str, template_type: str, ticketer: dict = None, queue: dict = None):
 
         flow = self.template_flow(template_type)
-
-        sample_flow = add_classifier_to_flow(flow, classifier_uuid, ticketer, queue)
+        sample_flow = add_classifier_to_flow(flow, classifier_uuid, template_type, ticketer, queue)
 
         body = dict(
             org=project_uuid,
@@ -347,6 +346,9 @@ class FlowsRESTClient:
         templates = {
             "lead_capture": f"{os.path.join(os.path.dirname(__file__))}/mp9/flows_definition_captura-de-leads.json",
             "support": f"{os.path.join(os.path.dirname(__file__))}/mp9/fluxos_atendimento_humano.json",
+            "omie": f"{os.path.join(os.path.dirname(__file__))}/mp9/cristal-omie.json",
+            "omie_financial": f"{os.path.join(os.path.dirname(__file__))}/mp9/omie_2_via_boleto_sem_chatgpt_v2.json",
+            "omie_financial+chatgpt": f"{os.path.join(os.path.dirname(__file__))}/mp9/omie_2_via_boleto_chatgpt_v2.json",
         }
         return templates.get(template_type)
 
@@ -372,3 +374,13 @@ class FlowsRESTClient:
             headers=self.authentication_instance.headers,
             json=body,
         )
+
+    def create_globals(self, omie_body: list):
+
+        response = requests.post(
+            url=f'{self.base_url}/api/v2/internals/globals/',
+            headers=self.authentication_instance.headers,
+            json=omie_body
+        )
+
+        return response
