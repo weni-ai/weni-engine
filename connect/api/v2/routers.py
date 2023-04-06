@@ -8,6 +8,8 @@ from connect.api.v2.user.views import UserAPIToken
 from connect.api.v2.organizations import views as organization_views
 from connect.api.v2.projects import views as project_views
 from connect.api.v2.internals import views as connect_internal_views
+from connect.api.v2.template_projects.views import TemplateTypeViewSet, TemplateFeatureViewSet, TemplateAIViewSet
+
 
 router = routers.SimpleRouter()
 
@@ -22,6 +24,11 @@ projects_router = routers.NestedSimpleRouter(
 projects_router.register(
     "projects", project_views.ProjectViewSet, basename="organization-projects"
 )
+
+router.register(r"projects/template-type", TemplateTypeViewSet, basename="template-type")
+router.register(r"projects/template-ai", TemplateAIViewSet, basename="template-ai")
+router.register(r"projects/template-features", TemplateFeatureViewSet, basename="template-features")
+
 
 urlpatterns = [
     path("", include(router.urls)),
