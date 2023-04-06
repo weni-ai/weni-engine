@@ -251,19 +251,19 @@ def request_permission_project(sender, instance, created, **kwargs):
 def project_authorization(sender, instance, created, **kwargs):
     if created:
         if instance.is_moderator:
-             RequestChatsPermission.objects.create(
-                 email=instance.user.email,
-                 role=ChatsRole.ADMIN.value,
-                 project=instance.project,
-                 created_by=instance.user
-             )
+            RequestChatsPermission.objects.create(
+                email=instance.user.email,
+                role=ChatsRole.ADMIN.value,
+                project=instance.project,
+                created_by=instance.user
+            )
         else:
-             RequestChatsPermission.objects.create(
-                 email=instance.user.email,
-                 role=ChatsRole.AGENT.value,
-                 project=instance.project,
-                 created_by=instance.user
-             )
+            RequestChatsPermission.objects.create(
+                email=instance.user.email,
+                role=ChatsRole.AGENT.value,
+                project=instance.project,
+                created_by=instance.user
+            )
 
         RecentActivity.objects.create(
             action="ADD",
