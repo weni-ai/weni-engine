@@ -1,0 +1,5484 @@
+{
+  "version": "13",
+  "site": "https://flows.weni.ai",
+  "flows": [
+    {
+      "_ui": {
+        "nodes": {
+          "5ecbc001-f052-4b44-b997-8e6fbe04ca7f": {
+            "position": {
+              "left": 40,
+              "top": 0
+            },
+            "type": "execute_actions"
+          }
+        }
+      },
+      "expire_after_minutes": 10080,
+      "language": "base",
+      "localization": {},
+      "metadata": {
+        "expires": 10080
+      },
+      "name": "Apaga dados do cliente Financeiro",
+      "nodes": [
+        {
+          "actions": [
+            {
+              "field": {
+                "key": "codigo_cliente_omie",
+                "name": "Codigo Cliente Omie"
+              },
+              "type": "set_contact_field",
+              "uuid": "73349d21-4f2a-4cc5-b8ad-83992977e366",
+              "value": ""
+            },
+            {
+              "field": {
+                "key": "email",
+                "name": "Email"
+              },
+              "type": "set_contact_field",
+              "uuid": "20699d31-998f-4cf0-96ec-4a74635b9f5d",
+              "value": ""
+            },
+            {
+              "field": {
+                "key": "documento",
+                "name": "Documento"
+              },
+              "type": "set_contact_field",
+              "uuid": "83e416dc-597f-4889-ab6c-80e4eb5b1e17",
+              "value": ""
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "8ef40f9a-b797-4bcc-b22f-acb9b19ee312"
+            }
+          ],
+          "uuid": "5ecbc001-f052-4b44-b997-8e6fbe04ca7f"
+        }
+      ],
+      "spec_version": "13.1.0",
+      "type": "messaging",
+      "uuid": "196ae45d-f761-4ec5-9ad4-b1f3a77028aa",
+      "revision": 1
+    },
+    {
+      "_ui": {
+        "nodes": {
+          "47ea9625-060f-47b8-974c-2e9d1faffb9d": {
+            "config": {
+              "cases": {},
+              "operand": {
+                "id": "codigo_cliente_omie",
+                "name": "Codigo Cliente Omie",
+                "type": "field"
+              }
+            },
+            "position": {
+              "left": 500,
+              "top": 0
+            },
+            "type": "split_by_contact_field"
+          },
+          "231ac8b5-8674-4d2d-af87-8b678b1152d5": {
+            "position": {
+              "left": 280,
+              "top": 120
+            },
+            "type": "execute_actions"
+          },
+          "d88f54ab-148d-4ffe-afc9-96b8df6cd1bb": {
+            "config": {},
+            "position": {
+              "left": 860,
+              "top": 120
+            },
+            "type": "split_by_subflow"
+          },
+          "1a214f45-da35-459b-8306-0ff8eb200dff": {
+            "config": {
+              "cases": {}
+            },
+            "position": {
+              "left": 860,
+              "top": 280
+            },
+            "type": "split_by_groups"
+          },
+          "eb6b702f-26f8-43a9-bcc7-e6bceaed8c55": {
+            "config": {},
+            "position": {
+              "left": 260,
+              "top": 440
+            },
+            "type": "split_by_webhook"
+          },
+          "e6396c2a-acd9-4627-b881-662d79b9e970": {
+            "position": {
+              "left": 260,
+              "top": 700
+            },
+            "type": "execute_actions"
+          },
+          "06a26fcd-3231-47e4-91be-ad857a226bae": {
+            "config": {
+              "cases": {}
+            },
+            "position": {
+              "left": 840,
+              "top": 700
+            },
+            "type": "split_by_expression"
+          },
+          "58c9b4cd-2c0c-45ed-8fbf-331c1a83bef6": {
+            "position": {
+              "left": 680,
+              "top": 840
+            },
+            "type": "execute_actions"
+          },
+          "0277c2d3-dce0-45b2-9b64-0aa32c8271be": {
+            "position": {
+              "left": 1020,
+              "top": 840
+            },
+            "type": "execute_actions"
+          },
+          "8beace45-2fa8-4911-ac7c-790d97b94f09": {
+            "config": {
+              "cases": {},
+              "operand": {
+                "id": "registros",
+                "name": "registros",
+                "type": "result"
+              }
+            },
+            "position": {
+              "left": 260,
+              "top": 1100
+            },
+            "type": "split_by_run_result"
+          },
+          "44b288ba-85bd-413b-8c14-800e3c261e34": {
+            "config": {
+              "cases": {}
+            },
+            "position": {
+              "left": 240,
+              "top": 1240
+            },
+            "type": "split_by_expression"
+          },
+          "222f0591-2946-44e9-a19d-a0badcc697e9": {
+            "config": {
+              "cases": {}
+            },
+            "position": {
+              "left": 520,
+              "top": 1300
+            },
+            "type": "split_by_expression"
+          },
+          "7ddaff5a-efd1-4676-a35a-907ecb1bd4c3": {
+            "position": {
+              "left": 400,
+              "top": 1420
+            },
+            "type": "execute_actions"
+          },
+          "37b7b45d-0a0f-40f2-9d50-1c46b546c264": {
+            "position": {
+              "left": 660,
+              "top": 1420
+            },
+            "type": "execute_actions"
+          },
+          "ae7a7d15-dd2c-4158-b1ad-15ef7f7e0a2f": {
+            "config": {
+              "cases": {}
+            },
+            "position": {
+              "left": 560,
+              "top": 2020
+            },
+            "type": "split_by_expression"
+          },
+          "af77037c-e2d3-4fb4-933f-219b29f4bb29": {
+            "position": {
+              "left": 440,
+              "top": 2140
+            },
+            "type": "execute_actions"
+          },
+          "800a0aa9-64d7-443e-bc8f-1ac22bb0bcdc": {
+            "config": {},
+            "position": {
+              "left": 560,
+              "top": 2460
+            },
+            "type": "split_by_webhook"
+          },
+          "7c186f55-cc9e-4573-952e-4d8c2ed861aa": {
+            "config": {
+              "cases": {}
+            },
+            "position": {
+              "left": 460,
+              "top": 2680
+            },
+            "type": "split_by_expression"
+          },
+          "da6e6547-c8b4-4907-a1f2-6e8b2763ebf6": {
+            "config": {
+              "cases": {}
+            },
+            "position": {
+              "left": 880,
+              "top": 2680
+            },
+            "type": "split_by_expression"
+          },
+          "afef1d4e-a77a-47a7-9c8b-7d29918fd262": {
+            "position": {
+              "left": 360,
+              "top": 2800
+            },
+            "type": "execute_actions"
+          },
+          "8a7281ec-222d-4ca6-a6bb-e31daad31b85": {
+            "position": {
+              "left": 600,
+              "top": 2800
+            },
+            "type": "execute_actions"
+          },
+          "38179c1e-4018-4a62-b842-58c298f08f25": {
+            "position": {
+              "left": 440,
+              "top": 3040
+            },
+            "type": "execute_actions"
+          },
+          "7a04c88b-e50e-4eab-943a-36ba2c23f652": {
+            "position": {
+              "left": 280,
+              "top": 3200
+            },
+            "type": "execute_actions"
+          },
+          "d6156c18-13a9-42c7-aa55-51d83f70b96f": {
+            "config": {
+              "cases": {}
+            },
+            "position": {
+              "left": 260,
+              "top": 3360
+            },
+            "type": "split_by_expression"
+          },
+          "98caf3c6-ebb9-44bf-882e-e58e0678e77e": {
+            "config": {
+              "cases": {},
+              "operand": {
+                "id": "pagina",
+                "name": "pagina",
+                "type": "result"
+              }
+            },
+            "position": {
+              "left": 520,
+              "top": 3480
+            },
+            "type": "split_by_run_result"
+          },
+          "ad134ab0-5a9e-43e0-8f6e-388bc598cfb0": {
+            "position": {
+              "left": 280,
+              "top": 3620
+            },
+            "type": "execute_actions"
+          },
+          "c20dcb36-8d4d-4bbc-81a4-a76218d76b24": {
+            "config": {
+              "cases": {},
+              "operand": {
+                "id": "quantidade_de_envios",
+                "name": "quantidade de envios",
+                "type": "result"
+              }
+            },
+            "position": {
+              "left": 720,
+              "top": 3660
+            },
+            "type": "split_by_run_result"
+          },
+          "d296e31d-0b6e-484b-bc96-d74f1d22baa4": {
+            "position": {
+              "left": 620,
+              "top": 3780
+            },
+            "type": "execute_actions"
+          },
+          "2f4392d8-3e1d-4305-8ac6-1f0c8d4136f7": {
+            "position": {
+              "left": 880,
+              "top": 3780
+            },
+            "type": "execute_actions"
+          }
+        },
+        "stickies": {
+          "0816f38d-3a59-4f19-ac4e-7a2a70841c16": {
+            "body": "Aqui criamos a l\u00f3gica inicial de contador para fazer a pagina\u00e7\u00e3o das parcelas",
+            "color": "purple",
+            "position": {
+              "left": 60,
+              "top": 160
+            },
+            "title": "Salvar resultados"
+          },
+          "17ab380d-1b06-47df-97bd-420e71ece2a0": {
+            "body": "Aqui usamos o recurso de Pesquisar lan\u00e7amentos usando o codigo do cliente omie.",
+            "color": "purple",
+            "position": {
+              "left": 40,
+              "top": 460
+            },
+            "title": "Webhook"
+          },
+          "3b4994c3-ac25-4b20-bfb0-7ed642e7ec0c": {
+            "body": "Aqui desconsideramos as parcelas com status Recebido e Cancelado, voc\u00ea pode personalizar como preferir",
+            "color": "purple",
+            "position": {
+              "bottom": null,
+              "left": 40,
+              "right": null,
+              "top": 1260
+            },
+            "title": "Nova Nota"
+          },
+          "5b3d421f-4ad0-4e28-8a66-825a3711a669": {
+            "body": "aqui consultamos o recurso Obter boleto https://app.omie.com.br/api/v1/financas/contareceberboleto/#ObterBoleto",
+            "color": "purple",
+            "position": {
+              "bottom": 2320,
+              "left": 820,
+              "right": 220,
+              "top": 2480
+            },
+            "title": "Documenta\u00e7\u00e3o da API"
+          },
+          "676b24f9-1e0f-4374-93e9-50e1b13b3271": {
+            "body": "Aqui salvamos as informa\u00e7\u00f5es essenciais para a l\u00f3gica de pagina\u00e7\u00e3o das parcelas",
+            "color": "purple",
+            "position": {
+              "left": 60,
+              "top": 800
+            },
+            "title": "Salvar resultado"
+          },
+          "697399b7-fcec-45a3-890a-2b45ce452957": {
+            "body": "Aqui apresentamos as vari\u00e1veis que retornam da api. Usamos express\u00f5es para isso. Se deseja remover algum par\u00e2metro que n\u00e3o queira mostrar ao usu\u00e1rio, edite a mensagem. Mas lembre de tomar cuidado.",
+            "color": "purple",
+            "position": {
+              "left": 960,
+              "top": 1580
+            },
+            "title": "Informa\u00e7\u00f5es da parcela"
+          },
+          "989ac86e-aa96-4e14-bf6a-39249d44b9b8": {
+            "body": "Aqui temos a mensagem final, antes da mensagem \"Posso ajudar com algo mais\". Se quiser editar, fique \u00e0 vontade",
+            "color": "purple",
+            "position": {
+              "bottom": null,
+              "left": 780,
+              "right": null,
+              "top": 3960
+            },
+            "title": "Mensagem final"
+          },
+          "ee9b5b8e-d65a-4593-8742-4a4bfaaf063b": {
+            "body": "Aqui realizamos o credenciamento para usu\u00e1rios que n\u00e3o est\u00e3o credenciados",
+            "color": "purple",
+            "position": {
+              "bottom": 0,
+              "left": 1120,
+              "right": 20,
+              "top": 120
+            },
+            "title": "Nova Nota"
+          }
+        }
+      },
+      "expire_after_minutes": 10080,
+      "language": "base",
+      "localization": {},
+      "metadata": {
+        "expires": 10080
+      },
+      "name": "Financeiro - Segunda via",
+      "nodes": [
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "231ac8b5-8674-4d2d-af87-8b678b1152d5",
+              "uuid": "daeb3508-9d01-47f5-b872-e6a4e8a1ff53"
+            },
+            {
+              "destination_uuid": "d88f54ab-148d-4ffe-afc9-96b8df6cd1bb",
+              "uuid": "fa953def-5134-4ecb-be23-c2dc4f854250"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [],
+                "category_uuid": "69d7e0f3-0542-401b-849c-58e9ab3e1479",
+                "type": "has_text",
+                "uuid": "08ac2cdb-4513-4e48-89f5-c862a442442f"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "daeb3508-9d01-47f5-b872-e6a4e8a1ff53",
+                "name": "Credenciado",
+                "uuid": "69d7e0f3-0542-401b-849c-58e9ab3e1479"
+              },
+              {
+                "exit_uuid": "fa953def-5134-4ecb-be23-c2dc4f854250",
+                "name": "Other",
+                "uuid": "0d35d05f-e9f2-42e8-b0c1-14a6953196ea"
+              }
+            ],
+            "default_category_uuid": "0d35d05f-e9f2-42e8-b0c1-14a6953196ea",
+            "operand": "@fields.codigo_cliente_omie",
+            "type": "switch"
+          },
+          "uuid": "47ea9625-060f-47b8-974c-2e9d1faffb9d"
+        },
+        {
+          "actions": [
+            {
+              "category": "",
+              "name": "contador",
+              "type": "set_run_result",
+              "uuid": "4442bdfe-dc99-4997-8c96-5a51dcf1507a",
+              "value": "0"
+            },
+            {
+              "category": "",
+              "name": "quantidade de envios",
+              "type": "set_run_result",
+              "uuid": "7993df0b-0ed7-4b47-8edd-168b397db9ff",
+              "value": "0"
+            },
+            {
+              "category": "",
+              "name": "pagina",
+              "type": "set_run_result",
+              "uuid": "22c0b342-a679-49c2-b3e6-563a25ab85d8",
+              "value": "1"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "eb6b702f-26f8-43a9-bcc7-e6bceaed8c55",
+              "uuid": "0c7dabe0-7593-42d7-9dbe-5f4644334aa3"
+            }
+          ],
+          "uuid": "231ac8b5-8674-4d2d-af87-8b678b1152d5"
+        },
+        {
+          "actions": [
+            {
+              "flow": {
+                "name": "Financeiro - Credenciamento",
+                "uuid": "9f0defeb-2c3e-46ee-a49d-dedadb926926"
+              },
+              "type": "enter_flow",
+              "uuid": "bba28a1b-fc2e-43b7-93a2-ac292c2ce035"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "1a214f45-da35-459b-8306-0ff8eb200dff",
+              "uuid": "2278de96-e016-4323-8e19-5872693c7eb5"
+            },
+            {
+              "destination_uuid": null,
+              "uuid": "402e3b23-6437-4a1b-a1ca-3e989082fbc1"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "completed"
+                ],
+                "category_uuid": "bc8149b9-e077-4f81-9d8a-a2bb513ed20b",
+                "type": "has_only_text",
+                "uuid": "e5e9e260-cc10-4016-a43d-b5a66a216ab1"
+              },
+              {
+                "arguments": [
+                  "expired"
+                ],
+                "category_uuid": "5340abac-6217-41e6-83a1-b9dfa12de553",
+                "type": "has_only_text",
+                "uuid": "8bb7b205-d3eb-4b06-88be-af1d63d18805"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "2278de96-e016-4323-8e19-5872693c7eb5",
+                "name": "Complete",
+                "uuid": "bc8149b9-e077-4f81-9d8a-a2bb513ed20b"
+              },
+              {
+                "exit_uuid": "402e3b23-6437-4a1b-a1ca-3e989082fbc1",
+                "name": "Expired",
+                "uuid": "5340abac-6217-41e6-83a1-b9dfa12de553"
+              }
+            ],
+            "default_category_uuid": "5340abac-6217-41e6-83a1-b9dfa12de553",
+            "operand": "@child.status",
+            "type": "switch"
+          },
+          "uuid": "d88f54ab-148d-4ffe-afc9-96b8df6cd1bb"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "0ab6e8df-9d19-4cdb-bacd-fd88140ccd58"
+            },
+            {
+              "destination_uuid": "231ac8b5-8674-4d2d-af87-8b678b1152d5",
+              "uuid": "1e22c8e7-918f-4420-a8b0-032512203d0e"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "a94d2f05-b553-4c3f-b1b5-aa5ddf1b6d1b",
+                  "Satisfeito"
+                ],
+                "category_uuid": "71f2898b-ed73-4782-8976-433417b1a987",
+                "type": "has_group",
+                "uuid": "d6f0f0b7-167f-43d8-b015-eee916fa074d"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "0ab6e8df-9d19-4cdb-bacd-fd88140ccd58",
+                "name": "Satisfeito",
+                "uuid": "71f2898b-ed73-4782-8976-433417b1a987"
+              },
+              {
+                "exit_uuid": "1e22c8e7-918f-4420-a8b0-032512203d0e",
+                "name": "Other",
+                "uuid": "807ef59e-c46a-4fc3-a611-0366c1d7e7c2"
+              }
+            ],
+            "default_category_uuid": "807ef59e-c46a-4fc3-a611-0366c1d7e7c2",
+            "operand": "@contact.groups",
+            "result_name": "",
+            "type": "switch"
+          },
+          "uuid": "1a214f45-da35-459b-8306-0ff8eb200dff"
+        },
+        {
+          "actions": [
+            {
+              "body": "{\"call\":\"PesquisarLancamentos\",\"app_key\":\"@globals.appkey\",\"app_secret\":\"@globals.appsecret\",\"param\":[{\"nPagina\":@results.pagina,\"nRegPorPagina\":5, \"nCodCliente\":@fields.codigo_cliente_omie}]}",
+              "headers": {
+                "Content-Type": "application/json"
+              },
+              "method": "POST",
+              "result_name": "PesquisarLancamentos",
+              "type": "call_webhook",
+              "url": "https://app.omie.com.br/api/v1/financas/pesquisartitulos/",
+              "uuid": "7216d8b5-a10f-41b7-b7a5-e385921d4f1f"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "e6396c2a-acd9-4627-b881-662d79b9e970",
+              "uuid": "f502b9cf-7aeb-4342-875c-7db8cc4a069e"
+            },
+            {
+              "destination_uuid": "06a26fcd-3231-47e4-91be-ad857a226bae",
+              "uuid": "65be5cf9-80a7-4373-88d5-a988577fe3ca"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "Success"
+                ],
+                "category_uuid": "ba5c6c92-7df2-468c-860a-1a86a596ae10",
+                "type": "has_only_text",
+                "uuid": "3e92fa38-de87-4045-8e24-42f139115355"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "f502b9cf-7aeb-4342-875c-7db8cc4a069e",
+                "name": "Success",
+                "uuid": "ba5c6c92-7df2-468c-860a-1a86a596ae10"
+              },
+              {
+                "exit_uuid": "65be5cf9-80a7-4373-88d5-a988577fe3ca",
+                "name": "Failure",
+                "uuid": "c65e1e63-e502-437f-816b-46daeac566f6"
+              }
+            ],
+            "default_category_uuid": "c65e1e63-e502-437f-816b-46daeac566f6",
+            "operand": "@results.pesquisarlancamentos.category",
+            "type": "switch"
+          },
+          "uuid": "eb6b702f-26f8-43a9-bcc7-e6bceaed8c55"
+        },
+        {
+          "actions": [
+            {
+              "category": "",
+              "name": "registros",
+              "type": "set_run_result",
+              "uuid": "dfe2e11d-0a90-4e1b-a752-2fa6866b2c53",
+              "value": "@results.pesquisarlancamentos.extra.nregistros"
+            },
+            {
+              "category": "",
+              "name": "nTotPaginas",
+              "type": "set_run_result",
+              "uuid": "4cd73cad-fbbf-4b14-93bc-6c866adf1167",
+              "value": "@results.pesquisarlancamentos.extra.nTotPaginas"
+            },
+            {
+              "category": "",
+              "name": "nTotRegistros",
+              "type": "set_run_result",
+              "uuid": "1ed01012-0136-4dc7-9c37-b37c99a1980f",
+              "value": "@results.pesquisarlancamentos.extra.nTotRegistros"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "8beace45-2fa8-4911-ac7c-790d97b94f09",
+              "uuid": "f7005c70-4f2d-49e9-9782-52adbf638296"
+            }
+          ],
+          "uuid": "e6396c2a-acd9-4627-b881-662d79b9e970"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "58c9b4cd-2c0c-45ed-8fbf-331c1a83bef6",
+              "uuid": "46074da1-136b-4dbf-92b6-fba01ea50ab2"
+            },
+            {
+              "destination_uuid": "0277c2d3-dce0-45b2-9b64-0aa32c8271be",
+              "uuid": "ca43492b-1192-4b27-8059-99beabdaff9c"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "ERROR: Id do Cliente informado na tag [nCodCliente] n\\u00e3o cadastrado"
+                ],
+                "category_uuid": "292ca398-d26d-43dc-b992-1acc0e9a2c12",
+                "type": "has_phrase",
+                "uuid": "cf377445-f8c3-4fa8-9be3-600e7b32cec1"
+              },
+              {
+                "arguments": [
+                  "ERROR: Id do Cliente informado na tag [nCodCliente] n\u00e3o cadastrado"
+                ],
+                "category_uuid": "292ca398-d26d-43dc-b992-1acc0e9a2c12",
+                "type": "has_phrase",
+                "uuid": "98209342-1162-4156-8f6a-0f466cbd4d9f"
+              },
+              {
+                "arguments": [
+                  "ERROR: Id do Cliente informado na tag [nCodCliente] nao cadastrado"
+                ],
+                "category_uuid": "292ca398-d26d-43dc-b992-1acc0e9a2c12",
+                "type": "has_phrase",
+                "uuid": "27d1c0e5-5243-4e2e-a686-83edd0286013"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "46074da1-136b-4dbf-92b6-fba01ea50ab2",
+                "name": "Cliente n\u00e3o encontrado",
+                "uuid": "292ca398-d26d-43dc-b992-1acc0e9a2c12"
+              },
+              {
+                "exit_uuid": "ca43492b-1192-4b27-8059-99beabdaff9c",
+                "name": "Other",
+                "uuid": "388e7cef-3fc8-4a21-865b-07d913447f9e"
+              }
+            ],
+            "default_category_uuid": "388e7cef-3fc8-4a21-865b-07d913447f9e",
+            "operand": "@webhook",
+            "type": "switch"
+          },
+          "uuid": "06a26fcd-3231-47e4-91be-ad857a226bae"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "N\u00e3o consegui acessar seu contrato no sistema. Em caso de d\u00favidas, entre em contato com o setor Financeiro. ",
+              "type": "send_msg",
+              "uuid": "690542af-57aa-4061-9433-de929aaa939a"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "c3ca1c3f-be41-43ac-adde-e50c195d253f"
+            }
+          ],
+          "uuid": "58c9b4cd-2c0c-45ed-8fbf-331c1a83bef6"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Infelizmente n\u00e3o consegui acessar as parcelas do seu contrato. Em caso de d\u00favidas, entre em contato com o setor Financeiro.",
+              "type": "send_msg",
+              "uuid": "1ea5ea3e-2b10-4850-9e6e-f79054dda316"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "ae1dd3ca-d6fc-4389-aca7-30cd9f0b5954"
+            }
+          ],
+          "uuid": "0277c2d3-dce0-45b2-9b64-0aa32c8271be"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "44b288ba-85bd-413b-8c14-800e3c261e34",
+              "uuid": "bbf9d40a-5558-40a4-a7f7-96e63090e69f"
+            },
+            {
+              "destination_uuid": "0277c2d3-dce0-45b2-9b64-0aa32c8271be",
+              "uuid": "61bf39e7-ff56-4935-a038-78994aa67945"
+            },
+            {
+              "destination_uuid": "0277c2d3-dce0-45b2-9b64-0aa32c8271be",
+              "uuid": "7c4773f3-976c-4a71-833c-a45abe2e64dd"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "1"
+                ],
+                "category_uuid": "ab71d2b2-ef41-4efa-972d-b8ec649dd1c4",
+                "type": "has_number_gte",
+                "uuid": "93a204cb-f731-449c-9120-7293fa88bfd6"
+              },
+              {
+                "arguments": [
+                  "0"
+                ],
+                "category_uuid": "c0cf4dfb-664a-4e34-9604-096b6f419af0",
+                "type": "has_number_eq",
+                "uuid": "e6944608-0c20-4e2e-bb8a-49f61af097f5"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "bbf9d40a-5558-40a4-a7f7-96e63090e69f",
+                "name": "Tem registros",
+                "uuid": "ab71d2b2-ef41-4efa-972d-b8ec649dd1c4"
+              },
+              {
+                "exit_uuid": "61bf39e7-ff56-4935-a038-78994aa67945",
+                "name": "Sem parcelas",
+                "uuid": "c0cf4dfb-664a-4e34-9604-096b6f419af0"
+              },
+              {
+                "exit_uuid": "7c4773f3-976c-4a71-833c-a45abe2e64dd",
+                "name": "Other",
+                "uuid": "4016d3c0-da4b-4777-b154-79542dcb0aba"
+              }
+            ],
+            "default_category_uuid": "4016d3c0-da4b-4777-b154-79542dcb0aba",
+            "operand": "@results.registros",
+            "type": "switch"
+          },
+          "uuid": "8beace45-2fa8-4911-ac7c-790d97b94f09"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "7a04c88b-e50e-4eab-943a-36ba2c23f652",
+              "uuid": "f18255c3-72e3-4831-a885-7db046bc3ad0"
+            },
+            {
+              "destination_uuid": "222f0591-2946-44e9-a19d-a0badcc697e9",
+              "uuid": "13f1f60f-b7bd-4b0d-a90c-32826ca8f806"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "@globals.status_boleto_para_desconsiderar"
+                ],
+                "category_uuid": "1d071bb9-6daf-4443-a8c4-eff748367b01",
+                "type": "has_any_word",
+                "uuid": "9fd5bf4b-bbf6-4cd9-9773-d051c9b10f36"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "f18255c3-72e3-4831-a885-7db046bc3ad0",
+                "name": "Desconsiderar",
+                "uuid": "1d071bb9-6daf-4443-a8c4-eff748367b01"
+              },
+              {
+                "exit_uuid": "13f1f60f-b7bd-4b0d-a90c-32826ca8f806",
+                "name": "Other",
+                "uuid": "8ca0e76f-b543-4458-90dc-baec840cbbf1"
+              }
+            ],
+            "default_category_uuid": "8ca0e76f-b543-4458-90dc-baec840cbbf1",
+            "operand": "@(results.pesquisarlancamentos.extra.titulosencontrados[results.contador].cabecTitulo.cStatus)",
+            "type": "switch"
+          },
+          "uuid": "44b288ba-85bd-413b-8c14-800e3c261e34"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "7ddaff5a-efd1-4676-a35a-907ecb1bd4c3",
+              "uuid": "0de28ee9-8559-4a19-b5ee-d3b34002771b"
+            },
+            {
+              "destination_uuid": "37b7b45d-0a0f-40f2-9d50-1c46b546c264",
+              "uuid": "88015e8a-ff8d-4b6a-a925-cce65e42910b"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "whatsapp"
+                ],
+                "category_uuid": "5329f228-a23d-4d2a-911a-e56114bcd4a0",
+                "type": "has_any_word",
+                "uuid": "1d9ea7bd-df27-43fe-8c3f-a7674111eff9"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "0de28ee9-8559-4a19-b5ee-d3b34002771b",
+                "name": "Whatsapp",
+                "uuid": "5329f228-a23d-4d2a-911a-e56114bcd4a0"
+              },
+              {
+                "exit_uuid": "88015e8a-ff8d-4b6a-a925-cce65e42910b",
+                "name": "Other",
+                "uuid": "825e8155-f7cc-4c51-89ee-b058bc7e8c00"
+              }
+            ],
+            "default_category_uuid": "825e8155-f7cc-4c51-89ee-b058bc7e8c00",
+            "operand": "@contact.urns",
+            "type": "switch"
+          },
+          "uuid": "222f0591-2946-44e9-a19d-a0badcc697e9"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "\ud83d\udcc4 A parcela @(results.pesquisarlancamentos.extra.titulosencontrados[results.contador].cabectitulo.cnumparcela) \ndo t\u00edtulo @(results.pesquisarlancamentos.extra.titulosencontrados[results.contador].cabectitulo.cnumtitulo), com vencimento em *@(results.pesquisarlancamentos.extra.titulosencontrados[results.contador].cabectitulo.ddtvenc)* est\u00e1 com status *@(results.pesquisarlancamentos.extra.titulosencontrados[results.contador].cabectitulo.cstatus)*.\n\nO valor de lan\u00e7amento do boleto \u00e9 *R$ @(results.pesquisarlancamentos.extra.titulosencontrados[results.contador].cabectitulo.nvalortitulo)*",
+              "type": "send_msg",
+              "uuid": "6420e5d0-f2e4-4c7c-8fe9-2341155c426f"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "ae7a7d15-dd2c-4158-b1ad-15ef7f7e0a2f",
+              "uuid": "bac6ab7d-3ca0-4722-8347-2644d7381aa1"
+            }
+          ],
+          "uuid": "7ddaff5a-efd1-4676-a35a-907ecb1bd4c3"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "\ud83d\udcc4 A parcela @(results.pesquisarlancamentos.extra.titulosencontrados[results.contador].cabectitulo.cnumparcela) \n do t\u00edtulo @(results.pesquisarlancamentos.extra.titulosencontrados[results.contador].cabectitulo.cnumtitulo), com vencimento em **@(results.pesquisarlancamentos.extra.titulosencontrados[results.contador].cabectitulo.ddtvenc)** est\u00e1 com status **@(results.pesquisarlancamentos.extra.titulosencontrados[results.contador].cabectitulo.cstatus)**.\n\nO valor de lan\u00e7amento do boleto \u00e9 **R$ @(results.pesquisarlancamentos.extra.titulosencontrados[results.contador].cabectitulo.nvalortitulo)**",
+              "type": "send_msg",
+              "uuid": "7473c98c-85d4-43ed-8d5d-ec2cbf03ddec"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "ae7a7d15-dd2c-4158-b1ad-15ef7f7e0a2f",
+              "uuid": "a82ccdf0-44c4-4561-b49b-32dc0f9fd3ae"
+            }
+          ],
+          "uuid": "37b7b45d-0a0f-40f2-9d50-1c46b546c264"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "af77037c-e2d3-4fb4-933f-219b29f4bb29",
+              "uuid": "c4af6e84-50c0-4112-96d4-dd0d2745b3be"
+            },
+            {
+              "destination_uuid": "800a0aa9-64d7-443e-bc8f-1ac22bb0bcdc",
+              "uuid": "f609a878-7543-4d87-b4fd-c354a788b78b"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [],
+                "category_uuid": "ec4ed3fe-fecb-499c-b0bc-0ab573bf987f",
+                "type": "has_text",
+                "uuid": "167be79e-314e-419e-bc0e-d1532d71e15b"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "c4af6e84-50c0-4112-96d4-dd0d2745b3be",
+                "name": "Tem c\u00f3digo de barras",
+                "uuid": "ec4ed3fe-fecb-499c-b0bc-0ab573bf987f"
+              },
+              {
+                "exit_uuid": "f609a878-7543-4d87-b4fd-c354a788b78b",
+                "name": "Other",
+                "uuid": "3ea8b6f0-33eb-46bc-af27-b4978dc37b1c"
+              }
+            ],
+            "default_category_uuid": "3ea8b6f0-33eb-46bc-af27-b4978dc37b1c",
+            "operand": "@(results.pesquisarlancamentos.extra.titulosencontrados[results.contador].cabectitulo.ccodigobarras)",
+            "type": "switch"
+          },
+          "uuid": "ae7a7d15-dd2c-4158-b1ad-15ef7f7e0a2f"
+        },
+        {
+          "actions": [
+            {
+              "all_urns": false,
+              "attachments": [],
+              "quick_replies": [],
+              "text": "\ud83c\udfe6 Copie a linha digit\u00e1vel e pague com o aplicativo do seu banco: ",
+              "type": "send_msg",
+              "uuid": "791136df-6fdb-418d-945e-7e014064b1ce"
+            },
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "@(replace(results.pesquisarlancamentos.extra.titulosencontrados[results.contador].cabectitulo.ccodigobarras, \".\", \"\"))",
+              "type": "send_msg",
+              "uuid": "18da6cae-8423-464b-972c-f6427f0bd654"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "800a0aa9-64d7-443e-bc8f-1ac22bb0bcdc",
+              "uuid": "e66b46be-2277-4843-b7ba-07bbc37f231f"
+            }
+          ],
+          "uuid": "af77037c-e2d3-4fb4-933f-219b29f4bb29"
+        },
+        {
+          "actions": [
+            {
+              "body": "{\"call\":\"ObterBoleto\",\"app_key\":\"@globals.appkey\",\"app_secret\":\"@globals.appsecret\",\"param\":[{\"nCodTitulo\":@(results.pesquisarlancamentos.extra.titulosencontrados[results.contador].cabectitulo.ncodtitulo),\"cCodIntTitulo\":\"@(results.pesquisarlancamentos.extra.titulosencontrados[results.contador].cabectitulo.ccodinttitulo)\"}]}",
+              "headers": {
+                "Content-Type": "application/json"
+              },
+              "method": "POST",
+              "result_name": "ObterBoleto",
+              "type": "call_webhook",
+              "url": "https://app.omie.com.br/api/v1/financas/contareceberboleto/",
+              "uuid": "d29cb903-97ba-4314-bed6-790cb442f834"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "7c186f55-cc9e-4573-952e-4d8c2ed861aa",
+              "uuid": "009716d9-00ac-4a31-91a8-01cc91be5b41"
+            },
+            {
+              "destination_uuid": "da6e6547-c8b4-4907-a1f2-6e8b2763ebf6",
+              "uuid": "6fc15844-0594-44e4-beab-bd0bec8d5ac3"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "Success"
+                ],
+                "category_uuid": "82023121-dfdb-4f64-b747-6e021e6ce4fe",
+                "type": "has_only_text",
+                "uuid": "95554639-b9af-4674-96c2-4c1f5a543721"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "009716d9-00ac-4a31-91a8-01cc91be5b41",
+                "name": "Success",
+                "uuid": "82023121-dfdb-4f64-b747-6e021e6ce4fe"
+              },
+              {
+                "exit_uuid": "6fc15844-0594-44e4-beab-bd0bec8d5ac3",
+                "name": "Failure",
+                "uuid": "80bab907-dc2c-4be4-a826-86b8a4f86390"
+              }
+            ],
+            "default_category_uuid": "80bab907-dc2c-4be4-a826-86b8a4f86390",
+            "operand": "@results.obterboleto.category",
+            "type": "switch"
+          },
+          "uuid": "800a0aa9-64d7-443e-bc8f-1ac22bb0bcdc"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "afef1d4e-a77a-47a7-9c8b-7d29918fd262",
+              "uuid": "3f27d40f-6ee9-420f-9ca1-be4ca2197b48"
+            },
+            {
+              "destination_uuid": "8a7281ec-222d-4ca6-a6bb-e31daad31b85",
+              "uuid": "d8518795-1f42-499d-9d77-7d3343debad0"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "whatsapp"
+                ],
+                "category_uuid": "5ba3edb4-e265-4c62-a0f4-08d947ce4a62",
+                "type": "has_any_word",
+                "uuid": "69d7378d-62e4-4c49-8bfe-35957466d17e"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "3f27d40f-6ee9-420f-9ca1-be4ca2197b48",
+                "name": "Whatsapp",
+                "uuid": "5ba3edb4-e265-4c62-a0f4-08d947ce4a62"
+              },
+              {
+                "exit_uuid": "d8518795-1f42-499d-9d77-7d3343debad0",
+                "name": "Other",
+                "uuid": "8f312665-832d-47a3-913a-a5ef59425193"
+              }
+            ],
+            "default_category_uuid": "8f312665-832d-47a3-913a-a5ef59425193",
+            "operand": "@contact.urns",
+            "type": "switch"
+          },
+          "uuid": "7c186f55-cc9e-4573-952e-4d8c2ed861aa"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "7a04c88b-e50e-4eab-943a-36ba2c23f652",
+              "uuid": "cbb5a9e6-4831-464a-aca5-08168ec1aa72"
+            },
+            {
+              "destination_uuid": "7a04c88b-e50e-4eab-943a-36ba2c23f652",
+              "uuid": "9db29206-f81e-419e-9135-31d8428e7dfe"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "ERROR: Nenhum boleto foi gerado para essa conta a receber."
+                ],
+                "category_uuid": "88af1908-165f-4872-be3c-54758839cb4a",
+                "type": "has_phrase",
+                "uuid": "448bbdad-ae22-4d40-91c9-941211394b7b"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "cbb5a9e6-4831-464a-aca5-08168ec1aa72",
+                "name": "Nenhum boleto foi gerado",
+                "uuid": "88af1908-165f-4872-be3c-54758839cb4a"
+              },
+              {
+                "exit_uuid": "9db29206-f81e-419e-9135-31d8428e7dfe",
+                "name": "Other",
+                "uuid": "2a20d17e-8ae9-4e19-bb21-e659255a9687"
+              }
+            ],
+            "default_category_uuid": "2a20d17e-8ae9-4e19-bb21-e659255a9687",
+            "operand": "@results.obterboleto.extra.faultstring",
+            "type": "switch"
+          },
+          "uuid": "da6e6547-c8b4-4907-a1f2-6e8b2763ebf6"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Ou, se preferir, baixe o boleto em PDF:",
+              "type": "send_msg",
+              "uuid": "6fabd96d-912a-475a-b167-2ff3c75bb55e"
+            },
+            {
+              "attachments": [
+                "application:@results.obterboleto.extra.cLinkBoleto"
+              ],
+              "quick_replies": [],
+              "text": "boleto",
+              "type": "send_msg",
+              "uuid": "b4594ed7-828b-433c-95ed-59f0c0ea9e12"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "38179c1e-4018-4a62-b842-58c298f08f25",
+              "uuid": "4484b9f9-8ee8-4cc8-8cd5-4e09e106f0a5"
+            }
+          ],
+          "uuid": "afef1d4e-a77a-47a7-9c8b-7d29918fd262"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Ou, se preferir, baixe o boleto em PDF atrav\u00e9s do link:",
+              "type": "send_msg",
+              "uuid": "b1bc37f5-60f9-4deb-9ac3-1f2cca28e348"
+            },
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "@results.obterboleto.extra.cLinkBoleto",
+              "type": "send_msg",
+              "uuid": "d807a7a6-2209-4d28-bbce-cd6ee20e212d"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "38179c1e-4018-4a62-b842-58c298f08f25",
+              "uuid": "cee5aaf0-8db2-49ed-a60d-875803952b6d"
+            }
+          ],
+          "uuid": "8a7281ec-222d-4ca6-a6bb-e31daad31b85"
+        },
+        {
+          "actions": [
+            {
+              "category": "",
+              "name": "quantidade de envios",
+              "type": "set_run_result",
+              "uuid": "ccaafa8d-4bab-44a2-9795-81e75a5e26c6",
+              "value": "@(results.quantidade_de_envios +1)"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "7a04c88b-e50e-4eab-943a-36ba2c23f652",
+              "uuid": "d705366c-f4d8-4a23-a256-6dc011d8eaa0"
+            }
+          ],
+          "uuid": "38179c1e-4018-4a62-b842-58c298f08f25"
+        },
+        {
+          "actions": [
+            {
+              "category": "",
+              "name": "contador",
+              "type": "set_run_result",
+              "uuid": "7f55ed53-fb7b-4e27-8a7c-ad48c15e6c31",
+              "value": "@(results.contador +1)"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "d6156c18-13a9-42c7-aa55-51d83f70b96f",
+              "uuid": "64e34a03-df5e-45e2-bbdf-0ae55d165037"
+            }
+          ],
+          "uuid": "7a04c88b-e50e-4eab-943a-36ba2c23f652"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "44b288ba-85bd-413b-8c14-800e3c261e34",
+              "uuid": "58e5ee1a-013d-4aee-b9c9-bbee405db443"
+            },
+            {
+              "destination_uuid": "98caf3c6-ebb9-44bf-882e-e58e0678e77e",
+              "uuid": "8af29fe0-aa08-49ed-a9a9-682b0d778a90"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "@results.registros"
+                ],
+                "category_uuid": "da218599-8d12-462e-b793-576c4eb229dd",
+                "type": "has_number_lt",
+                "uuid": "a1515bd7-a3eb-41f7-994a-8b3dab7cefb6"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "58e5ee1a-013d-4aee-b9c9-bbee405db443",
+                "name": "< Quantidade de registros",
+                "uuid": "da218599-8d12-462e-b793-576c4eb229dd"
+              },
+              {
+                "exit_uuid": "8af29fe0-aa08-49ed-a9a9-682b0d778a90",
+                "name": "Other",
+                "uuid": "13ceaaf7-f4f7-48a1-952a-42ec6ce1dace"
+              }
+            ],
+            "default_category_uuid": "13ceaaf7-f4f7-48a1-952a-42ec6ce1dace",
+            "operand": "@results.contador",
+            "type": "switch"
+          },
+          "uuid": "d6156c18-13a9-42c7-aa55-51d83f70b96f"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "ad134ab0-5a9e-43e0-8f6e-388bc598cfb0",
+              "uuid": "07eb7df4-d7b8-405d-8ecc-1bf4ab9e5c42"
+            },
+            {
+              "destination_uuid": "c20dcb36-8d4d-4bbc-81a4-a76218d76b24",
+              "uuid": "77050abf-95ce-47b6-a8fd-a30b4dc13711"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "@results.ntotpaginas"
+                ],
+                "category_uuid": "dde1a3e6-a052-4c48-86c5-de49d63bd44a",
+                "type": "has_number_lt",
+                "uuid": "7465f5c9-e65a-408e-97c5-685b7193e1bb"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "07eb7df4-d7b8-405d-8ecc-1bf4ab9e5c42",
+                "name": "Continua pagina\u00e7\u00e3o",
+                "uuid": "dde1a3e6-a052-4c48-86c5-de49d63bd44a"
+              },
+              {
+                "exit_uuid": "77050abf-95ce-47b6-a8fd-a30b4dc13711",
+                "name": "Other",
+                "uuid": "e5e83c9d-53c6-4866-be89-cf9cbc8a3c37"
+              }
+            ],
+            "default_category_uuid": "e5e83c9d-53c6-4866-be89-cf9cbc8a3c37",
+            "operand": "@results.pagina",
+            "type": "switch"
+          },
+          "uuid": "98caf3c6-ebb9-44bf-882e-e58e0678e77e"
+        },
+        {
+          "actions": [
+            {
+              "category": "",
+              "name": "pagina",
+              "type": "set_run_result",
+              "uuid": "a07eaad3-3ca9-4135-aa29-12128cf72d29",
+              "value": "@(results.pagina +1)"
+            },
+            {
+              "category": "",
+              "name": "contador",
+              "type": "set_run_result",
+              "uuid": "8ec4909b-8f67-4e8e-bd0d-011820138241",
+              "value": "0"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "eb6b702f-26f8-43a9-bcc7-e6bceaed8c55",
+              "uuid": "2a62f5cb-0b15-4a53-a059-fcb58047a11e"
+            }
+          ],
+          "uuid": "ad134ab0-5a9e-43e0-8f6e-388bc598cfb0"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "d296e31d-0b6e-484b-bc96-d74f1d22baa4",
+              "uuid": "3b420376-5253-42d6-bf5c-18dd3e32eac9"
+            },
+            {
+              "destination_uuid": "2f4392d8-3e1d-4305-8ac6-1f0c8d4136f7",
+              "uuid": "fcf66542-5bd5-4db4-ad57-122466b9f559"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "0"
+                ],
+                "category_uuid": "96a578bc-41e9-42e4-a65f-d938ece6bfbe",
+                "type": "has_number_eq",
+                "uuid": "3b1ad3da-e877-4aef-98d6-93e701c19c40"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "3b420376-5253-42d6-bf5c-18dd3e32eac9",
+                "name": "Nenhum boleto enviado",
+                "uuid": "96a578bc-41e9-42e4-a65f-d938ece6bfbe"
+              },
+              {
+                "exit_uuid": "fcf66542-5bd5-4db4-ad57-122466b9f559",
+                "name": "Other",
+                "uuid": "9bb9188b-30af-4bf8-aa09-27d3b0ceb559"
+              }
+            ],
+            "default_category_uuid": "9bb9188b-30af-4bf8-aa09-27d3b0ceb559",
+            "operand": "@results.quantidade_de_envios",
+            "type": "switch"
+          },
+          "uuid": "c20dcb36-8d4d-4bbc-81a4-a76218d76b24"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "N\u00e3o encontrei boletos gerados para voc\u00ea no sistema. Entre em contato com o setor financeiro para confirmar se existem d\u00e9bitos.",
+              "type": "send_msg",
+              "uuid": "4b6d4555-bd19-4a96-9a1c-b65c4b72c12a"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "c5fdcc2f-0fe6-47b6-be3a-b135f448c71b"
+            }
+          ],
+          "uuid": "d296e31d-0b6e-484b-bc96-d74f1d22baa4"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "text": "Em caso de d\u00favidas, entre em contato com o setor Financeiro. ",
+              "type": "send_msg",
+              "quick_replies": [],
+              "uuid": "9f81d1bd-5509-4a77-b5c6-ac078f74177a"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "2fcd2780-809a-4943-8bad-fd7c52e7d85a"
+            }
+          ],
+          "uuid": "2f4392d8-3e1d-4305-8ac6-1f0c8d4136f7"
+        }
+      ],
+      "spec_version": "13.1.0",
+      "type": "messaging",
+      "uuid": "d1c6f02f-c58a-48a8-88df-4040b3ed35d7",
+      "revision": 2
+    },
+    {
+      "_ui": {
+        "nodes": {
+          "1cfd6a08-7dda-436d-8e93-4be780ea3ac2": {
+            "config": {
+              "cases": {}
+            },
+            "position": {
+              "left": 540,
+              "top": 0
+            },
+            "type": "split_by_expression"
+          },
+          "86d35467-b5b0-4591-93a2-0754ed5dcbd4": {
+            "position": {
+              "left": 420,
+              "top": 120
+            },
+            "type": "execute_actions"
+          },
+          "495628d3-d81c-4290-91fc-1ef40c0471cc": {
+            "position": {
+              "left": 660,
+              "top": 120
+            },
+            "type": "execute_actions"
+          },
+          "7d2cf70a-bb06-4c70-876a-d3807a7f15d8": {
+            "type": "split_by_intent",
+            "position": {
+              "left": 1020,
+              "top": 180
+            },
+            "config": {}
+          },
+          "0ca8633d-6cc7-4841-9263-4b75d2405e7f": {
+            "position": {
+              "left": 1280,
+              "top": 300
+            },
+            "type": "execute_actions"
+          },
+          "adbc8e76-0a13-4846-bac7-f612f7cea28f": {
+            "config": {
+              "cases": {}
+            },
+            "position": {
+              "left": 480,
+              "top": 420
+            },
+            "type": "wait_for_response"
+          },
+          "f9c61c2a-eb7d-4cbe-8467-6b9d66525f29": {
+            "position": {
+              "left": 280,
+              "top": 580
+            },
+            "type": "execute_actions"
+          },
+          "833f1510-6269-4087-a6ca-af09af35a99c": {
+            "position": {
+              "left": 500,
+              "top": 580
+            },
+            "type": "execute_actions"
+          },
+          "0947aded-4806-494a-9db0-ee8fbd0d3f95": {
+            "position": {
+              "left": 820,
+              "top": 600
+            },
+            "type": "execute_actions"
+          },
+          "a9f8cf4d-9760-43a0-bbbe-4a0a80e00e3b": {
+            "position": {
+              "left": 1120,
+              "top": 600
+            },
+            "type": "execute_actions"
+          },
+          "1596347d-7069-48ee-afee-e51a7b0eec97": {
+            "config": {},
+            "position": {
+              "left": 400,
+              "top": 800
+            },
+            "type": "split_by_webhook"
+          },
+          "ecdfee5a-8160-4564-aa2b-7284d613c545": {
+            "config": {
+              "cases": {}
+            },
+            "position": {
+              "left": 340,
+              "top": 1020
+            },
+            "type": "split_by_expression"
+          },
+          "2304239b-4eb9-4e4f-9700-860ec9c16f43": {
+            "config": {
+              "cases": {}
+            },
+            "position": {
+              "left": 340,
+              "top": 1160
+            },
+            "type": "split_by_expression"
+          },
+          "11ff45ea-d1e5-4a53-b735-3bf5722fc83f": {
+            "config": {
+              "cases": {}
+            },
+            "position": {
+              "left": 660,
+              "top": 1160
+            },
+            "type": "split_by_expression"
+          },
+          "03b00ed4-49f0-4676-8f97-94fa4028cd15": {
+            "config": {
+              "cases": {}
+            },
+            "position": {
+              "left": 1220,
+              "top": 1180
+            },
+            "type": "split_by_expression"
+          },
+          "92696a98-f842-4fab-a7f7-c0d3b359c02c": {
+            "config": {
+              "cases": {}
+            },
+            "position": {
+              "left": 1540,
+              "top": 1180
+            },
+            "type": "split_by_expression"
+          },
+          "a74e267b-ba23-430a-a2b1-c0879e450aac": {
+            "position": {
+              "left": 340,
+              "top": 1280
+            },
+            "type": "execute_actions"
+          },
+          "f9b7f391-091b-4775-9f8c-917ba52dbaeb": {
+            "position": {
+              "left": 840,
+              "top": 1300
+            },
+            "type": "execute_actions"
+          },
+          "2792490e-371f-4c7f-938c-efc3072f4a00": {
+            "position": {
+              "left": 1220,
+              "top": 1300
+            },
+            "type": "execute_actions"
+          },
+          "c8777fc2-b777-43f8-8b28-05b7800c7a80": {
+            "position": {
+              "left": 1540,
+              "top": 1300
+            },
+            "type": "execute_actions"
+          },
+          "bdde2580-ef83-40a8-a39c-8dbe010c6c36": {
+            "position": {
+              "left": 1820,
+              "top": 1300
+            },
+            "type": "execute_actions"
+          },
+          "82640005-c162-4bce-afb1-e729c5244741": {
+            "config": {},
+            "position": {
+              "left": 340,
+              "top": 1440
+            },
+            "type": "split_by_subflow"
+          },
+          "c1b130d7-8823-4961-ae73-2b1d58441c65": {
+            "position": {
+              "left": 800,
+              "top": 1460
+            },
+            "type": "execute_actions"
+          },
+          "b2523eec-8118-4ad1-b881-b9f9ffc4786d": {
+            "config": {},
+            "position": {
+              "left": 1820,
+              "top": 1580
+            },
+            "type": "split_by_subflow"
+          },
+          "3957a5f5-2635-4840-af21-2923061faecf": {
+            "position": {
+              "left": 340,
+              "top": 1620
+            },
+            "type": "execute_actions"
+          },
+          "7c358120-db6f-4706-b85c-6b2a1303f535": {
+            "position": {
+              "left": 1380,
+              "top": 1680
+            },
+            "type": "execute_actions"
+          },
+          "ca48ff0e-9e25-4857-b0a7-4429f3c2c956": {
+            "position": {
+              "left": 340,
+              "top": 1780
+            },
+            "type": "execute_actions"
+          },
+          "e87eb4bf-cea6-4bf6-86da-e25733b63690": {
+            "position": {
+              "left": 1760,
+              "top": 1800
+            },
+            "type": "execute_actions"
+          },
+          "9316f283-e8d4-442f-9e9d-fe41e2b68fcd": {
+            "position": {
+              "left": 720,
+              "top": 1900
+            },
+            "type": "execute_actions"
+          },
+          "bded9fcd-9996-48f7-aa2b-a1f75b700055": {
+            "config": {
+              "cases": {}
+            },
+            "position": {
+              "left": 1360,
+              "top": 1920
+            },
+            "type": "wait_for_response"
+          },
+          "690bc83a-3dbb-4952-8e2b-090c769beea9": {
+            "config": {
+              "cases": {}
+            },
+            "position": {
+              "left": 340,
+              "top": 2100
+            },
+            "type": "wait_for_response"
+          },
+          "3afb7d5c-049a-4bf0-aa19-90a27dbe1f23": {
+            "position": {
+              "left": 1160,
+              "top": 2120
+            },
+            "type": "execute_actions"
+          },
+          "cfe39e0c-3036-4355-b955-4e608f25ae13": {
+            "position": {
+              "left": 1440,
+              "top": 2120
+            },
+            "type": "execute_actions"
+          },
+          "efaa1dc0-27df-439b-b1a0-88f8ba49c183": {
+            "position": {
+              "left": 1760,
+              "top": 2160
+            },
+            "type": "execute_actions"
+          },
+          "af89349d-b938-4e4a-b104-1acff9f86018": {
+            "position": {
+              "left": 720,
+              "top": 2220
+            },
+            "type": "execute_actions"
+          },
+          "998abf56-e578-4c2b-a98b-6d7193f0acc1": {
+            "position": {
+              "left": 100,
+              "top": 2280
+            },
+            "type": "execute_actions"
+          },
+          "1ab79b9a-9ded-4a07-8343-51601f14981e": {
+            "position": {
+              "left": 400,
+              "top": 2280
+            },
+            "type": "execute_actions"
+          },
+          "777c73f8-d925-47a2-aa37-029e46af2f8e": {
+            "position": {
+              "left": 1160,
+              "top": 2300
+            },
+            "type": "execute_actions"
+          },
+          "70c72b9f-91d6-440a-84f7-0bc89f61ad90": {
+            "config": {
+              "cases": {}
+            },
+            "position": {
+              "left": 1440,
+              "top": 2320
+            },
+            "type": "wait_for_response"
+          },
+          "e25bf952-ed9c-4a95-8f75-1e31bb939471": {
+            "position": {
+              "left": 100,
+              "top": 2440
+            },
+            "type": "execute_actions"
+          },
+          "b8f5c8a6-54fb-4d2e-82b3-0a377cdee20c": {
+            "config": {
+              "cases": {}
+            },
+            "position": {
+              "left": 400,
+              "top": 2460
+            },
+            "type": "wait_for_response"
+          },
+          "7c2c10d6-f440-412d-a074-c7639b8d67ea": {
+            "position": {
+              "left": 1440,
+              "top": 2500
+            },
+            "type": "execute_actions"
+          },
+          "cf5026a7-6ed9-4075-89f6-bf4ff7de84ae": {
+            "position": {
+              "left": 1700,
+              "top": 2500
+            },
+            "type": "execute_actions"
+          },
+          "eba62ce2-1401-4498-95e1-d0062c1b3d49": {
+            "position": {
+              "left": 1160,
+              "top": 2620
+            },
+            "type": "execute_actions"
+          },
+          "ba1a4899-459e-4645-9dec-7cd6d2e2b66e": {
+            "position": {
+              "left": 400,
+              "top": 2640
+            },
+            "type": "execute_actions"
+          },
+          "76361010-524d-4bac-b985-8803b6b9992c": {
+            "position": {
+              "left": 660,
+              "top": 2640
+            },
+            "type": "execute_actions"
+          },
+          "debd3f54-ab7c-489f-8144-bd21336439cc": {
+            "position": {
+              "left": 100,
+              "top": 2760
+            },
+            "type": "execute_actions"
+          },
+          "3b4fad54-7c40-410f-9579-0417c5425248": {
+            "config": {},
+            "position": {
+              "left": 1440,
+              "top": 2840
+            },
+            "type": "split_by_subflow"
+          }
+        },
+        "stickies": {
+          "163a8593-f0c5-41b9-ba81-da15d869e834": {
+            "body": "Aqui consultamos o CPF/CNPJ para salvar o codigo_cliente usando o recurso Clientes do M\u00f3dulo geral",
+            "color": "purple",
+            "position": {
+              "bottom": 220,
+              "left": 160,
+              "right": 80,
+              "top": 800
+            },
+            "title": "Webhook"
+          },
+          "245276f1-8a14-42c4-956c-84b5a9971cbd": {
+            "body": "Substitua pelo seu fluxo de atendimento humano",
+            "color": "purple",
+            "position": {
+              "left": 1720,
+              "top": 2840
+            },
+            "title": "Atendimento Humano"
+          },
+          "6baec4b5-ae16-41f9-bba1-17dcbc1b7ccf": {
+            "body": "Aqui verificamos se existe telefone2 no cadastro, para que o cliente valide e consiga prosseguir com seu acesso.\n\nCaso n\u00e3o exista, informamos ao usu\u00e1rio. Aqui \u00e9 poss\u00edvel conectar o atendimento humano, se seu projeto tiver esse servi\u00e7o no contrato com a Weni.",
+            "color": "purple",
+            "position": {
+              "left": 2080,
+              "top": 1260
+            },
+            "title": "Telefone2"
+          },
+          "75a3a3b5-b369-4db5-bb69-0b876998004f": {
+            "body": "Aqui verificamos se existe email no cadastro, para que o cliente valide e consiga prosseguir com seu acesso.\n\nCaso n\u00e3o exista email, verificamos se existe telefone, para fazer verifica\u00e7\u00e3o por numero de telefone.",
+            "color": "purple",
+            "position": {
+              "bottom": -1000,
+              "left": 100,
+              "right": 0,
+              "top": 1160
+            },
+            "title": "Email"
+          },
+          "dbefb4cd-4d50-4d7a-9dc2-c2e1ac182f26": {
+            "body": "Aqui verificamos se existe email no cadastro, para que o cliente valide e consiga prosseguir com seu acesso.\n\nCaso n\u00e3o exista email, verificamos se existe telefone, para fazer verifica\u00e7\u00e3o por numero de telefone.",
+            "color": "purple",
+            "position": {
+              "bottom": null,
+              "left": 1220,
+              "right": null,
+              "top": 900
+            },
+            "title": "Telefone1"
+          }
+        }
+      },
+      "expire_after_minutes": 10080,
+      "language": "base",
+      "localization": {},
+      "metadata": {
+        "expires": 10080
+      },
+      "name": "Financeiro - Credenciamento",
+      "nodes": [
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "86d35467-b5b0-4591-93a2-0754ed5dcbd4",
+              "uuid": "b29e2336-fe3c-4561-9c48-9e5d784d5cf6"
+            },
+            {
+              "destination_uuid": "495628d3-d81c-4290-91fc-1ef40c0471cc",
+              "uuid": "047207ad-5ed5-452a-afd5-7afb1197c24f"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "whatsapp"
+                ],
+                "category_uuid": "f71f882d-1cf0-4d5f-b34c-a1fa8e8b0afa",
+                "type": "has_any_word",
+                "uuid": "f2585a68-102a-42aa-acc1-d55f739aba24"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "b29e2336-fe3c-4561-9c48-9e5d784d5cf6",
+                "name": "Whatsapp",
+                "uuid": "f71f882d-1cf0-4d5f-b34c-a1fa8e8b0afa"
+              },
+              {
+                "exit_uuid": "047207ad-5ed5-452a-afd5-7afb1197c24f",
+                "name": "Other",
+                "uuid": "b18040ba-9823-4633-a013-6a3a1f21527c"
+              }
+            ],
+            "default_category_uuid": "b18040ba-9823-4633-a013-6a3a1f21527c",
+            "operand": "@contact.urns",
+            "type": "switch"
+          },
+          "uuid": "1cfd6a08-7dda-436d-8e93-4be780ea3ac2"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [
+                "Encerrar conversa"
+              ],
+              "text": "\ud83d\udd12 Para liberar seu acesso \u00e0s informa\u00e7\u00f5es Financeiras, por favor informe o *CPF ou CNPJ* do titular.\n\n_\u2022\tFormato para CPF: 000.000.000-00_\n_\u2022\tFormato para CNPJ: 00.000.000/0000-00_",
+              "type": "send_msg",
+              "uuid": "ead4ab44-0530-441f-a749-fe8f3087a11b"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "adbc8e76-0a13-4846-bac7-f612f7cea28f",
+              "uuid": "ae8db97f-0f75-48e3-a80f-63e84bffb283"
+            }
+          ],
+          "uuid": "86d35467-b5b0-4591-93a2-0754ed5dcbd4"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [
+                "Encerrar conversa"
+              ],
+              "text": "\ud83d\udd12 Para liberar seu acesso \u00e0s informa\u00e7\u00f5es Financeiras, por favor informe o CPF ou CNPJ do titular.\n\n\u2022\tFormato para CPF: 000.000.000-00;\n\u2022\tFormato para CNPJ: 00.000.000/0000-00.",
+              "type": "send_msg",
+              "uuid": "9e92d5c8-df0b-4bd8-afa0-656f3df6bc4d"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "adbc8e76-0a13-4846-bac7-f612f7cea28f",
+              "uuid": "6554bab2-4462-4664-a771-1a987863154f"
+            }
+          ],
+          "uuid": "495628d3-d81c-4290-91fc-1ef40c0471cc"
+        },
+        {
+          "uuid": "7d2cf70a-bb06-4c70-876a-d3807a7f15d8",
+          "actions": [
+            {
+              "uuid": "842de62b-a530-4cd3-9d4a-cca9046b716c",
+              "type": "call_classifier",
+              "result_name": "_Result Classification",
+              "input": "@input.text",
+              "classifier": {
+                "uuid": "84fa7b0b-2c78-4ef2-b8b7-b9a540433c99",
+                "name": "Cristal"
+              }
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "encerrar",
+                  ".9"
+                ],
+                "type": "has_top_intent",
+                "uuid": "b5ac7d80-146e-4ffd-807b-eb39b316b7e1",
+                "category_uuid": "1e6b0acb-ed30-4967-b230-e7942352d466"
+              },
+              {
+                "arguments": [
+                  "Success",
+                  "Skipped"
+                ],
+                "category_uuid": "847563fb-e57d-401e-8af4-5f54a28eb98b",
+                "type": "has_category",
+                "uuid": "77fd396a-90d6-495e-9c97-f43b159ef4ab"
+              }
+            ],
+            "operand": "@results._result_classification",
+            "categories": [
+              {
+                "exit_uuid": "b520540b-b19e-48e1-b160-6fe5d4e344c8",
+                "name": "Encerrar",
+                "uuid": "1e6b0acb-ed30-4967-b230-e7942352d466"
+              },
+              {
+                "exit_uuid": "89515423-7161-4bf6-b469-11a090c81761",
+                "name": "Other",
+                "uuid": "847563fb-e57d-401e-8af4-5f54a28eb98b"
+              },
+              {
+                "exit_uuid": "b267aabb-9d15-4431-bc73-dc036dfe09b4",
+                "name": "Failure",
+                "uuid": "15389e87-ab1e-40ce-9675-4bf84e222ea9"
+              }
+            ],
+            "type": "switch",
+            "default_category_uuid": "15389e87-ab1e-40ce-9675-4bf84e222ea9",
+            "result_name": "Result"
+          },
+          "exits": [
+            {
+              "destination_uuid": "0947aded-4806-494a-9db0-ee8fbd0d3f95",
+              "uuid": "b520540b-b19e-48e1-b160-6fe5d4e344c8"
+            },
+            {
+              "destination_uuid": "0ca8633d-6cc7-4841-9263-4b75d2405e7f",
+              "uuid": "89515423-7161-4bf6-b469-11a090c81761"
+            },
+            {
+              "destination_uuid": "0ca8633d-6cc7-4841-9263-4b75d2405e7f",
+              "uuid": "b267aabb-9d15-4431-bc73-dc036dfe09b4"
+            }
+          ]
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Por favor, digite seu CPF ou CNPJ seguindo a formata\u00e7\u00e3o:\n\n_\u2022\tPara CPF: 000.000.000-00_\n_\u2022\tPara CNPJ: 00.000.000/0000-00_",
+              "type": "send_msg",
+              "uuid": "52542bb3-e32b-4f77-a880-624a30dc3af2"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "adbc8e76-0a13-4846-bac7-f612f7cea28f",
+              "uuid": "66475715-4b85-4942-8ba5-93db4c6e35d8"
+            }
+          ],
+          "uuid": "0ca8633d-6cc7-4841-9263-4b75d2405e7f"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "c1b130d7-8823-4961-ae73-2b1d58441c65",
+              "uuid": "f407354b-fd3a-4f8b-8534-adaba5fc72f7"
+            },
+            {
+              "destination_uuid": "f9c61c2a-eb7d-4cbe-8467-6b9d66525f29",
+              "uuid": "037888f9-eb3a-4eac-92e2-a46d885161c4"
+            },
+            {
+              "destination_uuid": "833f1510-6269-4087-a6ca-af09af35a99c",
+              "uuid": "e6c08374-289c-4fb0-b84e-1dcc1b9403f8"
+            },
+            {
+              "destination_uuid": "0947aded-4806-494a-9db0-ee8fbd0d3f95",
+              "uuid": "278824cf-40d7-4249-ad58-afd1572f78d3"
+            },
+            {
+              "destination_uuid": "7d2cf70a-bb06-4c70-876a-d3807a7f15d8",
+              "uuid": "ba7090b1-5641-4aaf-9e49-f01588f104ba"
+            },
+            {
+              "destination_uuid": "a9f8cf4d-9760-43a0-bbbe-4a0a80e00e3b",
+              "uuid": "d99981f3-018d-44df-9d70-8b8ddbea165f"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "00.000.000/0000-00"
+                ],
+                "category_uuid": "32fa4e3f-adbb-495c-9f00-574cb6ada605",
+                "type": "has_only_phrase",
+                "uuid": "5773ea18-7956-4389-80d0-c60ea69045a8"
+              },
+              {
+                "arguments": [
+                  "000.000.000-00"
+                ],
+                "category_uuid": "32fa4e3f-adbb-495c-9f00-574cb6ada605",
+                "type": "has_only_phrase",
+                "uuid": "682744d4-eb94-4773-a4aa-e3eb59913c05"
+              },
+              {
+                "arguments": [
+                  "[0-9]{2}\\.[0-9]{3}\\.[0-9]{3}\\/[0-9]{4}\\-[0-9]{2}"
+                ],
+                "category_uuid": "b447d1bd-b59f-4b5b-8258-f23015cb650d",
+                "type": "has_pattern",
+                "uuid": "c6f0bfe3-d10f-47bf-96f9-47e3d29639a6"
+              },
+              {
+                "arguments": [
+                  "[0-9]{3}\\.?[0-9]{3}\\.?[0-9]{3}\\-?[0-9]{2}"
+                ],
+                "category_uuid": "fd7a0616-513b-44d0-a39f-1d7a395bb8f2",
+                "type": "has_pattern",
+                "uuid": "79efd19f-3d4b-4c23-ac35-738c15ce3dfd"
+              },
+              {
+                "arguments": [
+                  "[0-9]{3}\\.?[0-9]{3}\\.?[0-9]{3}\\.?[0-9]{2}"
+                ],
+                "category_uuid": "fd7a0616-513b-44d0-a39f-1d7a395bb8f2",
+                "type": "has_pattern",
+                "uuid": "34e374e7-6085-4395-ab47-c44d0425f269"
+              },
+              {
+                "arguments": [
+                  "encerrar"
+                ],
+                "category_uuid": "ecbf088b-5279-410e-a9d8-83f0ba0969ab",
+                "type": "has_any_word",
+                "uuid": "d3972c35-ab23-48a0-bfc0-8fef6191541f"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "f407354b-fd3a-4f8b-8534-adaba5fc72f7",
+                "name": "ZERO",
+                "uuid": "32fa4e3f-adbb-495c-9f00-574cb6ada605"
+              },
+              {
+                "exit_uuid": "037888f9-eb3a-4eac-92e2-a46d885161c4",
+                "name": "CNPJ",
+                "uuid": "b447d1bd-b59f-4b5b-8258-f23015cb650d"
+              },
+              {
+                "exit_uuid": "e6c08374-289c-4fb0-b84e-1dcc1b9403f8",
+                "name": "CPF",
+                "uuid": "fd7a0616-513b-44d0-a39f-1d7a395bb8f2"
+              },
+              {
+                "exit_uuid": "278824cf-40d7-4249-ad58-afd1572f78d3",
+                "name": "Encerrar",
+                "uuid": "ecbf088b-5279-410e-a9d8-83f0ba0969ab"
+              },
+              {
+                "exit_uuid": "ba7090b1-5641-4aaf-9e49-f01588f104ba",
+                "name": "Other",
+                "uuid": "97c57bac-5468-48e4-9cfa-95972c4c11ab"
+              },
+              {
+                "exit_uuid": "d99981f3-018d-44df-9d70-8b8ddbea165f",
+                "name": "No Response",
+                "uuid": "a1afbdcd-8a3b-46a7-bab4-91fb0fc35fe4"
+              }
+            ],
+            "default_category_uuid": "97c57bac-5468-48e4-9cfa-95972c4c11ab",
+            "operand": "@input.text",
+            "result_name": "documento",
+            "type": "switch",
+            "wait": {
+              "timeout": {
+                "category_uuid": "a1afbdcd-8a3b-46a7-bab4-91fb0fc35fe4",
+                "seconds": 3600
+              },
+              "type": "msg"
+            }
+          },
+          "uuid": "adbc8e76-0a13-4846-bac7-f612f7cea28f"
+        },
+        {
+          "actions": [
+            {
+              "category": "",
+              "name": "documento",
+              "type": "set_run_result",
+              "uuid": "baad4ee4-3b16-4867-88f7-43efb23d9b1f",
+              "value": "@(replace(replace(replace(results.documento.value, \".\", \"\"), \"-\", \"\"), \"/\", \"\"))"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "1596347d-7069-48ee-afee-e51a7b0eec97",
+              "uuid": "66760d30-b45f-4695-bb46-b65fddd05720"
+            }
+          ],
+          "uuid": "f9c61c2a-eb7d-4cbe-8467-6b9d66525f29"
+        },
+        {
+          "actions": [
+            {
+              "category": "",
+              "name": "documento",
+              "type": "set_run_result",
+              "uuid": "02d004fc-71f7-47d5-bccf-0cc4d3dd1205",
+              "value": "@(replace(replace(replace(results.documento.value, \".\", \"\"), \"-\", \"\"), \"/\", \"\"))"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "1596347d-7069-48ee-afee-e51a7b0eec97",
+              "uuid": "084b7e56-9085-46ea-ad22-0b46361ef109"
+            }
+          ],
+          "uuid": "833f1510-6269-4087-a6ca-af09af35a99c"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "A @globals.nome_da_empresa agradece seu contato \ud83d\udc4b",
+              "type": "send_msg",
+              "uuid": "5df7cd6d-1666-42cc-884f-174eef899b97"
+            },
+            {
+              "groups": [
+                {
+                  "count": 0,
+                  "name": "Satisfeito",
+                  "query": null,
+                  "status": "ready",
+                  "uuid": "a94d2f05-b553-4c3f-b1b5-aa5ddf1b6d1b"
+                }
+              ],
+              "type": "add_contact_groups",
+              "uuid": "97eeb745-a521-4f48-9fd1-09fc29c78dc5"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "a3e6f2c4-c0a2-4cf6-8baf-0e6b0b33d0a5"
+            }
+          ],
+          "uuid": "0947aded-4806-494a-9db0-ee8fbd0d3f95"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Por falta de resposta, estou encerrando nossa conversa. Quando quiser, \u00e9 s\u00f3 falar comigo novamente",
+              "type": "send_msg",
+              "uuid": "1bb04f27-86bb-41ef-9e50-d030c4ff57db"
+            },
+            {
+              "groups": [
+                {
+                  "count": 0,
+                  "name": "Satisfeito",
+                  "query": null,
+                  "status": "ready",
+                  "uuid": "a94d2f05-b553-4c3f-b1b5-aa5ddf1b6d1b"
+                }
+              ],
+              "type": "add_contact_groups",
+              "uuid": "2b6da33f-7323-4a04-a9f7-e64a3e6df5f1"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "e9d7d23c-6568-445a-bb46-93cafb780286"
+            }
+          ],
+          "uuid": "a9f8cf4d-9760-43a0-bbbe-4a0a80e00e3b"
+        },
+        {
+          "actions": [
+            {
+              "body": "{\"call\":\"ListarClientes\",\"app_key\":\"@globals.appkey\",\"app_secret\":\"@globals.appsecret\",\"param\":[{\"pagina\":1,\"registros_por_pagina\":50,\"apenas_importado_api\":\"N\",\"clientesFiltro\":{\"cnpj_cpf\":\"@results.documento\"}}]}",
+              "headers": {
+                "Content-Type": "application/json"
+              },
+              "method": "POST",
+              "result_name": "cliente",
+              "type": "call_webhook",
+              "url": "https://app.omie.com.br/api/v1/geral/clientes/",
+              "uuid": "4bda0a9f-cbba-4a04-9373-e19579be4678"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "ecdfee5a-8160-4564-aa2b-7284d613c545",
+              "uuid": "5e69f690-6069-460d-bf0a-e17646625a5b"
+            },
+            {
+              "destination_uuid": "11ff45ea-d1e5-4a53-b735-3bf5722fc83f",
+              "uuid": "0695ce2e-c1f8-4b22-956a-d9aa84e83b81"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "Success"
+                ],
+                "category_uuid": "0c5adab0-a739-463b-84b4-23d476f9f875",
+                "type": "has_only_text",
+                "uuid": "98f83782-eb95-4b24-9751-7b8784e7e45d"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "5e69f690-6069-460d-bf0a-e17646625a5b",
+                "name": "Success",
+                "uuid": "0c5adab0-a739-463b-84b4-23d476f9f875"
+              },
+              {
+                "exit_uuid": "0695ce2e-c1f8-4b22-956a-d9aa84e83b81",
+                "name": "Failure",
+                "uuid": "402cf4c6-388e-4c05-9ca3-6ab6d40e90b6"
+              }
+            ],
+            "default_category_uuid": "402cf4c6-388e-4c05-9ca3-6ab6d40e90b6",
+            "operand": "@results.cliente.category",
+            "type": "switch"
+          },
+          "uuid": "1596347d-7069-48ee-afee-e51a7b0eec97"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "2304239b-4eb9-4e4f-9700-860ec9c16f43",
+              "uuid": "9f8231d7-734d-466f-b686-61c79bfca959"
+            },
+            {
+              "destination_uuid": "03b00ed4-49f0-4676-8f97-94fa4028cd15",
+              "uuid": "d808e22f-fbc3-4e6f-8110-17c9b9645fed"
+            },
+            {
+              "destination_uuid": "2304239b-4eb9-4e4f-9700-860ec9c16f43",
+              "uuid": "4b45afdc-e539-4599-96e6-7f48a1fff2da"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "email"
+                ],
+                "category_uuid": "d7dc8d84-8aa8-401d-a71c-dd53efd6151f",
+                "type": "has_any_word",
+                "uuid": "9d3e17c4-dd14-4230-9206-8f4d3458df56"
+              },
+              {
+                "arguments": [
+                  "telefone"
+                ],
+                "category_uuid": "c323815f-1569-4a2e-8608-179b5be640ba",
+                "type": "has_any_word",
+                "uuid": "5ccfc340-c860-4973-acf0-dcecbe5ab133"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "9f8231d7-734d-466f-b686-61c79bfca959",
+                "name": "Email",
+                "uuid": "d7dc8d84-8aa8-401d-a71c-dd53efd6151f"
+              },
+              {
+                "exit_uuid": "d808e22f-fbc3-4e6f-8110-17c9b9645fed",
+                "name": "Telefone",
+                "uuid": "c323815f-1569-4a2e-8608-179b5be640ba"
+              },
+              {
+                "exit_uuid": "4b45afdc-e539-4599-96e6-7f48a1fff2da",
+                "name": "Other",
+                "uuid": "f64563af-6f21-4fba-b181-411a1c1b6f14"
+              }
+            ],
+            "default_category_uuid": "f64563af-6f21-4fba-b181-411a1c1b6f14",
+            "operand": "@globals.tipo_credenciamento",
+            "type": "switch"
+          },
+          "uuid": "ecdfee5a-8160-4564-aa2b-7284d613c545"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "a74e267b-ba23-430a-a2b1-c0879e450aac",
+              "uuid": "749e6a87-f415-4a36-9b53-ce2146e3d603"
+            },
+            {
+              "destination_uuid": "03b00ed4-49f0-4676-8f97-94fa4028cd15",
+              "uuid": "1fac2803-0c53-4b0b-a166-f9e4031c4a9d"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [],
+                "category_uuid": "cc553c01-374f-4341-acee-c85a8a885fe0",
+                "type": "has_email",
+                "uuid": "701ea456-627f-455c-824e-1b7048bdfe87"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "749e6a87-f415-4a36-9b53-ce2146e3d603",
+                "name": "Tem Email",
+                "uuid": "cc553c01-374f-4341-acee-c85a8a885fe0"
+              },
+              {
+                "exit_uuid": "1fac2803-0c53-4b0b-a166-f9e4031c4a9d",
+                "name": "Other",
+                "uuid": "e004eaca-bf0a-4637-9f40-31e6990c61da"
+              }
+            ],
+            "default_category_uuid": "e004eaca-bf0a-4637-9f40-31e6990c61da",
+            "operand": "@results.cliente.extra.clientes_cadastro.0.email",
+            "type": "switch"
+          },
+          "uuid": "2304239b-4eb9-4e4f-9700-860ec9c16f43"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "c1b130d7-8823-4961-ae73-2b1d58441c65",
+              "uuid": "1890aad5-9b21-430b-a126-34640c1450fb"
+            },
+            {
+              "destination_uuid": "f9b7f391-091b-4775-9f8c-917ba52dbaeb",
+              "uuid": "d163cfff-7a68-4f13-bae7-51b31bb39ccb"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "N\\u00e3o existem registros para a p\\u00e1gina"
+                ],
+                "category_uuid": "3e75353a-9efe-4c16-8772-df52319c68b3",
+                "type": "has_all_words",
+                "uuid": "743ab250-5ee4-4ae1-9fec-5acddb728a2a"
+              },
+              {
+                "arguments": [
+                  "Nao existem registros para a pagina"
+                ],
+                "category_uuid": "3e75353a-9efe-4c16-8772-df52319c68b3",
+                "type": "has_all_words",
+                "uuid": "7ab631e8-136a-49b6-bfb2-a8eed3c7c3ab"
+              },
+              {
+                "arguments": [
+                  "N\u00e3o existem registros para a pagina"
+                ],
+                "category_uuid": "3e75353a-9efe-4c16-8772-df52319c68b3",
+                "type": "has_all_words",
+                "uuid": "f39f2df0-86f5-49b0-bcf0-5b601dc82c4f"
+              },
+              {
+                "arguments": [
+                  "N\u00e3o existem registros para a p\u00e1gina"
+                ],
+                "category_uuid": "3e75353a-9efe-4c16-8772-df52319c68b3",
+                "type": "has_all_words",
+                "uuid": "b8802f96-480e-425c-aae1-a89f64e4e1f6"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "1890aad5-9b21-430b-a126-34640c1450fb",
+                "name": "Sem registro",
+                "uuid": "3e75353a-9efe-4c16-8772-df52319c68b3"
+              },
+              {
+                "exit_uuid": "d163cfff-7a68-4f13-bae7-51b31bb39ccb",
+                "name": "Other",
+                "uuid": "770e03f1-8ec4-4c12-81ff-6ff1fc84e5b6"
+              }
+            ],
+            "default_category_uuid": "770e03f1-8ec4-4c12-81ff-6ff1fc84e5b6",
+            "operand": "@webhook.faultstring",
+            "type": "switch"
+          },
+          "uuid": "11ff45ea-d1e5-4a53-b735-3bf5722fc83f"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "2792490e-371f-4c7f-938c-efc3072f4a00",
+              "uuid": "f4632c22-f1b5-462f-94cb-5332ba833bb6"
+            },
+            {
+              "destination_uuid": "92696a98-f842-4fab-a7f7-c0d3b359c02c",
+              "uuid": "a4f1c313-94f7-4dd4-9833-fc86b1b252ea"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [],
+                "category_uuid": "f1885dc3-8db1-4a8b-9d88-6ccc428fcc0b",
+                "type": "has_text",
+                "uuid": "ccb7d16b-1dd1-46e1-ac2f-43840f2c8dca"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "f4632c22-f1b5-462f-94cb-5332ba833bb6",
+                "name": "Tem telefone 1",
+                "uuid": "f1885dc3-8db1-4a8b-9d88-6ccc428fcc0b"
+              },
+              {
+                "exit_uuid": "a4f1c313-94f7-4dd4-9833-fc86b1b252ea",
+                "name": "Other",
+                "uuid": "acbfa8ff-35a8-4296-96b6-214df72b5d1e"
+              }
+            ],
+            "default_category_uuid": "acbfa8ff-35a8-4296-96b6-214df72b5d1e",
+            "operand": "@results.cliente.extra.clientes_cadastro.0.telefone1_numero",
+            "type": "switch"
+          },
+          "uuid": "03b00ed4-49f0-4676-8f97-94fa4028cd15"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "c8777fc2-b777-43f8-8b28-05b7800c7a80",
+              "uuid": "e1e2800b-df7f-4dca-b2e8-d8751b1aa839"
+            },
+            {
+              "destination_uuid": "bdde2580-ef83-40a8-a39c-8dbe010c6c36",
+              "uuid": "dd775563-a8fd-4e11-bcbe-b5c61e5426ed"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [],
+                "category_uuid": "46db3ebd-8124-4583-8899-021b2b4d7ebe",
+                "type": "has_text",
+                "uuid": "0af62c48-14c3-470c-a205-3095dccd7f64"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "e1e2800b-df7f-4dca-b2e8-d8751b1aa839",
+                "name": "Tem telefone 2",
+                "uuid": "46db3ebd-8124-4583-8899-021b2b4d7ebe"
+              },
+              {
+                "exit_uuid": "dd775563-a8fd-4e11-bcbe-b5c61e5426ed",
+                "name": "Other",
+                "uuid": "8351a0e9-ebdb-4b12-94df-29cab34accbd"
+              }
+            ],
+            "default_category_uuid": "8351a0e9-ebdb-4b12-94df-29cab34accbd",
+            "operand": "@results.cliente.extra.clientes_cadastro.0.telefone2_numero",
+            "type": "switch"
+          },
+          "uuid": "92696a98-f842-4fab-a7f7-c0d3b359c02c"
+        },
+        {
+          "actions": [
+            {
+              "category": "",
+              "name": "email",
+              "type": "set_run_result",
+              "uuid": "60c4e12e-12ce-46ca-9333-a6991dfc3fcb",
+              "value": "@results.cliente.extra.clientes_cadastro.0.email"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "82640005-c162-4bce-afb1-e729c5244741",
+              "uuid": "788c2c81-9268-4f5a-b3eb-dac1cff6ad40"
+            }
+          ],
+          "uuid": "a74e267b-ba23-430a-a2b1-c0879e450aac"
+        },
+        {
+          "actions": [
+            {
+              "addresses": [
+                "sarah.pinheiro@weni.ai"
+              ],
+              "body": "Documento testado: @results.documento\n\n",
+              "subject": "Erro Credenciamento OMIE Template cristal",
+              "type": "send_email",
+              "uuid": "6d9adb5d-43c7-43d9-bd3c-fa913a0837f3"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "c1b130d7-8823-4961-ae73-2b1d58441c65",
+              "uuid": "2ce6f3bd-e480-4c13-8f42-b24c66c389a2"
+            }
+          ],
+          "uuid": "f9b7f391-091b-4775-9f8c-917ba52dbaeb"
+        },
+        {
+          "actions": [
+            {
+              "category": "",
+              "name": "Telefone",
+              "type": "set_run_result",
+              "uuid": "96251d3a-d49c-4b7b-9692-808e0834c192",
+              "value": "@results.cliente.extra.clientes_cadastro.0.telefone1_numero"
+            },
+            {
+              "category": "",
+              "name": "Telefone",
+              "type": "set_run_result",
+              "uuid": "3a234569-95b8-4496-9dc9-a4806365d01f",
+              "value": "@(replace(results.telefone, \"-\", \"\"))"
+            },
+            {
+              "category": "",
+              "name": "Telefone",
+              "type": "set_run_result",
+              "uuid": "ea47b0ea-cccb-4b2b-9138-3647998d08aa",
+              "value": "@(replace(results.telefone, \" \", \"\"))"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "7c358120-db6f-4706-b85c-6b2a1303f535",
+              "uuid": "6b97ab48-34ca-4c9b-8618-38643139f73d"
+            }
+          ],
+          "uuid": "2792490e-371f-4c7f-938c-efc3072f4a00"
+        },
+        {
+          "actions": [
+            {
+              "category": "",
+              "name": "Telefone",
+              "type": "set_run_result",
+              "uuid": "06f0cf66-d4ec-438e-a009-51bf11b21b26",
+              "value": "@results.cliente.extra.clientes_cadastro.0.telefone2_numero"
+            },
+            {
+              "category": "",
+              "name": "Telefone",
+              "type": "set_run_result",
+              "uuid": "3999baf6-9017-4de9-99ed-b65f31b3d70d",
+              "value": "@(replace(results.telefone, \"-\", \"\"))"
+            },
+            {
+              "category": "",
+              "name": "Telefone",
+              "type": "set_run_result",
+              "uuid": "af1fece3-4219-4bca-a076-fe6c443b08a2",
+              "value": "@(replace(results.telefone, \" \", \"\"))"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "7c358120-db6f-4706-b85c-6b2a1303f535",
+              "uuid": "93fa339c-1719-43ef-8453-af179b280ef8"
+            }
+          ],
+          "uuid": "c8777fc2-b777-43f8-8b28-05b7800c7a80"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "\ud83d\udcde Vi que voc\u00ea n\u00e3o possui telefone cadastrado no sistema, entre em contato com o Financeiro para fazer essa atualiza\u00e7\u00e3o de dados.\n\nN\u00e3o se preocupe, quando seus dados estiverem atualizados, voc\u00ea conseguir\u00e1 utilizar as funcionalidades desse canal.",
+              "type": "send_msg",
+              "uuid": "69a67e13-9ef3-46c6-82d7-681fc8824f6a"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "b2523eec-8118-4ad1-b881-b9f9ffc4786d",
+              "uuid": "fcc6d79d-aff0-4982-be0c-6ab66106d384"
+            }
+          ],
+          "uuid": "bdde2580-ef83-40a8-a39c-8dbe010c6c36"
+        },
+        {
+          "actions": [
+            {
+              "flow": {
+                "name": "Censurador de E-mails",
+                "uuid": "06252155-2f37-4b19-9e9f-90ee0da8065b"
+              },
+              "type": "enter_flow",
+              "uuid": "c6be809e-fc9e-42b7-86b4-8197ca2b5ea8"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "3957a5f5-2635-4840-af21-2923061faecf",
+              "uuid": "d1c4e332-6b76-41fd-9211-254316455387"
+            },
+            {
+              "destination_uuid": null,
+              "uuid": "f8d99479-7319-4de3-90b4-0439f0a85ae5"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "completed"
+                ],
+                "category_uuid": "3af56538-8366-44c0-a580-aad21e4816c5",
+                "type": "has_only_text",
+                "uuid": "a516b7ee-ab42-4d30-9b9f-59971cfe779e"
+              },
+              {
+                "arguments": [
+                  "expired"
+                ],
+                "category_uuid": "c3625c60-9064-4739-848e-4b95c8373375",
+                "type": "has_only_text",
+                "uuid": "59c945d5-03a2-4b64-8036-ad26295c1297"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "d1c4e332-6b76-41fd-9211-254316455387",
+                "name": "Complete",
+                "uuid": "3af56538-8366-44c0-a580-aad21e4816c5"
+              },
+              {
+                "exit_uuid": "f8d99479-7319-4de3-90b4-0439f0a85ae5",
+                "name": "Expired",
+                "uuid": "c3625c60-9064-4739-848e-4b95c8373375"
+              }
+            ],
+            "default_category_uuid": "c3625c60-9064-4739-848e-4b95c8373375",
+            "operand": "@child.status",
+            "type": "switch"
+          },
+          "uuid": "82640005-c162-4bce-afb1-e729c5244741"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "N\u00e3o achei seu cadastro como um Cliente, Fornecedor ou Transportadora no nosso Sistema...",
+              "type": "send_msg",
+              "uuid": "b5dc67f4-f161-4174-bd08-f4e3edcaf47c"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "1cfd6a08-7dda-436d-8e93-4be780ea3ac2",
+              "uuid": "e1e106ab-96a9-4d85-830b-37a02d72be37"
+            }
+          ],
+          "uuid": "c1b130d7-8823-4961-ae73-2b1d58441c65"
+        },
+        {
+          "actions": [
+            {
+              "flow": {
+                "name": "Atendimento Financeiro",
+                "uuid": "60d94960-a32a-4584-a4b3-8f2e50db0bb1"
+              },
+              "type": "enter_flow",
+              "uuid": "b36cff49-bc31-4436-abbc-5f9ffec42563"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "3aaba906-74e7-4421-a917-b785825a48d3"
+            },
+            {
+              "destination_uuid": null,
+              "uuid": "329fc2ea-12f0-40ab-90c6-8a57f091ea6d"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "completed"
+                ],
+                "category_uuid": "8382197b-88d7-4d6b-bc5b-f0db2ee44cee",
+                "type": "has_only_text",
+                "uuid": "f25e5c95-51e5-4afe-b2a3-76dbb362458a"
+              },
+              {
+                "arguments": [
+                  "expired"
+                ],
+                "category_uuid": "49e66642-d76b-449d-906e-3774371a593a",
+                "type": "has_only_text",
+                "uuid": "fcfb81f2-f531-4bdb-bbce-fadc38239c32"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "3aaba906-74e7-4421-a917-b785825a48d3",
+                "name": "Complete",
+                "uuid": "8382197b-88d7-4d6b-bc5b-f0db2ee44cee"
+              },
+              {
+                "exit_uuid": "329fc2ea-12f0-40ab-90c6-8a57f091ea6d",
+                "name": "Expired",
+                "uuid": "49e66642-d76b-449d-906e-3774371a593a"
+              }
+            ],
+            "default_category_uuid": "49e66642-d76b-449d-906e-3774371a593a",
+            "operand": "@child.status",
+            "type": "switch"
+          },
+          "uuid": "b2523eec-8118-4ad1-b881-b9f9ffc4786d"
+        },
+        {
+          "actions": [
+            {
+              "category": "",
+              "name": "email_censurado",
+              "type": "set_run_result",
+              "uuid": "8fadf9f2-e753-4e36-9aee-62f1c9df7bc6",
+              "value": "@child.results.email_censurado"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "ca48ff0e-9e25-4857-b0a7-4429f3c2c956",
+              "uuid": "200aa6f2-7734-4ded-97b0-92ad765106d0"
+            }
+          ],
+          "uuid": "3957a5f5-2635-4840-af21-2923061faecf"
+        },
+        {
+          "actions": [
+            {
+              "all_urns": false,
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Para liberar seu acesso financeiro, confirme os 4 \u00faltimos d\u00edgitos do telefone que termina com * * * @(text_slice(results.telefone,(text_length(results.telefone) -1))).",
+              "type": "send_msg",
+              "uuid": "d24c77c5-08df-467c-a693-dd6f204ea31a"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "bded9fcd-9996-48f7-aa2b-a1f75b700055",
+              "uuid": "0e38ddda-f294-4205-9675-8456d6d81dae"
+            }
+          ],
+          "uuid": "7c358120-db6f-4706-b85c-6b2a1303f535"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Para liberar seu acesso financeiro, confirme o email abaixo que consta no seu cadastro: \n\n\ud83d\udce7 @results.email_censurado \n\n_\u00c9 s\u00f3 escrever o email completo_",
+              "type": "send_msg",
+              "uuid": "b8bccd55-373b-4fc1-8386-0dd0ec707a71"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "690bc83a-3dbb-4952-8e2b-090c769beea9",
+              "uuid": "504c8a2f-a972-4322-8cb1-513444fa5c4c"
+            }
+          ],
+          "uuid": "ca48ff0e-9e25-4857-b0a7-4429f3c2c956"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Por falta de resposta, estou encerrando nossa conversa. Quando quiser, \u00e9 s\u00f3 falar comigo novamente",
+              "type": "send_msg",
+              "uuid": "345cf3a2-acaf-4564-a361-61573210ca3b"
+            },
+            {
+              "groups": [
+                {
+                  "count": 0,
+                  "name": "Satisfeito",
+                  "query": null,
+                  "status": "ready",
+                  "uuid": "a94d2f05-b553-4c3f-b1b5-aa5ddf1b6d1b"
+                }
+              ],
+              "type": "add_contact_groups",
+              "uuid": "611ace6d-fa3d-41d0-a5ce-8b39c65b2c7a"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "ab6aba81-b115-4252-b547-a0bf2cf97d2f"
+            }
+          ],
+          "uuid": "e87eb4bf-cea6-4bf6-86da-e25733b63690"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Por falta de resposta, estou encerrando nossa conversa. Quando quiser, \u00e9 s\u00f3 falar comigo novamente",
+              "type": "send_msg",
+              "uuid": "da5f5bd1-a043-4407-b603-b955a63cae26"
+            },
+            {
+              "groups": [
+                {
+                  "count": 0,
+                  "name": "Satisfeito",
+                  "query": null,
+                  "status": "ready",
+                  "uuid": "a94d2f05-b553-4c3f-b1b5-aa5ddf1b6d1b"
+                }
+              ],
+              "type": "add_contact_groups",
+              "uuid": "37b52678-0766-4c3f-aa9d-2c06b04511bf"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "f0955f9b-4b02-46b2-98ef-9735d42b1178"
+            }
+          ],
+          "uuid": "9316f283-e8d4-442f-9e9d-fe41e2b68fcd"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "3afb7d5c-049a-4bf0-aa19-90a27dbe1f23",
+              "uuid": "3bbb4f5f-ed60-4d71-a4e7-0c8f2276f269"
+            },
+            {
+              "destination_uuid": "cfe39e0c-3036-4355-b955-4e608f25ae13",
+              "uuid": "91a0d5c3-a930-40da-9ab3-8cc22e74f5ff"
+            },
+            {
+              "destination_uuid": "e87eb4bf-cea6-4bf6-86da-e25733b63690",
+              "uuid": "0fa3bef9-d331-4f3a-abbf-2e0695b8a172"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "@(text_slice(results.telefone ,(text_length(results.telefone) -4 )))"
+                ],
+                "category_uuid": "b4ddad83-fbbf-4ef2-b8cb-677c4ae4776f",
+                "type": "has_number_eq",
+                "uuid": "8fecc45b-98ab-423d-a861-231c5e9417ee"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "3bbb4f5f-ed60-4d71-a4e7-0c8f2276f269",
+                "name": "Validado",
+                "uuid": "b4ddad83-fbbf-4ef2-b8cb-677c4ae4776f"
+              },
+              {
+                "exit_uuid": "91a0d5c3-a930-40da-9ab3-8cc22e74f5ff",
+                "name": "Other",
+                "uuid": "3d2c5f43-05a2-4633-9789-b6a3e7cac8d9"
+              },
+              {
+                "exit_uuid": "0fa3bef9-d331-4f3a-abbf-2e0695b8a172",
+                "name": "No Response",
+                "uuid": "06b19f70-70b7-433d-852b-2879409b7910"
+              }
+            ],
+            "default_category_uuid": "3d2c5f43-05a2-4633-9789-b6a3e7cac8d9",
+            "operand": "@input.text",
+            "result_name": "validacao",
+            "type": "switch",
+            "wait": {
+              "timeout": {
+                "category_uuid": "06b19f70-70b7-433d-852b-2879409b7910",
+                "seconds": 3600
+              },
+              "type": "msg"
+            }
+          },
+          "uuid": "bded9fcd-9996-48f7-aa2b-a1f75b700055"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "998abf56-e578-4c2b-a98b-6d7193f0acc1",
+              "uuid": "322dd8ce-7f2b-4a26-a64e-06b987c1705f"
+            },
+            {
+              "destination_uuid": "1ab79b9a-9ded-4a07-8343-51601f14981e",
+              "uuid": "314c3666-b1d5-4c52-b906-adee4624233e"
+            },
+            {
+              "destination_uuid": "9316f283-e8d4-442f-9e9d-fe41e2b68fcd",
+              "uuid": "479efd7f-0ad6-40ce-a600-a65e082b0bc7"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "@results.email"
+                ],
+                "category_uuid": "caabb945-a80f-4e83-99a0-65dc47cfdda0",
+                "type": "has_only_phrase",
+                "uuid": "76fd2952-da88-491a-86cf-ea4175b7c419"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "322dd8ce-7f2b-4a26-a64e-06b987c1705f",
+                "name": "Validado",
+                "uuid": "caabb945-a80f-4e83-99a0-65dc47cfdda0"
+              },
+              {
+                "exit_uuid": "314c3666-b1d5-4c52-b906-adee4624233e",
+                "name": "Other",
+                "uuid": "33549bba-95c7-4db5-b156-4f221eb31fae"
+              },
+              {
+                "exit_uuid": "479efd7f-0ad6-40ce-a600-a65e082b0bc7",
+                "name": "No Response",
+                "uuid": "ae2b1a85-aabf-4393-9b24-36f5c911f0b4"
+              }
+            ],
+            "default_category_uuid": "33549bba-95c7-4db5-b156-4f221eb31fae",
+            "operand": "@input.text",
+            "result_name": "validacao",
+            "type": "switch",
+            "wait": {
+              "timeout": {
+                "category_uuid": "ae2b1a85-aabf-4393-9b24-36f5c911f0b4",
+                "seconds": 3600
+              },
+              "type": "msg"
+            }
+          },
+          "uuid": "690bc83a-3dbb-4952-8e2b-090c769beea9"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "\ud83d\udd13 Seu acesso financeiro foi liberado.",
+              "type": "send_msg",
+              "uuid": "92c7f86e-8741-4b56-a053-1cba57e14fad"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "777c73f8-d925-47a2-aa37-029e46af2f8e",
+              "uuid": "38fad774-4bce-418b-b742-51bc543e9ba9"
+            }
+          ],
+          "uuid": "3afb7d5c-049a-4bf0-aa19-90a27dbe1f23"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [
+                "Est\u00e1 desatualizado",
+                "N\u00e3o \u00e9 meu",
+                "Est\u00e1 certo"
+              ],
+              "text": "\ud83d\udcde Esse n\u00famero de telefone ainda \u00e9 seu? ",
+              "type": "send_msg",
+              "uuid": "63bcc7f0-7021-4419-b234-55ed9010e5cc"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "70c72b9f-91d6-440a-84f7-0bc89f61ad90",
+              "uuid": "07ad6af2-4b92-4c7a-8dd7-bd30c8632609"
+            }
+          ],
+          "uuid": "cfe39e0c-3036-4355-b955-4e608f25ae13"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Esse n\u00e3o \u00e9 o n\u00famero que consta no seu cadastro aqui pra mim...\n\n_Digita somente os 4 \u00faltimos d\u00edgitos_",
+              "type": "send_msg",
+              "uuid": "5dc62689-c550-4b92-88a1-c2dc9f2bc800"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "7c358120-db6f-4706-b85c-6b2a1303f535",
+              "uuid": "82899678-9a99-49fc-bfa8-ea41071b34ef"
+            }
+          ],
+          "uuid": "efaa1dc0-27df-439b-b1a0-88f8ba49c183"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Certo, se este email \u00e9 seu e est\u00e1 atualizado, por favor digite-o por completo para confirmar sua identidade:\n\n\ud83d\udce7 @results.email_censurado \n\n_\u00c9 s\u00f3 escrever o email completo_",
+              "type": "send_msg",
+              "uuid": "9bfaf5c2-4696-46fc-a133-49717bba70e7"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "690bc83a-3dbb-4952-8e2b-090c769beea9",
+              "uuid": "d07698c4-b79b-4765-ab47-7a44f1fc0707"
+            }
+          ],
+          "uuid": "af89349d-b938-4e4a-b104-1acff9f86018"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "\ud83d\udd13 Seu acesso financeiro foi liberado.",
+              "type": "send_msg",
+              "uuid": "fdf70e37-c487-4865-8d82-50d0dac23d5d"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "e25bf952-ed9c-4a95-8f75-1e31bb939471",
+              "uuid": "427f0b32-6cfa-4e6d-8e12-dffc2e967bb3"
+            }
+          ],
+          "uuid": "998abf56-e578-4c2b-a98b-6d7193f0acc1"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [
+                "Est\u00e1 desatualizado",
+                "N\u00e3o \u00e9 meu",
+                "Est\u00e1 certo"
+              ],
+              "text": "\ud83d\udce7 Esse email ainda \u00e9 seu?",
+              "type": "send_msg",
+              "uuid": "92cf8151-3877-4671-9c8e-c6860ef999b9"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "b8f5c8a6-54fb-4d2e-82b3-0a377cdee20c",
+              "uuid": "baf52eae-684a-44fe-8eab-176565181511"
+            }
+          ],
+          "uuid": "1ab79b9a-9ded-4a07-8343-51601f14981e"
+        },
+        {
+          "actions": [
+            {
+              "field": {
+                "key": "email",
+                "name": "Email"
+              },
+              "type": "set_contact_field",
+              "uuid": "ae82a521-df17-4fc9-971f-9dfce4e56da3",
+              "value": "@results.cliente.extra.clientes_cadastro.0.email"
+            },
+            {
+              "name": "@results.cliente.extra.clientes_cadastro.0.nome_fantasia",
+              "type": "set_contact_name",
+              "uuid": "7b6f9d04-c81b-4d58-b528-428d243661c3"
+            },
+            {
+              "field": {
+                "key": "codigo_cliente_omie",
+                "name": "Codigo Cliente Omie"
+              },
+              "type": "set_contact_field",
+              "uuid": "72a3b084-040e-48d4-a6e2-91fa07b2bf37",
+              "value": "@results.cliente.extra.clientes_cadastro.0.codigo_cliente_omie"
+            },
+            {
+              "field": {
+                "key": "documento",
+                "name": "Documento"
+              },
+              "type": "set_contact_field",
+              "uuid": "8e65cbb6-bf51-432b-ad40-43aa0f671013",
+              "value": "@results.cliente.extra.clientes_cadastro.0.cnpj_cpf"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "eba62ce2-1401-4498-95e1-d0062c1b3d49",
+              "uuid": "fca52019-9548-4f9e-a1f0-aafcceceb2a4"
+            }
+          ],
+          "uuid": "777c73f8-d925-47a2-aa37-029e46af2f8e"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "7c2c10d6-f440-412d-a074-c7639b8d67ea",
+              "uuid": "10c7555b-6a23-49df-929c-b9804ebde240"
+            },
+            {
+              "destination_uuid": "efaa1dc0-27df-439b-b1a0-88f8ba49c183",
+              "uuid": "372b58bb-d1ca-4a4b-9b96-df87f9bb6502"
+            },
+            {
+              "destination_uuid": "cf5026a7-6ed9-4075-89f6-bf4ff7de84ae",
+              "uuid": "39986aa5-acca-4a4f-8042-7f986c8f6932"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "N\u00e3o nao n nop nau"
+                ],
+                "category_uuid": "0bacb0c0-89dd-4e45-91dc-08969844dd95",
+                "type": "has_any_word",
+                "uuid": "cfd52c81-584d-4c96-acba-e802eb241846"
+              },
+              {
+                "arguments": [
+                  "desatualizado desatualisado"
+                ],
+                "category_uuid": "0bacb0c0-89dd-4e45-91dc-08969844dd95",
+                "type": "has_any_word",
+                "uuid": "b82dc03c-d31c-42e1-aece-ecb99f6775d9"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "10c7555b-6a23-49df-929c-b9804ebde240",
+                "name": "Desatualizado",
+                "uuid": "0bacb0c0-89dd-4e45-91dc-08969844dd95"
+              },
+              {
+                "exit_uuid": "372b58bb-d1ca-4a4b-9b96-df87f9bb6502",
+                "name": "Other",
+                "uuid": "8a70e47f-2129-4084-9fd0-8defe2d087e0"
+              },
+              {
+                "exit_uuid": "39986aa5-acca-4a4f-8042-7f986c8f6932",
+                "name": "No Response",
+                "uuid": "289dd36f-ff8a-4d61-9b2a-b0624b4e3c78"
+              }
+            ],
+            "default_category_uuid": "8a70e47f-2129-4084-9fd0-8defe2d087e0",
+            "operand": "@input.text",
+            "result_name": "checagem",
+            "type": "switch",
+            "wait": {
+              "timeout": {
+                "category_uuid": "289dd36f-ff8a-4d61-9b2a-b0624b4e3c78",
+                "seconds": 3600
+              },
+              "type": "msg"
+            }
+          },
+          "uuid": "70c72b9f-91d6-440a-84f7-0bc89f61ad90"
+        },
+        {
+          "actions": [
+            {
+              "field": {
+                "key": "email",
+                "name": "Email"
+              },
+              "type": "set_contact_field",
+              "uuid": "ba1f3d0a-950c-4d7c-a4c9-a098feb828cd",
+              "value": "@results.cliente.extra.clientes_cadastro.0.email"
+            },
+            {
+              "name": "@results.cliente.extra.clientes_cadastro.0.nome_fantasia",
+              "type": "set_contact_name",
+              "uuid": "118e6faa-44d1-42f8-93db-c499315fc824"
+            },
+            {
+              "field": {
+                "key": "codigo_cliente_omie",
+                "name": "Codigo Cliente Omie"
+              },
+              "type": "set_contact_field",
+              "uuid": "91a6f3fe-b286-4b6b-9701-1ab0d016a645",
+              "value": "@results.cliente.extra.clientes_cadastro.0.codigo_cliente_omie"
+            },
+            {
+              "field": {
+                "key": "documento",
+                "name": "Documento"
+              },
+              "type": "set_contact_field",
+              "uuid": "02f38e30-20d2-426a-8664-cc26bb8ff03d",
+              "value": "@results.cliente.extra.clientes_cadastro.0.cnpj_cpf"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "debd3f54-ab7c-489f-8144-bd21336439cc",
+              "uuid": "9bacacda-95ed-4079-b956-b479e57d411b"
+            }
+          ],
+          "uuid": "e25bf952-ed9c-4a95-8f75-1e31bb939471"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "ba1a4899-459e-4645-9dec-7cd6d2e2b66e",
+              "uuid": "231b3166-bd05-4b1f-9a00-af5dd5212515"
+            },
+            {
+              "destination_uuid": "af89349d-b938-4e4a-b104-1acff9f86018",
+              "uuid": "7b474b6b-2176-446a-9b3e-624043c72ccf"
+            },
+            {
+              "destination_uuid": "76361010-524d-4bac-b985-8803b6b9992c",
+              "uuid": "32d71192-4386-4b12-b9ab-14385b18e31a"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "n\u00e3o n no nau nao"
+                ],
+                "category_uuid": "1c13352e-77cb-4bf7-8d39-32e61574e15f",
+                "type": "has_any_word",
+                "uuid": "137eda8c-b50a-454e-b762-7adb06cdd0d5"
+              },
+              {
+                "arguments": [
+                  "desatualizado"
+                ],
+                "category_uuid": "1c13352e-77cb-4bf7-8d39-32e61574e15f",
+                "type": "has_any_word",
+                "uuid": "5d12d645-7bbd-41d9-8b0b-d9a3b7d03bf1"
+              },
+              {
+                "arguments": [
+                  "N\u00e3o est\u00e1 atualizado"
+                ],
+                "category_uuid": "1c13352e-77cb-4bf7-8d39-32e61574e15f",
+                "type": "has_all_words",
+                "uuid": "25e12ce3-14df-411b-b500-1dcdf1dacd45"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "231b3166-bd05-4b1f-9a00-af5dd5212515",
+                "name": "Desatualizado",
+                "uuid": "1c13352e-77cb-4bf7-8d39-32e61574e15f"
+              },
+              {
+                "exit_uuid": "7b474b6b-2176-446a-9b3e-624043c72ccf",
+                "name": "Other",
+                "uuid": "275cd91a-e1d7-4580-abdf-403ff646825f"
+              },
+              {
+                "exit_uuid": "32d71192-4386-4b12-b9ab-14385b18e31a",
+                "name": "No Response",
+                "uuid": "2d961f40-0070-4bb6-9c3d-6bd8e3bea955"
+              }
+            ],
+            "default_category_uuid": "275cd91a-e1d7-4580-abdf-403ff646825f",
+            "operand": "@input.text",
+            "result_name": "checagem",
+            "type": "switch",
+            "wait": {
+              "timeout": {
+                "category_uuid": "2d961f40-0070-4bb6-9c3d-6bd8e3bea955",
+                "seconds": 3600
+              },
+              "type": "msg"
+            }
+          },
+          "uuid": "b8f5c8a6-54fb-4d2e-82b3-0a377cdee20c"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "\ud83d\udcde Entendi, como seu telefone est\u00e1 desatualizado, entre em contato com o Financeiro para fazer essa atualiza\u00e7\u00e3o de dados.\n\nN\u00e3o se preocupe, quando seus dados estiverem atualizados, voc\u00ea conseguir\u00e1 utilizar as funcionalidades desse canal.",
+              "type": "send_msg",
+              "uuid": "9f03a25b-57e6-4601-b193-66c9c196b8bb"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "3b4fad54-7c40-410f-9579-0417c5425248",
+              "uuid": "ca724039-0d39-43ad-8a11-2487ba3a826a"
+            }
+          ],
+          "uuid": "7c2c10d6-f440-412d-a074-c7639b8d67ea"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Por falta de resposta, estou encerrando nossa conversa. Quando quiser, \u00e9 s\u00f3 falar comigo novamente",
+              "type": "send_msg",
+              "uuid": "3fe90fc7-a8ff-4668-b713-2b1bb0ce9e6d"
+            },
+            {
+              "groups": [
+                {
+                  "count": 0,
+                  "name": "Satisfeito",
+                  "query": null,
+                  "status": "ready",
+                  "uuid": "a94d2f05-b553-4c3f-b1b5-aa5ddf1b6d1b"
+                }
+              ],
+              "type": "add_contact_groups",
+              "uuid": "f3e1ca55-d3a0-4556-bbb2-5f5845febe10"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "9dd55ba2-7045-4dd4-a0aa-c03c2bbda40a"
+            }
+          ],
+          "uuid": "cf5026a7-6ed9-4075-89f6-bf4ff7de84ae"
+        },
+        {
+          "actions": [
+            {
+              "all_groups": false,
+              "groups": [
+                {
+                  "name": "Satisfeito",
+                  "uuid": "a94d2f05-b553-4c3f-b1b5-aa5ddf1b6d1b"
+                }
+              ],
+              "type": "remove_contact_groups",
+              "uuid": "e4feb7a9-a65c-4425-93bb-d221d8e5eb27"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "5c55e389-0800-4958-ba8a-a01236faba78"
+            }
+          ],
+          "uuid": "eba62ce2-1401-4498-95e1-d0062c1b3d49"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Ent\u00e3o vamos tentar fazer uma valida\u00e7\u00e3o pelo seu n\u00famero de telefone cadastrado",
+              "type": "send_msg",
+              "uuid": "860db750-fab3-41e6-bf46-5312160002c1"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "03b00ed4-49f0-4676-8f97-94fa4028cd15",
+              "uuid": "24689865-6f24-43c9-a71d-202c53bbe9c0"
+            }
+          ],
+          "uuid": "ba1a4899-459e-4645-9dec-7cd6d2e2b66e"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Por falta de resposta, estou encerrando nossa conversa. Quando quiser, \u00e9 s\u00f3 falar comigo novamente",
+              "type": "send_msg",
+              "uuid": "8b625b57-1abf-4609-ac10-663d2ee474b4"
+            },
+            {
+              "groups": [
+                {
+                  "count": 0,
+                  "name": "Satisfeito",
+                  "query": null,
+                  "status": "ready",
+                  "uuid": "a94d2f05-b553-4c3f-b1b5-aa5ddf1b6d1b"
+                }
+              ],
+              "type": "add_contact_groups",
+              "uuid": "d985c5df-c477-4c4d-8bbe-82fe407b5794"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "9a2fdca6-7c9b-4352-96a0-a8418db20cd2"
+            }
+          ],
+          "uuid": "76361010-524d-4bac-b985-8803b6b9992c"
+        },
+        {
+          "actions": [
+            {
+              "all_groups": false,
+              "groups": [
+                {
+                  "name": "Satisfeito",
+                  "uuid": "a94d2f05-b553-4c3f-b1b5-aa5ddf1b6d1b"
+                }
+              ],
+              "type": "remove_contact_groups",
+              "uuid": "b1b7ba26-b351-4878-8406-35af5a03f258"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "401c1c4c-7d0e-47f3-9afa-1259fba16667"
+            }
+          ],
+          "uuid": "debd3f54-ab7c-489f-8144-bd21336439cc"
+        },
+        {
+          "actions": [
+            {
+              "flow": {
+                "name": "Atendimento Financeiro",
+                "uuid": "60d94960-a32a-4584-a4b3-8f2e50db0bb1"
+              },
+              "type": "enter_flow",
+              "uuid": "4370bed1-6926-4ba3-b94e-ffac43a3bb1f"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "99f9d055-bda3-4a0d-a7b0-331d97c1d6da"
+            },
+            {
+              "destination_uuid": null,
+              "uuid": "86723983-016b-42b7-b4ff-a9181dd9c185"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "completed"
+                ],
+                "category_uuid": "b94a35f8-d17f-4a68-8184-e7ca280499da",
+                "type": "has_only_text",
+                "uuid": "8e3e919e-21dd-49fb-bd68-82f8d4b6f449"
+              },
+              {
+                "arguments": [
+                  "expired"
+                ],
+                "category_uuid": "5c206308-81a7-4ece-ae22-9fd7fedc16b5",
+                "type": "has_only_text",
+                "uuid": "adf4e082-1ddd-4dd3-aaf3-1b2fef25a855"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "99f9d055-bda3-4a0d-a7b0-331d97c1d6da",
+                "name": "Complete",
+                "uuid": "b94a35f8-d17f-4a68-8184-e7ca280499da"
+              },
+              {
+                "exit_uuid": "86723983-016b-42b7-b4ff-a9181dd9c185",
+                "name": "Expired",
+                "uuid": "5c206308-81a7-4ece-ae22-9fd7fedc16b5"
+              }
+            ],
+            "default_category_uuid": "5c206308-81a7-4ece-ae22-9fd7fedc16b5",
+            "operand": "@child.status",
+            "type": "switch"
+          },
+          "uuid": "3b4fad54-7c40-410f-9579-0417c5425248"
+        }
+      ],
+      "spec_version": "13.1.0",
+      "type": "messaging",
+      "uuid": "9f0defeb-2c3e-46ee-a49d-dedadb926926",
+      "revision": 2
+    },
+    {
+      "_ui": {
+        "nodes": {
+          "2423e352-783c-41b6-889d-4a297b3ab739": {
+            "position": {
+              "left": 160,
+              "top": 40
+            },
+            "type": "execute_actions"
+          },
+          "f9e6a3a7-072b-4922-953a-f9066cb7794b": {
+            "position": {
+              "left": 160,
+              "top": 220
+            },
+            "type": "execute_actions"
+          }
+        }
+      },
+      "expire_after_minutes": 10080,
+      "language": "base",
+      "localization": {},
+      "metadata": {
+        "expires": 10080
+      },
+      "name": "Inatividade",
+      "nodes": [
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Como voc\u00ea parou de responder, finalizei seu atendimento. Mas sempre que precisar \u00e9 s\u00f3 falar comigo \ud83d\udc4b",
+              "type": "send_msg",
+              "uuid": "298d82f4-e3f8-47d0-a9e6-73d31ae0deae"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "f9e6a3a7-072b-4922-953a-f9066cb7794b",
+              "uuid": "013a1c56-26b1-4738-91b1-393bbf5b3f9b"
+            }
+          ],
+          "uuid": "2423e352-783c-41b6-889d-4a297b3ab739"
+        },
+        {
+          "actions": [
+            {
+              "groups": [
+                {
+                  "count": 0,
+                  "name": "Satisfeito",
+                  "query": null,
+                  "status": "ready",
+                  "uuid": "a94d2f05-b553-4c3f-b1b5-aa5ddf1b6d1b"
+                }
+              ],
+              "type": "add_contact_groups",
+              "uuid": "d50762e6-cad7-4de4-bd30-5b021fb4e599"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "da1fae1c-ed76-4f1a-be84-94c3ec152184"
+            }
+          ],
+          "uuid": "f9e6a3a7-072b-4922-953a-f9066cb7794b"
+        }
+      ],
+      "spec_version": "13.1.0",
+      "type": "messaging",
+      "uuid": "b91a8f96-c25e-4121-b645-baa29d6b2e32",
+      "revision": 1
+    },
+    {
+      "_ui": {
+        "nodes": {
+          "24b75074-dfbc-462d-bc7f-d47e64216e24": {
+            "position": {
+              "left": 60,
+              "top": 0
+            },
+            "type": "execute_actions"
+          },
+          "411f466f-1561-4aa5-bd03-501069e571fb": {
+            "position": {
+              "left": 380,
+              "top": 260
+            },
+            "type": "execute_actions"
+          },
+          "51e6ec34-6cce-4f59-a043-f109a93ce50b": {
+            "position": {
+              "left": 380,
+              "top": 0
+            },
+            "type": "execute_actions"
+          },
+          "a7f23b0e-d534-48fc-9355-9ed8f3600681": {
+            "position": {
+              "left": 660,
+              "top": 0
+            },
+            "type": "execute_actions"
+          },
+          "eb95c0ae-9f32-45cf-a427-e1262aff7879": {
+            "position": {
+              "left": 380,
+              "top": 120
+            },
+            "type": "execute_actions"
+          }
+        }
+      },
+      "expire_after_minutes": 10080,
+      "language": "base",
+      "localization": {},
+      "metadata": {
+        "expires": 10080
+      },
+      "name": "Financeiro - Censurador de E-mail",
+      "nodes": [
+        {
+          "actions": [
+            {
+              "category": "",
+              "name": "email",
+              "type": "set_run_result",
+              "uuid": "83441db6-f252-4f66-aea5-fb78173979c7",
+              "value": "@parent.results.email"
+            },
+            {
+              "category": "",
+              "name": "servidor do email",
+              "type": "set_run_result",
+              "uuid": "d18dfc2a-60c5-458d-85c9-d02d47042753",
+              "value": "@(\"@\"&field(results.email, 1, \"@\"))"
+            },
+            {
+              "category": "",
+              "name": "contador de caracteres",
+              "type": "set_run_result",
+              "uuid": "3a8a07e2-48ac-471d-a414-d3b2a8df14e2",
+              "value": "@(text_length(field(results.email, 0, \"@\")))"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "51e6ec34-6cce-4f59-a043-f109a93ce50b",
+              "uuid": "e0cf2cd7-acd1-482f-b498-9e37ba120dd0"
+            }
+          ],
+          "uuid": "24b75074-dfbc-462d-bc7f-d47e64216e24"
+        },
+        {
+          "actions": [
+            {
+              "category": "",
+              "name": "primeira parte email",
+              "type": "set_run_result",
+              "uuid": "e6aa6052-2730-4771-bf92-e2a754c1c5a5",
+              "value": "@(field(results.email, 0, \"@\"))"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "eb95c0ae-9f32-45cf-a427-e1262aff7879",
+              "uuid": "7ad86a83-a925-48cb-8c30-bcbad6a3e6d5"
+            }
+          ],
+          "uuid": "51e6ec34-6cce-4f59-a043-f109a93ce50b"
+        },
+        {
+          "actions": [
+            {
+              "category": "",
+              "name": "email_censurado",
+              "type": "set_run_result",
+              "uuid": "706e2084-82fe-4df1-9b06-5fdc8f86bdea",
+              "value": "@results.asteriscos@results.ultimos_caracteres_exibidos@results.servidor_do_email"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "8d2da496-90d6-44c2-b9a3-665f69e56c6f"
+            }
+          ],
+          "uuid": "a7f23b0e-d534-48fc-9355-9ed8f3600681"
+        },
+        {
+          "actions": [
+            {
+              "category": "",
+              "name": "asteriscos",
+              "type": "set_run_result",
+              "uuid": "f6731c41-2c3b-408a-8610-f9c73a5c20a9",
+              "value": "@(repeat(\"* \", ((results.contador_de_caracteres - 2))))"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "411f466f-1561-4aa5-bd03-501069e571fb",
+              "uuid": "c9187d73-84b9-4559-935c-48edc2c5c03c"
+            }
+          ],
+          "uuid": "eb95c0ae-9f32-45cf-a427-e1262aff7879"
+        },
+        {
+          "actions": [
+            {
+              "category": "",
+              "name": "ultimos caracteres exibidos",
+              "type": "set_run_result",
+              "uuid": "2a5d160c-b104-4c08-a3c1-b04267d13a1e",
+              "value": "@(text_slice(results.primeira_parte_email, -2))"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "a7f23b0e-d534-48fc-9355-9ed8f3600681",
+              "uuid": "6a115f08-6d7d-47b4-9cdb-db4db966e838"
+            }
+          ],
+          "uuid": "411f466f-1561-4aa5-bd03-501069e571fb"
+        }
+      ],
+      "spec_version": "13.1.0",
+      "type": "messaging",
+      "uuid": "06252155-2f37-4b19-9e9f-90ee0da8065b",
+      "revision": 1
+    },
+    {
+      "_ui": {
+        "nodes": {
+          "c1a9d5c6-b893-4f13-87b2-1af4a1e2d162": {
+            "position": {
+              "left": 580,
+              "top": 20
+            },
+            "type": "execute_actions"
+          },
+          "ef991c4e-6722-4599-ae6c-ebf7821bae46": {
+            "position": {
+              "left": 580,
+              "top": 360
+            },
+            "type": "execute_actions"
+          },
+          "ab754da6-7498-4467-a693-0f9a341a5465": {
+            "type": "wait_for_response",
+            "position": {
+              "left": 400,
+              "top": 580
+            },
+            "config": {
+              "cases": {}
+            }
+          },
+          "2346a25d-d70a-4107-8693-94605d2a87b0": {
+            "config": {},
+            "position": {
+              "left": 1160,
+              "top": 600
+            },
+            "type": "split_by_subflow"
+          },
+          "c4470382-2521-45d6-84c3-bf1b5b8e2fa4": {
+            "type": "split_by_intent",
+            "position": {
+              "left": 1000,
+              "top": 820
+            },
+            "config": {}
+          },
+          "ab2fe232-252a-47ef-86ad-c32e33d18640": {
+            "config": {},
+            "position": {
+              "left": 240,
+              "top": 1060
+            },
+            "type": "split_by_subflow"
+          },
+          "30d83415-4e3b-4ea9-977a-bb29852037bd": {
+            "config": {},
+            "position": {
+              "left": 480,
+              "top": 1060
+            },
+            "type": "split_by_subflow"
+          },
+          "4420e371-b44d-447b-86d0-55ea29172877": {
+            "config": {},
+            "position": {
+              "left": 720,
+              "top": 1060
+            },
+            "type": "split_by_subflow"
+          },
+          "d7fd6877-8a48-4b2b-8ff6-ef5ca7909623": {
+            "config": {},
+            "position": {
+              "left": 1120,
+              "top": 1120
+            },
+            "type": "split_by_subflow"
+          },
+          "a96bb195-af71-472a-8ba7-18f8b863ac04": {
+            "position": {
+              "left": 1380,
+              "top": 1120
+            },
+            "type": "execute_actions"
+          },
+          "07fdcc24-ae81-4b74-af68-e44184ff6d99": {
+            "config": {},
+            "position": {
+              "left": 1120,
+              "top": 1300
+            },
+            "type": "split_by_subflow"
+          },
+          "f0cec545-e8cc-4e06-9972-5e9c9936a94b": {
+            "type": "split_by_groups",
+            "position": {
+              "left": 740,
+              "top": 1400
+            },
+            "config": {
+              "cases": {}
+            }
+          },
+          "d71bd3ee-6490-41d8-9761-4f3c1ac8e0a6": {
+            "position": {
+              "left": 740,
+              "top": 1540
+            },
+            "type": "execute_actions"
+          }
+        },
+        "stickies": {
+          "3e7136c2-46d2-48ce-932c-a5dd97d54935": {
+            "body": "Substitua pelo seu fluxo que abre atendimento humano. ",
+            "color": "purple",
+            "position": {
+              "left": 760,
+              "top": 1200,
+              "right": 340,
+              "bottom": -640
+            },
+            "title": "Atendimento Financeiro"
+          },
+          "5b8b246f-0dc8-483d-ae76-2672849c05ad": {
+            "body": "Aqui enviamos uma mensagem de boas vindas que pode ser personalizada. Atualmente usamos vari\u00e1veis globais para enviar o nome da empresa e do bot.",
+            "color": "purple",
+            "position": {
+              "left": 320,
+              "top": 60
+            },
+            "title": "Boas vindas"
+          },
+          "671caadf-6523-4c08-a000-401898671ca0": {
+            "body": "\u00c9 o fluxo que apaga o credenciamento feito pelo usuario, quando o mesmo enviar SAIR",
+            "color": "purple",
+            "position": {
+              "left": 1400,
+              "top": 1300,
+              "right": 220,
+              "bottom": -560
+            },
+            "title": "Apaga dados do cliente Financeiro"
+          },
+          "67946079-36ec-406a-ab2f-9451b80a3283": {
+            "body": "Esse \u00e9 o fluxo que envia a segunda via para o usu\u00e1rio que j\u00e1 \u00e9 cliente",
+            "color": "purple",
+            "position": {
+              "left": 240,
+              "top": 1220,
+              "right": 80,
+              "bottom": -620
+            },
+            "title": "Financeiro - Segunda via"
+          },
+          "6ad895c8-3fa9-48fc-8290-fe946296e894": {
+            "body": "Se o usu\u00e1rio for cliente, enviamos um submenu com op\u00e7\u00f5es. Esse menu \u00e9 personalizado, s\u00f3 lembre de personalizar tamb\u00e9m o card \"Aguarde por resposta\"",
+            "color": "purple",
+            "position": {
+              "left": 360,
+              "top": 360,
+              "right": 80,
+              "bottom": -580
+            },
+            "title": "Se o usuario for cliente"
+          },
+          "fa415aa2-c9ed-4377-af1d-d50c1959299a": {
+            "body": "Para categoria other ou sair, chamamos a intelig\u00eancia da cristal para saber sobre o que o cliente est\u00e1 falando e tratar no fluxo. O tratamento pode ser personalizado de acordo com sua necessidade.",
+            "color": "purple",
+            "position": {
+              "left": 1440,
+              "top": 800,
+              "right": 380,
+              "bottom": -580
+            },
+            "title": "Dividir por inten\u00e7\u00e3o"
+          }
+        }
+      },
+      "expire_after_minutes": 10080,
+      "language": "base",
+      "localization": {},
+      "metadata": {
+        "expires": 10080
+      },
+      "name": "Fluxo Principal",
+      "nodes": [
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Ol\u00e1, sou a @globals.nome_do_bot, assistente de atendimento da @globals.nome_da_empresa \ud83d\ude0a\n\nHoje \u00e9 um dia especial...",
+              "type": "send_msg",
+              "uuid": "2c24c148-446c-485f-be9d-c68bdc75a246"
+            },
+            {
+              "all_groups": false,
+              "groups": [
+                {
+                  "name": "Satisfeito",
+                  "uuid": "a94d2f05-b553-4c3f-b1b5-aa5ddf1b6d1b"
+                }
+              ],
+              "type": "remove_contact_groups",
+              "uuid": "d6810c55-0d16-40f7-b942-618a3dec55fb"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "ef991c4e-6722-4599-ae6c-ebf7821bae46",
+              "uuid": "5a000050-0e80-46c6-9df4-6c2e6e8f9cf4"
+            }
+          ],
+          "uuid": "c1a9d5c6-b893-4f13-87b2-1af4a1e2d162"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [
+                "2\u00aa via de boletos",
+                "Falar com Financeiro",
+                "D\u00favidas Financeiras"
+              ],
+              "text": "O que voc\u00ea deseja?",
+              "type": "send_msg",
+              "uuid": "2f51a46f-f995-4b4e-866f-9dad590e818a"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "ab754da6-7498-4467-a693-0f9a341a5465",
+              "uuid": "43abb566-ba04-472c-aa3b-9f7eb4890d92"
+            }
+          ],
+          "uuid": "ef991c4e-6722-4599-ae6c-ebf7821bae46"
+        },
+        {
+          "uuid": "ab754da6-7498-4467-a693-0f9a341a5465",
+          "actions": [],
+          "router": {
+            "type": "switch",
+            "default_category_uuid": "ac8af9f9-ece6-40a6-8cd6-0bf0bd30dbbc",
+            "cases": [
+              {
+                "arguments": [
+                  "1"
+                ],
+                "type": "has_any_word",
+                "uuid": "ccc839d3-b529-4ff2-8019-037eaa437fe5",
+                "category_uuid": "e5b4a533-e601-43ca-aae8-18047e383c2e"
+              },
+              {
+                "arguments": [
+                  "2\u00aa via de boletos"
+                ],
+                "type": "has_all_words",
+                "uuid": "6d19e5a5-1f3b-4fd2-969f-c0bf9fb2f201",
+                "category_uuid": "e5b4a533-e601-43ca-aae8-18047e383c2e"
+              },
+              {
+                "arguments": [
+                  "3 duvidas d\u00favida d\u00favidas duvida"
+                ],
+                "type": "has_any_word",
+                "uuid": "352daec9-3890-4e3b-8fb5-1abb8212fc41",
+                "category_uuid": "bf91c528-4cec-4ad4-87ae-7ca228463655"
+              },
+              {
+                "arguments": [
+                  "2 financeiro"
+                ],
+                "type": "has_any_word",
+                "uuid": "41ffd690-27d2-4d2a-b131-207f5a5ce08d",
+                "category_uuid": "1e5ade15-d2bf-4ae4-bebd-0f19fe752923"
+              },
+              {
+                "arguments": [
+                  "encerrar conversa"
+                ],
+                "type": "has_all_words",
+                "uuid": "2ef7349c-6b23-4d36-b348-3a5914fd49ac",
+                "category_uuid": "d13093be-2f90-4a2a-817e-76ab72d1c0e1"
+              },
+              {
+                "arguments": [
+                  "sair"
+                ],
+                "type": "has_any_word",
+                "uuid": "28e04689-88c5-4191-96c9-a14973a6f1bd",
+                "category_uuid": "d13093be-2f90-4a2a-817e-76ab72d1c0e1"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "1c2c865f-03b2-4584-823a-8c2566af24fa",
+                "name": "2\u00aa via de boletos",
+                "uuid": "e5b4a533-e601-43ca-aae8-18047e383c2e"
+              },
+              {
+                "exit_uuid": "4fdc8039-3030-48bb-aae9-e66b8f42a64d",
+                "name": "D\u00favidas financeiras",
+                "uuid": "bf91c528-4cec-4ad4-87ae-7ca228463655"
+              },
+              {
+                "exit_uuid": "dfdc62ea-b60f-4388-9de1-f289fe771a18",
+                "name": "Financeiro",
+                "uuid": "1e5ade15-d2bf-4ae4-bebd-0f19fe752923"
+              },
+              {
+                "exit_uuid": "ab473e23-7529-43b1-8d9c-b000e8fd9a24",
+                "name": "Sair",
+                "uuid": "d13093be-2f90-4a2a-817e-76ab72d1c0e1"
+              },
+              {
+                "exit_uuid": "de441cea-510d-4714-b46b-5f240718ba54",
+                "name": "Other",
+                "uuid": "ac8af9f9-ece6-40a6-8cd6-0bf0bd30dbbc"
+              },
+              {
+                "exit_uuid": "2850f79c-be85-4e88-bc24-f6015222cb7b",
+                "name": "No Response",
+                "uuid": "f53d852c-7f06-44d2-a88e-ccddcfcccf49"
+              }
+            ],
+            "operand": "@input.text",
+            "wait": {
+              "type": "msg",
+              "timeout": {
+                "seconds": 3600,
+                "category_uuid": "f53d852c-7f06-44d2-a88e-ccddcfcccf49"
+              }
+            },
+            "result_name": "solicitacao"
+          },
+          "exits": [
+            {
+              "destination_uuid": "ab2fe232-252a-47ef-86ad-c32e33d18640",
+              "uuid": "1c2c865f-03b2-4584-823a-8c2566af24fa"
+            },
+            {
+              "destination_uuid": "30d83415-4e3b-4ea9-977a-bb29852037bd",
+              "uuid": "4fdc8039-3030-48bb-aae9-e66b8f42a64d"
+            },
+            {
+              "destination_uuid": "4420e371-b44d-447b-86d0-55ea29172877",
+              "uuid": "dfdc62ea-b60f-4388-9de1-f289fe771a18"
+            },
+            {
+              "destination_uuid": "c4470382-2521-45d6-84c3-bf1b5b8e2fa4",
+              "uuid": "ab473e23-7529-43b1-8d9c-b000e8fd9a24"
+            },
+            {
+              "destination_uuid": "c4470382-2521-45d6-84c3-bf1b5b8e2fa4",
+              "uuid": "de441cea-510d-4714-b46b-5f240718ba54"
+            },
+            {
+              "destination_uuid": "2346a25d-d70a-4107-8693-94605d2a87b0",
+              "uuid": "2850f79c-be85-4e88-bc24-f6015222cb7b"
+            }
+          ]
+        },
+        {
+          "actions": [
+            {
+              "flow": {
+                "name": "Inatividade",
+                "uuid": "b91a8f96-c25e-4121-b645-baa29d6b2e32"
+              },
+              "type": "enter_flow",
+              "uuid": "55a5e937-ab79-43d0-83bf-aa65b7394344"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "acdf7a30-b532-4bba-a693-edcc5e1ff881"
+            },
+            {
+              "destination_uuid": null,
+              "uuid": "61ee05c0-af0c-4d8a-8ff6-ced2791a88bc"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "completed"
+                ],
+                "category_uuid": "b155b4fc-029a-48e2-857e-043352338a67",
+                "type": "has_only_text",
+                "uuid": "d7e20ec0-aa72-49ec-b2dd-05f1c6a8ed54"
+              },
+              {
+                "arguments": [
+                  "expired"
+                ],
+                "category_uuid": "98309b7a-fa08-4437-9e00-ec42ec445902",
+                "type": "has_only_text",
+                "uuid": "fd5ec6fa-064b-4895-a542-f5770a20bf9c"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "acdf7a30-b532-4bba-a693-edcc5e1ff881",
+                "name": "Complete",
+                "uuid": "b155b4fc-029a-48e2-857e-043352338a67"
+              },
+              {
+                "exit_uuid": "61ee05c0-af0c-4d8a-8ff6-ced2791a88bc",
+                "name": "Expired",
+                "uuid": "98309b7a-fa08-4437-9e00-ec42ec445902"
+              }
+            ],
+            "default_category_uuid": "98309b7a-fa08-4437-9e00-ec42ec445902",
+            "operand": "@child.status",
+            "type": "switch"
+          },
+          "uuid": "2346a25d-d70a-4107-8693-94605d2a87b0"
+        },
+        {
+          "uuid": "c4470382-2521-45d6-84c3-bf1b5b8e2fa4",
+          "actions": [
+            {
+              "uuid": "3e3d4fb3-77f7-4c74-b1cf-f91657b80206",
+              "type": "call_classifier",
+              "result_name": "_Result Classification",
+              "input": "@input.text",
+              "classifier": {
+                "uuid": "84fa7b0b-2c78-4ef2-b8b7-b9a540433c99",
+                "name": "Cristal"
+              }
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "consultar",
+                  ".9"
+                ],
+                "type": "has_top_intent",
+                "uuid": "901d89b1-4ba4-462f-a258-00c700c55baf",
+                "category_uuid": "54e5dd48-4f7f-48df-a5c5-5f60645f3ebd"
+              },
+              {
+                "arguments": [
+                  "segunda_via",
+                  ".9"
+                ],
+                "type": "has_top_intent",
+                "uuid": "b447caa2-b2df-4937-84ef-c3b7685c1a97",
+                "category_uuid": "54e5dd48-4f7f-48df-a5c5-5f60645f3ebd"
+              },
+              {
+                "arguments": [
+                  "atendimento",
+                  ".9"
+                ],
+                "type": "has_top_intent",
+                "uuid": "969b2c4b-710a-4d4c-90c4-040589e1afa5",
+                "category_uuid": "e6f2847b-fbb0-4369-b64f-98d43670b279"
+              },
+              {
+                "arguments": [
+                  "encerrar",
+                  ".9"
+                ],
+                "type": "has_top_intent",
+                "uuid": "884b2d29-ee7a-486f-82b6-d126a5fe8664",
+                "category_uuid": "aacdf48b-1627-42c5-82a8-005bc8ec2ec1"
+              },
+              {
+                "arguments": [
+                  "negativo",
+                  ".9"
+                ],
+                "type": "has_top_intent",
+                "uuid": "4ee90a21-b321-47b0-b373-083954366222",
+                "category_uuid": "aacdf48b-1627-42c5-82a8-005bc8ec2ec1"
+              },
+              {
+                "arguments": [
+                  "Success",
+                  "Skipped"
+                ],
+                "category_uuid": "0ce934ae-0ac9-4f3b-ac45-79ec95952c37",
+                "type": "has_category",
+                "uuid": "323142cd-4916-4aa1-be49-c7ebd5546a77"
+              }
+            ],
+            "operand": "@results._result_classification",
+            "categories": [
+              {
+                "exit_uuid": "27b758bd-0341-4a56-b069-ec090f2a5924",
+                "name": "Segunda Via",
+                "uuid": "54e5dd48-4f7f-48df-a5c5-5f60645f3ebd"
+              },
+              {
+                "exit_uuid": "c1c41d39-8de3-4428-a2cb-c94f47edec76",
+                "name": "Atendimento",
+                "uuid": "e6f2847b-fbb0-4369-b64f-98d43670b279"
+              },
+              {
+                "exit_uuid": "72df75eb-cace-454d-8849-f71e02625cbd",
+                "name": "Encerrar",
+                "uuid": "aacdf48b-1627-42c5-82a8-005bc8ec2ec1"
+              },
+              {
+                "exit_uuid": "00ac6843-86bd-4253-965b-9e0014d083bb",
+                "name": "Other",
+                "uuid": "0ce934ae-0ac9-4f3b-ac45-79ec95952c37"
+              },
+              {
+                "exit_uuid": "93586e45-6208-4279-b678-d7b8798376cc",
+                "name": "Failure",
+                "uuid": "74858002-b9ea-48fb-8b77-f2a9459196fc"
+              }
+            ],
+            "type": "switch",
+            "default_category_uuid": "74858002-b9ea-48fb-8b77-f2a9459196fc",
+            "result_name": "Result"
+          },
+          "exits": [
+            {
+              "destination_uuid": "ab2fe232-252a-47ef-86ad-c32e33d18640",
+              "uuid": "27b758bd-0341-4a56-b069-ec090f2a5924"
+            },
+            {
+              "destination_uuid": "4420e371-b44d-447b-86d0-55ea29172877",
+              "uuid": "c1c41d39-8de3-4428-a2cb-c94f47edec76"
+            },
+            {
+              "destination_uuid": "d7fd6877-8a48-4b2b-8ff6-ef5ca7909623",
+              "uuid": "72df75eb-cace-454d-8849-f71e02625cbd"
+            },
+            {
+              "destination_uuid": "a96bb195-af71-472a-8ba7-18f8b863ac04",
+              "uuid": "00ac6843-86bd-4253-965b-9e0014d083bb"
+            },
+            {
+              "destination_uuid": "a96bb195-af71-472a-8ba7-18f8b863ac04",
+              "uuid": "93586e45-6208-4279-b678-d7b8798376cc"
+            }
+          ]
+        },
+        {
+          "actions": [
+            {
+              "flow": {
+                "name": "Financeiro - Segunda via",
+                "uuid": "d1c6f02f-c58a-48a8-88df-4040b3ed35d7"
+              },
+              "type": "enter_flow",
+              "uuid": "bb4285dc-bb0c-4044-959d-6495a3121cea"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "f0cec545-e8cc-4e06-9972-5e9c9936a94b",
+              "uuid": "ce7ddc89-6172-4d41-b47e-2c14183ad907"
+            },
+            {
+              "destination_uuid": null,
+              "uuid": "dca58df8-df43-4d7a-a915-03307da98ed1"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "completed"
+                ],
+                "category_uuid": "1ce7a7a8-28bd-40a1-87b4-ab7ab30b51b5",
+                "type": "has_only_text",
+                "uuid": "c3be04d9-699f-4d94-8f21-31222285171b"
+              },
+              {
+                "arguments": [
+                  "expired"
+                ],
+                "category_uuid": "c5081626-5f80-4100-808b-89fdb48c4808",
+                "type": "has_only_text",
+                "uuid": "e43b0e16-8d80-4b93-a161-2f612f5c44cc"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "ce7ddc89-6172-4d41-b47e-2c14183ad907",
+                "name": "Complete",
+                "uuid": "1ce7a7a8-28bd-40a1-87b4-ab7ab30b51b5"
+              },
+              {
+                "exit_uuid": "dca58df8-df43-4d7a-a915-03307da98ed1",
+                "name": "Expired",
+                "uuid": "c5081626-5f80-4100-808b-89fdb48c4808"
+              }
+            ],
+            "default_category_uuid": "c5081626-5f80-4100-808b-89fdb48c4808",
+            "operand": "@child.status",
+            "type": "switch"
+          },
+          "uuid": "ab2fe232-252a-47ef-86ad-c32e33d18640"
+        },
+        {
+          "actions": [
+            {
+              "flow": {
+                "name": "ChatGPT",
+                "uuid": "b9381b7f-a2e3-4a54-b810-d9b1dcf768bb"
+              },
+              "type": "enter_flow",
+              "uuid": "b2faf030-ef0d-4738-9d12-a36816b2b87d"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "f0cec545-e8cc-4e06-9972-5e9c9936a94b",
+              "uuid": "891b0285-01f4-449f-808c-2f4ee19f94d9"
+            },
+            {
+              "destination_uuid": null,
+              "uuid": "94905012-a3dd-4294-bd21-bfafbc6b797c"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "completed"
+                ],
+                "category_uuid": "2c27186b-c4fc-4384-80f8-e0303964cf9f",
+                "type": "has_only_text",
+                "uuid": "f6382df0-0e53-4c81-b9f4-677e96b10582"
+              },
+              {
+                "arguments": [
+                  "expired"
+                ],
+                "category_uuid": "b2ea6b5b-dbc0-4af6-bfa4-997f063ac339",
+                "type": "has_only_text",
+                "uuid": "983289fb-401d-44ba-9695-2183855d2e79"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "891b0285-01f4-449f-808c-2f4ee19f94d9",
+                "name": "Complete",
+                "uuid": "2c27186b-c4fc-4384-80f8-e0303964cf9f"
+              },
+              {
+                "exit_uuid": "94905012-a3dd-4294-bd21-bfafbc6b797c",
+                "name": "Expired",
+                "uuid": "b2ea6b5b-dbc0-4af6-bfa4-997f063ac339"
+              }
+            ],
+            "default_category_uuid": "b2ea6b5b-dbc0-4af6-bfa4-997f063ac339",
+            "operand": "@child.status",
+            "type": "switch"
+          },
+          "uuid": "30d83415-4e3b-4ea9-977a-bb29852037bd"
+        },
+        {
+          "actions": [
+            {
+              "flow": {
+                "name": "Atendimento Financeiro",
+                "uuid": "60d94960-a32a-4584-a4b3-8f2e50db0bb1"
+              },
+              "type": "enter_flow",
+              "uuid": "fa3f056f-9cee-4ff7-ab5b-3aa329c369a6"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "f0cec545-e8cc-4e06-9972-5e9c9936a94b",
+              "uuid": "f72448d0-143d-451e-9349-185e161067cc"
+            },
+            {
+              "destination_uuid": null,
+              "uuid": "b61d47e4-5ae8-4aad-a210-b67fd4ca008e"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "completed"
+                ],
+                "category_uuid": "ecb27c16-90f5-4c3e-9faa-5f7c458952d4",
+                "type": "has_only_text",
+                "uuid": "b3dc8b79-998b-4730-9d55-f39e56c4491e"
+              },
+              {
+                "arguments": [
+                  "expired"
+                ],
+                "category_uuid": "66648953-6566-4da4-ac71-c5190b42ab2b",
+                "type": "has_only_text",
+                "uuid": "8065574c-0c62-4572-9981-a1181e087190"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "f72448d0-143d-451e-9349-185e161067cc",
+                "name": "Complete",
+                "uuid": "ecb27c16-90f5-4c3e-9faa-5f7c458952d4"
+              },
+              {
+                "exit_uuid": "b61d47e4-5ae8-4aad-a210-b67fd4ca008e",
+                "name": "Expired",
+                "uuid": "66648953-6566-4da4-ac71-c5190b42ab2b"
+              }
+            ],
+            "default_category_uuid": "66648953-6566-4da4-ac71-c5190b42ab2b",
+            "operand": "@child.status",
+            "type": "switch"
+          },
+          "uuid": "4420e371-b44d-447b-86d0-55ea29172877"
+        },
+        {
+          "actions": [
+            {
+              "flow": {
+                "name": "Encerramento",
+                "uuid": "099ecfb9-1afe-41d5-bad8-eff2cf988942"
+              },
+              "type": "enter_flow",
+              "uuid": "69193b87-ccd4-4ba8-bd9a-8765e269f14b"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "07fdcc24-ae81-4b74-af68-e44184ff6d99",
+              "uuid": "eb5b23c3-166f-43b0-9fec-0f39cdd1ec91"
+            },
+            {
+              "destination_uuid": null,
+              "uuid": "e6ee28d5-6f35-4fbb-ad0b-0ccffd7fc714"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "completed"
+                ],
+                "category_uuid": "8a6d5f3b-9f64-4e2a-bc55-58dcfbee4ec3",
+                "type": "has_only_text",
+                "uuid": "bbf3d2c1-34e2-4b1a-914a-517de8ed8bdd"
+              },
+              {
+                "arguments": [
+                  "expired"
+                ],
+                "category_uuid": "51d9f1ff-f41d-4dc2-ba2c-29c9cafa8d2e",
+                "type": "has_only_text",
+                "uuid": "eec72a0d-c9ed-4ce0-b8b7-517d11a791f3"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "eb5b23c3-166f-43b0-9fec-0f39cdd1ec91",
+                "name": "Complete",
+                "uuid": "8a6d5f3b-9f64-4e2a-bc55-58dcfbee4ec3"
+              },
+              {
+                "exit_uuid": "e6ee28d5-6f35-4fbb-ad0b-0ccffd7fc714",
+                "name": "Expired",
+                "uuid": "51d9f1ff-f41d-4dc2-ba2c-29c9cafa8d2e"
+              }
+            ],
+            "default_category_uuid": "51d9f1ff-f41d-4dc2-ba2c-29c9cafa8d2e",
+            "operand": "@child.status",
+            "type": "switch"
+          },
+          "uuid": "d7fd6877-8a48-4b2b-8ff6-ef5ca7909623"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "N\u00e3o entendi, responde com uma das op\u00e7\u00f5es abaixo",
+              "type": "send_msg",
+              "uuid": "62fa1c97-7de4-468c-81d7-166758ce1f6a"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "ef991c4e-6722-4599-ae6c-ebf7821bae46",
+              "uuid": "44759056-769a-449e-967e-9dfcb221c0fa"
+            }
+          ],
+          "uuid": "a96bb195-af71-472a-8ba7-18f8b863ac04"
+        },
+        {
+          "actions": [
+            {
+              "flow": {
+                "name": "Apaga dados do cliente Financeiro",
+                "uuid": "196ae45d-f761-4ec5-9ad4-b1f3a77028aa"
+              },
+              "type": "enter_flow",
+              "uuid": "8fc868a9-dfe5-4287-bb54-d6b38008ab2c"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "815b8e12-b01e-42f1-8372-0b834047b14a"
+            },
+            {
+              "destination_uuid": null,
+              "uuid": "9e7e854f-4df8-4549-b34d-587070819d67"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "completed"
+                ],
+                "category_uuid": "f7d21c79-fe50-4d2f-a57c-5516200b9991",
+                "type": "has_only_text",
+                "uuid": "2fbd9754-e128-4b13-af80-787c98832a3f"
+              },
+              {
+                "arguments": [
+                  "expired"
+                ],
+                "category_uuid": "a4cfdaf0-e75b-4169-b357-396cfa51bb6e",
+                "type": "has_only_text",
+                "uuid": "fbbcad0e-5a84-481d-941b-fb03c91aa908"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "815b8e12-b01e-42f1-8372-0b834047b14a",
+                "name": "Complete",
+                "uuid": "f7d21c79-fe50-4d2f-a57c-5516200b9991"
+              },
+              {
+                "exit_uuid": "9e7e854f-4df8-4549-b34d-587070819d67",
+                "name": "Expired",
+                "uuid": "a4cfdaf0-e75b-4169-b357-396cfa51bb6e"
+              }
+            ],
+            "default_category_uuid": "a4cfdaf0-e75b-4169-b357-396cfa51bb6e",
+            "operand": "@child.status",
+            "type": "switch"
+          },
+          "uuid": "07fdcc24-ae81-4b74-af68-e44184ff6d99"
+        },
+        {
+          "uuid": "f0cec545-e8cc-4e06-9972-5e9c9936a94b",
+          "actions": [],
+          "router": {
+            "type": "switch",
+            "cases": [
+              {
+                "uuid": "a786a96b-5b64-4c52-8219-ef35ae7fcc35",
+                "type": "has_group",
+                "arguments": [
+                  "a94d2f05-b553-4c3f-b1b5-aa5ddf1b6d1b",
+                  "Satisfeito"
+                ],
+                "category_uuid": "b00efadb-5cb5-40cd-8d85-dae9ad5600ce"
+              },
+              {
+                "uuid": "11ffe4d1-14bb-49c9-8347-8953688bd2fb",
+                "type": "has_group",
+                "arguments": [
+                  "d03a745e-d285-429d-91d0-51874f18bd6e",
+                  "Atendimento humano"
+                ],
+                "category_uuid": "317f331f-62d7-4f40-8798-13e4c2fd753b"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "9ee5cfd0-1412-4097-979b-ea390610fc65",
+                "name": "Satisfeito",
+                "uuid": "b00efadb-5cb5-40cd-8d85-dae9ad5600ce"
+              },
+              {
+                "uuid": "317f331f-62d7-4f40-8798-13e4c2fd753b",
+                "name": "Atendimento humano",
+                "exit_uuid": "bd353b93-56af-43d3-9c95-6799a5351a56"
+              },
+              {
+                "exit_uuid": "481519d6-c8bd-4a33-9501-6e878992e777",
+                "name": "Other",
+                "uuid": "ceb213a8-3e9b-4c05-a694-e11e871ed365"
+              }
+            ],
+            "default_category_uuid": "ceb213a8-3e9b-4c05-a694-e11e871ed365",
+            "operand": "@contact.groups",
+            "result_name": ""
+          },
+          "exits": [
+            {
+              "uuid": "9ee5cfd0-1412-4097-979b-ea390610fc65"
+            },
+            {
+              "uuid": "bd353b93-56af-43d3-9c95-6799a5351a56"
+            },
+            {
+              "destination_uuid": "d71bd3ee-6490-41d8-9761-4f3c1ac8e0a6",
+              "uuid": "481519d6-c8bd-4a33-9501-6e878992e777"
+            }
+          ]
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [
+                "2\u00aa via de boletos",
+                "Falar com Financeiro",
+                "D\u00favidas Financeiras",
+                "Encerrar conversa"
+              ],
+              "text": "Posso ajudar com algo mais?",
+              "type": "send_msg",
+              "uuid": "dc0778dc-eebf-475f-a212-f29d13fcd958"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "ab754da6-7498-4467-a693-0f9a341a5465",
+              "uuid": "d2eaa035-e6b8-4613-a2a6-5815ff845f6c"
+            }
+          ],
+          "uuid": "d71bd3ee-6490-41d8-9761-4f3c1ac8e0a6"
+        }
+      ],
+      "spec_version": "13.1.0",
+      "type": "messaging",
+      "uuid": "da8d3a8d-6dbb-46f2-bbc8-38080e1f9ee1",
+      "revision": 43
+    },
+    {
+      "_ui": {
+        "nodes": {
+          "2888daa6-1efe-4313-b02d-7e0f98c2ba79": {
+            "position": {
+              "left": 240,
+              "top": 20
+            },
+            "type": "execute_actions"
+          }
+        },
+        "stickies": {}
+      },
+      "expire_after_minutes": 10080,
+      "language": "base",
+      "localization": {},
+      "metadata": {
+        "expires": 10080
+      },
+      "name": "Encerramento",
+      "nodes": [
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "text": "A @globals.nome_da_empresa agradece seu contato \ud83d\udc4b Se precisar de algo mais \u00e9 s\u00f3 falar ",
+              "type": "send_msg",
+              "quick_replies": [],
+              "uuid": "d52ab483-8adb-4a1a-882b-3adb5ee40d60"
+            },
+            {
+              "groups": [
+                {
+                  "count": 0,
+                  "name": "Satisfeito",
+                  "query": null,
+                  "status": "ready",
+                  "uuid": "a94d2f05-b553-4c3f-b1b5-aa5ddf1b6d1b"
+                }
+              ],
+              "type": "add_contact_groups",
+              "uuid": "e8573bcf-3068-4a5a-bffb-32e23039c50c"
+            },
+            {
+              "type": "remove_contact_groups",
+              "groups": [
+                {
+                  "uuid": "d03a745e-d285-429d-91d0-51874f18bd6e",
+                  "name": "Atendimento humano"
+                }
+              ],
+              "all_groups": false,
+              "uuid": "c901eb0c-6d43-4758-b348-37fe541b9bd2"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "e48be51f-1234-4006-a367-ee8745415257"
+            }
+          ],
+          "uuid": "2888daa6-1efe-4313-b02d-7e0f98c2ba79"
+        }
+      ],
+      "spec_version": "13.1.0",
+      "type": "messaging",
+      "uuid": "099ecfb9-1afe-41d5-bad8-eff2cf988942",
+      "revision": 6
+    },
+    {
+      "_ui": {
+        "nodes": {
+          "83fba4d7-a369-495d-8cc0-3bfcc45928c1": {
+            "type": "split_by_ticket",
+            "position": {
+              "left": 120,
+              "top": 40
+            },
+            "config": {}
+          },
+          "1e4e61cf-512d-4733-8aec-336232310065": {
+            "position": {
+              "left": 120,
+              "top": 360
+            },
+            "type": "execute_actions"
+          },
+          "6bfb6bc0-e352-4c2e-ba79-b3afc2fa239a": {
+            "position": {
+              "left": 400,
+              "top": 360
+            },
+            "type": "execute_actions"
+          }
+        },
+        "stickies": {
+          "40aae96f-cfdb-4492-97a8-d837c674bbb7": {
+            "body": "Esse fluxo \u00e9 uma mensagem para usu\u00e1rios que queiram falar com atendente. Usamos a vari\u00e1vel global Contato Financeiro. Se quiser atualizar o n\u00famero de contato, v\u00e1 nas configura\u00e7\u00f5es do seu projeto",
+            "color": "purple",
+            "position": {
+              "left": 900,
+              "top": 140,
+              "right": 180,
+              "bottom": 60
+            },
+            "title": "Aten\u00e7\u00e3o"
+          }
+        }
+      },
+      "expire_after_minutes": 10080,
+      "language": "base",
+      "localization": {},
+      "metadata": {
+        "expires": 10080
+      },
+      "name": "Atendimento Financeiro",
+      "nodes": [
+        {
+          "uuid": "83fba4d7-a369-495d-8cc0-3bfcc45928c1",
+          "actions": [
+            {
+              "uuid": "c3786352-f3c8-41da-b802-f63be9b7f780",
+              "type": "open_ticket",
+              "ticketer": {
+                "uuid": "c88fb834-de93-4650-84fd-f5c2a775eaad",
+                "name": "Financeiro"
+              },
+              "body": "@results",
+              "topic": {
+                "name": "Financeiro",
+                "uuid": "8eb1a72c-310f-4e37-80a8-e89a20f84482",
+                "created_on": "2023-02-23T11:15:17.541534-03:00"
+              },
+              "assignee": null,
+              "result_name": "Result"
+            }
+          ],
+          "router": {
+            "type": "switch",
+            "operand": "@results.result",
+            "cases": [
+              {
+                "arguments": [
+                  "Success"
+                ],
+                "category_uuid": "a59b3716-c8c8-4962-a23b-be67b1758eba",
+                "type": "has_category",
+                "uuid": "23170f73-92cb-4a9a-a388-7bb3a8390135"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "a1629141-1cbe-4b47-8068-676e660ba2fb",
+                "name": "Success",
+                "uuid": "a59b3716-c8c8-4962-a23b-be67b1758eba"
+              },
+              {
+                "exit_uuid": "a52f6d7a-998d-45dc-a6d0-8449b4468d39",
+                "name": "Failure",
+                "uuid": "d1055116-4664-4031-8c37-c1978fd8ce74"
+              }
+            ],
+            "default_category_uuid": "d1055116-4664-4031-8c37-c1978fd8ce74"
+          },
+          "exits": [
+            {
+              "destination_uuid": "1e4e61cf-512d-4733-8aec-336232310065",
+              "uuid": "a1629141-1cbe-4b47-8068-676e660ba2fb"
+            },
+            {
+              "destination_uuid": "6bfb6bc0-e352-4c2e-ba79-b3afc2fa239a",
+              "uuid": "a52f6d7a-998d-45dc-a6d0-8449b4468d39"
+            }
+          ]
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Aguarde um instante para ser atendido",
+              "type": "send_msg",
+              "uuid": "080753c4-5fd4-4471-b57f-bf93528e9e2b"
+            },
+            {
+              "type": "add_contact_groups",
+              "groups": [
+                {
+                  "uuid": "d03a745e-d285-429d-91d0-51874f18bd6e",
+                  "name": "Atendimento humano",
+                  "query": null,
+                  "status": "ready",
+                  "count": 0
+                }
+              ],
+              "uuid": "4a0983c1-6fe7-418c-bc18-ebeda0113113"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "896c0203-b17d-4363-b2f2-56880c0805b3"
+            }
+          ],
+          "uuid": "1e4e61cf-512d-4733-8aec-336232310065"
+        },
+        {
+          "uuid": "6bfb6bc0-e352-4c2e-ba79-b3afc2fa239a",
+          "actions": [
+            {
+              "attachments": [],
+              "text": "N\u00e3o estamos em hor\u00e1rio de atendimento, por favor entre em contato novamente depois",
+              "type": "send_msg",
+              "quick_replies": [],
+              "uuid": "427b31fe-b687-4829-a33d-8b7cc5136693"
+            }
+          ],
+          "exits": [
+            {
+              "uuid": "bba301dc-9743-4d25-8447-a78a4b4e8ead",
+              "destination_uuid": null
+            }
+          ]
+        }
+      ],
+      "spec_version": "13.1.0",
+      "type": "messaging",
+      "uuid": "60d94960-a32a-4584-a4b3-8f2e50db0bb1",
+      "revision": 16
+    },
+    {
+      "_ui": {
+        "nodes": {
+          "9695cc90-b403-4cef-b45f-2e12a4133aa2": {
+            "position": {
+              "left": 340,
+              "top": 0
+            },
+            "type": "execute_actions"
+          },
+          "03ae61cd-49fc-4e00-b036-41519213ec3f": {
+            "config": {
+              "cases": {}
+            },
+            "position": {
+              "left": 100,
+              "top": 200
+            },
+            "type": "wait_for_response"
+          },
+          "04f76488-8f17-4638-9ba9-6fcbd1d0cd75": {
+            "type": "split_by_webhook",
+            "position": {
+              "left": 100,
+              "top": 440
+            },
+            "config": {}
+          },
+          "57d6e011-8fab-4b03-9c72-fc5a5adc1e00": {
+            "type": "split_by_webhook",
+            "position": {
+              "left": 340,
+              "top": 440
+            },
+            "config": {}
+          },
+          "42aa79f7-6c2b-4c8a-961e-bc69fb3fcf4f": {
+            "config": {},
+            "position": {
+              "left": 680,
+              "top": 440
+            },
+            "type": "split_by_subflow"
+          },
+          "f616d0bc-dee0-4348-be3f-4e7949a8adb4": {
+            "position": {
+              "left": 100,
+              "top": 740
+            },
+            "type": "execute_actions"
+          },
+          "2f500a9b-bfe9-4a43-ab8b-e97d06fb35c8": {
+            "position": {
+              "left": 420,
+              "top": 740
+            },
+            "type": "execute_actions"
+          }
+        },
+        "stickies": {}
+      },
+      "expire_after_minutes": 10080,
+      "language": "por",
+      "localization": {},
+      "metadata": {
+        "expires": 10080
+      },
+      "name": "ChatGPT",
+      "nodes": [
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [
+                "INCC",
+                "IGPM",
+                "IPCA",
+                "SELIC"
+              ],
+              "text": "Escolha o \u00edndice financeiro que deseja entender melhor:",
+              "type": "send_msg",
+              "uuid": "e01c9045-c0cf-4424-af2f-bab175199faa"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "03ae61cd-49fc-4e00-b036-41519213ec3f",
+              "uuid": "bac295b5-41a3-4064-80cd-de3d771036d3"
+            }
+          ],
+          "uuid": "9695cc90-b403-4cef-b45f-2e12a4133aa2"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "04f76488-8f17-4638-9ba9-6fcbd1d0cd75",
+              "uuid": "c4f5eaf9-4b3d-4bb5-9535-82778cd1477a"
+            },
+            {
+              "destination_uuid": "04f76488-8f17-4638-9ba9-6fcbd1d0cd75",
+              "uuid": "3ce9bbce-3d05-4aa6-b312-c3dad00cb076"
+            },
+            {
+              "destination_uuid": "04f76488-8f17-4638-9ba9-6fcbd1d0cd75",
+              "uuid": "47d25499-8f5c-44ed-b9d8-97fced34a850"
+            },
+            {
+              "destination_uuid": "04f76488-8f17-4638-9ba9-6fcbd1d0cd75",
+              "uuid": "6f60461c-5a9a-4328-8856-7426e4546ae0"
+            },
+            {
+              "destination_uuid": "57d6e011-8fab-4b03-9c72-fc5a5adc1e00",
+              "uuid": "4baf2092-86ed-4600-8599-1ed3cb279fac"
+            },
+            {
+              "destination_uuid": "42aa79f7-6c2b-4c8a-961e-bc69fb3fcf4f",
+              "uuid": "ceef4995-7e20-4618-9bd0-1b73cc25c6df"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "1"
+                ],
+                "category_uuid": "d2ba47cd-60fd-4144-ba51-b6a894fbc1ec",
+                "type": "has_any_word",
+                "uuid": "aafccd6f-010e-4acb-971d-a4fb906db759"
+              },
+              {
+                "arguments": [
+                  "incc"
+                ],
+                "category_uuid": "d2ba47cd-60fd-4144-ba51-b6a894fbc1ec",
+                "type": "has_all_words",
+                "uuid": "c676c134-cfcc-4256-8131-72349357767f"
+              },
+              {
+                "arguments": [
+                  "2"
+                ],
+                "category_uuid": "61c48800-cd9b-4337-98a1-e746fdff980b",
+                "type": "has_any_word",
+                "uuid": "4a8f5d81-91af-4079-8f74-eca6a26f86b0"
+              },
+              {
+                "arguments": [
+                  "igpm"
+                ],
+                "category_uuid": "61c48800-cd9b-4337-98a1-e746fdff980b",
+                "type": "has_all_words",
+                "uuid": "8afc0b05-3a18-4ddb-afaa-02fd06a7b28d"
+              },
+              {
+                "arguments": [
+                  "3 IPCA"
+                ],
+                "category_uuid": "7cdf5c8e-f5f5-4993-87e8-d90ac04b0b2f",
+                "type": "has_any_word",
+                "uuid": "0940097d-263a-4aa0-a005-4155006fc759"
+              },
+              {
+                "arguments": [
+                  "4 SELIC"
+                ],
+                "category_uuid": "a40b6ceb-4bb4-4463-b1d6-0f33a33415c3",
+                "type": "has_any_word",
+                "uuid": "d5820e7f-6713-478f-a8d5-eb44e85cf5be"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "c4f5eaf9-4b3d-4bb5-9535-82778cd1477a",
+                "name": "O que \u00e9 o \u00edndice INCC?",
+                "uuid": "d2ba47cd-60fd-4144-ba51-b6a894fbc1ec"
+              },
+              {
+                "exit_uuid": "3ce9bbce-3d05-4aa6-b312-c3dad00cb076",
+                "name": "O que \u00e9 o \u00edndice IGPM?",
+                "uuid": "61c48800-cd9b-4337-98a1-e746fdff980b"
+              },
+              {
+                "exit_uuid": "47d25499-8f5c-44ed-b9d8-97fced34a850",
+                "name": "O que \u00e9 o \u00edndice IPCA?",
+                "uuid": "7cdf5c8e-f5f5-4993-87e8-d90ac04b0b2f"
+              },
+              {
+                "exit_uuid": "6f60461c-5a9a-4328-8856-7426e4546ae0",
+                "name": "O que \u00e9 o \u00edndice SELIC?",
+                "uuid": "a40b6ceb-4bb4-4463-b1d6-0f33a33415c3"
+              },
+              {
+                "exit_uuid": "4baf2092-86ed-4600-8599-1ed3cb279fac",
+                "name": "Other",
+                "uuid": "cec53722-1ef7-4a09-ad7c-ed94f9ad7bcc"
+              },
+              {
+                "exit_uuid": "ceef4995-7e20-4618-9bd0-1b73cc25c6df",
+                "name": "No Response",
+                "uuid": "98ee90a7-d6aa-4b56-a7a5-f8f0432bd66d"
+              }
+            ],
+            "default_category_uuid": "cec53722-1ef7-4a09-ad7c-ed94f9ad7bcc",
+            "operand": "@input.text",
+            "result_name": "pergunta",
+            "type": "switch",
+            "wait": {
+              "timeout": {
+                "category_uuid": "98ee90a7-d6aa-4b56-a7a5-f8f0432bd66d",
+                "seconds": 900
+              },
+              "type": "msg"
+            }
+          },
+          "uuid": "03ae61cd-49fc-4e00-b036-41519213ec3f"
+        },
+        {
+          "uuid": "04f76488-8f17-4638-9ba9-6fcbd1d0cd75",
+          "actions": [
+            {
+              "uuid": "9aa17139-862c-4b7a-90a4-f7031b450240",
+              "headers": {
+                "Authorization": "@globals.token_chatgpt",
+                "Content-Type": "application/json"
+              },
+              "type": "call_webhook",
+              "url": "https://api.openai.com/v1/completions",
+              "body": "{\"model\": \"text-davinci-003\", \"prompt\": \"Esse \u00e9 um gerador de respostas amig\u00e1veis e simples sobre os \u00edndices e taxas financeiras no Brasil. As respostas s\u00f3 podem ser dadas sobre os \u00edndices INCC, IGMP, IPCA e SELIC. Pergunta: @results.pergunta.category. Para qualquer pergunta fora desse contexto, gere uma resposta informando que n\u00e3o conhece sobre o assunto.\", \"temperature\": 0, \"max_tokens\": 200}",
+              "method": "POST",
+              "result_name": "chatgpt"
+            }
+          ],
+          "router": {
+            "type": "switch",
+            "operand": "@results.chatgpt.category",
+            "cases": [
+              {
+                "arguments": [
+                  "Success"
+                ],
+                "category_uuid": "541e684d-3724-4288-bd67-8174a4a34706",
+                "type": "has_only_text",
+                "uuid": "edda8024-e81e-4fe4-810a-ea987bd5bbb8"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "d33552bd-4c83-4b2f-9e93-d3a4c67b6b43",
+                "name": "Success",
+                "uuid": "541e684d-3724-4288-bd67-8174a4a34706"
+              },
+              {
+                "exit_uuid": "69bbe441-1353-4267-b88d-079eefa6e0fe",
+                "name": "Failure",
+                "uuid": "7fb1216a-db03-47e3-9eb8-a66457ebea9f"
+              }
+            ],
+            "default_category_uuid": "7fb1216a-db03-47e3-9eb8-a66457ebea9f"
+          },
+          "exits": [
+            {
+              "destination_uuid": "f616d0bc-dee0-4348-be3f-4e7949a8adb4",
+              "uuid": "d33552bd-4c83-4b2f-9e93-d3a4c67b6b43"
+            },
+            {
+              "destination_uuid": "2f500a9b-bfe9-4a43-ab8b-e97d06fb35c8",
+              "uuid": "69bbe441-1353-4267-b88d-079eefa6e0fe"
+            }
+          ]
+        },
+        {
+          "uuid": "57d6e011-8fab-4b03-9c72-fc5a5adc1e00",
+          "actions": [
+            {
+              "uuid": "4d0eb82e-1663-4600-abd8-60fa6cfe9a13",
+              "headers": {
+                "Authorization": "@globals.token_chatgpt",
+                "Content-Type": "application/json"
+              },
+              "type": "call_webhook",
+              "url": "https://api.openai.com/v1/completions",
+              "body": "{\"model\": \"text-davinci-003\", \"prompt\": \"Esse \u00e9 um gerador de respostas amig\u00e1veis e simples sobre os \u00edndices e taxas financeiras no Brasil. As respostas s\u00f3 podem ser dadas sobre os \u00edndices INCC, IGMP, IPCA e SELIC. Pergunta: @results.pergunta.value. Para qualquer pergunta fora desse contexto, gere uma resposta informando que n\u00e3o conhece sobre o assunto.\", \"temperature\": 0, \"max_tokens\": 200}",
+              "method": "POST",
+              "result_name": "chatgpt"
+            }
+          ],
+          "router": {
+            "type": "switch",
+            "operand": "@results.chatgpt.category",
+            "cases": [
+              {
+                "arguments": [
+                  "Success"
+                ],
+                "category_uuid": "d16a8c64-9f92-410b-ad25-e0340277e96c",
+                "type": "has_only_text",
+                "uuid": "d2058e7e-d021-4469-bdb6-09978c4ea106"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "36354f2e-ad48-4759-9f43-73d3142e66fe",
+                "name": "Success",
+                "uuid": "d16a8c64-9f92-410b-ad25-e0340277e96c"
+              },
+              {
+                "exit_uuid": "d68471b6-6d02-437a-bd59-3ea3f8fd7bfa",
+                "name": "Failure",
+                "uuid": "424d7327-1e9c-41e6-a502-7b5742dc98d9"
+              }
+            ],
+            "default_category_uuid": "424d7327-1e9c-41e6-a502-7b5742dc98d9"
+          },
+          "exits": [
+            {
+              "destination_uuid": "f616d0bc-dee0-4348-be3f-4e7949a8adb4",
+              "uuid": "36354f2e-ad48-4759-9f43-73d3142e66fe"
+            },
+            {
+              "destination_uuid": "2f500a9b-bfe9-4a43-ab8b-e97d06fb35c8",
+              "uuid": "d68471b6-6d02-437a-bd59-3ea3f8fd7bfa"
+            }
+          ]
+        },
+        {
+          "actions": [
+            {
+              "flow": {
+                "name": "Inatividade",
+                "uuid": "b91a8f96-c25e-4121-b645-baa29d6b2e32"
+              },
+              "type": "enter_flow",
+              "uuid": "55fad91e-c23b-4244-a598-98a4d4fdbf6a"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "1d655b85-af50-43fc-881f-11346d566c3d"
+            },
+            {
+              "destination_uuid": null,
+              "uuid": "869bd788-1317-4f7f-9d90-27544cbb629f"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "completed"
+                ],
+                "category_uuid": "b4e86cfa-afc8-43c8-b135-14fcd8417ec6",
+                "type": "has_only_text",
+                "uuid": "ef4a629f-38f9-4747-a5b8-9e7d909a35f6"
+              },
+              {
+                "arguments": [
+                  "expired"
+                ],
+                "category_uuid": "94d1c3dc-af37-4834-a0ee-8fdbb6ec8bcf",
+                "type": "has_only_text",
+                "uuid": "8aaf2d94-a16e-410a-82fc-7749119f4bd6"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "1d655b85-af50-43fc-881f-11346d566c3d",
+                "name": "Complete",
+                "uuid": "b4e86cfa-afc8-43c8-b135-14fcd8417ec6"
+              },
+              {
+                "exit_uuid": "869bd788-1317-4f7f-9d90-27544cbb629f",
+                "name": "Expired",
+                "uuid": "94d1c3dc-af37-4834-a0ee-8fdbb6ec8bcf"
+              }
+            ],
+            "default_category_uuid": "94d1c3dc-af37-4834-a0ee-8fdbb6ec8bcf",
+            "operand": "@child.status",
+            "type": "switch"
+          },
+          "uuid": "42aa79f7-6c2b-4c8a-961e-bc69fb3fcf4f"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "\u26a1 Com a ajuda da tecnologia de OpenAI, aqui est\u00e1 uma resposta precisa e atualizada sobre os \u00edndices financeiros do Brasil:",
+              "type": "send_msg",
+              "uuid": "d6f2129f-6235-46e2-abca-63b037d285bc"
+            },
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "@webhook.choices.0.text",
+              "type": "send_msg",
+              "uuid": "96930098-cb76-48b8-aa3c-4cccb0c0a6e6"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "e899065f-e60a-4682-a70c-c4846c3ae869"
+            }
+          ],
+          "uuid": "f616d0bc-dee0-4348-be3f-4e7949a8adb4"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "N\u00e3o encontrei uma resposta para sua pergunta, usamos a tecnologia de OpenAI para fornecer respostas precisas e atualizadas sobre os \u00edndices financeiros do Brasil \u26a1",
+              "type": "send_msg",
+              "uuid": "2155a4e6-3e4e-4802-8a1f-e8630630adf4"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "fe243025-243f-4494-adcb-0226628915ec"
+            }
+          ],
+          "uuid": "2f500a9b-bfe9-4a43-ab8b-e97d06fb35c8"
+        }
+      ],
+      "spec_version": "13.1.0",
+      "type": "messaging",
+      "uuid": "b9381b7f-a2e3-4a54-b810-d9b1dcf768bb",
+      "revision": 3
+    }
+  ],
+  "campaigns": [],
+  "triggers": [
+    {
+      "trigger_type": "C",
+      "flow": {
+        "uuid": "da8d3a8d-6dbb-46f2-bbc8-38080e1f9ee1",
+        "name": "Fluxo Principal"
+      },
+      "groups": [],
+      "exclude_groups": [
+        {
+          "uuid": "d03a745e-d285-429d-91d0-51874f18bd6e",
+          "name": "Atendimento humano"
+        }
+      ],
+      "keyword": null
+    },
+    {
+      "trigger_type": "T",
+      "flow": {
+        "uuid": "099ecfb9-1afe-41d5-bad8-eff2cf988942",
+        "name": "Encerramento"
+      },
+      "groups": [],
+      "exclude_groups": [],
+      "keyword": null
+    }
+  ],
+  "fields": [
+    {
+      "key": "codigo_cliente_omie",
+      "name": "Codigo Cliente Omie",
+      "type": "text"
+    },
+    {
+      "key": "documento",
+      "name": "Documento",
+      "type": "text"
+    },
+    {
+      "key": "email",
+      "name": "Email",
+      "type": "text"
+    }
+  ],
+  "groups": [
+    {
+      "uuid": "d03a745e-d285-429d-91d0-51874f18bd6e",
+      "name": "Atendimento humano",
+      "query": null
+    },
+    {
+      "uuid": "a94d2f05-b553-4c3f-b1b5-aa5ddf1b6d1b",
+      "name": "Satisfeito",
+      "query": null
+    }
+  ]
+}
