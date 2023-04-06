@@ -156,12 +156,14 @@ class ProjectSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user = self.context["request"].user
-        task = tasks.create_project(  # pragma: no cover
-            validated_data.get("name"),
-            user.email,
-            str(validated_data.get("timezone")),
+
+        flow_instance = FlowsRESTClient()
+
+        project = flow_instance.create_project(
+            project_name=validated_data.get("name"),
+            user_email=user.email,
+            project_timezone=validated_data.get("timezone"),
         )
-        project = task
 
         validated_data.update(
             {
@@ -500,7 +502,7 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
         if authorization.role == 0:
             data.update(
                 {
-                    "message": "Project authorization not setted",
+                    "data": {"message": "Project authorization not setted"},
                     "status": "FAILED"
                 }
             )
@@ -516,11 +518,11 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
                 repository_uuid = settings.REPOSITORY_IDS.get(project.template_type)
                 access_token = intelligence_client.get_access_token(request.user.email, repository_uuid)
             except Exception as error:
-                logger.error(error)
+                logger.error(f" REPOSITORY IDS {error}")
                 template.delete()
                 data.update(
                     {
-                        "message": "Could not get access token",
+                        "data": {"message": "Could not get access token"},
                         "status": "FAILED"
                     }
                 )
@@ -538,7 +540,7 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
                     access_token=access_token,
                 ).get("uuid")
             except Exception as error:
-                logger.error(error)
+                logger.error(f"CREATE CLASSIFIER {error}")
                 template.delete()
                 data.update(
                     {

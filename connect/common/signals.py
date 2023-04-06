@@ -41,7 +41,7 @@ def create_service_status(sender, instance, created, **kwargs):
         if not settings.TESTING:
             chats_client = ChatsRESTClient()
 
-            template = instance.is_template and instance.template_type == Project.TYPE_SUPPORT
+            template = instance.is_template and instance.template_type in [Project.TYPE_SUPPORT, Project.TYPE_OMIE_PAYMENT_FINANCIAL, Project.TYPE_OMIE_PAYMENT_FINANCIAL_CHAT_GPT]
 
             if not template:
                 response = chats_client.create_chat_project(
@@ -120,7 +120,7 @@ def delete_opened_project(sender, instance, **kwargs):
 
 @receiver(post_save, sender=OrganizationAuthorization)
 def org_authorizations(sender, instance, created, **kwargs):
-
+    # if settings.CREATE_AI_ORGANIZATION:
     if instance.role is not OrganizationLevelRole.NOTHING.value:
         if created:
             organization_permission_mapper = {

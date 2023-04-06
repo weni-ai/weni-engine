@@ -139,3 +139,5 @@ weni-script.py
 weni-script-*.py
 .vscode/*
 .pylintrc
+
+.tool-versions
