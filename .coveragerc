@@ -4,20 +4,34 @@ source =
     ./connect/authentication
     ./connect/common
 omit =
+    ./manage.py
+    ./connect/__init__.py
+    ./connect/asgi.py
+    ./connect/wsgi.py
+    ./connect/settings.py
+    ./connect/urls.py
+    ./connect/api/v1/__init__.py
     ./connect/api/apps.py
-    ./connect/common/apps.py
-    ./connect/authentication/apps.py
+    ./connect/grpc/*
     ./connect/api/v1/tests/*
     ./connect/api/grpc/*
     ./connect/api/v1/swagger.py
+    ./connect/authentication/apps.py
     ./connect/authentication/tests.py
     ./connect/authentication/signals.py
     ./connect/authentication/migrations/*
-    ./connect/common/tests.py
+    ./connect/common/apps.py
+    ./connect/common/tests/*
     ./connect/common/tasks.py
     ./connect/common/signals.py
     ./connect/common/management/*
     ./connect/common/migrations/*
+    ./connect/billing/__init__.py
+    ./connect/billing/tests.py
+    ./connect/billing/tests_billingv2.py
+    ./connect/billing/migrations/*
+    ./connect/template_projects/migrations/*
 
 [report]
 fail_under = 85
+skip_empty = true
