@@ -31,6 +31,11 @@ omit =
     ./connect/billing/tests_billingv2.py
     ./connect/billing/migrations/*
     ./connect/template_projects/migrations/*
+    ./connect/template_projects/tests.py
+    ./connect/elastic/tests.py
+    ./connect/api/v2/organizations/tests.py
+    ./connect/api/v2/projects/tests.py
+    ./connect/api/v2/internals/tests.py
 
 [report]
 fail_under = 85
