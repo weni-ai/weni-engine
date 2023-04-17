@@ -314,18 +314,22 @@ class Organization(models.Model):
     def send_email_access_code(self, email: str, user_name: str, access_code: str):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
+
+        user = User.objects.get(email=email)
+
         context = {
             "base_url": settings.BASE_URL,
             "access_code": access_code,
             "user_name": user_name,
         }
+            
         mail.send_mail(
             _("You receive an access code to Weni Platform"),
-            render_to_string("authentication/emails/access_code.txt", context),
+            render_to_string(f"authentication/emails/access_code_{user.language}.txt", context),
             None,
             [email],
             html_message=render_to_string(
-                "authentication/emails/access_code.html", context
+                f"authentication/emails/access_code_{user.language}.html", context
             ),
         )
         return mail
