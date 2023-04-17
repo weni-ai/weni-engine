@@ -54,7 +54,7 @@ class CiUtils(object):
             self.logger.fail(e.stdout.decode("utf-8").replace("\n", "\n ").strip())
         return res
 
-    def run_ci(self, path, is_local:bool):
+    def run_ci(self, path, is_local: bool):
         self.init_ci(path, is_local)
         ok = self.execute('python manage.py migrate')
         ok += self.execute('python manage.py collectstatic --noinput', False)
