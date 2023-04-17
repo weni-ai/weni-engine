@@ -145,7 +145,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             ),
         }
 
-    def create(self, validated_data):
+    def _create(self, validated_data):  # deprecated
         user = self.context["request"].user
         extra_data = self.context["request"].data.get("project")
 
@@ -171,6 +171,64 @@ class ProjectSerializer(serializers.ModelSerializer):
             is_template=True if extra_data.get("template") else False,
             created_by=user,
             template_type=extra_data.get("template_type")
+        )
+
+        if Project.objects.filter(created_by=user).count() == 1:
+            data = dict(
+                send_request_flow=settings.SEND_REQUEST_FLOW_PRODUCT,
+                flow_uuid=settings.FLOW_PRODUCT_UUID,
+                token_authorization=settings.TOKEN_AUTHORIZATION_FLOW_PRODUCT
+            )
+            user.send_request_flow_user_info(data)
+
+        if is_template:
+            extra_data.update(
+                {
+                    "project": instance.uuid,
+                    "authorization": instance.get_user_authorization(user).uuid
+                }
+            )
+
+            template_serializer = TemplateProjectSerializer(data=extra_data, context=self.context["request"])
+            template_serializer.is_valid()
+            template_project = template_serializer.save()
+
+            if type(template_project) == dict:
+                return template_project
+
+        return instance
+
+    def create(self, validated_data):
+        user = self.context["request"].user
+        extra_data = self.context["request"].data.get("project")
+
+        if not extra_data:
+            extra_data = {
+                "template": self.context["request"].data.get("template"),
+                "template_type": self.context["request"].data.get("template_type"),
+            }
+
+        is_template = extra_data.get("template")
+
+        instance = Project.objects.create(
+            name=validated_data.get("name"),
+            timezone=str(validated_data.get("timezone")),
+            organization=validated_data.get("organization"),
+            is_template=True if extra_data.get("template") else False,
+            created_by=user,
+            template_type=extra_data.get("template_type")
+        )
+
+        created, flows_info = self.create_flows_project(validated_data, user, is_template, str(instance.uuid))
+
+        if not created:
+            return flows_info
+
+        instance.flow_id = flows_info.get("id")
+        instance.flow_organization = flows_info.get("uuid")
+
+        instance.save(
+            update_fields=["flow_id", "flow_organization"]
         )
 
         if Project.objects.filter(created_by=user).count() == 1:
