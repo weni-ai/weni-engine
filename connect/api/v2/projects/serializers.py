@@ -341,7 +341,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             response = opened.day
         return response
 
-    def create_flows_project(self, data: dict, user: User, is_template: bool):
+    def create_flows_project(self, data: dict, user: User, is_template: bool, project_uuid: str):
         flow_instance = FlowsRESTClient()
         created = False
         try:
@@ -349,14 +349,16 @@ class ProjectSerializer(serializers.ModelSerializer):
                 flows_info = flow_instance.create_template_project(
                     data.get("name"),
                     user.email,
-                    str(data.get("timezone"))
+                    str(data.get("timezone")),
+                    project_uuid,
                 )
                 flows_info = json.loads(flows_info.get("data"))
             else:
                 flows_info = flow_instance.create_project(
                     project_name=data.get("name"),
                     user_email=user.email,
-                    project_timezone=str(data.get("timezone"))
+                    project_timezone=str(data.get("timezone")),
+                    project_uuid=project_uuid,
                 )
             created = True
         except Exception as error:
