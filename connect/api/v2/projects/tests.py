@@ -361,7 +361,7 @@ class ProjectTestCase(TestCase):
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_classifier")
     def test_create_classifier(self, create_classifier):
         response_data = uuid.uuid4()
-        create_classifier.side_effect = [{"data": {"uuid": response_data}}]
+        create_classifier.side_effect = [{"data": {"uuid": response_data}, "status": status.HTTP_201_CREATED}]
 
         project = self.project
         authorization = project.get_user_authorization(self.user)
