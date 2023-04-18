@@ -246,7 +246,7 @@ def problem_capture_invoice():
             for project in organization.project.all():
                 current_app.send_task(  # pragma: no cover
                     name="update_suspend_project",
-                    args=[project.flow_organization, True],
+                    args=[project.uuid, True],
                 )
 
 

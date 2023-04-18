@@ -112,13 +112,13 @@ def update_project(organization_uuid: str, organization_name: str):
 
 
 @app.task(name="delete_project")
-def delete_project(inteligence_organization: int, user_email):
+def delete_project(project_uuid: str, user_email):
     if settings.USE_FLOW_REST:
         flow_instance = FlowsRESTClient()
     else:
         flow_instance = utils.get_grpc_types().get("flow")
     flow_instance.delete_project(
-        project_uuid=inteligence_organization,
+        project_uuid=project_uuid,
         user_email=user_email,
     )
     return True
@@ -131,7 +131,7 @@ def delete_project(inteligence_organization: int, user_email):
     retry_backoff=True,
 )
 def update_user_permission_project(
-    flow_organization: str, project_uuid: str, user_email: str, permission: int
+    project_uuid: str, user_email: str, permission: int
 ):
     if settings.USE_FLOW_REST:
         flow_instance = FlowsRESTClient()
@@ -141,7 +141,7 @@ def update_user_permission_project(
     integrations_client = IntegrationsRESTClient()
 
     flow_instance.update_user_permission_project(
-        organization_uuid=flow_organization,
+        organization_uuid=project_uuid,
         user_email=user_email,
         permission=permission,
     )
@@ -317,7 +317,7 @@ def check_organization_free_plan():
             for project in organization.project.all():
                 app.send_task(
                     "update_suspend_project",
-                    args=[str(project.flow_organization), True],
+                    args=[str(project.uuid), True],
                 )
             organization.save(update_fields=["is_suspended"])
             organization.organization_billing.send_email_expired_free_plan(
@@ -439,7 +439,7 @@ def sync_channels_statistics():
     for project in Project.objects.all():
         project.extra_active_integration = len(
             list(
-                flow_instance.list_channel(project_uuid=str(project.flow_organization))
+                flow_instance.list_channel(project_uuid=str(project.uuid))
             )
         )
         project.save(update_fields=["extra_active_integration"])

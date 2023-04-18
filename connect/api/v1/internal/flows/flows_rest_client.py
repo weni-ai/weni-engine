@@ -65,7 +65,7 @@ class FlowsRESTClient:
 
         return response.json()
 
-    def update_project(self, organization_uuid: int, organization_name: str):
+    def update_project(self, organization_uuid: str, organization_name: str):
         body = {
             "uuid": organization_uuid
         }

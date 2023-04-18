@@ -260,7 +260,7 @@ class ProjectSerializer(serializers.ModelSerializer):
         name = validated_data.get("name", instance.name)
         celery_app.send_task(
             "update_project",
-            args=[instance.flow_organization, name],
+            args=[instance.uuid, name],
         )
         updated_instance = super().update(instance, validated_data)
         if not settings.TESTING:
