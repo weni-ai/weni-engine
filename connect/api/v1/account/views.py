@@ -228,7 +228,8 @@ class MyUserProfileViewSet(
                 ),
                 user=dict(
                     phone=user.phone,
-                    last_update_profile=user.last_update_profile
+                    last_update_profile=user.last_update_profile,
+                    position=user.position
                 )
             )
             return Response(status=200, data=response)

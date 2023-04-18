@@ -16,16 +16,16 @@ class LogController(object):
 
     def warning(self, logText: str):
         print(f'{COLORS.WARNING} Warning: {logText}{COLORS.ENDC}')
-    
+
     def fail(self, logText: str):
         print(f'{COLORS.FAIL} Fail: {logText}{COLORS.ENDC}')
-    
+
     def header(self, logText: str):
         print(f'{COLORS.HEADER}{logText}{COLORS.ENDC}')
-    
+
     def cyanText(self, logText: str):
         print(f'{COLORS.BLUE}RUNNING:\n{COLORS.CYAN} └─ {logText}{COLORS.ENDC}')
-    
+
     def success(self):
         print(f'{COLORS.GREEN} └──── SUCCESS')
 
