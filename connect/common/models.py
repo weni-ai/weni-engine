@@ -22,11 +22,12 @@ from connect.common.gateways.rocket_gateway import Rocket
 from enum import Enum
 from celery import current_app
 import stripe
+from connect.common.helpers import send_mass_html_mail
+
 from connect.api.v1.internal.intelligence.intelligence_rest_client import (
     IntelligenceRESTClient,
 )
 from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
-# from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
 from rest_framework import status
 from connect.common.helpers import send_mass_html_mail
 
@@ -1339,9 +1340,7 @@ class BillingPlan(models.Model):
                 self.trial_end_date = pendulum.now().end_of("day").add(months=1)
             else:
                 # Create invoice for charges
-                stripe.api_key = settings.BILLING_SETTINGS.get("stripe", {}).get(
-                    "API_KEY"
-                )
+                stripe.api_key = settings.BILLING_SETTINGS.get("stripe", {}).get("API_KEY")
 
                 customer = self.stripe_customer
 
@@ -1513,7 +1512,10 @@ class BillingPlan(models.Model):
 
         amount_currenty = Decimal(
             BillingPlan.plan_info(self.plan)["price"]
-            + (settings.BILLING_COST_PER_WHATSAPP * self.organization.extra_integration)
+            + (
+                settings.BILLING_COST_PER_WHATSAPP
+                * self.organization.extra_integration
+            )
         ).quantize(Decimal(".01"), decimal.ROUND_HALF_UP)
 
         return {"total_contact": contact_count, "amount_currenty": amount_currenty}

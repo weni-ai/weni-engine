@@ -5,7 +5,6 @@ from connect.api.v2.channels.views import ChannelsAPIView, CreateWACChannelAPIVi
 from connect.api.v2.classifier.views import CreateClassifierAPIView, ListClassifierAPIView, RetrieveClassfierAPIView, DeleteClassifierAPIView
 from connect.api.v2.ticketer.views import TicketerAPIView
 from connect.api.v2.user.views import UserAPIToken
-
 from connect.api.v2.template_projects.views import TemplateTypeViewSet, TemplateFeatureViewSet, TemplateAIViewSet
 
 from connect.api.v2.organizations import views as organization_views
@@ -25,7 +24,6 @@ router.register(
 projects_router = routers.NestedSimpleRouter(
     router, r"organizations", lookup="organization"
 )
-
 projects_router.register(
     "projects", project_views.ProjectViewSet, basename="organization-projects"
 )
