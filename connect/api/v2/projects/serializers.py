@@ -225,7 +225,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             return flows_info
 
         instance.flow_id = flows_info.get("id")
-        instance.flow_organization = flows_info.get("uuid")
+        instance.flow_organization = flows_info.get("flow_organization")
 
         instance.save(
             update_fields=["flow_id", "flow_organization"]
