@@ -151,7 +151,7 @@ class FlowsRESTClient:
         return dict(status=response.status_code)
 
     def get_user_api_token(self, project_uuid: str, user_email: str):
-        params = dict(org=project_uuid, user=user_email)
+        params = dict(project=project_uuid, user=user_email)
         response = requests.get(
             url=f"{self.base_url}/api/v2/internals/users/api-token",
             params=params,
