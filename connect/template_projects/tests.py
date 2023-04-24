@@ -64,10 +64,11 @@ class TemplateTypeModelTestCase(TestCase):
             setup={"setup": "setup"}
         )
 
-    def test_str_returns_valid_id(self):
+    def test_str(self):
 
+        str_response = self.template_type_object.__str__()
         model_id = self.template_type_object.id
-        self.assertIsInstance(model_id, int)
+        self.assertListEqual(str_response.split(), [str(model_id)])
 
 
 class TemplateAIModelTestCase(TestCase):
@@ -88,10 +89,11 @@ class TemplateAIModelTestCase(TestCase):
             template_type=self.template_type_object
         )
 
-    def test_str_returns_valid_id(self):
+    def test_str(self):
 
+        str_response = self.template_ai_object.__str__()
         model_id = self.template_ai_object.id
-        self.assertIsInstance(model_id, int)
+        self.assertListEqual(str_response.split(), [str(model_id)])
 
 
 class TemplateFeatureModelTestCase(TestCase):
@@ -114,7 +116,8 @@ class TemplateFeatureModelTestCase(TestCase):
             template_type=self.template_type_object
         )
 
-    def test_str_returns_valid_id(self):
+    def test_str(self):
 
+        str_response = self.template_feature_object.__str__()
         model_id = self.template_feature_object.id
-        self.assertIsInstance(model_id, int)
+        self.assertListEqual(str_response.split(), [str(model_id)])
