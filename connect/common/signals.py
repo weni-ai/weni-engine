@@ -35,6 +35,7 @@ logger = logging.getLogger("connect.common.signals")
 
 @receiver(post_save, sender=Project)
 def create_service_status(sender, instance, created, **kwargs):
+    update_fields = list(kwargs.get("update_fields")) if kwargs.get("update_fields") else None
     if created:
         for service in Service.objects.filter(default=True):
             instance.service_status.create(service=service)
@@ -62,12 +63,13 @@ def create_service_status(sender, instance, created, **kwargs):
                 )
                 instance.created_by.send_request_flow_user_info(data)
 
-        for permission in instance.project_authorizations.all():
-            update_user_permission_project(
-                project_uuid=str(instance.uuid),
-                user_email=permission.user.email,
-                permission=permission.role
-            )
+        if instance.flow_organization:
+            for permission in instance.project_authorizations.all():
+                update_user_permission_project(
+                    project_uuid=str(instance.flow_organization),
+                    user_email=permission.user.email,
+                    permission=permission.role
+                )
 
         for authorization in instance.organization.authorizations.all():
             if authorization.can_contribute:
@@ -81,6 +83,13 @@ def create_service_status(sender, instance, created, **kwargs):
                         project=project_auth.project,
                         created_by=project_auth.user
                     )
+    elif "flow_organization" in update_fields:
+        for permission in instance.project_authorizations.all():
+            update_user_permission_project(
+                project_uuid=str(instance.flow_organization),
+                user_email=permission.user.email,
+                permission=permission.role
+            )
 
 
 @receiver(post_save, sender=Service)
@@ -285,7 +294,7 @@ def project_authorization(sender, instance, created, **kwargs):
             instance_user.save(update_fields=["role"])
 
         update_user_permission_project(
-            project_uuid=str(instance.project.uuid),
+            project_uuid=str(instance.project.flow_organization),
             user_email=instance.user.email,
             permission=instance.role
         )
