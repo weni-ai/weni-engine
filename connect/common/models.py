@@ -281,35 +281,59 @@ class Organization(models.Model):
         )
         return mail
 
-    def send_email_change_organization_name(
-        self,
-        user_name: str,
-        email: str,
-        organization_previous_name: str,
-        organization_new_name: str,
-    ):
+    def send_email_change_organization_name(self, prev_name: str, new_name: str, emails: list = None):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
+
+        print(prev_name, new_name)
+
+        if not emails:
+            emails = (
+                self.authorizations.exclude(
+                    role=OrganizationRole.VIEWER.value
+                )
+                .values_list("user__email", "user__username", "user__language")
+                .order_by("user__language")
+            )
+
+        from_email = None
+
         context = {
-            "base_url": settings.BASE_URL,
-            "user_name": user_name,
-            "organization_previous_name": organization_previous_name,
-            "organization_new_name": organization_new_name,
+            "webapp_billing_url": f"{settings.WEBAPP_BASE_URL}/orgs/{self.uuid}/billing",
+            "org_name": self.name,
+            "organization_previous_name": prev_name,
+            "organization_new_name": new_name,
         }
-        mail.send_mail(
-            f"{organization_previous_name} "
-            + _("is now")
-            + f" {organization_new_name}",
-            render_to_string(
-                "common/emails/organization/change_organization_name.txt", context
-            ),
-            None,
-            [email],
-            html_message=render_to_string(
-                "common/emails/organization/change_organization_name.html", context
-            ),
-        )
-        return mail
+
+        msg_list = []
+
+        for email in emails:
+
+            username = email[1]
+            context["user_name"] = username
+
+            language = email[2]
+
+            if language == "pt-br":
+                subject = f"{prev_name} agora se chama {new_name}!"
+            else:
+                subject = _(f"{prev_name} is now named {new_name}!")
+
+            message = render_to_string(
+                "common/emails/organization/change_organization_name.txt",
+                context,
+            )
+            html_message = render_to_string(
+                "common/emails/organization/change_organization_name.html",
+                context,
+            )
+
+            recipient_list = [email[0]]
+            msg = (subject, message, html_message, from_email, recipient_list)
+            msg_list.append(msg)
+
+            html_mail = send_mass_html_mail(msg_list, fail_silently=False)
+            return html_mail
 
     def send_email_access_code(self, email: str, user_name: str, access_code: str):
         if not settings.SEND_EMAILS:
@@ -322,7 +346,7 @@ class Organization(models.Model):
             "access_code": access_code,
             "user_name": user_name,
         }
-            
+
         mail.send_mail(
             _("You receive an access code to Weni Platform"),
             render_to_string(f"authentication/emails/access_code_{user.language}.txt", context),
@@ -2258,4 +2282,3 @@ class NewsletterOrganization(models.Model):
 
     def trial_end_date(self):
         return self.organization.organization_billing.trial_end_date
-
