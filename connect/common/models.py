@@ -351,8 +351,6 @@ class Organization(models.Model):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
 
-        print(prev_name, new_name)
-
         if not emails:
             emails = (
                 self.authorizations.exclude(
@@ -754,25 +752,55 @@ class Project(models.Model):
 
         current_app.send_task("delete_project", args=[flow_organization, user_email])
 
-    def send_email_create_project(self, first_name: str, email: str):
+    def send_email_create_project(self, emails: list = None):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
+
+        if not emails:
+            emails = (
+                self.project_authorizations.exclude(
+                    role=OrganizationRole.VIEWER.value
+                )
+                .values_list("user__email", "user__username", "user__language")
+                .order_by("user__language")
+            )
+
+        from_email = None
+        msg_list = []
+
         context = {
             "base_url": settings.BASE_URL,
             "organization_name": self.organization.name,
             "project_name": self.name,
-            "first_name": first_name,
         }
-        mail.send_mail(
-            _(f"You have been invited to join the {self.name} organization"),
-            render_to_string("common/emails/project/project_create.txt", context),
-            None,
-            [email],
-            html_message=render_to_string(
-                "common/emails/project/project_create.html", context
-            ),
-        )
-        return mail
+
+        for email in emails:
+
+            username = email[1]
+            context["first_name"] = username
+
+            language = email[2]
+
+            if language == "pt-br":
+                subject = "Seu projeto foi criado com sucesso!"
+            else:
+                subject = _("Your project has been successfully created!")
+
+            message = render_to_string(
+                "common/emails/project/project_create.txt",
+                context,
+            )
+            html_message = render_to_string(
+                "common/emails/project/project_create.html",
+                context,
+            )
+
+            recipient_list = [email[0]]
+            msg = (subject, message, html_message, from_email, recipient_list)
+            msg_list.append(msg)
+
+        html_mail = send_mass_html_mail(msg_list, fail_silently=False)
+        return html_mail
 
     def send_email_change_project(self, first_name: str, email: str, info: dict):
         if not settings.SEND_EMAILS:

@@ -359,3 +359,9 @@ def request_chats_permission(sender, instance, created, **kwargs):
                         )
                 # project_auth.save(update_fields=["chats_authorization"])
                 instance.delete()
+
+
+@receiver(post_save, sender=Project)
+def send_email_create_project(sender, instance, created, **kwargs):
+    if created:
+        instance.send_email_create_project()
