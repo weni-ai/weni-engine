@@ -216,27 +216,56 @@ class Organization(models.Model):
         )
         return mail
 
-    def send_email_organization_create(self, email: str, first_name: str):
+    def send_email_organization_create(self, emails: list = None):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
+
+        if not emails:
+            emails = (
+                self.authorizations.exclude(
+                    role=OrganizationRole.VIEWER.value
+                )
+                .values_list("user__email", "user__username", "user__language")
+                .order_by("user__language")
+            )
+
+        from_email = None
+
         context = {
             "base_url": settings.BASE_URL,
             "webapp_base_url": settings.WEBAPP_BASE_URL,
             "organization_name": self.name,
-            "first_name": first_name,
         }
-        mail.send_mail(
-            _("Organization created!"),
-            render_to_string(
-                "common/emails/organization/organization_create.txt", context
-            ),
-            None,
-            [email],
-            html_message=render_to_string(
-                "common/emails/organization/organization_create.html", context
-            ),
-        )
-        return mail
+
+        msg_list = []
+
+        for email in emails:
+
+            username = email[1]
+            context["first_name"] = username
+
+            language = email[2]
+
+            if language == "pt-br":
+                subject = f"Você acabou de dar vida a {self.name}"
+            else:
+                subject = _(f"You just gave life to {self.name}")
+
+            message = render_to_string(
+                "common/emails/organization/organization_create.txt",
+                context,
+            )
+            html_message = render_to_string(
+                "common/emails/organization/organization_create.html",
+                context,
+            )
+
+            recipient_list = [email[0]]
+            msg = (subject, message, html_message, from_email, recipient_list)
+            msg_list.append(msg)
+
+            html_mail = send_mass_html_mail(msg_list, fail_silently=False)
+            return html_mail
 
     def send_email_remove_permission_organization(self, first_name: str, email: str):
         if not settings.SEND_EMAILS:
