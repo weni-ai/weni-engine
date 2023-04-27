@@ -11,8 +11,7 @@ from django.db import models
 from django.db.models import Sum
 from django.template.loader import render_to_string
 from django.utils import timezone
-
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import activate, ugettext_lazy as _
 from timezone_field import TimeZoneField
 
 from connect import billing
@@ -418,24 +417,34 @@ class Organization(models.Model):
         return mail
 
     def send_email_permission_change(
-        self, user_name: str, old_permission: str, new_permission: str, email: str
+        self, user: User, old_permission: str, new_permission: str
     ):
+
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
+
         context = {
             "base_url": settings.BASE_URL,
-            "user_name": user_name,
+            "user_name": user.username,
             "old_permission": old_permission,
             "new_permission": new_permission,
             "org_name": self.name,
         }
+
+        activate(user.language)
+
+        if user.language == "pt-br":
+            subject = f"Um administrador da organização { self.name } atualizou sua permissão"
+        else:
+            subject = _(f"An administrator of {self.name } has updated your permission")
+
         mail.send_mail(
-            _("A new permission has been assigned to you"),
+            subject,
             render_to_string(
                 "common/emails/organization/permission_change.txt", context
             ),
             None,
-            [email],
+            [user.email],
             html_message=render_to_string(
                 "common/emails/organization/permission_change.html", context
             ),
