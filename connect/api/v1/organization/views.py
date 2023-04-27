@@ -229,6 +229,7 @@ class OrganizationViewSet(
 
     def perform_destroy(self, instance):
         intelligence_organization = instance.inteligence_organization
+        instance.send_email_delete_organization()
         instance.delete()
         ai_client = IntelligenceRESTClient()
         ai_client.delete_organization(organization_id=intelligence_organization, user_email=self.request.user.email)

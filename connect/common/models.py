@@ -289,26 +289,56 @@ class Organization(models.Model):
         )
         return mail
 
-    def send_email_delete_organization(self, first_name: str, email: str):
+    def send_email_delete_organization(self, emails: list = None):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
+
+        if not emails:
+            emails = (
+                self.authorizations.exclude(
+                    role=OrganizationRole.VIEWER.value
+                )
+                .values_list("user__email", "user__username", "user__language")
+                .order_by("user__language")
+            )
+
+        from_email = None
+
         context = {
             "base_url": settings.BASE_URL,
+            "webapp_base_url": settings.WEBAPP_BASE_URL,
             "organization_name": self.name,
-            "first_name": first_name,
         }
-        mail.send_mail(
-            f"{self.name} " + _("no longer exists!"),
-            render_to_string(
-                "common/emails/organization/delete_organization.txt", context
-            ),
-            None,
-            [email],
-            html_message=render_to_string(
-                "common/emails/organization/delete_organization.html", context
-            ),
-        )
-        return mail
+
+        msg_list = []
+
+        for email in emails:
+
+            username = email[1]
+            context["first_name"] = username
+
+            language = email[2]
+
+            if language == "pt-br":
+                subject = f"A organização { self.name } deixou de existir"
+            else:
+                subject = _(f"The organization { self.name } no longer exists")
+
+            message = render_to_string(
+                "common/emails/organization/delete_organization.txt",
+                context,
+            )
+            html_message = render_to_string(
+                "common/emails/organization/delete_organization.html",
+                context,
+            )
+
+            recipient_list = [email[0]]
+            msg = (subject, message, html_message, from_email, recipient_list)
+            msg_list.append(msg)
+
+            html_mail = send_mass_html_mail(msg_list, fail_silently=False)
+            return html_mail
 
     def send_email_change_organization_name(self, prev_name: str, new_name: str, emails: list = None):
         if not settings.SEND_EMAILS:
