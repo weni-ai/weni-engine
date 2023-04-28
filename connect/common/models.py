@@ -13,6 +13,7 @@ from django.template.loader import render_to_string
 from django.utils import timezone
 
 from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import activate
 from timezone_field import TimeZoneField
 
 from connect import billing
@@ -1836,27 +1837,22 @@ class BillingPlan(models.Model):
         for email in emails:
 
             username = email[1]
+            language_code = email[2]
+            activate(language_code)
             context["user_name"] = username
-
-            if email[2] == "en-us":
+            message = render_to_string(
+                "billing/emails/plan_is_about_to_expire_en.txt", context
+            )
+            html_message = render_to_string(
+                "billing/emails/plan_is_about_to_expire_en.html", context
+            )
+            if language_code == "en-us":
                 subject = _(
                     f"Your organization is close to {self.plan_limit} attendances"
-                )
-                message = render_to_string(
-                    "billing/emails/plan_is_about_to_expire_en.txt", context
-                )
-                html_message = render_to_string(
-                    "billing/emails/plan_is_about_to_expire_en.html", context
                 )
             else:
                 subject = _(
                     f"Sua organização estã proxima de {self.plan_limit} atendimentos"
-                )
-                message = render_to_string(
-                    "billing/emails/plan_is_about_to_expire_pt_BR.txt", context
-                )
-                html_message = render_to_string(
-                    "billing/emails/plan_is_about_to_expire_pt_BR.html", context
                 )
 
             recipient_list = [email[0]]
