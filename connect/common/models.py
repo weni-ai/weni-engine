@@ -1597,7 +1597,7 @@ class BillingPlan(models.Model):
             "user_name": user_name,
         }
         mail.send_mail(
-            _("Your organization's plan has expired"),
+            _("Your organization's plan has ended"),
             render_to_string("billing/emails/finished-plan.txt", context),
             None,
             email,
