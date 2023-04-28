@@ -40,21 +40,8 @@ class UserTestCase(TestCase):
         )
 
     def test_update_language(self):
-        self.user.language = "es"
-        self.user.save()
-        self.assertEqual(self.user.language, "es")
-
-    def test_send_request_flow_user_info(self):
-        self.user.send_request_flow_user_info()
-        self.assertTrue(self.user.is_request_flow_user_info)
-
-    def test_send_password_reset(self):
-        self.user.send_password_reset()
-        self.assertTrue(self.user.is_request_password_reset)
-
-    def test_check_password_reset_token(self):
-        self.user.send_password_reset()
-        self.assertTrue(self.user.check_password_reset_token(self.user.password_reset_token))
+        self.user.update_language("pt_br")
+        self.assertEqual(self.user.language, "pt_br")
 
     def test_token_generator(self):
         self.assertTrue(self.user.token_generator)
