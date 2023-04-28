@@ -1781,27 +1781,19 @@ class BillingPlan(models.Model):
 
         for email in emails:
 
+            language_code = email[2]
+            activate(language_code)
             username = email[1]
             context["user_name"] = username
-
-            if email[2] == "en-us":
-                message = render_to_string(
-                    "billing/emails/plan_expired_due_attendence_limit_en.txt", context
-                )
-                html_message = render_to_string(
-                    "billing/emails/plan_expired_due_attendence_limit_en.html", context
-                )
+            html_message = render_to_string(
+                "billing/emails/plan_expired_due_attendence_limit_en.html", context
+            )
+            message = render_to_string(
+                "billing/emails/plan_expired_due_attendence_limit_en.txt", context
+            )
+            if language_code == "en-us":
                 subject = _(f"You reached {self.plan_limit} attendances")
-
             else:
-                message = render_to_string(
-                    "billing/emails/plan_expired_due_attendence_limit_pt_BR.txt",
-                    context,
-                )
-                html_message = render_to_string(
-                    "billing/emails/plan_expired_due_attendence_limit_pt_BR.html",
-                    context,
-                )
                 subject = _(f"Você atingiu {self.plan_limit} atendimentos")
 
             recipient_list = [email[0]]
