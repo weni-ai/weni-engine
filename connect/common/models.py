@@ -1727,26 +1727,18 @@ class BillingPlan(models.Model):
         msg_list = []
         for email in emails:
 
+            language_code = email[2]
             username = email[1]
             context["user_name"] = username
-
-            if email[2] == "en-us":
-                message = render_to_string(
-                    "billing/emails/trial_plan_expired_due_time_limit_en.txt", context
-                )
-                html_message = render_to_string(
-                    "billing/emails/trial_plan_expired_due_time_limit_en.html", context
-                )
+            message = render_to_string(
+                "billing/emails/trial_plan_expired_due_time_limit_en.txt", context
+            )
+            html_message = render_to_string(
+                "billing/emails/trial_plan_expired_due_time_limit_en.html", context
+            )
+            if language_code == "en-us":
                 subject = _("Your trial plan has expired")
             else:
-                message = render_to_string(
-                    "billing/emails/trial_plan_expired_due_time_limit_pt_BR.txt",
-                    context,
-                )
-                html_message = render_to_string(
-                    "billing/emails/trial_plan_expired_due_time_limit_pt_BR.html",
-                    context,
-                )
                 subject = "Seu plano Trial expirou"
 
             recipient_list = [email[0]]
