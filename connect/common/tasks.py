@@ -377,7 +377,6 @@ def sync_project_information():
             if len(statistic_project_result) > 0:
                 project.flow_count = int(statistic_project_result.get("active_flows"))
                 project.save(update_fields=["flow_count"])
-            print(f"Project: {project} - OK: {project.flow_count} flows")
         except ConnectionError as c:
             logger.error(f"Remote end closed connection without: {c} - Project: {project}")
             continue
