@@ -211,6 +211,7 @@ class FlowsRESTClient:
         response = requests.get(
             url=f'{self.base_url}/api/v2/internals/statistic/{project_uuid}/',
             headers=self.authentication_instance.headers,
+            timeout=180
         )
         return response.json()
 
