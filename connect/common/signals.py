@@ -292,12 +292,12 @@ def project_authorization(sender, instance, created, **kwargs):
         if instance_user.level == OrganizationLevelRole.NOTHING.value:
             instance_user.role = OrganizationRole.VIEWER.value
             instance_user.save(update_fields=["role"])
-
-        update_user_permission_project(
-            project_uuid=str(instance.project.flow_organization),
-            user_email=instance.user.email,
-            permission=instance.role
-        )
+        if instance.project.flow_organization:
+            update_user_permission_project(
+                project_uuid=str(instance.project.flow_organization),
+                user_email=instance.user.email,
+                permission=instance.role
+            )
 
 
 @receiver(post_save, sender=RequestRocketPermission)
