@@ -1632,14 +1632,33 @@ class BillingPlan(models.Model):
             "user_name": user_name,
             "org_name": self.organization.name,
         }
-        mail.send_mail(
-            _("Your organization's credit card was removed"),
-            render_to_string("billing/emails/removed_card.txt", context),
-            None,
-            email,
-            html_message=render_to_string("billing/emails/removed_card.html", context),
-        )
-        return mail
+        from_email = None
+        msg_list = []
+        for user_email in email:
+
+            language_code = User.objects.get(email=user_email).language
+            activate(language_code)
+            message = render_to_string(
+                "billing/emails/removed_card.txt", context
+            )
+            html_message = render_to_string(
+                "billing/emails/removed_card.html", context
+            )
+            if language_code == "en-us":
+                subject = _(
+                    "Your organization's credit card was removed"
+                )
+            else:
+                subject = _(
+                    "O cartão de crédito vinculado a sua organização foi removido"
+                )
+
+            recipient_list = [user_email]
+            msg = (subject, message, html_message, from_email, recipient_list)
+            msg_list.append(msg)
+
+        html_mail = send_mass_html_mail(msg_list, fail_silently=False)
+        return html_mail
 
     def send_email_expired_free_plan(self, user_name: str, email: list):
         if not settings.SEND_EMAILS:
