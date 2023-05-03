@@ -66,7 +66,8 @@ def create_service_status(sender, instance, created, **kwargs):
         if instance.flow_organization:
             for permission in instance.project_authorizations.all():
                 update_user_permission_project(
-                    project_uuid=str(instance.flow_organization),
+                    project_uuid=str(instance.uuid),
+                    flow_organization=str(instance.flow_organization),
                     user_email=permission.user.email,
                     permission=permission.role
                 )
@@ -86,7 +87,8 @@ def create_service_status(sender, instance, created, **kwargs):
     elif "flow_organization" in update_fields:
         for permission in instance.project_authorizations.all():
             update_user_permission_project(
-                project_uuid=str(instance.flow_organization),
+                project_uuid=str(instance.uuid),
+                flow_organization=str(instance.flow_organization),
                 user_email=permission.user.email,
                 permission=permission.role
             )
@@ -294,7 +296,8 @@ def project_authorization(sender, instance, created, **kwargs):
             instance_user.save(update_fields=["role"])
         if instance.project.flow_organization:
             update_user_permission_project(
-                project_uuid=str(instance.project.flow_organization),
+                project_uuid=str(instance.project.uuid),
+                flow_organization=str(instance.project.flow_organization),
                 user_email=instance.user.email,
                 permission=instance.role
             )

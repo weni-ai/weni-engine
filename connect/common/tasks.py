@@ -131,7 +131,7 @@ def delete_project(project_uuid: str, user_email):
     retry_backoff=True,
 )
 def update_user_permission_project(
-    project_uuid: str, user_email: str, permission: int
+    project_uuid: str, flow_organization: str, user_email: str, permission: int
 ):
     if settings.USE_FLOW_REST:
         flow_instance = FlowsRESTClient()
@@ -141,7 +141,7 @@ def update_user_permission_project(
     integrations_client = IntegrationsRESTClient()
 
     flow_instance.update_user_permission_project(
-        organization_uuid=project_uuid,
+        organization_uuid=flow_organization,
         user_email=user_email,
         permission=permission,
     )
