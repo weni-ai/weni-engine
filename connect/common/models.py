@@ -584,7 +584,7 @@ class Project(models.Model):
         default=DATE_FORMAT_DAY_FIRST,
         help_text=_("Whether day comes first or month comes first in dates"),
     )
-    flow_organization = models.UUIDField(_("flow identification UUID"), unique=True)
+    flow_organization = models.UUIDField(_("flow identification UUID"), unique=True, null=True, blank=True)
     flow_id = models.PositiveIntegerField(
         _("flow identification ID"), unique=True, null=True
     )
@@ -646,9 +646,9 @@ class Project(models.Model):
         return {"flow": flows_result, "intelligence": intelligence_result}
 
     def perform_destroy_flows_project(self, user_email: str):
-        flow_organization = self.flow_organization
+        project_uuid = self.uuid
 
-        current_app.send_task("delete_project", args=[flow_organization, user_email])
+        current_app.send_task("delete_project", args=[project_uuid, user_email])
 
     def send_email_create_project(self, first_name: str, email: str):
         if not settings.SEND_EMAILS:
@@ -769,6 +769,7 @@ class Project(models.Model):
                 "data": {"message": "Could not create classifier"},
                 "status": status.HTTP_500_INTERNAL_SERVER_ERROR
             }
+
         return created, data
 
     def create_chats_project(self):
@@ -1362,7 +1363,7 @@ class BillingPlan(models.Model):
                 )
                 for project in self.organization.project.all():  # pragma: no cover
                     current_app.send_task(
-                        name="update_suspend_project", args=[project.flow_organization, False]
+                        name="update_suspend_project", args=[project.uuid, False]
                     )
 
         return super().save(force_insert, force_update, using, update_fields)
@@ -1901,7 +1902,7 @@ class BillingPlan(models.Model):
         self.organization.save(update_fields=["is_suspended"])
         for project in self.organization.project.all():
             current_app.send_task(  # pragma: no cover
-                name="update_suspend_project", args=[project.flow_organization, True]
+                name="update_suspend_project", args=[project.uuid, True]
             )
 
     @property

@@ -18,11 +18,12 @@ class FlowsRESTClient:
         assert endpoint.startswith("/"), "the endpoint needs to start with: /"
         return self.base_url + endpoint
 
-    def create_template_project(self, project_name: str, user_email: str, project_timezone: str):
+    def create_template_project(self, project_name: str, user_email: str, project_timezone: str, project_uuid: str):
         body = dict(
             name=project_name,
             timezone=project_timezone,
-            user_email=user_email
+            user_email=user_email,
+            uuid=project_uuid,
         )
         response = requests.post(
             url=f"{self.base_url}/api/v2/internals/template-orgs/",
@@ -48,11 +49,12 @@ class FlowsRESTClient:
         )
         return dict(status=response.status_code, data=response.text)
 
-    def create_project(self, project_name: str, user_email: str, project_timezone: str):
+    def create_project(self, project_name: str, user_email: str, project_timezone: str, project_uuid: str):
         body = dict(
             name=project_name,
             timezone=project_timezone,
-            user_email=user_email
+            user_email=user_email,
+            uuid=project_uuid,
         )
 
         response = requests.post(
@@ -63,7 +65,7 @@ class FlowsRESTClient:
 
         return response.json()
 
-    def update_project(self, organization_uuid: int, organization_name: str):
+    def update_project(self, organization_uuid: str, organization_name: str):
         body = {
             "uuid": organization_uuid
         }
@@ -149,7 +151,7 @@ class FlowsRESTClient:
         return dict(status=response.status_code)
 
     def get_user_api_token(self, project_uuid: str, user_email: str):
-        params = dict(org=project_uuid, user=user_email)
+        params = dict(project=project_uuid, user=user_email)
         response = requests.get(
             url=f"{self.base_url}/api/v2/internals/users/api-token",
             params=params,
