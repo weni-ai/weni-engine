@@ -1,3 +1,7 @@
+# 2.8.1
+## *Fix*
+  - fix api_v2_urls import
+
 # 2.8.0
 ## *Change*
   - Connect-Flows Communication; Passing `project.uuid` instead of `project.flow_organization`
