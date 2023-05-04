@@ -11,8 +11,7 @@ from django.db import models
 from django.db.models import Sum
 from django.template.loader import render_to_string
 from django.utils import timezone
-
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import activate, ugettext_lazy as _
 from timezone_field import TimeZoneField
 
 from connect import billing
@@ -178,19 +177,27 @@ class Organization(models.Model):
         )
         return mail
 
-    def send_email_organization_going_out(self, user_name: str, email: str):
+    def send_email_organization_going_out(self, user: User):
+
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
+
         context = {
             "base_url": settings.BASE_URL,
-            "user_name": user_name,
+            "user_name": user.username,
             "organization_name": self.name,
         }
+
+        if user.language == "pt-br":
+            subject = f"Você está deixando a organização {self.name}"
+        else:
+            subject = _(f"You are leaving {self.name}")
+
         mail.send_mail(
-            _("You are leaving") + f" {self.name}",
+            subject,
             render_to_string("common/emails/organization/leaving_org.txt", context),
             None,
-            [email],
+            [user.email],
             html_message=render_to_string(
                 "common/emails/organization/leaving_org.html", context
             ),
@@ -216,27 +223,56 @@ class Organization(models.Model):
         )
         return mail
 
-    def send_email_organization_create(self, email: str, first_name: str):
+    def send_email_organization_create(self, emails: list = None):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
+
+        if not emails:
+            emails = (
+                self.authorizations.exclude(
+                    role=OrganizationRole.VIEWER.value
+                )
+                .values_list("user__email", "user__username", "user__language")
+                .order_by("user__language")
+            )
+
+        from_email = None
+
         context = {
             "base_url": settings.BASE_URL,
             "webapp_base_url": settings.WEBAPP_BASE_URL,
             "organization_name": self.name,
-            "first_name": first_name,
         }
-        mail.send_mail(
-            _("Organization created!"),
-            render_to_string(
-                "common/emails/organization/organization_create.txt", context
-            ),
-            None,
-            [email],
-            html_message=render_to_string(
-                "common/emails/organization/organization_create.html", context
-            ),
-        )
-        return mail
+
+        msg_list = []
+
+        for email in emails:
+
+            username = email[1]
+            context["first_name"] = username
+
+            language = email[2]
+
+            if language == "pt-br":
+                subject = f"Você acabou de dar vida a {self.name}"
+            else:
+                subject = _(f"You just gave life to {self.name}")
+
+            message = render_to_string(
+                "common/emails/organization/organization_create.txt",
+                context,
+            )
+            html_message = render_to_string(
+                "common/emails/organization/organization_create.html",
+                context,
+            )
+
+            recipient_list = [email[0]]
+            msg = (subject, message, html_message, from_email, recipient_list)
+            msg_list.append(msg)
+
+            html_mail = send_mass_html_mail(msg_list, fail_silently=False)
+            return html_mail
 
     def send_email_remove_permission_organization(self, first_name: str, email: str):
         if not settings.SEND_EMAILS:
@@ -260,95 +296,161 @@ class Organization(models.Model):
         )
         return mail
 
-    def send_email_delete_organization(self, first_name: str, email: str):
+    def send_email_delete_organization(self, emails: list = None):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
-        context = {
-            "base_url": settings.BASE_URL,
-            "organization_name": self.name,
-            "first_name": first_name,
-        }
-        mail.send_mail(
-            f"{self.name} " + _("no longer exists!"),
-            render_to_string(
-                "common/emails/organization/delete_organization.txt", context
-            ),
-            None,
-            [email],
-            html_message=render_to_string(
-                "common/emails/organization/delete_organization.html", context
-            ),
-        )
-        return mail
 
-    def send_email_change_organization_name(
-        self,
-        user_name: str,
-        email: str,
-        organization_previous_name: str,
-        organization_new_name: str,
-    ):
-        if not settings.SEND_EMAILS:
-            return False  # pragma: no cover
+        if not emails:
+            emails = (
+                self.authorizations.exclude(
+                    role=OrganizationRole.VIEWER.value
+                )
+                .values_list("user__email", "user__username", "user__language")
+                .order_by("user__language")
+            )
+
+        from_email = None
+
         context = {
             "base_url": settings.BASE_URL,
-            "user_name": user_name,
-            "organization_previous_name": organization_previous_name,
-            "organization_new_name": organization_new_name,
+            "webapp_base_url": settings.WEBAPP_BASE_URL,
+            "organization_name": self.name,
         }
-        mail.send_mail(
-            f"{organization_previous_name} "
-            + _("is now")
-            + f" {organization_new_name}",
-            render_to_string(
-                "common/emails/organization/change_organization_name.txt", context
-            ),
-            None,
-            [email],
-            html_message=render_to_string(
-                "common/emails/organization/change_organization_name.html", context
-            ),
-        )
-        return mail
+
+        msg_list = []
+
+        for email in emails:
+
+            username = email[1]
+            context["first_name"] = username
+
+            language = email[2]
+
+            if language == "pt-br":
+                subject = f"A organização { self.name } deixou de existir"
+            else:
+                subject = _(f"The organization { self.name } no longer exists")
+
+            message = render_to_string(
+                "common/emails/organization/delete_organization.txt",
+                context,
+            )
+            html_message = render_to_string(
+                "common/emails/organization/delete_organization.html",
+                context,
+            )
+
+            recipient_list = [email[0]]
+            msg = (subject, message, html_message, from_email, recipient_list)
+            msg_list.append(msg)
+
+            html_mail = send_mass_html_mail(msg_list, fail_silently=False)
+            return html_mail
+
+    def send_email_change_organization_name(self, prev_name: str, new_name: str, emails: list = None):
+        if not settings.SEND_EMAILS:
+            return False  # pragma: no cover
+
+        if not emails:
+            emails = (
+                self.authorizations.exclude(
+                    role=OrganizationRole.VIEWER.value
+                )
+                .values_list("user__email", "user__username", "user__language")
+                .order_by("user__language")
+            )
+
+        from_email = None
+
+        context = {
+            "webapp_billing_url": f"{settings.WEBAPP_BASE_URL}/orgs/{self.uuid}/billing",
+            "org_name": self.name,
+            "organization_previous_name": prev_name,
+            "organization_new_name": new_name,
+        }
+
+        msg_list = []
+
+        for email in emails:
+
+            username = email[1]
+            context["user_name"] = username
+
+            language = email[2]
+
+            if language == "pt-br":
+                subject = f"{prev_name} agora se chama {new_name}!"
+            else:
+                subject = _(f"{prev_name} is now named {new_name}!")
+
+            message = render_to_string(
+                "common/emails/organization/change_organization_name.txt",
+                context,
+            )
+            html_message = render_to_string(
+                "common/emails/organization/change_organization_name.html",
+                context,
+            )
+
+            recipient_list = [email[0]]
+            msg = (subject, message, html_message, from_email, recipient_list)
+            msg_list.append(msg)
+
+            html_mail = send_mass_html_mail(msg_list, fail_silently=False)
+            return html_mail
 
     def send_email_access_code(self, email: str, user_name: str, access_code: str):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
+
+        user = User.objects.get(email=email)
+
         context = {
             "base_url": settings.BASE_URL,
             "access_code": access_code,
             "user_name": user_name,
         }
+
         mail.send_mail(
             _("You receive an access code to Weni Platform"),
-            render_to_string("authentication/emails/access_code.txt", context),
+            render_to_string(f"authentication/emails/access_code_{user.language}.txt", context),
             None,
             [email],
             html_message=render_to_string(
-                "authentication/emails/access_code.html", context
+                f"authentication/emails/access_code_{user.language}.html", context
             ),
         )
         return mail
 
     def send_email_permission_change(
-        self, user_name: str, old_permission: str, new_permission: str, email: str
+        self, user: User, old_permission: str, new_permission: str
     ):
+
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
+
         context = {
             "base_url": settings.BASE_URL,
-            "user_name": user_name,
+            "user_name": user.username,
             "old_permission": old_permission,
             "new_permission": new_permission,
             "org_name": self.name,
         }
+
+        activate(user.language)
+
+        if user.language == "pt-br":
+            subject = f"Um administrador da organização { self.name } atualizou sua permissão"
+        else:
+            subject = _(f"An administrator of {self.name } has updated your permission")
+
         mail.send_mail(
-            _("A new permission has been assigned to you"),
+            subject,
             render_to_string(
                 "common/emails/organization/permission_change.txt", context
             ),
             None,
-            [email],
+            [user.email],
             html_message=render_to_string(
                 "common/emails/organization/permission_change.html", context
             ),
@@ -650,25 +752,55 @@ class Project(models.Model):
 
         current_app.send_task("delete_project", args=[project_uuid, user_email])
 
-    def send_email_create_project(self, first_name: str, email: str):
+    def send_email_create_project(self, emails: list = None):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
+
+        if not emails:
+            emails = (
+                self.project_authorizations.exclude(
+                    role=OrganizationRole.VIEWER.value
+                )
+                .values_list("user__email", "user__username", "user__language")
+                .order_by("user__language")
+            )
+
+        from_email = None
+        msg_list = []
+
         context = {
             "base_url": settings.BASE_URL,
             "organization_name": self.organization.name,
             "project_name": self.name,
-            "first_name": first_name,
         }
-        mail.send_mail(
-            _(f"You have been invited to join the {self.name} organization"),
-            render_to_string("common/emails/project/project_create.txt", context),
-            None,
-            [email],
-            html_message=render_to_string(
-                "common/emails/project/project_create.html", context
-            ),
-        )
-        return mail
+
+        for email in emails:
+
+            username = email[1]
+            context["first_name"] = username
+
+            language = email[2]
+
+            if language == "pt-br":
+                subject = "Seu projeto foi criado com sucesso!"
+            else:
+                subject = _("Your project has been successfully created!")
+
+            message = render_to_string(
+                "common/emails/project/project_create.txt",
+                context,
+            )
+            html_message = render_to_string(
+                "common/emails/project/project_create.html",
+                context,
+            )
+
+            recipient_list = [email[0]]
+            msg = (subject, message, html_message, from_email, recipient_list)
+            msg_list.append(msg)
+
+        html_mail = send_mass_html_mail(msg_list, fail_silently=False)
+        return html_mail
 
     def send_email_change_project(self, first_name: str, email: str, info: dict):
         if not settings.SEND_EMAILS:

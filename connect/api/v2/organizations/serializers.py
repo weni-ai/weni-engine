@@ -129,6 +129,8 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
             user=user, role=OrganizationRole.ADMIN.value
         )
 
+        instance.send_email_organization_create()
+
         # Other users
         for authorization in authorizations:
             RequestPermissionOrganization.objects.create(
