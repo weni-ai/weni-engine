@@ -35,13 +35,14 @@ logger = logging.getLogger("connect.common.signals")
 
 @receiver(post_save, sender=Project)
 def create_service_status(sender, instance, created, **kwargs):
+    update_fields = list(kwargs.get("update_fields")) if kwargs.get("update_fields") else None
     if created:
         for service in Service.objects.filter(default=True):
             instance.service_status.create(service=service)
         if not settings.TESTING:
             chats_client = ChatsRESTClient()
 
-            template = instance.is_template and instance.template_type == Project.TYPE_SUPPORT
+            template = instance.is_template and instance.template_type in [Project.TYPE_SUPPORT, Project.TYPE_OMIE_PAYMENT_FINANCIAL, Project.TYPE_OMIE_PAYMENT_FINANCIAL_CHAT_GPT]
 
             if not template:
                 response = chats_client.create_chat_project(
@@ -62,22 +63,15 @@ def create_service_status(sender, instance, created, **kwargs):
                 )
                 instance.created_by.send_request_flow_user_info(data)
 
-        for permission in instance.project_authorizations.all():
-            update_user_permission_project(
-                flow_organization=str(instance.flow_organization),
-                project_uuid=str(instance.uuid),
-                user_email=permission.user.email,
-                permission=permission.role
-            )
-            # celery_app.send_task(
-            #     "update_user_permission_project",
-            #     args=[
-            #         instance.flow_organization,
-            #         instance.uuid,
-            #         permission.user.email,
-            #         permission.role,
-            #     ],
-            # )
+        if instance.flow_organization:
+            for permission in instance.project_authorizations.all():
+                update_user_permission_project(
+                    project_uuid=str(instance.uuid),
+                    flow_organization=str(instance.flow_organization),
+                    user_email=permission.user.email,
+                    permission=permission.role
+                )
+
         for authorization in instance.organization.authorizations.all():
             if authorization.can_contribute:
                 project_auth = instance.get_user_authorization(authorization.user)
@@ -90,6 +84,14 @@ def create_service_status(sender, instance, created, **kwargs):
                         project=project_auth.project,
                         created_by=project_auth.user
                     )
+    elif "flow_organization" in update_fields:
+        for permission in instance.project_authorizations.all():
+            update_user_permission_project(
+                project_uuid=str(instance.uuid),
+                flow_organization=str(instance.flow_organization),
+                user_email=permission.user.email,
+                permission=permission.role
+            )
 
 
 @receiver(post_save, sender=Service)
@@ -105,7 +107,7 @@ def update_organization(instance, **kwargs):
         celery_app.send_task(  # pragma: no cover
             name="update_suspend_project",
             args=[
-                str(project.flow_organization),
+                str(project.uuid),
                 instance.is_suspended,
             ],
         )
@@ -120,7 +122,7 @@ def delete_opened_project(sender, instance, **kwargs):
 
 @receiver(post_save, sender=OrganizationAuthorization)
 def org_authorizations(sender, instance, created, **kwargs):
-
+    # if settings.CREATE_AI_ORGANIZATION:
     if instance.role is not OrganizationLevelRole.NOTHING.value:
         if created:
             organization_permission_mapper = {
@@ -251,19 +253,19 @@ def request_permission_project(sender, instance, created, **kwargs):
 def project_authorization(sender, instance, created, **kwargs):
     if created:
         if instance.is_moderator:
-             RequestChatsPermission.objects.create(
-                 email=instance.user.email,
-                 role=ChatsRole.ADMIN.value,
-                 project=instance.project,
-                 created_by=instance.user
-             )
+            RequestChatsPermission.objects.create(
+                email=instance.user.email,
+                role=ChatsRole.ADMIN.value,
+                project=instance.project,
+                created_by=instance.user
+            )
         else:
-             RequestChatsPermission.objects.create(
-                 email=instance.user.email,
-                 role=ChatsRole.AGENT.value,
-                 project=instance.project,
-                 created_by=instance.user
-             )
+            RequestChatsPermission.objects.create(
+                email=instance.user.email,
+                role=ChatsRole.AGENT.value,
+                project=instance.project,
+                created_by=instance.user
+            )
 
         RecentActivity.objects.create(
             action="ADD",
@@ -292,22 +294,13 @@ def project_authorization(sender, instance, created, **kwargs):
         if instance_user.level == OrganizationLevelRole.NOTHING.value:
             instance_user.role = OrganizationRole.VIEWER.value
             instance_user.save(update_fields=["role"])
-
-        update_user_permission_project(
-            flow_organization=str(instance.project.flow_organization),
-            project_uuid=str(instance.project.uuid),
-            user_email=instance.user.email,
-            permission=instance.role
-        )
-        # celery_app.send_task(
-        #     "update_user_permission_project",
-        #     args=[
-        #         instance.project.flow_organization,
-        #         instance.project.uuid,
-        #         instance.user.email,
-        #         instance.role,
-        #     ],
-        # )
+        if instance.project.flow_organization:
+            update_user_permission_project(
+                project_uuid=str(instance.project.uuid),
+                flow_organization=str(instance.project.flow_organization),
+                user_email=instance.user.email,
+                permission=instance.role
+            )
 
 
 @receiver(post_save, sender=RequestRocketPermission)

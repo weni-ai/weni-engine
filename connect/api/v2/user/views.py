@@ -13,7 +13,7 @@ class UserAPIToken(views.APIView):
         project = Project.objects.get(uuid=project_uuid)
 
         rest_client = FlowsRESTClient()
-        response = rest_client.get_user_api_token(str(project.flow_organization), user)
+        response = rest_client.get_user_api_token(str(project.uuid), user)
 
         return JsonResponse(status=response.status_code, data=response.json())
 

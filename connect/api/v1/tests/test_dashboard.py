@@ -1,5 +1,6 @@
 import json
 import uuid
+import pendulum
 
 from django.test import RequestFactory, TestCase
 from rest_framework import status
@@ -11,6 +12,7 @@ from connect.common.models import (
     Organization,
     Newsletter,
     NewsletterLanguage,
+    NewsletterOrganization,
     BillingPlan,
     OrganizationRole,
 )
@@ -97,14 +99,62 @@ class ListNewsletterTestCase(TestCase):
 
     def test_status_okay(self):
         response, content_data = self.request(self.token)
-        self.assertEqual(content_data["count"], 1)
-        self.assertEqual(len(content_data["results"]), 1)
-        self.assertEqual(content_data["results"][0].get("language"), "en-us")
+        self.assertEqual(len(content_data), 1)
+        self.assertEqual(content_data[0].get("language"), "en-us")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_does_not_exist(self):
         self.newsletter_language_en.delete()
         response, content_data = self.request(self.token)
-        self.assertEqual(content_data["count"], 0)
-        self.assertEqual(len(content_data["results"]), 0)
+        self.assertEqual(len(content_data), 0)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+
+class ListNewsletterOrgTestCase(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.user, self.token = create_user_and_token()
+        self.organization = Organization.objects.create(
+            name="ASDF",
+            description="ASDF",
+            inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__payment_method=BillingPlan.PAYMENT_METHOD_CREDIT_CARD,
+            organization_billing__plan=BillingPlan.PLAN_TRIAL,
+        )
+        self.organization_authorization = self.organization.authorizations.create(
+            user=self.user, role=OrganizationRole.ADMIN.value
+        )
+
+    def request(self, token):
+        authorization_header = {"HTTP_AUTHORIZATION": "Token {}".format(token)}
+        request = self.factory.get(
+            "/v1/dashboard/newsletter/",
+            **authorization_header,
+        )
+        response = NewsletterViewSet.as_view({"get": "list"})(request)
+        response.render()
+        content_data = json.loads(response.content)
+        return (response, content_data)
+
+    def test_newsletter_trial_end(self):
+        self.organization.organization_billing.end_trial_period()
+
+        response, content_data = self.request(self.token)
+        newsletter = content_data[0]
+
+        self.assertEquals(pendulum.parse(newsletter.get("trial_end_date")), self.organization.organization_billing.trial_end_date)
+        self.assertEquals(newsletter.get("title"), "trial-ended")
+
+    def test_newsletter_trial_about_to_end(self):
+        NewsletterOrganization.objects.create(
+            newsletter=Newsletter.objects.create(),
+            title="trial-about-to-end",
+            description=f"Your trial period of the organization {self.organization.name}, is about to expire.",
+            organization=self.organization
+        )
+
+        response, content_data = self.request(self.token)
+
+        newsletter = content_data[0]
+        self.assertEquals(newsletter.get("title"), "trial-about-to-end")
