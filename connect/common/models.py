@@ -1596,14 +1596,33 @@ class BillingPlan(models.Model):
             "organization_name": self.organization.name,
             "user_name": user_name,
         }
-        mail.send_mail(
-            _("Your organization's plan has ended"),
-            render_to_string("billing/emails/finished-plan.txt", context),
-            None,
-            email,
-            html_message=render_to_string("billing/emails/finished-plan.html", context),
-        )
-        return mail
+        from_email = None
+        msg_list = []
+        for user_email in email:
+
+            language_code = User.objects.get(email=user_email).language
+            activate(language_code)
+            message = render_to_string(
+                "billing/emails/finished-plan.txt", context
+            )
+            html_message = render_to_string(
+                "billing/emails/finished-plan.html", context
+            )
+            if language_code == "en-us":
+                subject = _(
+                    "Your organization's plan has ended"
+                )
+            else:
+                subject = _(
+                    "O plano da sua organização foi encerrado."
+                )
+
+            recipient_list = [user_email]
+            msg = (subject, message, html_message, from_email, recipient_list)
+            msg_list.append(msg)
+
+        html_mail = send_mass_html_mail(msg_list, fail_silently=False)
+        return html_mail
 
     def send_email_reactivated_plan(self, user_name: str, email: list):
         if not settings.SEND_EMAILS:
