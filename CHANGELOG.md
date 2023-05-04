@@ -1,3 +1,11 @@
+# 2.8.0
+## *Change*
+  - Connect-Flows Communication; Passing `project.uuid` instead of `project.flow_organization`
+
+# 2.7.2
+## *Fix*
+  - Increase timeout for get_project_statistic request
+
 # 2.7.1
 ## *Fix*
   - Coverage Files
