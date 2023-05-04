@@ -43,6 +43,7 @@ from connect.common.models import (
     ProjectRole,
     BillingPlan,
     Project,
+    NewsletterOrganization,
 )
 from connect import billing
 from connect.billing.gateways.stripe_gateway import StripeGateway
@@ -487,6 +488,7 @@ class OrganizationViewSet(
                 organization.authorizations.values_list("user__email", flat=True),
                 old_plan,
             )
+            NewsletterOrganization.destroy_newsletter(organization)
             return JsonResponse(
                 data={"plan": org_billing.plan}, status=status.HTTP_200_OK
             )

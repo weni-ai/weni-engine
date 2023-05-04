@@ -2255,3 +2255,12 @@ class NewsletterOrganization(models.Model):
 
     def trial_end_date(self):
         return self.organization.organization_billing.trial_end_date
+
+    @staticmethod
+    def destroy_newsletter(organization: Organization):
+        organization_newsletters = NewsletterOrganization.objects.filter(
+            organization=organization
+        )
+        for newsletter in organization_newsletters:
+            if isinstance(newsletter, NewsletterOrganization):
+                newsletter.delete()
