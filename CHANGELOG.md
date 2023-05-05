@@ -1,3 +1,10 @@
+# 2.9.0
+## *Fix*
+  - template email translations
+  - Delete organization newsletter after changing plan
+## *Add*
+  - Endpoint to get user info about organizations
+
 # 2.8.1
 ## *Fix*
   - fix api_v2_urls import
