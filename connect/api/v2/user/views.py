@@ -1,8 +1,10 @@
 from rest_framework import views, status
+
+from django.conf import settings
 from django.http import JsonResponse
+
 from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
-from connect.common.models import Project, OrganizationAuthorization
-from connect.api.v1.organization.permissions import OrganizationHasPermission
+from connect.common.models import Project, OrganizationAuthorization, BillingPlan
 
 
 class UserAPIToken(views.APIView):
@@ -19,15 +21,17 @@ class UserAPIToken(views.APIView):
 
 class UserIsPaying(views.APIView):
 
-    permission_classes = [OrganizationHasPermission]
-
     def get(self, request, *args, **kwargs):
         user_email = request.data.get("user_email")
+        token = request.data.get("token")
+        if token != settings.VERIFICATION_MARKETING_TOKEN:
+            return JsonResponse(status=status.HTTP_401_UNAUTHORIZED, data={"message": "You don't have permission to do this action"})
+
         org_auth = OrganizationAuthorization.objects.filter(user__email=user_email)
         response_data = []
 
         if len(org_auth) == 0:
-            return JsonResponse(status=status.HTTP_404_NOT_FOUND, data={"message": "this user doesn't have permission on any organization"})
+            return JsonResponse(status=status.HTTP_404_NOT_FOUND, data={"message": "This user doesn't have permission on any organization"})
 
         for auth in org_auth:
             current_body = {
@@ -38,5 +42,4 @@ class UserIsPaying(views.APIView):
             for project in auth.organization.project.all():
                 current_body["project"].append(project.uuid)
             response_data.append({auth.organization.name: current_body})
-        print(response_data)
         return JsonResponse(status=status.HTTP_200_OK, data=dict(orgs=response_data))
