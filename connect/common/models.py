@@ -13,6 +13,7 @@ from django.template.loader import render_to_string
 from django.utils import timezone
 
 from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import activate
 from timezone_field import TimeZoneField
 
 from connect import billing
@@ -1596,14 +1597,33 @@ class BillingPlan(models.Model):
             "organization_name": self.organization.name,
             "user_name": user_name,
         }
-        mail.send_mail(
-            _("Your organization's plan has expired"),
-            render_to_string("billing/emails/finished-plan.txt", context),
-            None,
-            email,
-            html_message=render_to_string("billing/emails/finished-plan.html", context),
-        )
-        return mail
+        from_email = None
+        msg_list = []
+        for user_email in email:
+
+            language_code = User.objects.get(email=user_email).language
+            activate(language_code)
+            message = render_to_string(
+                "billing/emails/finished-plan.txt", context
+            )
+            html_message = render_to_string(
+                "billing/emails/finished-plan.html", context
+            )
+            if language_code == "en-us":
+                subject = _(
+                    "Your organization's plan has ended"
+                )
+            else:
+                subject = _(
+                    "O plano da sua organização foi encerrado."
+                )
+
+            recipient_list = [user_email]
+            msg = (subject, message, html_message, from_email, recipient_list)
+            msg_list.append(msg)
+
+        html_mail = send_mass_html_mail(msg_list, fail_silently=False)
+        return html_mail
 
     def send_email_reactivated_plan(self, user_name: str, email: list):
         if not settings.SEND_EMAILS:
@@ -1613,16 +1633,33 @@ class BillingPlan(models.Model):
             "organization_name": self.organization.name,
             "user_name": user_name,
         }
-        mail.send_mail(
-            _("Your organization's plan has been reactivated."),
-            render_to_string("billing/emails/reactived-plan.txt", context),
-            None,
-            email,
-            html_message=render_to_string(
+        from_email = None
+        msg_list = []
+        for user_email in email:
+
+            language_code = User.objects.get(email=user_email).language
+            activate(language_code)
+            message = render_to_string(
+                "billing/emails/reactived-plan.txt", context
+            )
+            html_message = render_to_string(
                 "billing/emails/reactived-plan.html", context
-            ),
-        )
-        return mail
+            )
+            if language_code == "en-us":
+                subject = _(
+                    "Your organization's plan has been reactivated."
+                )
+            else:
+                subject = _(
+                    "O plano da sua organização foi reativado."
+                )
+
+            recipient_list = [user_email]
+            msg = (subject, message, html_message, from_email, recipient_list)
+            msg_list.append(msg)
+
+        html_mail = send_mass_html_mail(msg_list, fail_silently=False)
+        return html_mail
 
     def send_email_removed_credit_card(self, user_name: str, email: list):
         if not settings.SEND_EMAILS:
@@ -1632,14 +1669,33 @@ class BillingPlan(models.Model):
             "user_name": user_name,
             "org_name": self.organization.name,
         }
-        mail.send_mail(
-            _("Your organization's credit card was removed"),
-            render_to_string("billing/emails/removed_card.txt", context),
-            None,
-            email,
-            html_message=render_to_string("billing/emails/removed_card.html", context),
-        )
-        return mail
+        from_email = None
+        msg_list = []
+        for user_email in email:
+
+            language_code = User.objects.get(email=user_email).language
+            activate(language_code)
+            message = render_to_string(
+                "billing/emails/removed_card.txt", context
+            )
+            html_message = render_to_string(
+                "billing/emails/removed_card.html", context
+            )
+            if language_code == "en-us":
+                subject = _(
+                    "Your organization's credit card was removed"
+                )
+            else:
+                subject = _(
+                    "O cartão de crédito vinculado a sua organização foi removido"
+                )
+
+            recipient_list = [user_email]
+            msg = (subject, message, html_message, from_email, recipient_list)
+            msg_list.append(msg)
+
+        html_mail = send_mass_html_mail(msg_list, fail_silently=False)
+        return html_mail
 
     def send_email_expired_free_plan(self, user_name: str, email: list):
         if not settings.SEND_EMAILS:
@@ -1727,26 +1783,18 @@ class BillingPlan(models.Model):
         msg_list = []
         for email in emails:
 
+            language_code = email[2]
             username = email[1]
             context["user_name"] = username
-
-            if email[2] == "en-us":
-                message = render_to_string(
-                    "billing/emails/trial_plan_expired_due_time_limit_en.txt", context
-                )
-                html_message = render_to_string(
-                    "billing/emails/trial_plan_expired_due_time_limit_en.html", context
-                )
+            message = render_to_string(
+                "billing/emails/trial_plan_expired_due_time_limit_en.txt", context
+            )
+            html_message = render_to_string(
+                "billing/emails/trial_plan_expired_due_time_limit_en.html", context
+            )
+            if language_code == "en-us":
                 subject = _("Your trial plan has expired")
             else:
-                message = render_to_string(
-                    "billing/emails/trial_plan_expired_due_time_limit_pt_BR.txt",
-                    context,
-                )
-                html_message = render_to_string(
-                    "billing/emails/trial_plan_expired_due_time_limit_pt_BR.html",
-                    context,
-                )
                 subject = "Seu plano Trial expirou"
 
             recipient_list = [email[0]]
@@ -1781,27 +1829,19 @@ class BillingPlan(models.Model):
 
         for email in emails:
 
+            language_code = email[2]
+            activate(language_code)
             username = email[1]
             context["user_name"] = username
-
-            if email[2] == "en-us":
-                message = render_to_string(
-                    "billing/emails/plan_expired_due_attendence_limit_en.txt", context
-                )
-                html_message = render_to_string(
-                    "billing/emails/plan_expired_due_attendence_limit_en.html", context
-                )
+            html_message = render_to_string(
+                "billing/emails/plan_expired_due_attendence_limit_en.html", context
+            )
+            message = render_to_string(
+                "billing/emails/plan_expired_due_attendence_limit_en.txt", context
+            )
+            if language_code == "en-us":
                 subject = _(f"You reached {self.plan_limit} attendances")
-
             else:
-                message = render_to_string(
-                    "billing/emails/plan_expired_due_attendence_limit_pt_BR.txt",
-                    context,
-                )
-                html_message = render_to_string(
-                    "billing/emails/plan_expired_due_attendence_limit_pt_BR.html",
-                    context,
-                )
                 subject = _(f"Você atingiu {self.plan_limit} atendimentos")
 
             recipient_list = [email[0]]
@@ -1837,27 +1877,22 @@ class BillingPlan(models.Model):
         for email in emails:
 
             username = email[1]
+            language_code = email[2]
+            activate(language_code)
             context["user_name"] = username
-
-            if email[2] == "en-us":
+            message = render_to_string(
+                "billing/emails/plan_is_about_to_expire_en.txt", context
+            )
+            html_message = render_to_string(
+                "billing/emails/plan_is_about_to_expire_en.html", context
+            )
+            if language_code == "en-us":
                 subject = _(
                     f"Your organization is close to {self.plan_limit} attendances"
-                )
-                message = render_to_string(
-                    "billing/emails/plan_is_about_to_expire_en.txt", context
-                )
-                html_message = render_to_string(
-                    "billing/emails/plan_is_about_to_expire_en.html", context
                 )
             else:
                 subject = _(
                     f"Sua organização estã proxima de {self.plan_limit} atendimentos"
-                )
-                message = render_to_string(
-                    "billing/emails/plan_is_about_to_expire_pt_BR.txt", context
-                )
-                html_message = render_to_string(
-                    "billing/emails/plan_is_about_to_expire_pt_BR.html", context
                 )
 
             recipient_list = [email[0]]
