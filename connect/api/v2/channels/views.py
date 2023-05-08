@@ -38,7 +38,7 @@ class ChannelsAPIView(views.APIView):
         flows_instance = FlowsRESTClient()
         response = flows_instance.create_channel(
             user=serializer.validated_data.get("user"),
-            project_uuid=str(project.flow_organization),
+            project_uuid=str(project.uuid),
             data=serializer.validated_data.get("data"),
             channeltype_code=serializer.validated_data.get("channeltype_code"),
         )
@@ -87,7 +87,7 @@ class CreateWACChannelAPIView(views.APIView):
         flow_instance = FlowsRESTClient()
         project_data = flow_instance.create_wac_channel(
             user=serializer.validated_data.get("user"),
-            flow_organization=str(project.flow_organization),
+            flow_organization=str(project.uuid),
             config=serializer.validated_data.get("config"),
             phone_number_id=serializer.validated_data.get("phone_number_id")
         )
