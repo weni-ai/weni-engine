@@ -301,7 +301,7 @@ class OrganizationViewSetTestCase(TestCase):
             "router_token": "rt_token"
         }
         create_organization.side_effect = [{"id": 1}]
-        flows_info.side_effect = [{"id": 1, "uuid": uuid.uuid4()}]
+        flows_info.side_effect = [{"data": '{"id": 1, "uuid": "6b6a8c8b-6734-4110-81c9-287eaeab8e26"}'}]
         send_request_flow_user_info.side_effect = [True]
         get_ai_access_token.side_effect = [(True, str(uuid.uuid4()))]
         create_classifier.side_effect = [{"status": 201, "data": {"uuid": "fdd4a7bb-fe5a-41b1-96a2-96d95c4e7aab"}}]
@@ -355,7 +355,7 @@ class OrganizationViewSetTestCase(TestCase):
         )
 
         organization = content_data.get("organization")
-
+        print(content_data)
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
         self.assertEquals(organization["authorizations"]["count"], 2)
 

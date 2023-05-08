@@ -352,6 +352,7 @@ class ProjectSerializer(serializers.ModelSerializer):
                     str(data.get("timezone")),
                     project_uuid,
                 )
+                print(flows_info)
                 flows_info = json.loads(flows_info.get("data"))
             else:
                 flows_info = flow_instance.create_project(
@@ -361,7 +362,7 @@ class ProjectSerializer(serializers.ModelSerializer):
                     project_uuid=project_uuid,
                 )
             created = True
-        except Exception as error:
+        except ZeroDivisionError as error:
             flows_info = {
                 "data": {"message": "Could not create project"},
                 "status": status.HTTP_500_INTERNAL_SERVER_ERROR
