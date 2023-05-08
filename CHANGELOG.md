@@ -1,3 +1,22 @@
+# 2.9.0
+## *Fix*
+  - template email translations
+  - Delete organization newsletter after changing plan
+## *Add*
+  - Endpoint to get user info about organizations
+
+# 2.8.1
+## *Fix*
+  - fix api_v2_urls import
+
+# 2.8.0
+## *Change*
+  - Connect-Flows Communication; Passing `project.uuid` instead of `project.flow_organization`
+
+# 2.7.2
+## *Fix*
+  - Increase timeout for get_project_statistic request
+
 # 2.7.1
 ## *Fix*
   - Coverage Files

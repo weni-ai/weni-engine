@@ -179,7 +179,7 @@ class ProjectSerializer(serializers.ModelSerializer):
         name = validated_data.get("name", instance.name)
         celery_app.send_task(
             "update_project",
-            args=[instance.flow_organization, name],
+            args=[instance.uuid, name],
         )
         updated_instance = super().update(instance, validated_data)
         if not settings.TESTING:
@@ -413,7 +413,7 @@ class ListChannelSerializer(serializers.Serializer):
 
     def get_channel_data(self, obj):
         task = tasks.list_channels(
-            project_uuid=str(obj.flow_organization),
+            project_uuid=str(obj.uuid),
             channel_type=self.context["channel_type"],
         )
         return dict(project_uuid=obj.uuid, channels=task)

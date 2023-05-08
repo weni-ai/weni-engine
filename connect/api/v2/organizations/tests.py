@@ -287,6 +287,78 @@ class OrganizationViewSetTestCase(TestCase):
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
         self.assertEquals(organization["authorizations"]["count"], 2)
 
+    @patch("connect.api.v1.internal.integrations.integrations_rest_client.IntegrationsRESTClient.whatsapp_demo_integration")
+    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_flows")
+    @patch("connect.api.v1.internal.chats.chats_rest_client.ChatsRESTClient.create_chat_project")
+    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_classifier")
+    @patch("connect.common.models.Organization.get_ai_access_token")
+    @patch("connect.authentication.models.User.send_request_flow_user_info")
+    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_template_project")
+    @patch("connect.api.v1.internal.intelligence.intelligence_rest_client.IntelligenceRESTClient.create_organization")
+    def test_create_organization_lead_capture_chat_gpt(self, create_organization, flows_info, send_request_flow_user_info, get_ai_access_token, create_classifier, create_chat_project, create_flows, wpp_integration):
+        data = {
+            "redirect_url": "https://example.com",
+            "router_token": "rt_token"
+        }
+        create_organization.side_effect = [{"id": 1}]
+        flows_info.side_effect = [{"id": 1, "uuid": uuid.uuid4()}]
+        send_request_flow_user_info.side_effect = [True]
+        get_ai_access_token.side_effect = [(True, str(uuid.uuid4()))]
+        create_classifier.side_effect = [{"status": 201, "data": {"uuid": "fdd4a7bb-fe5a-41b1-96a2-96d95c4e7aab"}}]
+        wpp_integration.side_effect = [data]
+
+        chats_data = {
+            "ticketer": {"uuid": str(uuid.uuid4()), "name": "Test Ticketer"},
+            "queue": {"uuid": str(uuid.uuid4()), "name": "Test Queue"},
+        }
+
+        class Response:
+            text = json.dumps(chats_data)
+
+        flows_response = '{"uuid": "9785a273-37de-4658-bfa2-d8028dc06c84"}'
+        create_chat_project.side_effect = [Response()]
+
+        create_flows.side_effect = [dict(status=201, data=flows_response)]
+
+        org_data = {
+            "name": "V2",
+            "description": "V2 desc",
+            "organization_billing_plan": BillingPlan.PLAN_TRIAL,
+            "authorizations": [
+                {"user_email": "e@mail.com", "role": 3},
+                {"user_email": "user_1@user.com", "role": 3}
+            ],
+        }
+
+        project_data = {
+            "date_format": "D",
+            "name": "Test Project",
+            "timezone": "America/Argentina/Buenos_Aires",
+            "template": True,
+            "template_type": Project.TYPE_LEAD_CAPTURE
+        }
+
+        data = {
+            "organization": org_data,
+            "project": project_data
+        }
+
+        path = "/v2/organizations/"
+        method = {"post": "create"}
+        user = self.user
+
+        response, content_data = self.request(
+            path,
+            method,
+            user=user,
+            data=data
+        )
+
+        organization = content_data.get("organization")
+
+        self.assertEquals(response.status_code, status.HTTP_201_CREATED)
+        self.assertEquals(organization["authorizations"]["count"], 2)
+
     @patch("connect.api.v2.projects.serializers.TemplateProjectSerializer.validate_project_authorization")
     @patch("connect.authentication.models.User.send_request_flow_user_info")
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_template_project")

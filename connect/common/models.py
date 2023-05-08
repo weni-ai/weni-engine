@@ -13,6 +13,7 @@ from django.template.loader import render_to_string
 from django.utils import timezone
 
 from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import activate
 from timezone_field import TimeZoneField
 
 from connect import billing
@@ -554,7 +555,7 @@ class Project(models.Model):
 
     TYPE_SUPPORT = "support"
     TYPE_LEAD_CAPTURE = "lead_capture"
-    TYPE_LEAD_CAPTURE_CHAT_GPT = "lead_capture_chatgpt"
+    TYPE_LEAD_CAPTURE_CHAT_GPT = "lead_capture+chatgpt"
     TYPE_OMIE_LEAD_CAPTURE = "omie_lead_capture"
     TYPE_OMIE_PAYMENT_FINANCIAL = "omie_financial"
     TYPE_OMIE_PAYMENT_FINANCIAL_CHAT_GPT = "omie_financial+chatgpt"
@@ -586,7 +587,7 @@ class Project(models.Model):
         default=DATE_FORMAT_DAY_FIRST,
         help_text=_("Whether day comes first or month comes first in dates"),
     )
-    flow_organization = models.UUIDField(_("flow identification UUID"), unique=True)
+    flow_organization = models.UUIDField(_("flow identification UUID"), unique=True, null=True, blank=True)
     flow_id = models.PositiveIntegerField(
         _("flow identification ID"), unique=True, null=True
     )
@@ -648,9 +649,9 @@ class Project(models.Model):
         return {"flow": flows_result, "intelligence": intelligence_result}
 
     def perform_destroy_flows_project(self, user_email: str):
-        flow_organization = self.flow_organization
+        project_uuid = self.uuid
 
-        current_app.send_task("delete_project", args=[flow_organization, user_email])
+        current_app.send_task("delete_project", args=[project_uuid, user_email])
 
     def send_email_create_project(self, first_name: str, email: str):
         if not settings.SEND_EMAILS:
@@ -742,7 +743,7 @@ class Project(models.Model):
 
         classifier_name = {
             "lead_capture": "Farewell & Greetings",
-            "lead_capture_chat_gpt": "Farewell & Greetings",
+            "lead_capture_chat+gpt": "Farewell & Greetings",
             "support": "Binary Answers",
             "omie": "OMIE",
             "omie_financial": "Cristal - Assistente Financeiro",
@@ -772,6 +773,7 @@ class Project(models.Model):
                 "data": {"message": "Could not create classifier"},
                 "status": status.HTTP_500_INTERNAL_SERVER_ERROR
             }
+
         return created, data
 
     def create_chats_project(self):
@@ -1365,7 +1367,7 @@ class BillingPlan(models.Model):
                 )
                 for project in self.organization.project.all():  # pragma: no cover
                     current_app.send_task(
-                        name="update_suspend_project", args=[project.flow_organization, False]
+                        name="update_suspend_project", args=[project.uuid, False]
                     )
 
         return super().save(force_insert, force_update, using, update_fields)
@@ -1598,14 +1600,33 @@ class BillingPlan(models.Model):
             "organization_name": self.organization.name,
             "user_name": user_name,
         }
-        mail.send_mail(
-            _("Your organization's plan has expired"),
-            render_to_string("billing/emails/finished-plan.txt", context),
-            None,
-            email,
-            html_message=render_to_string("billing/emails/finished-plan.html", context),
-        )
-        return mail
+        from_email = None
+        msg_list = []
+        for user_email in email:
+
+            language_code = User.objects.get(email=user_email).language
+            activate(language_code)
+            message = render_to_string(
+                "billing/emails/finished-plan.txt", context
+            )
+            html_message = render_to_string(
+                "billing/emails/finished-plan.html", context
+            )
+            if language_code == "en-us":
+                subject = _(
+                    "Your organization's plan has ended"
+                )
+            else:
+                subject = _(
+                    "O plano da sua organização foi encerrado."
+                )
+
+            recipient_list = [user_email]
+            msg = (subject, message, html_message, from_email, recipient_list)
+            msg_list.append(msg)
+
+        html_mail = send_mass_html_mail(msg_list, fail_silently=False)
+        return html_mail
 
     def send_email_reactivated_plan(self, user_name: str, email: list):
         if not settings.SEND_EMAILS:
@@ -1615,16 +1636,33 @@ class BillingPlan(models.Model):
             "organization_name": self.organization.name,
             "user_name": user_name,
         }
-        mail.send_mail(
-            _("Your organization's plan has been reactivated."),
-            render_to_string("billing/emails/reactived-plan.txt", context),
-            None,
-            email,
-            html_message=render_to_string(
+        from_email = None
+        msg_list = []
+        for user_email in email:
+
+            language_code = User.objects.get(email=user_email).language
+            activate(language_code)
+            message = render_to_string(
+                "billing/emails/reactived-plan.txt", context
+            )
+            html_message = render_to_string(
                 "billing/emails/reactived-plan.html", context
-            ),
-        )
-        return mail
+            )
+            if language_code == "en-us":
+                subject = _(
+                    "Your organization's plan has been reactivated."
+                )
+            else:
+                subject = _(
+                    "O plano da sua organização foi reativado."
+                )
+
+            recipient_list = [user_email]
+            msg = (subject, message, html_message, from_email, recipient_list)
+            msg_list.append(msg)
+
+        html_mail = send_mass_html_mail(msg_list, fail_silently=False)
+        return html_mail
 
     def send_email_removed_credit_card(self, user_name: str, email: list):
         if not settings.SEND_EMAILS:
@@ -1634,14 +1672,33 @@ class BillingPlan(models.Model):
             "user_name": user_name,
             "org_name": self.organization.name,
         }
-        mail.send_mail(
-            _("Your organization's credit card was removed"),
-            render_to_string("billing/emails/removed_card.txt", context),
-            None,
-            email,
-            html_message=render_to_string("billing/emails/removed_card.html", context),
-        )
-        return mail
+        from_email = None
+        msg_list = []
+        for user_email in email:
+
+            language_code = User.objects.get(email=user_email).language
+            activate(language_code)
+            message = render_to_string(
+                "billing/emails/removed_card.txt", context
+            )
+            html_message = render_to_string(
+                "billing/emails/removed_card.html", context
+            )
+            if language_code == "en-us":
+                subject = _(
+                    "Your organization's credit card was removed"
+                )
+            else:
+                subject = _(
+                    "O cartão de crédito vinculado a sua organização foi removido"
+                )
+
+            recipient_list = [user_email]
+            msg = (subject, message, html_message, from_email, recipient_list)
+            msg_list.append(msg)
+
+        html_mail = send_mass_html_mail(msg_list, fail_silently=False)
+        return html_mail
 
     def send_email_expired_free_plan(self, user_name: str, email: list):
         if not settings.SEND_EMAILS:
@@ -1729,26 +1786,18 @@ class BillingPlan(models.Model):
         msg_list = []
         for email in emails:
 
+            language_code = email[2]
             username = email[1]
             context["user_name"] = username
-
-            if email[2] == "en-us":
-                message = render_to_string(
-                    "billing/emails/trial_plan_expired_due_time_limit_en.txt", context
-                )
-                html_message = render_to_string(
-                    "billing/emails/trial_plan_expired_due_time_limit_en.html", context
-                )
+            message = render_to_string(
+                "billing/emails/trial_plan_expired_due_time_limit_en.txt", context
+            )
+            html_message = render_to_string(
+                "billing/emails/trial_plan_expired_due_time_limit_en.html", context
+            )
+            if language_code == "en-us":
                 subject = _("Your trial plan has expired")
             else:
-                message = render_to_string(
-                    "billing/emails/trial_plan_expired_due_time_limit_pt_BR.txt",
-                    context,
-                )
-                html_message = render_to_string(
-                    "billing/emails/trial_plan_expired_due_time_limit_pt_BR.html",
-                    context,
-                )
                 subject = "Seu plano Trial expirou"
 
             recipient_list = [email[0]]
@@ -1783,27 +1832,19 @@ class BillingPlan(models.Model):
 
         for email in emails:
 
+            language_code = email[2]
+            activate(language_code)
             username = email[1]
             context["user_name"] = username
-
-            if email[2] == "en-us":
-                message = render_to_string(
-                    "billing/emails/plan_expired_due_attendence_limit_en.txt", context
-                )
-                html_message = render_to_string(
-                    "billing/emails/plan_expired_due_attendence_limit_en.html", context
-                )
+            html_message = render_to_string(
+                "billing/emails/plan_expired_due_attendence_limit_en.html", context
+            )
+            message = render_to_string(
+                "billing/emails/plan_expired_due_attendence_limit_en.txt", context
+            )
+            if language_code == "en-us":
                 subject = _(f"You reached {self.plan_limit} attendances")
-
             else:
-                message = render_to_string(
-                    "billing/emails/plan_expired_due_attendence_limit_pt_BR.txt",
-                    context,
-                )
-                html_message = render_to_string(
-                    "billing/emails/plan_expired_due_attendence_limit_pt_BR.html",
-                    context,
-                )
                 subject = _(f"Você atingiu {self.plan_limit} atendimentos")
 
             recipient_list = [email[0]]
@@ -1839,27 +1880,22 @@ class BillingPlan(models.Model):
         for email in emails:
 
             username = email[1]
+            language_code = email[2]
+            activate(language_code)
             context["user_name"] = username
-
-            if email[2] == "en-us":
+            message = render_to_string(
+                "billing/emails/plan_is_about_to_expire_en.txt", context
+            )
+            html_message = render_to_string(
+                "billing/emails/plan_is_about_to_expire_en.html", context
+            )
+            if language_code == "en-us":
                 subject = _(
                     f"Your organization is close to {self.plan_limit} attendances"
-                )
-                message = render_to_string(
-                    "billing/emails/plan_is_about_to_expire_en.txt", context
-                )
-                html_message = render_to_string(
-                    "billing/emails/plan_is_about_to_expire_en.html", context
                 )
             else:
                 subject = _(
                     f"Sua organização estã proxima de {self.plan_limit} atendimentos"
-                )
-                message = render_to_string(
-                    "billing/emails/plan_is_about_to_expire_pt_BR.txt", context
-                )
-                html_message = render_to_string(
-                    "billing/emails/plan_is_about_to_expire_pt_BR.html", context
                 )
 
             recipient_list = [email[0]]
@@ -1904,7 +1940,7 @@ class BillingPlan(models.Model):
         self.organization.save(update_fields=["is_suspended"])
         for project in self.organization.project.all():
             current_app.send_task(  # pragma: no cover
-                name="update_suspend_project", args=[project.flow_organization, True]
+                name="update_suspend_project", args=[project.uuid, True]
             )
 
     @property
@@ -2257,3 +2293,12 @@ class NewsletterOrganization(models.Model):
 
     def trial_end_date(self):
         return self.organization.organization_billing.trial_end_date
+
+    @staticmethod
+    def destroy_newsletter(organization: Organization):
+        organization_newsletters = NewsletterOrganization.objects.filter(
+            organization=organization
+        )
+        for newsletter in organization_newsletters:
+            if isinstance(newsletter, NewsletterOrganization):
+                newsletter.delete()
