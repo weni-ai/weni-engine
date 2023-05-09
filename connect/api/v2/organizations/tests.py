@@ -17,7 +17,15 @@ from django.conf import settings
 
 
 class OrganizationViewSetTestCase(TestCase):
+
     def setUp(self):
+        self.integrations_rest = patch("connect.api.v1.internal.integrations.integrations_rest_client.IntegrationsRESTClient.update_user_permission_project")
+        self.flows_rest = patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.update_user_permission_project")
+        self.integrations_rest_mock = self.integrations_rest.start()
+        self.flows_rest_mock = self.flows_rest.start()
+        self.integrations_rest_mock.return_value = [200, 200]
+        self.flows_rest_mock.return_value = [200, 200]
+
         self.factory = APIRequestFactory()
         self.user, self.user_token = create_user_and_token("user")
         self.user_1, self.user_1_token = create_user_and_token("user_1")
@@ -295,7 +303,11 @@ class OrganizationViewSetTestCase(TestCase):
     @patch("connect.authentication.models.User.send_request_flow_user_info")
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_template_project")
     @patch("connect.api.v1.internal.intelligence.intelligence_rest_client.IntelligenceRESTClient.create_organization")
-    def test_create_organization_lead_capture_chat_gpt(self, create_organization, flows_info, send_request_flow_user_info, get_ai_access_token, create_classifier, create_chat_project, create_flows, wpp_integration):
+    def test_create_organization_lead_capture_chat_gpt(
+        self, create_organization, flows_info, send_request_flow_user_info,
+        get_ai_access_token, create_classifier, create_chat_project,
+        create_flows, wpp_integration
+    ):
         data = {
             "redirect_url": "https://example.com",
             "router_token": "rt_token"
