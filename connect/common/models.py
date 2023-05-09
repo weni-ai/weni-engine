@@ -743,7 +743,7 @@ class Project(models.Model):
 
         classifier_name = {
             "lead_capture": "Farewell & Greetings",
-            "lead_capture_chat+gpt": "Farewell & Greetings",
+            "lead_capture+chatgpt": "Farewell & Greetings",
             "support": "Binary Answers",
             "omie": "OMIE",
             "omie_financial": "Cristal - Assistente Financeiro",

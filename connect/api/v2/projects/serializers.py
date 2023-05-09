@@ -516,7 +516,14 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
 
         return template
 
-    def create_globals(project_uuid: str, user_email: str, global_body: dict):
+    def create_globals(self, project_uuid: str, user_email: str):
+
+        data = self.context._data
+
+        if data.get("project_view"):
+            globals_dict = data.get("globals")
+        else:
+            globals_dict = data.get("project").get("globals")
 
         flows = FlowsRESTClient()
         body = {
@@ -525,7 +532,7 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
         }
         globals_list = []
 
-        for key, value in global_body.items():
+        for key, value in globals_dict.items():
             payload = {
                 "name": key,
                 "value": value
@@ -533,7 +540,18 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
             payload.update(body)
             globals_list.append(payload)
 
-        response = flows.create_globals(globals_list)
-        if response.status_code == 201:
-            return response.json()
-        raise Exception(response.json())
+        try:
+            response = flows.create_globals(globals_list)
+            if response.status_code == 201:
+                created = True
+                return created, response.json()
+            raise Exception(response.json())
+
+        except Exception as error:
+            logger.error(f"Create globals: {error}")
+            response_data = {
+                "data": {"message": "Could not create global"},
+                "status": status.HTTP_500_INTERNAL_SERVER_ERROR
+            }
+            created = False
+            return created, response_data
