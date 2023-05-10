@@ -698,6 +698,114 @@ class OrganizationViewSetTestCase(TestCase):
         self.assertEquals(organization["authorizations"]["count"], 2)
 
 
+    @patch("connect.api.v1.internal.integrations.integrations_rest_client.IntegrationsRESTClient.whatsapp_demo_integration")
+    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_flows")
+    @patch("connect.api.v1.internal.chats.chats_rest_client.ChatsRESTClient.create_chat_project")
+    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_classifier")
+    @patch("connect.api.v1.internal.intelligence.intelligence_rest_client.IntelligenceRESTClient.get_access_token")
+    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_globals")
+    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.update_user_permission_project")
+    @patch("connect.api.v1.internal.integrations.integrations_rest_client.IntegrationsRESTClient.update_user_permission_project")
+    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_template_project")
+    @patch("connect.api.v1.internal.intelligence.intelligence_rest_client.IntelligenceRESTClient.create_organization")
+    def test_create_organization_omie_lead_capture(
+        self,
+        create_organization,
+        create_template_project,
+        integrations_perm,
+        flows_perm,
+        create_globals,
+        get_access_token,
+        create_classifier,
+        create_chat_project,
+        create_flows,
+        whatsapp_demo_integration
+    ):
+        integrations_perm.side_effect = [200, 200]
+        flows_perm.side_effect = [200, 200]
+
+        class GlobalResponse:
+            status_code = 201
+
+            @staticmethod
+            def json():
+                return {
+                    "org": "75694862-7dee-411f-a2d1-8a48fad743d2",
+                    "name": "appkey",
+                    "value": "1234567"
+                }
+
+        chats_data = {
+            "ticketer": {"uuid": str(uuid.uuid4()), "name": "Test Ticketer"},
+            "queue": {"uuid": str(uuid.uuid4()), "name": "Test Queue"},
+        }
+
+        class ChatsResponse:
+            text = json.dumps(chats_data)
+
+        flows_response = '{"uuid": "9785a273-37de-4658-bfa2-d8028dc06c84"}'
+
+        wpp_data = {
+            "redirect_url": "https://example.com",
+            "router_token": "rt_token"
+        }
+
+        # side effects
+
+        create_organization.side_effect = [{"id": 1}]
+        create_template_project.side_effect = [{"data": '{"id": 1, "uuid": "6b6a8c8b-6734-4110-81c9-287eaeab8e26"}'}]
+        create_globals.side_effect = [GlobalResponse]
+        get_access_token.side_effect = ["6b6a8c8b-6734-tokn-81c9-287eaeab8e26"]
+        create_classifier.side_effect = [{"status": 201, "data": {"uuid": "fdd4a7bb-fe5a-41b1-96a2-96d95c4e7aab"}}]
+        create_chat_project.side_effect = [ChatsResponse()]
+        create_flows.side_effect = [dict(status=201, data=flows_response)]
+        whatsapp_demo_integration.side_effect = [wpp_data]
+
+        org_data = {
+            "name": "OMIE LEAD CAPTURE",
+            "description": "OMIE LEAD CAPTURE",
+            "organization_billing_plan": BillingPlan.PLAN_TRIAL,
+            "authorizations": [
+                {"user_email": "e@mail.com", "role": 3},
+                {"user_email": "user_1@user.com", "role": 3}
+            ],
+        }
+
+        project_data = {
+            "date_format": "D",
+            "name": "Test Project",
+            "timezone": "America/Argentina/Buenos_Aires",
+            "template": True,
+            "template_type": Project.TYPE_OMIE_LEAD_CAPTURE,
+            "globals": {
+                "appkey": 1234567890,
+                "appsecret": "0abcdefghjkl",
+            }
+        }
+
+        data = {
+            "organization": org_data,
+            "project": project_data
+        }
+
+        path = "/v2/organizations/"
+        method = {"post": "create"}
+        user = self.user
+
+        response, content_data = self.request(
+            path,
+            method,
+            user=user,
+            data=data
+        )
+
+        print(content_data)
+
+        organization = content_data.get("organization")
+
+        self.assertEquals(response.status_code, status.HTTP_201_CREATED)
+        self.assertEquals(organization["authorizations"]["count"], 2)
+
 class OrganizationTestCase(TestCase):
     def setUp(self):
         self.factory = APIRequestFactory()
