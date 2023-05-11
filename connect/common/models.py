@@ -744,6 +744,7 @@ class Project(models.Model):
             "support": "Binary Answers",
             "omie": "OMIE",
             "omie_financial": "Cristal - Assistente Financeiro",
+            "omie_lead_capture": "Cristal - Assistente Financeiro",
             "omie_financial+chatgpt": "Cristal - Assistente Financeiro"
         }
 
