@@ -19,6 +19,7 @@ class UserAPIToken(views.APIView):
 
         return JsonResponse(status=response.status_code, data=response.json())
 
+
 class UserIsPaying(views.APIView):
 
     def get(self, request, *args, **kwargs):

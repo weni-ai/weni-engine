@@ -13,6 +13,8 @@ from django.utils.translation import ugettext_lazy as _
 
 from connect.storages import AvatarUserMediaStorage
 
+from connect.api.v1.keycloak import KeycloakControl
+
 
 class UserManager(BaseUserManager):
     def _create_user(self, email, username, password=None, **extra_fields):
@@ -146,6 +148,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         null=True,
         blank=True
     )
+    first_login = models.BooleanField(default=False)
+    first_login_token = models.TextField(null=True)
 
     objects = UserManager()
 
@@ -247,3 +251,15 @@ class User(AbstractBaseUser, PermissionsMixin):
         chats_rest.update_user_language(self.email, self.language)
         flows_rest.update_language(self.email, self.language)
         intelligence_rest.update_language(self.email, self.language)
+
+    def save_first_login_token(self, token: str):
+        self.first_login_token = token
+        self.save(update_fields=["first_login_token"])
+
+    def set_verify_email(self):
+
+        self.first_login = False
+        keycloak = KeycloakControl()
+        keycloak.set_verify_email(self.email)
+
+        self.save(update_fields=["first_login"])
