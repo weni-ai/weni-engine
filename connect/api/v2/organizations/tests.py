@@ -697,7 +697,6 @@ class OrganizationViewSetTestCase(TestCase):
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
         self.assertEquals(organization["authorizations"]["count"], 2)
 
-
     @patch("connect.api.v1.internal.integrations.integrations_rest_client.IntegrationsRESTClient.whatsapp_demo_integration")
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_flows")
     @patch("connect.api.v1.internal.chats.chats_rest_client.ChatsRESTClient.create_chat_project")
@@ -805,6 +804,7 @@ class OrganizationViewSetTestCase(TestCase):
 
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
         self.assertEquals(organization["authorizations"]["count"], 2)
+
 
 class OrganizationTestCase(TestCase):
     def setUp(self):

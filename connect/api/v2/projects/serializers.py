@@ -426,12 +426,22 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
         else:
             globals_dict = data.get("project").get("globals")
 
-        default_globals = {
-            "nome_da_empresa": f"{project.name}",
-            "nome_do_bot": f"{project.name}",
-            "status_boleto_para_desconsiderar": "Recebido, Cancelado",
-            "tipo_credenciamento": "email"
-        }
+        if project.template_type in [Project.TYPE_OMIE_PAYMENT_FINANCIAL, Project.TYPE_OMIE_PAYMENT_FINANCIAL_CHAT_GPT]:
+            default_globals = {
+                "nome_da_empresa": f"{project.name}",
+                "nome_do_bot": f"{project.name}",
+                "status_boleto_para_desconsiderar": "Recebido, Cancelado",
+                "tipo_credenciamento": "email"
+            }
+        elif project.template_type in [Project.TYPE_OMIE_LEAD_CAPTURE]:
+            default_globals = {
+                "nome_da_empresa": f"{project.name}",
+                "nome_do_bot": f"{project.name}",
+                "codigo_da_conta": "-- CLIENT OMIE --",
+                "codigo_da_origem": "-- CLIENT OMIE --",
+                "codigo_da_solucao": "-- CLIENT OMIE --",
+                "codigo_do_vendedor": "-- CLIENT OMIE --",
+            }
 
         globals_dict.update(default_globals)
 
