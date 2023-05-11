@@ -352,7 +352,6 @@ class ProjectSerializer(serializers.ModelSerializer):
                     str(data.get("timezone")),
                     project_uuid,
                 )
-                print(flows_info)
                 flows_info = json.loads(flows_info.get("data"))
             else:
                 flows_info = flow_instance.create_project(
