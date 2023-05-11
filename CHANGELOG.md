@@ -1,3 +1,9 @@
+# 2.10.0
+
+## *Add*
+  - New project template
+  - Verify user after 2nd login
+
 # 2.9.0
 ## *Fix*
   - template email translations
