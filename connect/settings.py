@@ -528,6 +528,7 @@ AI_CRISTAL = env.str("AI_CRISTAL")
 
 REPOSITORY_IDS = {
     "lead_capture": AI_FAREWELL_N_GREETINGS,
+    "lead_capture+chatgpt": AI_FAREWELL_N_GREETINGS,
     "support": AI_BINARY_ANSWERS,
     "omie_financial": AI_CRISTAL,
     "omie_financial+chatgpt": AI_CRISTAL

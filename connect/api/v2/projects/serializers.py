@@ -361,7 +361,7 @@ class ProjectSerializer(serializers.ModelSerializer):
                     project_uuid=project_uuid,
                 )
             created = True
-        except Exception as error:
+        except ZeroDivisionError as error:
             flows_info = {
                 "data": {"message": "Could not create project"},
                 "status": status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -457,10 +457,16 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
 
         if project.template_type in Project.HAS_GLOBALS:
 
-            created, data = self.create_globals_omie(
-                project,
-                str(authorization.user.email)
-            )
+            if project.template_type == Project.TYPE_LEAD_CAPTURE_CHAT_GPT:
+                created, data = self.create_globals(
+                    str(project.flow_organization),
+                    str(authorization.user.email)
+                )
+            else:
+                created, data = self.create_globals_omie(
+                    project,
+                    str(authorization.user.email)
+                )
 
             if not created:
                 return data
@@ -508,3 +514,43 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
         )
 
         return template
+
+    def create_globals(self, project_uuid: str, user_email: str):
+
+        data = self.context._data
+
+        if data.get("project_view"):
+            globals_dict = data.get("globals")
+        else:
+            globals_dict = data.get("project").get("globals")
+
+        flows = FlowsRESTClient()
+        body = {
+            "org": project_uuid,
+            "user": user_email,
+        }
+        globals_list = []
+
+        for key, value in globals_dict.items():
+            payload = {
+                "name": key,
+                "value": value
+            }
+            payload.update(body)
+            globals_list.append(payload)
+
+        try:
+            response = flows.create_globals(globals_list)
+            if response.status_code == 201:
+                created = True
+                return created, response.json()
+            raise Exception(response.json())
+
+        except Exception as error:
+            logger.error(f"Create globals: {error}")
+            response_data = {
+                "data": {"message": "Could not create global"},
+                "status": status.HTTP_500_INTERNAL_SERVER_ERROR
+            }
+            created = False
+            return created, response_data

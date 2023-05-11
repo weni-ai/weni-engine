@@ -1,0 +1,2180 @@
+{
+  "version": "13",
+  "site": "https://flows-staging.weni.ai",
+  "flows": [
+    {
+      "_ui": {
+        "nodes": {
+          "b5157b43-4bbb-41c4-b7e8-0771b9855189": {
+            "position": {
+              "left": 500,
+              "top": 20
+            },
+            "type": "execute_actions"
+          },
+          "f54d2e65-fc53-437f-b07a-9195a25ac2df": {
+            "position": {
+              "left": 1240,
+              "top": 300
+            },
+            "type": "execute_actions"
+          },
+          "9d87df7c-7faf-460d-be19-777f380af7c0": {
+            "config": {
+              "cases": {}
+            },
+            "position": {
+              "left": 520,
+              "top": 320
+            },
+            "type": "wait_for_response"
+          },
+          "2f916d1a-6ec5-4fff-a929-fdc740875aa0": {
+            "position": {
+              "left": 220,
+              "top": 620
+            },
+            "type": "execute_actions"
+          },
+          "a4bd6d78-e6a1-4069-801b-b2c0ce4dbf63": {
+            "position": {
+              "left": 540,
+              "top": 660
+            },
+            "type": "execute_actions"
+          },
+          "1d622d89-76e7-4a13-81c5-5ce4444e4ddb": {
+            "type": "split_by_webhook",
+            "position": {
+              "left": 860,
+              "top": 660
+            },
+            "config": {}
+          },
+          "0481fe95-3114-4dcc-b3ab-44e803da34ed": {
+            "position": {
+              "left": 860,
+              "top": 880
+            },
+            "type": "execute_actions"
+          }
+        },
+        "stickies": {
+          "0d6c3a14-1605-483a-b9ab-bd1e54cd2559": {
+            "body": "Aqui verificamos que o usu\u00e1rio n\u00e3o digitou um email e perguntamos se ele pode informar e damos a op\u00e7\u00e3o de Sim e N\u00e3o. \n\nImportante lembrar que nessa etapa, se o usu\u00e1rio j\u00e1 responder com seu email, conseguiremos detectar, pois todas as regras est\u00e3o no mesmo card \"Aguarde por resposta\".",
+            "color": "green",
+            "position": {
+              "left": 1160,
+              "top": 740,
+              "right": 280,
+              "bottom": -60
+            },
+            "title": "Enviar mensagem"
+          },
+          "28c49c10-7bbd-4ae0-9260-a3f9493e1842": {
+            "body": "Aqui enviamos uma mensagem para o caso do usu\u00e1rio digitar \"N\u00e3o\"",
+            "color": "green",
+            "position": {
+              "bottom": 20,
+              "left": 540,
+              "right": 0,
+              "top": 860
+            },
+            "title": "Enviar mensagem"
+          },
+          "9f2588fc-91ee-46d2-b1a3-316e808998fb": {
+            "body": "Aqui aguardamos pela resposta do usu\u00e1rio e usamos a regra \"tem um email\".\n\nTamb\u00e9m usamos a regra de Sim e N\u00e3o para verificar se o usu\u00e1rio quer ou n\u00e3o informar o email.",
+            "color": "green",
+            "position": {
+              "bottom": null,
+              "left": 280,
+              "right": null,
+              "top": 300
+            },
+            "title": "Aguarde por resposta"
+          },
+          "b3a443f3-cfdd-4eab-9098-5d5dfc263054": {
+            "body": "Aqui perguntamos o email do usu\u00e1rio. Voc\u00ea pode personalizar essa mensagem para a que preferir",
+            "color": "green",
+            "position": {
+              "bottom": null,
+              "left": 280,
+              "right": null,
+              "top": 20
+            },
+            "title": "Enviar mensagem"
+          },
+          "b44c848b-3113-4652-bf5d-6779b432e520": {
+            "body": "Tamb\u00e9m salvamos no campo de contato Email. Esse dado poder\u00e1 ser visto em detalhes no hist\u00f3rico de cada contato e pode ser usado em qualquer fluxo de mensagem pois a informa\u00e7\u00e3o est\u00e1 sendo salva no contato e n\u00e3o em um fluxo de mensagem espec\u00edfico.",
+            "color": "green",
+            "position": {
+              "bottom": -120,
+              "left": 220,
+              "right": 200,
+              "top": 840
+            },
+            "title": "Atualizar o contato"
+          },
+          "bece5d9d-c8e7-4e9b-a42c-5ed641c0edec": {
+            "body": "A categoria No Response serve para quando o fluxo continua sem que o usu\u00e1rio tenha respondido \u00e0 pergunta. Normalmente \u00e9 utilizado para n\u00e3o deixar o usu\u00e1rio preso em uma pergunta.\n\nAl\u00e9m disso, adicionamos o usu\u00e1rio no grupo \"Conversa encerrada\" pois antes de enviar outra mensagem ou entrar em outro fluxo podemos verificar se o usu\u00e1rio est\u00e1 nesse grupo e evitar o envio de mensagens",
+            "color": "green",
+            "position": {
+              "bottom": null,
+              "left": 1480,
+              "right": null,
+              "top": 300
+            },
+            "title": "Categoria No response"
+          },
+          "ef592bdf-a34e-44df-9ae4-4514d74d2c50": {
+            "body": "Adicionamos o email do usu\u00e1rio na URN e-mail. Essa URN \u00e9 o canal em que o usu\u00e1rio pode ser contatado.\n\nOBS: Voc\u00ea disparar emails ativamente se o usu\u00e1rio tiver a URN email",
+            "color": "green",
+            "position": {
+              "bottom": null,
+              "left": 0,
+              "right": null,
+              "top": 620
+            },
+            "title": "Adicione URN"
+          }
+        }
+      },
+      "expire_after_minutes": 10080,
+      "language": "base",
+      "localization": {},
+      "metadata": {
+        "expires": 10080,
+        "revision": 11
+      },
+      "name": "Coleta de E-mail - Fluxo secund\u00e1rio",
+      "nodes": [
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "@(title(contact.first_name)), qual o seu e-mail?",
+              "type": "send_msg",
+              "uuid": "aae67347-2c88-413f-8cb7-0b98847989d2"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "9d87df7c-7faf-460d-be19-777f380af7c0",
+              "uuid": "d06fd05f-86cb-4edd-bc88-c7385668c078"
+            }
+          ],
+          "uuid": "b5157b43-4bbb-41c4-b7e8-0771b9855189"
+        },
+        {
+          "actions": [
+            {
+              "groups": [
+                {
+                  "count": 0,
+                  "name": "Conversa Encerrada",
+                  "query": null,
+                  "status": "ready",
+                  "uuid": "b7abd3ed-e078-4127-9ced-de6b14ca81bd"
+                }
+              ],
+              "type": "add_contact_groups",
+              "uuid": "8429c735-40af-400d-b1c6-06a2f1f75cc1"
+            },
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Por falta de resposta, encerrei esse atendimento. Mas quando quiser \u00e9 s\u00f3 falar comigo \ud83d\ude09",
+              "type": "send_msg",
+              "uuid": "66cab7bd-443e-4c65-8538-6d7068bec00c"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "11a0f6c8-c9ee-46bb-8af1-08582c1e8505"
+            }
+          ],
+          "uuid": "f54d2e65-fc53-437f-b07a-9195a25ac2df"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "2f916d1a-6ec5-4fff-a929-fdc740875aa0",
+              "uuid": "ac5a5ab3-a233-43bd-9a78-a25d85e10d1c"
+            },
+            {
+              "destination_uuid": "b5157b43-4bbb-41c4-b7e8-0771b9855189",
+              "uuid": "056d73bb-09ca-4428-9d1a-407c7aaaedea"
+            },
+            {
+              "destination_uuid": "a4bd6d78-e6a1-4069-801b-b2c0ce4dbf63",
+              "uuid": "183e9b32-f376-43b9-8860-1248d474dcc9"
+            },
+            {
+              "destination_uuid": "1d622d89-76e7-4a13-81c5-5ce4444e4ddb",
+              "uuid": "8e6ae165-3db7-4648-8707-04bdd7375d68"
+            },
+            {
+              "destination_uuid": "f54d2e65-fc53-437f-b07a-9195a25ac2df",
+              "uuid": "4e083ece-6ec9-490e-866a-3f2e3bcf8710"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [],
+                "category_uuid": "201ca48d-6418-4049-8761-b0fffceecfeb",
+                "type": "has_email",
+                "uuid": "6c320864-f2f9-4e08-83b8-13b0f4abe11b"
+              },
+              {
+                "arguments": [
+                  "Sim si s"
+                ],
+                "category_uuid": "d63b1aff-23da-49fd-aae2-652cb526b49b",
+                "type": "has_any_word",
+                "uuid": "4acfe316-7829-4980-97ed-aeb6058e21ee"
+              },
+              {
+                "arguments": [
+                  "N\u00e3o nao n nau"
+                ],
+                "category_uuid": "979c9de5-4016-44fa-9e52-32b697b3baf9",
+                "type": "has_any_word",
+                "uuid": "6e57d5b7-9b00-4514-96a3-2fad29969099"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "ac5a5ab3-a233-43bd-9a78-a25d85e10d1c",
+                "name": "Tem email",
+                "uuid": "201ca48d-6418-4049-8761-b0fffceecfeb"
+              },
+              {
+                "exit_uuid": "056d73bb-09ca-4428-9d1a-407c7aaaedea",
+                "name": "Sim",
+                "uuid": "d63b1aff-23da-49fd-aae2-652cb526b49b"
+              },
+              {
+                "exit_uuid": "183e9b32-f376-43b9-8860-1248d474dcc9",
+                "name": "N\u00e3o",
+                "uuid": "979c9de5-4016-44fa-9e52-32b697b3baf9"
+              },
+              {
+                "exit_uuid": "8e6ae165-3db7-4648-8707-04bdd7375d68",
+                "name": "Other",
+                "uuid": "716e0768-d885-4839-8cc5-3e60d53d0463"
+              },
+              {
+                "exit_uuid": "4e083ece-6ec9-490e-866a-3f2e3bcf8710",
+                "name": "No Response",
+                "uuid": "624357fb-7e47-4ab3-9739-3956f19a6c82"
+              }
+            ],
+            "default_category_uuid": "716e0768-d885-4839-8cc5-3e60d53d0463",
+            "operand": "@input.text",
+            "result_name": "email",
+            "type": "switch",
+            "wait": {
+              "timeout": {
+                "category_uuid": "624357fb-7e47-4ab3-9739-3956f19a6c82",
+                "seconds": 300
+              },
+              "type": "msg"
+            }
+          },
+          "uuid": "9d87df7c-7faf-460d-be19-777f380af7c0"
+        },
+        {
+          "actions": [
+            {
+              "path": "@results.email",
+              "scheme": "mailto",
+              "type": "add_contact_urn",
+              "uuid": "be12b0a4-cec0-4ebb-bfb9-c74c842adbe3"
+            },
+            {
+              "field": {
+                "key": "email",
+                "name": "Email"
+              },
+              "type": "set_contact_field",
+              "uuid": "1607b5a7-f005-45be-9d66-5ee5daffddf0",
+              "value": "@results.email"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "560aa7e2-eb63-4659-87c7-e43492e5ce79"
+            }
+          ],
+          "uuid": "2f916d1a-6ec5-4fff-a929-fdc740875aa0"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Entendi, mas nesse caso precisamos dessa informa\u00e7\u00e3o para entrar em contato com voc\u00ea.",
+              "type": "send_msg",
+              "uuid": "fa9244c8-eab2-47b6-8eb6-62b933760848"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "b5157b43-4bbb-41c4-b7e8-0771b9855189",
+              "uuid": "58d73e5f-963e-4a53-bdc0-53f638b2fbc0"
+            }
+          ],
+          "uuid": "a4bd6d78-e6a1-4069-801b-b2c0ce4dbf63"
+        },
+        {
+          "uuid": "1d622d89-76e7-4a13-81c5-5ce4444e4ddb",
+          "actions": [
+            {
+              "uuid": "ae5b8529-fe20-46c1-8630-76b0a9311b1d",
+              "headers": {
+                "Authorization": "Bearer @globals.token_chatgpt",
+                "Content-Type": "application/json"
+              },
+              "type": "call_webhook",
+              "url": "https://api.openai.com/v1/completions",
+              "body": "{\"model\": \"text-davinci-003\", \"prompt\": \"Esse \u00e9 um coletor de dados como nome, email e idade. Pergunta: @input.text. Para qualquer pergunta que n\u00e3o seja considerada um email, gere uma resposta informando que n\u00e3o conhece sobre o assunto, caso seja uma delas, gere uma resposta agradecendo.\", \"temperature\": 0, \"max_tokens\": 200} ",
+              "method": "POST",
+              "result_name": "ChatGPT"
+            }
+          ],
+          "router": {
+            "type": "switch",
+            "operand": "@results.chatgpt.category",
+            "cases": [
+              {
+                "arguments": [
+                  "Success"
+                ],
+                "category_uuid": "11c14716-104b-4a32-aa0b-52010bc5c19a",
+                "type": "has_only_text",
+                "uuid": "ec14cdef-538b-41e7-8c04-d58930222acf"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "0db390b5-4278-442d-b1e0-4bd4069be3d1",
+                "name": "Success",
+                "uuid": "11c14716-104b-4a32-aa0b-52010bc5c19a"
+              },
+              {
+                "exit_uuid": "cc881ca2-fc37-4b15-8e03-bf0444fc0223",
+                "name": "Failure",
+                "uuid": "3c3295d4-8aa0-4753-bb1d-6e5ae329031b"
+              }
+            ],
+            "default_category_uuid": "3c3295d4-8aa0-4753-bb1d-6e5ae329031b"
+          },
+          "exits": [
+            {
+              "destination_uuid": "0481fe95-3114-4dcc-b3ab-44e803da34ed",
+              "uuid": "0db390b5-4278-442d-b1e0-4bd4069be3d1"
+            },
+            {
+              "destination_uuid": null,
+              "uuid": "cc881ca2-fc37-4b15-8e03-bf0444fc0223"
+            }
+          ]
+        },
+        {
+          "uuid": "0481fe95-3114-4dcc-b3ab-44e803da34ed",
+          "actions": [
+            {
+              "attachments": [],
+              "text": "@results.chatgpt.extra.choices.0.text",
+              "type": "send_msg",
+              "quick_replies": [],
+              "uuid": "81d4dd58-8859-417b-b790-7566145a6f62"
+            }
+          ],
+          "exits": [
+            {
+              "uuid": "2708a12a-0a1d-48aa-b1e2-d8ee0a7f3d17",
+              "destination_uuid": "b5157b43-4bbb-41c4-b7e8-0771b9855189"
+            }
+          ]
+        }
+      ],
+      "spec_version": "13.1.0",
+      "type": "messaging",
+      "uuid": "35e5b573-dd0e-4d40-8c37-a8071810bd74",
+      "version": "13.0.0",
+      "revision": 8
+    },
+    {
+      "_ui": {
+        "nodes": {
+          "9c150a42-be02-43c3-92f7-4a81af009869": {
+            "position": {
+              "left": 380,
+              "top": 0
+            },
+            "type": "execute_actions"
+          },
+          "eb2aa9c2-53fe-4160-8f57-ecdea5fa1182": {
+            "position": {
+              "left": 1080,
+              "top": 300
+            },
+            "type": "execute_actions"
+          },
+          "bfb12723-eece-48bb-bfbc-8fe568488590": {
+            "config": {
+              "cases": {}
+            },
+            "position": {
+              "left": 380,
+              "top": 340
+            },
+            "type": "wait_for_response"
+          },
+          "793a9e16-8524-4b4c-bf07-1c8f7680bd10": {
+            "config": {
+              "cases": {},
+              "operand": {
+                "id": "contador_de_erros",
+                "name": "contador de erros",
+                "type": "result"
+              }
+            },
+            "position": {
+              "left": 380,
+              "top": 760
+            },
+            "type": "split_by_run_result"
+          },
+          "238943eb-3a24-4fc4-bcd4-f56082a08ab7": {
+            "position": {
+              "left": 40,
+              "top": 840
+            },
+            "type": "execute_actions"
+          },
+          "908eed21-7052-43d4-9662-a47b0ad67421": {
+            "position": {
+              "left": 1080,
+              "top": 840
+            },
+            "type": "execute_actions"
+          },
+          "e5c8c245-02ca-4acc-9a4c-6126a449df5d": {
+            "config": {
+              "cases": {}
+            },
+            "position": {
+              "left": 560,
+              "top": 1060
+            },
+            "type": "split_by_expression"
+          },
+          "719a4ac0-190a-4b1c-aac5-54204c212121": {
+            "position": {
+              "left": 380,
+              "top": 1260
+            },
+            "type": "execute_actions"
+          },
+          "eba8cb3d-a755-4967-bafc-18005aced11d": {
+            "type": "split_by_webhook",
+            "position": {
+              "left": 740,
+              "top": 1280
+            },
+            "config": {}
+          },
+          "371f7a3a-1d10-4362-8aaa-0ab61187d463": {
+            "position": {
+              "left": 380,
+              "top": 1480
+            },
+            "type": "execute_actions"
+          },
+          "775aa806-55f6-4c38-ba19-27e816301ef0": {
+            "position": {
+              "left": 740,
+              "top": 1480
+            },
+            "type": "execute_actions"
+          }
+        },
+        "stickies": {
+          "31a2d425-2b21-43bd-847f-f5864b742e1c": {
+            "body": "Se for o primeiro erro do usu\u00e1rio mas a mensagem dele tiver um n\u00famero, informamos que precisamos de certa formata\u00e7\u00e3o. Por\u00e9m se n\u00e3o tiver um n\u00famero, mandamos uma mensagem diferente",
+            "color": "green",
+            "position": {
+              "left": 840,
+              "top": 1060
+            },
+            "title": "Dividir por express\u00e3o"
+          },
+          "4b75124b-d1fb-4e41-b2c0-877de7faa0c5": {
+            "body": "Aqui verificamos o contador de erros. Se ainda for 0, categorizamos como \"Primeiro erro\" e tratamos de acordo, se for o segundo erro, o usu\u00e1rio passa pela categoria Other.",
+            "color": "green",
+            "position": {
+              "bottom": null,
+              "left": 660,
+              "right": null,
+              "top": 700
+            },
+            "title": "Dividir por Resultado de Fluxo"
+          },
+          "900b639d-8b44-45c5-b701-73539cf16569": {
+            "body": "Aqui salvamos um resultado chamado contador de erros. Ele sempre ser\u00e1 salvo como 0 no in\u00edcio do fluxo de mensagem e usaremos ele posteriormente para verificar se o usu\u00e1rio digitou um formato de n\u00famero diferente do esperado",
+            "color": "green",
+            "position": {
+              "bottom": 0,
+              "left": 140,
+              "right": 0,
+              "top": 0
+            },
+            "title": "Salvar Resultado do Fluxo"
+          },
+          "ac2fbb92-efc5-4e86-9cda-1c1b95fb0432": {
+            "body": "Aqui perguntamos qual o telefone do usu\u00e1rio mostrando o formato aceito pelo REGEX",
+            "color": "green",
+            "position": {
+              "bottom": null,
+              "left": 660,
+              "right": null,
+              "top": 80
+            },
+            "title": "Enviar mensagem"
+          },
+          "c86653e9-7662-420d-9585-41c01e8a7c90": {
+            "body": "Aguardamos a resposta do usu\u00e1rio.\n\nLembre que voc\u00ea pode clicar na op\u00e7\u00e3o \"Continue quando n\u00e3o houver resposta...\" e escolher o tempo que deseja esperar.\n\nDentro do card \"Aguarde por resposta\" usamos criar regra usando REGEX para saber se o usu\u00e1rio digitou o n\u00famero na formata\u00e7\u00e3o correta. Se for preciso, voc\u00ea pdoe adicionar outras regras de \"corresponde a regex\".",
+            "color": "green",
+            "position": {
+              "bottom": null,
+              "left": 660,
+              "right": null,
+              "top": 340
+            },
+            "title": "Aguarde por resposta"
+          },
+          "d2fd3cf4-c6b6-4df1-98be-5392370c9e08": {
+            "body": "Aqui salvamos o telefone informado no campo de contato Telefone para que o dado seja salvo no contato e n\u00e3o somente no fluxo de mensagem.",
+            "color": "green",
+            "position": {
+              "bottom": null,
+              "left": 40,
+              "right": null,
+              "top": 940
+            },
+            "title": "Atualizar contato"
+          },
+          "f88eb18a-c5fe-4472-a46e-832c71aea5db": {
+            "body": "Se o usu\u00e1rio errar o n\u00famero por uma segunda vez, enviamos um email para o respons\u00e1vel do setor e o deixamos prosseguir, visto que pode ser um n\u00famero de outro pa\u00eds etc.\n\nVoc\u00ea pode editar o email para receber uma sinaliza\u00e7\u00e3o quando algum usu\u00e1rio passar por esse cen\u00e1rio.\n\nDepois de enviar o email, salvamos o telefone e deixamos o usu\u00e1rio prosseguir para o pr\u00f3ximo fluxo.",
+            "color": "green",
+            "position": {
+              "left": 1320,
+              "top": 840
+            },
+            "title": "Enviar Email"
+          },
+          "f9fa6580-02e7-40b0-8f14-b0ae827706e9": {
+            "body": "Aqui salvamos +1 no contador de erros. Isso vai servir para verificarmos se \u00e9 ou n\u00e3o a primeira vez que o usu\u00e1rio errou o formato de n\u00famero desejado.\n\nSe o usu\u00e1rio errar por uma segunda vez, enviamos um email para o respons\u00e1vel do setor e o deixamos prosseguir.",
+            "color": "green",
+            "position": {
+              "left": 140,
+              "top": 1240
+            },
+            "title": "Salvar Resultado do Fluxo"
+          },
+          "fe104c2f-df51-4a3b-86cf-f463f934b3ee": {
+            "body": "A categoria No Response serve para quando o fluxo continua sem que o usu\u00e1rio tenha respondido \u00e0 pergunta. Normalmente \u00e9 utilizado para n\u00e3o deixar o usu\u00e1rio preso em uma pergunta.\n\nAl\u00e9m disso, adicionamos o usu\u00e1rio no grupo \"Conversa encerrada\" pois antes de enviar outra mensagem ou entrar em outro fluxo podemos verificar se o usu\u00e1rio est\u00e1 nesse grupo e evitar o envio de mensagens.",
+            "color": "green",
+            "position": {
+              "bottom": null,
+              "left": 1320,
+              "right": null,
+              "top": 260
+            },
+            "title": "Categoria No response"
+          }
+        }
+      },
+      "expire_after_minutes": 10080,
+      "language": "base",
+      "localization": {},
+      "metadata": {
+        "expires": 10080,
+        "revision": 75
+      },
+      "name": "Coleta de Telefone - Fluxo secund\u00e1rio",
+      "nodes": [
+        {
+          "actions": [
+            {
+              "category": "",
+              "name": "contador de erros",
+              "type": "set_run_result",
+              "uuid": "9d055543-af8c-48f2-a137-997254316675",
+              "value": "0"
+            },
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Legal. Agora voc\u00ea poderia me informar tamb\u00e9m o seu telefone com DDD? (DD) 9xxxx-xxxx",
+              "type": "send_msg",
+              "uuid": "a125566f-6136-4ab3-8da1-3d0fc5e85156"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "bfb12723-eece-48bb-bfbc-8fe568488590",
+              "uuid": "65dfd8d9-8c22-41fa-8ad6-db9aeba0baf2"
+            }
+          ],
+          "uuid": "9c150a42-be02-43c3-92f7-4a81af009869"
+        },
+        {
+          "actions": [
+            {
+              "groups": [
+                {
+                  "count": 0,
+                  "name": "Conversa Encerrada",
+                  "query": null,
+                  "status": "ready",
+                  "uuid": "b7abd3ed-e078-4127-9ced-de6b14ca81bd"
+                }
+              ],
+              "type": "add_contact_groups",
+              "uuid": "090bc801-10d3-4569-aa92-ce25378bfdcc"
+            },
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Por falta de resposta, encerrei esse atendimento. Mas quando quiser \u00e9 s\u00f3 falar comigo \ud83d\ude09",
+              "type": "send_msg",
+              "uuid": "08d0e846-ad0e-4e59-800b-d2c974924ec1"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "91fb0240-30d0-42a7-9000-f1de90d2e09b"
+            }
+          ],
+          "uuid": "eb2aa9c2-53fe-4160-8f57-ecdea5fa1182"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "238943eb-3a24-4fc4-bcd4-f56082a08ab7",
+              "uuid": "f9ad984a-d5af-473c-842f-e396590920aa"
+            },
+            {
+              "destination_uuid": "793a9e16-8524-4b4c-bf07-1c8f7680bd10",
+              "uuid": "3cff8bc8-ef21-443c-9d14-d6a7509a40f0"
+            },
+            {
+              "destination_uuid": "eb2aa9c2-53fe-4160-8f57-ecdea5fa1182",
+              "uuid": "568ce567-f18b-4d20-bac1-7c0ff839ea00"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "^(?:(?:\\+|00)?(55)\\s?)?(\\(?([1-9][0-9])\\)?\\s?)(?:((?:9\\d|[2-9])\\d{3})\\-?(\\d{4}))$"
+                ],
+                "category_uuid": "a9447cd7-b6ba-4922-86b4-ab2bf7f1a008",
+                "type": "has_pattern",
+                "uuid": "e61d32dd-a0ec-4a09-bcfc-3b9b98a9ea46"
+              },
+              {
+                "arguments": [],
+                "category_uuid": "a9447cd7-b6ba-4922-86b4-ab2bf7f1a008",
+                "type": "has_phone",
+                "uuid": "9036a8b1-3274-42cc-b7d0-646fdd1ea47e"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "f9ad984a-d5af-473c-842f-e396590920aa",
+                "name": "Telefone",
+                "uuid": "a9447cd7-b6ba-4922-86b4-ab2bf7f1a008"
+              },
+              {
+                "exit_uuid": "3cff8bc8-ef21-443c-9d14-d6a7509a40f0",
+                "name": "Other",
+                "uuid": "c4372127-a1e0-4766-a981-6c359a437d3f"
+              },
+              {
+                "exit_uuid": "568ce567-f18b-4d20-bac1-7c0ff839ea00",
+                "name": "No Response",
+                "uuid": "7dbcd96d-3e11-4b73-9a4f-4e7c12ee12b3"
+              }
+            ],
+            "default_category_uuid": "c4372127-a1e0-4766-a981-6c359a437d3f",
+            "operand": "@input.text",
+            "result_name": "Telefone",
+            "type": "switch",
+            "wait": {
+              "timeout": {
+                "category_uuid": "7dbcd96d-3e11-4b73-9a4f-4e7c12ee12b3",
+                "seconds": 300
+              },
+              "type": "msg"
+            }
+          },
+          "uuid": "bfb12723-eece-48bb-bfbc-8fe568488590"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "e5c8c245-02ca-4acc-9a4c-6126a449df5d",
+              "uuid": "17b829f1-aa8c-411b-9c22-259e93b3a678"
+            },
+            {
+              "destination_uuid": "908eed21-7052-43d4-9662-a47b0ad67421",
+              "uuid": "e92ba00a-71f3-4ae4-845f-dc29b19cac7c"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "0"
+                ],
+                "category_uuid": "9fccb7ef-d9dc-42ec-bdb8-61b3c1d60db5",
+                "type": "has_number_eq",
+                "uuid": "b19a0a31-b9cf-4521-a476-c50760774ed6"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "17b829f1-aa8c-411b-9c22-259e93b3a678",
+                "name": "Primeiro erro",
+                "uuid": "9fccb7ef-d9dc-42ec-bdb8-61b3c1d60db5"
+              },
+              {
+                "exit_uuid": "e92ba00a-71f3-4ae4-845f-dc29b19cac7c",
+                "name": "Other",
+                "uuid": "317e0c8e-f655-42df-b862-dd76a0f1726c"
+              }
+            ],
+            "default_category_uuid": "317e0c8e-f655-42df-b862-dd76a0f1726c",
+            "operand": "@results.contador_de_erros",
+            "type": "switch"
+          },
+          "uuid": "793a9e16-8524-4b4c-bf07-1c8f7680bd10"
+        },
+        {
+          "actions": [
+            {
+              "field": {
+                "key": "telefone",
+                "name": "Telefone"
+              },
+              "type": "set_contact_field",
+              "uuid": "28f7e3da-44ff-47eb-93e3-2c574c996d5c",
+              "value": "@results.telefone"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "75c24996-3eb8-43a4-893e-2403fd92d98f"
+            }
+          ],
+          "uuid": "238943eb-3a24-4fc4-bcd4-f56082a08ab7"
+        },
+        {
+          "actions": [
+            {
+              "addresses": [
+                "weni@weni.ai"
+              ],
+              "body": "Cliente com n\u00famero diferente da formata\u00e7\u00e3o - Chatbot\n\nNumero informado no Chatbot: @results.telefone.value\n\nNome: @contact.name\n\nUUID: @contact.uuid ",
+              "subject": "Usu\u00e1rio com n\u00famero diferente da formata\u00e7\u00e3o - Chatbot",
+              "type": "send_email",
+              "uuid": "e4d609f5-5771-4956-89b1-6ac0808d4584"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "238943eb-3a24-4fc4-bcd4-f56082a08ab7",
+              "uuid": "ada3b2fc-e4bf-4920-9a81-c2878279cfcf"
+            }
+          ],
+          "uuid": "908eed21-7052-43d4-9662-a47b0ad67421"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "719a4ac0-190a-4b1c-aac5-54204c212121",
+              "uuid": "d3d77e22-c92a-490f-ab87-956e8a956fa4"
+            },
+            {
+              "destination_uuid": "eba8cb3d-a755-4967-bafc-18005aced11d",
+              "uuid": "13ef0403-477e-4ebc-babb-ae4cd4b9b207"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [],
+                "category_uuid": "f1011dae-370f-437c-9e65-7e28f61d6ad0",
+                "type": "has_number",
+                "uuid": "79cf8406-2e4b-4f8a-8f4a-d064cbff9530"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "d3d77e22-c92a-490f-ab87-956e8a956fa4",
+                "name": "Has Number",
+                "uuid": "f1011dae-370f-437c-9e65-7e28f61d6ad0"
+              },
+              {
+                "exit_uuid": "13ef0403-477e-4ebc-babb-ae4cd4b9b207",
+                "name": "Other",
+                "uuid": "6931ca66-732c-489c-a39c-072705c006c3"
+              }
+            ],
+            "default_category_uuid": "6931ca66-732c-489c-a39c-072705c006c3",
+            "operand": "@input.text",
+            "type": "switch"
+          },
+          "uuid": "e5c8c245-02ca-4acc-9a4c-6126a449df5d"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Ent\u00e3o @(title(contact.first_name)), eu preciso de um n\u00famero v\u00e1lido! Por favor, digita seu n\u00famero abaixo. (DD) 9xxxx-xxxx",
+              "type": "send_msg",
+              "uuid": "ddbf8cae-0fd8-4189-825a-bc48daffa562"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "371f7a3a-1d10-4362-8aaa-0ab61187d463",
+              "uuid": "b995aadb-ee7b-4c92-8425-c87932dfd037"
+            }
+          ],
+          "uuid": "719a4ac0-190a-4b1c-aac5-54204c212121"
+        },
+        {
+          "uuid": "eba8cb3d-a755-4967-bafc-18005aced11d",
+          "actions": [
+            {
+              "uuid": "cfeae443-d741-410b-9e68-08441d2630cc",
+              "headers": {
+                "Authorization": "Bearer @globals.token_chatgpt",
+                "Content-Type": "application/json"
+              },
+              "type": "call_webhook",
+              "url": "https://api.openai.com/v1/completions",
+              "body": "{\"model\": \"text-davinci-003\", \"prompt\": \"Esse \u00e9 um coletor de dados como nome, email, idade e telefone. Pergunta: @input.text. Para qualquer pergunta que n\u00e3o seja considerada um n\u00famero de telefone, gere uma resposta informando que n\u00e3o conhece sobre o assunto, caso seja uma delas, pe\u00e7a que seja no formato (DD) 9xxxx-xxxx\", \"temperature\": 0, \"max_tokens\": 200} ",
+              "method": "POST",
+              "result_name": "ChatGPT"
+            }
+          ],
+          "router": {
+            "type": "switch",
+            "operand": "@results.chatgpt.category",
+            "cases": [
+              {
+                "arguments": [
+                  "Success"
+                ],
+                "category_uuid": "b3da44a6-5f06-4a34-a90f-43becbe86ebb",
+                "type": "has_only_text",
+                "uuid": "6104c619-efc2-40aa-860d-6de5b65234bb"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "6da1332d-a993-4441-8add-76bdee55911f",
+                "name": "Success",
+                "uuid": "b3da44a6-5f06-4a34-a90f-43becbe86ebb"
+              },
+              {
+                "exit_uuid": "e5cc0213-b79a-4ad4-b781-16b89f813a00",
+                "name": "Failure",
+                "uuid": "bbe0154d-0acb-46a5-9434-18eb94c59b25"
+              }
+            ],
+            "default_category_uuid": "bbe0154d-0acb-46a5-9434-18eb94c59b25"
+          },
+          "exits": [
+            {
+              "destination_uuid": "775aa806-55f6-4c38-ba19-27e816301ef0",
+              "uuid": "6da1332d-a993-4441-8add-76bdee55911f"
+            },
+            {
+              "destination_uuid": null,
+              "uuid": "e5cc0213-b79a-4ad4-b781-16b89f813a00"
+            }
+          ]
+        },
+        {
+          "uuid": "371f7a3a-1d10-4362-8aaa-0ab61187d463",
+          "actions": [
+            {
+              "type": "set_run_result",
+              "name": "contador de erros",
+              "value": "@(results.contador_de_erros +1)",
+              "category": "",
+              "uuid": "9394feb9-ac78-4259-8ab8-f9d76beac56c"
+            }
+          ],
+          "exits": [
+            {
+              "uuid": "77b54fd7-7022-4dac-b709-1b603850de9f",
+              "destination_uuid": "bfb12723-eece-48bb-bfbc-8fe568488590"
+            }
+          ]
+        },
+        {
+          "uuid": "775aa806-55f6-4c38-ba19-27e816301ef0",
+          "actions": [
+            {
+              "attachments": [],
+              "text": "@results.chatgpt.extra.choices.0.text",
+              "type": "send_msg",
+              "quick_replies": [],
+              "uuid": "351ae8e3-6017-49d2-8a22-7e7ba82d97ca"
+            }
+          ],
+          "exits": [
+            {
+              "uuid": "e97e730b-31ee-4745-8baa-efb3df6a8577",
+              "destination_uuid": "371f7a3a-1d10-4362-8aaa-0ab61187d463"
+            }
+          ]
+        }
+      ],
+      "spec_version": "13.1.0",
+      "type": "messaging",
+      "uuid": "06615c36-2386-4869-af37-37cc70a4759a",
+      "version": "13.0.0",
+      "revision": 17
+    },
+    {
+      "_ui": {
+        "nodes": {
+          "ccc4db95-c4e3-4ed0-b8fd-0731563528ce": {
+            "config": {
+              "cases": {}
+            },
+            "position": {
+              "left": 260,
+              "top": 0
+            },
+            "type": "split_by_groups"
+          },
+          "2bb6505d-b083-4462-a2bc-86e8a60853a9": {
+            "position": {
+              "left": 580,
+              "top": 140
+            },
+            "type": "execute_actions"
+          },
+          "211ca71a-27e5-4e7f-84de-6678fa46144b": {
+            "type": "split_by_webhook",
+            "position": {
+              "left": 1320,
+              "top": 260
+            },
+            "config": {}
+          },
+          "ef0a0ca2-6d6d-4999-bd04-a15fd8b458b2": {
+            "position": {
+              "left": 580,
+              "top": 300
+            },
+            "type": "execute_actions"
+          },
+          "07a3417c-274e-486f-92b2-59a74b2f2ba3": {
+            "config": {
+              "cases": {}
+            },
+            "position": {
+              "left": 520,
+              "top": 500
+            },
+            "type": "wait_for_response"
+          },
+          "c30367fe-19a3-474f-b320-2bc93b197527": {
+            "position": {
+              "left": 60,
+              "top": 560
+            },
+            "type": "execute_actions"
+          },
+          "3198bde2-0fae-45cc-8a8f-b59f1af52b5c": {
+            "position": {
+              "left": 1320,
+              "top": 600
+            },
+            "type": "execute_actions"
+          },
+          "2ee1966f-261d-47eb-a8a2-2b96ec7193b3": {
+            "position": {
+              "left": 560,
+              "top": 720
+            },
+            "type": "execute_actions"
+          },
+          "daaa5cab-ff72-45a5-a584-985c471a0592": {
+            "position": {
+              "left": 1320,
+              "top": 460
+            },
+            "type": "execute_actions"
+          }
+        },
+        "stickies": {
+          "0617a23f-efdb-49e5-ba20-5ac2a615ea9d": {
+            "body": "Salvamos o nome do usu\u00e1rio no campo de contato name. Poder\u00e1 ser visualizado no m\u00f3dulo Est\u00fadio",
+            "color": "green",
+            "position": {
+              "bottom": null,
+              "left": 580,
+              "right": null,
+              "top": 820
+            },
+            "title": "Atualizar o contato"
+          },
+          "33cbfb49-faf0-4ab2-9e7e-3f408ca9f174": {
+            "body": "O card \"Enviar mensagem\" serve para enviarmos mensagens ao usu\u00e1rio atrav\u00e9s de um canal.\n\nEssa mensagem pode ser personalizada, por exemplo, perguntando qual o nome social dessa pessoa.",
+            "color": "green",
+            "position": {
+              "bottom": 40,
+              "left": 820,
+              "right": 80,
+              "top": 160
+            },
+            "title": "Enviar mensagem"
+          },
+          "373a0539-4474-4e13-801e-771ca9715104": {
+            "body": "Esse card serve para parar a fluidez do fluxo de mensagem e aguardar um momento para que haja uma resposta do usu\u00e1rio.\n\n\u00c9 muito importante ser usado para deixar a conversa mais humana.\n\nLembre que voc\u00ea pode clicar na op\u00e7\u00e3o \"Continue quando n\u00e3o houver resposta...\" e escolher o tempo que deseja esperar.\n\nDentro do card \"Aguarde por resposta\" tamb\u00e9m podemos criar regras para caso, quando o usu\u00e1rio responder, j\u00e1 verificar se h\u00e1 alguma palavra ou se \u00e9 um texto.",
+            "color": "green",
+            "position": {
+              "bottom": 20,
+              "left": 940,
+              "right": -80,
+              "top": 420
+            },
+            "title": "Aguarde por resposta"
+          },
+          "6498f488-e153-4538-8b0c-6fa47df44d8e": {
+            "body": "Aqui verificamos se o usu\u00e1rio est\u00e1 no grupo \"Informou nome\", pois se tiver \u00e9 porque j\u00e1 informou seu nome anteriormente visto que o usu\u00e1rio s\u00f3 \u00e9 adicionado neste grupo ap\u00f3s informar o nome.\n\nSe voc\u00ea n\u00e3o quiser perguntar o nome novamente, \u00e9 s\u00f3 retirar a liga\u00e7\u00e3o da categoria Informou Nome ou abaixar o card at\u00e9 que o fluxo de mensagem se inicie no primeiro card \"Enviar mensagem\"",
+            "color": "green",
+            "position": {
+              "bottom": 20,
+              "left": 160,
+              "right": 100,
+              "top": 160
+            },
+            "title": "Dividir por filia\u00e7\u00e3o de grupo"
+          },
+          "8080bcb1-b037-4aad-8b63-288a5b3c0960": {
+            "body": "A categoria Encerrar serve para quando o fluxo de mensagem continua sem que o usu\u00e1rio tenha respondido \u00e0 pergunta. Normalmente \u00e9 utilizado para n\u00e3o deixar o usu\u00e1rio preso em uma pergunta.\n\nAl\u00e9m disso, adicionamos o usu\u00e1rio no grupo \"Conversa encerrada\" pois antes de enviar outra mensagem ou entrar em outro fluxo de mensagem podemos verificar se o usu\u00e1rio est\u00e1 nesse grupo e evitar o envio de mensagens.",
+            "color": "green",
+            "position": {
+              "bottom": 40,
+              "left": 60,
+              "right": 0,
+              "top": 760
+            },
+            "title": "Categoria Encerrar"
+          },
+          "e8a26bed-1667-4c90-9d62-b842eed9d5c4": {
+            "body": "A categoria No Response serve para quando o fluxo continua sem que o usu\u00e1rio tenha respondido \u00e0 pergunta. Normalmente \u00e9 utilizado para n\u00e3o deixar o usu\u00e1rio preso em uma pergunta.\n\nAl\u00e9m disso, adicionamos o usu\u00e1rio no grupo \"Conversa encerrada\" pois antes de enviar outra mensagem ou entrar em outro fluxo podemos verificar se o usu\u00e1rio est\u00e1 nesse grupo e evitar o envio de mensagens.",
+            "color": "green",
+            "position": {
+              "bottom": null,
+              "left": 1560,
+              "right": null,
+              "top": 520
+            },
+            "title": "Categoria No Response"
+          },
+          "fde32c92-9fa1-4bf2-8807-50e42dce9923": {
+            "body": "Aqui tratamos a excess\u00e3o para caso o usu\u00e1rio n\u00e3o digite um texto, podendo ter enviado a foto de seu documento etc.",
+            "color": "green",
+            "position": {
+              "bottom": 20,
+              "left": 1560,
+              "right": 160,
+              "top": 220
+            },
+            "title": "Other"
+          }
+        }
+      },
+      "expire_after_minutes": 10080,
+      "language": "base",
+      "localization": {},
+      "metadata": {
+        "expires": 10080,
+        "revision": 1
+      },
+      "name": "Coleta do Nome - Fluxo secund\u00e1rio",
+      "nodes": [
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "2bb6505d-b083-4462-a2bc-86e8a60853a9",
+              "uuid": "66d52b48-19b0-42dc-abb4-554e78eebcc4"
+            },
+            {
+              "destination_uuid": "2bb6505d-b083-4462-a2bc-86e8a60853a9",
+              "uuid": "5ebaee15-986d-47e3-81b9-7c6aab82d1c7"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "52f6267f-4c43-4dda-b8ca-1c704eaa0fa4",
+                  "Informou Nome"
+                ],
+                "category_uuid": "569b73cd-87db-421b-a2bc-aca97d0096ba",
+                "type": "has_group",
+                "uuid": "9e331397-cef6-4293-b3fb-5b1defc8cc74"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "66d52b48-19b0-42dc-abb4-554e78eebcc4",
+                "name": "Informou Nome",
+                "uuid": "569b73cd-87db-421b-a2bc-aca97d0096ba"
+              },
+              {
+                "exit_uuid": "5ebaee15-986d-47e3-81b9-7c6aab82d1c7",
+                "name": "Other",
+                "uuid": "7071e0d3-3324-45ca-ab61-b38783c4abe4"
+              }
+            ],
+            "default_category_uuid": "7071e0d3-3324-45ca-ab61-b38783c4abe4",
+            "operand": "@contact.groups",
+            "result_name": "",
+            "type": "switch"
+          },
+          "uuid": "ccc4db95-c4e3-4ed0-b8fd-0731563528ce"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Gostaria de te conhecer melhor \ud83d\ude0a",
+              "type": "send_msg",
+              "uuid": "cc888877-1f58-4465-b69d-f1b7eeb239dd"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "ef0a0ca2-6d6d-4999-bd04-a15fd8b458b2",
+              "uuid": "ef388003-4476-4701-a702-9f705d347fe8"
+            }
+          ],
+          "uuid": "2bb6505d-b083-4462-a2bc-86e8a60853a9"
+        },
+        {
+          "uuid": "211ca71a-27e5-4e7f-84de-6678fa46144b",
+          "actions": [
+            {
+              "uuid": "c1219f70-c8d5-4263-a9e5-2b4568758a8a",
+              "headers": {
+                "Authorization": "Bearer @globals.token_chatgpt",
+                "Content-Type": "application/json"
+              },
+              "type": "call_webhook",
+              "url": "https://api.openai.com/v1/completions",
+              "body": "{\"model\": \"text-davinci-003\", \"prompt\": \"Esse \u00e9 um coletor de dados como nome, email e idade. Pergunta: @input.text. Para qualquer pergunta que n\u00e3o seja considerada um nome pr\u00f3prio, gere uma resposta informando que n\u00e3o conhece sobre o assunto, caso seja uma delas, gere uma resposta agradecendo.\", \"temperature\": 0, \"max_tokens\": 200} ",
+              "method": "POST",
+              "result_name": "ChatGPT"
+            }
+          ],
+          "router": {
+            "type": "switch",
+            "operand": "@results.chatgpt.category",
+            "cases": [
+              {
+                "arguments": [
+                  "Success"
+                ],
+                "category_uuid": "7559166b-8d22-4f66-beaf-d2e6088eadb9",
+                "type": "has_only_text",
+                "uuid": "28dda7c8-cc5b-46e1-ac57-62792cce2b7d"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "9b791ae7-e0c6-4f0f-a364-2955b7950106",
+                "name": "Success",
+                "uuid": "7559166b-8d22-4f66-beaf-d2e6088eadb9"
+              },
+              {
+                "exit_uuid": "81c48ca4-da85-4d78-97cc-330e52be11dc",
+                "name": "Failure",
+                "uuid": "46e9d998-0e17-4954-88e5-a72781409e34"
+              }
+            ],
+            "default_category_uuid": "46e9d998-0e17-4954-88e5-a72781409e34"
+          },
+          "exits": [
+            {
+              "destination_uuid": "daaa5cab-ff72-45a5-a584-985c471a0592",
+              "uuid": "9b791ae7-e0c6-4f0f-a364-2955b7950106"
+            },
+            {
+              "destination_uuid": null,
+              "uuid": "81c48ca4-da85-4d78-97cc-330e52be11dc"
+            }
+          ]
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Por favor, qual o seu nome completo?",
+              "type": "send_msg",
+              "uuid": "10b96426-786f-4f70-85c6-973eca35a8d7"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "07a3417c-274e-486f-92b2-59a74b2f2ba3",
+              "uuid": "92303db7-1294-4d9e-b6bb-3ff61da3ff71"
+            }
+          ],
+          "uuid": "ef0a0ca2-6d6d-4999-bd04-a15fd8b458b2"
+        },
+        {
+          "uuid": "daaa5cab-ff72-45a5-a584-985c471a0592",
+          "actions": [
+            {
+              "attachments": [],
+              "text": "@results.chatgpt.extra.choices.0.text",
+              "type": "send_msg",
+              "quick_replies": [],
+              "uuid": "30b26623-3d5e-4274-9506-06333b9a5412"
+            }
+          ],
+          "exits": [
+            {
+              "uuid": "9caad802-d765-4bea-baa1-fa29a8d46933",
+              "destination_uuid": "ef0a0ca2-6d6d-4999-bd04-a15fd8b458b2"
+            }
+          ]
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "c30367fe-19a3-474f-b320-2bc93b197527",
+              "uuid": "8826d428-3572-4fda-8d58-1b5bd7873e91"
+            },
+            {
+              "destination_uuid": "2ee1966f-261d-47eb-a8a2-2b96ec7193b3",
+              "uuid": "b8f8b0dc-a8ff-429f-85a4-50a44d06ac69"
+            },
+            {
+              "destination_uuid": "211ca71a-27e5-4e7f-84de-6678fa46144b",
+              "uuid": "b31596e3-1216-43cf-b41f-dec70d155406"
+            },
+            {
+              "destination_uuid": "3198bde2-0fae-45cc-8a8f-b59f1af52b5c",
+              "uuid": "3ea80044-5599-4500-938d-fa4d1226e00c"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "desistir sair encerrar"
+                ],
+                "category_uuid": "86037c2c-cb50-4906-8a9d-18aea86fa77b",
+                "type": "has_any_word",
+                "uuid": "934dbcf7-bb60-4384-9cd5-da7c5ca09ed0"
+              },
+              {
+                "arguments": [],
+                "category_uuid": "9a3a75be-700b-461b-b83a-1215527ed858",
+                "type": "has_text",
+                "uuid": "b2d46a0c-8c61-4774-ade8-5fa27ef84b2b"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "8826d428-3572-4fda-8d58-1b5bd7873e91",
+                "name": "Encerrar",
+                "uuid": "86037c2c-cb50-4906-8a9d-18aea86fa77b"
+              },
+              {
+                "exit_uuid": "b8f8b0dc-a8ff-429f-85a4-50a44d06ac69",
+                "name": "Nome",
+                "uuid": "9a3a75be-700b-461b-b83a-1215527ed858"
+              },
+              {
+                "exit_uuid": "b31596e3-1216-43cf-b41f-dec70d155406",
+                "name": "Other",
+                "uuid": "570f2f2e-e7ed-4a87-8e87-a402e0a2ae68"
+              },
+              {
+                "exit_uuid": "3ea80044-5599-4500-938d-fa4d1226e00c",
+                "name": "No Response",
+                "uuid": "043196ad-57c9-43fe-b91c-fba0e33ddab6"
+              }
+            ],
+            "default_category_uuid": "570f2f2e-e7ed-4a87-8e87-a402e0a2ae68",
+            "operand": "@input.text",
+            "result_name": "nome",
+            "type": "switch",
+            "wait": {
+              "timeout": {
+                "category_uuid": "043196ad-57c9-43fe-b91c-fba0e33ddab6",
+                "seconds": 900
+              },
+              "type": "msg"
+            }
+          },
+          "uuid": "07a3417c-274e-486f-92b2-59a74b2f2ba3"
+        },
+        {
+          "actions": [
+            {
+              "groups": [
+                {
+                  "count": 2,
+                  "name": "Conversa Encerrada",
+                  "query": null,
+                  "status": "ready",
+                  "uuid": "b7abd3ed-e078-4127-9ced-de6b14ca81bd"
+                }
+              ],
+              "type": "add_contact_groups",
+              "uuid": "aeedd49a-7463-4257-8230-2152677c490a"
+            },
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Certo, quando quiser \u00e9 s\u00f3 falar comigo \ud83d\ude09",
+              "type": "send_msg",
+              "uuid": "30c3ae50-b331-4f21-a4a8-c896d4f56da2"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "bb498037-e7ad-4291-ba20-a773ffb4c691"
+            }
+          ],
+          "uuid": "c30367fe-19a3-474f-b320-2bc93b197527"
+        },
+        {
+          "actions": [
+            {
+              "groups": [
+                {
+                  "count": 0,
+                  "name": "Conversa Encerrada",
+                  "query": null,
+                  "status": "ready",
+                  "uuid": "b7abd3ed-e078-4127-9ced-de6b14ca81bd"
+                }
+              ],
+              "type": "add_contact_groups",
+              "uuid": "0b5ccc8d-b471-47e8-b3ad-75a853eed149"
+            },
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Por falta de resposta, encerrei esse atendimento. Mas quando quiser \u00e9 s\u00f3 falar comigo \ud83d\ude09",
+              "type": "send_msg",
+              "uuid": "799351af-815d-40bf-85a4-d82c026eefe1"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "106f5903-a43c-4f41-8342-961494316778"
+            }
+          ],
+          "uuid": "3198bde2-0fae-45cc-8a8f-b59f1af52b5c"
+        },
+        {
+          "actions": [
+            {
+              "name": "@results.nome.value",
+              "type": "set_contact_name",
+              "uuid": "60c99543-8fab-4067-8ddd-38a474ce05cd"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "2322a09c-aee0-4a32-aa46-45557e22c41d"
+            }
+          ],
+          "uuid": "2ee1966f-261d-47eb-a8a2-2b96ec7193b3"
+        }
+      ],
+      "spec_version": "13.1.0",
+      "type": "messaging",
+      "uuid": "f9f124d1-d587-4ca2-897b-f533a2833d67",
+      "version": "13.0.0",
+      "revision": 6
+    },
+    {
+      "_ui": {
+        "nodes": {
+          "29fe093b-2327-4fd4-acd7-153ebd836e6f": {
+            "config": {},
+            "position": {
+              "left": 440,
+              "top": 700
+            },
+            "type": "split_by_subflow"
+          },
+          "3c67684e-d224-44bb-af35-eab61461ade5": {
+            "config": {},
+            "position": {
+              "left": 360,
+              "top": 20
+            },
+            "type": "split_by_intent"
+          },
+          "73da7c41-8e91-463b-92c2-dc286134a3b6": {
+            "position": {
+              "left": 440,
+              "top": 460
+            },
+            "type": "execute_actions"
+          },
+          "850b100f-e123-4344-b7c5-e8a1c75cf8be": {
+            "position": {
+              "left": 440,
+              "top": 3020
+            },
+            "type": "execute_actions"
+          },
+          "9a3983a5-7367-4653-a6be-c9cd8bca3b55": {
+            "position": {
+              "left": 280,
+              "top": 300
+            },
+            "type": "execute_actions"
+          },
+          "9f0b4ccb-1e75-4146-85c6-d57ca0d24cee": {
+            "config": {
+              "cases": {}
+            },
+            "position": {
+              "left": 440,
+              "top": 1800
+            },
+            "type": "split_by_groups"
+          },
+          "bf6b282e-c5dd-436b-a6c7-e90de01aab41": {
+            "config": {},
+            "position": {
+              "left": 440,
+              "top": 2200
+            },
+            "type": "split_by_subflow"
+          },
+          "c1c6f2de-5109-439f-a2db-9c955eb6e08b": {
+            "config": {
+              "cases": {}
+            },
+            "position": {
+              "left": 440,
+              "top": 1040
+            },
+            "type": "split_by_groups"
+          },
+          "d4d52dd1-cc3f-445e-8eda-47eb04b34546": {
+            "position": {
+              "left": 440,
+              "top": 2760
+            },
+            "type": "execute_actions"
+          },
+          "e004a908-cf5c-4174-bf65-1413a8a7d461": {
+            "config": {
+              "cases": {}
+            },
+            "position": {
+              "left": 440,
+              "top": 2500
+            },
+            "type": "split_by_groups"
+          },
+          "f1f6a759-17b3-479e-811f-4a38e8ddbc84": {
+            "config": {},
+            "position": {
+              "left": 440,
+              "top": 1400
+            },
+            "type": "split_by_subflow"
+          }
+        },
+        "stickies": {
+          "2593103f-f5b8-427c-823d-a10c26f53ab5": {
+            "body": "Se voc\u00ea quer que seu fluxo inicie ativamente, como n\u00e3o haver\u00e1 mensagem do usu\u00e1rio para enviar \u00e0 intelig\u00eancia, remova o card \"Dividir por Inten\u00e7\u00e3o\"",
+            "color": "green",
+            "position": {
+              "bottom": 360,
+              "left": 900,
+              "right": 0,
+              "top": 380
+            },
+            "title": "Aten\u00e7\u00e3o"
+          },
+          "40b9d992-255e-4610-8d10-628f2a690cdb": {
+            "body": "Esse card serve para verificarmos se o usu\u00e1rio est\u00e1 no grupo Conversa Encerrada, se sim, o fluxo n\u00e3o continua. Agora se o usu\u00e1rio n\u00e3o estiver nesse grupo, ir\u00e1 passar pela categoria Other e continuar\u00e1 no fluxo.\n\n\u00c9 importante lembrar que o usu\u00e1rio s\u00f3 \u00e9 colocado no grupo Conversa encerrada se quiser encerrar ou ficar inativo.",
+            "color": "green",
+            "position": {
+              "bottom": 600,
+              "left": 700,
+              "right": 160,
+              "top": 960
+            },
+            "title": "Dividir por Filia\u00e7\u00e3o de Grupo"
+          },
+          "4c951ae0-3825-4259-8095-55faba7b8330": {
+            "body": "Neste fluxo de mensagens usamos o card \"Entrar em um fluxo\" para organizar a estrutura das nossas perguntas. \n\nO card \"Entrar em um fluxo\" simplesmente direciona o usu\u00e1rio para outro fluxo de mensagens  em mil\u00e9simos de segundos e j\u00e1 executa a a\u00e7\u00e3o desse outro fluxo de mensagens .\n\nSendo assim, a t\u00edtulo de organiza\u00e7\u00e3o perguntamos o nome, telefone e email, cada um em seu devido fluxo.de mensagem.",
+            "color": "green",
+            "position": {
+              "bottom": 260,
+              "left": 120,
+              "right": -380,
+              "top": 440
+            },
+            "title": "Entrar em um fluxo"
+          },
+          "7d438dfe-84e6-4d32-9082-3fd3b5b6ff48": {
+            "body": "No fluxo de mensagens  \"Nome\" captaremos o nome do usu\u00e1rio usando a intelig\u00eancia artificial criada pela Weni",
+            "color": "green",
+            "position": {
+              "bottom": 600,
+              "left": 700,
+              "right": 160,
+              "top": 700
+            },
+            "title": "Nome"
+          },
+          "9706b839-c9f0-408d-9131-d03efb225c69": {
+            "body": "Aqui enviamos a \u00faltima mensagem do usu\u00e1rio para o classificador. Toda intelig\u00eancia \u00e9 utilizada atrav\u00e9s desse card e pode pode categorizar de acordo com uma inten\u00e7\u00e3o da intelig\u00eancia.\n\nNesse caso, se a inten\u00e7\u00e3o for \"greeting\" iremos saudar o usu\u00e1rio de acordo.",
+            "color": "green",
+            "position": {
+              "bottom": null,
+              "left": 700,
+              "right": null,
+              "top": 20
+            },
+            "title": "Dividir por inten\u00e7\u00e3o"
+          },
+          "a1885b39-5ae2-4f07-94cc-3ee92803eacb": {
+            "body": "No fluxo de mensagem \"Telefone\" captaremos o telefone de contato do usu\u00e1rio usando regras REGEX no card \"Aguarde Por Resposta\".\n\nRegex \u00e9 uma express\u00e3o regular, ou Regex, s\u00e3o padr\u00f5es utilizados para identificar determinadas combina\u00e7\u00f5es ou cadeias de caracteres em uma string.",
+            "color": "green",
+            "position": {
+              "bottom": 580,
+              "left": 700,
+              "right": 160,
+              "top": 1340
+            },
+            "title": "Telefone"
+          },
+          "a678ac34-58e5-42af-a765-6e815e42bc14": {
+            "body": "Mensagem de feedback ao usu\u00e1rio.\n\nPode ser removida ou alterada, se preferir.",
+            "color": "green",
+            "position": {
+              "bottom": null,
+              "left": 220,
+              "right": null,
+              "top": 3040
+            },
+            "title": "Enviar mensagem"
+          },
+          "af489e76-4330-4611-bbdc-b8937bc0c8ad": {
+            "body": "Aqui colocamos uma mensagem de boas vindas se seu chatbot s\u00f3 for captar esses dados do usu\u00e1rio.\n\nSe preferir, pode remover essa mensagem e usar o restante do fluxo de mensagens em uma etapa de seu chatbot que j\u00e1 foi constru\u00eddo. Ao remover essa mensagem inicial, seu fluxo de mensagem j\u00e1 iniciar\u00e1 na pergunta do nome do usu\u00e1rio.",
+            "color": "green",
+            "position": {
+              "bottom": 200,
+              "left": 700,
+              "right": 40,
+              "top": 300
+            },
+            "title": "Enviar mensagem"
+          },
+          "cd728368-0909-452d-a350-67e6abf1c172": {
+            "body": "No fluxo de mensagem \"E-mail\" captaremos o E-mail de contato do usu\u00e1rio usando a regra \"Tem um email\" no card \"Aguarde Por Resposta\".\n\nEssa \u00e9 uma regra padr\u00e3o da plataforma Weni, que verifica se o formato de texto \u00e9 compat\u00edvel com o de um email. \u00c9 importante ressaltar que n\u00e3o \u00e9 feita uma verifica\u00e7\u00e3o de exist\u00eancia do email e sim verifica\u00e7\u00e3o do formato que foi enviado pelo usu\u00e1rio.",
+            "color": "green",
+            "position": {
+              "bottom": 640,
+              "left": 720,
+              "right": 160,
+              "top": 2220
+            },
+            "title": "E-mail"
+          },
+          "d3e1c246-3824-486e-9794-8a43eb65309c": {
+            "body": "Esse card serve para verificarmos se o usu\u00e1rio est\u00e1 no grupo Conversa Encerrada, se sim, o fluxo de mensagem n\u00e3o continua. Agora se o usu\u00e1rio n\u00e3o estiver nesse grupo, ir\u00e1 passar pela categoria Other e continuar\u00e1 no fluxo de mensagem.\n\n\u00c9 importante lembrar que o usu\u00e1rio s\u00f3 \u00e9 colocado no grupo Conversa encerrada se quiser encerrar ou ficar inativo.",
+            "color": "green",
+            "position": {
+              "bottom": 720,
+              "left": 720,
+              "right": 180,
+              "top": 1820
+            },
+            "title": "Dividir por Filia\u00e7\u00e3o de Grupo"
+          },
+          "e3f9e26c-fdb7-448b-bc9f-570fa19c1440": {
+            "body": "Esse card serve para adicionar o usu\u00e1rio que completou o envio de informa\u00e7\u00f5es em um grupo chamado \"Lead Completo\".\n\nVoc\u00ea pode visualizar todas as pessoas que est\u00e3o nesse grupo acessando o m\u00f3dulo Est\u00fadio > Contatos > Filtrar pelo Grupo Lead Completo no canto inferior esquerdo da Tela.\n\nVoc\u00ea tamb\u00e9m pode disparar mensagens ativamente para todas as pessoas que estejam dentro desse grupo.",
+            "color": "green",
+            "position": {
+              "bottom": 440,
+              "left": 700,
+              "right": 20,
+              "top": 2760
+            },
+            "title": "Adicione a um Grupo"
+          },
+          "fcfeb8a7-a7bf-4892-90f3-2a2fd17bd2e2": {
+            "body": "Esse \u00e9 o fluxo de mensagens principal de captura de dados. Sendo assim, ele que dever\u00e1 ser iniciado quando voc\u00ea precisar coletar nome, telefone e email de algum usu\u00e1rio.\n\nNeste fluxo usamos card \"Entrar em um fluxo\" para organizar as etapas e tipos de perguntas como nome, telefone e email. Mas o fluxo que voc\u00ea deve usar \u00e9 o \"Coleta de dados\".",
+            "color": "purple",
+            "position": {
+              "bottom": -20,
+              "left": 60,
+              "right": -60,
+              "top": 20
+            },
+            "title": "Informa\u00e7\u00f5es iniciais"
+          }
+        }
+      },
+      "expire_after_minutes": 10080,
+      "language": "base",
+      "localization": {},
+      "metadata": {
+        "expires": 10080,
+        "revision": 11
+      },
+      "name": "Coleta de Dados - Fluxo Principal",
+      "nodes": [
+        {
+          "actions": [
+            {
+              "classifier": {
+                "name": "Farewell & Greetings",
+                "uuid": "41d7c434-89e5-49ed-9691-aec3d47a5fc5"
+              },
+              "input": "@input.text",
+              "result_name": "_cumprimento Classification",
+              "type": "call_classifier",
+              "uuid": "118b1cb3-698c-425f-9fc6-2167f8526330"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "9a3983a5-7367-4653-a6be-c9cd8bca3b55",
+              "uuid": "10faee03-75c9-4d06-bd16-0f2c4998dc17"
+            },
+            {
+              "destination_uuid": "73da7c41-8e91-463b-92c2-dc286134a3b6",
+              "uuid": "c05dff4e-5ef9-45d0-8b2c-873cbde0f87a"
+            },
+            {
+              "destination_uuid": "73da7c41-8e91-463b-92c2-dc286134a3b6",
+              "uuid": "1aa70fa1-cdd9-45f7-b134-4042f7c58ac7"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "greeting",
+                  ".9"
+                ],
+                "category_uuid": "f01911c4-71a6-460a-8713-82217dde4790",
+                "type": "has_top_intent",
+                "uuid": "88e007bb-f1e8-46ab-be7f-af8dbd0b33fa"
+              },
+              {
+                "arguments": [
+                  "Success",
+                  "Skipped"
+                ],
+                "category_uuid": "f7dbc369-63df-452f-8030-ab36e60d6fa8",
+                "type": "has_category",
+                "uuid": "cbd4dba1-3845-49ad-8048-3e1a40ac558a"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "10faee03-75c9-4d06-bd16-0f2c4998dc17",
+                "name": "Greeting",
+                "uuid": "f01911c4-71a6-460a-8713-82217dde4790"
+              },
+              {
+                "exit_uuid": "c05dff4e-5ef9-45d0-8b2c-873cbde0f87a",
+                "name": "Other",
+                "uuid": "f7dbc369-63df-452f-8030-ab36e60d6fa8"
+              },
+              {
+                "exit_uuid": "1aa70fa1-cdd9-45f7-b134-4042f7c58ac7",
+                "name": "Failure",
+                "uuid": "55af99af-8f42-4d19-a75a-3fa53d5c109c"
+              }
+            ],
+            "default_category_uuid": "55af99af-8f42-4d19-a75a-3fa53d5c109c",
+            "operand": "@results._cumprimento_classification",
+            "result_name": "cumprimento",
+            "type": "switch"
+          },
+          "uuid": "3c67684e-d224-44bb-af35-eab61461ade5"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Ol\u00e1, \u00e9 um prazer falar com voc\u00ea",
+              "type": "send_msg",
+              "uuid": "cf8eef8f-a9f8-4680-bf01-0c35a6102fa9"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "73da7c41-8e91-463b-92c2-dc286134a3b6",
+              "uuid": "04322561-f436-4ae9-bf0a-694dc28eda04"
+            }
+          ],
+          "uuid": "9a3983a5-7367-4653-a6be-c9cd8bca3b55"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Seja bem-vindo a nossa central de atendimento! Vamos iniciar a captura de dados para cadastro",
+              "type": "send_msg",
+              "uuid": "2346f53d-ec51-4246-bb89-809fc82099a0"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "29fe093b-2327-4fd4-acd7-153ebd836e6f",
+              "uuid": "e1d02587-eae8-4cb6-8bd6-6d32fb8e42cd"
+            }
+          ],
+          "uuid": "73da7c41-8e91-463b-92c2-dc286134a3b6"
+        },
+        {
+          "actions": [
+            {
+              "flow": {
+                "name": "Coleta do Nome - Fluxo secund\u00e1rio",
+                "uuid": "f9f124d1-d587-4ca2-897b-f533a2833d67"
+              },
+              "type": "enter_flow",
+              "uuid": "ed663e76-323b-497d-9752-7e1b094d3d15"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "c1c6f2de-5109-439f-a2db-9c955eb6e08b",
+              "uuid": "ed926d45-fddf-4530-8b5a-66eecef95f26"
+            },
+            {
+              "destination_uuid": null,
+              "uuid": "1d5880a6-7085-4ee4-82bb-5ba02cacecce"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "completed"
+                ],
+                "category_uuid": "f6b5ba54-1a9b-4c00-9726-efa0018cca86",
+                "type": "has_only_text",
+                "uuid": "ee0ae85a-257a-4e21-9a17-173781058ee2"
+              },
+              {
+                "arguments": [
+                  "expired"
+                ],
+                "category_uuid": "763a5af5-d1bf-47f8-b3fc-27fdce26e22b",
+                "type": "has_only_text",
+                "uuid": "31c2a534-cd7b-4eeb-bc15-a2721d595786"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "ed926d45-fddf-4530-8b5a-66eecef95f26",
+                "name": "Complete",
+                "uuid": "f6b5ba54-1a9b-4c00-9726-efa0018cca86"
+              },
+              {
+                "exit_uuid": "1d5880a6-7085-4ee4-82bb-5ba02cacecce",
+                "name": "Expired",
+                "uuid": "763a5af5-d1bf-47f8-b3fc-27fdce26e22b"
+              }
+            ],
+            "default_category_uuid": "763a5af5-d1bf-47f8-b3fc-27fdce26e22b",
+            "operand": "@child.status",
+            "type": "switch"
+          },
+          "uuid": "29fe093b-2327-4fd4-acd7-153ebd836e6f"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "uuid": "62ab52d4-a9c1-467f-b53a-67b43250fc86"
+            },
+            {
+              "destination_uuid": "f1f6a759-17b3-479e-811f-4a38e8ddbc84",
+              "uuid": "8ee50632-5539-4d1f-92a3-7d8a58d1044b"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "b7abd3ed-e078-4127-9ced-de6b14ca81bd",
+                  "Conversa Encerrada"
+                ],
+                "category_uuid": "0ed889cd-37e4-42ad-bbcf-9a378f1df3c8",
+                "type": "has_group",
+                "uuid": "a55dc603-3850-49e3-b90c-660e231fe1ab"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "62ab52d4-a9c1-467f-b53a-67b43250fc86",
+                "name": "Conversa Encerrada",
+                "uuid": "0ed889cd-37e4-42ad-bbcf-9a378f1df3c8"
+              },
+              {
+                "exit_uuid": "8ee50632-5539-4d1f-92a3-7d8a58d1044b",
+                "name": "Other",
+                "uuid": "1cc5bfd7-bcfc-499b-9fdb-c724c6333009"
+              }
+            ],
+            "default_category_uuid": "1cc5bfd7-bcfc-499b-9fdb-c724c6333009",
+            "operand": "@contact.groups",
+            "result_name": "",
+            "type": "switch"
+          },
+          "uuid": "c1c6f2de-5109-439f-a2db-9c955eb6e08b"
+        },
+        {
+          "actions": [
+            {
+              "flow": {
+                "name": "Coleta de Telefone - Fluxo secund\u00e1rio",
+                "uuid": "06615c36-2386-4869-af37-37cc70a4759a"
+              },
+              "type": "enter_flow",
+              "uuid": "42ad0223-7fe9-46cb-9779-6db24c1f5670"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "9f0b4ccb-1e75-4146-85c6-d57ca0d24cee",
+              "uuid": "6d692600-9fa0-4ca2-b6ac-8964384b670e"
+            },
+            {
+              "destination_uuid": null,
+              "uuid": "95419a8a-cfaf-4b1e-9b65-f9280e22bd8b"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "completed"
+                ],
+                "category_uuid": "f9c63b82-ebeb-4c3e-9a5a-21589c9fb3ea",
+                "type": "has_only_text",
+                "uuid": "b07cfeff-36bb-42ac-a4b3-8c016e2574a6"
+              },
+              {
+                "arguments": [
+                  "expired"
+                ],
+                "category_uuid": "615407b9-577b-4b7d-80dd-9a7fae1d449f",
+                "type": "has_only_text",
+                "uuid": "ea7c8e2d-82e7-4276-a311-3ed2f8218747"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "6d692600-9fa0-4ca2-b6ac-8964384b670e",
+                "name": "Complete",
+                "uuid": "f9c63b82-ebeb-4c3e-9a5a-21589c9fb3ea"
+              },
+              {
+                "exit_uuid": "95419a8a-cfaf-4b1e-9b65-f9280e22bd8b",
+                "name": "Expired",
+                "uuid": "615407b9-577b-4b7d-80dd-9a7fae1d449f"
+              }
+            ],
+            "default_category_uuid": "615407b9-577b-4b7d-80dd-9a7fae1d449f",
+            "operand": "@child.status",
+            "type": "switch"
+          },
+          "uuid": "f1f6a759-17b3-479e-811f-4a38e8ddbc84"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "uuid": "0b74cc56-9db1-4cc0-ac82-26ef7428364a"
+            },
+            {
+              "destination_uuid": "bf6b282e-c5dd-436b-a6c7-e90de01aab41",
+              "uuid": "be34b096-f514-4bbf-be04-6cbf4656a1ba"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "b7abd3ed-e078-4127-9ced-de6b14ca81bd",
+                  "Conversa Encerrada"
+                ],
+                "category_uuid": "e7a05894-b30b-43e9-bf5d-8877c4c30b88",
+                "type": "has_group",
+                "uuid": "d951355a-3b29-4841-a0c5-8950f1efd53f"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "0b74cc56-9db1-4cc0-ac82-26ef7428364a",
+                "name": "Conversa Encerrada",
+                "uuid": "e7a05894-b30b-43e9-bf5d-8877c4c30b88"
+              },
+              {
+                "exit_uuid": "be34b096-f514-4bbf-be04-6cbf4656a1ba",
+                "name": "Other",
+                "uuid": "a7d1f60a-4c70-4b2e-abec-130bb3eef0a0"
+              }
+            ],
+            "default_category_uuid": "a7d1f60a-4c70-4b2e-abec-130bb3eef0a0",
+            "operand": "@contact.groups",
+            "result_name": "",
+            "type": "switch"
+          },
+          "uuid": "9f0b4ccb-1e75-4146-85c6-d57ca0d24cee"
+        },
+        {
+          "actions": [
+            {
+              "flow": {
+                "name": "Coleta de E-mail - Fluxo secund\u00e1rio",
+                "uuid": "35e5b573-dd0e-4d40-8c37-a8071810bd74"
+              },
+              "type": "enter_flow",
+              "uuid": "61d2fcac-3d1d-47e3-aed2-a9c945cbd0a1"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "e004a908-cf5c-4174-bf65-1413a8a7d461",
+              "uuid": "94468ac4-f9b3-47e6-8a9b-41fff1bf5175"
+            },
+            {
+              "destination_uuid": null,
+              "uuid": "2bc80e4e-07df-4a34-a98f-ec00cfc90e97"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "completed"
+                ],
+                "category_uuid": "e8447e7e-f914-4e91-a273-0c63b0d99b2c",
+                "type": "has_only_text",
+                "uuid": "b309200a-e311-4162-92ae-667348562614"
+              },
+              {
+                "arguments": [
+                  "expired"
+                ],
+                "category_uuid": "5b907536-899f-45de-8703-eb1766dfc0cc",
+                "type": "has_only_text",
+                "uuid": "3df6f434-201a-4235-9b33-9faf80d9cc91"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "94468ac4-f9b3-47e6-8a9b-41fff1bf5175",
+                "name": "Complete",
+                "uuid": "e8447e7e-f914-4e91-a273-0c63b0d99b2c"
+              },
+              {
+                "exit_uuid": "2bc80e4e-07df-4a34-a98f-ec00cfc90e97",
+                "name": "Expired",
+                "uuid": "5b907536-899f-45de-8703-eb1766dfc0cc"
+              }
+            ],
+            "default_category_uuid": "5b907536-899f-45de-8703-eb1766dfc0cc",
+            "operand": "@child.status",
+            "type": "switch"
+          },
+          "uuid": "bf6b282e-c5dd-436b-a6c7-e90de01aab41"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "uuid": "f043fd21-d498-41da-90aa-b20235a29849"
+            },
+            {
+              "destination_uuid": "d4d52dd1-cc3f-445e-8eda-47eb04b34546",
+              "uuid": "a2d55e38-d6ba-403d-b254-0a36c9a2adb9"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "b7abd3ed-e078-4127-9ced-de6b14ca81bd",
+                  "Conversa Encerrada"
+                ],
+                "category_uuid": "979e86a9-068d-4bec-8c12-55a5cf54a96a",
+                "type": "has_group",
+                "uuid": "72bc2936-5a1d-43fe-b0b0-3cf09525c726"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "f043fd21-d498-41da-90aa-b20235a29849",
+                "name": "Conversa Encerrada",
+                "uuid": "979e86a9-068d-4bec-8c12-55a5cf54a96a"
+              },
+              {
+                "exit_uuid": "a2d55e38-d6ba-403d-b254-0a36c9a2adb9",
+                "name": "Other",
+                "uuid": "d8f096df-b734-4b95-b5c7-e149ac6c14a7"
+              }
+            ],
+            "default_category_uuid": "d8f096df-b734-4b95-b5c7-e149ac6c14a7",
+            "operand": "@contact.groups",
+            "result_name": "",
+            "type": "switch"
+          },
+          "uuid": "e004a908-cf5c-4174-bf65-1413a8a7d461"
+        },
+        {
+          "actions": [
+            {
+              "groups": [
+                {
+                  "count": 0,
+                  "name": "Lead Completo",
+                  "query": null,
+                  "status": "ready",
+                  "uuid": "7ce49ac0-56b6-4b1c-952e-b3352bdba76b"
+                }
+              ],
+              "type": "add_contact_groups",
+              "uuid": "d065499b-0e4e-4e96-864b-da28a0b4cef9"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "850b100f-e123-4344-b7c5-e8a1c75cf8be",
+              "uuid": "5ecaba67-6159-4f77-9e3b-565bdaf1c6e0"
+            }
+          ],
+          "uuid": "d4d52dd1-cc3f-445e-8eda-47eb04b34546"
+        },
+        {
+          "actions": [
+            {
+              "all_urns": false,
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Consegui salvar seus dados aqui na nossa base \ud83e\udd1d",
+              "type": "send_msg",
+              "uuid": "2267ccbe-7adc-455c-bac1-83da35406bd9"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "d9deab88-cfa4-4d06-937e-2b3d01a95785"
+            }
+          ],
+          "uuid": "850b100f-e123-4344-b7c5-e8a1c75cf8be"
+        }
+      ],
+      "spec_version": "13.1.0",
+      "type": "messaging",
+      "uuid": "99c015ef-71ac-4425-8b2a-99037535882f",
+      "version": "13.0.0",
+      "revision": 1
+    }
+  ],
+  "campaigns": [],
+  "triggers": [
+    {
+      "trigger_type": "C",
+      "flow": {
+        "uuid": "99c015ef-71ac-4425-8b2a-99037535882f",
+        "name": "Coleta de Dados - Fluxo Principal"
+      },
+      "groups": [],
+      "exclude_groups": [],
+      "keyword": null
+    }
+  ],
+  "fields": [
+    {
+      "key": "email",
+      "name": "Email",
+      "type": "text"
+    },
+    {
+      "key": "telefone",
+      "name": "Telefone",
+      "type": "text"
+    }
+  ],
+  "groups": [
+    {
+      "uuid": "b7abd3ed-e078-4127-9ced-de6b14ca81bd",
+      "name": "Conversa Encerrada",
+      "query": null
+    },
+    {
+      "uuid": "52f6267f-4c43-4dda-b8ca-1c704eaa0fa4",
+      "name": "Informou Nome",
+      "query": null
+    },
+    {
+      "uuid": "7ce49ac0-56b6-4b1c-952e-b3352bdba76b",
+      "name": "Lead Completo",
+      "query": null
+    }
+  ]
+}

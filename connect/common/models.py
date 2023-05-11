@@ -555,6 +555,7 @@ class Project(models.Model):
 
     TYPE_SUPPORT = "support"
     TYPE_LEAD_CAPTURE = "lead_capture"
+    TYPE_LEAD_CAPTURE_CHAT_GPT = "lead_capture+chatgpt"
     TYPE_OMIE_LEAD_CAPTURE = "omie_lead_capture"
     TYPE_OMIE_PAYMENT_FINANCIAL = "omie_financial"
     TYPE_OMIE_PAYMENT_FINANCIAL_CHAT_GPT = "omie_financial+chatgpt"
@@ -562,12 +563,13 @@ class Project(models.Model):
     TEMPLATE_TYPES = (
         (TYPE_SUPPORT, _("support")),
         (TYPE_LEAD_CAPTURE, _("lead capture")),
+        (TYPE_LEAD_CAPTURE_CHAT_GPT, _("lead_capture+chatgpt")),
         (TYPE_OMIE_LEAD_CAPTURE, "omie_lead_capture"),
         (TYPE_OMIE_PAYMENT_FINANCIAL, "omie_financial"),
         (TYPE_OMIE_PAYMENT_FINANCIAL_CHAT_GPT, "omie_financial+chatgpt"),
     )
 
-    HAS_GLOBALS = [TYPE_OMIE_LEAD_CAPTURE, TYPE_OMIE_PAYMENT_FINANCIAL, TYPE_OMIE_PAYMENT_FINANCIAL_CHAT_GPT]
+    HAS_GLOBALS = [TYPE_OMIE_LEAD_CAPTURE, TYPE_OMIE_PAYMENT_FINANCIAL, TYPE_OMIE_PAYMENT_FINANCIAL_CHAT_GPT, TYPE_LEAD_CAPTURE_CHAT_GPT]
     HAS_CHATS = [TYPE_OMIE_LEAD_CAPTURE, TYPE_OMIE_PAYMENT_FINANCIAL, TYPE_OMIE_PAYMENT_FINANCIAL_CHAT_GPT, TYPE_SUPPORT]
 
     uuid = models.UUIDField(
@@ -741,6 +743,7 @@ class Project(models.Model):
 
         classifier_name = {
             "lead_capture": "Farewell & Greetings",
+            "lead_capture+chatgpt": "Farewell & Greetings",
             "support": "Binary Answers",
             "omie": "OMIE",
             "omie_financial": "Cristal - Assistente Financeiro",

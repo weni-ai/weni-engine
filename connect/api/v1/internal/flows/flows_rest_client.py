@@ -348,6 +348,7 @@ class FlowsRESTClient:
     def template_flow(self, template_type):
         templates = {
             "lead_capture": f"{os.path.join(os.path.dirname(__file__))}/mp9/flows_definition_captura-de-leads.json",
+            "lead_capture+chatgpt": f"{os.path.join(os.path.dirname(__file__))}/mp9/captura-de-lead_chatgpt.json",
             "support": f"{os.path.join(os.path.dirname(__file__))}/mp9/fluxos_atendimento_humano.json",
             "omie": f"{os.path.join(os.path.dirname(__file__))}/mp9/cristal-omie.json",
             "omie_financial": f"{os.path.join(os.path.dirname(__file__))}/mp9/omie_2_via_boleto_sem_chatgpt_v2.json",
