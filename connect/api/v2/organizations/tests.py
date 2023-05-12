@@ -779,6 +779,10 @@ class OrganizationViewSetTestCase(TestCase):
             "globals": {
                 "appkey": 1234567890,
                 "appsecret": "0abcdefghjkl",
+                "codigo_da_conta": "-- 1 --",
+                "codigo_da_origem": "-- 1 --",
+                "codigo_da_solucao": "-- 2 --",
+                "codigo_do_vendedor": "-- 2 --",
             }
         }
 
@@ -798,7 +802,7 @@ class OrganizationViewSetTestCase(TestCase):
             data=data
         )
 
-        print(content_data)
+        # print(content_data)
 
         organization = content_data.get("organization")
 

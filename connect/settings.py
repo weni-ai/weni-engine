@@ -537,5 +537,5 @@ REPOSITORY_IDS = {
 
 CREATE_AI_ORGANIZATION = env.bool("CREATE_AI_ORGANIZATION")
 
-OMIE_APP_KEY = env.str("OMIE_APP_KEY")
-OMIE_APP_SECRET = env.str("OMIE_APP_SECRET")
+OMIE_APP_KEY = env.str("OMIE_APP_KEY", default="ap_test")
+OMIE_APP_SECRET = env.str("OMIE_APP_SECRET", default="sk_test")

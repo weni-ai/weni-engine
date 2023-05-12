@@ -437,10 +437,6 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
             default_globals = {
                 "nome_da_empresa": f"{project.name}",
                 "nome_do_bot": f"{project.name}",
-                "codigo_da_conta": "-- CLIENT OMIE --",
-                "codigo_da_origem": "-- CLIENT OMIE --",
-                "codigo_da_solucao": "-- CLIENT OMIE --",
-                "codigo_do_vendedor": "-- CLIENT OMIE --",
             }
 
         globals_dict.update(default_globals)
