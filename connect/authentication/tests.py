@@ -27,3 +27,21 @@ class AuthenticationTestCase(TestCase):
         User.objects.create_user("user1@user.com", "fake")
         with self.assertRaises(IntegrityError):
             User.objects.create_user("user2@user.com", "fake")
+
+
+class UserTestCase(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="fake",
+            email="fake@fake.com",
+            first_name="Fake",
+            last_name="User",
+            language="en"
+        )
+
+    def test_update_language(self):
+        self.user.update_language("pt_br")
+        self.assertEqual(self.user.language, "pt_br")
+
+    def test_token_generator(self):
+        self.assertTrue(self.user.token_generator)
