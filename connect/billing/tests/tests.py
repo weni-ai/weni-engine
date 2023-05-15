@@ -336,3 +336,35 @@ class CheckPlansTestCase(TestCase):
 
     def test_billing_emails(self):
         self.start.organization_billing.send_email_trial_plan_expired_due_time_limit()
+
+
+class ChannelModelsTestCase(TestCase):
+
+    def setUp(self):
+        self.organization = Organization.objects.create(
+            name="test organization",
+            description="test organization",
+            inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan="trial",
+        )
+
+        self.project = self.organization.project.create(
+            name="project test",
+            timezone="America/Sao_Paulo",
+            flow_organization=uuid.uuid4(),
+        )
+
+        self.channel = Channel.objects.create(
+            channel_type="WhatsApp",
+            channel_flow_id=1,
+            project=self.project,
+        )
+
+    def test_create_channel(self):
+        self.assertEqual(self.channel.channel_type, "WhatsApp")
+        self.assertEqual(self.channel.channel_flow_id, 1)
+        self.assertEqual(self.channel.project, self.project)
+
+    def test_channel_exists(self):
+        self.assertTrue(self.channel.channel_exists(self.channel.channel_flow_id))
