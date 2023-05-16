@@ -355,16 +355,22 @@ class ChannelModelsTestCase(TestCase):
             flow_organization=uuid.uuid4(),
         )
 
-        self.channel = Channel.objects.create(
+        self.channel = Channel.create(
             channel_type="WhatsApp",
             channel_flow_id=1,
             project=self.project,
         )
 
     def test_create_channel(self):
+
         self.assertEqual(self.channel.channel_type, "WhatsApp")
         self.assertEqual(self.channel.channel_flow_id, 1)
         self.assertEqual(self.channel.project, self.project)
+
+    def test_create_existing_channel(self):
+  
+        existing_channel = Channel.create(channel_flow_id=1)
+        self.assertEqual(existing_channel, self.channel)
 
     def test_channel_exists(self):
         self.assertTrue(self.channel.channel_exists(self.channel.channel_flow_id))
