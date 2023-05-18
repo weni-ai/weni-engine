@@ -5,7 +5,7 @@ from connect.api.v2.channels.views import ChannelsAPIView, CreateWACChannelAPIVi
 from connect.api.v2.classifier.views import CreateClassifierAPIView, ListClassifierAPIView, RetrieveClassfierAPIView, DeleteClassifierAPIView
 from connect.api.v2.ticketer.views import TicketerAPIView
 from connect.api.v2.user.views import UserAPIToken, UserIsPaying
-from connect.api.v2.omie.views import OmieAccountAPIView, OmieOriginAPIView, OmieSolutionsAPIView
+from connect.api.v2.omie.views import OmieAccountAPIView, OmieOriginAPIView, OmieSolutionsAPIView, OmieUsersAPIView
 
 from connect.api.v2.template_projects.views import TemplateTypeViewSet, TemplateFeatureViewSet, TemplateAIViewSet
 
@@ -47,7 +47,7 @@ urlpatterns = [
     path("omie/accounts", OmieAccountAPIView.as_view(), name="omie-accounts"),
     path("omie/origins", OmieOriginAPIView.as_view(), name="omie-origins"),
     path("omie/solutions", OmieSolutionsAPIView.as_view(), name="omie-solutions"),
-    path("omie/users", OmieSolutionsAPIView.as_view(), name="omie-users"),
+    path("omie/users", OmieUsersAPIView.as_view(), name="omie-users"),
 ]
 urlpatterns += [
     path("", include(projects_router.urls)),
