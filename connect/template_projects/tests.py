@@ -2,10 +2,6 @@ from django.test import TestCase
 from connect.template_projects.models import TemplateType, TemplateAI, TemplateFeature
 
 
-
-# Create your tests here.
-
-
 class TemplateTypeModelTestCase(TestCase):
 
     def setUp(self):
