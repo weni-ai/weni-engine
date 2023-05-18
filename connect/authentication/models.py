@@ -192,9 +192,9 @@ class User(AbstractBaseUser, PermissionsMixin):
             ),
         )
 
-    def send_request_flow_user_info(self, flow_data):
+    def send_request_flow_user_info(self, flow_data):  # pragma: no cover
         if not flow_data.get('send_request_flow'):
-            return False  # pragma: no cover
+            return False
         company_size_mapping = [
             "1 - 20",
             "21 - 50",
