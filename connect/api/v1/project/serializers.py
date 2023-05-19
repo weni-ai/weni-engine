@@ -81,7 +81,7 @@ class ProjectSerializer(serializers.ModelSerializer):
     menu = serializers.SerializerMethodField()
     flow_organization = serializers.UUIDField(style={"show": False}, read_only=True)
     inteligence_count = serializers.IntegerField(read_only=True)
-    flow_count = serializers.IntegerField(read_only=True)
+    flow_count = serializers.SerializerMethodField()
     contact_count = serializers.IntegerField(read_only=True)
     total_contact_count = serializers.IntegerField(read_only=True)
     created_at = serializers.DateTimeField(
@@ -96,6 +96,17 @@ class ProjectSerializer(serializers.ModelSerializer):
     first_access = serializers.SerializerMethodField()
     wa_demo_token = serializers.SerializerMethodField()
     redirect_url = serializers.SerializerMethodField()
+
+    def get_flow_count(self, obj):
+        try:
+            flows = FlowsRESTClient()
+            response = flows.get_project_statistic(str(obj.flow_organization))
+            obj.flow_count = response.get("active_flows")
+            obj.save("flow_count")
+            return obj.flow_count
+        except Exception as e:
+            logger.error(f" Flow Count Error: {e}")
+            return obj.flow_count
 
     def get_project_type(self, obj):
         if obj.is_template and obj.template_project.exists():
