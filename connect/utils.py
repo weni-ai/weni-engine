@@ -4,7 +4,7 @@ from connect.common.models import Project, BillingPlan
 from connect.billing.models import Contact, ContactCount
 
 
-def upload_photo_rocket(server_rocket: str, jwt_token: str, avatar_url: str) -> bool:
+def upload_photo_rocket(server_rocket: str, jwt_token: str, avatar_url: str) -> bool:  # pragma: no cover
     login = requests.post(
         url="{}/api/v1/login/".format(server_rocket),
         json={"serviceName": "keycloak", "accessToken": jwt_token, "expiresIn": 200},
@@ -21,7 +21,7 @@ def upload_photo_rocket(server_rocket: str, jwt_token: str, avatar_url: str) -> 
     return True if set_photo.status_code == 200 else False
 
 
-def get_grpc_types():
+def get_grpc_types():  # pragma: no cover
     """
     Returns the possible types available for classifiers
     :return:

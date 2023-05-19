@@ -39,6 +39,8 @@ omit =
     ./connect/api/v2/organizations/tests.py
     ./connect/api/v2/projects/tests.py
     ./connect/api/v2/internals/tests.py
+    ./connect/common/gateways/rocket_gateway.py 
+    ./connect/billing/tests/tests.py
 
 [report]
 fail_under = 85

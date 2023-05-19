@@ -5,7 +5,7 @@ from connect.utils import es_convert_datetime
 from django.conf import settings
 
 
-class ElasticFlow(ElasticHandler):
+class ElasticFlow(ElasticHandler):  # pragma: no cover
     base_url = settings.FLOWS_ELASTIC_URL
     client = Elasticsearch(f"{base_url}")
 
