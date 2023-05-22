@@ -390,7 +390,7 @@ def sync_project_information():
             if "id" in flow_result:
                 project.flow_id = flow_result.get("id")
                 updated_fields.append("id")
-            
+            logger.info(f"project: {project.__str__()}")
             if len(updated_fields) > 0:
                 project.save(update_fields=updated_fields)
                 if not settings.TESTING:
