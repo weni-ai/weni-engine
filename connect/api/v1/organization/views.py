@@ -43,6 +43,7 @@ from connect.common.models import (
     ProjectRole,
     BillingPlan,
     Project,
+    NewsletterOrganization,
 )
 from connect import billing
 from connect.billing.gateways.stripe_gateway import StripeGateway
@@ -426,7 +427,7 @@ class OrganizationViewSet(
         for project in organization.project.all():
             celery_app.send_task(
                 "update_suspend_project",
-                args=[str(project.flow_organization), True],
+                args=[str(project.uuid), True],
             )
         user_name = (
             org_billing.organization.name
@@ -464,7 +465,7 @@ class OrganizationViewSet(
         for project in organization.project.all():
             celery_app.send_task(
                 "update_suspend_project",
-                args=[str(project.flow_organization), False],
+                args=[str(project.uuid), False],
             )
         user_name = (
             org_billing.organization.name
@@ -501,6 +502,7 @@ class OrganizationViewSet(
                 organization.authorizations.values_list("user__email", flat=True),
                 old_plan,
             )
+            NewsletterOrganization.destroy_newsletter(organization)
             return JsonResponse(
                 data={"plan": org_billing.plan}, status=status.HTTP_200_OK
             )

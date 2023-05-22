@@ -98,4 +98,8 @@ def add_classifier_to_flow(
 
         classifier["uuid"] = classifier_uuid
 
+    elif template_type == Project.TYPE_LEAD_CAPTURE_CHAT_GPT:
+        classifier = sample_flow["flows"][3]["nodes"][0]["actions"][0]["classifier"]
+        classifier["uuid"] = classifier_uuid
+
     return sample_flow

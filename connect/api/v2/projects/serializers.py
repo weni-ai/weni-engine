@@ -145,7 +145,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             ),
         }
 
-    def create(self, validated_data):
+    def _create(self, validated_data):  # deprecated
         user = self.context["request"].user
         extra_data = self.context["request"].data.get("project")
 
@@ -198,11 +198,69 @@ class ProjectSerializer(serializers.ModelSerializer):
 
         return instance
 
+    def create(self, validated_data):
+        user = self.context["request"].user
+        extra_data = self.context["request"].data.get("project")
+
+        if not extra_data:
+            extra_data = {
+                "template": self.context["request"].data.get("template"),
+                "template_type": self.context["request"].data.get("template_type"),
+            }
+
+        is_template = extra_data.get("template")
+
+        instance = Project.objects.create(
+            name=validated_data.get("name"),
+            timezone=str(validated_data.get("timezone")),
+            organization=validated_data.get("organization"),
+            is_template=True if extra_data.get("template") else False,
+            created_by=user,
+            template_type=extra_data.get("template_type")
+        )
+
+        created, flows_info = self.create_flows_project(validated_data, user, is_template, str(instance.uuid))
+
+        if not created:
+            return flows_info
+
+        instance.flow_id = flows_info.get("id")
+        instance.flow_organization = flows_info.get("flow_organization")
+
+        instance.save(
+            update_fields=["flow_id", "flow_organization"]
+        )
+
+        if Project.objects.filter(created_by=user).count() == 1:
+            data = dict(
+                send_request_flow=settings.SEND_REQUEST_FLOW_PRODUCT,
+                flow_uuid=settings.FLOW_PRODUCT_UUID,
+                token_authorization=settings.TOKEN_AUTHORIZATION_FLOW_PRODUCT
+            )
+            user.send_request_flow_user_info(data)
+
+        if is_template:
+            extra_data.update(
+                {
+                    "project": instance.uuid,
+                    "authorization": instance.get_user_authorization(user).uuid
+                }
+            )
+
+            template_serializer = TemplateProjectSerializer(data=extra_data, context=self.context["request"])
+            template_serializer.is_valid()
+            template_project = template_serializer.save()
+
+            if type(template_project) == dict:
+                return template_project
+
+        return instance
+
     def update(self, instance, validated_data):
         name = validated_data.get("name", instance.name)
         celery_app.send_task(
             "update_project",
-            args=[instance.flow_organization, name],
+            args=[instance.uuid, name],
         )
         updated_instance = super().update(instance, validated_data)
         if not settings.TESTING:
@@ -283,7 +341,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             response = opened.day
         return response
 
-    def create_flows_project(self, data: dict, user: User, is_template: bool):
+    def create_flows_project(self, data: dict, user: User, is_template: bool, project_uuid: str):
         flow_instance = FlowsRESTClient()
         created = False
         try:
@@ -291,17 +349,19 @@ class ProjectSerializer(serializers.ModelSerializer):
                 flows_info = flow_instance.create_template_project(
                     data.get("name"),
                     user.email,
-                    str(data.get("timezone"))
+                    str(data.get("timezone")),
+                    project_uuid,
                 )
                 flows_info = json.loads(flows_info.get("data"))
             else:
                 flows_info = flow_instance.create_project(
                     project_name=data.get("name"),
                     user_email=user.email,
-                    project_timezone=str(data.get("timezone"))
+                    project_timezone=str(data.get("timezone")),
+                    project_uuid=project_uuid,
                 )
             created = True
-        except Exception as error:
+        except ZeroDivisionError as error:
             flows_info = {
                 "data": {"message": "Could not create project"},
                 "status": status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -366,12 +426,18 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
         else:
             globals_dict = data.get("project").get("globals")
 
-        default_globals = {
-            "nome_da_empresa": f"{project.name}",
-            "nome_do_bot": f"{project.name}",
-            "status_boleto_para_desconsiderar": "Recebido, Cancelado",
-            "tipo_credenciamento": "email"
-        }
+        if project.template_type in [Project.TYPE_OMIE_PAYMENT_FINANCIAL, Project.TYPE_OMIE_PAYMENT_FINANCIAL_CHAT_GPT]:
+            default_globals = {
+                "nome_da_empresa": f"{project.name}",
+                "nome_do_bot": f"{project.name}",
+                "status_boleto_para_desconsiderar": "Recebido, Cancelado",
+                "tipo_credenciamento": "email"
+            }
+        elif project.template_type in [Project.TYPE_OMIE_LEAD_CAPTURE]:
+            default_globals = {
+                "nome_da_empresa": f"{project.name}",
+                "nome_do_bot": f"{project.name}",
+            }
 
         globals_dict.update(default_globals)
 
@@ -397,10 +463,16 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
 
         if project.template_type in Project.HAS_GLOBALS:
 
-            created, data = self.create_globals_omie(
-                project,
-                str(authorization.user.email)
-            )
+            if project.template_type == Project.TYPE_LEAD_CAPTURE_CHAT_GPT:
+                created, data = self.create_globals(
+                    str(project.flow_organization),
+                    str(authorization.user.email)
+                )
+            else:
+                created, data = self.create_globals_omie(
+                    project,
+                    str(authorization.user.email)
+                )
 
             if not created:
                 return data
@@ -448,3 +520,43 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
         )
 
         return template
+
+    def create_globals(self, project_uuid: str, user_email: str):
+
+        data = self.context._data
+
+        if data.get("project_view"):
+            globals_dict = data.get("globals")
+        else:
+            globals_dict = data.get("project").get("globals")
+
+        flows = FlowsRESTClient()
+        body = {
+            "org": project_uuid,
+            "user": user_email,
+        }
+        globals_list = []
+
+        for key, value in globals_dict.items():
+            payload = {
+                "name": key,
+                "value": value
+            }
+            payload.update(body)
+            globals_list.append(payload)
+
+        try:
+            response = flows.create_globals(globals_list)
+            if response.status_code == 201:
+                created = True
+                return created, response.json()
+            raise Exception(response.json())
+
+        except Exception as error:
+            logger.error(f"Create globals: {error}")
+            response_data = {
+                "data": {"message": "Could not create global"},
+                "status": status.HTTP_500_INTERNAL_SERVER_ERROR
+            }
+            created = False
+            return created, response_data

@@ -18,11 +18,12 @@ class FlowsRESTClient:
         assert endpoint.startswith("/"), "the endpoint needs to start with: /"
         return self.base_url + endpoint
 
-    def create_template_project(self, project_name: str, user_email: str, project_timezone: str):
+    def create_template_project(self, project_name: str, user_email: str, project_timezone: str, project_uuid: str):
         body = dict(
             name=project_name,
             timezone=project_timezone,
-            user_email=user_email
+            user_email=user_email,
+            uuid=project_uuid,
         )
         response = requests.post(
             url=f"{self.base_url}/api/v2/internals/template-orgs/",
@@ -48,11 +49,12 @@ class FlowsRESTClient:
         )
         return dict(status=response.status_code, data=response.text)
 
-    def create_project(self, project_name: str, user_email: str, project_timezone: str):
+    def create_project(self, project_name: str, user_email: str, project_timezone: str, project_uuid: str):
         body = dict(
             name=project_name,
             timezone=project_timezone,
-            user_email=user_email
+            user_email=user_email,
+            uuid=project_uuid,
         )
 
         response = requests.post(
@@ -63,7 +65,7 @@ class FlowsRESTClient:
 
         return response.json()
 
-    def update_project(self, organization_uuid: int, organization_name: str):
+    def update_project(self, organization_uuid: str, organization_name: str):
         body = {
             "uuid": organization_uuid
         }
@@ -149,7 +151,7 @@ class FlowsRESTClient:
         return dict(status=response.status_code)
 
     def get_user_api_token(self, project_uuid: str, user_email: str):
-        params = dict(org=project_uuid, user=user_email)
+        params = dict(project=project_uuid, user=user_email)
         response = requests.get(
             url=f"{self.base_url}/api/v2/internals/users/api-token",
             params=params,
@@ -211,6 +213,7 @@ class FlowsRESTClient:
         response = requests.get(
             url=f'{self.base_url}/api/v2/internals/statistic/{project_uuid}/',
             headers=self.authentication_instance.headers,
+            timeout=180
         )
         return response.json()
 
@@ -345,10 +348,12 @@ class FlowsRESTClient:
     def template_flow(self, template_type):
         templates = {
             "lead_capture": f"{os.path.join(os.path.dirname(__file__))}/mp9/flows_definition_captura-de-leads.json",
+            "lead_capture+chatgpt": f"{os.path.join(os.path.dirname(__file__))}/mp9/captura-de-lead_chatgpt.json",
             "support": f"{os.path.join(os.path.dirname(__file__))}/mp9/fluxos_atendimento_humano.json",
             "omie": f"{os.path.join(os.path.dirname(__file__))}/mp9/cristal-omie.json",
             "omie_financial": f"{os.path.join(os.path.dirname(__file__))}/mp9/omie_2_via_boleto_sem_chatgpt_v2.json",
             "omie_financial+chatgpt": f"{os.path.join(os.path.dirname(__file__))}/mp9/omie_2_via_boleto_chatgpt_v2.json",
+            "omie_lead_capture": f"{os.path.join(os.path.dirname(__file__))}/mp9/captura-de-leads-com-omie.json",
         }
         return templates.get(template_type)
 

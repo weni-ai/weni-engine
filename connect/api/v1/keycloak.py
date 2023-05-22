@@ -94,3 +94,14 @@ class KeycloakControl:  # pragma: no cover
         r = requests.delete(f"{server_url}admin/realms/{realm_name}/users/{user_id}", headers=headers)
 
         return r.status_code
+
+    def set_verify_email(self, email: str):
+        user_id = self.get_user_id_by_email(email)
+        if user_id is not None:
+            response = self.instance.update_user(
+                user_id=user_id,
+                payload={'requiredActions': ['VERIFY_EMAIL']}
+            )
+            return response
+        else:
+            return 'User not found'

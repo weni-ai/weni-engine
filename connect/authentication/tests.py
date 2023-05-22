@@ -1,5 +1,6 @@
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.db import IntegrityError
+from unittest.mock import patch
 
 from .models import User
 
@@ -27,3 +28,32 @@ class AuthenticationTestCase(TestCase):
         User.objects.create_user("user1@user.com", "fake")
         with self.assertRaises(IntegrityError):
             User.objects.create_user("user2@user.com", "fake")
+
+
+class UserTestCase(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="fake",
+            email="fake@fake.com",
+            first_name="Fake",
+            last_name="User",
+            language="en"
+        )
+
+    def test_update_language(self):
+        self.user.update_language("pt_br")
+        self.assertEqual(self.user.language, "pt_br")
+
+    def test_token_generator(self):
+        self.assertTrue(self.user.token_generator)
+
+    @override_settings(SEND_EMAIL=False)
+    def test_send_email_false_change_password_email(self):
+        self.assertFalse(self.user.send_change_password_email())
+
+    @patch("connect.api.v1.keycloak.KeycloakControl.get_instance")
+    @patch("connect.api.v1.keycloak.KeycloakControl.set_verify_email")
+    def test_set_verify_email(self, mock_set_verify_email, mock_get_instance):
+
+        self.user.set_verify_email()
+        self.assertFalse(self.user.first_login)

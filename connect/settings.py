@@ -100,6 +100,7 @@ env = environ.Env(
     FLOW_PRODUCT_UUID=(str, None),
     TOKEN_AUTHORIZATION_FLOW_PRODUCT=(str, None),
     CREATE_AI_ORGANIZATION=(bool, False),
+    VERIFICATION_MARKETING_TOKEN=(str, "")
 )
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -459,6 +460,8 @@ SEND_REQUEST_FLOW = env.bool("SEND_REQUEST_FLOW")
 FLOW_MARKETING_UUID = env.str("FLOW_MARKETING_UUID")
 TOKEN_AUTHORIZATION_FLOW_MARKETING = env.str("TOKEN_AUTHORIZATION_FLOW_MARKETING")
 
+VERIFICATION_MARKETING_TOKEN = env.str("VERIFICATION_MARKETING_TOKEN")
+
 # Flow Product Weni
 SEND_REQUEST_FLOW_PRODUCT = env.bool("SEND_REQUEST_FLOW_PRODUCT")
 FLOW_PRODUCT_UUID = env.str("FLOW_PRODUCT_UUID")
@@ -525,10 +528,15 @@ AI_CRISTAL = env.str("AI_CRISTAL")
 
 REPOSITORY_IDS = {
     "lead_capture": AI_FAREWELL_N_GREETINGS,
+    "lead_capture+chatgpt": AI_FAREWELL_N_GREETINGS,
     "support": AI_BINARY_ANSWERS,
     "omie_financial": AI_CRISTAL,
-    "omie_financial+chatgpt": AI_CRISTAL
+    "omie_financial+chatgpt": AI_CRISTAL,
+    "omie_lead_capture": AI_CRISTAL,
 }
 
 
 CREATE_AI_ORGANIZATION = env.bool("CREATE_AI_ORGANIZATION")
+
+OMIE_APP_KEY = env.str("OMIE_APP_KEY", default="ap_test")
+OMIE_APP_SECRET = env.str("OMIE_APP_SECRET", default="sk_test")

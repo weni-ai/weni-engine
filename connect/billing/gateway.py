@@ -13,7 +13,7 @@ class GatewayNotConfigured(Exception):
     pass
 
 
-class Gateway(object):
+class Gateway(object):  # pragma: no cover
     """Sub-classes to inherit from this and implement the below methods"""
 
     # To indicate if the gateway is in test mode or not

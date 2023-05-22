@@ -112,13 +112,13 @@ def update_project(organization_uuid: str, organization_name: str):
 
 
 @app.task(name="delete_project")
-def delete_project(inteligence_organization: int, user_email):
+def delete_project(project_uuid: str, user_email):
     if settings.USE_FLOW_REST:
         flow_instance = FlowsRESTClient()
     else:
         flow_instance = utils.get_grpc_types().get("flow")
     flow_instance.delete_project(
-        project_uuid=inteligence_organization,
+        project_uuid=project_uuid,
         user_email=user_email,
     )
     return True
@@ -131,7 +131,7 @@ def delete_project(inteligence_organization: int, user_email):
     retry_backoff=True,
 )
 def update_user_permission_project(
-    flow_organization: str, project_uuid: str, user_email: str, permission: int
+    project_uuid: str, flow_organization: str, user_email: str, permission: int
 ):
     if settings.USE_FLOW_REST:
         flow_instance = FlowsRESTClient()
@@ -317,7 +317,7 @@ def check_organization_free_plan():
             for project in organization.project.all():
                 app.send_task(
                     "update_suspend_project",
-                    args=[str(project.flow_organization), True],
+                    args=[str(project.uuid), True],
                 )
             organization.save(update_fields=["is_suspended"])
             organization.organization_billing.send_email_expired_free_plan(
@@ -369,19 +369,20 @@ def sync_project_information():
         flow_instance = FlowsRESTClient()
     else:
         flow_instance = utils.get_grpc_types().get("flow")
-    for project in Project.objects.all():
-        flow_result = flow_instance.get_project_info(
-            project_uuid=str(project.flow_organization)
-        )
-        if len(flow_result) > 0:
-            project.name = flow_result.get("name")
-            project.timezone = str(flow_result.get("timezone"))
-            project.date_format = str(flow_result.get("date_format"))
-            project.flow_id = flow_result.get("id")
-            project.save(update_fields=["name", "timezone", "date_format", "flow_id"])
-            if not settings.TESTING:
-                chats_client = ChatsRESTClient()
-                chats_client.update_chats_project(project_uuid=project.uuid)
+    for project in Project.objects.order_by("-created_at"):
+        try:
+            statistic_project_result = flow_instance.get_project_statistic(
+                project_uuid=str(project.flow_organization),
+            )
+            if len(statistic_project_result) > 0:
+                project.flow_count = int(statistic_project_result.get("active_flows"))
+                project.save(update_fields=["flow_count"])
+        except ConnectionError as c:
+            logger.error(f"Remote end closed connection without: {c} - Project: {project}")
+            continue
+        except Exception as e:
+            logger.error(f"Sync Project Information Exception {e}")
+            continue
 
 
 @app.task(name="sync_project_statistics")
@@ -439,7 +440,7 @@ def sync_channels_statistics():
     for project in Project.objects.all():
         project.extra_active_integration = len(
             list(
-                flow_instance.list_channel(project_uuid=str(project.flow_organization))
+                flow_instance.list_channel(project_uuid=str(project.uuid))
             )
         )
         project.save(update_fields=["extra_active_integration"])

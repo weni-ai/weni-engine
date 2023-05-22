@@ -11,6 +11,8 @@ from connect.celery import app as celery_app
 
 from connect.utils import check_module_permission
 
+from connect.authentication.models import User
+
 LOGGER = logging.getLogger("weni_django_oidc")
 
 
@@ -44,6 +46,7 @@ class WeniOIDCAuthenticationBackend(OIDCAuthenticationBackend):
         user.first_name = claims.get("given_name", "")
         user.last_name = claims.get("family_name", "")
         user.email = claims.get("email", "")
+        user.first_login = True
 
         if locale:
             if locale.lower() == "pt-br":
@@ -94,7 +97,23 @@ class WeniOIDCAuthentication(OIDCAuthentication):
 
         translation.activate(user_language)
 
+        user = instance[0]
+
+        if user.first_login and not user.first_login_token:
+            user.save_first_login_token(instance[1])
+
+        WeniOIDCAuthentication.verify_login(user, instance[1])
+
         return instance
+
+    @staticmethod
+    def verify_login(user: User, request_token: str):
+        """Compares the first login token with the token sent in the request to check if is the same session"""
+
+        user_token = user.first_login_token
+
+        if user.first_login and user_token != request_token:
+            user.set_verify_email()
 
 
 class ExternalAuthentication(BaseAuthentication):

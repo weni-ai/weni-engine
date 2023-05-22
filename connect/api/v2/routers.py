@@ -4,7 +4,8 @@ from rest_framework_nested import routers
 from connect.api.v2.channels.views import ChannelsAPIView, CreateWACChannelAPIView, ListChannelsAPIView
 from connect.api.v2.classifier.views import CreateClassifierAPIView, ListClassifierAPIView, RetrieveClassfierAPIView, DeleteClassifierAPIView
 from connect.api.v2.ticketer.views import TicketerAPIView
-from connect.api.v2.user.views import UserAPIToken
+from connect.api.v2.user.views import UserAPIToken, UserIsPaying
+from connect.api.v2.omie.views import OmieAccountAPIView, OmieOriginAPIView, OmieSolutionsAPIView, OmieUsersAPIView
 
 from connect.api.v2.template_projects.views import TemplateTypeViewSet, TemplateFeatureViewSet, TemplateAIViewSet
 
@@ -41,7 +42,12 @@ urlpatterns = [
     path("projects/channels", ListChannelsAPIView.as_view(), name="list-channels"),
     path("projects/<project_uuid>/create-wac-channel", CreateWACChannelAPIView.as_view(), name="create-wac-channel"),
     path("projects/<project_uuid>/user-api-token", UserAPIToken.as_view(), name="user-api-token"),
-    path("projects/<project_uuid>/user-api-token", UserAPIToken.as_view(), name="user-api-token")
+    path("projects/<project_uuid>/user-api-token", UserAPIToken.as_view(), name="user-api-token"),
+    path("account/user-is-paying", UserIsPaying.as_view(), name="user-is-paying"),
+    path("omie/accounts", OmieAccountAPIView.as_view(), name="omie-accounts"),
+    path("omie/origins", OmieOriginAPIView.as_view(), name="omie-origins"),
+    path("omie/solutions", OmieSolutionsAPIView.as_view(), name="omie-solutions"),
+    path("omie/users", OmieUsersAPIView.as_view(), name="omie-users"),
 ]
 urlpatterns += [
     path("", include(projects_router.urls)),
