@@ -1,0 +1,4441 @@
+{
+  "version": "13",
+  "site": "https://flows.weni.ai",
+  "flows": [
+    {
+      "_ui": {
+        "nodes": {
+          "b9e0b538-8c1e-4323-9e37-ab99ced10209": {
+            "position": {
+              "left": 60,
+              "top": 0
+            },
+            "type": "execute_actions"
+          }
+        }
+      },
+      "expire_after_minutes": 10080,
+      "language": "base",
+      "localization": {},
+      "metadata": {
+        "expires": 10080
+      },
+      "name": "Apagar dados do Lead",
+      "nodes": [
+        {
+          "actions": [
+            {
+              "field": {
+                "key": "ncod",
+                "name": "nCod"
+              },
+              "type": "set_contact_field",
+              "uuid": "6a38eb70-a33b-4af0-85f9-4debb472a8f9",
+              "value": ""
+            },
+            {
+              "field": {
+                "key": "ccodint",
+                "name": "cCodInt"
+              },
+              "type": "set_contact_field",
+              "uuid": "063e2930-479b-43ca-9b3b-65ef40fcbdce",
+              "value": ""
+            },
+            {
+              "field": {
+                "key": "ccodintop",
+                "name": "cCodIntOp"
+              },
+              "type": "set_contact_field",
+              "uuid": "73cd1d58-13d2-4068-9fda-177a33f77ed1",
+              "value": ""
+            },
+            {
+              "field": {
+                "key": "codigo_conta",
+                "name": "Codigo Conta"
+              },
+              "type": "set_contact_field",
+              "uuid": "7e86446a-4d25-4d40-a3b9-676ef84ddd0d",
+              "value": ""
+            },
+            {
+              "field": {
+                "key": "codigo_origem",
+                "name": "Codigo Origem"
+              },
+              "type": "set_contact_field",
+              "uuid": "b68c487c-9488-41bf-94d1-aace6e9ced8d",
+              "value": ""
+            },
+            {
+              "field": {
+                "key": "codigo_solucao",
+                "name": "Codigo Solucao"
+              },
+              "type": "set_contact_field",
+              "uuid": "b65da39f-be78-446d-8c18-114c1d263936",
+              "value": ""
+            },
+            {
+              "field": {
+                "key": "codigo_vendedor",
+                "name": "Codigo Vendedor"
+              },
+              "type": "set_contact_field",
+              "uuid": "8d565c8c-07fb-4e0b-9a19-dd78b0eb399e",
+              "value": ""
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "1bb52869-29f6-4729-9656-5127773f57c1"
+            }
+          ],
+          "uuid": "b9e0b538-8c1e-4323-9e37-ab99ced10209"
+        }
+      ],
+      "spec_version": "13.1.0",
+      "type": "messaging",
+      "uuid": "e611ac07-ea8b-4554-abbd-4c183f96a9cb",
+      "revision": 2
+    },
+    {
+      "_ui": {
+        "nodes": {
+          "25b954ae-e2be-49e2-b914-91c50a0d54ce": {
+            "config": {},
+            "position": {
+              "left": 300,
+              "top": 1140
+            },
+            "type": "split_by_webhook"
+          },
+          "43eea97d-5b0c-441e-8257-87be786d0c66": {
+            "position": {
+              "left": 580,
+              "top": 500
+            },
+            "type": "execute_actions"
+          },
+          "47a00589-835d-43a3-8fb7-8ca829d0dadd": {
+            "config": {
+              "cases": {},
+              "operand": {
+                "id": "codigo_origem",
+                "name": "Codigo Origem",
+                "type": "field"
+              }
+            },
+            "position": {
+              "left": 300,
+              "top": 920
+            },
+            "type": "split_by_contact_field"
+          },
+          "4eb4b60b-8da2-494a-aee6-dd047f71d4e9": {
+            "config": {
+              "cases": {},
+              "operand": {
+                "id": "codigo_conta",
+                "name": "Codigo Conta",
+                "type": "field"
+              }
+            },
+            "position": {
+              "left": 300,
+              "top": 400
+            },
+            "type": "split_by_contact_field"
+          },
+          "4edc4107-3a3a-416c-a95f-fd745b7bdc33": {
+            "config": {
+              "cases": {},
+              "operand": {
+                "id": "codigo_vendedor",
+                "name": "Codigo Vendedor",
+                "type": "field"
+              }
+            },
+            "position": {
+              "left": 300,
+              "top": 560
+            },
+            "type": "split_by_contact_field"
+          },
+          "62893572-073e-4f14-a407-aa042ee60f1f": {
+            "position": {
+              "left": 300,
+              "top": 240
+            },
+            "type": "execute_actions"
+          },
+          "73b043b7-bea5-48b1-9fa2-82bbe7635186": {
+            "config": {},
+            "position": {
+              "left": 580,
+              "top": 140
+            },
+            "type": "split_by_subflow"
+          },
+          "976c64b0-7f75-49fc-bc45-89d834319f58": {
+            "config": {
+              "cases": {}
+            },
+            "position": {
+              "left": 580,
+              "top": 1360
+            },
+            "type": "split_by_expression"
+          },
+          "ae1f919f-1928-4539-b539-f489b553a69a": {
+            "config": {
+              "cases": {}
+            },
+            "position": {
+              "left": 300,
+              "top": 1360
+            },
+            "type": "split_by_expression"
+          },
+          "b26d2660-c648-46d3-96d9-4e2d7ce069c0": {
+            "position": {
+              "left": 300,
+              "top": 1600
+            },
+            "type": "execute_actions"
+          },
+          "b8a15163-12a8-416b-a6f8-7228fe4f5efd": {
+            "position": {
+              "left": 580,
+              "top": 1020
+            },
+            "type": "execute_actions"
+          },
+          "cb274cdb-1f51-45f9-ba6c-c4c650f40fdd": {
+            "position": {
+              "left": 780,
+              "top": 1540
+            },
+            "type": "execute_actions"
+          },
+          "e9e53906-dac0-422a-a0a0-623f91331e41": {
+            "config": {
+              "cases": {},
+              "operand": {
+                "id": "ncod",
+                "name": "nCod",
+                "type": "field"
+              }
+            },
+            "position": {
+              "left": 300,
+              "top": 20
+            },
+            "type": "split_by_contact_field"
+          },
+          "ee0be173-539e-423c-b218-65432fea6ba2": {
+            "position": {
+              "left": 780,
+              "top": 1700
+            },
+            "type": "execute_actions"
+          },
+          "ef627bd0-f549-4a43-99f5-169727973d57": {
+            "position": {
+              "left": 580,
+              "top": 680
+            },
+            "type": "execute_actions"
+          },
+          "f58f3f91-2fd1-438b-a9d3-bda61d1df272": {
+            "config": {
+              "cases": {},
+              "operand": {
+                "id": "codigo_solucao",
+                "name": "Codigo Solucao",
+                "type": "field"
+              }
+            },
+            "position": {
+              "left": 300,
+              "top": 740
+            },
+            "type": "split_by_contact_field"
+          },
+          "f8cd6c71-6ac7-4c9f-8484-2e4f7b0daf4a": {
+            "position": {
+              "left": 580,
+              "top": 840
+            },
+            "type": "execute_actions"
+          }
+        },
+        "stickies": {
+          "5c15cfbf-f388-432b-ae13-212d494dfc30": {
+            "body": "Nesta etapa geramos um c\u00f3digo unico da integra\u00e7\u00e3o da oportunidade.\n\nCada oportunidade deve ter um c\u00f3digo diferente",
+            "color": "purple",
+            "position": {
+              "bottom": null,
+              "left": 80,
+              "right": null,
+              "top": 200
+            },
+            "title": "Gera\u00e7\u00e3o do codigo da oportunidade"
+          },
+          "a2ac18e0-e654-4358-ad45-019c141e7bcb": {
+            "body": "Para cadastrar oportunidade precisamos de alguns c\u00f3digos:\n\n\ncCodIntOp: C\u00f3digo de integra\u00e7\u00e3o da oportunidade.+\ncDesOp: Descri\u00e7\u00e3o da oportunidade.\nnCodContato: C\u00f3digo do contato.+\nnCodSolucao: C\u00f3digo da solu\u00e7\u00e3o.+\nnCodOrigem: C\u00f3digo da origem.+\nnCodConta: C\u00f3digo da conta.+\nnCodVendedor: C\u00f3digo do vendedor.+",
+            "color": "purple",
+            "position": {
+              "bottom": 700,
+              "left": 1080,
+              "right": 160,
+              "top": 1360
+            },
+            "title": "Aten\u00e7\u00e3o"
+          }
+        }
+      },
+      "expire_after_minutes": 10080,
+      "language": "base",
+      "localization": {},
+      "metadata": {
+        "expires": 10080
+      },
+      "name": "Cadastro de Lead - Incluir Oportunidade",
+      "nodes": [
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "62893572-073e-4f14-a407-aa042ee60f1f",
+              "uuid": "8758b5c1-73fb-404b-9a86-9c3304403b9a"
+            },
+            {
+              "destination_uuid": "73b043b7-bea5-48b1-9fa2-82bbe7635186",
+              "uuid": "1ecf8880-28c0-4415-bc98-ac6997e52edd"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [],
+                "category_uuid": "dcc46b8b-03b2-432a-bade-fb9bd19217db",
+                "type": "has_text",
+                "uuid": "4ad95552-7360-4e40-9523-36ee7a656abc"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "8758b5c1-73fb-404b-9a86-9c3304403b9a",
+                "name": "Lead j\u00e1 criado",
+                "uuid": "dcc46b8b-03b2-432a-bade-fb9bd19217db"
+              },
+              {
+                "exit_uuid": "1ecf8880-28c0-4415-bc98-ac6997e52edd",
+                "name": "Other",
+                "uuid": "a788f3ea-e4d7-4ce7-ae1b-6b75bbe81f7a"
+              }
+            ],
+            "default_category_uuid": "a788f3ea-e4d7-4ce7-ae1b-6b75bbe81f7a",
+            "operand": "@fields.ncod",
+            "type": "switch"
+          },
+          "uuid": "e9e53906-dac0-422a-a0a0-623f91331e41"
+        },
+        {
+          "actions": [
+            {
+              "flow": {
+                "name": "Cadastro de Lead - Incluir Contato",
+                "uuid": "3e8a2013-5155-4a48-99af-e7be710ac79a"
+              },
+              "type": "enter_flow",
+              "uuid": "03d86a5b-6c85-4923-8633-2219ef817331"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "62893572-073e-4f14-a407-aa042ee60f1f",
+              "uuid": "a40c1d94-3fe1-408e-844c-991248ba1384"
+            },
+            {
+              "destination_uuid": null,
+              "uuid": "3807c9ef-a942-44b5-bfd1-4cbfcd4078fc"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "completed"
+                ],
+                "category_uuid": "3d5028ed-5000-4dec-b9f6-97ee8f6a749a",
+                "type": "has_only_text",
+                "uuid": "15890c57-8d63-4437-b403-2888d2405f83"
+              },
+              {
+                "arguments": [
+                  "expired"
+                ],
+                "category_uuid": "5824b0e5-50e5-4cf1-9037-be88bd5c3a64",
+                "type": "has_only_text",
+                "uuid": "e5f33166-1196-4974-8ff9-78e6b55113f0"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "a40c1d94-3fe1-408e-844c-991248ba1384",
+                "name": "Complete",
+                "uuid": "3d5028ed-5000-4dec-b9f6-97ee8f6a749a"
+              },
+              {
+                "exit_uuid": "3807c9ef-a942-44b5-bfd1-4cbfcd4078fc",
+                "name": "Expired",
+                "uuid": "5824b0e5-50e5-4cf1-9037-be88bd5c3a64"
+              }
+            ],
+            "default_category_uuid": "5824b0e5-50e5-4cf1-9037-be88bd5c3a64",
+            "operand": "@child.status",
+            "type": "switch"
+          },
+          "uuid": "73b043b7-bea5-48b1-9fa2-82bbe7635186"
+        },
+        {
+          "actions": [
+            {
+              "field": {
+                "key": "ccodintop",
+                "name": "cCodIntOp"
+              },
+              "type": "set_contact_field",
+              "uuid": "8a863899-f96e-452b-adf5-c25b140b62ba",
+              "value": "@(format_datetime(now(),\"DDMMYYYYttmmssffffff\"))"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "4eb4b60b-8da2-494a-aee6-dd047f71d4e9",
+              "uuid": "8d4ee9cb-0d5f-4be1-a2de-7f049df90ca9"
+            }
+          ],
+          "uuid": "62893572-073e-4f14-a407-aa042ee60f1f"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "4edc4107-3a3a-416c-a95f-fd745b7bdc33",
+              "uuid": "b366edd0-2c0b-4206-ac4e-b4675a75e54b"
+            },
+            {
+              "destination_uuid": "43eea97d-5b0c-441e-8257-87be786d0c66",
+              "uuid": "118c53ed-7612-4689-adb7-d772b3e5e583"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [],
+                "category_uuid": "dded2797-660e-4855-804b-29df7412fd13",
+                "type": "has_text",
+                "uuid": "977402f6-4472-47ad-bb23-b96e7c121915"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "b366edd0-2c0b-4206-ac4e-b4675a75e54b",
+                "name": "Tem C\u00f3digo da Conta",
+                "uuid": "dded2797-660e-4855-804b-29df7412fd13"
+              },
+              {
+                "exit_uuid": "118c53ed-7612-4689-adb7-d772b3e5e583",
+                "name": "Other",
+                "uuid": "823bfe0d-8eaa-414c-bf84-129707f2e0f0"
+              }
+            ],
+            "default_category_uuid": "823bfe0d-8eaa-414c-bf84-129707f2e0f0",
+            "operand": "@fields.codigo_conta",
+            "type": "switch"
+          },
+          "uuid": "4eb4b60b-8da2-494a-aee6-dd047f71d4e9"
+        },
+        {
+          "actions": [
+            {
+              "field": {
+                "key": "codigo_conta",
+                "name": "Codigo Conta"
+              },
+              "type": "set_contact_field",
+              "uuid": "53d28b43-aaab-425c-a256-7bccafc1d40f",
+              "value": "@globals.codigo_da_conta"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "4edc4107-3a3a-416c-a95f-fd745b7bdc33",
+              "uuid": "dbf67a5e-a3db-477a-9d11-fc3629dde727"
+            }
+          ],
+          "uuid": "43eea97d-5b0c-441e-8257-87be786d0c66"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "f58f3f91-2fd1-438b-a9d3-bda61d1df272",
+              "uuid": "d77b9b9e-0517-4ca7-8ea9-22f32e5932c9"
+            },
+            {
+              "destination_uuid": "ef627bd0-f549-4a43-99f5-169727973d57",
+              "uuid": "c4176ea7-acde-4b93-a934-0926304930b1"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [],
+                "category_uuid": "a3ae77dc-88de-4723-8ad6-850a28466eb9",
+                "type": "has_text",
+                "uuid": "5968d228-27b3-45fd-ad0c-737ea3cae482"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "d77b9b9e-0517-4ca7-8ea9-22f32e5932c9",
+                "name": "Tem c\u00f3digo Vendedor",
+                "uuid": "a3ae77dc-88de-4723-8ad6-850a28466eb9"
+              },
+              {
+                "exit_uuid": "c4176ea7-acde-4b93-a934-0926304930b1",
+                "name": "Other",
+                "uuid": "1655e472-bcbc-49a7-8942-802ff13f76aa"
+              }
+            ],
+            "default_category_uuid": "1655e472-bcbc-49a7-8942-802ff13f76aa",
+            "operand": "@fields.codigo_vendedor",
+            "type": "switch"
+          },
+          "uuid": "4edc4107-3a3a-416c-a95f-fd745b7bdc33"
+        },
+        {
+          "actions": [
+            {
+              "field": {
+                "key": "codigo_vendedor",
+                "name": "Codigo Vendedor"
+              },
+              "type": "set_contact_field",
+              "uuid": "c812265a-39e4-474b-b712-7ce1535ccc7e",
+              "value": "@globals.codigo_do_vendedor"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "f58f3f91-2fd1-438b-a9d3-bda61d1df272",
+              "uuid": "f918951c-b824-44e7-9131-17dbf5a0c085"
+            }
+          ],
+          "uuid": "ef627bd0-f549-4a43-99f5-169727973d57"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "47a00589-835d-43a3-8fb7-8ca829d0dadd",
+              "uuid": "5fe22c9e-3aa0-45ec-bee4-235090f3f98b"
+            },
+            {
+              "destination_uuid": "f8cd6c71-6ac7-4c9f-8484-2e4f7b0daf4a",
+              "uuid": "1576107d-168e-4435-94e2-c0e817363fab"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [],
+                "category_uuid": "c89c3c2b-a797-4257-aba7-ebf1dedecc3e",
+                "type": "has_text",
+                "uuid": "0e69f5ad-61f7-4ff4-a98c-26931025b8a2"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "5fe22c9e-3aa0-45ec-bee4-235090f3f98b",
+                "name": "Tem c\u00f3digo Solu\u00e7\u00e3o",
+                "uuid": "c89c3c2b-a797-4257-aba7-ebf1dedecc3e"
+              },
+              {
+                "exit_uuid": "1576107d-168e-4435-94e2-c0e817363fab",
+                "name": "Other",
+                "uuid": "e7df663b-aab1-4af8-8b83-d9c3863fdd05"
+              }
+            ],
+            "default_category_uuid": "e7df663b-aab1-4af8-8b83-d9c3863fdd05",
+            "operand": "@fields.codigo_solucao",
+            "type": "switch"
+          },
+          "uuid": "f58f3f91-2fd1-438b-a9d3-bda61d1df272"
+        },
+        {
+          "actions": [
+            {
+              "field": {
+                "key": "codigo_solucao",
+                "name": "Codigo Solucao"
+              },
+              "type": "set_contact_field",
+              "uuid": "b798205e-1651-4a34-bd93-aed192578074",
+              "value": "@globals.codigo_da_solucao"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "47a00589-835d-43a3-8fb7-8ca829d0dadd",
+              "uuid": "47994c56-4253-4c34-93b7-c83ec8e02c9b"
+            }
+          ],
+          "uuid": "f8cd6c71-6ac7-4c9f-8484-2e4f7b0daf4a"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "25b954ae-e2be-49e2-b914-91c50a0d54ce",
+              "uuid": "f54abc95-c804-4fcb-8cb9-bcd94277d24b"
+            },
+            {
+              "destination_uuid": "b8a15163-12a8-416b-a6f8-7228fe4f5efd",
+              "uuid": "8818fce4-63ef-409a-bf45-72f0d2ed26f6"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [],
+                "category_uuid": "6f243299-c407-4914-897b-6a53fbe98f79",
+                "type": "has_text",
+                "uuid": "bdb1467f-028f-4fc2-be26-bf794809c6da"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "f54abc95-c804-4fcb-8cb9-bcd94277d24b",
+                "name": "Tem c\u00f3digo da Origem",
+                "uuid": "6f243299-c407-4914-897b-6a53fbe98f79"
+              },
+              {
+                "exit_uuid": "8818fce4-63ef-409a-bf45-72f0d2ed26f6",
+                "name": "Other",
+                "uuid": "df031c3c-3896-4aea-9dd9-166c0af9409f"
+              }
+            ],
+            "default_category_uuid": "df031c3c-3896-4aea-9dd9-166c0af9409f",
+            "operand": "@fields.codigo_origem",
+            "type": "switch"
+          },
+          "uuid": "47a00589-835d-43a3-8fb7-8ca829d0dadd"
+        },
+        {
+          "actions": [
+            {
+              "field": {
+                "key": "codigo_origem",
+                "name": "Codigo Origem"
+              },
+              "type": "set_contact_field",
+              "uuid": "78eef40b-929c-494c-84a3-69f06ead0576",
+              "value": "@globals.codigo_da_origem"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "25b954ae-e2be-49e2-b914-91c50a0d54ce",
+              "uuid": "5a2af7e6-7ffc-4894-8ae1-5cf40ab10e5a"
+            }
+          ],
+          "uuid": "b8a15163-12a8-416b-a6f8-7228fe4f5efd"
+        },
+        {
+          "actions": [
+            {
+              "body": "{\"call\":\"IncluirOportunidade\",\"app_key\":\"@globals.appkey\",\"app_secret\":\"@globals.appsecret\",\"param\":[{\"identificacao\":{\"cCodIntOp\":\"@fields.ccodintop\",\"cDesOp\":\"Chatbot Weni - @fields.ccodintop\",\"nCodConta\":@fields.codigo_conta,\"nCodContato\":@fields.ncod,\"nCodOrigem\":@fields.codigo_origem,\"nCodSolucao\":@fields.codigo_solucao,\"nCodVendedor\":@fields.codigo_vendedor}}]}",
+              "headers": {
+                "Content-Type": "application/json"
+              },
+              "method": "POST",
+              "result_name": "IncluirOportunidade",
+              "type": "call_webhook",
+              "url": "https://app.omie.com.br/api/v1/crm/oportunidades/",
+              "uuid": "d5e4caed-c6c4-40b9-8e7c-ba6cb0c6cadc"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "ae1f919f-1928-4539-b539-f489b553a69a",
+              "uuid": "a1fdbc4e-f3b4-42a2-bb79-c9ebf0b3a8e4"
+            },
+            {
+              "destination_uuid": "976c64b0-7f75-49fc-bc45-89d834319f58",
+              "uuid": "d641e7c3-81b3-4b05-8da3-734329349570"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "Success"
+                ],
+                "category_uuid": "9804b073-ea7c-47bf-bead-db5cdc8c7e09",
+                "type": "has_only_text",
+                "uuid": "dfbeb290-f3fa-4525-8fd3-0be90e7ca47c"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "a1fdbc4e-f3b4-42a2-bb79-c9ebf0b3a8e4",
+                "name": "Success",
+                "uuid": "9804b073-ea7c-47bf-bead-db5cdc8c7e09"
+              },
+              {
+                "exit_uuid": "d641e7c3-81b3-4b05-8da3-734329349570",
+                "name": "Failure",
+                "uuid": "f09f104e-b541-453a-bdc1-b3ea24827d97"
+              }
+            ],
+            "default_category_uuid": "f09f104e-b541-453a-bdc1-b3ea24827d97",
+            "operand": "@results.incluiroportunidade.category",
+            "type": "switch"
+          },
+          "uuid": "25b954ae-e2be-49e2-b914-91c50a0d54ce"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "b26d2660-c648-46d3-96d9-4e2d7ce069c0",
+              "uuid": "770da164-e012-4981-ab68-b2eac540153b"
+            },
+            {
+              "destination_uuid": "b26d2660-c648-46d3-96d9-4e2d7ce069c0",
+              "uuid": "c0bd6547-0b3b-49c8-8579-da9414be8169"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "Contato cadastrado com sucesso!"
+                ],
+                "category_uuid": "1beba62c-199f-46bb-8a25-8cd6d8cc384b",
+                "type": "has_phrase",
+                "uuid": "44c35768-3ef2-490e-bd1a-88b7cd2d28bb"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "770da164-e012-4981-ab68-b2eac540153b",
+                "name": "Contato cadastrado com sucesso!",
+                "uuid": "1beba62c-199f-46bb-8a25-8cd6d8cc384b"
+              },
+              {
+                "exit_uuid": "c0bd6547-0b3b-49c8-8579-da9414be8169",
+                "name": "Other",
+                "uuid": "bf115290-fdf3-45e9-a56f-bdded8a1da20"
+              }
+            ],
+            "default_category_uuid": "bf115290-fdf3-45e9-a56f-bdded8a1da20",
+            "operand": "@webhook.cDesStatus",
+            "type": "switch"
+          },
+          "uuid": "ae1f919f-1928-4539-b539-f489b553a69a"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "b26d2660-c648-46d3-96d9-4e2d7ce069c0",
+              "uuid": "bea5925f-8288-40ac-97f2-2324550fd3a2"
+            },
+            {
+              "destination_uuid": "cb274cdb-1f51-45f9-ba6c-c4c650f40fdd",
+              "uuid": "607c8bc7-6363-47ce-a500-e305aa281b36"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "Oportunidade j\u00e1 cadastrada"
+                ],
+                "category_uuid": "97fdb7ab-2eba-4060-9c5b-9317941f26d4",
+                "type": "has_phrase",
+                "uuid": "44b53d02-3b4e-4f45-b288-ddb749d741ac"
+              },
+              {
+                "arguments": [
+                  "ERROR: Oportundiade j\\u00e1 cadastrada."
+                ],
+                "category_uuid": "97fdb7ab-2eba-4060-9c5b-9317941f26d4",
+                "type": "has_phrase",
+                "uuid": "1e9977ac-3b7e-4a75-b8bb-186316513271"
+              },
+              {
+                "arguments": [
+                  "ERROR: Oportundiade j\u00e1 cadastrada."
+                ],
+                "category_uuid": "97fdb7ab-2eba-4060-9c5b-9317941f26d4",
+                "type": "has_phrase",
+                "uuid": "32d31789-f9b4-4aa1-b0e4-1df74bfda766"
+              },
+              {
+                "arguments": [
+                  "ERROR: Oportundiade j\\u00e1 cadastrada."
+                ],
+                "category_uuid": "97fdb7ab-2eba-4060-9c5b-9317941f26d4",
+                "type": "has_phrase",
+                "uuid": "10d11fcc-ddd0-4c0e-bd33-c43261f7c387"
+              },
+              {
+                "arguments": [
+                  "ERROR: Oportundiade j\u00e1 cadastrada."
+                ],
+                "category_uuid": "97fdb7ab-2eba-4060-9c5b-9317941f26d4",
+                "type": "has_phrase",
+                "uuid": "9f05e7af-c25b-46a7-9c71-29885d449114"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "bea5925f-8288-40ac-97f2-2324550fd3a2",
+                "name": "Oportunidade j\u00e1 cadastrada",
+                "uuid": "97fdb7ab-2eba-4060-9c5b-9317941f26d4"
+              },
+              {
+                "exit_uuid": "607c8bc7-6363-47ce-a500-e305aa281b36",
+                "name": "Other",
+                "uuid": "eea51c15-4e8e-4761-8093-a36a84100e60"
+              }
+            ],
+            "default_category_uuid": "eea51c15-4e8e-4761-8093-a36a84100e60",
+            "operand": "@webhook.faultstring",
+            "type": "switch"
+          },
+          "uuid": "976c64b0-7f75-49fc-bc45-89d834319f58"
+        },
+        {
+          "actions": [
+            {
+              "addresses": [
+                "teste@weni.ai"
+              ],
+              "body": "Erro ao Incluir contato\n\nUUID: @contact.uuid \n\nNome: @contact.name \n\nExtra: @webhook.extra",
+              "subject": "Erro ao Incluir Oportunidade Omie - @globals.nome_da_empresa",
+              "type": "send_email",
+              "uuid": "d8c6cfdf-9336-4b46-808f-8c0e02869cd5"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "ee0be173-539e-423c-b218-65432fea6ba2",
+              "uuid": "9bcd5ba5-7c4d-46cb-94de-81db3e759514"
+            }
+          ],
+          "uuid": "cb274cdb-1f51-45f9-ba6c-c4c650f40fdd"
+        },
+        {
+          "actions": [
+            {
+              "groups": [
+                {
+                  "count": 0,
+                  "name": "Oportunidade Enviada",
+                  "query": null,
+                  "status": "ready",
+                  "uuid": "f739f49d-431c-4715-aa7d-0dceaa2599dd"
+                }
+              ],
+              "type": "add_contact_groups",
+              "uuid": "4a49e6ca-b810-4cfa-ba2c-fb14a5d37bc3"
+            },
+            {
+              "all_groups": false,
+              "groups": [
+                {
+                  "name": "Oportunidade n\u00e3o enviada",
+                  "uuid": "e62d7cfb-293c-4ef2-94bc-4e822047ba79"
+                }
+              ],
+              "type": "remove_contact_groups",
+              "uuid": "e6c006a0-ebea-488a-a5a9-1559bfe52fe4"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "6005e600-b8d5-40ad-9f59-3a20b900d4ed"
+            }
+          ],
+          "uuid": "b26d2660-c648-46d3-96d9-4e2d7ce069c0"
+        },
+        {
+          "actions": [
+            {
+              "groups": [
+                {
+                  "count": 0,
+                  "name": "Oportunidade n\u00e3o enviada",
+                  "query": null,
+                  "status": "ready",
+                  "uuid": "e62d7cfb-293c-4ef2-94bc-4e822047ba79"
+                }
+              ],
+              "type": "add_contact_groups",
+              "uuid": "eb6cb6d4-910a-4931-aa67-4bcee33af501"
+            },
+            {
+              "all_groups": false,
+              "groups": [
+                {
+                  "name": "Oportunidade Enviada",
+                  "uuid": "f739f49d-431c-4715-aa7d-0dceaa2599dd"
+                }
+              ],
+              "type": "remove_contact_groups",
+              "uuid": "c1eb7fd8-de9e-4eae-a7b8-60b115756948"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "90142ccf-ba51-4671-ae64-776b76e5f611"
+            }
+          ],
+          "uuid": "ee0be173-539e-423c-b218-65432fea6ba2"
+        }
+      ],
+      "spec_version": "13.1.0",
+      "type": "messaging",
+      "uuid": "ecbfbea1-d0ad-4031-b538-764fa465e46f",
+      "revision": 14
+    },
+    {
+      "_ui": {
+        "nodes": {
+          "646a6d8d-3e54-48c6-a91e-7658c965948f": {
+            "position": {
+              "left": 580,
+              "top": 20
+            },
+            "type": "execute_actions"
+          },
+          "d2708063-9c91-4fa3-b18b-d5245f99a7e4": {
+            "config": {},
+            "position": {
+              "left": 580,
+              "top": 340
+            },
+            "type": "split_by_subflow"
+          }
+        },
+        "stickies": {
+          "0fbdcf20-b3f2-425a-81b6-352b8d6542c1": {
+            "body": "Inicia-se o fluxo Captura de Leads - Omie, no qual ir\u00e1 capturar nome, telefone e email e criar o contato e a oportunidade na Omie.",
+            "color": "purple",
+            "position": {
+              "left": 320,
+              "top": 320,
+              "right": 300,
+              "bottom": -360
+            },
+            "title": "N\u00e3o cliente"
+          },
+          "661c29b4-542c-4c75-938d-c722aba3bd24": {
+            "body": "Aqui enviamos uma mensagem de boas vindas que pode ser personalizada. Atualmente usamos vari\u00e1veis globais para enviar o nome da empresa e do bot.",
+            "color": "purple",
+            "position": {
+              "left": 320,
+              "top": 60
+            },
+            "title": "Boas vindas"
+          }
+        }
+      },
+      "expire_after_minutes": 10080,
+      "language": "base",
+      "localization": {},
+      "metadata": {
+        "expires": 10080
+      },
+      "name": "Fluxo Principal",
+      "nodes": [
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Ol\u00e1, sou a @globals.nome_do_bot, assistente de atendimento da @globals.nome_da_empresa \ud83d\ude0a\n\nHoje \u00e9 um dia especial...",
+              "type": "send_msg",
+              "uuid": "a853899b-71c4-41da-ad5d-a17cbac0ca87"
+            },
+            {
+              "all_groups": false,
+              "groups": [
+                {
+                  "name": "Satisfeito",
+                  "uuid": "2071332e-da02-4146-a2ac-b035ec02e9e3"
+                }
+              ],
+              "type": "remove_contact_groups",
+              "uuid": "f68d08fb-e4a8-4aa2-83f5-9f6065436c72"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "d2708063-9c91-4fa3-b18b-d5245f99a7e4",
+              "uuid": "9b87ff33-257d-435f-953b-431990848ee0"
+            }
+          ],
+          "uuid": "646a6d8d-3e54-48c6-a91e-7658c965948f"
+        },
+        {
+          "actions": [
+            {
+              "flow": {
+                "name": "Captura de Leads - Omie",
+                "uuid": "b22f09a0-91c6-42a0-b1b1-6600c1db3f6f"
+              },
+              "type": "enter_flow",
+              "uuid": "13e2ccc8-1c96-40e1-b054-f78deb8aca5d"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "273ca27b-3cb3-4024-a40d-0c836c13e20b"
+            },
+            {
+              "destination_uuid": null,
+              "uuid": "5d15fa0d-bd81-4be7-bf66-019e4b21b3f0"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "completed"
+                ],
+                "category_uuid": "a178ffac-99de-419e-adc8-2e99d7c71889",
+                "type": "has_only_text",
+                "uuid": "e7b0b5cc-18dd-41af-954b-93c2651eb2e5"
+              },
+              {
+                "arguments": [
+                  "expired"
+                ],
+                "category_uuid": "128ebd88-1062-41db-b58b-1129ccd6fd12",
+                "type": "has_only_text",
+                "uuid": "fa685628-f1b7-4e4c-b45d-8ec40a7f2418"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "273ca27b-3cb3-4024-a40d-0c836c13e20b",
+                "name": "Complete",
+                "uuid": "a178ffac-99de-419e-adc8-2e99d7c71889"
+              },
+              {
+                "exit_uuid": "5d15fa0d-bd81-4be7-bf66-019e4b21b3f0",
+                "name": "Expired",
+                "uuid": "128ebd88-1062-41db-b58b-1129ccd6fd12"
+              }
+            ],
+            "default_category_uuid": "128ebd88-1062-41db-b58b-1129ccd6fd12",
+            "operand": "@child.status",
+            "type": "switch"
+          },
+          "uuid": "d2708063-9c91-4fa3-b18b-d5245f99a7e4"
+        }
+      ],
+      "spec_version": "13.1.0",
+      "type": "messaging",
+      "uuid": "3ffa11ee-5ebb-4118-b26d-2ec48abec070",
+      "revision": 16
+    },
+    {
+      "_ui": {
+        "nodes": {
+          "049b301f-9977-4c4f-b834-d7ae18337859": {
+            "position": {
+              "left": 80,
+              "top": 440
+            },
+            "type": "execute_actions"
+          },
+          "0eef52fc-8ed9-4825-9930-d60f1a6708d7": {
+            "config": {
+              "cases": {}
+            },
+            "position": {
+              "left": 80,
+              "top": 300
+            },
+            "type": "split_by_expression"
+          },
+          "1e9bab0f-4b79-4a88-bc78-b3b98d3c3456": {
+            "position": {
+              "left": 720,
+              "top": 1520
+            },
+            "type": "execute_actions"
+          },
+          "2778f142-aad4-40c5-8186-a7d17a6c4f4b": {
+            "position": {
+              "left": 1340,
+              "top": 1440
+            },
+            "type": "execute_actions"
+          },
+          "45531134-447f-4511-9742-522ecb06d69e": {
+            "config": {
+              "cases": {},
+              "operand": {
+                "id": "ccodint",
+                "name": "cCodInt",
+                "type": "field"
+              }
+            },
+            "position": {
+              "left": 420,
+              "top": 440
+            },
+            "type": "split_by_contact_field"
+          },
+          "53220982-de11-4fce-8f6d-8cdc2bd8efbc": {
+            "config": {},
+            "position": {
+              "left": 180,
+              "top": 20
+            },
+            "type": "split_by_webhook"
+          },
+          "539edb90-6a41-42fb-813c-a89f1e940084": {
+            "config": {
+              "cases": {}
+            },
+            "position": {
+              "left": 420,
+              "top": 920
+            },
+            "type": "split_by_expression"
+          },
+          "5f228be1-e25c-4f73-95a4-8fed96348c91": {
+            "config": {
+              "cases": {}
+            },
+            "position": {
+              "left": 720,
+              "top": 1400
+            },
+            "type": "split_by_expression"
+          },
+          "66647ba1-54e6-44d4-9a5c-26a315afe81a": {
+            "position": {
+              "left": 1060,
+              "top": 1400
+            },
+            "type": "execute_actions"
+          },
+          "7944b29a-5b70-4ee2-9a09-aa59650a4999": {
+            "position": {
+              "left": 420,
+              "top": 1080
+            },
+            "type": "execute_actions"
+          },
+          "7ac1c5fb-6334-4e38-ad15-ad9456627d92": {
+            "config": {},
+            "position": {
+              "left": 720,
+              "top": 1100
+            },
+            "type": "split_by_webhook"
+          },
+          "bd0bbf30-1a03-448d-ad2e-952f9735f896": {
+            "config": {
+              "cases": {}
+            },
+            "position": {
+              "left": 720,
+              "top": 920
+            },
+            "type": "split_by_expression"
+          },
+          "cb0d4d12-1ac9-41f4-b0bb-93b238f075a9": {
+            "position": {
+              "left": 1060,
+              "top": 1080
+            },
+            "type": "execute_actions"
+          },
+          "d3d1c30e-e2a6-4c3f-b6fd-2a7c91db784e": {
+            "config": {},
+            "position": {
+              "left": 420,
+              "top": 620
+            },
+            "type": "split_by_webhook"
+          },
+          "e65c2472-4148-4b2b-8393-a7967db50bb6": {
+            "position": {
+              "left": 740,
+              "top": 600
+            },
+            "type": "execute_actions"
+          },
+          "fa458bd0-81b5-46e2-b866-81c0d13d659d": {
+            "position": {
+              "left": 420,
+              "top": 1720
+            },
+            "type": "execute_actions"
+          }
+        },
+        "stickies": {
+          "190d66d0-2d0e-492d-872d-03460a5ddf18": {
+            "body": "Aqui adicionamos o usu\u00e1rio ao grupo lead Cadastrado e removemos do grupo Lead N\u00e3o Cadastrado",
+            "color": "purple",
+            "position": {
+              "left": 220,
+              "top": 1740
+            },
+            "title": "Adicione a um grupo"
+          },
+          "268bd6c6-dc15-47d1-a299-9d1a52a39928": {
+            "body": "Aqui adicionamos o usu\u00e1rio ao grupo Lead N\u00e3o Cadastrado e removemos do grupo Lead Cadastrado",
+            "color": "purple",
+            "position": {
+              "bottom": null,
+              "left": 1580,
+              "right": null,
+              "top": 1460
+            },
+            "title": "Adicione a um grupo"
+          },
+          "43331efc-86a5-4b90-a101-5e40d8f5afca": {
+            "body": "Aqui verificamos se o contato j\u00e1 existe na Omie pesquisando pelo email, se sim, salvamos o nCod e o cCodInt.",
+            "color": "purple",
+            "position": {
+              "left": 460,
+              "top": 40
+            },
+            "title": "VerificarContato"
+          },
+          "815c3486-660c-4b27-92ef-e3745455a036": {
+            "body": "Aqui inclu\u00edmos o contato na Omie, passando nome, telefone e email.",
+            "color": "purple",
+            "position": {
+              "bottom": null,
+              "left": 220,
+              "right": null,
+              "top": 640
+            },
+            "title": "IncluirContato"
+          },
+          "9292f7cb-4062-453f-a3eb-1b8f111e9ff9": {
+            "body": "Nesta etapa geramos um c\u00f3digo unico da integra\u00e7\u00e3o do lead",
+            "color": "purple",
+            "position": {
+              "bottom": null,
+              "left": 1020,
+              "right": null,
+              "top": 640
+            },
+            "title": "Gera c\u00f3digo de integra\u00e7\u00e3o do lead"
+          },
+          "ccd2c621-21b0-464f-9d80-594e8324eddb": {
+            "body": "Adicione seu email para receber notifica\u00e7\u00f5es sempre que uma falha acontecer",
+            "color": "purple",
+            "position": {
+              "left": 1320,
+              "top": 1100
+            },
+            "title": "Enviar Email"
+          },
+          "e6ae774b-ac9b-4506-b9bc-d464ec700237": {
+            "body": "Aqui salvamos as informa\u00e7\u00f5es do contato criado",
+            "color": "purple",
+            "position": {
+              "bottom": null,
+              "left": 200,
+              "right": null,
+              "top": 1080
+            },
+            "title": "Atualizar contato"
+          },
+          "e7491a8e-28ca-47a3-aa87-d7a56a9df179": {
+            "body": "Aqui fazemos uma verifica\u00e7\u00e3o dupla caso a inclus\u00e3o do contato falhe. Verificamos se o contato j\u00e1 existe pesquisando pelo nome do contato",
+            "color": "purple",
+            "position": {
+              "bottom": null,
+              "left": 1000,
+              "right": null,
+              "top": 900
+            },
+            "title": "Verifica\u00e7\u00e3o dupla"
+          },
+          "ff1553a1-7b6e-4e7f-a088-4413facd0850": {
+            "body": "Adicione seu email para receber notifica\u00e7\u00f5es sempre que uma falha acontecer",
+            "color": "purple",
+            "position": {
+              "left": 1060,
+              "top": 1560
+            },
+            "title": "Enviar email"
+          }
+        }
+      },
+      "expire_after_minutes": 10080,
+      "language": "base",
+      "localization": {},
+      "metadata": {
+        "expires": 10080
+      },
+      "name": "Cadastro de Lead - Incluir Contato",
+      "nodes": [
+        {
+          "actions": [
+            {
+              "body": "{\"call\":\"VerificarContato\",\"app_key\":\"@globals.appkey\",\"app_secret\":\"@globals.appsecret\",\"param\":[{\"cNome\":\"\",\"cEmail\":\"@fields.email\"}]}",
+              "headers": {
+                "Content-Type": "application/json"
+              },
+              "method": "POST",
+              "result_name": "VerificarContato",
+              "type": "call_webhook",
+              "url": "https://app.omie.com.br/api/v1/crm/contatos/",
+              "uuid": "c4aa57c2-a516-4ac9-b431-09bbdd683f59"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "0eef52fc-8ed9-4825-9930-d60f1a6708d7",
+              "uuid": "efaca9c8-dbd2-4ea7-a997-04a48fbc5045"
+            },
+            {
+              "destination_uuid": "45531134-447f-4511-9742-522ecb06d69e",
+              "uuid": "13bb84d6-15fe-47f1-a447-55ed20648f29"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "Success"
+                ],
+                "category_uuid": "d9158aed-a223-40af-8089-8c528e91d78d",
+                "type": "has_only_text",
+                "uuid": "70052d34-b268-4a28-8be0-9c4e52e7ba8d"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "efaca9c8-dbd2-4ea7-a997-04a48fbc5045",
+                "name": "Success",
+                "uuid": "d9158aed-a223-40af-8089-8c528e91d78d"
+              },
+              {
+                "exit_uuid": "13bb84d6-15fe-47f1-a447-55ed20648f29",
+                "name": "Failure",
+                "uuid": "9bebaec3-ba76-410f-a870-e3b3a82f8708"
+              }
+            ],
+            "default_category_uuid": "9bebaec3-ba76-410f-a870-e3b3a82f8708",
+            "operand": "@results.verificarcontato.category",
+            "type": "switch"
+          },
+          "uuid": "53220982-de11-4fce-8f6d-8cdc2bd8efbc"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "049b301f-9977-4c4f-b834-d7ae18337859",
+              "uuid": "fbca0aa7-3c24-48c5-a5c2-9ae830c64658"
+            },
+            {
+              "destination_uuid": "45531134-447f-4511-9742-522ecb06d69e",
+              "uuid": "ff486c82-28a9-46cd-b5f5-983c8a2e4684"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [],
+                "category_uuid": "48cb8946-9bc9-41e1-a040-ad3a70407498",
+                "type": "has_text",
+                "uuid": "b9a3b139-fc57-4bf2-beb5-49a80058c354"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "fbca0aa7-3c24-48c5-a5c2-9ae830c64658",
+                "name": "Tem nCod",
+                "uuid": "48cb8946-9bc9-41e1-a040-ad3a70407498"
+              },
+              {
+                "exit_uuid": "ff486c82-28a9-46cd-b5f5-983c8a2e4684",
+                "name": "Other",
+                "uuid": "28e2cb69-63a1-4061-a12b-b78a2cc66efc"
+              }
+            ],
+            "default_category_uuid": "28e2cb69-63a1-4061-a12b-b78a2cc66efc",
+            "operand": "@webhook.nCod",
+            "type": "switch"
+          },
+          "uuid": "0eef52fc-8ed9-4825-9930-d60f1a6708d7"
+        },
+        {
+          "actions": [
+            {
+              "field": {
+                "key": "ncod",
+                "name": "nCod"
+              },
+              "type": "set_contact_field",
+              "uuid": "22effc2e-1f21-460e-8445-fa4611942d9d",
+              "value": "@webhook.nCod"
+            },
+            {
+              "field": {
+                "key": "ccodint",
+                "name": "cCodInt"
+              },
+              "type": "set_contact_field",
+              "uuid": "f4b344ad-23b5-475f-9f07-75d8c0f9c7f8",
+              "value": "@webhook.cCodInt"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "fa458bd0-81b5-46e2-b866-81c0d13d659d",
+              "uuid": "b08c893e-1e93-4d0d-94f7-2908f0a246d4"
+            }
+          ],
+          "uuid": "049b301f-9977-4c4f-b834-d7ae18337859"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "d3d1c30e-e2a6-4c3f-b6fd-2a7c91db784e",
+              "uuid": "cd245765-978b-43eb-bae1-7dded3d65e47"
+            },
+            {
+              "destination_uuid": "e65c2472-4148-4b2b-8393-a7967db50bb6",
+              "uuid": "b16c058e-e8d3-4c17-9aa9-66dfcf14a6dd"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [],
+                "category_uuid": "3ab6841c-bcb3-4d56-855a-38c21f896825",
+                "type": "has_text",
+                "uuid": "de98d5f7-6a64-4911-ba6f-0968738bc436"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "cd245765-978b-43eb-bae1-7dded3d65e47",
+                "name": "Tem c\u00f3digo de integra\u00e7\u00e3o do Lead",
+                "uuid": "3ab6841c-bcb3-4d56-855a-38c21f896825"
+              },
+              {
+                "exit_uuid": "b16c058e-e8d3-4c17-9aa9-66dfcf14a6dd",
+                "name": "Other",
+                "uuid": "772532d4-8390-4310-8543-525ed813afc4"
+              }
+            ],
+            "default_category_uuid": "772532d4-8390-4310-8543-525ed813afc4",
+            "operand": "@fields.ccodint",
+            "type": "switch"
+          },
+          "uuid": "45531134-447f-4511-9742-522ecb06d69e"
+        },
+        {
+          "actions": [
+            {
+              "field": {
+                "key": "ccodint",
+                "name": "cCodInt"
+              },
+              "type": "set_contact_field",
+              "uuid": "ba876a19-bc22-467c-a385-f94fe7d88d8c",
+              "value": "@(format_datetime(now(),\"DDMMYYYYttmmssfff\"))"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "d3d1c30e-e2a6-4c3f-b6fd-2a7c91db784e",
+              "uuid": "20c36db9-a31c-41d7-ad3c-9c26287cfa8e"
+            }
+          ],
+          "uuid": "e65c2472-4148-4b2b-8393-a7967db50bb6"
+        },
+        {
+          "actions": [
+            {
+              "body": "{\"call\":\"IncluirContato\",\"app_key\":\"@globals.appkey\",\"app_secret\":\"@globals.appsecret\",\"param\":[{\"identificacao\":{\"cCodInt\":\"@fields.ccodint\", \"cNome\":\"@contact.name\", \"cSobrenome\":\"\", \"dDtNasc\":\"\"}, \"endereco\":{\"cEndereco\":\"\",\"cCompl\":\"\",\"cCEP\":\"\",\"cBairro\":\"\",\"cCidade\":\"\",\"cUF\":\"\",\"cPais\":\"\"}, \"telefone_email\":{\"cDDDCel1\":\"\",\"cNumCel1\":\"@fields.telefone\",\"cEmail\":\"@fields.email\",\"cWebsite\":\"\"}}]}",
+              "headers": {
+                "Content-Type": "application/json"
+              },
+              "method": "POST",
+              "result_name": "IncluirContato",
+              "type": "call_webhook",
+              "url": "https://app.omie.com.br/api/v1/crm/contatos/",
+              "uuid": "df4d88da-7073-4dad-8fe2-82aaba920db8"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "539edb90-6a41-42fb-813c-a89f1e940084",
+              "uuid": "6d02426d-6a6c-40f5-9be8-f46555419d82"
+            },
+            {
+              "destination_uuid": "bd0bbf30-1a03-448d-ad2e-952f9735f896",
+              "uuid": "073cd0d7-182c-4887-abf4-1d7170182721"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "Success"
+                ],
+                "category_uuid": "aa495534-40a7-4690-a841-6fdfa68b6658",
+                "type": "has_only_text",
+                "uuid": "1dcf0f53-07f0-4316-b025-4aed3e22bdd1"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "6d02426d-6a6c-40f5-9be8-f46555419d82",
+                "name": "Success",
+                "uuid": "aa495534-40a7-4690-a841-6fdfa68b6658"
+              },
+              {
+                "exit_uuid": "073cd0d7-182c-4887-abf4-1d7170182721",
+                "name": "Failure",
+                "uuid": "ccca6913-5027-439d-84dd-be6404ede379"
+              }
+            ],
+            "default_category_uuid": "ccca6913-5027-439d-84dd-be6404ede379",
+            "operand": "@results.incluircontato.category",
+            "type": "switch"
+          },
+          "uuid": "d3d1c30e-e2a6-4c3f-b6fd-2a7c91db784e"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "7944b29a-5b70-4ee2-9a09-aa59650a4999",
+              "uuid": "e2ab85a3-2d57-4edf-a926-c537bed126ff"
+            },
+            {
+              "destination_uuid": "cb0d4d12-1ac9-41f4-b0bb-93b238f075a9",
+              "uuid": "1fe690c4-a695-46df-8f3e-2141b7037562"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "Contato cadastrado com sucesso!"
+                ],
+                "category_uuid": "e502b095-2956-43e4-9a9e-c3f60389c1b7",
+                "type": "has_phrase",
+                "uuid": "33efba89-ee7c-4d0a-b995-c3b6ef5cf94e"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "e2ab85a3-2d57-4edf-a926-c537bed126ff",
+                "name": "Contato cadastrado com sucesso!",
+                "uuid": "e502b095-2956-43e4-9a9e-c3f60389c1b7"
+              },
+              {
+                "exit_uuid": "1fe690c4-a695-46df-8f3e-2141b7037562",
+                "name": "Other",
+                "uuid": "2c325e44-26db-4da5-96a4-105eadc2b29f"
+              }
+            ],
+            "default_category_uuid": "2c325e44-26db-4da5-96a4-105eadc2b29f",
+            "operand": "@webhook.cDesStatus",
+            "type": "switch"
+          },
+          "uuid": "539edb90-6a41-42fb-813c-a89f1e940084"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "7ac1c5fb-6334-4e38-ad15-ad9456627d92",
+              "uuid": "84a1ee9b-b83d-49aa-b1f5-608bb832f0da"
+            },
+            {
+              "destination_uuid": "cb0d4d12-1ac9-41f4-b0bb-93b238f075a9",
+              "uuid": "432b7310-b122-4fb5-b87e-386f3ee52313"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "ERROR: Contato j\\u00e1 cadastrado para o C\\u00f3digo de Integra\\u00e7\\u00e3o"
+                ],
+                "category_uuid": "8da83efe-052c-4f5b-8c1a-1b02eddd5776",
+                "type": "has_all_words",
+                "uuid": "44889c2c-90d4-42f6-bb79-8f4f11e60031"
+              },
+              {
+                "arguments": [
+                  "ERROR: Contato j\u00e1 cadastrado para o C\u00f3digo de Integra\u00e7\u00e3o"
+                ],
+                "category_uuid": "8da83efe-052c-4f5b-8c1a-1b02eddd5776",
+                "type": "has_all_words",
+                "uuid": "366dd267-662b-4592-a5ff-bbdcac8d8e9f"
+              },
+              {
+                "arguments": [
+                  "ERROR: Contato ja cadastrado para o Codigo de Integracao"
+                ],
+                "category_uuid": "8da83efe-052c-4f5b-8c1a-1b02eddd5776",
+                "type": "has_all_words",
+                "uuid": "3d4cc32b-2637-4be4-887e-dfc51773d362"
+              },
+              {
+                "arguments": [
+                  "ERROR: Contato j\u00e1 cadastrado"
+                ],
+                "category_uuid": "8da83efe-052c-4f5b-8c1a-1b02eddd5776",
+                "type": "has_all_words",
+                "uuid": "6c0ba486-3ef3-478c-89f0-d5349f533dcc"
+              },
+              {
+                "arguments": [
+                  "ERROR: Contato ja cadastrado"
+                ],
+                "category_uuid": "8da83efe-052c-4f5b-8c1a-1b02eddd5776",
+                "type": "has_all_words",
+                "uuid": "47abb408-9f39-453b-9a71-995f3d205aae"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "84a1ee9b-b83d-49aa-b1f5-608bb832f0da",
+                "name": "Contato j\u00e1 existente",
+                "uuid": "8da83efe-052c-4f5b-8c1a-1b02eddd5776"
+              },
+              {
+                "exit_uuid": "432b7310-b122-4fb5-b87e-386f3ee52313",
+                "name": "Other",
+                "uuid": "59737516-d16c-4bf3-9ed7-6bf2c1a45cd3"
+              }
+            ],
+            "default_category_uuid": "59737516-d16c-4bf3-9ed7-6bf2c1a45cd3",
+            "operand": "@webhook.faultstring",
+            "type": "switch"
+          },
+          "uuid": "bd0bbf30-1a03-448d-ad2e-952f9735f896"
+        },
+        {
+          "actions": [
+            {
+              "field": {
+                "key": "ncod",
+                "name": "nCod"
+              },
+              "type": "set_contact_field",
+              "uuid": "0990e65e-920b-4dcd-8fb8-cf9e30200a36",
+              "value": "@webhook.nCod"
+            },
+            {
+              "field": {
+                "key": "ccodint",
+                "name": "cCodInt"
+              },
+              "type": "set_contact_field",
+              "uuid": "392a615d-dc46-43c4-be99-b21f723f846e",
+              "value": "@webhook.cCodInt"
+            },
+            {
+              "field": {
+                "key": "cdesstatus",
+                "name": "cDesStatus"
+              },
+              "type": "set_contact_field",
+              "uuid": "abd70b7f-a49b-4fea-9c9d-3ec7eb4db1a3",
+              "value": "@webhook.cDesStatus"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "fa458bd0-81b5-46e2-b866-81c0d13d659d",
+              "uuid": "ecfbb146-e459-4e6a-8a10-ea890131c0b9"
+            }
+          ],
+          "uuid": "7944b29a-5b70-4ee2-9a09-aa59650a4999"
+        },
+        {
+          "actions": [
+            {
+              "addresses": [
+                "teste@weni.ai"
+              ],
+              "body": "Erro ao Incluir contato\n\nUUID: @contact.uuid \n\nNome: @contact.name \n\nExtra: @webhook.extra",
+              "subject": "Erro ao Incluir contato OMIE - @globals.nome_da_empresa",
+              "type": "send_email",
+              "uuid": "488cc833-5e42-42bd-bc16-6f75a1ca464f"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "2778f142-aad4-40c5-8186-a7d17a6c4f4b",
+              "uuid": "132966b3-424e-4d5a-8a54-47d84073aee3"
+            }
+          ],
+          "uuid": "cb0d4d12-1ac9-41f4-b0bb-93b238f075a9"
+        },
+        {
+          "actions": [
+            {
+              "body": "{\"call\":\"VerificarContato\",\"app_key\":\"@globals.appkey\",\"app_secret\":\"@globals.appsecret\",\"param\":[{\"cNome\":\"@contact.name\",\"cEmail\":\"\"}]}",
+              "headers": {
+                "Content-Type": "application/json"
+              },
+              "method": "POST",
+              "result_name": "VerificarContato",
+              "type": "call_webhook",
+              "url": "https://app.omie.com.br/api/v1/crm/contatos/",
+              "uuid": "6092d41d-bec6-4b77-ac7f-25b0432cbc8d"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "5f228be1-e25c-4f73-95a4-8fed96348c91",
+              "uuid": "c036c60e-eb3d-4a7f-991f-b82fe3239699"
+            },
+            {
+              "destination_uuid": "66647ba1-54e6-44d4-9a5c-26a315afe81a",
+              "uuid": "1752f2c0-6978-4156-92bc-21dbd7147eba"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "Success"
+                ],
+                "category_uuid": "34b410fb-dcae-4e85-ac95-63a53803a139",
+                "type": "has_only_text",
+                "uuid": "b328b413-813b-4be4-8af7-cf50d8c76aac"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "c036c60e-eb3d-4a7f-991f-b82fe3239699",
+                "name": "Success",
+                "uuid": "34b410fb-dcae-4e85-ac95-63a53803a139"
+              },
+              {
+                "exit_uuid": "1752f2c0-6978-4156-92bc-21dbd7147eba",
+                "name": "Failure",
+                "uuid": "ea39d060-28cf-4dc7-85cc-8c248f1d6670"
+              }
+            ],
+            "default_category_uuid": "ea39d060-28cf-4dc7-85cc-8c248f1d6670",
+            "operand": "@results.verificarcontato.category",
+            "type": "switch"
+          },
+          "uuid": "7ac1c5fb-6334-4e38-ad15-ad9456627d92"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "1e9bab0f-4b79-4a88-bc78-b3b98d3c3456",
+              "uuid": "8b34a2ca-5903-4361-af57-0e74bd4b6274"
+            },
+            {
+              "destination_uuid": "66647ba1-54e6-44d4-9a5c-26a315afe81a",
+              "uuid": "869d6606-6bff-4c70-be12-6f2106273f12"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [],
+                "category_uuid": "a5813f52-a70e-49e3-abd8-c52eed7f096b",
+                "type": "has_text",
+                "uuid": "cc34152a-c521-4b85-a435-1d1149b4a762"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "8b34a2ca-5903-4361-af57-0e74bd4b6274",
+                "name": "Tem nCod",
+                "uuid": "a5813f52-a70e-49e3-abd8-c52eed7f096b"
+              },
+              {
+                "exit_uuid": "869d6606-6bff-4c70-be12-6f2106273f12",
+                "name": "Other",
+                "uuid": "583231ca-adef-4dce-9d24-8006c350269e"
+              }
+            ],
+            "default_category_uuid": "583231ca-adef-4dce-9d24-8006c350269e",
+            "operand": "@webhook.nCod",
+            "type": "switch"
+          },
+          "uuid": "5f228be1-e25c-4f73-95a4-8fed96348c91"
+        },
+        {
+          "actions": [
+            {
+              "addresses": [
+                "teste@weni.ai"
+              ],
+              "body": "Erro ao consultar contato Omie\n\nuuid: @contact.uuid\n\n@webhook.extra",
+              "subject": "Erro ao consultar contato j\u00e1 existente Omie - @globals.nome_da_empresa ",
+              "type": "send_email",
+              "uuid": "2e6d402a-7977-4e65-b63a-f80cadc8f454"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "2778f142-aad4-40c5-8186-a7d17a6c4f4b",
+              "uuid": "d9f7bf80-9dd9-4bf2-ac40-50eb0297dc95"
+            }
+          ],
+          "uuid": "66647ba1-54e6-44d4-9a5c-26a315afe81a"
+        },
+        {
+          "actions": [
+            {
+              "groups": [
+                {
+                  "count": 0,
+                  "name": "Lead N\u00e3o cadastrado",
+                  "query": null,
+                  "status": "ready",
+                  "uuid": "66e35bc2-c943-418d-9e49-769702167623"
+                }
+              ],
+              "type": "add_contact_groups",
+              "uuid": "6f0a9ce5-c5f5-4a54-8c97-34ff6c07a594"
+            },
+            {
+              "all_groups": false,
+              "groups": [
+                {
+                  "name": "Lead Cadastrado",
+                  "uuid": "9634ff85-f5f8-4b1f-a34e-d8eef6e2c108"
+                }
+              ],
+              "type": "remove_contact_groups",
+              "uuid": "1100677d-91d1-4b2f-b00b-4c3db2076959"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "1cb09cec-897f-4856-b0d7-d24299526a44"
+            }
+          ],
+          "uuid": "2778f142-aad4-40c5-8186-a7d17a6c4f4b"
+        },
+        {
+          "actions": [
+            {
+              "field": {
+                "key": "ncod",
+                "name": "nCod"
+              },
+              "type": "set_contact_field",
+              "uuid": "3c336d11-73da-45a7-a9da-0d6042782e60",
+              "value": "@webhook.nCod"
+            },
+            {
+              "field": {
+                "key": "ccodint",
+                "name": "cCodInt"
+              },
+              "type": "set_contact_field",
+              "uuid": "bd1342c4-237f-4d92-a6f7-20554ad9bf38",
+              "value": "@webhook.cCodInt"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "fa458bd0-81b5-46e2-b866-81c0d13d659d",
+              "uuid": "928eaf40-1c18-4db5-adce-dfd401abccb8"
+            }
+          ],
+          "uuid": "1e9bab0f-4b79-4a88-bc78-b3b98d3c3456"
+        },
+        {
+          "actions": [
+            {
+              "groups": [
+                {
+                  "count": 0,
+                  "name": "Lead Cadastrado",
+                  "query": null,
+                  "status": "ready",
+                  "uuid": "9634ff85-f5f8-4b1f-a34e-d8eef6e2c108"
+                }
+              ],
+              "type": "add_contact_groups",
+              "uuid": "b519d475-27f4-4bbb-b3cb-7b43649c573a"
+            },
+            {
+              "all_groups": false,
+              "groups": [
+                {
+                  "name": "Lead N\u00e3o cadastrado",
+                  "uuid": "66e35bc2-c943-418d-9e49-769702167623"
+                }
+              ],
+              "type": "remove_contact_groups",
+              "uuid": "e335da49-e052-4c81-8dab-d7fb090c1aa3"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "3c3b6037-86cd-481f-a76c-c68ec6ec4b3f"
+            }
+          ],
+          "uuid": "fa458bd0-81b5-46e2-b866-81c0d13d659d"
+        }
+      ],
+      "spec_version": "13.1.0",
+      "type": "messaging",
+      "uuid": "3e8a2013-5155-4a48-99af-e7be710ac79a",
+      "revision": 16
+    },
+    {
+      "_ui": {
+        "nodes": {
+          "4574862b-41f2-4274-9b10-ae68a0e45f1d": {
+            "position": {
+              "left": 1240,
+              "top": 300
+            },
+            "type": "execute_actions"
+          },
+          "4e518f1c-15cd-4418-ad37-01c689ea5c66": {
+            "position": {
+              "left": 540,
+              "top": 660
+            },
+            "type": "execute_actions"
+          },
+          "7bc63a25-2750-4d7e-81ef-8b200f7bd808": {
+            "config": {
+              "cases": {}
+            },
+            "position": {
+              "left": 520,
+              "top": 320
+            },
+            "type": "wait_for_response"
+          },
+          "9addb824-5831-445b-8e44-d739e912afb8": {
+            "position": {
+              "left": 220,
+              "top": 620
+            },
+            "type": "execute_actions"
+          },
+          "c2bbc8e8-9895-4a13-9668-3347ae51eee0": {
+            "position": {
+              "left": 860,
+              "top": 660
+            },
+            "type": "execute_actions"
+          },
+          "e3b6661a-510b-44ed-bfa9-8a0b2c55dbbe": {
+            "position": {
+              "left": 500,
+              "top": 20
+            },
+            "type": "execute_actions"
+          }
+        },
+        "stickies": {
+          "3981ad9d-3de2-4bdc-a2ba-2c91c09ec24e": {
+            "body": "Aqui enviamos uma mensagem para o caso do usu\u00e1rio digitar \"N\u00e3o\"",
+            "color": "purple",
+            "position": {
+              "bottom": 20,
+              "left": 540,
+              "right": 0,
+              "top": 860
+            },
+            "title": "Enviar mensagem"
+          },
+          "6de238a2-56d2-454c-8326-e9ada2498d0f": {
+            "body": "Adicionamos o email do usu\u00e1rio na URN e-mail. Essa URN \u00e9 o canal em que o usu\u00e1rio pode ser contatado.\n\nOBS: Voc\u00ea disparar emails ativamente se o usu\u00e1rio tiver a URN email",
+            "color": "purple",
+            "position": {
+              "bottom": null,
+              "left": 0,
+              "right": null,
+              "top": 620
+            },
+            "title": "Adicione URN"
+          },
+          "6f578108-e997-41db-9a1c-0c2d07eaa7eb": {
+            "body": "A categoria No Response serve para quando o fluxo continua sem que o usu\u00e1rio tenha respondido \u00e0 pergunta. Normalmente \u00e9 utilizado para n\u00e3o deixar o usu\u00e1rio preso em uma pergunta.\n\nAl\u00e9m disso, adicionamos o usu\u00e1rio no grupo \"Conversa encerrada\" pois antes de enviar outra mensagem ou entrar em outro fluxo podemos verificar se o usu\u00e1rio est\u00e1 nesse grupo e evitar o envio de mensagens",
+            "color": "purple",
+            "position": {
+              "bottom": null,
+              "left": 1480,
+              "right": null,
+              "top": 300
+            },
+            "title": "Categoria No response"
+          },
+          "74277e9b-662a-4587-8582-26c3377cc96d": {
+            "body": "Tamb\u00e9m salvamos no campo de contato Email. Esse dado poder\u00e1 ser visto em detalhes no hist\u00f3rico de cada contato e pode ser usado em qualquer fluxo de mensagem pois a informa\u00e7\u00e3o est\u00e1 sendo salva no contato e n\u00e3o em um fluxo de mensagem espec\u00edfico.",
+            "color": "purple",
+            "position": {
+              "bottom": -120,
+              "left": 220,
+              "right": 200,
+              "top": 840
+            },
+            "title": "Atualizar o contato"
+          },
+          "da002ce3-4e18-4a22-9b36-96a48f982a3e": {
+            "body": "Aqui verificamos que o usu\u00e1rio n\u00e3o digitou um email e perguntamos se ele pode informar e damos a op\u00e7\u00e3o de Sim e N\u00e3o. \n\nImportante lembrar que nessa etapa, se o usu\u00e1rio j\u00e1 responder com seu email, conseguiremos detectar, pois todas as regras est\u00e3o no mesmo card \"Aguarde por resposta\".",
+            "color": "purple",
+            "position": {
+              "bottom": 40,
+              "left": 880,
+              "right": 0,
+              "top": 840
+            },
+            "title": "Enviar mensagem"
+          },
+          "e28fcce8-0b2d-4fc5-83d8-add72e8a1821": {
+            "body": "Aqui aguardamos pela resposta do usu\u00e1rio e usamos a regra \"tem um email\".\n\nTamb\u00e9m usamos a regra de Sim e N\u00e3o para verificar se o usu\u00e1rio quer ou n\u00e3o informar o email.",
+            "color": "purple",
+            "position": {
+              "bottom": null,
+              "left": 280,
+              "right": null,
+              "top": 300
+            },
+            "title": "Aguarde por resposta"
+          },
+          "f279df0d-d508-4321-98b7-5d1f3d3c8c56": {
+            "body": "Aqui perguntamos o email do usu\u00e1rio. Voc\u00ea pode personalizar essa mensagem para a que preferir",
+            "color": "purple",
+            "position": {
+              "bottom": null,
+              "left": 280,
+              "right": null,
+              "top": 20
+            },
+            "title": "Enviar mensagem"
+          }
+        }
+      },
+      "expire_after_minutes": 10080,
+      "language": "base",
+      "localization": {},
+      "metadata": {
+        "expires": 10080,
+        "revision": 11
+      },
+      "name": "Coleta de E-mail",
+      "nodes": [
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "@(title(contact.first_name)), qual o seu e-mail?",
+              "type": "send_msg",
+              "uuid": "d12548cc-67ca-4696-8acf-1f4540e9612d"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "7bc63a25-2750-4d7e-81ef-8b200f7bd808",
+              "uuid": "3a86f0d7-83c4-49a3-bcc8-cefad9c1dbdb"
+            }
+          ],
+          "uuid": "e3b6661a-510b-44ed-bfa9-8a0b2c55dbbe"
+        },
+        {
+          "actions": [
+            {
+              "groups": [
+                {
+                  "count": 0,
+                  "name": "Conversa Encerrada",
+                  "query": null,
+                  "status": "ready",
+                  "uuid": "d01833de-92d9-4bb1-96eb-dde0c96665aa"
+                }
+              ],
+              "type": "add_contact_groups",
+              "uuid": "7b91c912-7378-4774-b045-e4abdbf4d1f2"
+            },
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Por falta de resposta, encerrei esse atendimento. Mas quando quiser \u00e9 s\u00f3 falar comigo \ud83d\ude09",
+              "type": "send_msg",
+              "uuid": "61558159-10f4-4c97-95a2-896dfc6067e7"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "fea6490e-3c3e-466a-a1aa-74411af301ed"
+            }
+          ],
+          "uuid": "4574862b-41f2-4274-9b10-ae68a0e45f1d"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "9addb824-5831-445b-8e44-d739e912afb8",
+              "uuid": "a0243fcb-8d59-4849-bb33-d8fdaf4dbafb"
+            },
+            {
+              "destination_uuid": "e3b6661a-510b-44ed-bfa9-8a0b2c55dbbe",
+              "uuid": "62ffb95d-9271-4907-9391-1ff871805202"
+            },
+            {
+              "destination_uuid": "4e518f1c-15cd-4418-ad37-01c689ea5c66",
+              "uuid": "cfabf73c-4e42-4182-a7d9-97b6d2a5cc76"
+            },
+            {
+              "destination_uuid": "c2bbc8e8-9895-4a13-9668-3347ae51eee0",
+              "uuid": "ab69bc1b-cd7d-41cd-ae0c-7c4bf045e947"
+            },
+            {
+              "destination_uuid": "4574862b-41f2-4274-9b10-ae68a0e45f1d",
+              "uuid": "ca034749-a416-4135-8092-2b05abac65f7"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [],
+                "category_uuid": "7dd6c033-d189-42c4-8f71-086a7a3a7692",
+                "type": "has_email",
+                "uuid": "9a7f8eaa-b7aa-46ae-b1cd-17a202f3adab"
+              },
+              {
+                "arguments": [
+                  "Sim si s"
+                ],
+                "category_uuid": "c7966b82-0275-4b6d-98fa-1794bdc23111",
+                "type": "has_any_word",
+                "uuid": "62b5ce3f-5f6e-4831-80ba-861e25899ed6"
+              },
+              {
+                "arguments": [
+                  "N\u00e3o nao n nau"
+                ],
+                "category_uuid": "41e7c02d-2bb5-4c21-8bc9-53188055e22e",
+                "type": "has_any_word",
+                "uuid": "2d264d0a-4ef7-4c96-8b32-5e5e24c19f85"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "a0243fcb-8d59-4849-bb33-d8fdaf4dbafb",
+                "name": "Tem email",
+                "uuid": "7dd6c033-d189-42c4-8f71-086a7a3a7692"
+              },
+              {
+                "exit_uuid": "62ffb95d-9271-4907-9391-1ff871805202",
+                "name": "Sim",
+                "uuid": "c7966b82-0275-4b6d-98fa-1794bdc23111"
+              },
+              {
+                "exit_uuid": "cfabf73c-4e42-4182-a7d9-97b6d2a5cc76",
+                "name": "N\u00e3o",
+                "uuid": "41e7c02d-2bb5-4c21-8bc9-53188055e22e"
+              },
+              {
+                "exit_uuid": "ab69bc1b-cd7d-41cd-ae0c-7c4bf045e947",
+                "name": "Other",
+                "uuid": "5af61c1a-4ae6-4890-92d5-af858e493d95"
+              },
+              {
+                "exit_uuid": "ca034749-a416-4135-8092-2b05abac65f7",
+                "name": "No Response",
+                "uuid": "2852598e-8c0f-4977-8572-b370b7afc553"
+              }
+            ],
+            "default_category_uuid": "5af61c1a-4ae6-4890-92d5-af858e493d95",
+            "operand": "@input.text",
+            "result_name": "email",
+            "type": "switch",
+            "wait": {
+              "timeout": {
+                "category_uuid": "2852598e-8c0f-4977-8572-b370b7afc553",
+                "seconds": 300
+              },
+              "type": "msg"
+            }
+          },
+          "uuid": "7bc63a25-2750-4d7e-81ef-8b200f7bd808"
+        },
+        {
+          "actions": [
+            {
+              "path": "@results.email",
+              "scheme": "mailto",
+              "type": "add_contact_urn",
+              "uuid": "2ae9c6c2-4f23-4e4e-8f8c-10e8a81603bb"
+            },
+            {
+              "field": {
+                "key": "email",
+                "name": "Email"
+              },
+              "type": "set_contact_field",
+              "uuid": "4d80698d-19ec-49c4-af5c-246bc77ac6fa",
+              "value": "@results.email"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "8b4326b1-a910-460c-8802-1d37a054dc29"
+            }
+          ],
+          "uuid": "9addb824-5831-445b-8e44-d739e912afb8"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Entendi, mas nesse caso precisamos dessa informa\u00e7\u00e3o para entrar em contato com voc\u00ea.",
+              "type": "send_msg",
+              "uuid": "08cdde80-256e-407e-9963-15e0217b15fc"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "e3b6661a-510b-44ed-bfa9-8a0b2c55dbbe",
+              "uuid": "cb11e203-83a5-4c97-9de9-1749ff4aecfa"
+            }
+          ],
+          "uuid": "4e518f1c-15cd-4418-ad37-01c689ea5c66"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [
+                "Sim",
+                "N\u00e3o"
+              ],
+              "text": "Essa \u00e9 uma informa\u00e7\u00e3o muito importante pra gente! Voc\u00ea pode nos informar?",
+              "type": "send_msg",
+              "uuid": "6f15cc2d-844c-4f3a-aead-9396680df2e0"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "7bc63a25-2750-4d7e-81ef-8b200f7bd808",
+              "uuid": "8ea0430b-3edf-4fb6-a267-9fac7d4845a3"
+            }
+          ],
+          "uuid": "c2bbc8e8-9895-4a13-9668-3347ae51eee0"
+        }
+      ],
+      "spec_version": "13.1.0",
+      "type": "messaging",
+      "uuid": "539c95e5-e872-4a5d-b455-d76e3dcc8b61",
+      "version": "13.0.0",
+      "revision": 3
+    },
+    {
+      "_ui": {
+        "nodes": {
+          "1c88cdd4-2721-4300-b183-a5fb32c9f447": {
+            "position": {
+              "left": 520,
+              "top": 180
+            },
+            "type": "execute_actions"
+          },
+          "1f2fad02-7b33-4bcd-ba2d-819741343f00": {
+            "position": {
+              "left": 80,
+              "top": 140
+            },
+            "type": "execute_actions"
+          },
+          "3faf44d5-c092-46ed-ae48-a450fe3541c1": {
+            "position": {
+              "left": 240,
+              "top": 520
+            },
+            "type": "execute_actions"
+          },
+          "61a64662-6c2e-4629-99d6-7a2b145eb83f": {
+            "config": {
+              "cases": {},
+              "operand": {
+                "id": "contador_de_erros",
+                "name": "contador de erros",
+                "type": "result"
+              }
+            },
+            "position": {
+              "left": 500,
+              "top": 880
+            },
+            "type": "split_by_run_result"
+          },
+          "61dba4e1-1e79-4403-a903-51cbcc6e3f59": {
+            "config": {
+              "cases": {}
+            },
+            "position": {
+              "left": 540,
+              "top": 1160
+            },
+            "type": "split_by_expression"
+          },
+          "674d9afb-fb15-46a0-a88b-a33944d7591b": {
+            "config": {
+              "cases": {}
+            },
+            "position": {
+              "left": 200,
+              "top": 0
+            },
+            "type": "split_by_expression"
+          },
+          "7202450f-e0f5-4a48-bff2-2c8afb3d327a": {
+            "position": {
+              "left": 1060,
+              "top": 440
+            },
+            "type": "execute_actions"
+          },
+          "90a5ef4f-5053-4170-8102-635b996f2018": {
+            "position": {
+              "left": 1060,
+              "top": 880
+            },
+            "type": "execute_actions"
+          },
+          "ca8baa4d-9cae-441d-8ad5-4015b25090b5": {
+            "position": {
+              "left": 360,
+              "top": 1360
+            },
+            "type": "execute_actions"
+          },
+          "d8785471-db86-4daa-9977-a6db59d9393a": {
+            "config": {
+              "cases": {}
+            },
+            "position": {
+              "left": 80,
+              "top": 360
+            },
+            "type": "wait_for_response"
+          },
+          "e1c53c59-18d2-431a-816c-c8892cd84712": {
+            "position": {
+              "left": 260,
+              "top": 1060
+            },
+            "type": "execute_actions"
+          },
+          "e9d353bb-14e2-4f95-aaff-ec78e1850719": {
+            "config": {
+              "cases": {}
+            },
+            "position": {
+              "left": 520,
+              "top": 480
+            },
+            "type": "wait_for_response"
+          },
+          "eb01fad0-c691-48c7-b0a2-ded4bf255c95": {
+            "position": {
+              "left": 80,
+              "top": 760
+            },
+            "type": "execute_actions"
+          },
+          "ed2a0ceb-511e-4743-8caf-22b6390708c9": {
+            "position": {
+              "left": 720,
+              "top": 1380
+            },
+            "type": "execute_actions"
+          }
+        },
+        "stickies": {
+          "08f7ed6b-1062-46af-b107-ada9320e4d8d": {
+            "body": "A categoria No Response serve para quando o fluxo continua sem que o usu\u00e1rio tenha respondido \u00e0 pergunta. Normalmente \u00e9 utilizado para n\u00e3o deixar o usu\u00e1rio preso em uma pergunta.\n\nAl\u00e9m disso, adicionamos o usu\u00e1rio no grupo \"Conversa encerrada\" pois antes de enviar outra mensagem ou entrar em outro fluxo podemos verificar se o usu\u00e1rio est\u00e1 nesse grupo e evitar o envio de mensagens.",
+            "color": "purple",
+            "position": {
+              "bottom": null,
+              "left": 1320,
+              "right": null,
+              "top": 260
+            },
+            "title": "Categoria No response"
+          },
+          "13885c2e-3797-447e-996b-a538ec066b2b": {
+            "body": "Aqui verificamos o contador de erros. Se ainda for 0, categorizamos como \"Primeiro erro\" e tratamos de acordo, se for o segundo erro, o usu\u00e1rio passa pela categoria Other.",
+            "color": "purple",
+            "position": {
+              "bottom": 140,
+              "left": 800,
+              "right": 140,
+              "top": 840
+            },
+            "title": "Dividir por Resultado de Fluxo"
+          },
+          "3355ec0f-ea5a-4121-9c7a-25f9bd08d558": {
+            "body": "Aguardamos a resposta do usu\u00e1rio.\n\nLembre que voc\u00ea pode clicar na op\u00e7\u00e3o \"Continue quando n\u00e3o houver resposta...\" e escolher o tempo que deseja esperar.\n\nDentro do card \"Aguarde por resposta\" usamos criar regra usando REGEX para saber se o usu\u00e1rio digitou o n\u00famero na formata\u00e7\u00e3o correta. Se for preciso, voc\u00ea pdoe adicionar outras regras de \"corresponde a regex\".",
+            "color": "purple",
+            "position": {
+              "bottom": 140,
+              "left": 800,
+              "right": 140,
+              "top": 480
+            },
+            "title": "Aguarde por resposta"
+          },
+          "348999b7-47f6-4357-ab9d-801bef51ada4": {
+            "body": "Se o usu\u00e1rio errar o n\u00famero por uma segunda vez, enviamos um email para o respons\u00e1vel do setor e o deixamos prosseguir, visto que pode ser um n\u00famero de outro pa\u00eds etc.\n\nVoc\u00ea pode editar o email para receber uma sinaliza\u00e7\u00e3o quando algum usu\u00e1rio passar por esse cen\u00e1rio.\n\nDepois de enviar o email, salvamos o telefone e deixamos o usu\u00e1rio prosseguir para o pr\u00f3ximo fluxo.",
+            "color": "purple",
+            "position": {
+              "left": 1320,
+              "top": 840
+            },
+            "title": "Enviar Email"
+          },
+          "5372c1d7-3a93-46ea-931f-3f1418de89a0": {
+            "body": "Se for o primeiro erro do usu\u00e1rio mas a mensagem dele tiver um n\u00famero, informamos que precisamos de certa formata\u00e7\u00e3o. Por\u00e9m se n\u00e3o tiver um n\u00famero, mandamos uma mensagem diferente",
+            "color": "purple",
+            "position": {
+              "bottom": 20,
+              "left": 800,
+              "right": -40,
+              "top": 1080
+            },
+            "title": "Dividir por express\u00e3o"
+          },
+          "58129c8a-2535-46bb-9cbf-ba607b665791": {
+            "body": "Aqui perguntamos qual o telefone do usu\u00e1rio mostrando o formato aceito pelo REGEX",
+            "color": "purple",
+            "position": {
+              "bottom": 140,
+              "left": 800,
+              "right": 140,
+              "top": 220
+            },
+            "title": "Enviar mensagem"
+          },
+          "affaf933-fe99-47c8-b6b2-4c67c0390c46": {
+            "body": "Aqui salvamos +1 no contador de erros. Isso vai servir para verificarmos se \u00e9 ou n\u00e3o a primeira vez que o usu\u00e1rio errou o formato de n\u00famero desejado.\n\nSe o usu\u00e1rio errar por uma segunda vez, enviamos um email para o respons\u00e1vel do setor e o deixamos prosseguir.",
+            "color": "purple",
+            "position": {
+              "bottom": null,
+              "left": 160,
+              "right": null,
+              "top": 1360
+            },
+            "title": "Salvar Resultado do Fluxo"
+          },
+          "caa6bf9a-787c-4c12-b38f-7bd2c6d8b9d9": {
+            "body": "Aqui salvamos um resultado chamado contador de erros. Ele sempre ser\u00e1 salvo como 0 no in\u00edcio do fluxo de mensagem e usaremos ele posteriormente para verificar se o usu\u00e1rio digitou um formato de n\u00famero diferente do esperado",
+            "color": "purple",
+            "position": {
+              "bottom": 0,
+              "left": 800,
+              "right": 660,
+              "top": 0
+            },
+            "title": "Salvar Resultado do Fluxo"
+          },
+          "f4981608-a886-4f03-98bd-c02234ec92ae": {
+            "body": "Aqui salvamos o telefone informado no campo de contato Telefone para que o dado seja salvo no contato e n\u00e3o somente no fluxo de mensagem.",
+            "color": "purple",
+            "position": {
+              "bottom": 80,
+              "left": 60,
+              "right": 20,
+              "top": 1020
+            },
+            "title": "Atualizar contato"
+          }
+        }
+      },
+      "expire_after_minutes": 10080,
+      "language": "base",
+      "localization": {},
+      "metadata": {
+        "expires": 10080,
+        "revision": 75
+      },
+      "name": "Coleta de Telefone",
+      "nodes": [
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "1f2fad02-7b33-4bcd-ba2d-819741343f00",
+              "uuid": "04f231a7-dca6-423e-9d5b-5e3fcfb03a85"
+            },
+            {
+              "destination_uuid": "1c88cdd4-2721-4300-b183-a5fb32c9f447",
+              "uuid": "342d2f29-84de-4630-9f29-919d4acd2dc9"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "whatsapp"
+                ],
+                "category_uuid": "5a029198-08b2-4e4f-bb84-3c458c091f90",
+                "type": "has_any_word",
+                "uuid": "7fa62ba2-1b7e-43a4-b178-71794a863c4c"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "04f231a7-dca6-423e-9d5b-5e3fcfb03a85",
+                "name": "Whatsapp",
+                "uuid": "5a029198-08b2-4e4f-bb84-3c458c091f90"
+              },
+              {
+                "exit_uuid": "342d2f29-84de-4630-9f29-919d4acd2dc9",
+                "name": "Other",
+                "uuid": "6cb04e00-5b0c-43b9-8f3a-be0160630a82"
+              }
+            ],
+            "default_category_uuid": "6cb04e00-5b0c-43b9-8f3a-be0160630a82",
+            "operand": "@contact.urns",
+            "type": "switch"
+          },
+          "uuid": "674d9afb-fb15-46a0-a88b-a33944d7591b"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [
+                "Sim",
+                "N\u00e3o"
+              ],
+              "text": "Posso salvar seu Whatsapp @(replace(urns.whatsapp, \"whatsapp:\", \"\")) como seu contato principal?",
+              "type": "send_msg",
+              "uuid": "ea2fd43b-8101-4866-b056-83fb478fe67f"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "d8785471-db86-4daa-9977-a6db59d9393a",
+              "uuid": "712a09f7-2bf7-4719-ad17-5838d56584f6"
+            }
+          ],
+          "uuid": "1f2fad02-7b33-4bcd-ba2d-819741343f00"
+        },
+        {
+          "actions": [
+            {
+              "category": "",
+              "name": "contador de erros",
+              "type": "set_run_result",
+              "uuid": "39b42a32-6288-4ce2-8d8f-dac974ad8f8a",
+              "value": "0"
+            },
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Voc\u00ea poderia me informar o seu telefone com DDD? \n\n_Nesse formato (DD) 9xxxx-xxxx_",
+              "type": "send_msg",
+              "uuid": "52d4ca58-251d-4837-b5ce-dd97e2f73a94"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "e9d353bb-14e2-4f95-aaff-ec78e1850719",
+              "uuid": "6b066a87-6a1d-4b8c-996b-353cfd1a8520"
+            }
+          ],
+          "uuid": "1c88cdd4-2721-4300-b183-a5fb32c9f447"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "eb01fad0-c691-48c7-b0a2-ded4bf255c95",
+              "uuid": "088035de-f47a-4d97-803c-dbee2c413e72"
+            },
+            {
+              "destination_uuid": "1c88cdd4-2721-4300-b183-a5fb32c9f447",
+              "uuid": "72ff938b-1452-44c1-b9c6-c8be96903615"
+            },
+            {
+              "destination_uuid": "3faf44d5-c092-46ed-ae48-a450fe3541c1",
+              "uuid": "0b5a7aff-82b2-4fe9-8eb4-7580258053e4"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "Sim aim asim si ss sss yes"
+                ],
+                "category_uuid": "44adeb60-decb-4aaa-b423-40ea49c87b06",
+                "type": "has_any_word",
+                "uuid": "36369180-1083-4bca-ae03-e84cc2f98644"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "088035de-f47a-4d97-803c-dbee2c413e72",
+                "name": "Sim",
+                "uuid": "44adeb60-decb-4aaa-b423-40ea49c87b06"
+              },
+              {
+                "exit_uuid": "72ff938b-1452-44c1-b9c6-c8be96903615",
+                "name": "Other",
+                "uuid": "01fc0810-f375-43d6-bbef-7632c4a5ed37"
+              },
+              {
+                "exit_uuid": "0b5a7aff-82b2-4fe9-8eb4-7580258053e4",
+                "name": "No Response",
+                "uuid": "d1631dd3-5f4e-4648-91c3-21b008ece900"
+              }
+            ],
+            "default_category_uuid": "01fc0810-f375-43d6-bbef-7632c4a5ed37",
+            "operand": "@input.text",
+            "result_name": "confirmacao",
+            "type": "switch",
+            "wait": {
+              "timeout": {
+                "category_uuid": "d1631dd3-5f4e-4648-91c3-21b008ece900",
+                "seconds": 7200
+              },
+              "type": "msg"
+            }
+          },
+          "uuid": "d8785471-db86-4daa-9977-a6db59d9393a"
+        },
+        {
+          "actions": [
+            {
+              "groups": [
+                {
+                  "count": 0,
+                  "name": "Conversa Encerrada",
+                  "query": null,
+                  "status": "ready",
+                  "uuid": "d01833de-92d9-4bb1-96eb-dde0c96665aa"
+                }
+              ],
+              "type": "add_contact_groups",
+              "uuid": "654229cb-6d0a-400c-bbe4-404e515aaa8b"
+            },
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Por falta de resposta, encerrei esse atendimento. Mas quando quiser \u00e9 s\u00f3 falar comigo \ud83d\ude09",
+              "type": "send_msg",
+              "uuid": "8264bea2-c14a-49ee-8639-46b1d6adbfe9"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "a65271a8-03da-482c-aa05-3e0e9aaee3a0"
+            }
+          ],
+          "uuid": "7202450f-e0f5-4a48-bff2-2c8afb3d327a"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "e1c53c59-18d2-431a-816c-c8892cd84712",
+              "uuid": "3456de66-4dc2-454c-9005-d2ca13422082"
+            },
+            {
+              "destination_uuid": "61a64662-6c2e-4629-99d6-7a2b145eb83f",
+              "uuid": "8cc8f442-0bb6-4a99-b76c-7453bf152fb9"
+            },
+            {
+              "destination_uuid": "7202450f-e0f5-4a48-bff2-2c8afb3d327a",
+              "uuid": "d5971702-e127-4c97-9f8e-2530e860f5e3"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "^(?:(?:\\+|00)?(55)\\s?)?(\\(?([1-9][0-9])\\)?\\s?)(?:((?:9\\d|[2-9])\\d{3})\\-?(\\d{4}))$"
+                ],
+                "category_uuid": "63ff5cb3-9716-4a61-b294-4d273853ba81",
+                "type": "has_pattern",
+                "uuid": "06dead2a-c9f0-4c6e-b10f-6e7418a1aee7"
+              },
+              {
+                "arguments": [],
+                "category_uuid": "63ff5cb3-9716-4a61-b294-4d273853ba81",
+                "type": "has_phone",
+                "uuid": "6a192f87-80c7-4e8f-adf0-81c1d147a55d"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "3456de66-4dc2-454c-9005-d2ca13422082",
+                "name": "Telefone",
+                "uuid": "63ff5cb3-9716-4a61-b294-4d273853ba81"
+              },
+              {
+                "exit_uuid": "8cc8f442-0bb6-4a99-b76c-7453bf152fb9",
+                "name": "Other",
+                "uuid": "d3048221-ec68-4612-a512-8c42d4c91472"
+              },
+              {
+                "exit_uuid": "d5971702-e127-4c97-9f8e-2530e860f5e3",
+                "name": "No Response",
+                "uuid": "b7ae1e9b-3e2a-4744-9605-ef6fbbc33ce5"
+              }
+            ],
+            "default_category_uuid": "d3048221-ec68-4612-a512-8c42d4c91472",
+            "operand": "@input.text",
+            "result_name": "Telefone",
+            "type": "switch",
+            "wait": {
+              "timeout": {
+                "category_uuid": "b7ae1e9b-3e2a-4744-9605-ef6fbbc33ce5",
+                "seconds": 300
+              },
+              "type": "msg"
+            }
+          },
+          "uuid": "e9d353bb-14e2-4f95-aaff-ec78e1850719"
+        },
+        {
+          "actions": [
+            {
+              "groups": [
+                {
+                  "count": 0,
+                  "name": "Conversa Encerrada",
+                  "query": null,
+                  "status": "ready",
+                  "uuid": "d01833de-92d9-4bb1-96eb-dde0c96665aa"
+                }
+              ],
+              "type": "add_contact_groups",
+              "uuid": "a3bde917-a4f5-4c33-b0b6-d4dfc522444c"
+            },
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Por falta de resposta, encerrei esse atendimento. Mas quando quiser \u00e9 s\u00f3 falar comigo \ud83d\ude09",
+              "type": "send_msg",
+              "uuid": "04b62db2-2a9e-4a7c-a0c4-408597b59a93"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "b657ced4-20e2-4e00-b254-f573165f3312"
+            }
+          ],
+          "uuid": "3faf44d5-c092-46ed-ae48-a450fe3541c1"
+        },
+        {
+          "actions": [
+            {
+              "field": {
+                "key": "telefone",
+                "name": "Telefone"
+              },
+              "type": "set_contact_field",
+              "uuid": "ec803d03-b355-4ebf-b1e2-065a3b5e4e41",
+              "value": "@(replace(urns.whatsapp, \"whatsapp:\", \"\"))"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "7e7d5250-1869-4d09-bfc9-6db0f78bf22b"
+            }
+          ],
+          "uuid": "eb01fad0-c691-48c7-b0a2-ded4bf255c95"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "61dba4e1-1e79-4403-a903-51cbcc6e3f59",
+              "uuid": "979a59a5-ec64-47f0-a543-89aa25334a1c"
+            },
+            {
+              "destination_uuid": "90a5ef4f-5053-4170-8102-635b996f2018",
+              "uuid": "37b7e957-4e71-4eb0-80eb-05a325e5898c"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "0"
+                ],
+                "category_uuid": "7c6d2846-8e64-4cd6-8b35-6e50d69bbbd2",
+                "type": "has_number_eq",
+                "uuid": "b0d6135f-3e04-4080-90bd-348bf44373e6"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "979a59a5-ec64-47f0-a543-89aa25334a1c",
+                "name": "Primeiro erro",
+                "uuid": "7c6d2846-8e64-4cd6-8b35-6e50d69bbbd2"
+              },
+              {
+                "exit_uuid": "37b7e957-4e71-4eb0-80eb-05a325e5898c",
+                "name": "Other",
+                "uuid": "30af4fc8-f5f5-4570-94d3-becd2aa5500b"
+              }
+            ],
+            "default_category_uuid": "30af4fc8-f5f5-4570-94d3-becd2aa5500b",
+            "operand": "@results.contador_de_erros",
+            "type": "switch"
+          },
+          "uuid": "61a64662-6c2e-4629-99d6-7a2b145eb83f"
+        },
+        {
+          "actions": [
+            {
+              "addresses": [
+                "weni@weni.ai"
+              ],
+              "body": "Cliente com n\u00famero diferente da formata\u00e7\u00e3o - Chatbot\n\nNumero informado no Chatbot: @results.telefone.value\n\nNome: @contact.name\n\nUUID: @contact.uuid ",
+              "subject": "Usu\u00e1rio com n\u00famero diferente da formata\u00e7\u00e3o - Chatbot",
+              "type": "send_email",
+              "uuid": "74d2114a-9c9a-42e8-bb66-5964ae46be45"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "e1c53c59-18d2-431a-816c-c8892cd84712",
+              "uuid": "28fd8e5d-6b91-43f9-b92e-23cbab15f712"
+            }
+          ],
+          "uuid": "90a5ef4f-5053-4170-8102-635b996f2018"
+        },
+        {
+          "actions": [
+            {
+              "field": {
+                "key": "telefone",
+                "name": "Telefone"
+              },
+              "type": "set_contact_field",
+              "uuid": "330f31b8-b63c-4a74-8d8c-146c2df691e9",
+              "value": "@results.telefone"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "5731003c-7f82-4299-bcf7-adfd2bab5296"
+            }
+          ],
+          "uuid": "e1c53c59-18d2-431a-816c-c8892cd84712"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "ca8baa4d-9cae-441d-8ad5-4015b25090b5",
+              "uuid": "12226773-2bd7-425a-93c8-083144bdde00"
+            },
+            {
+              "destination_uuid": "ed2a0ceb-511e-4743-8caf-22b6390708c9",
+              "uuid": "e1e0f407-e245-41e2-a303-9bde38d9f027"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [],
+                "category_uuid": "9314465b-8035-4686-a903-fa4f44a18e5c",
+                "type": "has_number",
+                "uuid": "1c4ddb0b-224d-40e3-a0d4-42a767c3ca2b"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "12226773-2bd7-425a-93c8-083144bdde00",
+                "name": "Has Number",
+                "uuid": "9314465b-8035-4686-a903-fa4f44a18e5c"
+              },
+              {
+                "exit_uuid": "e1e0f407-e245-41e2-a303-9bde38d9f027",
+                "name": "Other",
+                "uuid": "e07cc745-7963-4f8c-b02a-5f06aa418067"
+              }
+            ],
+            "default_category_uuid": "e07cc745-7963-4f8c-b02a-5f06aa418067",
+            "operand": "@input.text",
+            "type": "switch"
+          },
+          "uuid": "61dba4e1-1e79-4403-a903-51cbcc6e3f59"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Ent\u00e3o @(title(contact.first_name)), eu preciso de um n\u00famero v\u00e1lido! Por favor, digita seu n\u00famero abaixo. (DD) 9xxxx-xxxx",
+              "type": "send_msg",
+              "uuid": "43bad6f1-3268-4f1c-92c1-105043957bcc"
+            },
+            {
+              "category": "",
+              "name": "contador de erros",
+              "type": "set_run_result",
+              "uuid": "f438a9db-d0cd-42ee-8991-d55d4a5ff03e",
+              "value": "@(contador_de_erros +1)"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "e9d353bb-14e2-4f95-aaff-ec78e1850719",
+              "uuid": "6512fd8e-6229-43f6-9541-1473e836e905"
+            }
+          ],
+          "uuid": "ca8baa4d-9cae-441d-8ad5-4015b25090b5"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Preciso desta informa\u00e7\u00e3o caso eu precise te contatar \ud83d\ude14",
+              "type": "send_msg",
+              "uuid": "4cda4fc9-4703-4291-b325-4a2270d1790c"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "ca8baa4d-9cae-441d-8ad5-4015b25090b5",
+              "uuid": "79cb22d3-fd13-48ac-9ee1-8f8eeab5cbad"
+            }
+          ],
+          "uuid": "ed2a0ceb-511e-4743-8caf-22b6390708c9"
+        }
+      ],
+      "spec_version": "13.1.0",
+      "type": "messaging",
+      "uuid": "2b5aa5a3-b716-4ad4-acaf-7e6b8a202fbf",
+      "version": "13.0.0",
+      "revision": 2
+    },
+    {
+      "_ui": {
+        "nodes": {
+          "17b95b67-c811-4156-9b40-bdade8e69c73": {
+            "position": {
+              "left": 580,
+              "top": 920
+            },
+            "type": "execute_actions"
+          },
+          "1fa86003-cddd-441b-b27a-5e521168b33f": {
+            "position": {
+              "left": 80,
+              "top": 720
+            },
+            "type": "execute_actions"
+          },
+          "40e82636-38de-4943-b1bc-c3c81ebbd996": {
+            "position": {
+              "left": 600,
+              "top": 500
+            },
+            "type": "execute_actions"
+          },
+          "492421e1-8489-4395-a674-4fb5d7ce7ec4": {
+            "position": {
+              "left": 1280,
+              "top": 700
+            },
+            "type": "execute_actions"
+          },
+          "57637e34-24d9-4355-acf7-0ea08c82ec64": {
+            "config": {},
+            "position": {
+              "left": 580,
+              "top": 1100
+            },
+            "type": "split_by_subflow"
+          },
+          "63d9e292-6f4a-4cce-8344-9bfe3d406662": {
+            "position": {
+              "left": 600,
+              "top": 340
+            },
+            "type": "execute_actions"
+          },
+          "b7f1739b-d246-4fa1-9711-a9d0e2c30f69": {
+            "position": {
+              "left": 280,
+              "top": 160
+            },
+            "type": "execute_actions"
+          },
+          "eb5fbbcd-fdc7-42ab-b1ac-0956bd1d5984": {
+            "config": {
+              "cases": {}
+            },
+            "position": {
+              "left": 540,
+              "top": 700
+            },
+            "type": "wait_for_response"
+          },
+          "f0675c0a-c363-4d54-9ae6-fc29c20f15ca": {
+            "position": {
+              "left": 1280,
+              "top": 460
+            },
+            "type": "execute_actions"
+          },
+          "f5955311-be5e-4095-8cc3-3b267af146d0": {
+            "config": {
+              "cases": {}
+            },
+            "position": {
+              "left": 280,
+              "top": 340
+            },
+            "type": "wait_for_response"
+          },
+          "fa8a5f59-2576-45c6-8229-d84dbabb2d4a": {
+            "config": {
+              "cases": {}
+            },
+            "position": {
+              "left": 280,
+              "top": 0
+            },
+            "type": "split_by_groups"
+          }
+        },
+        "stickies": {
+          "120ac629-cc94-49b3-913f-98cb60f36419": {
+            "body": "O card \"Enviar mensagem\" serve para enviarmos mensagens ao usu\u00e1rio atrav\u00e9s de um canal.\n\nEssa mensagem pode ser personalizada, por exemplo, perguntando qual o nome social dessa pessoa.",
+            "color": "purple",
+            "position": {
+              "bottom": 180,
+              "left": 920,
+              "right": 180,
+              "top": 300
+            },
+            "title": "Enviar mensagem"
+          },
+          "63fee139-f00e-4b5a-b4a8-935535ce09a8": {
+            "body": "Aqui verificamos se o usu\u00e1rio est\u00e1 no grupo \"Informou nome\", pois se tiver \u00e9 porque j\u00e1 informou seu nome anteriormente visto que o usu\u00e1rio s\u00f3 \u00e9 adicionado neste grupo ap\u00f3s informar o nome.\n\nSe voc\u00ea n\u00e3o quiser perguntar o nome novamente, \u00e9 s\u00f3 retirar a liga\u00e7\u00e3o da categoria Informou Nome ou abaixar o card at\u00e9 que o fluxo de mensagem se inicie no primeiro card \"Enviar mensagem\"",
+            "color": "purple",
+            "position": {
+              "bottom": -120,
+              "left": 60,
+              "right": 0,
+              "top": 20
+            },
+            "title": "Dividir por filia\u00e7\u00e3o de grupo"
+          },
+          "69abfbd6-e457-451e-bca5-38cc5cc9c833": {
+            "body": "Aqui atualizamos o campo de contato \"name\" e poder\u00e1 ser visto no m\u00f3dulo Est\u00fadio > Contatos",
+            "color": "purple",
+            "position": {
+              "bottom": 460,
+              "left": 600,
+              "right": 20,
+              "top": 1280
+            },
+            "title": "Atualizar o contato"
+          },
+          "76fcd361-ae53-47f7-86aa-0e1b3c7ec8c8": {
+            "body": "Apagamos o C\u00f3digo do Contato sempre que o mesmo informar seu nome pois criamos a possibilidade de mais de 1 lead chegar pelo canal.\n\nIsso quer dizer que se o usu\u00e1rio informar que o nome dele mudou, sempre ser\u00e1 gerado um novo c\u00f3digo de contato para cadastrar na API da Omie.",
+            "color": "purple",
+            "position": {
+              "left": 820,
+              "top": 1100
+            },
+            "title": "nCod"
+          },
+          "7e207b33-679c-41fd-af4d-a1fde0396bba": {
+            "body": "A categoria No Response serve para quando o fluxo continua sem que o usu\u00e1rio tenha respondido \u00e0 pergunta. Normalmente \u00e9 utilizado para n\u00e3o deixar o usu\u00e1rio preso em uma pergunta.\n\nAl\u00e9m disso, adicionamos o usu\u00e1rio no grupo \"Conversa encerrada\" pois antes de enviar outra mensagem ou entrar em outro fluxo podemos verificar se o usu\u00e1rio est\u00e1 nesse grupo e evitar o envio de mensagens.",
+            "color": "purple",
+            "position": {
+              "bottom": 140,
+              "left": 1520,
+              "right": -40,
+              "top": 660
+            },
+            "title": "Categoria No Response"
+          },
+          "b7e2987e-79af-4cc3-b44d-3ea6ff72f024": {
+            "body": "Esse card serve para parar a fluidez do fluxo de mensagem e aguardar um momento para que haja uma resposta do usu\u00e1rio.\n\n\u00c9 muito importante ser usado para deixar a conversa mais humana.\n\nLembre que voc\u00ea pode clicar na op\u00e7\u00e3o \"Continue quando n\u00e3o houver resposta...\" e escolher o tempo que deseja esperar.\n\nDentro do card \"Aguarde por resposta\" tamb\u00e9m podemos criar regras para caso, quando o usu\u00e1rio responder, j\u00e1 verificar se h\u00e1 alguma palavra ou se \u00e9 um texto.",
+            "color": "purple",
+            "position": {
+              "bottom": 160,
+              "left": 920,
+              "right": -100,
+              "top": 560
+            },
+            "title": "Aguarde por resposta"
+          },
+          "e922c5c2-ad35-482a-8655-07435c3e2139": {
+            "body": "Aqui tratamos a excess\u00e3o para caso o usu\u00e1rio n\u00e3o digite um texto, podendo ter enviado a foto de seu documento etc.",
+            "color": "purple",
+            "position": {
+              "bottom": 160,
+              "left": 1520,
+              "right": 120,
+              "top": 360
+            },
+            "title": "Other"
+          },
+          "ff7c6bad-90a1-4867-99dc-5f2ac3dad3e6": {
+            "body": "A categoria Encerrar serve para quando o fluxo de mensagem continua sem que o usu\u00e1rio tenha respondido \u00e0 pergunta. Normalmente \u00e9 utilizado para n\u00e3o deixar o usu\u00e1rio preso em uma pergunta.\n\nAl\u00e9m disso, adicionamos o usu\u00e1rio no grupo \"Conversa encerrada\" pois antes de enviar outra mensagem ou entrar em outro fluxo de mensagem podemos verificar se o usu\u00e1rio est\u00e1 nesse grupo e evitar o envio de mensagens.",
+            "color": "purple",
+            "position": {
+              "bottom": 200,
+              "left": 80,
+              "right": 20,
+              "top": 920
+            },
+            "title": "Categoria Encerrar"
+          }
+        }
+      },
+      "expire_after_minutes": 10080,
+      "language": "base",
+      "localization": {},
+      "metadata": {
+        "expires": 10080,
+        "revision": 1
+      },
+      "name": "Coleta do Nome",
+      "nodes": [
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "b7f1739b-d246-4fa1-9711-a9d0e2c30f69",
+              "uuid": "2d3030ab-19cc-4065-a0a2-5a51566cb595"
+            },
+            {
+              "destination_uuid": "63d9e292-6f4a-4cce-8344-9bfe3d406662",
+              "uuid": "1f674609-0486-441e-85e2-fbd3dcf926ce"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "30bcaa89-ebfb-482c-a696-c71ab13a679b",
+                  "Informou Nome"
+                ],
+                "category_uuid": "19d222be-d8b6-4bdc-8117-e81e4aeb07a5",
+                "type": "has_group",
+                "uuid": "98a55ab6-3759-4ba7-a0cd-b6c283072e5f"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "2d3030ab-19cc-4065-a0a2-5a51566cb595",
+                "name": "Informou Nome",
+                "uuid": "19d222be-d8b6-4bdc-8117-e81e4aeb07a5"
+              },
+              {
+                "exit_uuid": "1f674609-0486-441e-85e2-fbd3dcf926ce",
+                "name": "Other",
+                "uuid": "14d89eb5-cf9b-4cf7-9ecf-db3f3380be15"
+              }
+            ],
+            "default_category_uuid": "14d89eb5-cf9b-4cf7-9ecf-db3f3380be15",
+            "operand": "@contact.groups",
+            "result_name": "",
+            "type": "switch"
+          },
+          "uuid": "fa8a5f59-2576-45c6-8229-d84dbabb2d4a"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [
+                "Sim",
+                "N\u00e3o"
+              ],
+              "text": "Confirma para mim, @contact.name \u00e9 o seu nome?",
+              "type": "send_msg",
+              "uuid": "7100e2b2-39d1-4b10-a380-60f12a07b508"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "f5955311-be5e-4095-8cc3-3b267af146d0",
+              "uuid": "80799b19-e282-4606-95f3-c21a2dd66109"
+            }
+          ],
+          "uuid": "b7f1739b-d246-4fa1-9711-a9d0e2c30f69"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "740212e7-40c5-48c9-aa85-61a264263da0"
+            },
+            {
+              "destination_uuid": "40e82636-38de-4943-b1bc-c3c81ebbd996",
+              "uuid": "fc5ae013-84ed-4aff-81d2-787c18190ec5"
+            },
+            {
+              "destination_uuid": "63d9e292-6f4a-4cce-8344-9bfe3d406662",
+              "uuid": "fd70fbb0-048b-42af-8073-8f74ef746f7d"
+            },
+            {
+              "destination_uuid": "492421e1-8489-4395-a674-4fb5d7ce7ec4",
+              "uuid": "4e7874fc-8504-4f20-aea4-5cb1911fe534"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "Sim si aim s ss"
+                ],
+                "category_uuid": "1f5a8f9f-4c2a-4287-bb8f-f65a2f47eedd",
+                "type": "has_any_word",
+                "uuid": "17078caa-3162-442d-93ef-085b1da8ad86"
+              },
+              {
+                "arguments": [
+                  "N\u00e3o nao nau nop"
+                ],
+                "category_uuid": "a6ee8809-a6a6-4ecb-be18-518acd5bab5c",
+                "type": "has_any_word",
+                "uuid": "248c0447-8507-4cb8-b87d-e1dca1777849"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "740212e7-40c5-48c9-aa85-61a264263da0",
+                "name": "Sim",
+                "uuid": "1f5a8f9f-4c2a-4287-bb8f-f65a2f47eedd"
+              },
+              {
+                "exit_uuid": "fc5ae013-84ed-4aff-81d2-787c18190ec5",
+                "name": "N\u00e3o",
+                "uuid": "a6ee8809-a6a6-4ecb-be18-518acd5bab5c"
+              },
+              {
+                "exit_uuid": "fd70fbb0-048b-42af-8073-8f74ef746f7d",
+                "name": "Other",
+                "uuid": "2f411ffa-2591-4bf8-8ff9-5295d1f10fcf"
+              },
+              {
+                "exit_uuid": "4e7874fc-8504-4f20-aea4-5cb1911fe534",
+                "name": "No Response",
+                "uuid": "f878c907-6bd6-4cb5-ab86-233f9d260447"
+              }
+            ],
+            "default_category_uuid": "2f411ffa-2591-4bf8-8ff9-5295d1f10fcf",
+            "operand": "@input.text",
+            "result_name": "confirmacao",
+            "type": "switch",
+            "wait": {
+              "timeout": {
+                "category_uuid": "f878c907-6bd6-4cb5-ab86-233f9d260447",
+                "seconds": 3600
+              },
+              "type": "msg"
+            }
+          },
+          "uuid": "f5955311-be5e-4095-8cc3-3b267af146d0"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Gostaria de te conhecer melhor \ud83d\ude0a",
+              "type": "send_msg",
+              "uuid": "a9c0dbef-5841-4805-a2a9-ede261c83892"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "40e82636-38de-4943-b1bc-c3c81ebbd996",
+              "uuid": "45b25608-3db5-44a9-93eb-7bea6a1d55bd"
+            }
+          ],
+          "uuid": "63d9e292-6f4a-4cce-8344-9bfe3d406662"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Preciso que me envie em formato de texto...",
+              "type": "send_msg",
+              "uuid": "58425171-24b8-477b-8133-d96e315a002f"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "40e82636-38de-4943-b1bc-c3c81ebbd996",
+              "uuid": "124a8668-05a4-41ec-a632-3aa4262fdd87"
+            }
+          ],
+          "uuid": "f0675c0a-c363-4d54-9ae6-fc29c20f15ca"
+        },
+        {
+          "actions": [
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Por favor, qual o seu nome completo?",
+              "type": "send_msg",
+              "uuid": "1eb3299e-309f-4b65-9e2d-add16520ce51"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "eb5fbbcd-fdc7-42ab-b1ac-0956bd1d5984",
+              "uuid": "1217178f-e983-4c90-9e9d-96c460ee0640"
+            }
+          ],
+          "uuid": "40e82636-38de-4943-b1bc-c3c81ebbd996"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "1fa86003-cddd-441b-b27a-5e521168b33f",
+              "uuid": "4509ee1e-1cc9-48d4-a6b0-4c51da3186cf"
+            },
+            {
+              "destination_uuid": "17b95b67-c811-4156-9b40-bdade8e69c73",
+              "uuid": "36d5ebc6-a691-4c0c-9fec-c64960003548"
+            },
+            {
+              "destination_uuid": "f0675c0a-c363-4d54-9ae6-fc29c20f15ca",
+              "uuid": "d012f75d-b975-4e26-92ee-0dc12d11ca45"
+            },
+            {
+              "destination_uuid": "492421e1-8489-4395-a674-4fb5d7ce7ec4",
+              "uuid": "6f476fe6-b808-4c10-bd40-87631c98c0d5"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "desistir sair encerrar"
+                ],
+                "category_uuid": "5e939fe0-dd1b-4a0e-b97d-7aa7fcbf179f",
+                "type": "has_any_word",
+                "uuid": "29dc552e-e025-41f9-bf8d-f2686d7152f9"
+              },
+              {
+                "arguments": [],
+                "category_uuid": "f8577bcb-245d-46b4-bba8-6ef21de4b09a",
+                "type": "has_text",
+                "uuid": "65252c27-a583-4671-9884-009f6b7841aa"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "4509ee1e-1cc9-48d4-a6b0-4c51da3186cf",
+                "name": "Encerrar",
+                "uuid": "5e939fe0-dd1b-4a0e-b97d-7aa7fcbf179f"
+              },
+              {
+                "exit_uuid": "36d5ebc6-a691-4c0c-9fec-c64960003548",
+                "name": "Nome",
+                "uuid": "f8577bcb-245d-46b4-bba8-6ef21de4b09a"
+              },
+              {
+                "exit_uuid": "d012f75d-b975-4e26-92ee-0dc12d11ca45",
+                "name": "Other",
+                "uuid": "c311587c-fef7-4da7-957b-01f8b797633d"
+              },
+              {
+                "exit_uuid": "6f476fe6-b808-4c10-bd40-87631c98c0d5",
+                "name": "No Response",
+                "uuid": "764d8f0c-b3c8-4913-aebe-3f10a89bef38"
+              }
+            ],
+            "default_category_uuid": "c311587c-fef7-4da7-957b-01f8b797633d",
+            "operand": "@input.text",
+            "result_name": "nome",
+            "type": "switch",
+            "wait": {
+              "timeout": {
+                "category_uuid": "764d8f0c-b3c8-4913-aebe-3f10a89bef38",
+                "seconds": 900
+              },
+              "type": "msg"
+            }
+          },
+          "uuid": "eb5fbbcd-fdc7-42ab-b1ac-0956bd1d5984"
+        },
+        {
+          "actions": [
+            {
+              "groups": [
+                {
+                  "count": 0,
+                  "name": "Conversa Encerrada",
+                  "query": null,
+                  "status": "ready",
+                  "uuid": "d01833de-92d9-4bb1-96eb-dde0c96665aa"
+                }
+              ],
+              "type": "add_contact_groups",
+              "uuid": "4ccd49f6-d248-4fcf-afc9-77bf4e8867d6"
+            },
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Por falta de resposta, encerrei esse atendimento. Mas quando quiser \u00e9 s\u00f3 falar comigo \ud83d\ude09",
+              "type": "send_msg",
+              "uuid": "643948cf-a317-4288-ba85-e4b843629bd6"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "24eb28b1-d455-4ee0-9964-85a0fa5fb76c"
+            }
+          ],
+          "uuid": "492421e1-8489-4395-a674-4fb5d7ce7ec4"
+        },
+        {
+          "actions": [
+            {
+              "groups": [
+                {
+                  "count": 2,
+                  "name": "Conversa Encerrada",
+                  "query": null,
+                  "status": "ready",
+                  "uuid": "d01833de-92d9-4bb1-96eb-dde0c96665aa"
+                }
+              ],
+              "type": "add_contact_groups",
+              "uuid": "4e4ab10e-d0a0-43ce-8c49-020020485ecb"
+            },
+            {
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Certo, quando quiser \u00e9 s\u00f3 falar comigo \ud83d\ude09",
+              "type": "send_msg",
+              "uuid": "46756da6-e077-4141-91e0-ada7cc02881e"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "820d13e7-bda5-422d-834f-9b79b0f7aa4d"
+            }
+          ],
+          "uuid": "1fa86003-cddd-441b-b27a-5e521168b33f"
+        },
+        {
+          "actions": [
+            {
+              "name": "@results.nome.value",
+              "type": "set_contact_name",
+              "uuid": "c51c18a1-14c6-4ce6-9680-996f9a65d8da"
+            },
+            {
+              "groups": [
+                {
+                  "count": 0,
+                  "name": "Informou Nome",
+                  "query": null,
+                  "status": "ready",
+                  "uuid": "30bcaa89-ebfb-482c-a696-c71ab13a679b"
+                }
+              ],
+              "type": "add_contact_groups",
+              "uuid": "f8df6a4c-65ea-40c4-ad7e-02b15e24cfc5"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "57637e34-24d9-4355-acf7-0ea08c82ec64",
+              "uuid": "d662841c-6c63-4346-aa43-083cd57470eb"
+            }
+          ],
+          "uuid": "17b95b67-c811-4156-9b40-bdade8e69c73"
+        },
+        {
+          "actions": [
+            {
+              "flow": {
+                "name": "Apagar dados do Lead",
+                "uuid": "e611ac07-ea8b-4554-abbd-4c183f96a9cb"
+              },
+              "type": "enter_flow",
+              "uuid": "9aae13ec-ebef-4612-9adb-015da95ee40b"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "d7c32bde-a214-434d-b7cc-047770625e35"
+            },
+            {
+              "destination_uuid": null,
+              "uuid": "85b35be4-c7b4-448b-8150-90fbaf0f9111"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "completed"
+                ],
+                "category_uuid": "2c11d12d-f3fb-4e6e-befd-844df30ba223",
+                "type": "has_only_text",
+                "uuid": "605887c1-3e34-4a46-8edd-5fc339b4fff9"
+              },
+              {
+                "arguments": [
+                  "expired"
+                ],
+                "category_uuid": "4a71162e-0ec8-4441-b3b4-fb2a6f08af35",
+                "type": "has_only_text",
+                "uuid": "af63f8d5-1f3c-48a8-8795-4f55dad1817a"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "d7c32bde-a214-434d-b7cc-047770625e35",
+                "name": "Complete",
+                "uuid": "2c11d12d-f3fb-4e6e-befd-844df30ba223"
+              },
+              {
+                "exit_uuid": "85b35be4-c7b4-448b-8150-90fbaf0f9111",
+                "name": "Expired",
+                "uuid": "4a71162e-0ec8-4441-b3b4-fb2a6f08af35"
+              }
+            ],
+            "default_category_uuid": "4a71162e-0ec8-4441-b3b4-fb2a6f08af35",
+            "operand": "@child.status",
+            "type": "switch"
+          },
+          "uuid": "57637e34-24d9-4355-acf7-0ea08c82ec64"
+        }
+      ],
+      "spec_version": "13.1.0",
+      "type": "messaging",
+      "uuid": "9bbd69de-da2c-44a5-a592-b318ec794e56",
+      "version": "13.0.0",
+      "revision": 3
+    },
+    {
+      "_ui": {
+        "nodes": {
+          "0ab6a1a7-287d-4ed8-b528-b8f8c01b22ce": {
+            "position": {
+              "left": 420,
+              "top": 3260
+            },
+            "type": "execute_actions"
+          },
+          "0b8ee008-fde8-47fa-837d-5260967b13c4": {
+            "config": {
+              "cases": {}
+            },
+            "position": {
+              "left": 420,
+              "top": 2720
+            },
+            "type": "split_by_groups"
+          },
+          "2755b598-67fc-4eb0-94d3-ce55c2e9ca49": {
+            "config": {},
+            "position": {
+              "left": 300,
+              "top": 2840
+            },
+            "type": "split_by_subflow"
+          },
+          "33b8a316-10d0-4f7d-9c20-66de46430b28": {
+            "config": {
+              "cases": {}
+            },
+            "position": {
+              "left": 420,
+              "top": 1300
+            },
+            "type": "split_by_groups"
+          },
+          "4e3ff573-1131-4583-b5a9-b2ea1c8c5943": {
+            "config": {
+              "cases": {}
+            },
+            "position": {
+              "left": 420,
+              "top": 540
+            },
+            "type": "split_by_groups"
+          },
+          "55ed8f6e-0a08-46d2-a0b8-56081134b4a0": {
+            "config": {},
+            "position": {
+              "left": 420,
+              "top": 2500
+            },
+            "type": "split_by_subflow"
+          },
+          "70152e22-d490-4c08-b646-30c624c012f6": {
+            "config": {},
+            "position": {
+              "left": 420,
+              "top": 900
+            },
+            "type": "split_by_subflow"
+          },
+          "80529319-c408-4cb7-a2ed-204c5ab069e6": {
+            "config": {},
+            "position": {
+              "left": 420,
+              "top": 200
+            },
+            "type": "split_by_subflow"
+          },
+          "a322b1d5-50db-4faf-9bb6-2707fa86910b": {
+            "config": {},
+            "position": {
+              "left": 420,
+              "top": 1700
+            },
+            "type": "split_by_subflow"
+          },
+          "cf537a35-49e7-4342-bb0e-e46482b95c5d": {
+            "config": {
+              "cases": {}
+            },
+            "position": {
+              "left": 420,
+              "top": 2000
+            },
+            "type": "split_by_groups"
+          },
+          "e6604fb2-03d2-46a2-8ed6-c5b97e49daf4": {
+            "position": {
+              "left": 420,
+              "top": 3060
+            },
+            "type": "execute_actions"
+          },
+          "ee128874-a3db-45a0-866d-6a69f5f7d482": {
+            "position": {
+              "left": 420,
+              "top": 2300
+            },
+            "type": "execute_actions"
+          }
+        },
+        "stickies": {
+          "0d0083b2-6cf7-4907-bcaa-9ebcf0df5258": {
+            "body": "Esse card serve para verificarmos se o usu\u00e1rio est\u00e1 no grupo Conversa Encerrada, se sim, o fluxo n\u00e3o continua. Agora se o usu\u00e1rio n\u00e3o estiver nesse grupo, ir\u00e1 passar pela categoria Other e continuar\u00e1 no fluxo.\n\n\u00c9 importante lembrar que o usu\u00e1rio s\u00f3 \u00e9 colocado no grupo Conversa encerrada se quiser encerrar ou ficar inativo.",
+            "color": "purple",
+            "position": {
+              "bottom": 860,
+              "left": 700,
+              "right": 160,
+              "top": 1220
+            },
+            "title": "Dividir por Filia\u00e7\u00e3o de Grupo"
+          },
+          "4add01c1-1ae5-41b9-8cdf-aa84f8e29076": {
+            "body": "Esse \u00e9 o fluxo de mensagens principal de captura de dados. Sendo assim, ele que dever\u00e1 ser iniciado quando voc\u00ea precisar coletar nome, telefone e email de algum usu\u00e1rio.\n\nNeste fluxo usamos card \"Entrar em um fluxo\" para organizar as etapas e tipos de perguntas como nome, telefone e email. Mas o fluxo que voc\u00ea deve usar \u00e9 o \"Captura de Leads - Omie\n\".",
+            "color": "purple",
+            "position": {
+              "bottom": 0,
+              "left": 120,
+              "right": 0,
+              "top": 40
+            },
+            "title": "Informa\u00e7\u00f5es iniciais"
+          },
+          "693fdf1e-9eb4-4c3c-80db-8a1a68dd6fd3": {
+            "body": "Neste fluxo incluimos a oportunidade api da Omie",
+            "color": "purple",
+            "position": {
+              "bottom": 20,
+              "left": 60,
+              "right": -140,
+              "top": 2840
+            },
+            "title": "Incluir oportunidade"
+          },
+          "753bcb91-f5c6-4836-81db-f6c49ef1bb1e": {
+            "body": "Neste fluxo incluimos o contato na api da omie.",
+            "color": "purple",
+            "position": {
+              "bottom": -120,
+              "left": 200,
+              "right": 0,
+              "top": 2500
+            },
+            "title": "Incluir contato"
+          },
+          "8c6966cf-0a04-4478-bd31-c2d39e23c4db": {
+            "body": "Neste fluxo de mensagens usamos o card \"Entrar em um fluxo\" para organizar a estrutura das nossas perguntas. \n\nO card \"Entrar em um fluxo\" simplesmente direciona o usu\u00e1rio para outro fluxo de mensagens  em mil\u00e9simos de segundos e j\u00e1 executa a a\u00e7\u00e3o desse outro fluxo de mensagens .\n\nSendo assim, a t\u00edtulo de organiza\u00e7\u00e3o perguntamos o nome, telefone e email, cada um em seu devido fluxo.de mensagem.",
+            "color": "purple",
+            "position": {
+              "bottom": -140,
+              "left": 680,
+              "right": 180,
+              "top": 40
+            },
+            "title": "Entrar em um fluxo"
+          },
+          "a0889d78-48bf-4946-b208-8840ff6b6541": {
+            "body": "Adicione seu email para receber uma notifica\u00e7\u00e3o sempre que um lead for criado",
+            "color": "purple",
+            "position": {
+              "bottom": null,
+              "left": 680,
+              "right": null,
+              "top": 3280
+            },
+            "title": "Enviar Email"
+          },
+          "a507503c-2b76-443f-bdc9-11774aa9d149": {
+            "body": "Mensagem de feedback ao usu\u00e1rio.\n\nPode ser removida ou alterada, se preferir.",
+            "color": "purple",
+            "position": {
+              "bottom": 20,
+              "left": 680,
+              "right": 460,
+              "top": 3060
+            },
+            "title": "Enviar mensagem"
+          },
+          "ac6454c0-fe74-4b63-9058-fc552f57cee7": {
+            "body": "Esse card serve para verificarmos se o usu\u00e1rio est\u00e1 no grupo Conversa Encerrada, se sim, o fluxo de mensagem n\u00e3o continua. Agora se o usu\u00e1rio n\u00e3o estiver nesse grupo, ir\u00e1 passar pela categoria Other e continuar\u00e1 no fluxo de mensagem.\n\n\u00c9 importante lembrar que o usu\u00e1rio s\u00f3 \u00e9 colocado no grupo Conversa encerrada se quiser encerrar ou ficar inativo.",
+            "color": "purple",
+            "position": {
+              "bottom": -660,
+              "left": 680,
+              "right": 140,
+              "top": 440
+            },
+            "title": "Dividir por Filia\u00e7\u00e3o de Grupo"
+          },
+          "d5e6d883-3c5c-41b8-875c-30f5edc1fad0": {
+            "body": "Esse card serve para adicionar o usu\u00e1rio que completou o envio de informa\u00e7\u00f5es em um grupo chamado \"Lead Completo\".\n\nVoc\u00ea pode visualizar todas as pessoas que est\u00e3o nesse grupo acessando o m\u00f3dulo Est\u00fadio > Contatos > Filtrar pelo Grupo Lead Completo no canto inferior esquerdo da Tela.\n\nVoc\u00ea tamb\u00e9m pode disparar mensagens ativamente para todas as pessoas que estejam dentro desse grupo.",
+            "color": "purple",
+            "position": {
+              "bottom": -200,
+              "left": 720,
+              "right": 40,
+              "top": 2120
+            },
+            "title": "Adicione a um Grupo"
+          }
+        }
+      },
+      "expire_after_minutes": 10080,
+      "language": "base",
+      "localization": {},
+      "metadata": {
+        "expires": 10080,
+        "revision": 11
+      },
+      "name": "Captura de Leads - Omie",
+      "nodes": [
+        {
+          "actions": [
+            {
+              "flow": {
+                "name": "Coleta do Nome",
+                "uuid": "9bbd69de-da2c-44a5-a592-b318ec794e56"
+              },
+              "type": "enter_flow",
+              "uuid": "b54c6c03-40c8-4f5b-a805-398d5b20274e"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "4e3ff573-1131-4583-b5a9-b2ea1c8c5943",
+              "uuid": "9507267d-e082-4b40-990e-e39c393e4f4b"
+            },
+            {
+              "destination_uuid": null,
+              "uuid": "3a8cfac0-f6b7-42b2-a3a7-dd3ed2235032"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "completed"
+                ],
+                "category_uuid": "8a1b3471-40fe-41c7-89d0-293fb87f39ff",
+                "type": "has_only_text",
+                "uuid": "ae9f78e2-c050-4171-af31-dfd161eff769"
+              },
+              {
+                "arguments": [
+                  "expired"
+                ],
+                "category_uuid": "6aa78e99-9284-4a98-aa78-9438c1d3b6eb",
+                "type": "has_only_text",
+                "uuid": "074d86da-8f8c-450f-95a8-cd42b05f0129"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "9507267d-e082-4b40-990e-e39c393e4f4b",
+                "name": "Complete",
+                "uuid": "8a1b3471-40fe-41c7-89d0-293fb87f39ff"
+              },
+              {
+                "exit_uuid": "3a8cfac0-f6b7-42b2-a3a7-dd3ed2235032",
+                "name": "Expired",
+                "uuid": "6aa78e99-9284-4a98-aa78-9438c1d3b6eb"
+              }
+            ],
+            "default_category_uuid": "6aa78e99-9284-4a98-aa78-9438c1d3b6eb",
+            "operand": "@child.status",
+            "type": "switch"
+          },
+          "uuid": "80529319-c408-4cb7-a2ed-204c5ab069e6"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "uuid": "bd93ac62-27d6-4079-b64b-7c68b2f3efa4"
+            },
+            {
+              "destination_uuid": "70152e22-d490-4c08-b646-30c624c012f6",
+              "uuid": "11761c44-57e6-46ec-9688-ff789351006b"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "d01833de-92d9-4bb1-96eb-dde0c96665aa",
+                  "Conversa Encerrada"
+                ],
+                "category_uuid": "cd5b2da3-8ea3-408d-b908-1f3ead91cd75",
+                "type": "has_group",
+                "uuid": "ff9304cf-bc8e-4700-aa69-29d80aa53887"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "bd93ac62-27d6-4079-b64b-7c68b2f3efa4",
+                "name": "Conversa Encerrada",
+                "uuid": "cd5b2da3-8ea3-408d-b908-1f3ead91cd75"
+              },
+              {
+                "exit_uuid": "11761c44-57e6-46ec-9688-ff789351006b",
+                "name": "Other",
+                "uuid": "54eb07e5-561d-4099-bb29-72306a86fdf1"
+              }
+            ],
+            "default_category_uuid": "54eb07e5-561d-4099-bb29-72306a86fdf1",
+            "operand": "@contact.groups",
+            "result_name": "",
+            "type": "switch"
+          },
+          "uuid": "4e3ff573-1131-4583-b5a9-b2ea1c8c5943"
+        },
+        {
+          "actions": [
+            {
+              "flow": {
+                "name": "Coleta de Telefone",
+                "uuid": "2b5aa5a3-b716-4ad4-acaf-7e6b8a202fbf"
+              },
+              "type": "enter_flow",
+              "uuid": "dff9110f-94ab-48f0-a00f-1a9d221cb26c"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "33b8a316-10d0-4f7d-9c20-66de46430b28",
+              "uuid": "a662eda5-00bc-4f8a-8ff6-60dd73112480"
+            },
+            {
+              "destination_uuid": null,
+              "uuid": "e306fea9-b193-499b-b614-551d4f4a2d05"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "completed"
+                ],
+                "category_uuid": "da7b7c93-6d17-4a72-980d-4c6ddbdab9f2",
+                "type": "has_only_text",
+                "uuid": "57e41f1e-4bbb-4c1a-ab19-153e0663e984"
+              },
+              {
+                "arguments": [
+                  "expired"
+                ],
+                "category_uuid": "b2bc569e-f9dc-436a-adbe-db70d34adede",
+                "type": "has_only_text",
+                "uuid": "1a0d40fb-ed7b-4fbe-acd6-70d483bd28b6"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "a662eda5-00bc-4f8a-8ff6-60dd73112480",
+                "name": "Complete",
+                "uuid": "da7b7c93-6d17-4a72-980d-4c6ddbdab9f2"
+              },
+              {
+                "exit_uuid": "e306fea9-b193-499b-b614-551d4f4a2d05",
+                "name": "Expired",
+                "uuid": "b2bc569e-f9dc-436a-adbe-db70d34adede"
+              }
+            ],
+            "default_category_uuid": "b2bc569e-f9dc-436a-adbe-db70d34adede",
+            "operand": "@child.status",
+            "type": "switch"
+          },
+          "uuid": "70152e22-d490-4c08-b646-30c624c012f6"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "uuid": "13755e18-f50c-4fb9-a877-162c2ce52599"
+            },
+            {
+              "destination_uuid": "a322b1d5-50db-4faf-9bb6-2707fa86910b",
+              "uuid": "298297cf-025a-463b-bdda-e31c31bfa2bf"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "d01833de-92d9-4bb1-96eb-dde0c96665aa",
+                  "Conversa Encerrada"
+                ],
+                "category_uuid": "c32dbd48-8d3b-4bfc-a525-91e7929b7fef",
+                "type": "has_group",
+                "uuid": "725a7ed6-935e-4297-b6fd-04b9fea2fa87"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "13755e18-f50c-4fb9-a877-162c2ce52599",
+                "name": "Conversa Encerrada",
+                "uuid": "c32dbd48-8d3b-4bfc-a525-91e7929b7fef"
+              },
+              {
+                "exit_uuid": "298297cf-025a-463b-bdda-e31c31bfa2bf",
+                "name": "Other",
+                "uuid": "a95e5a02-6767-444e-b3c1-01febd075ee2"
+              }
+            ],
+            "default_category_uuid": "a95e5a02-6767-444e-b3c1-01febd075ee2",
+            "operand": "@contact.groups",
+            "result_name": "",
+            "type": "switch"
+          },
+          "uuid": "33b8a316-10d0-4f7d-9c20-66de46430b28"
+        },
+        {
+          "actions": [
+            {
+              "flow": {
+                "name": "Coleta de E-mail",
+                "uuid": "539c95e5-e872-4a5d-b455-d76e3dcc8b61"
+              },
+              "type": "enter_flow",
+              "uuid": "128f8084-4bc0-449b-aeca-9c5dcc9faa68"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "cf537a35-49e7-4342-bb0e-e46482b95c5d",
+              "uuid": "ee30736d-ee14-4333-b58e-97abf4aa1d23"
+            },
+            {
+              "destination_uuid": null,
+              "uuid": "93249b3d-64e5-4805-9601-c1a7e8794831"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "completed"
+                ],
+                "category_uuid": "7a5e9500-158d-4625-8314-445de5bf8c90",
+                "type": "has_only_text",
+                "uuid": "3ff96164-21d4-460d-b9ba-182843dc40bc"
+              },
+              {
+                "arguments": [
+                  "expired"
+                ],
+                "category_uuid": "7aed0e42-16a3-4384-8900-75a0a3b385b7",
+                "type": "has_only_text",
+                "uuid": "ded262ca-56be-45a6-a60c-8b269d4997e9"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "ee30736d-ee14-4333-b58e-97abf4aa1d23",
+                "name": "Complete",
+                "uuid": "7a5e9500-158d-4625-8314-445de5bf8c90"
+              },
+              {
+                "exit_uuid": "93249b3d-64e5-4805-9601-c1a7e8794831",
+                "name": "Expired",
+                "uuid": "7aed0e42-16a3-4384-8900-75a0a3b385b7"
+              }
+            ],
+            "default_category_uuid": "7aed0e42-16a3-4384-8900-75a0a3b385b7",
+            "operand": "@child.status",
+            "type": "switch"
+          },
+          "uuid": "a322b1d5-50db-4faf-9bb6-2707fa86910b"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "uuid": "3055b159-a036-4450-837f-fc3dd0f08f43"
+            },
+            {
+              "destination_uuid": "ee128874-a3db-45a0-866d-6a69f5f7d482",
+              "uuid": "deaea7d8-d5ae-4abc-b571-a88f7cd6d4fd"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "d01833de-92d9-4bb1-96eb-dde0c96665aa",
+                  "Conversa Encerrada"
+                ],
+                "category_uuid": "f0c6b4d9-e355-4c38-9691-84332ab101b4",
+                "type": "has_group",
+                "uuid": "209ee0e4-0f5f-40d2-9df0-8d413a9b852d"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "3055b159-a036-4450-837f-fc3dd0f08f43",
+                "name": "Conversa Encerrada",
+                "uuid": "f0c6b4d9-e355-4c38-9691-84332ab101b4"
+              },
+              {
+                "exit_uuid": "deaea7d8-d5ae-4abc-b571-a88f7cd6d4fd",
+                "name": "Other",
+                "uuid": "692ff693-6841-44b7-8112-8ad586bc13d0"
+              }
+            ],
+            "default_category_uuid": "692ff693-6841-44b7-8112-8ad586bc13d0",
+            "operand": "@contact.groups",
+            "result_name": "",
+            "type": "switch"
+          },
+          "uuid": "cf537a35-49e7-4342-bb0e-e46482b95c5d"
+        },
+        {
+          "actions": [
+            {
+              "groups": [
+                {
+                  "count": 0,
+                  "name": "Lead Completo",
+                  "query": null,
+                  "status": "ready",
+                  "uuid": "23f7a5ff-a631-4d73-8780-9d357f9b50dd"
+                }
+              ],
+              "type": "add_contact_groups",
+              "uuid": "bd55b01b-3cae-4c4e-bcb4-37bc60f6e6f0"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "55ed8f6e-0a08-46d2-a0b8-56081134b4a0",
+              "uuid": "790a77ff-ad67-4b6a-a786-57e26f08a9a6"
+            }
+          ],
+          "uuid": "ee128874-a3db-45a0-866d-6a69f5f7d482"
+        },
+        {
+          "actions": [
+            {
+              "flow": {
+                "name": "Cadastro de Lead - Incluir Contato",
+                "uuid": "3e8a2013-5155-4a48-99af-e7be710ac79a"
+              },
+              "type": "enter_flow",
+              "uuid": "c96696b7-855e-496f-ad48-8997f19ebf15"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "0b8ee008-fde8-47fa-837d-5260967b13c4",
+              "uuid": "a682fcf5-0a41-4ba6-b26d-3e2b4c75978c"
+            },
+            {
+              "destination_uuid": null,
+              "uuid": "63c5fbd7-bb42-4d06-a086-9293959256ef"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "completed"
+                ],
+                "category_uuid": "360b37ac-e5c8-43ac-bd18-5dc7bca7702f",
+                "type": "has_only_text",
+                "uuid": "72fdc982-9058-4849-a96b-0b8f9c1f8b8b"
+              },
+              {
+                "arguments": [
+                  "expired"
+                ],
+                "category_uuid": "8f770f92-3048-4dfc-83bf-584b016ae625",
+                "type": "has_only_text",
+                "uuid": "77206827-6e2a-424d-8cf8-fdd4a116a735"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "a682fcf5-0a41-4ba6-b26d-3e2b4c75978c",
+                "name": "Complete",
+                "uuid": "360b37ac-e5c8-43ac-bd18-5dc7bca7702f"
+              },
+              {
+                "exit_uuid": "63c5fbd7-bb42-4d06-a086-9293959256ef",
+                "name": "Expired",
+                "uuid": "8f770f92-3048-4dfc-83bf-584b016ae625"
+              }
+            ],
+            "default_category_uuid": "8f770f92-3048-4dfc-83bf-584b016ae625",
+            "operand": "@child.status",
+            "type": "switch"
+          },
+          "uuid": "55ed8f6e-0a08-46d2-a0b8-56081134b4a0"
+        },
+        {
+          "actions": [],
+          "exits": [
+            {
+              "destination_uuid": "2755b598-67fc-4eb0-94d3-ce55c2e9ca49",
+              "uuid": "f3b812dd-5cb7-4b59-8d3f-7f27a50b0384"
+            },
+            {
+              "destination_uuid": "e6604fb2-03d2-46a2-8ed6-c5b97e49daf4",
+              "uuid": "1a6ef6ed-6574-4274-9b7b-8814ace0efe2"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "9634ff85-f5f8-4b1f-a34e-d8eef6e2c108",
+                  "Lead Cadastrado"
+                ],
+                "category_uuid": "731d5e58-9478-4f0b-a3ff-d5a7b05fee35",
+                "type": "has_group",
+                "uuid": "21a1f117-1a47-4904-90d2-f34d52e02779"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "f3b812dd-5cb7-4b59-8d3f-7f27a50b0384",
+                "name": "Lead Cadastrado",
+                "uuid": "731d5e58-9478-4f0b-a3ff-d5a7b05fee35"
+              },
+              {
+                "exit_uuid": "1a6ef6ed-6574-4274-9b7b-8814ace0efe2",
+                "name": "Other",
+                "uuid": "53a5c7b2-d711-44ab-b1ff-733231eac901"
+              }
+            ],
+            "default_category_uuid": "53a5c7b2-d711-44ab-b1ff-733231eac901",
+            "operand": "@contact.groups",
+            "result_name": "",
+            "type": "switch"
+          },
+          "uuid": "0b8ee008-fde8-47fa-837d-5260967b13c4"
+        },
+        {
+          "actions": [
+            {
+              "flow": {
+                "name": "Cadastro de Lead - Incluir Oportunidade",
+                "uuid": "ecbfbea1-d0ad-4031-b538-764fa465e46f"
+              },
+              "type": "enter_flow",
+              "uuid": "1584b182-9873-4a3b-aaa6-9ae875a9aba5"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "e6604fb2-03d2-46a2-8ed6-c5b97e49daf4",
+              "uuid": "6e9659fc-75e2-4c75-84a3-3bdc57d2d394"
+            },
+            {
+              "destination_uuid": null,
+              "uuid": "3b36a9eb-2634-4769-b6aa-f1cc5715e24e"
+            }
+          ],
+          "router": {
+            "cases": [
+              {
+                "arguments": [
+                  "completed"
+                ],
+                "category_uuid": "65fc04c1-2bcc-4809-bd30-57a7335c3945",
+                "type": "has_only_text",
+                "uuid": "f418caec-5a37-4d21-8a9d-13044e803740"
+              },
+              {
+                "arguments": [
+                  "expired"
+                ],
+                "category_uuid": "751293b7-f424-4cd6-8cc4-7bffb7442d28",
+                "type": "has_only_text",
+                "uuid": "395046a6-02f9-4cae-ac48-857311d9c0f5"
+              }
+            ],
+            "categories": [
+              {
+                "exit_uuid": "6e9659fc-75e2-4c75-84a3-3bdc57d2d394",
+                "name": "Complete",
+                "uuid": "65fc04c1-2bcc-4809-bd30-57a7335c3945"
+              },
+              {
+                "exit_uuid": "3b36a9eb-2634-4769-b6aa-f1cc5715e24e",
+                "name": "Expired",
+                "uuid": "751293b7-f424-4cd6-8cc4-7bffb7442d28"
+              }
+            ],
+            "default_category_uuid": "751293b7-f424-4cd6-8cc4-7bffb7442d28",
+            "operand": "@child.status",
+            "type": "switch"
+          },
+          "uuid": "2755b598-67fc-4eb0-94d3-ce55c2e9ca49"
+        },
+        {
+          "actions": [
+            {
+              "all_urns": false,
+              "attachments": [],
+              "quick_replies": [],
+              "text": "Informei sobre seu interesse aos nossos respons\u00e1veis \ud83e\udd1d Aguarde, um de nossos consultores ir\u00e1 entrar em contato",
+              "type": "send_msg",
+              "uuid": "a0a7635b-5021-4c81-ac49-ddeadb6ce988"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": "0ab6a1a7-287d-4ed8-b528-b8f8c01b22ce",
+              "uuid": "77e41dab-2ec1-41ef-8396-70c0fd50efe3"
+            }
+          ],
+          "uuid": "e6604fb2-03d2-46a2-8ed6-c5b97e49daf4"
+        },
+        {
+          "actions": [
+            {
+              "addresses": [
+                "seuemail@weni.ai"
+              ],
+              "body": "O contato @contact.name acabou de ser cadastrado como lead na API da Omie.\n\nTelefone: @fields.telefone\n\nEmail: @fields.email",
+              "subject": "Novo Lead captado via Chatbot - API OMIE @globals.nome_da_empresa",
+              "type": "send_email",
+              "uuid": "01494ca8-1957-4d89-9301-b87e690ac474"
+            }
+          ],
+          "exits": [
+            {
+              "destination_uuid": null,
+              "uuid": "6fc38a06-b72e-4393-8498-6f3c71ac8ec0"
+            }
+          ],
+          "uuid": "0ab6a1a7-287d-4ed8-b528-b8f8c01b22ce"
+        }
+      ],
+      "spec_version": "13.1.0",
+      "type": "messaging",
+      "uuid": "b22f09a0-91c6-42a0-b1b1-6600c1db3f6f",
+      "version": "13.0.0",
+      "revision": 26
+    }
+  ],
+  "campaigns": [],
+  "triggers": [
+    {
+      "trigger_type": "C",
+      "flow": {
+        "uuid": "3ffa11ee-5ebb-4118-b26d-2ec48abec070",
+        "name": "Fluxo Principal"
+      },
+      "groups": [],
+      "exclude_groups": [
+        {
+          "uuid": "b62299b2-186f-4078-ac0c-8247441d5edb",
+          "name": "Atendimento humano"
+        }
+      ],
+      "keyword": null
+    }
+  ],
+  "fields": [
+    {
+      "key": "ccodint",
+      "name": "cCodInt",
+      "type": "text"
+    },
+    {
+      "key": "ccodintop",
+      "name": "cCodIntOp",
+      "type": "text"
+    },
+    {
+      "key": "cdesstatus",
+      "name": "cDesStatus",
+      "type": "text"
+    },
+    {
+      "key": "codigo_conta",
+      "name": "Codigo Conta",
+      "type": "text"
+    },
+    {
+      "key": "codigo_origem",
+      "name": "Codigo Origem",
+      "type": "text"
+    },
+    {
+      "key": "codigo_solucao",
+      "name": "Codigo Solucao",
+      "type": "text"
+    },
+    {
+      "key": "codigo_vendedor",
+      "name": "Codigo Vendedor",
+      "type": "text"
+    },
+    {
+      "key": "email",
+      "name": "Email",
+      "type": "text"
+    },
+    {
+      "key": "ncod",
+      "name": "nCod",
+      "type": "text"
+    },
+    {
+      "key": "telefone",
+      "name": "Telefone",
+      "type": "text"
+    }
+  ],
+  "groups": [
+    {
+      "uuid": "d01833de-92d9-4bb1-96eb-dde0c96665aa",
+      "name": "Conversa Encerrada",
+      "query": null
+    },
+    {
+      "uuid": "30bcaa89-ebfb-482c-a696-c71ab13a679b",
+      "name": "Informou Nome",
+      "query": null
+    },
+    {
+      "uuid": "9634ff85-f5f8-4b1f-a34e-d8eef6e2c108",
+      "name": "Lead Cadastrado",
+      "query": null
+    },
+    {
+      "uuid": "23f7a5ff-a631-4d73-8780-9d357f9b50dd",
+      "name": "Lead Completo",
+      "query": null
+    },
+    {
+      "uuid": "66e35bc2-c943-418d-9e49-769702167623",
+      "name": "Lead N\u00e3o cadastrado",
+      "query": null
+    },
+    {
+      "uuid": "f739f49d-431c-4715-aa7d-0dceaa2599dd",
+      "name": "Oportunidade Enviada",
+      "query": null
+    },
+    {
+      "uuid": "e62d7cfb-293c-4ef2-94bc-4e822047ba79",
+      "name": "Oportunidade n\u00e3o enviada",
+      "query": null
+    },
+    {
+      "uuid": "2071332e-da02-4146-a2ac-b035ec02e9e3",
+      "name": "Satisfeito",
+      "query": null
+    }
+  ]
+}

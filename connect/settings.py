@@ -531,8 +531,12 @@ REPOSITORY_IDS = {
     "lead_capture+chatgpt": AI_FAREWELL_N_GREETINGS,
     "support": AI_BINARY_ANSWERS,
     "omie_financial": AI_CRISTAL,
-    "omie_financial+chatgpt": AI_CRISTAL
+    "omie_financial+chatgpt": AI_CRISTAL,
+    "omie_lead_capture": AI_CRISTAL,
 }
 
 
 CREATE_AI_ORGANIZATION = env.bool("CREATE_AI_ORGANIZATION")
+
+OMIE_APP_KEY = env.str("OMIE_APP_KEY", default="ap_test")
+OMIE_APP_SECRET = env.str("OMIE_APP_SECRET", default="sk_test")
