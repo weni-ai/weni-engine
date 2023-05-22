@@ -230,9 +230,23 @@ class OrganizationViewSet(
 
     def perform_destroy(self, instance):
         intelligence_organization = instance.inteligence_organization
+        instance.send_email_delete_organization()
         instance.delete()
         ai_client = IntelligenceRESTClient()
         ai_client.delete_organization(organization_id=intelligence_organization, user_email=self.request.user.email)
+
+    def update(self, request, *args, **kwargs):
+        data = request.data
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+
+        if data.get("name"):
+            instance.send_email_change_organization_name(instance.name, data.get("name"))
+
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(serializer.data)
 
     @action(
         detail=True,
@@ -805,9 +819,17 @@ class OrganizationAuthorizationViewSet(
             IsAuthenticated,
             OrganizationAdminManagerAuthorization,
         ]
+
+        data = self.request.data
+
+        if data.get("role"):
+            instance = self.get_object()
+            old_permission = OrganizationRole(instance.role).name
+            new_permission = OrganizationRole(data.get("role")).name
+            instance.organization.send_email_permission_change(instance.user, old_permission, new_permission)
+
         response = super().update(*args, **kwargs)
-        instance = self.get_object()
-        instance.send_new_role_email(self.request.user)
+        # instance.send_new_role_email(self.request.user)
         return response
 
     def list(self, request, *args, **kwargs):
@@ -839,7 +861,7 @@ class OrganizationAuthorizationViewSet(
         obj = organization.get_user_authorization(self.request.user)
 
         self.check_object_permissions(self.request, obj)
-
+        organization.send_email_organization_going_out(obj.user)
         obj.delete()
         return Response(status=204)
 
