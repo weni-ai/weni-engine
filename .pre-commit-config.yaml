@@ -31,10 +31,21 @@ repos:
     hooks:
     -   id: check-poetry # Validates the structure of the pyproject.toml file
 
+  # - repo: local
+  #   hooks:
+  #     - id: unittests
+  #       name: Run unit tests
+  #       entry: python manage.py test
+  #       language: system
+  #       pass_filenames: false
+
+repos:
   - repo: local
     hooks:
-      - id: unittests
-        name: Run unit tests
-        entry: python manage.py test
+      - id: check-coverage
+        name: Check code coverage
+        entry: coverage run --source='.' manage.py test
         language: system
         pass_filenames: false
+        always_run: true
+        fail_under: 70
