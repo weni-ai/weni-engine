@@ -371,12 +371,31 @@ def sync_project_information():
         flow_instance = utils.get_grpc_types().get("flow")
     for project in Project.objects.order_by("-created_at"):
         try:
-            statistic_project_result = flow_instance.get_project_statistic(
-                project_uuid=str(project.flow_organization),
+            flow_result = flow_instance.get_project_info(
+                project_uuid=str(project.uuid)
             )
-            if len(statistic_project_result) > 0:
-                project.flow_count = int(statistic_project_result.get("active_flows"))
-                project.save(update_fields=["flow_count"])
+            updated_fields = []
+            if "name" in flow_result:
+                project.name = flow_result.get("name")
+                updated_fields.append("name")
+
+            if "timezone" in flow_result:
+                project.timezone = str(flow_result.get("timezone"))
+                updated_fields.append("timezone")
+            
+            if "data_format" in flow_result:
+                project.date_format = str(flow_result.get("date_format"))
+                updated_fields.append("data_format")
+            
+            if "id" in flow_result:
+                project.flow_id = flow_result.get("id")
+                updated_fields.append("id")
+            
+            if len(updated_fields) > 0:
+                project.save(update_fields=updated_fields)
+                if not settings.TESTING:
+                    chats_client = ChatsRESTClient()
+                    chats_client.update_chats_project(project_uuid=project.uuid)
         except ConnectionError as c:
             logger.error(f"Remote end closed connection without: {c} - Project: {project}")
             continue
@@ -391,14 +410,22 @@ def sync_project_statistics():
         flow_instance = FlowsRESTClient()
     else:
         flow_instance = utils.get_grpc_types().get("flow")
-    for project in Project.objects.all():
-        statistic_project_result = flow_instance.get_project_statistic(
-            project_uuid=str(project.flow_organization),
-        )
+    
+        for project in Project.objects.order_by("-created_at"):
+            try:
+                statistic_project_result = flow_instance.get_project_statistic(
+                    project_uuid=str(project.flow_organization),
+                )
+                if len(statistic_project_result) > 0:
+                    project.flow_count = int(statistic_project_result.get("active_flows"))
+                    project.save(update_fields=["flow_count"])
+            except ConnectionError as c:
+                logger.error(f"Remote end closed connection without: {c} - Project: {project}")
+                continue
+            except Exception as e:
+                logger.error(f"Sync Project Statistics Exception {e}")
+                continue
 
-        if len(statistic_project_result) > 0:
-            project.flow_count = int(statistic_project_result.get("active_flows"))
-            project.save(update_fields=["flow_count"])
 
 
 @app.task()
