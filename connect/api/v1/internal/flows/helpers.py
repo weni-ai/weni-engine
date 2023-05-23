@@ -102,4 +102,26 @@ def add_classifier_to_flow(
         classifier = sample_flow["flows"][3]["nodes"][0]["actions"][0]["classifier"]
         classifier["uuid"] = classifier_uuid
 
+    elif template_type == Project.TYPE_SAC_CHAT_GPT:
+        classifier = sample_flow["flows"][2]["nodes"][3]["actions"][0]["classifier"]
+        classifier["uuid"] = classifier_uuid
+
+        ticketer_uuid = ticketer.get("uuid")
+        ticketer_name = ticketer.get("name")
+
+        queue_uuid = queue.get("uuid")
+        queue_name = queue.get("name")
+
+        sector = sample_flow["flows"][0]["nodes"][5]["actions"][0]
+        ticketer_json = sector["ticketer"]
+        queue_json = sector["topic"]
+
+        # add ticketer to json
+        ticketer_json["uuid"] = ticketer_uuid
+        ticketer_json["name"] = ticketer_name
+
+        # add queue to json
+        queue_json["uuid"] = queue_uuid
+        queue_json["name"] = queue_name
+
     return sample_flow
