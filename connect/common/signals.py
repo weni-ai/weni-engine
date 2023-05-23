@@ -42,7 +42,7 @@ def create_service_status(sender, instance, created, **kwargs):
         if not settings.TESTING:
             chats_client = ChatsRESTClient()
 
-            template = instance.is_template and instance.template_type in [Project.TYPE_SUPPORT, Project.TYPE_OMIE_PAYMENT_FINANCIAL, Project.TYPE_OMIE_PAYMENT_FINANCIAL_CHAT_GPT]
+            template = instance.is_template and instance.template_type in Project.HAS_CHATS
 
             if not template:
                 response = chats_client.create_chat_project(
