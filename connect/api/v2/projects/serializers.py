@@ -463,7 +463,9 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
 
         if project.template_type in Project.HAS_GLOBALS:
 
-            if project.template_type == Project.TYPE_LEAD_CAPTURE_CHAT_GPT:
+            common_templates = [Project.TYPE_SAC_CHAT_GPT, Project.TYPE_LEAD_CAPTURE_CHAT_GPT]
+
+            if project.template_type in common_templates:
                 created, data = self.create_globals(
                     str(project.flow_organization),
                     str(authorization.user.email)
