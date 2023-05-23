@@ -533,6 +533,7 @@ REPOSITORY_IDS = {
     "omie_financial": AI_CRISTAL,
     "omie_financial+chatgpt": AI_CRISTAL,
     "omie_lead_capture": AI_CRISTAL,
+    "sac+chatgpt": AI_CRISTAL,
 }
 
 
