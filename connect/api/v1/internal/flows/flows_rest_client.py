@@ -354,6 +354,7 @@ class FlowsRESTClient:
             "omie_financial": f"{os.path.join(os.path.dirname(__file__))}/mp9/omie_2_via_boleto_sem_chatgpt_v2.json",
             "omie_financial+chatgpt": f"{os.path.join(os.path.dirname(__file__))}/mp9/omie_2_via_boleto_chatgpt_v2.json",
             "omie_lead_capture": f"{os.path.join(os.path.dirname(__file__))}/mp9/captura-de-leads-com-omie.json",
+            "sac+chatgpt": f"{os.path.join(os.path.dirname(__file__))}/mp9/sac_chatgpt.json",
         }
         return templates.get(template_type)
 

@@ -662,6 +662,7 @@ class Project(models.Model):
     TYPE_OMIE_LEAD_CAPTURE = "omie_lead_capture"
     TYPE_OMIE_PAYMENT_FINANCIAL = "omie_financial"
     TYPE_OMIE_PAYMENT_FINANCIAL_CHAT_GPT = "omie_financial+chatgpt"
+    TYPE_SAC_CHAT_GPT = "sac+chatgpt"
 
     TEMPLATE_TYPES = (
         (TYPE_SUPPORT, _("support")),
@@ -670,10 +671,11 @@ class Project(models.Model):
         (TYPE_OMIE_LEAD_CAPTURE, "omie_lead_capture"),
         (TYPE_OMIE_PAYMENT_FINANCIAL, "omie_financial"),
         (TYPE_OMIE_PAYMENT_FINANCIAL_CHAT_GPT, "omie_financial+chatgpt"),
+        (TYPE_SAC_CHAT_GPT, "sac+chatgpt"),
     )
 
-    HAS_GLOBALS = [TYPE_OMIE_LEAD_CAPTURE, TYPE_OMIE_PAYMENT_FINANCIAL, TYPE_OMIE_PAYMENT_FINANCIAL_CHAT_GPT, TYPE_LEAD_CAPTURE_CHAT_GPT]
-    HAS_CHATS = [TYPE_OMIE_LEAD_CAPTURE, TYPE_OMIE_PAYMENT_FINANCIAL, TYPE_OMIE_PAYMENT_FINANCIAL_CHAT_GPT, TYPE_SUPPORT]
+    HAS_GLOBALS = [TYPE_OMIE_LEAD_CAPTURE, TYPE_OMIE_PAYMENT_FINANCIAL, TYPE_OMIE_PAYMENT_FINANCIAL_CHAT_GPT, TYPE_LEAD_CAPTURE_CHAT_GPT, TYPE_SAC_CHAT_GPT]
+    HAS_CHATS = [TYPE_OMIE_LEAD_CAPTURE, TYPE_OMIE_PAYMENT_FINANCIAL, TYPE_OMIE_PAYMENT_FINANCIAL_CHAT_GPT, TYPE_SUPPORT, TYPE_SAC_CHAT_GPT]
 
     uuid = models.UUIDField(
         _("UUID"), primary_key=True, default=uuid4.uuid4, editable=False
@@ -881,7 +883,8 @@ class Project(models.Model):
             "omie": "OMIE",
             "omie_financial": "Cristal - Assistente Financeiro",
             "omie_lead_capture": "Cristal - Assistente Financeiro",
-            "omie_financial+chatgpt": "Cristal - Assistente Financeiro"
+            "omie_financial+chatgpt": "Cristal - Assistente Financeiro",
+            "sac+chatgpt": "Cristal - Assistente Financeiro",
         }
 
         try:
