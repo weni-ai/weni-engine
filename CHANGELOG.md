@@ -1,3 +1,12 @@
+# 2.12.0
+
+## *Add*
+
+  - New template SAC + Chatgpt
+
+## *Fix*
+  - Task sync_project_information back to get and update project data from streams
+  - Task sync_project_statistics adding error handling
 # 2.11.0
 ## *Add*
   - New template type: Omie Lead Capture
