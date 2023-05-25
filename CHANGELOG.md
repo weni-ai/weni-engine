@@ -1,3 +1,19 @@
+# 2.11.0
+## *Add*
+  - New template type: Omie Lead Capture
+
+## *Fix*
+  - Email translation
+
+## *Change*
+  - Coverage from 73% to 75%
+
+
+# 2.10.1
+
+## *Fix*
+  - Merge Migrations
+
 # 2.10.0
 
 ## *Add*
