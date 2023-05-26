@@ -1646,7 +1646,8 @@ class BillingPlan(models.Model):
 
         return {"total_contact": contact_count, "amount_currenty": amount_currenty}
 
-    def current_invoice_v2(self):
+    @property
+    def current_invoice(self):
         # Total contacts of the organization
         contact_count = self.organization.project.aggregate(
             total_contact_count=Sum("contact_count")

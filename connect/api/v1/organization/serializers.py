@@ -45,7 +45,7 @@ class BillingPlanSerializer(serializers.ModelSerializer):
             "card_brand",
             "payment_warnings",
             "problem_capture_invoice",
-            "currenty_invoice",
+            "current_invoice",
             "contract_on",
             "trial_end_date",
             "days_till_trial_end"
@@ -92,7 +92,7 @@ class BillingPlanSerializer(serializers.ModelSerializer):
     )
     payment_warnings = serializers.ListField()
     problem_capture_invoice = serializers.BooleanField()
-    currenty_invoice = serializers.DictField(
+    current_invoice = serializers.DictField(
         read_only=True,
         help_text=_("Total active contacts and current invoice amount before closing"),
     )
