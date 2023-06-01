@@ -1535,6 +1535,8 @@ class BillingPlan(models.Model):
             elif plan == BillingPlan.PLAN_ENTERPRISE:
                 price = settings.PLAN_ENTERPRISE_PRICE
                 limit = settings.PLAN_ENTERPRISE_LIMIT
+            else:
+                return {"valid": False}
 
             return {"price": price, "limit": limit, "valid": True}
 
