@@ -1653,10 +1653,13 @@ class BillingPlan(models.Model):
             total_contact_count=Sum("contact_count")
         ).get("total_contact_count")
 
-        amount_currenty = Decimal(
-            BillingPlan.plan_info(self.plan)["price"]
-            + (settings.BILLING_COST_PER_WHATSAPP * self.organization.extra_integration)
-        ).quantize(Decimal(".01"), decimal.ROUND_HALF_UP)
+        if self.plan != self.PLAN_ENTERPRISE:
+            amount_currenty = Decimal(
+                BillingPlan.plan_info(self.plan)["price"]
+                + (settings.BILLING_COST_PER_WHATSAPP * self.organization.extra_integration)
+            ).quantize(Decimal(".01"), decimal.ROUND_HALF_UP)
+        else:
+            amount_currenty = BillingPlan.plan_info(self.plan)["price"]
 
         return {"total_contact": contact_count, "amount_currenty": amount_currenty}
 
