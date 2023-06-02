@@ -301,6 +301,7 @@ class ProjectEmailTestCase(TestCase):
         sended_mail = self.project.send_email_deleted_project(
             self.test_first_name, self.test_email
         )
+        print(self.test_first_name, self.test_email)
         self.assertEqual(len(sended_mail.outbox), 1)
         outbox = sended_mail.outbox[0]
         self.assertEqual(outbox.subject, "A project was deleted...")

@@ -356,7 +356,7 @@ def sync_total_contact_count():
         flow_instance = utils.get_grpc_types().get("flow")
 
     for project in Project.objects.all():
-        response = flow_instance.get_project_statistic(project_uuid=str(project.flow_organization))
+        response = flow_instance.get_project_statistic(project_uuid=str(project.uuid))
         contacts = response.get("active_contacts", project.total_contact_count)
         project.total_contact_count = contacts
         project.save(update_fields=["total_contact_count"])
@@ -410,11 +410,11 @@ def sync_project_statistics():
         flow_instance = FlowsRESTClient()
     else:
         flow_instance = utils.get_grpc_types().get("flow")
-    
+
         for project in Project.objects.order_by("-created_at"):
             try:
                 statistic_project_result = flow_instance.get_project_statistic(
-                    project_uuid=str(project.flow_organization),
+                    project_uuid=str(project.uuid),
                 )
                 if len(statistic_project_result) > 0:
                     project.flow_count = int(statistic_project_result.get("active_flows"))
@@ -425,7 +425,6 @@ def sync_project_statistics():
             except Exception as e:
                 logger.error(f"Sync Project Statistics Exception {e}")
                 continue
-
 
 
 @app.task()
