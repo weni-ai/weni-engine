@@ -1,3 +1,9 @@
+# 2.12.2
+
+## *Fix*
+
+  - fix get_count_intelligences_project, wrong attribute for classifier
+
 # 2.12.1
 
 ## *Fix*
