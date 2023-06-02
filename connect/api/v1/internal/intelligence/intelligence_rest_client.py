@@ -112,7 +112,7 @@ class IntelligenceRESTClient:
                 url=f"{self.base_url}v2/internal/repository/retrieve_authorization/",
                 headers=self.authentication_instance.headers,
                 params={
-                    "repository_authorization": classifier.get("authorization_uuid")
+                    "repository_authorization": classifier.get("access_token")
                 },
             )
             if response.status_code == 200:
