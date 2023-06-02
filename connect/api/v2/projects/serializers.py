@@ -361,7 +361,7 @@ class ProjectSerializer(serializers.ModelSerializer):
                     project_uuid=project_uuid,
                 )
             created = True
-        except ZeroDivisionError as error:
+        except Exception as error:
             flows_info = {
                 "data": {"message": "Could not create project"},
                 "status": status.HTTP_500_INTERNAL_SERVER_ERROR
