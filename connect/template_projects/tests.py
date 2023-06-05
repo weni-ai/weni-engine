@@ -71,3 +71,28 @@ class TemplateFeatureModelTestCase(TestCase):
         str_response = self.template_feature_object.__str__()
         model_id = self.template_feature_object.id
         self.assertListEqual(str_response.split(), [str(model_id)])
+
+
+class TemplateFlowModelTestCase(TestCase):
+
+    def setUp(self):
+
+        self.template_type_object = TemplateType.objects.create(
+            level=1,
+            category="category",
+            description="description",
+            name="name",
+            setup={"setup": "setup"}
+        )
+
+        self.template_flow_object = TemplateFeature.objects.create(
+            name="name",
+            flow_url="flow_url",
+            template_type=self.template_type_object
+        )
+
+    def test_str(self):
+
+        str_response = self.template_flow_object.__str__()
+        model_id = self.template_flow_object.id
+        self.assertListEqual(str_response.split(), [str(model_id)])
