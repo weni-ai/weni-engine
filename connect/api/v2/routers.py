@@ -7,7 +7,7 @@ from connect.api.v2.ticketer.views import TicketerAPIView
 from connect.api.v2.user.views import UserAPIToken, UserIsPaying
 from connect.api.v2.omie.views import OmieAccountAPIView, OmieOriginAPIView, OmieSolutionsAPIView, OmieUsersAPIView
 
-from connect.api.v2.template_projects.views import TemplateTypeViewSet, TemplateFeatureViewSet, TemplateAIViewSet
+from connect.api.v2.template_projects.views import TemplateTypeViewSet, TemplateFeatureViewSet, TemplateAIViewSet, TemplateFlowViewSet
 
 from connect.api.v2.organizations import views as organization_views
 from connect.api.v2.projects import views as project_views
@@ -18,6 +18,7 @@ router = routers.SimpleRouter()
 router.register(r"projects/template-type", TemplateTypeViewSet, basename="template-type")
 router.register(r"projects/template-ai", TemplateAIViewSet, basename="template-ai")
 router.register(r"projects/template-features", TemplateFeatureViewSet, basename="template-features")
+router.register(r"projects/template-flow", TemplateFlowViewSet, basename="template-flow")
 
 router.register(
     "organizations", organization_views.OrganizationViewSet, basename="organizations"

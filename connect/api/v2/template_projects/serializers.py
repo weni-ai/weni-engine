@@ -1,5 +1,5 @@
 from rest_framework.serializers import ModelSerializer
-from connect.template_projects.models import TemplateType, TemplateAI, TemplateFeature
+from connect.template_projects.models import TemplateType, TemplateAI, TemplateFeature, TemplateFlow
 from rest_framework import serializers
 
 
@@ -39,3 +39,10 @@ class RetrieveTemplateSerializer(ModelSerializer):
     class Meta:
         model = TemplateType
         fields = ['id', 'description', 'name']
+
+
+class TemplateFlowSerializer(ModelSerializer):
+
+    class Meta:
+        model = TemplateFlow
+        fields = "__all__"
