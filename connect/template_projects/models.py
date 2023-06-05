@@ -40,7 +40,7 @@ class TemplateFeature(models.Model):
     name = models.CharField(max_length=255)  # description="Name of the AI, only available if type == 'Intelligences'"
     type = models.CharField(max_length=255, choices=features_types)
     feature_identifier = models.CharField(max_length=255)  # description="Identifier of the feature"
-    template_type = models.ManyToManyField(TemplateType, on_delete=models.CASCADE, related_name='template_features')
+    template_type = models.ManyToManyField(TemplateType, related_name='template_features')
 
     def __str__(self):
         return f"{self.id}"
