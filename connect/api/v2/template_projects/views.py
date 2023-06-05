@@ -54,7 +54,7 @@ class TemplateAIViewSet(ModelViewSet):
 
 
 class TemplateFeatureViewSet(ModelViewSet):
-    queryset = TemplateFeature.objects.all()
+    queryset = TemplateFeature.objects.only('id', 'name')
     serializer_class = TemplateFeatureSerializer
     permission_classes = [IsAdminOrReadOnly]
 
@@ -71,7 +71,7 @@ class TemplateFeatureViewSet(ModelViewSet):
 
 class TemplateFlowViewSet(ModelViewSet):
 
-    queryset = TemplateFlow.objects.all()
+    queryset = TemplateFlow.objects.only('id', 'name')
     serializer_class = TemplateFlowSerializer
     permission_classes = [IsAdminOrReadOnly]
 
