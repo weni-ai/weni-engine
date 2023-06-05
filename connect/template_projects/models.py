@@ -44,3 +44,13 @@ class TemplateFeature(models.Model):
 
     def __str__(self):
         return f"{self.id}"
+
+
+class TemplateFlow(models.Model):
+
+    name = models.CharField(max_length=255)
+    flow_url = models.TextField()
+    template_type = models.ForeignKey(TemplateType, on_delete=models.CASCADE, related_name='template_flows')
+
+    def __str__(self):
+        return f"{self.id}"
