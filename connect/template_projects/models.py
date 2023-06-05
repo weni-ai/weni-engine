@@ -1,5 +1,5 @@
 from django.db import models
-from .storage import TemplateTypeImageStorage
+from .storage import TemplateTypeImageStorage, TemplateFlowFileStorage
 
 
 class TemplateType(models.Model):
@@ -49,7 +49,7 @@ class TemplateFeature(models.Model):
 class TemplateFlow(models.Model):
 
     name = models.CharField(max_length=255)
-    flow_url = models.TextField()
+    flow_url = models.FileField(storage=TemplateFlowFileStorage())
     template_type = models.ForeignKey(TemplateType, on_delete=models.CASCADE, related_name='template_flows')
 
     def __str__(self):
