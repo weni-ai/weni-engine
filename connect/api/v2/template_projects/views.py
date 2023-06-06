@@ -1,7 +1,7 @@
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
-from connect.template_projects.models import TemplateType, TemplateFeature, TemplateAI, TemplateFlow
-from .serializers import TemplateTypeSerializer, RetrieveTemplateSerializer, TemplateFeatureSerializer, TemplateAISerializer, TemplateFlowSerializer
+from connect.template_projects.models import TemplateType, TemplateFeature, TemplateFlow
+from .serializers import TemplateTypeSerializer, RetrieveTemplateSerializer, TemplateFeatureSerializer, TemplateFlowSerializer
 from .permission import IsAdminOrReadOnly
 
 
@@ -35,22 +35,6 @@ class TemplateTypeViewSet(ModelViewSet):
         serializer = RetrieveTemplateSerializer(instance)
 
         return Response(serializer.data)
-
-
-class TemplateAIViewSet(ModelViewSet):
-    queryset = TemplateAI.objects.all()
-    serializer_class = TemplateAISerializer
-    permission_classes = [IsAdminOrReadOnly]
-
-    def get_queryset(self):
-        queryset = self.queryset
-        name = self.request.query_params.get('name', None)
-        template_type = self.request.query_params.get('template_type', None)
-        if name:
-            queryset = self.queryset.filter(name__iexact=name)
-        if template_type:
-            queryset = self.queryset.filter(pk=template_type)
-        return queryset
 
 
 class TemplateFeatureViewSet(ModelViewSet):
