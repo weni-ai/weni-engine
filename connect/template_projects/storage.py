@@ -27,7 +27,8 @@ class TemplateFlowFileStorage(S3Boto3Storage):
 
     def get_available_name(self, name, max_length=None):
         if self.override_available_name:
+            new_name = name.split(".")[0]
             ext = name.split(".")[-1]
-            filename = "av_%s.%s" % (uuid.uuid4(), ext)
+            filename = f"{new_name}_{uuid.uuid4()}.{ext}"
             return super().get_available_name(filename, max_length)
         return super().get_available_name(name, max_length)

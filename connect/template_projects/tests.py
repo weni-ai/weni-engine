@@ -1,5 +1,6 @@
 from django.test import TestCase
-from connect.template_projects.models import TemplateType, TemplateAI, TemplateFeature
+from connect.template_projects.models import TemplateType, TemplateAI, TemplateFeature, TemplateFlow
+from unittest.mock import MagicMock
 
 
 class TemplateTypeModelTestCase(TestCase):
@@ -85,9 +86,12 @@ class TemplateFlowModelTestCase(TestCase):
             setup={"setup": "setup"}
         )
 
-        self.template_flow_object = TemplateFeature.objects.create(
+        file_mock = MagicMock(spec="File")
+        file_mock.name = 'test_file.json'
+
+        self.template_flow_object = TemplateFlow.objects.create(
             name="name",
-            flow_url="flow_url",
+            flow_url=file_mock,
             template_type=self.template_type_object
         )
 
