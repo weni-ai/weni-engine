@@ -1,3 +1,13 @@
+# 2.13.0
+
+## *Change*
+
+  - Change flows_rest_client statistic method calls to use project.uuid
+
+## *Update*
+
+  - Add try/except on statistic method on flows_rest_client.
+
 # 2.12.2
 
 ## *Fix*
