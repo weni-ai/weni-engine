@@ -210,12 +210,15 @@ class FlowsRESTClient:
         return response.json()
 
     def get_project_statistic(self, project_uuid: str):
-        response = requests.get(
-            url=f'{self.base_url}/api/v2/internals/statistic/{project_uuid}/',
-            headers=self.authentication_instance.headers,
-            timeout=180
-        )
-        return response.json()
+        try:
+            response = requests.get(
+                url=f'{self.base_url}/api/v2/internals/statistic/{project_uuid}/',
+                headers=self.authentication_instance.headers,
+                timeout=180
+            )
+            return response.json()
+        except Exception as request_error:
+            return dict(error=str(request_error))
 
     def get_billing_total_statistics(self, project_uuid: str, before: str, after: str):
         body = dict(
