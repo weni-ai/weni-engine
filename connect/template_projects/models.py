@@ -1,5 +1,5 @@
 from django.db import models
-from .storage import TemplateTypeImageStorage
+from .storage import TemplateTypeImageStorage, TemplateFlowFileStorage
 
 
 class TemplateType(models.Model):
@@ -18,16 +18,6 @@ class TemplateType(models.Model):
         return f"{self.id}"
 
 
-class TemplateAI(models.Model):
-
-    name = models.CharField(max_length=255)
-    description = models.TextField(blank=True, null=True)
-    template_type = models.ForeignKey(TemplateType, on_delete=models.CASCADE, related_name='template_ais')
-
-    def __str__(self):
-        return f"{self.id}"
-
-
 class TemplateFeature(models.Model):
 
     features_types = [
@@ -40,7 +30,17 @@ class TemplateFeature(models.Model):
     name = models.CharField(max_length=255)  # description="Name of the AI, only available if type == 'Intelligences'"
     type = models.CharField(max_length=255, choices=features_types)
     feature_identifier = models.CharField(max_length=255)  # description="Identifier of the feature"
-    template_type = models.ForeignKey(TemplateType, on_delete=models.CASCADE, related_name='template_features')
+    template_type = models.ManyToManyField(TemplateType, related_name='template_features')
+
+    def __str__(self):
+        return f"{self.id}"
+
+
+class TemplateFlow(models.Model):
+
+    name = models.CharField(max_length=255)
+    flow_url = models.FileField(storage=TemplateFlowFileStorage())
+    template_type = models.ForeignKey(TemplateType, on_delete=models.CASCADE, related_name='template_flows')
 
     def __str__(self):
         return f"{self.id}"
