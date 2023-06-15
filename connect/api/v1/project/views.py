@@ -138,7 +138,7 @@ class ProjectViewSet(
 
         task = tasks.search_project(
             organization_id=project.organization.inteligence_organization,
-            project_uuid=str(project.flow_organization),
+            project_uuid=str(project.uuid),
             text=serializer.data.get("text")
         )
 
