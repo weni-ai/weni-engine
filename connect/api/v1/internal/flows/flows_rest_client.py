@@ -38,7 +38,7 @@ class FlowsRESTClient:
         sample_flow = add_classifier_to_flow(flow, classifier_uuid, template_type, ticketer, queue)
 
         body = dict(
-            org=project_uuid,
+            project=project_uuid,
             sample_flow=sample_flow,
             classifier_uuid=classifier_uuid
         )
@@ -193,7 +193,7 @@ class FlowsRESTClient:
     def get_project_flows(self, project_uuid, flow_name):
         params = dict(
             flow_name=flow_name,
-            org_uuid=project_uuid
+            project=project_uuid
         )
         response = requests.get(
             url=f"{self.base_url}/api/v2/internals/project-flows/",
