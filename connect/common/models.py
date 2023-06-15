@@ -952,7 +952,7 @@ class Project(models.Model):
 
         try:
             flows = flow_instance.create_flows(
-                str(self.flow_organization),
+                str(self.uuid),
                 str(classifier_uuid),
                 self.template_type,
                 ticketer=chats_response.get("ticketer"),

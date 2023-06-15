@@ -569,7 +569,7 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
                     )
                     chats_response = json.loads(chats_response.text)
                 flows = rest_client.create_flows(
-                    str(project.flow_organization),
+                    str(project.uuid),
                     str(classifier_uuid),
                     project.template_type,
                     ticketer=chats_response.get("ticketer") if is_support else None,
