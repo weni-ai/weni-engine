@@ -1,3 +1,4 @@
+from connect.api.v2.template_projects.permission import IsAdminOrReadOnly
 from rest_framework import mixins, status
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.response import Response
@@ -67,6 +68,37 @@ class ProjectViewSet(
         else:
             OpenedProject.objects.create(project=instance, user=user, day=timezone.now())
         return Response(data={"day": str(last_opened_on.day)}, status=status.HTTP_200_OK)
+
+    @action(
+        detail=True,
+        methods=["patch"],
+        url_name="update-flows-project"
+    )
+    def update_flows_project(self, request, **kwargs):
+        instance = self.get_object()
+        allowed_fields = ["name", "timezone", "date_format", "flow_id"]
+        request_fields = []
+
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+
+        for field in allowed_fields:
+            if field in serializer.validated_data:
+                setattr(instance, field, serializer.validated_data[field])
+                request_fields.append(field)
+
+        request_fields = list(serializer.validated_data.keys())
+
+        if not request_fields:
+            return Response(data={
+                "error": "At least one field should be send one allowed field show be on the request.", "allowed_fields": allowed_fields
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        instance.save(update_fields=request_fields)
+
+        return Response(data={
+            "message": "Project updated successfully", "name": instance.name
+        }, status=status.HTTP_200_OK)
 
     def create(self, request, *args, **kwargs):
         request.data.update(

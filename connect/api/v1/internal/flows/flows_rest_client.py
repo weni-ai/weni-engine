@@ -393,3 +393,15 @@ class FlowsRESTClient:
         )
 
         return response
+
+    def update_project_fields(self, project_uuid: str, fields: dict):
+        body = dict(
+            uuid=project_uuid,
+            fields=fields
+        )
+        response = requests.patch(
+            url=f'{self.base_url}/api/v2/internals/orgs/{project_uuid}/',  # Wait for the new endpoint
+            headers=self.authentication_instance.headers,
+            json=body
+        )
+        return response.json()

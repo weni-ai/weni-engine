@@ -66,7 +66,6 @@ class ProjectViewSetTestCase(TestCase):
 
         request = self.make_request(path, method, data)
         force_authenticate(request, user=user, token=user.auth_token)
-
         response = ProjectViewSet.as_view(method)(request, organization_uuid=pk, data=data, uuid=project_uuid)
         response.render()
 
@@ -459,6 +458,30 @@ class ProjectViewSetTestCase(TestCase):
         )
 
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
+
+    def test_update_flows_project(self):
+
+        organization_uuid = str(self.org_1.uuid)
+        project_uuid = str(self.project1.uuid)
+        data = {
+            "name": "Test V2 Project (update)",
+            "timezone": "America/Argentina/Buenos_Aires",
+            "date_format": "D",
+            "id": 2,
+        }
+        method = {"patch": "partial_update"}
+        path = f"v2/organizations/{organization_uuid}/projects/{project_uuid}/update_flows_project/"
+        user = self.user
+        response, content_data = self.request(
+            path,
+            method,
+            user=user,
+            pk=organization_uuid,
+            project_uuid=project_uuid,
+            data=data
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(data.get("name"), content_data.get("name"))
 
 
 class ProjectTestCase(TestCase):
