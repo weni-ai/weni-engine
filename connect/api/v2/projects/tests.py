@@ -467,7 +467,6 @@ class ProjectViewSetTestCase(TestCase):
             "name": "Test V2 Project (update)",
             "timezone": "America/Argentina/Buenos_Aires",
             "date_format": "D",
-            "id": 2,
         }
         method = {"patch": "partial_update"}
         path = f"v2/organizations/{organization_uuid}/projects/{project_uuid}/update_flows_project/"

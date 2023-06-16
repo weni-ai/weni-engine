@@ -11,6 +11,7 @@ from connect.common.models import (
 )
 from connect.api.v2.projects.serializers import (
     ProjectSerializer,
+    ProjectSerializerUpdate,
 )
 
 from django.utils import timezone
@@ -69,36 +70,9 @@ class ProjectViewSet(
             OpenedProject.objects.create(project=instance, user=user, day=timezone.now())
         return Response(data={"day": str(last_opened_on.day)}, status=status.HTTP_200_OK)
 
-    @action(
-        detail=True,
-        methods=["patch"],
-        url_name="update-flows-project"
-    )
-    def update_flows_project(self, request, **kwargs):
-        instance = self.get_object()
-        allowed_fields = ["name", "timezone", "date_format", "flow_id"]
-        request_fields = []
-
-        serializer = self.get_serializer(instance, data=request.data, partial=True)
-        serializer.is_valid(raise_exception=True)
-
-        for field in allowed_fields:
-            if field in serializer.validated_data:
-                setattr(instance, field, serializer.validated_data[field])
-                request_fields.append(field)
-
-        request_fields = list(serializer.validated_data.keys())
-
-        if not request_fields:
-            return Response(data={
-                "error": "At least one field should be send one allowed field show be on the request.", "allowed_fields": allowed_fields
-            }, status=status.HTTP_400_BAD_REQUEST)
-
-        instance.save(update_fields=request_fields)
-
-        return Response(data={
-            "message": "Project updated successfully", "name": instance.name
-        }, status=status.HTTP_200_OK)
+    def update(self, request, *args, **kwargs):
+        self.serializer_class = ProjectSerializerUpdate
+        return super(ProjectViewSet, self).update(request, *args, **kwargs)
 
     def create(self, request, *args, **kwargs):
         request.data.update(
