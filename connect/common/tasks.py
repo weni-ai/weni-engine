@@ -382,14 +382,15 @@ def sync_project_information():
             if "timezone" in flow_result:
                 project.timezone = str(flow_result.get("timezone"))
                 updated_fields.append("timezone")
-            
+
             if "data_format" in flow_result:
                 project.date_format = str(flow_result.get("date_format"))
                 updated_fields.append("data_format")
-            
+
             if "id" in flow_result:
                 project.flow_id = flow_result.get("id")
                 updated_fields.append("flow_id")
+
             logger.info(f"project: {project.__str__()}")
             if len(updated_fields) > 0:
                 project.save(update_fields=updated_fields)

@@ -41,8 +41,11 @@ def create_service_status(sender, instance, created, **kwargs):
             instance.service_status.create(service=service)
         if not settings.TESTING:
             chats_client = ChatsRESTClient()
+            ai_client = IntelligenceRESTClient()
 
             template = instance.is_template and instance.template_type in Project.HAS_CHATS
+
+            ai_client.create_project(instance.uuid)
 
             if not template:
                 response = chats_client.create_chat_project(

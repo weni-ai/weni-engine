@@ -4,6 +4,7 @@ import json
 from django.conf import settings
 
 from connect.api.v1.internal.internal_authentication import InternalAuthentication
+from connect.common.models import Project
 
 logger = logging.getLogger(__name__)
 
@@ -133,3 +134,38 @@ class IntelligenceRESTClient:
         )
 
         return json.loads(response.text).get("access_token")
+
+    def create_project(self, project_uuid):
+        project = Project.objects.get(uuid=project_uuid)
+        body = {
+            "project_uuid": project.uuuid,
+            "name": project.name,
+            "timezone": project.timezone,
+            "is_template": project.is_template,
+            "intelligence_organization": project.organization.inteligence_organization,
+            "date_format": project.date_format,
+            "created_by": project.create_by if project.created_by else "crm@weni.ai"
+        }
+        response = requests.post(
+            url=f"{self.base_url}v2/project",
+            headers=self.authentication_instance.headers,
+            json=body
+        )
+
+        return response.json()
+
+    def update_project(self, project_data):
+        response = requests.patch(
+            url=f"{self.base_url}v2/project",
+            headers=self.authentication_instance.headers,
+            json=project_data
+        )
+        return response.json()
+
+    def delete_project(self, project_uuid):
+        response = requests.delete(
+            url=f"{self.base_url}v2/project",
+            headers=self.authentication_instance.headers,
+            json={"project_uuid": project_uuid}
+        )
+        return response.json()
