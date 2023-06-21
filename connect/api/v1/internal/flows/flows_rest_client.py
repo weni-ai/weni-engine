@@ -383,7 +383,6 @@ class FlowsRESTClient:
         return response
 
     def update_project(self, project_uuid: str, **kwargs: dict):
-
         try:
             response = requests.patch(
                 url=f'{self.base_url}/api/v2/internals/orgs/{project_uuid}/',
