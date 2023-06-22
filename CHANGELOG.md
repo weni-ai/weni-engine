@@ -1,3 +1,9 @@
+# 2.14.0
+
+## *Change*
+
+  - project UUID instead of flow_organization in flows related endpoints
+
 # 2.13.0
 
 ## *Change*
