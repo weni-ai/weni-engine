@@ -744,7 +744,7 @@ class Project(models.Model):
         intelligence_client = IntelligenceRESTClient()
 
         flows_result = flows_client.get_project_flows(
-            project_uuid=self.flow_organization, flow_name=text
+            project_uuid=self.uuid, flow_name=text
         )
         intelligence_result = intelligence_client.get_organization_intelligences(
             intelligence_name=text,
@@ -952,7 +952,7 @@ class Project(models.Model):
 
         try:
             flows = flow_instance.create_flows(
-                str(self.flow_organization),
+                str(self.uuid),
                 str(classifier_uuid),
                 self.template_type,
                 ticketer=chats_response.get("ticketer"),
