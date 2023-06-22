@@ -65,18 +65,6 @@ class FlowsRESTClient:
 
         return response.json()
 
-    def update_project(self, organization_uuid: str, organization_name: str):
-        body = {
-            "uuid": organization_uuid
-        }
-        if organization_name:
-            body['name'] = organization_name
-        response = requests.patch(
-            url=f"{self.base_url}/",
-            headers=self.authentication_instance.headers,
-            json=body
-        )
-        return dict(status=response.status_code, data=response.data)
 
     def delete_project(self, project_uuid: int, user_email: str):
         body = dict(
@@ -393,3 +381,14 @@ class FlowsRESTClient:
         )
 
         return response
+
+    def update_project(self, project_uuid: str, **kwargs: dict):
+        try:
+            response = requests.patch(
+                url=f'{self.base_url}/api/v2/internals/orgs/{project_uuid}/',
+                headers=self.authentication_instance.headers,
+                json=kwargs
+            )
+            return response.json()
+        except Exception as request_error:
+            return dict(error=str(request_error))

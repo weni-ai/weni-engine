@@ -10,6 +10,7 @@ from connect.common.models import (
 )
 from connect.api.v2.projects.serializers import (
     ProjectSerializer,
+    ProjectUpdateSerializer,
 )
 
 from django.utils import timezone
@@ -67,6 +68,10 @@ class ProjectViewSet(
         else:
             OpenedProject.objects.create(project=instance, user=user, day=timezone.now())
         return Response(data={"day": str(last_opened_on.day)}, status=status.HTTP_200_OK)
+
+    def update(self, request, *args, **kwargs):
+        self.serializer_class = ProjectUpdateSerializer
+        return super(ProjectViewSet, self).update(request, *args, **kwargs)
 
     def create(self, request, *args, **kwargs):
         request.data.update(
