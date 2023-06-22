@@ -562,3 +562,36 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
             }
             created = False
             return created, response_data
+
+
+class ProjectUpdateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Project
+        fields = [
+            "name",
+            "timezone",
+            "date_format",
+            "uuid",
+        ]
+        ref_name = None
+
+    name = serializers.CharField(max_length=500, required=False)
+    timezone = fields.TimezoneField(required=False)
+    date_format = serializers.CharField(max_length=1, required=False)
+
+    def update(self, instance, validated_data):
+        flow_client = FlowsRESTClient()
+        data = validated_data
+        if validated_data.get("timezone"):
+            data["timezone"] = str(data["timezone"])
+
+        try:
+            flow_client.update_project(
+                str(instance.uuid),
+                **data
+            )
+            return super().update(instance, validated_data)
+        except Exception as error:
+            logger.error(f"Update project: {error}")
+            raise error

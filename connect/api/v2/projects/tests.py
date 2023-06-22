@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.test import APIRequestFactory, force_authenticate
 
 from django.test import TestCase
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 from connect.api.v1.tests.utils import create_user_and_token
 from connect.common.models import Organization, BillingPlan, OrganizationRole, Project
@@ -66,7 +66,6 @@ class ProjectViewSetTestCase(TestCase):
 
         request = self.make_request(path, method, data)
         force_authenticate(request, user=user, token=user.auth_token)
-
         response = ProjectViewSet.as_view(method)(request, organization_uuid=pk, data=data, uuid=project_uuid)
         response.render()
 
@@ -459,6 +458,30 @@ class ProjectViewSetTestCase(TestCase):
         )
 
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
+
+    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.update_project")
+    def test_update_flows_project(self, mock_update_project):
+
+        mock_response = Mock()
+        mock_response.status_code = status.HTTP_200_OK
+        mock_response.json.return_value = {"message": "Success"}
+
+        mock_update_project.return_value = mock_response
+
+        organization_uuid = str(self.org_1.uuid)
+        project_uuid = str(self.project1.uuid)
+
+        url = f"v2/organizations/{organization_uuid}/projects/{project_uuid}/"
+        data = {
+            "name": "Novo nome",
+            "timezone": "America/New_York",
+            "date_format": "D",
+        }
+        method = {"patch": "partial_update"}
+        response, content_data = self.request(url, method, data, user=self.user, pk=organization_uuid, project_uuid=project_uuid)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(content_data.get("name"), data.get("name"))
+        mock_update_project.assert_called_once_with(project_uuid, name="Novo nome", timezone="America/New_York", date_format="D")
 
 
 class ProjectTestCase(TestCase):

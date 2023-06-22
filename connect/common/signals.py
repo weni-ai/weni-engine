@@ -87,7 +87,7 @@ def create_service_status(sender, instance, created, **kwargs):
                         project=project_auth.project,
                         created_by=project_auth.user
                     )
-    elif "flow_organization" in update_fields:
+    elif update_fields and "flow_organization" in update_fields:
         for permission in instance.project_authorizations.all():
             update_user_permission_project(
                 project_uuid=str(instance.uuid),
