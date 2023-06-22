@@ -1,3 +1,9 @@
+# 2.15.0
+
+## *Change*
+
+  - Architecture change where the weni-engine will change the project fields and send them to the flows.
+
 # 2.14.0
 
 ## *Change*
