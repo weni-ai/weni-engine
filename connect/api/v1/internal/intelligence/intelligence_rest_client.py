@@ -139,13 +139,13 @@ class IntelligenceRESTClient:
         from connect.common.models import Project
         project = Project.objects.get(uuid=project_uuid)
         body = {
-            "project_uuid": project.uuuid,
+            "project_uuid": str(project.uuid),
             "name": project.name,
-            "timezone": project.timezone,
+            "timezone": str(project.timezone),
             "is_template": project.is_template,
             "intelligence_organization": project.organization.inteligence_organization,
             "date_format": project.date_format,
-            "created_by": project.create_by if project.created_by else "crm@weni.ai"
+            "created_by": str(project.created_by) if project.created_by else "crm@weni.ai"
         }
         response = requests.post(
             url=f"{self.base_url}v2/project",
