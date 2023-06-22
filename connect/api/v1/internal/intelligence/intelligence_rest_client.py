@@ -4,7 +4,7 @@ import json
 from django.conf import settings
 
 from connect.api.v1.internal.internal_authentication import InternalAuthentication
-from connect.common.models import Project
+
 
 logger = logging.getLogger(__name__)
 
@@ -136,6 +136,7 @@ class IntelligenceRESTClient:
         return json.loads(response.text).get("access_token")
 
     def create_project(self, project_uuid):
+        from connect.common.models import Project
         project = Project.objects.get(uuid=project_uuid)
         body = {
             "project_uuid": project.uuuid,
