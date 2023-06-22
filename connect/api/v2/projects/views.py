@@ -1,4 +1,3 @@
-from connect.api.v2.template_projects.permission import IsAdminOrReadOnly
 from rest_framework import mixins, status
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.response import Response
