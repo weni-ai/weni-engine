@@ -346,8 +346,8 @@ class Organization(models.Model):
             msg = (subject, message, html_message, from_email, recipient_list)
             msg_list.append(msg)
 
-            html_mail = send_mass_html_mail(msg_list, fail_silently=False)
-            return html_mail
+        html_mail = send_mass_html_mail(msg_list, fail_silently=False)
+        return html_mail
 
     def send_email_change_organization_name(self, prev_name: str, new_name: str, emails: list = None):
         if not settings.SEND_EMAILS:
