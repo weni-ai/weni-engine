@@ -21,6 +21,7 @@ from connect.common.models import (
     RocketAuthorization,
 )
 from django.conf import settings
+from django.core import mail
 from connect.common.gateways.rocket_gateway import Rocket
 from freezegun import freeze_time
 
@@ -372,6 +373,19 @@ class OrganizationTestCase(TestCase):
         self.test_first_name = "test"
         self.organization_new_name = "Test Org"
 
+        self.test_user1 = User.objects.create_user(
+            email=self.test_email,
+            username=self.test_user_name,
+            first_name=self.test_first_name,
+            language="en",
+        )
+        self.test_user2 = User.objects.create_user(
+            email="test2@example.com",
+            username="test2_username",
+            first_name="test2",
+            language="pt-br",
+        )
+
     def test_str_organization(self):
         self.assertEqual(
             self.organization.__str__(),
@@ -389,16 +403,12 @@ class OrganizationTestCase(TestCase):
         self.assertEqual(outbox.to[0], self.test_email)
 
     def test_send_email_organization_going_out(self):
-        sended_mail = self.organization.send_email_organization_going_out(
-            self.test_user_name, self.test_email
-        )
-        self.assertEqual(len(sended_mail.outbox), 1)
-        outbox = sended_mail.outbox[0]
-        self.assertEqual(
-            outbox.subject, f"You are leaving {self.organization.name}"
-        )
-        self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
-        self.assertEqual(outbox.to[0], self.test_email)
+        self.organization.send_email_organization_going_out(self.test_user1)
+
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].subject, "You are leaving Test Organization")
+        self.assertIn(self.test_user_name, mail.outbox[0].body)
+        self.assertIn("Test Organization", mail.outbox[0].body)
 
     def test_send_email_organization_removed(self):
         sended_mail = self.organization.send_email_organization_removed(
@@ -436,7 +446,7 @@ class OrganizationTestCase(TestCase):
 
     def test_send_email_delete_organization(self):
         sended_email = self.organization.send_email_delete_organization(
-            self.test_first_name, self.test_email
+            self.test_email
         )
         self.assertEqual(len(sended_email.outbox), 1)
         outbox = sended_email.outbox[0]
