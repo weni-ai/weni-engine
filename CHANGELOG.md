@@ -1,3 +1,9 @@
+# 2.15.1
+
+## *Fix*
+
+  - Add correct permissions for v2 project api
+
 # 2.15.0
 
 ## *Change*
