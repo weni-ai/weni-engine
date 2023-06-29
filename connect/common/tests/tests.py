@@ -655,6 +655,19 @@ class BillingPlanTestCase(TestCase):
         self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
         self.assertEqual(outbox.to[0], self.test_email[0])
 
+    def test_send_email_plan_is_about_to_expire(self):
+        self.billing.plan = BillingPlan.PLAN_TRIAL
+        user1 = (self.test_user1.email, self.test_user1.username, self.test_user1.language)
+        user2 = (self.test_user2.email, self.test_user2.username, self.test_user2.language)
+        email_list = [user1, user2]
+        self.billing.send_email_plan_is_about_to_expire(
+            email_list
+        )
+        self.assertEqual(len(mail.outbox), 2)
+        outbox = mail.outbox[0]
+        self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
+        self.assertEqual(outbox.to[0], self.test_email[0])
+
 
 class ProjectAuthorizationTestCase(TestCase):
     def setUp(self):

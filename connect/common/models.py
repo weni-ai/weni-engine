@@ -1520,7 +1520,7 @@ class BillingPlan(models.Model):
                 price = settings.PLAN_TRIAL_PRICE
                 limit = settings.PLAN_TRIAL_LIMIT
 
-            if plan == BillingPlan.PLAN_START:
+            elif plan == BillingPlan.PLAN_START:
                 price = settings.PLAN_START_PRICE
                 limit = settings.PLAN_START_LIMIT
 
