@@ -273,8 +273,8 @@ class Organization(models.Model):
             msg = (subject, message, html_message, from_email, recipient_list)
             msg_list.append(msg)
 
-            html_mail = send_mass_html_mail(msg_list, fail_silently=False)
-            return html_mail
+        html_mail = send_mass_html_mail(msg_list, fail_silently=False)
+        return html_mail
 
     def send_email_remove_permission_organization(self, first_name: str, email: str):
         if not settings.SEND_EMAILS:
@@ -346,8 +346,8 @@ class Organization(models.Model):
             msg = (subject, message, html_message, from_email, recipient_list)
             msg_list.append(msg)
 
-            html_mail = send_mass_html_mail(msg_list, fail_silently=False)
-            return html_mail
+        html_mail = send_mass_html_mail(msg_list, fail_silently=False)
+        return html_mail
 
     def send_email_change_organization_name(self, prev_name: str, new_name: str, emails: list = None):
         if not settings.SEND_EMAILS:
@@ -398,8 +398,8 @@ class Organization(models.Model):
             msg = (subject, message, html_message, from_email, recipient_list)
             msg_list.append(msg)
 
-            html_mail = send_mass_html_mail(msg_list, fail_silently=False)
-            return html_mail
+        html_mail = send_mass_html_mail(msg_list, fail_silently=False)
+        return html_mail
 
     def send_email_access_code(self, email: str, user_name: str, access_code: str):
         if not settings.SEND_EMAILS:
@@ -1520,7 +1520,7 @@ class BillingPlan(models.Model):
                 price = settings.PLAN_TRIAL_PRICE
                 limit = settings.PLAN_TRIAL_LIMIT
 
-            if plan == BillingPlan.PLAN_START:
+            elif plan == BillingPlan.PLAN_START:
                 price = settings.PLAN_START_PRICE
                 limit = settings.PLAN_START_LIMIT
 
