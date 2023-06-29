@@ -1,3 +1,14 @@
+# 2.15.2
+
+## *Fix*
+
+  - Fix some send email functions to multiple languages
+  - Billing plan trial statement
+
+## *Add*
+
+  - Add new unit tests to improve models coverage 
+
 # 2.15.1
 
 ## *Fix*
