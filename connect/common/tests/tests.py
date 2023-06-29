@@ -589,11 +589,11 @@ class BillingPlanTestCase(TestCase):
         self.assertEqual(outbox.to[0], self.test_email[0])
 
     def test_send_email_reactivated_plan(self):
-        sended_email = self.billing.send_email_reactivated_plan(
+        self.billing.send_email_reactivated_plan(
             self.test_user_name, self.test_email
         )
-        self.assertEqual(len(sended_email.outbox), 1)
-        outbox = sended_email.outbox[0]
+        self.assertEqual(len(mail.outbox), 1)
+        outbox = mail.outbox[0]
         self.assertEqual(
             outbox.subject,
             "Your organization's plan has been reactivated.",
