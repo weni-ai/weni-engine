@@ -544,9 +544,6 @@ class BillingPlanTestCase(TestCase):
             language="pt-br",
         )
 
-        # self.organization.organization_billing.stripe_customer="cus_KpDZ129lPQbygj"
-        # self.organization.organization_billing.save()
-
     def test_send_email_added_card(self):
         sended_email = self.billing.send_email_added_card(
             self.test_user_name, self.test_email
