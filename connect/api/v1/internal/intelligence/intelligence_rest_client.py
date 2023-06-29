@@ -152,7 +152,7 @@ class IntelligenceRESTClient:
             headers=self.authentication_instance.headers,
             json=body
         )
-
+        response.raise_for_status()
         return response.json()
 
     def update_project(self, project_data):
