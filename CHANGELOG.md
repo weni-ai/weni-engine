@@ -1,3 +1,21 @@
+# 2.15.1
+
+## *Fix*
+
+  - Add correct permissions for v2 project api
+
+# 2.15.0
+
+## *Change*
+
+  - Architecture change where the weni-engine will change the project fields and send them to the flows.
+
+# 2.14.0
+
+## *Change*
+
+  - project UUID instead of flow_organization in flows related endpoints
+
 # 2.13.0
 
 ## *Change*
