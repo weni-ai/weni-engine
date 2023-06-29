@@ -531,6 +531,19 @@ class BillingPlanTestCase(TestCase):
         self.test_user_name = "test username"
         self.test_email = ["test@example.com"]
         self.test_first_name = "test"
+        self.test_user1 = User.objects.create_user(
+            email=self.test_email[0],
+            username=self.test_user_name,
+            first_name=self.test_first_name,
+            language="en-us",
+        )
+        self.test_user2 = User.objects.create_user(
+            email="test@test.com",
+            username="test2_username",
+            first_name="test2",
+            language="pt-br",
+        )
+
         # self.organization.organization_billing.stripe_customer="cus_KpDZ129lPQbygj"
         # self.organization.organization_billing.save()
 
@@ -561,15 +574,17 @@ class BillingPlanTestCase(TestCase):
         self.assertEqual(outbox.to[0], self.test_email[0])
 
     def test_send_email_finished_plan(self):
-        sended_email = self.billing.send_email_finished_plan(
-            self.test_user_name, self.test_email
+        email_list = [self.test_user1.email, self.test_user2.email]
+        self.billing.send_email_finished_plan(
+            self.test_user1.username, email_list
         )
-        self.assertEqual(len(sended_email.outbox), 1)
-        outbox = sended_email.outbox[0]
-        self.assertEqual(
-            outbox.subject,
-            "Your organization's plan has expired",
-        )
+        self.assertEqual(len(mail.outbox), 2)
+        outbox = mail.outbox[0]
+        if self.test_user1.language == "en-us":
+            self.assertEqual(
+                outbox.subject,
+                "Your organization's plan has ended",
+            )
         self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
         self.assertEqual(outbox.to[0], self.test_email[0])
 
