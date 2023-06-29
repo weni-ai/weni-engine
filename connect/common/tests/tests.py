@@ -602,11 +602,11 @@ class BillingPlanTestCase(TestCase):
         self.assertEqual(outbox.to[0], self.test_email[0])
 
     def test_send_email_removed_credit_card(self):
-        sended_email = self.billing.send_email_removed_credit_card(
+        self.billing.send_email_removed_credit_card(
             self.test_user_name, self.test_email
         )
-        self.assertEqual(len(sended_email.outbox), 1)
-        outbox = sended_email.outbox[0]
+        self.assertEqual(len(mail.outbox), 1)
+        outbox = mail.outbox[0]
         self.assertEqual(
             outbox.subject,
             "Your organization's credit card was removed",
