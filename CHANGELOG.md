@@ -1,3 +1,9 @@
+# 2.16.0
+
+## *Add*
+
+  - Support for Project in AI module
+
 # 2.15.2
 
 ## *Fix*
