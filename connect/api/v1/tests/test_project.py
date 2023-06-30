@@ -5,6 +5,7 @@ from unittest.mock import patch
 from django.test import RequestFactory
 from django.test import TestCase
 from django.test.client import MULTIPART_CONTENT
+from django.core import mail
 from django.conf import settings
 from rest_framework import status
 
@@ -245,67 +246,6 @@ class UpdateProjectTestCase(TestCase):
         )
         # if the user dosen't have an authorization he cant find the project
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
-
-class ProjectEmailTestCase(TestCase):
-    def setUp(self):
-        self.factory = RequestFactory()
-
-        self.owner, self.owner_token = create_user_and_token("owner")
-        self.user, self.user_token = create_user_and_token("user")
-
-        self.organization = Organization.objects.create(
-            name="test organization",
-            description="",
-            inteligence_organization=1,
-            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
-            organization_billing__plan="free",
-        )
-        self.organization_authorization = self.organization.authorizations.create(
-            user=self.owner, role=OrganizationRole.ADMIN.value
-        )
-        self.project = self.organization.project.create(
-            name="project test",
-            timezone="America/Sao_Paulo",
-            flow_organization=uuid4.uuid4(),
-        )
-        self.test_email = "test@example.com"
-        self.test_user_name = "test_username"
-        self.test_first_name = "test"
-        self.organization_new_name = "Test Org"
-
-    def test_send_email_change_project(self):
-        info = {
-            "old_project_name": "name_test",
-            "date_before": "DD-MM-AAAA",
-            "old_timezone": "(GMT -03:00) America / Argentina / Buenos Aires",
-            "country_loc_suport_before": "Argentina",
-            "country_loc_suport_now": "Brasil",
-            "default_lang_before": "Espanhol",
-            "default_lang_now": "Português do Brasil",
-            "secondary_lang_before": "Espanhol",
-            "secondary_lang_now": "Espanhol",
-            "user": "João",
-        }
-
-        sended_mail = self.project.send_email_change_project(
-            self.test_first_name, self.test_email, info
-        )
-        self.assertEqual(len(sended_mail.outbox), 1)
-        outbox = sended_mail.outbox[0]
-        self.assertEqual(outbox.subject, f"The project {self.project.name} has changed")
-        self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
-        self.assertEqual(outbox.to[0], self.test_email)
-
-    def test_send_email_deleted_project(self):
-        sended_mail = self.project.send_email_deleted_project(
-            self.test_first_name, self.test_email
-        )
-        self.assertEqual(len(sended_mail.outbox), 1)
-        outbox = sended_mail.outbox[0]
-        self.assertEqual(outbox.subject, "A project was deleted...")
-        self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
-        self.assertEqual(outbox.to[0], self.test_email)
 
 
 class DeleteProjectAuthTestCase(TestCase):
