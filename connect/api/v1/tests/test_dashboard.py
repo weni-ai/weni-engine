@@ -16,15 +16,22 @@ from connect.common.models import (
     BillingPlan,
     OrganizationRole,
 )
+from connect.common.mocks import StripeMockGateway
+from unittest.mock import patch
 
 
 class ListStatusServiceTestCase(TestCase):
-    def setUp(self):
+    @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway, mock_permission):
         self.factory = RequestFactory()
 
         self.service = Service.objects.create(url="http://test.com", default=True)
 
         self.user, self.token = create_user_and_token()
+
+        mock_get_gateway.return_value = StripeMockGateway()
+        mock_permission.return_value = True
 
         self.organization = Organization.objects.create(
             name="test organization",
@@ -111,9 +118,11 @@ class ListNewsletterTestCase(TestCase):
 
 
 class ListNewsletterOrgTestCase(TestCase):
-    def setUp(self):
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway):
         self.factory = RequestFactory()
         self.user, self.token = create_user_and_token()
+        mock_get_gateway.return_value = StripeMockGateway()
         self.organization = Organization.objects.create(
             name="ASDF",
             description="ASDF",

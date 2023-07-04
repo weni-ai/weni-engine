@@ -16,6 +16,7 @@ from connect.common.models import (
     BillingPlan,
     OrganizationRole
 )
+from connect.common.mocks import StripeMockGateway
 
 
 class CeleryResponse:
@@ -27,9 +28,14 @@ class CeleryResponse:
 
 
 class ListInvoiceAPITestCase(TestCase):
-    def setUp(self):
+    @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway, mock_permission):
         self.factory = RequestFactory()
         self.owner, self.owner_token = create_user_and_token("owner")
+
+        mock_get_gateway.return_value = StripeMockGateway()
+        mock_permission.return_value = True
 
         self.organization = Organization.objects.create(
             name="test organization",
@@ -65,7 +71,10 @@ class ListInvoiceAPITestCase(TestCase):
         content_data = json.loads(response.content)
         return (response, content_data)
 
-    def test_okay(self):
+    @patch("connect.common.models.StripeGateway")
+    def test_okay(self, mock_get_gateway):
+        mock_get_gateway.return_value = StripeMockGateway()
+
         self.organization.organization_billing_invoice.create(
             due_date=timezone.now() + timedelta(days=10),
             invoice_random_id=1
@@ -86,10 +95,14 @@ class ListInvoiceAPITestCase(TestCase):
 
 
 class InvoiceDataTestCase(TestCase):
-    def setUp(self):
+    @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway, mock_permission):
+        mock_get_gateway.return_value = StripeMockGateway()
+        mock_permission.return_value = True
+
         self.factory = RequestFactory()
         self.owner, self.owner_token = create_user_and_token("owner")
-
         self.organization = Organization.objects.create(
             name="test organization",
             description="",
@@ -133,11 +146,14 @@ class InvoiceDataTestCase(TestCase):
 
         return response, content_data
 
+    @patch("connect.api.v1.invoice.views.StripeGateway")
     @patch("connect.celery.app.send_task")
-    def test_okay(self, task):
+    def test_okay(self, task, mock_get_gateway):
         task.side_effect = [
             CeleryResponse(dict(active_contacts=0)),
         ]
+        mock_get_gateway.return_value = StripeMockGateway()
+
         response, content_data = self.request(
             self.organization.uuid,
             1,
