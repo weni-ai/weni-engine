@@ -423,7 +423,7 @@ class OrganizationTestCase(TestCase):
         self.assertEqual(outbox.to[0], self.test_email)
 
     def test_send_email_organization_create(self):
-        email1 = (   
+        email1 = (
             self.test_user1.email,
             self.test_user1.username,
             self.test_user1.language
@@ -491,9 +491,9 @@ class OrganizationTestCase(TestCase):
         result = organization.send_email_access_code(email, user_name, access_code)
 
         self.assertTrue(result)
-        self.assertEqual(len(mail.outbox), 1) 
+        self.assertEqual(len(mail.outbox), 1)
         sent_email = mail.outbox[0]
-        self.assertEqual(sent_email.subject, "You receive an access code to Weni Platform") 
+        self.assertEqual(sent_email.subject, "You receive an access code to Weni Platform")
 
     def test_send_email_permission_change(self):
         sended_email = self.organization.send_email_permission_change(

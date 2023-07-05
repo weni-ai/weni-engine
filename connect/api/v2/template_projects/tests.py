@@ -47,7 +47,6 @@ class TemplateTypeViewSetTestCase(TestCase):
 
         template_id = self.template_type_object.id
 
-        print("Object id:", self.template_type_object.id)
         response = self.request(
             {"get": "retrieve"},
             f"/v2/projects/template-type/{template_id}",
