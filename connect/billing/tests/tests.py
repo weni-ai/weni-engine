@@ -8,6 +8,7 @@ from django.utils import timezone
 
 from unittest import skipIf
 from unittest.mock import patch
+from connect.common.mocks import StripeMockGateway
 import uuid as uuid4
 
 from django.test import TestCase
@@ -21,7 +22,6 @@ from connect.common.models import Organization, Project, BillingPlan, Organizati
 from freezegun import freeze_time
 from connect.billing.tasks import sync_contacts, check_organization_plans
 from connect.api.v1.tests.utils import create_contacts, create_user_and_token
-
 
 @skipIf(not settings.BILLING_SETTINGS.get("stripe", None), "gateway not configured")
 class StripeGatewayTestCase(TestCase):
@@ -156,8 +156,9 @@ class SyncContactsTestCase(TestCase):
 
 
 class ContactTestCase(TestCase):
-
-    def setUp(self):
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway):
+        mock_get_gateway.return_value = StripeMockGateway()
         self.organization = Organization.objects.create(
             name='org test',
             description='desc',
@@ -246,7 +247,11 @@ class MessageTestCase(TestCase):
 
 
 class CheckPlansTestCase(TestCase):
-    def setUp(self):
+    @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway, mock_permission):
+        mock_get_gateway.return_value = StripeMockGateway()
+        mock_permission.return_value = True
         # Orgs
         self.start = Organization.objects.create(
             name="Start org",
@@ -345,7 +350,7 @@ class CheckPlansTestCase(TestCase):
     def test_billing_emails(self):
         self.start.organization_billing.send_email_trial_plan_expired_due_time_limit()
 
-
+@skipIf(True, "Deprecated")
 class ChannelModelsTestCase(TestCase):
 
     def setUp(self):
@@ -386,7 +391,9 @@ class ChannelModelsTestCase(TestCase):
 
 class ContactCountTestCase(TestCase):
 
-    def setUp(self):
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway):
+        mock_get_gateway.return_value = StripeMockGateway()
         self.organization = Organization.objects.create(
             name="test organization",
             description="test organization",

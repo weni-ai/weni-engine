@@ -11,10 +11,14 @@ from connect.api.v1.organization.views import OrganizationViewSet
 from connect.api.v1.tests.utils import create_user_and_token
 
 from rest_framework import status
+from connect.common.mocks import StripeMockGateway
+from unittest.mock import patch
 
 
 class TrialNewsletterTestCase(TestCase):
-    def setUp(self) -> None:
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway) -> None:
+        mock_get_gateway.return_value = StripeMockGateway()
         self.factory = RequestFactory()
         self.owner, self.owner_token = create_user_and_token("owner")
         self.organization = Organization.objects.create(
@@ -28,7 +32,9 @@ class TrialNewsletterTestCase(TestCase):
             user=self.owner, role=OrganizationRole.ADMIN.value
         )
 
-    def test_ok(self):
+    @patch("connect.billing.get_gateway")
+    def test_ok(self, mock_get_gateway):
+        mock_get_gateway.return_value = StripeMockGateway()
         b = self.organization.organization_billing
 
         self.assertEquals(b.plan, BillingPlan.PLAN_TRIAL)
