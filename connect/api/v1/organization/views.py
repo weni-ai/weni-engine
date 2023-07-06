@@ -825,7 +825,7 @@ class OrganizationAuthorizationViewSet(
         if data.get("role"):
             instance = self.get_object()
             old_permission = OrganizationRole(instance.role).name
-            new_permission = OrganizationRole(data.get("role")).name
+            new_permission = OrganizationRole(int(data.get("role"))).name
             instance.organization.send_email_permission_change(instance.user, old_permission, new_permission)
 
         response = super().update(*args, **kwargs)
