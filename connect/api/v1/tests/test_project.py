@@ -51,19 +51,18 @@ class CreateProjectAPITestCase(TestCase):
         content_data = json.loads(response.content)
         return (response, content_data)
 
-    @patch("connect.common.tasks.create_project.delay")
-    def test_okay(self, task_create_project):
-        task_create_project.return_value.result = {"uuid": uuid4.uuid4()}
-        response, content_data = self.request(
-            {
-                "name": "Project 1",
-                "organization": self.organization.uuid,
-                "date_format": "D",
-                "timezone": "America/Sao_Paulo",
-            },
-            self.owner_token,
-        )
+    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_project")
+    def test_create_project(self, mock_create_project):
+        project_uuid = str(uuid4.uuid4())
+        mock_create_project.return_value = {"uuid": project_uuid}
 
+        data = {
+            "name": "Project 1",
+            "timezone": "America/Sao_Paulo",
+            "flow_organization": uuid4.uuid4(),
+            "organization": str(self.organization.uuid),
+        }
+        response, content_data = self.request(data, self.owner_token)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         project = Project.objects.get(pk=content_data.get("uuid"))
