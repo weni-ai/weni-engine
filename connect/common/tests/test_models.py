@@ -5,6 +5,8 @@ from django.conf import settings
 from connect.authentication.models import User
 from connect.common.models import Organization, OrganizationRole, BillingPlan, Project
 from connect.api.v1.tests.utils import create_user_and_token
+from connect.common.mocks import StripeMockGateway
+from unittest.mock import patch
 from unittest import skipIf
 
 
@@ -107,7 +109,12 @@ class BillingPlanTestCase(TestCase):
 
 
 class ProjectEmailTestCase(TestCase):
-    def setUp(self):
+
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway):
+
+        mock_get_gateway.return_value = StripeMockGateway()
+
         self.user, self.token = create_user_and_token()
         self_test_org = Organization.objects.create(
             name="Test Organization",
