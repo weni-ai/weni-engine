@@ -1,4 +1,4 @@
-import uuid as uuid4
+import uuid
 from django.test import TestCase
 from django.core import mail
 from django.conf import settings

@@ -7,11 +7,15 @@ from connect.billing.models import Contact, ContactCount
 from connect.billing.tasks import daily_contact_count
 from connect.utils import count_contacts
 from freezegun import freeze_time
+from connect.common.mocks import StripeMockGateway
+from unittest.mock import patch
 
 
 @freeze_time("2022-05-14")
 class CountContactsTestCase(TestCase):
-    def setUp(self) -> None:
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway) -> None:
+        mock_get_gateway.return_value = StripeMockGateway()
         self.organization = Organization.objects.create(
             name="test organization",
             description="test organization",

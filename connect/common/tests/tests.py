@@ -24,6 +24,8 @@ from django.conf import settings
 from django.core import mail
 from connect.common.gateways.rocket_gateway import Rocket
 from freezegun import freeze_time
+from connect.common.mocks import StripeMockGateway
+from unittest.mock import patch
 
 
 class NewsletterTestCase(TestCase):
@@ -45,7 +47,9 @@ class NewsletterTestCase(TestCase):
 
 
 class ServiceStatusTestCase(TestCase):
-    def setUp(self):
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway):
+        mock_get_gateway.return_value = StripeMockGateway()
         self.owner = User.objects.create_user("owner@user.com", "owner")
 
         self.organization = Organization.objects.create(
@@ -91,7 +95,9 @@ class ServiceStatusTestCase(TestCase):
 
 
 class OrganizationAuthorizationTestCase(TestCase):
-    def setUp(self):
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway):
+        mock_get_gateway.return_value = StripeMockGateway()
         self.owner = User.objects.create_user("owner@user.com", "owner")
         self.user = User.objects.create_user("fake@user.com", "user")
         self.financial = User.objects.create_user("financial@user.com", "financial")
@@ -361,7 +367,9 @@ class InvoiceTestCase(TestCase):
 
 
 class OrganizationTestCase(TestCase):
-    def setUp(self):
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway):
+        mock_get_gateway.return_value = StripeMockGateway()
         self.organization = Organization.objects.create(
             name="Test Organization",
             inteligence_organization=0,
@@ -505,7 +513,9 @@ class OrganizationTestCase(TestCase):
         self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
         self.assertEqual(outbox.to[0], self.test_email)
 
-    def test_days_till_trial_end(self):
+    @patch("connect.billing.get_gateway")
+    def test_days_till_trial_end(self, mock_get_gateway):
+        mock_get_gateway.return_value = StripeMockGateway()
         organization = Organization.objects.create(
             name="Test Organization Trial",
             inteligence_organization=0,
@@ -520,7 +530,9 @@ class OrganizationTestCase(TestCase):
 
 
 class BillingPlanTestCase(TestCase):
-    def setUp(self):
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway):
+        mock_get_gateway.return_value = StripeMockGateway()
         self.organization = Organization.objects.create(
             name="Test",
             inteligence_organization=0,
@@ -677,7 +689,11 @@ class BillingPlanTestCase(TestCase):
 
 
 class ProjectAuthorizationTestCase(TestCase):
-    def setUp(self):
+    @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway, mock_permission):
+        mock_get_gateway.return_value = StripeMockGateway()
+        mock_permission.return_value = True
         self.owner = User.objects.create_user("owner@user.com", "owner")
         self.user = User.objects.create_user("fake@user.com", "user")
 
@@ -789,9 +805,14 @@ class RocketAuthorizationTestCase(TestCase):
 
 
 class RequestPermissionProjectTestCase(TestCase):
-    def setUp(self):
+    @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway, mock_permission):
         self.owner = User.objects.create_user("owner@user.com", "owner")
         self.user = User.objects.create_user("fake@user.com", "user")
+
+        mock_get_gateway.return_value = StripeMockGateway()
+        mock_permission.return_value = True
 
         self.organization = Organization.objects.create(
             name="Test",
@@ -808,7 +829,9 @@ class RequestPermissionProjectTestCase(TestCase):
             flow_organization=uuid4.uuid4(),
         )
 
-    def test_create_request_permission(self):
+    @patch("connect.common.signals.update_user_permission_project")
+    def test_create_request_permission(self, mock_permission):
+        mock_permission.return_value = True
         self.request_permission = RequestPermissionProject.objects.create(
             email="fake@user.com",
             project=self.project,
