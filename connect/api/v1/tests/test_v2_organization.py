@@ -330,7 +330,7 @@ class PlanAPITestCase(TestCase):
         self.assertFalse(self.trial.organization_billing.is_active)
 
     @patch("connect.billing.get_gateway")
-    def test_task_end_trial_plan(self, mock_get_gateway, mock_permission):
+    def test_task_end_trial_plan(self, mock_get_gateway):
         """
         Test if 'task_end_trial_plan' suspends org that should after the trial periods end
         """
@@ -567,7 +567,9 @@ class IntegrationTestCase(TestCase):
         content_data = json.loads(response.content)
         return response, content_data
 
-    def test_plan_limits(self):
+    @patch("connect.billing.get_gateway")
+    def test_plan_limits(self, mock_get_gateway):
+        mock_get_gateway.return_value = StripeMockGateway()
         # Creates more contacts than the plan limit allows
         num_contacts = BillingPlan.plan_info(self.organization.organization_billing.plan)["limit"] * 5 + 1
         self.assertTrue(self.organization.organization_billing.is_active)
