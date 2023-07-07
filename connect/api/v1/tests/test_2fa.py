@@ -15,19 +15,25 @@ from connect.common.models import (
     BillingPlan,
     OrganizationRole,
 )
+from connect.common.mocks import StripeMockGateway
+from unittest.mock import patch
 
 
 class TwoFactorAuthTestCase(TestCase):
-    def setUp(self):
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway):
         self.factory = RequestFactory()
         self.owner, self.owner_token = create_user_and_token("owner")
         self.user, self.user_token = create_user_and_token("user")
+
+        mock_get_gateway.return_value = StripeMockGateway()
+
         self.organization = Organization.objects.create(
             name="test organization",
             description="test organization",
             inteligence_organization=1,
             organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
-            organization_billing__plan="free",
+            organization_billing__plan=BillingPlan.PLAN_TRIAL,
         )
         self.organization_authorization = self.organization.authorizations.create(
             user=self.owner, role=OrganizationRole.ADMIN.value

@@ -38,8 +38,8 @@ class CiUtils(object):
                 BILLING_COST_PER_WHATSAPP=199
                 BILLING_TEST_MODE=True
                 AI_FAREWELL_N_GREETINGS=""
-                AI_CRISTAL=""
                 AI_BINARY_ANSWERS=""
+                AI_CRISTAL=""
             """.replace(" ", "").strip()
         return env
 

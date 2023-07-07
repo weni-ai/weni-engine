@@ -19,6 +19,7 @@ from connect.api.v1.organization.filters import (
     OrganizationAuthorizationFilter,
     RequestPermissionOrganizationFilter,
 )
+from rest_framework.exceptions import PermissionDenied
 from connect.api.v1.organization.permissions import (
     Has2FA,
     OrganizationHasPermission,
@@ -821,9 +822,11 @@ class OrganizationAuthorizationViewSet(
         ]
 
         data = self.request.data
-
         if data.get("role"):
             instance = self.get_object()
+
+            if instance.user == self.request.user:
+                raise PermissionDenied("Can't change own permission")
             old_permission = OrganizationRole(instance.role).name
             new_permission = OrganizationRole(int(data.get("role"))).name
             instance.organization.send_email_permission_change(instance.user, old_permission, new_permission)

@@ -1,7 +1,7 @@
 import json
 import uuid as uuid4
 from unittest.mock import patch
-
+from unittest import skipIf
 from django.test import RequestFactory
 from django.test import TestCase
 from django.test.client import MULTIPART_CONTENT
@@ -19,8 +19,10 @@ from connect.common.models import (
     RequestPermissionProject,
     RequestPermissionOrganization,
 )
+from connect.common.mocks import StripeMockGateway
 
 
+@skipIf(True, "create project v1 is deprecated")
 class CreateProjectAPITestCase(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
@@ -76,7 +78,11 @@ class CreateProjectAPITestCase(TestCase):
 
 
 class ListProjectAPITestCase(TestCase):
-    def setUp(self):
+    @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway, mock_permission):
+        mock_get_gateway.return_value = StripeMockGateway()
+        mock_permission.return_value = True
         self.factory = RequestFactory()
         self.owner, self.owner_token = create_user_and_token("owner")
         self.user, self.user_token = create_user_and_token("user")
@@ -86,7 +92,7 @@ class ListProjectAPITestCase(TestCase):
             description="",
             inteligence_organization=1,
             organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
-            organization_billing__plan="free",
+            organization_billing__plan=BillingPlan.PLAN_TRIAL,
         )
 
         RequestPermissionOrganization.objects.create(
@@ -248,7 +254,12 @@ class UpdateProjectTestCase(TestCase):
 
 
 class DeleteProjectAuthTestCase(TestCase):
-    def setUp(self):
+    @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway, mock_permission):
+        mock_get_gateway.return_value = StripeMockGateway()
+        mock_permission.return_value = True
+
         self.factory = RequestFactory()
 
         self.owner, self.owner_token = create_user_and_token("owner")

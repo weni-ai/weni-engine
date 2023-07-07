@@ -1,7 +1,7 @@
 import json
 from unittest import skipIf
 import uuid as uuid4
-from unittest.mock import patch
+from unittest.mock import patch, Mock
 from django.conf import settings
 from django.http import JsonResponse
 from django.test import RequestFactory
@@ -21,6 +21,7 @@ from connect.common.models import (
     Project,
     OrganizationRole,
 )
+from connect.common.mocks import StripeMockGateway
 
 
 @skipIf(True, "deprecated")
@@ -73,9 +74,14 @@ class CreateOrganizationAPITestCase(TestCase):
 
 
 class ListOrganizationAPITestCase(TestCase):
-    def setUp(self):
+    @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway, mock_permission):
         self.factory = RequestFactory()
         self.owner, self.owner_token = create_user_and_token("owner")
+
+        mock_get_gateway.return_value = StripeMockGateway()
+        mock_permission.return_value = True
 
         self.organization = Organization.objects.create(
             name="test organization",
@@ -113,10 +119,13 @@ class ListOrganizationAPITestCase(TestCase):
 
 
 class GetOrganizationContactsAPITestCase(TestCase):
-    def setUp(self):
+    @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway, mock_permission):
         self.factory = RequestFactory()
         self.owner, self.owner_token = create_user_and_token("owner")
-
+        mock_get_gateway.return_value = StripeMockGateway()
+        mock_permission.return_value = True
         self.organization = Organization.objects.create(
             name="test organization",
             description="",
@@ -188,7 +197,11 @@ class GetOrganizationContactsAPITestCase(TestCase):
 
 
 class OrgBillingPlan(TestCase):
-    def setUp(self):
+    @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway, mock_permission):
+        mock_get_gateway.return_value = StripeMockGateway()
+        mock_permission.return_value = True
         self.factory = RequestFactory()
         self.owner, self.owner_token = create_user_and_token("owner")
         self.contributor, self.contributor_token = create_user_and_token("contributor")
@@ -359,7 +372,9 @@ class OrgBillingPlan(TestCase):
         content_data = json.loads(response.content)
         return response, content_data
 
-    def test_change_plan_admin(self):
+    @patch("connect.billing.get_gateway")
+    def test_change_plan_admin(self, mock_get_gateway):
+        mock_get_gateway.return_value = StripeMockGateway()
         data = {"organization_billing_plan": "enterprise"}
         response, content_data = self.request_change_plan(
             self.organization.uuid, data, self.owner_token
@@ -405,7 +420,12 @@ class OrgBillingPlan(TestCase):
 
 
 class OrgBillingAdditionalInformation(TestCase):
-    def setUp(self):
+    @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway, mock_permission):
+        mock_get_gateway.return_value = StripeMockGateway()
+        mock_permission.return_value = True
+
         self.factory = RequestFactory()
         self.admin, self.admin_token = create_user_and_token("admin")
         self.contributor, self.contributor_token = create_user_and_token("contributor")
@@ -499,11 +519,16 @@ class OrgBillingAdditionalInformation(TestCase):
 
 
 class ListOrganizationAuthorizationTestCase(TestCase):
-    def setUp(self):
+    @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway, mock_permission):
         self.factory = RequestFactory()
 
         self.owner, self.owner_token = create_user_and_token("owner")
         self.user, self.user_token = create_user_and_token()
+
+        mock_get_gateway.return_value = StripeMockGateway()
+        mock_permission.return_value = True
 
         self.organization = Organization.objects.create(
             name="test organization",
@@ -552,7 +577,11 @@ class ListOrganizationAuthorizationTestCase(TestCase):
 
 
 class UpdateAuthorizationRoleTestCase(TestCase):
-    def setUp(self):
+    # @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway):
+        mock_get_gateway.return_value = StripeMockGateway()
+        # mock_permission.return_value = True
         self.factory = RequestFactory()
 
         self.owner, self.owner_token = create_user_and_token("owner")
@@ -563,7 +592,7 @@ class UpdateAuthorizationRoleTestCase(TestCase):
             description="",
             inteligence_organization=1,
             organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
-            organization_billing__plan="free",
+            organization_billing__plan=BillingPlan.PLAN_TRIAL,
         )
         self.organization_authorization = self.organization.authorizations.create(
             user=self.owner, role=OrganizationRole.ADMIN.value
@@ -621,11 +650,16 @@ class UpdateAuthorizationRoleTestCase(TestCase):
 
 
 class DestroyAuthorizationRoleTestCase(TestCase):
-    def setUp(self):
+    @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway, mock_permission):
         self.factory = RequestFactory()
 
         self.owner, self.owner_token = create_user_and_token("owner")
         self.user, self.user_token = create_user_and_token()
+
+        mock_get_gateway.return_value = StripeMockGateway()
+        mock_permission.return_value = True
 
         self.organization = Organization.objects.create(
             name="test organization",
@@ -669,9 +703,14 @@ class DestroyAuthorizationRoleTestCase(TestCase):
 
 
 class ActiveContactsLimitTestCase(TestCase):
-    def setUp(self):
+    @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway, mock_permission):
         self.factory = RequestFactory()
         self.owner, self.owner_token = create_user_and_token("owner")
+
+        mock_get_gateway.return_value = StripeMockGateway()
+        mock_permission.return_value = True
 
         self.organization = Organization.objects.create(
             name="test organization",
@@ -766,7 +805,9 @@ class ActiveContactsLimitTestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual("free plan is valid yet", content_data["message"])
 
-    def test_organization_over_limit(self):
+    @patch("connect.common.signals.update_user_permission_project")
+    def test_organization_over_limit(self, mock_permission):
+        mock_permission.return_value = True
         self.project2 = Project.objects.create(
             name="Unit Test Project 2",
             flow_organization=uuid4.uuid4(),
@@ -819,11 +860,15 @@ class ActiveContactsLimitTestCase(TestCase):
 
 
 class ExtraIntegrationsTestCase(TestCase):
-    def setUp(self):
+    @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway, mock_permission):
         self.factory = RequestFactory()
 
         self.owner, self.owner_token = create_user_and_token("owner")
         self.user, self.user_token = create_user_and_token()
+        mock_get_gateway.return_value = StripeMockGateway()
+        mock_permission.return_value = True
         self.organization = Organization.objects.create(
             name="test organization",
             description="",
@@ -868,9 +913,14 @@ class ExtraIntegrationsTestCase(TestCase):
 
 
 class GetOrganizationStripeDataTestCase(TestCase):
-    def setUp(self):
+    @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway, mock_permission):
         self.factory = RequestFactory()
         self.owner, self.owner_token = create_user_and_token("owner")
+
+        mock_get_gateway.return_value = StripeMockGateway()
+        mock_permission.return_value = True
 
         self.organization = Organization.objects.create(
             name="test organization",
@@ -899,14 +949,22 @@ class GetOrganizationStripeDataTestCase(TestCase):
 
         content_data = json.loads(response.content)
         return (response, content_data)
+    
+    @patch("connect.api.v1.organization.views.StripeGateway")
+    @patch("connect.common.models.BillingPlan.get_stripe_customer")
+    def test_get_stripe_card_data(self, mock_stripe_customer, mock_get_gateway):
 
-    def test_get_stripe_card_data(self):
+        mock_response = Mock()
+        mock_response.id = ''
+
+        mock_stripe_customer.return_value = mock_response
+
+        mock_get_gateway.return_value = StripeMockGateway()
         response, content_data = self.request(
             "get-stripe-card-data",
             self.organization.uuid,
             self.owner_token,
         )
-
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(content_data["response"][0]["last2"], "42")
         self.assertEqual(content_data["response"][0]["brand"], "visa")
