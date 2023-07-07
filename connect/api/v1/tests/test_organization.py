@@ -949,7 +949,7 @@ class GetOrganizationStripeDataTestCase(TestCase):
 
         content_data = json.loads(response.content)
         return (response, content_data)
-    
+
     @patch("connect.api.v1.organization.views.StripeGateway")
     @patch("connect.common.models.BillingPlan.get_stripe_customer")
     def test_get_stripe_card_data(self, mock_stripe_customer, mock_get_gateway):

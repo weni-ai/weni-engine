@@ -65,7 +65,6 @@ class FlowsRESTClient:
 
         return response.json()
 
-
     def delete_project(self, project_uuid: int, user_email: str):
         body = dict(
             user_email=user_email

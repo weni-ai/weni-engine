@@ -5,8 +5,6 @@ from unittest import skipIf
 from django.test import RequestFactory
 from django.test import TestCase
 from django.test.client import MULTIPART_CONTENT
-from django.core import mail
-from django.conf import settings
 from rest_framework import status
 
 from connect.api.v1.project.views import ProjectViewSet, TemplateProjectViewSet
