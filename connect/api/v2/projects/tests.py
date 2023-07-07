@@ -9,6 +9,7 @@ from unittest.mock import Mock, patch
 from connect.api.v1.tests.utils import create_user_and_token
 from connect.common.models import Organization, BillingPlan, OrganizationRole, Project
 from connect.api.v2.projects.views import ProjectViewSet
+from connect.common.mocks import StripeMockGateway
 
 from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
 
@@ -486,8 +487,12 @@ class ProjectViewSetTestCase(TestCase):
 
 class ProjectTestCase(TestCase):
 
+    @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.billing.get_gateway")
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.update_user_permission_project")
-    def setUp(self, update_user_permission_project):
+    def setUp(self, update_user_permission_project, mock_get_gateway, mock_permissions):
+        mock_get_gateway.return_value = StripeMockGateway()
+        mock_permissions.return_value = True
         update_user_permission_project.side_effect = [True]
         self.organization = Organization.objects.create(
             name="Test project methods",

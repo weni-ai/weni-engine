@@ -176,7 +176,11 @@ class ListProjectAPITestCase(TestCase):
 
 
 class UpdateProjectTestCase(TestCase):
-    def setUp(self):
+    @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway, mock_permission):
+        mock_get_gateway.return_value = StripeMockGateway()
+        mock_permission.return_value = True
         self.factory = RequestFactory()
 
         self.owner, self.owner_token = create_user_and_token("owner")
@@ -331,7 +335,11 @@ class DeleteProjectAuthTestCase(TestCase):
 
 # @skipIf(True, "Needs mock")
 class TemplateProjectTestCase(TestCase):
-    def setUp(self):
+    @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway, mock_permission):
+        mock_get_gateway.return_value = StripeMockGateway()
+        mock_permission.return_value = True
         self.factory = RequestFactory()
 
         self.user, self.user_token = create_user_and_token("user")
@@ -402,7 +410,9 @@ class TemplateProjectTestCase(TestCase):
         )
         self.assertEquals(response.status_code, status.HTTP_200_OK)
 
-    def test_create_template_project(self):
+    @patch("connect.common.signals.update_user_permission_project")
+    def test_create_template_project(self, mock_permission):
+        mock_permission.return_value = True
         data = {
             "date_format": "D",
             "name": "Test template project",
