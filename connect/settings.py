@@ -541,3 +541,9 @@ CREATE_AI_ORGANIZATION = env.bool("CREATE_AI_ORGANIZATION")
 
 OMIE_APP_KEY = env.str("OMIE_APP_KEY", default="ap_test")
 OMIE_APP_SECRET = env.str("OMIE_APP_SECRET", default="sk_test")
+
+KC_DB_NAME = env.str("KC_DB_NAME")
+KC_DB_USER = env.str("KC_DB_USER")
+KC_DB_PASSWORD = env.str("KC_DB_PASSWORD")
+KC_DB_HOST = env.str("KC_DB_HOST")
+KC_DB_PORT = env.int("KC_DB_PORT")
