@@ -256,7 +256,7 @@ class OrganizationViewSetTestCase(TestCase):
             "router_token": "rt_token"
         }
         create_organization.side_effect = [{"id": 1}]
-        flows_info.side_effect = [{"id": 1, "uuid": uuid.uuid4()}]
+        flows_info.side_effect = [{"data": '{"id": 1, "uuid": "6b6a8c8b-6734-4110-81c9-287eaeab8e26"}'}]
         send_request_flow_user_info.side_effect = [True]
         get_ai_access_token.side_effect = [(True, str(uuid.uuid4()))]
         create_classifier.side_effect = [{"status": 201, "data": {"uuid": "fdd4a7bb-fe5a-41b1-96a2-96d95c4e7aab"}}]
@@ -388,22 +388,22 @@ class OrganizationViewSetTestCase(TestCase):
         )
 
         organization = content_data.get("organization")
-        print(content_data)
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
         self.assertEquals(organization["authorizations"]["count"], 2)
 
+    @patch("connect.api.v2.projects.serializers.TemplateProjectSerializer.validate_project_authorization")
     @patch("connect.common.signals.update_user_permission_project")
     @patch("connect.billing.get_gateway")
-    @patch("connect.api.v2.projects.serializers.TemplateProjectSerializer.validate_project_authorization")
     @patch("connect.authentication.models.User.send_request_flow_user_info")
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_template_project")
     def test_create_organization_lead_project_fail_auth(
-        self, mock_get_gateway, mock_permission, flows_info,
-        send_request_flow_user_info, validate_authorization=None
+        self, flows_info,
+        send_request_flow_user_info, mock_get_gateway,
+        mock_permission, validate_authorization=None,
     ):
         mock_get_gateway.return_value = StripeMockGateway()
         mock_permission.return_value = True
-        flows_info.side_effect = [{"id": 1, "uuid": uuid.uuid4()}]
+        flows_info.side_effect = [{"data": '{"id": 1, "uuid": "6b6a8c8b-6734-4110-81c9-287eaeab8e26"}'}]
         send_request_flow_user_info.side_effect = [True]
         validate_authorization.side_effect = [(False, {
             "data": {"message": "Project authorization not setted"},
@@ -458,7 +458,7 @@ class OrganizationViewSetTestCase(TestCase):
     ):
         mock_get_gateway.return_value = StripeMockGateway()
         create_organization.side_effect = [{"id": 1}]
-        flows_info.side_effect = [{"id": 1, "uuid": uuid.uuid4()}]
+        flows_info.side_effect = [{"data": '{"id": 1, "uuid": "6b6a8c8b-6734-4110-81c9-287eaeab8e26"}'}]
         send_request_flow_user_info.side_effect = [True]
         get_ai_access_token.side_effect = [(False, {
             "data": {"message": "Could not get access token"},
@@ -548,7 +548,7 @@ class OrganizationViewSetTestCase(TestCase):
         get_ai_access_token, create_classifier, mock_get_gateway
     ):
         mock_get_gateway.return_value = StripeMockGateway()
-        flows_info.side_effect = [{"id": 1, "uuid": uuid.uuid4()}]
+        flows_info.side_effect = [{"data": '{"id": 1, "uuid": "6b6a8c8b-6734-4110-81c9-287eaeab8e26"}'}]
         send_request_flow_user_info.side_effect = [True]
         get_ai_access_token.side_effect = [(True, str(uuid.uuid4()))]
         create_classifier.side_effect = [Exception()]
@@ -598,7 +598,7 @@ class OrganizationViewSetTestCase(TestCase):
         create_classifier, create_flows, mock_get_gateway
     ):
         mock_get_gateway.return_value = StripeMockGateway()
-        flows_info.side_effect = [{"id": 1, "uuid": uuid.uuid4()}]
+        flows_info.side_effect = [{"data": '{"id": 1, "uuid": "6b6a8c8b-6734-4110-81c9-287eaeab8e26"}'}]
         send_request_flow_user_info.side_effect = [True]
         get_ai_access_token.side_effect = [(True, str(uuid.uuid4()))]
         create_classifier.side_effect = [{"status": 201, "data": {"uuid": "fdd4a7bb-fe5a-41b1-96a2-96d95c4e7aab"}}]
@@ -662,7 +662,7 @@ class OrganizationViewSetTestCase(TestCase):
             "status": status.HTTP_500_INTERNAL_SERVER_ERROR
         }
 
-        flows_info.side_effect = [{"id": 1, "uuid": uuid.uuid4()}]
+        flows_info.side_effect = [{"data": '{"id": 1, "uuid": "6b6a8c8b-6734-4110-81c9-287eaeab8e26"}'}]
         send_request_flow_user_info.side_effect = [True]
         get_ai_access_token.side_effect = [(True, str(uuid.uuid4()))]
         create_classifier.side_effect = [{"status": 201, "data": {"uuid": "fdd4a7bb-fe5a-41b1-96a2-96d95c4e7aab"}}]
@@ -786,7 +786,7 @@ class OrganizationViewSetTestCase(TestCase):
         # side effects
 
         create_organization.side_effect = [{"id": 1}]
-        create_template_project.side_effect = [{"id": 1, "uuid": "6b6a8c8b-6734-4110-81c9-287eaeab8e26"}]
+        create_template_project.side_effect = [{"data": '{"id": 1, "uuid": "6b6a8c8b-6734-4110-81c9-287eaeab8e26"}'}]
         create_globals.side_effect = [GlobalResponse]
         get_access_token.side_effect = ["6b6a8c8b-6734-tokn-81c9-287eaeab8e26"]
         create_classifier.side_effect = [{"status": 201, "data": {"uuid": "fdd4a7bb-fe5a-41b1-96a2-96d95c4e7aab"}}]
