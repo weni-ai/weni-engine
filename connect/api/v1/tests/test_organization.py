@@ -597,6 +597,9 @@ class UpdateAuthorizationRoleTestCase(TestCase):
         self.organization_authorization = self.organization.authorizations.create(
             user=self.owner, role=OrganizationRole.ADMIN.value
         )
+        self.organization_authorization = self.organization.authorizations.create(
+            user=self.user, role=OrganizationRole.CONTRIBUTOR.value
+        )
 
     def request(self, organization, token, user, data):
         authorization_header = {"HTTP_AUTHORIZATION": "Token {}".format(token.key)}
@@ -612,18 +615,18 @@ class UpdateAuthorizationRoleTestCase(TestCase):
         content_data = json.loads(response.content)
         return (response, content_data)
 
-    def test_okay(self):
+    def test_change_role(self):
         response, content_data = self.request(
             self.organization,
             self.owner_token,
             self.user,
-            {"role": OrganizationRole.CONTRIBUTOR.value},
+            {"role": OrganizationRole.ADMIN.value},
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(content_data.get("role"), OrganizationRole.CONTRIBUTOR.value)
+        self.assertEqual(content_data.get("role"), OrganizationRole.ADMIN.value)
 
         user_authorization = self.organization.get_user_authorization(self.user)
-        self.assertEqual(user_authorization.role, OrganizationRole.CONTRIBUTOR.value)
+        self.assertEqual(user_authorization.role, OrganizationRole.ADMIN.value)
 
     def test_forbidden(self):
         response, content_data = self.request(
@@ -635,10 +638,10 @@ class UpdateAuthorizationRoleTestCase(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_owner_can_t_set_your_role(self):
+    def test_user_can_t_set_your_role(self):
         response, content_data = self.request(
             self.organization,
-            self.owner_token,
+            self.user_token,
             self.owner,
             {"role": OrganizationRole.CONTRIBUTOR.value},
         )
@@ -946,7 +949,7 @@ class GetOrganizationStripeDataTestCase(TestCase):
 
         content_data = json.loads(response.content)
         return (response, content_data)
-    
+
     @patch("connect.api.v1.organization.views.StripeGateway")
     @patch("connect.common.models.BillingPlan.get_stripe_customer")
     def test_get_stripe_card_data(self, mock_stripe_customer, mock_get_gateway):

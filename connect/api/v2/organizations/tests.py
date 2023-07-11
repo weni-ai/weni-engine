@@ -12,13 +12,17 @@ from unittest.mock import patch
 from connect.api.v1.tests.utils import create_user_and_token
 from connect.common.models import Organization, BillingPlan, OrganizationRole, Project
 from connect.api.v2.organizations.views import OrganizationViewSet
+from connect.common.mocks import StripeMockGateway
 
 from django.conf import settings
 
 
 class OrganizationViewSetTestCase(TestCase):
 
-    def setUp(self):
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway):
+        mock_get_gateway.return_value = StripeMockGateway()
+
         self.integrations_rest = patch("connect.api.v1.internal.integrations.integrations_rest_client.IntegrationsRESTClient.update_user_permission_project")
         self.flows_rest = patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.update_user_permission_project")
         self.integrations_rest_mock = self.integrations_rest.start()
@@ -133,10 +137,14 @@ class OrganizationViewSetTestCase(TestCase):
         self.assertEquals(response.status_code, status.HTTP_200_OK)
         self.assertEquals(content_data.get("count"), 2)
 
+    @patch("connect.billing.get_gateway")
     @patch("connect.api.v1.internal.intelligence.intelligence_rest_client.IntelligenceRESTClient.create_organization")
     @patch("connect.authentication.models.User.send_request_flow_user_info")
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_project")
-    def test_create_organization_blank_project(self, create_project, send_request_flow_user_info, create_organization):
+    def test_create_organization_blank_project(
+        self, create_project, send_request_flow_user_info, create_organization, mock_get_gateway
+    ):
+        mock_get_gateway.return_value = StripeMockGateway()
         intelligence_organization = 555
         create_project.side_effect = [{"id": 1, "uuid": uuid.uuid4()}]
         create_organization.side_effect = [{"id": intelligence_organization}]
@@ -178,10 +186,14 @@ class OrganizationViewSetTestCase(TestCase):
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
         self.assertEquals(organization["authorizations"]["count"], 2)
 
+    @patch("connect.billing.get_gateway")
     @patch("connect.api.v1.internal.intelligence.intelligence_rest_client.IntelligenceRESTClient.create_organization")
     @patch("connect.authentication.models.User.send_request_flow_user_info")
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_project")
-    def test_create_organization_ai_blank_project(self, create_project, send_request_flow_user_info, create_organization):
+    def test_create_organization_ai_blank_project(
+        self, create_project, send_request_flow_user_info, create_organization, mock_get_gateway
+    ):
+        mock_get_gateway.return_value = StripeMockGateway()
         intelligence_organization = 555
         create_project.side_effect = [{"id": 1, "uuid": uuid.uuid4()}]
         create_organization.side_effect = [{"id": intelligence_organization}]
@@ -223,6 +235,7 @@ class OrganizationViewSetTestCase(TestCase):
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
         self.assertEquals(organization["inteligence_organization"], intelligence_organization)
 
+    @patch("connect.billing.get_gateway")
     @patch("connect.api.v1.internal.integrations.integrations_rest_client.IntegrationsRESTClient.whatsapp_demo_integration")
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_flows")
     @patch("connect.api.v1.internal.chats.chats_rest_client.ChatsRESTClient.create_chat_project")
@@ -231,83 +244,13 @@ class OrganizationViewSetTestCase(TestCase):
     @patch("connect.authentication.models.User.send_request_flow_user_info")
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_template_project")
     @patch("connect.api.v1.internal.intelligence.intelligence_rest_client.IntelligenceRESTClient.create_organization")
-    def test_create_organization_lead_project(self, create_organization, flows_info, send_request_flow_user_info, get_ai_access_token, create_classifier, create_chat_project, create_flows, wpp_integration):
-        data = {
-            "redirect_url": "https://example.com",
-            "router_token": "rt_token"
-        }
-        create_organization.side_effect = [{"id": 1}]
-        flows_info.side_effect = [{"id": 1, "uuid": uuid.uuid4()}]
-        send_request_flow_user_info.side_effect = [True]
-        get_ai_access_token.side_effect = [(True, str(uuid.uuid4()))]
-        create_classifier.side_effect = [{"status": 201, "data": {"uuid": "fdd4a7bb-fe5a-41b1-96a2-96d95c4e7aab"}}]
-        wpp_integration.side_effect = [data]
-
-        chats_data = {
-            "ticketer": {"uuid": str(uuid.uuid4()), "name": "Test Ticketer"},
-            "queue": {"uuid": str(uuid.uuid4()), "name": "Test Queue"},
-        }
-
-        class Response:
-            text = json.dumps(chats_data)
-
-        flows_response = '{"uuid": "9785a273-37de-4658-bfa2-d8028dc06c84"}'
-        create_chat_project.side_effect = [Response()]
-
-        create_flows.side_effect = [dict(status=201, data=flows_response)]
-
-        org_data = {
-            "name": "V2",
-            "description": "V2 desc",
-            "organization_billing_plan": BillingPlan.PLAN_TRIAL,
-            "authorizations": [
-                {"user_email": "e@mail.com", "role": 3},
-                {"user_email": "user_1@user.com", "role": 3}
-            ],
-        }
-
-        project_data = {
-            "date_format": "D",
-            "name": "Test Project",
-            "timezone": "America/Argentina/Buenos_Aires",
-            "template": True,
-            "template_type": Project.TYPE_LEAD_CAPTURE
-        }
-
-        data = {
-            "organization": org_data,
-            "project": project_data
-        }
-
-        path = "/v2/organizations/"
-        method = {"post": "create"}
-        user = self.user
-
-        response, content_data = self.request(
-            path,
-            method,
-            user=user,
-            data=data
-        )
-
-        organization = content_data.get("organization")
-
-        self.assertEquals(response.status_code, status.HTTP_201_CREATED)
-        self.assertEquals(organization["authorizations"]["count"], 2)
-
-    @patch("connect.api.v1.internal.integrations.integrations_rest_client.IntegrationsRESTClient.whatsapp_demo_integration")
-    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_flows")
-    @patch("connect.api.v1.internal.chats.chats_rest_client.ChatsRESTClient.create_chat_project")
-    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_classifier")
-    @patch("connect.common.models.Organization.get_ai_access_token")
-    @patch("connect.authentication.models.User.send_request_flow_user_info")
-    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_template_project")
-    @patch("connect.api.v1.internal.intelligence.intelligence_rest_client.IntelligenceRESTClient.create_organization")
-    def test_create_organization_lead_capture_chat_gpt(
-        self, create_organization, flows_info, send_request_flow_user_info,
-        get_ai_access_token, create_classifier, create_chat_project,
-        create_flows, wpp_integration
+    def test_create_organization_lead_project(
+        self, create_organization, flows_info,
+        send_request_flow_user_info, get_ai_access_token,
+        create_classifier, create_chat_project,
+        create_flows, wpp_integration, mock_get_gateway
     ):
+        mock_get_gateway.return_value = StripeMockGateway()
         data = {
             "redirect_url": "https://example.com",
             "router_token": "rt_token"
@@ -367,15 +310,100 @@ class OrganizationViewSetTestCase(TestCase):
         )
 
         organization = content_data.get("organization")
-        print(content_data)
+
+        self.assertEquals(response.status_code, status.HTTP_201_CREATED)
+        self.assertEquals(organization["authorizations"]["count"], 2)
+
+    @patch("connect.billing.get_gateway")
+    @patch("connect.api.v1.internal.integrations.integrations_rest_client.IntegrationsRESTClient.whatsapp_demo_integration")
+    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_flows")
+    @patch("connect.api.v1.internal.chats.chats_rest_client.ChatsRESTClient.create_chat_project")
+    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_classifier")
+    @patch("connect.common.models.Organization.get_ai_access_token")
+    @patch("connect.authentication.models.User.send_request_flow_user_info")
+    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_template_project")
+    @patch("connect.api.v1.internal.intelligence.intelligence_rest_client.IntelligenceRESTClient.create_organization")
+    def test_create_organization_lead_capture_chat_gpt(
+        self, create_organization, flows_info, send_request_flow_user_info,
+        get_ai_access_token, create_classifier, create_chat_project,
+        create_flows, wpp_integration, mock_get_gateway
+    ):
+        mock_get_gateway.return_value = StripeMockGateway()
+        data = {
+            "redirect_url": "https://example.com",
+            "router_token": "rt_token"
+        }
+        create_organization.side_effect = [{"id": 1}]
+        flows_info.side_effect = [{"data": '{"id": 1, "uuid": "6b6a8c8b-6734-4110-81c9-287eaeab8e26"}'}]
+        send_request_flow_user_info.side_effect = [True]
+        get_ai_access_token.side_effect = [(True, str(uuid.uuid4()))]
+        create_classifier.side_effect = [{"status": 201, "data": {"uuid": "fdd4a7bb-fe5a-41b1-96a2-96d95c4e7aab"}}]
+        wpp_integration.side_effect = [data]
+
+        chats_data = {
+            "ticketer": {"uuid": str(uuid.uuid4()), "name": "Test Ticketer"},
+            "queue": {"uuid": str(uuid.uuid4()), "name": "Test Queue"},
+        }
+
+        class Response:
+            text = json.dumps(chats_data)
+
+        flows_response = '{"uuid": "9785a273-37de-4658-bfa2-d8028dc06c84"}'
+        create_chat_project.side_effect = [Response()]
+
+        create_flows.side_effect = [dict(status=201, data=flows_response)]
+
+        org_data = {
+            "name": "V2",
+            "description": "V2 desc",
+            "organization_billing_plan": BillingPlan.PLAN_TRIAL,
+            "authorizations": [
+                {"user_email": "e@mail.com", "role": 3},
+                {"user_email": "user_1@user.com", "role": 3}
+            ],
+        }
+
+        project_data = {
+            "date_format": "D",
+            "name": "Test Project",
+            "timezone": "America/Argentina/Buenos_Aires",
+            "template": True,
+            "template_type": Project.TYPE_LEAD_CAPTURE
+        }
+
+        data = {
+            "organization": org_data,
+            "project": project_data
+        }
+
+        path = "/v2/organizations/"
+        method = {"post": "create"}
+        user = self.user
+
+        response, content_data = self.request(
+            path,
+            method,
+            user=user,
+            data=data
+        )
+
+        organization = content_data.get("organization")
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
         self.assertEquals(organization["authorizations"]["count"], 2)
 
     @patch("connect.api.v2.projects.serializers.TemplateProjectSerializer.validate_project_authorization")
+    @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.billing.get_gateway")
     @patch("connect.authentication.models.User.send_request_flow_user_info")
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_template_project")
-    def test_create_organization_lead_project_fail_auth(self, flows_info, send_request_flow_user_info, validate_authorization=None):
-        flows_info.side_effect = [{"id": 1, "uuid": uuid.uuid4()}]
+    def test_create_organization_lead_project_fail_auth(
+        self, flows_info,
+        send_request_flow_user_info, mock_get_gateway,
+        mock_permission, validate_authorization=None,
+    ):
+        mock_get_gateway.return_value = StripeMockGateway()
+        mock_permission.return_value = True
+        flows_info.side_effect = [{"data": '{"id": 1, "uuid": "6b6a8c8b-6734-4110-81c9-287eaeab8e26"}'}]
         send_request_flow_user_info.side_effect = [True]
         validate_authorization.side_effect = [(False, {
             "data": {"message": "Project authorization not setted"},
@@ -418,13 +446,19 @@ class OrganizationViewSetTestCase(TestCase):
 
         self.assertEquals(int(response.status_code), status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+    @patch("connect.billing.get_gateway")
     @patch("connect.common.models.Organization.get_ai_access_token")
     @patch("connect.authentication.models.User.send_request_flow_user_info")
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_template_project")
     @patch("connect.api.v1.internal.intelligence.intelligence_rest_client.IntelligenceRESTClient.create_organization")
-    def test_create_organization_lead_project_fail_access_token(self, create_organization, flows_info, send_request_flow_user_info, get_ai_access_token):
+    def test_create_organization_lead_project_fail_access_token(
+        self, create_organization, flows_info,
+        send_request_flow_user_info, get_ai_access_token,
+        mock_get_gateway
+    ):
+        mock_get_gateway.return_value = StripeMockGateway()
         create_organization.side_effect = [{"id": 1}]
-        flows_info.side_effect = [{"id": 1, "uuid": uuid.uuid4()}]
+        flows_info.side_effect = [{"data": '{"id": 1, "uuid": "6b6a8c8b-6734-4110-81c9-287eaeab8e26"}'}]
         send_request_flow_user_info.side_effect = [True]
         get_ai_access_token.side_effect = [(False, {
             "data": {"message": "Could not get access token"},
@@ -466,8 +500,10 @@ class OrganizationViewSetTestCase(TestCase):
         )
         self.assertEquals(int(response.status_code), status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+    @patch("connect.billing.get_gateway")
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_project")
-    def test_create_organization_fail_create_project(self, flows_info):
+    def test_create_organization_fail_create_project(self, flows_info, mock_get_gateway):
+        mock_get_gateway.return_value = StripeMockGateway()
         flows_info.side_effect = [Exception("Error")]
         org_data = {
             "name": "V2",
@@ -502,12 +538,17 @@ class OrganizationViewSetTestCase(TestCase):
         )
         self.assertEquals(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+    @patch("connect.billing.get_gateway")
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_classifier")
     @patch("connect.common.models.Organization.get_ai_access_token")
     @patch("connect.authentication.models.User.send_request_flow_user_info")
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_template_project")
-    def test_create_organization_lead_project_fail_create_classifier(self, flows_info, send_request_flow_user_info, get_ai_access_token, create_classifier):
-        flows_info.side_effect = [{"id": 1, "uuid": uuid.uuid4()}]
+    def test_create_organization_lead_project_fail_create_classifier(
+        self, flows_info, send_request_flow_user_info,
+        get_ai_access_token, create_classifier, mock_get_gateway
+    ):
+        mock_get_gateway.return_value = StripeMockGateway()
+        flows_info.side_effect = [{"data": '{"id": 1, "uuid": "6b6a8c8b-6734-4110-81c9-287eaeab8e26"}'}]
         send_request_flow_user_info.side_effect = [True]
         get_ai_access_token.side_effect = [(True, str(uuid.uuid4()))]
         create_classifier.side_effect = [Exception()]
@@ -546,13 +587,18 @@ class OrganizationViewSetTestCase(TestCase):
         )
         self.assertEquals(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+    @patch("connect.billing.get_gateway")
     @patch("connect.common.models.Project.create_flows")
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_classifier")
     @patch("connect.common.models.Organization.get_ai_access_token")
     @patch("connect.authentication.models.User.send_request_flow_user_info")
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_template_project")
-    def test_create_organization_lead_project_fail_create_flows(self, flows_info, send_request_flow_user_info, get_ai_access_token, create_classifier, create_flows):
-        flows_info.side_effect = [{"id": 1, "uuid": uuid.uuid4()}]
+    def test_create_organization_lead_project_fail_create_flows(
+        self, flows_info, send_request_flow_user_info, get_ai_access_token,
+        create_classifier, create_flows, mock_get_gateway
+    ):
+        mock_get_gateway.return_value = StripeMockGateway()
+        flows_info.side_effect = [{"data": '{"id": 1, "uuid": "6b6a8c8b-6734-4110-81c9-287eaeab8e26"}'}]
         send_request_flow_user_info.side_effect = [True]
         get_ai_access_token.side_effect = [(True, str(uuid.uuid4()))]
         create_classifier.side_effect = [{"status": 201, "data": {"uuid": "fdd4a7bb-fe5a-41b1-96a2-96d95c4e7aab"}}]
@@ -597,6 +643,7 @@ class OrganizationViewSetTestCase(TestCase):
         self.assertEquals(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
         self.assertEquals(content_data, response_data.get("data"))
 
+    @patch("connect.billing.get_gateway")
     @patch("connect.common.models.Project.whatsapp_demo_integration")
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_flows")
     @patch("connect.api.v1.internal.chats.chats_rest_client.ChatsRESTClient.create_chat_project")
@@ -604,13 +651,18 @@ class OrganizationViewSetTestCase(TestCase):
     @patch("connect.common.models.Organization.get_ai_access_token")
     @patch("connect.authentication.models.User.send_request_flow_user_info")
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_template_project")
-    def test_create_organization_lead_project_fail_integrate_wpp(self, flows_info, send_request_flow_user_info, get_ai_access_token, create_classifier, create_chat_project, create_flows, wpp_integration):
+    def test_create_organization_lead_project_fail_integrate_wpp(
+        self, flows_info, send_request_flow_user_info, get_ai_access_token,
+        create_classifier, create_chat_project, create_flows,
+        wpp_integration, mock_get_gateway
+    ):
+        mock_get_gateway.return_value = StripeMockGateway()
         response_data = {
             "data": {"message": "Could not create flow"},
             "status": status.HTTP_500_INTERNAL_SERVER_ERROR
         }
 
-        flows_info.side_effect = [{"id": 1, "uuid": uuid.uuid4()}]
+        flows_info.side_effect = [{"data": '{"id": 1, "uuid": "6b6a8c8b-6734-4110-81c9-287eaeab8e26"}'}]
         send_request_flow_user_info.side_effect = [True]
         get_ai_access_token.side_effect = [(True, str(uuid.uuid4()))]
         create_classifier.side_effect = [{"status": 201, "data": {"uuid": "fdd4a7bb-fe5a-41b1-96a2-96d95c4e7aab"}}]
@@ -681,6 +733,7 @@ class OrganizationViewSetTestCase(TestCase):
             user=user
         )
 
+    @patch("connect.billing.get_gateway")
     @patch("connect.api.v1.internal.integrations.integrations_rest_client.IntegrationsRESTClient.whatsapp_demo_integration")
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_flows")
     @patch("connect.api.v1.internal.chats.chats_rest_client.ChatsRESTClient.create_chat_project")
@@ -698,8 +751,11 @@ class OrganizationViewSetTestCase(TestCase):
         create_classifier,
         create_chat_project,
         create_flows,
-        whatsapp_demo_integration
+        whatsapp_demo_integration,
+        mock_get_gateway
     ):
+
+        mock_get_gateway.return_value = StripeMockGateway()
 
         class GlobalResponse:
             status_code = 201
@@ -730,7 +786,7 @@ class OrganizationViewSetTestCase(TestCase):
         # side effects
 
         create_organization.side_effect = [{"id": 1}]
-        create_template_project.side_effect = [{"id": 1, "uuid": "6b6a8c8b-6734-4110-81c9-287eaeab8e26"}]
+        create_template_project.side_effect = [{"data": '{"id": 1, "uuid": "6b6a8c8b-6734-4110-81c9-287eaeab8e26"}'}]
         create_globals.side_effect = [GlobalResponse]
         get_access_token.side_effect = ["6b6a8c8b-6734-tokn-81c9-287eaeab8e26"]
         create_classifier.side_effect = [{"status": 201, "data": {"uuid": "fdd4a7bb-fe5a-41b1-96a2-96d95c4e7aab"}}]
@@ -781,6 +837,7 @@ class OrganizationViewSetTestCase(TestCase):
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
         self.assertEquals(organization["authorizations"]["count"], 2)
 
+    @patch("connect.billing.get_gateway")
     @patch("connect.api.v1.internal.integrations.integrations_rest_client.IntegrationsRESTClient.whatsapp_demo_integration")
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_flows")
     @patch("connect.api.v1.internal.chats.chats_rest_client.ChatsRESTClient.create_chat_project")
@@ -802,8 +859,10 @@ class OrganizationViewSetTestCase(TestCase):
         create_classifier,
         create_chat_project,
         create_flows,
-        whatsapp_demo_integration
+        whatsapp_demo_integration,
+        mock_get_gateway
     ):
+        mock_get_gateway.return_value = StripeMockGateway()
         integrations_perm.side_effect = [200, 200]
         flows_perm.side_effect = [200, 200]
 
@@ -895,7 +954,9 @@ class OrganizationViewSetTestCase(TestCase):
 
 
 class OrganizationTestCase(TestCase):
-    def setUp(self):
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway):
+        mock_get_gateway.return_value = StripeMockGateway()
         self.factory = APIRequestFactory()
         self.user, self.user_token = create_user_and_token("user")
 
@@ -927,4 +988,4 @@ class OrganizationTestCase(TestCase):
         created, data = organization.create_ai_organization(self.auth.user.email)
         self.assertFalse(created)
         self.assertEquals(data.get("status"), status.HTTP_500_INTERNAL_SERVER_ERROR)
-        self.assertEquals(data.get("message"), "Could not create organization in AI module")
+        self.assertEquals(data.get("data").get("message"), "Could not create organization in AI module")

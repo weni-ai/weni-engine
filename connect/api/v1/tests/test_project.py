@@ -5,8 +5,6 @@ from unittest import skipIf
 from django.test import RequestFactory
 from django.test import TestCase
 from django.test.client import MULTIPART_CONTENT
-from django.core import mail
-from django.conf import settings
 from rest_framework import status
 
 from connect.api.v1.project.views import ProjectViewSet, TemplateProjectViewSet
@@ -53,19 +51,18 @@ class CreateProjectAPITestCase(TestCase):
         content_data = json.loads(response.content)
         return (response, content_data)
 
-    @patch("connect.common.tasks.create_project.delay")
-    def test_okay(self, task_create_project):
-        task_create_project.return_value.result = {"uuid": uuid4.uuid4()}
-        response, content_data = self.request(
-            {
-                "name": "Project 1",
-                "organization": self.organization.uuid,
-                "date_format": "D",
-                "timezone": "America/Sao_Paulo",
-            },
-            self.owner_token,
-        )
+    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_project")
+    def test_create_project(self, mock_create_project):
+        project_uuid = str(uuid4.uuid4())
+        mock_create_project.return_value = {"uuid": project_uuid}
 
+        data = {
+            "name": "Project 1",
+            "timezone": "America/Sao_Paulo",
+            "flow_organization": uuid4.uuid4(),
+            "organization": str(self.organization.uuid),
+        }
+        response, content_data = self.request(data, self.owner_token)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         project = Project.objects.get(pk=content_data.get("uuid"))
@@ -177,7 +174,11 @@ class ListProjectAPITestCase(TestCase):
 
 
 class UpdateProjectTestCase(TestCase):
-    def setUp(self):
+    @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway, mock_permission):
+        mock_get_gateway.return_value = StripeMockGateway()
+        mock_permission.return_value = True
         self.factory = RequestFactory()
 
         self.owner, self.owner_token = create_user_and_token("owner")
@@ -332,7 +333,11 @@ class DeleteProjectAuthTestCase(TestCase):
 
 # @skipIf(True, "Needs mock")
 class TemplateProjectTestCase(TestCase):
-    def setUp(self):
+    @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway, mock_permission):
+        mock_get_gateway.return_value = StripeMockGateway()
+        mock_permission.return_value = True
         self.factory = RequestFactory()
 
         self.user, self.user_token = create_user_and_token("user")
@@ -403,7 +408,9 @@ class TemplateProjectTestCase(TestCase):
         )
         self.assertEquals(response.status_code, status.HTTP_200_OK)
 
-    def test_create_template_project(self):
+    @patch("connect.common.signals.update_user_permission_project")
+    def test_create_template_project(self, mock_permission):
+        mock_permission.return_value = True
         data = {
             "date_format": "D",
             "name": "Test template project",
