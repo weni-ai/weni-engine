@@ -263,3 +263,9 @@ class User(AbstractBaseUser, PermissionsMixin):
         keycloak.set_verify_email(self.email)
 
         self.save(update_fields=["first_login"])
+
+
+class UserEmailSetup(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="email_setup")
+    receive_project_emails = models.BooleanField(default=True)
+    receive_organization_emails = models.BooleanField(default=True)

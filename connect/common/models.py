@@ -761,7 +761,9 @@ class Project(models.Model):
     def send_email_create_project(self, emails: list = None):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
-
+        print(self.project_authorizations.exclude(
+                    role=OrganizationRole.VIEWER.value
+                ))
         if not emails:
             emails = (
                 self.project_authorizations.exclude(
