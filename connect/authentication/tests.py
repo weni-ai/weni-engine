@@ -32,7 +32,6 @@ class AuthenticationTestCase(TestCase):
 
 class UserTestCase(TestCase):
 
-    
     def setUp(self):
 
         self.user = User.objects.create_user(

@@ -41,13 +41,13 @@ class BillingPlanTestCase(TestCase):
         self.p1 = self.basic.project.create(
             name="project test",
             timezone="America/Sao_Paulo",
-            flow_organization=uuid4.uuid4(),
+            flow_organization=uuid.uuid4(),
             contact_count=44,
         )
         self.p2 = self.basic.project.create(
             name="project test 2",
             timezone="America/Sao_Paulo",
-            flow_organization=uuid4.uuid4(),
+            flow_organization=uuid.uuid4(),
             contact_count=56,
         )
 

@@ -23,6 +23,7 @@ from freezegun import freeze_time
 from connect.billing.tasks import sync_contacts, check_organization_plans
 from connect.api.v1.tests.utils import create_contacts, create_user_and_token
 
+
 @skipIf(not settings.BILLING_SETTINGS.get("stripe", None), "gateway not configured")
 class StripeGatewayTestCase(TestCase):
     def setUp(self):
@@ -349,6 +350,7 @@ class CheckPlansTestCase(TestCase):
 
     def test_billing_emails(self):
         self.start.organization_billing.send_email_trial_plan_expired_due_time_limit()
+
 
 @skipIf(True, "Deprecated")
 class ChannelModelsTestCase(TestCase):

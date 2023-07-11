@@ -40,6 +40,7 @@ class CiUtils(object):
                 AI_FAREWELL_N_GREETINGS=""
                 AI_BINARY_ANSWERS=""
                 AI_CRISTAL=""
+                DEFAULT_DATABASE=postgres://weni:weni@localhost:5432/weni
             """.replace(" ", "").strip()
         return env
 

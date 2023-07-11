@@ -12,7 +12,6 @@ from connect.api.v2.projects.views import ProjectViewSet
 from connect.common.mocks import StripeMockGateway
 
 from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
-from connect.common.mocks import StripeMockGateway
 
 
 class ProjectViewSetTestCase(TestCase):
@@ -339,8 +338,8 @@ class ProjectViewSetTestCase(TestCase):
             dict(status=status.HTTP_201_CREATED, data={}),
         ]
         mock_permission.return_value = True
-        class ChatsResponse:
 
+        class ChatsResponse:
             chats_data = {
                 "ticketer": {"uuid": str(uuid.uuid4()), "name": "Test Ticketer"},
                 "queue": {"uuid": str(uuid.uuid4()), "name": "Test Queue"},
@@ -417,8 +416,8 @@ class ProjectViewSetTestCase(TestCase):
             dict(status=status.HTTP_201_CREATED, data={}),
         ]
         mock_permission.return_value = True
-        class ChatsResponse:
 
+        class ChatsResponse:
             chats_data = {
                 "ticketer": {"uuid": str(uuid.uuid4()), "name": "Test Ticketer"},
                 "queue": {"uuid": str(uuid.uuid4()), "name": "Test Queue"},
