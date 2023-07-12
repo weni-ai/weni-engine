@@ -30,7 +30,7 @@ from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
 # from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
 from rest_framework import status
 from connect.common.helpers import send_mass_html_mail
-
+from django.db.models import Q
 
 logger = logging.getLogger(__name__)
 
@@ -230,13 +230,16 @@ class Organization(models.Model):
             return False  # pragma: no cover
 
         if not emails:
+            filter = Q(
+                role=OrganizationRole.VIEWER.value) | Q(
+                user__email_setup__receive_organization_emails=False
+            )
             emails = (
-                self.authorizations.exclude(
-                    role=OrganizationRole.VIEWER.value
-                )
+                self.authorizations.exclude(filter)
                 .values_list("user__email", "user__username", "user__language")
                 .order_by("user__language")
             )
+            print(emails)
 
         from_email = None
 
@@ -761,14 +764,14 @@ class Project(models.Model):
     def send_email_create_project(self, emails: list = None):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
-        print(self.project_authorizations.exclude(
-                    role=OrganizationRole.VIEWER.value
-                ))
+
         if not emails:
+            filter = Q(
+                        role=OrganizationRole.VIEWER.value) | Q(
+                        user__email_setup__receive_project_emails=False
+                    )
             emails = (
-                self.project_authorizations.exclude(
-                    role=OrganizationRole.VIEWER.value
-                )
+                self.project_authorizations.exclude(filter)
                 .values_list("user__email", "user__username", "user__language")
                 .order_by("user__language")
             )

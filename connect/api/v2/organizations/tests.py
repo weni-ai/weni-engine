@@ -11,6 +11,7 @@ from unittest.mock import patch
 
 from connect.api.v1.tests.utils import create_user_and_token
 from connect.common.models import Organization, BillingPlan, OrganizationRole, Project
+from connect.authentication.models import UserEmailSetup
 from connect.api.v2.organizations.views import OrganizationViewSet
 
 from django.conf import settings
@@ -887,6 +888,52 @@ class OrganizationViewSetTestCase(TestCase):
         )
 
         # print(content_data)
+
+        organization = content_data.get("organization")
+
+        self.assertEquals(response.status_code, status.HTTP_201_CREATED)
+        self.assertEquals(organization["authorizations"]["count"], 2)
+
+    @patch("connect.api.v1.internal.intelligence.intelligence_rest_client.IntelligenceRESTClient.create_organization")
+    @patch("connect.authentication.models.User.send_request_flow_user_info")
+    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_project")
+    def test_user_email_setup(self, create_project, send_request_flow_user_info, create_organization):
+        UserEmailSetup.objects.create(user=self.user, receive_project_emails=False, receive_organization_emails=False)
+        intelligence_organization = 555
+        create_project.side_effect = [{"id": 1, "uuid": uuid.uuid4()}]
+        create_organization.side_effect = [{"id": intelligence_organization}]
+        send_request_flow_user_info.side_effect = [True]
+        org_data = {
+            "name": "Email Setup",
+            "description": "Email Setup",
+            "organization_billing_plan": BillingPlan.PLAN_TRIAL,
+            "authorizations": [
+                {"user_email": "e@mail.com", "role": 3},
+                {"user_email": "user_1@user.com", "role": 3}
+            ],
+        }
+
+        project_data = {
+            "date_format": "D",
+            "name": "Email Setup",
+            "timezone": "America/Argentina/Buenos_Aires",
+        }
+
+        data = {
+            "organization": org_data,
+            "project": project_data
+        }
+
+        path = "/v2/organizations/"
+        method = {"post": "create"}
+        user = self.user
+
+        response, content_data = self.request(
+            path,
+            method,
+            user=user,
+            data=data
+        )
 
         organization = content_data.get("organization")
 
