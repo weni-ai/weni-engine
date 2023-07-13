@@ -1,7 +1,12 @@
 import uuid
 from django.test import TestCase
+from django.core import mail
+from django.conf import settings
 from connect.authentication.models import User
-from connect.common.models import Organization, OrganizationRole, BillingPlan  # , Project
+from connect.common.models import Organization, OrganizationRole, BillingPlan, Project
+from connect.api.v1.tests.utils import create_user_and_token
+from connect.common.mocks import StripeMockGateway
+from unittest.mock import patch
 from unittest import skipIf
 
 
@@ -101,3 +106,60 @@ class BillingPlanTestCase(TestCase):
         for field in fields:
             if field:
                 print(f"{field} = {billing.__dict__[field]}")
+
+
+class ProjectEmailTestCase(TestCase):
+
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway):
+
+        mock_get_gateway.return_value = StripeMockGateway()
+
+        self.user, self.token = create_user_and_token()
+        self_test_org = Organization.objects.create(
+            name="Test Organization",
+            inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan=BillingPlan.PLAN_START,
+        )
+        self.test_project = Project.objects.create(
+            name="Test Project",
+            organization=self_test_org
+        )
+        self.test_email = "test@example.com"
+        self.test_first_name = "Test User"
+
+    def test_send_email_change_project(self):
+
+        self.info = {
+            "old_project_name": "Old Project",
+            "date_before": "2022-01-01",
+            "old_timezone": "America/New_York",
+            "country_loc_suport_before": "USA",
+            "country_loc_suport_now": "Canada",
+            "default_lang_before": "English",
+            "default_lang_now": "French",
+            "secondary_lang_before": "Spanish",
+            "secondary_lang_now": "Spanish",
+            "user": "John Doe",
+        }
+        self.test_project.send_email_change_project(
+            self.test_first_name, self.test_email, self.info
+        )
+
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(
+            mail.outbox[0].subject, f"The project {self.test_project.name} has changed"
+        )
+        self.assertEqual(mail.outbox[0].from_email, settings.DEFAULT_FROM_EMAIL)
+        self.assertEqual(mail.outbox[0].to, [self.test_email])
+
+    def test_send_email_deleted_project(self):
+        self.test_project.send_email_deleted_project(
+            self.test_first_name, self.test_email
+        )
+        self.assertEqual(len(mail.outbox), 1)
+        outbox = mail.outbox[0]
+        self.assertEqual(outbox.subject, "A project was deleted...")
+        self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
+        self.assertEqual(outbox.to[0], self.test_email)
