@@ -239,7 +239,6 @@ class Organization(models.Model):
                 .values_list("user__email", "user__username", "user__language")
                 .order_by("user__language")
             )
-            print(emails)
 
         from_email = None
 
