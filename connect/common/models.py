@@ -1372,12 +1372,14 @@ class BillingPlan(models.Model):
         BILLING_CYCLE_TRIENAL: 1095,
     }
 
+    PAYMENT_NOT_SETTED = "not_setted"
     PAYMENT_METHOD_CREDIT_CARD = "credit_card"
     PAYMENT_METHOD_PAYMENT_SLIP = "payment_slip"
 
     PAYMENT_METHOD_CHOICES = [
         (PAYMENT_METHOD_CREDIT_CARD, _("credit card")),
         (PAYMENT_METHOD_PAYMENT_SLIP, _("payment slip")),
+        (PAYMENT_NOT_SETTED, _("not setted"))
     ]
 
     PLAN_FREE = "free"
