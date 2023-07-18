@@ -17,6 +17,7 @@ from connect.api.v1.account.serializers import (
     ChangePasswordSerializer,
     ChangeLanguageSerializer,
     SearchUserSerializer,
+    UserEmailSetupSerializer
 )
 from connect.api.v1.keycloak import KeycloakControl
 from connect.authentication.models import User
@@ -24,7 +25,7 @@ from connect.common.models import OrganizationAuthorization, Service
 from connect.utils import upload_photo_rocket
 from connect.celery import app as celery_app
 from rest_framework import status
-
+from connect.authentication.models import UserEmailSetup
 
 class MyUserProfileViewSet(
     mixins.RetrieveModelMixin,
@@ -235,6 +236,35 @@ class MyUserProfileViewSet(
             return Response(status=200, data=response)
         except Exception as e:
             return Response(status=404, data=dict(error=str(e)))
+
+    @action(
+        detail=True,
+        methods=["PATCH"],
+        url_name="receive-emails",
+    )
+    def receive_emails(self, request, **kwargs):
+        user = request.user
+        data = request.data
+
+        try:
+            setup = user.email_setup
+            if "receive_organization_emails" in data.keys():
+                setup.receive_organization_emails = data.get("receive_organization_emails")
+                setup.save(update_fields=["receive_organization_emails"])
+            if "receive_project_emails" in data.keys():
+                setup.receive_project_emails = data.get("receive_project_emails")
+                setup.save(update_fields=["receive_project_emails"])
+            response = UserEmailSetupSerializer(setup).data
+            return Response(status=200, data=response)
+
+        except UserEmailSetup.DoesNotExist:
+            data.update(user=user)
+            setup = UserEmailSetup.objects.create(**data)
+            response = UserEmailSetupSerializer(setup).data
+            return Response(status=200, data=response)
+        except Exception as e:
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR, data={"message": e})
+    
 
 
 class SearchUserViewSet(mixins.ListModelMixin, GenericViewSet):  # pragma: no cover
