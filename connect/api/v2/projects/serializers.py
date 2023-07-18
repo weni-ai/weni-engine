@@ -254,6 +254,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             if type(template_project) == dict:
                 return template_project
 
+        instance.send_email_create_project()
         return instance
 
     def update(self, instance, validated_data):
