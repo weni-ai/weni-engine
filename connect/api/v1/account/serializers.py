@@ -5,7 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
 from connect.api.v1.fields import PasswordField
-from connect.authentication.models import User
+from connect.authentication.models import User, UserEmailSetup
 
 from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
 from connect.api.v1.internal.integrations.integrations_rest_client import IntegrationsRESTClient
@@ -106,3 +106,9 @@ class SearchUserSerializer(serializers.ModelSerializer):
             "last_name",
             "photo",
         ]
+
+
+class UserEmailSetupSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserEmailSetup
+        fields = ["receive_organization_emails", "receive_project_emails"]
