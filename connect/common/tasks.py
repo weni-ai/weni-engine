@@ -362,6 +362,7 @@ def sync_total_contact_count():
         project.save(update_fields=["total_contact_count"])
     return True
 
+
 @app.task(name="sync_project_statistics")
 def sync_project_statistics():
     if settings.USE_FLOW_REST:
