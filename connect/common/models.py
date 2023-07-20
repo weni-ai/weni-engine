@@ -766,9 +766,9 @@ class Project(models.Model):
 
         if not emails:
             filter = Q(
-                        role=OrganizationRole.VIEWER.value) | Q(
-                        user__email_setup__receive_project_emails=False
-                    )
+                role=OrganizationRole.VIEWER.value) | Q(
+                user__email_setup__receive_project_emails=False
+            )
             emails = (
                 self.project_authorizations.exclude(filter)
                 .values_list("user__email", "user__username", "user__language")

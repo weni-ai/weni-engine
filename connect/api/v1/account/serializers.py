@@ -27,7 +27,8 @@ class UserSerializer(serializers.ModelSerializer):
             "last_update_profile",
             "utm",
             "email_marketing",
-            "has_2fa"
+            "has_2fa",
+            "send_email_setup",
         ]
         ref_name = None
 
@@ -48,6 +49,7 @@ class UserSerializer(serializers.ModelSerializer):
     last_update_profile = serializers.DateTimeField(read_only=True)
     utm = serializers.JSONField(required=False, initial=dict)
     email_marketing = serializers.BooleanField(required=False)
+    send_email_setup = serializers.SerializerMethodField()
 
     def update(self, instance, validated_data):
         instance.last_update_profile = timezone.now()
@@ -79,6 +81,13 @@ class UserSerializer(serializers.ModelSerializer):
             )
 
         return update_instance
+
+    def get_send_email_setup(self, obj):
+        try:
+            setup = obj.email_setup
+            return UserEmailSetupSerializer(setup).data
+        except Exception:
+            return {}
 
 
 class UserPhotoSerializer(serializers.Serializer):
