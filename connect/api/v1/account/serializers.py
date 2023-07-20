@@ -86,7 +86,7 @@ class UserSerializer(serializers.ModelSerializer):
         try:
             setup = obj.email_setup
             return UserEmailSetupSerializer(setup).data
-        except:
+        except Exception:
             return {}
 
 
