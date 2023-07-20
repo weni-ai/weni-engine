@@ -105,7 +105,7 @@ class AIGetOrganizationViewTestCase(TestCase):
         self.assertEquals(organization.inteligence_organization, data.get("intelligence_organization"))
 
 
-class OrganizationAuthorizationRoleSerializerTestCase(TestCase):
+class RequestPermissionOrganizationSerializerTestCase(TestCase):
 
     @patch("connect.billing.get_gateway")
     def setUp(self, mock_get_gateway):
@@ -176,3 +176,50 @@ class OrganizationAuthorizationRoleSerializerTestCase(TestCase):
 
         data = self.test_serializer.get_user_data(request_permission)
         self.assertEqual(data["name"], non_existing_email)
+
+
+class OrganizationAuthorizationRoleSerializerTestCase(TestCase):
+
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway):
+        mock_get_gateway.return_value = StripeMockGateway()
+        self.test_serializer = OrganizationAuthorizationRoleSerializer()
+
+        self.org_test = Organization.objects.create(
+            name="test organization",
+            description="",
+            inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan="enterprise",
+        )
+
+        self.test_user = User.objects.create(
+            email="test@test.com",
+            username="test",
+            first_name="first_name",
+            last_name="last_name",
+        )
+
+    def test_validate_role_nothing(self):
+        attrs = {
+            "email": "test@example.com",
+            "role": OrganizationLevelRole.NOTHING.value,
+        }
+
+        with self.assertRaises(PermissionDenied) as context:
+            self.test_serializer.validate(attrs)
+
+        self.assertEqual(str(context.exception), "You cannot set user role 0")
+
+    def test_validate_role_valid(self):
+        attrs = {
+            "email": "test@example.com",
+            "role": OrganizationLevelRole.ADMIN.value,
+        }
+
+        try:
+            validated_attrs = self.test_serializer.validate(attrs)
+        except PermissionDenied:
+            self.fail("Unexpected PermissionDenied exception.")
+
+        self.assertEqual(attrs, validated_attrs)
