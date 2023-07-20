@@ -27,6 +27,7 @@ from connect.celery import app as celery_app
 from rest_framework import status
 from connect.authentication.models import UserEmailSetup
 
+
 class MyUserProfileViewSet(
     mixins.RetrieveModelMixin,
     mixins.UpdateModelMixin,
@@ -264,7 +265,6 @@ class MyUserProfileViewSet(
             return Response(status=200, data=response)
         except Exception as e:
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR, data={"message": e})
-    
 
 
 class SearchUserViewSet(mixins.ListModelMixin, GenericViewSet):  # pragma: no cover
