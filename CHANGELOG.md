@@ -1,3 +1,14 @@
+# 2.17.0
+
+## *Add*
+  - model to management of the send emails from organization and project by user
+  - recovery data if that user receive emails on user serializer
+  - Add new unit tests to improve serializer coverage 
+
+## *Delete*
+
+  - Remove celery project name task. Weni engine will now make it without flows dependency
+
 # 2.16.0
 
 ## *Add*
