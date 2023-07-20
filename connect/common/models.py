@@ -30,7 +30,7 @@ from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
 # from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
 from rest_framework import status
 from connect.common.helpers import send_mass_html_mail
-
+from django.db.models import Q
 
 logger = logging.getLogger(__name__)
 
@@ -230,10 +230,12 @@ class Organization(models.Model):
             return False  # pragma: no cover
 
         if not emails:
+            filter = Q(
+                role=OrganizationRole.VIEWER.value) | Q(
+                user__email_setup__receive_organization_emails=False
+            )
             emails = (
-                self.authorizations.exclude(
-                    role=OrganizationRole.VIEWER.value
-                )
+                self.authorizations.exclude(filter)
                 .values_list("user__email", "user__username", "user__language")
                 .order_by("user__language")
             )
@@ -273,8 +275,8 @@ class Organization(models.Model):
             msg = (subject, message, html_message, from_email, recipient_list)
             msg_list.append(msg)
 
-            html_mail = send_mass_html_mail(msg_list, fail_silently=False)
-            return html_mail
+        html_mail = send_mass_html_mail(msg_list, fail_silently=False)
+        return html_mail
 
     def send_email_remove_permission_organization(self, first_name: str, email: str):
         if not settings.SEND_EMAILS:
@@ -346,8 +348,8 @@ class Organization(models.Model):
             msg = (subject, message, html_message, from_email, recipient_list)
             msg_list.append(msg)
 
-            html_mail = send_mass_html_mail(msg_list, fail_silently=False)
-            return html_mail
+        html_mail = send_mass_html_mail(msg_list, fail_silently=False)
+        return html_mail
 
     def send_email_change_organization_name(self, prev_name: str, new_name: str, emails: list = None):
         if not settings.SEND_EMAILS:
@@ -398,8 +400,8 @@ class Organization(models.Model):
             msg = (subject, message, html_message, from_email, recipient_list)
             msg_list.append(msg)
 
-            html_mail = send_mass_html_mail(msg_list, fail_silently=False)
-            return html_mail
+        html_mail = send_mass_html_mail(msg_list, fail_silently=False)
+        return html_mail
 
     def send_email_access_code(self, email: str, user_name: str, access_code: str):
         if not settings.SEND_EMAILS:
@@ -744,7 +746,7 @@ class Project(models.Model):
         intelligence_client = IntelligenceRESTClient()
 
         flows_result = flows_client.get_project_flows(
-            project_uuid=self.flow_organization, flow_name=text
+            project_uuid=self.uuid, flow_name=text
         )
         intelligence_result = intelligence_client.get_organization_intelligences(
             intelligence_name=text,
@@ -763,10 +765,12 @@ class Project(models.Model):
             return False  # pragma: no cover
 
         if not emails:
+            filter = Q(
+                        role=OrganizationRole.VIEWER.value) | Q(
+                        user__email_setup__receive_project_emails=False
+                    )
             emails = (
-                self.project_authorizations.exclude(
-                    role=OrganizationRole.VIEWER.value
-                )
+                self.project_authorizations.exclude(filter)
                 .values_list("user__email", "user__username", "user__language")
                 .order_by("user__language")
             )
@@ -952,7 +956,7 @@ class Project(models.Model):
 
         try:
             flows = flow_instance.create_flows(
-                str(self.flow_organization),
+                str(self.uuid),
                 str(classifier_uuid),
                 self.template_type,
                 ticketer=chats_response.get("ticketer"),
@@ -1520,7 +1524,7 @@ class BillingPlan(models.Model):
                 price = settings.PLAN_TRIAL_PRICE
                 limit = settings.PLAN_TRIAL_LIMIT
 
-            if plan == BillingPlan.PLAN_START:
+            elif plan == BillingPlan.PLAN_START:
                 price = settings.PLAN_START_PRICE
                 limit = settings.PLAN_START_LIMIT
 

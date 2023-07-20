@@ -8,17 +8,20 @@ from unittest.mock import patch
 
 from connect.api.v1.tests.utils import create_user_and_token
 from connect.common.models import Organization, BillingPlan, Project, OrganizationRole
+from connect.common.mocks import StripeMockGateway
 from connect.api.v2.internals.views import AIGetOrganizationView
 
 
 class AIGetOrganizationViewTestCase(TestCase):
+    @patch("connect.billing.get_gateway")
     @patch(
         "connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.update_user_permission_project"
     )
     @patch(
         "connect.api.v1.internal.integrations.integrations_rest_client.IntegrationsRESTClient.update_user_permission_project"
     )
-    def setUp(self, integrations_rest, flows_rest):
+    def setUp(self, integrations_rest, flows_rest, mock_get_gateway):
+        mock_get_gateway.return_value = StripeMockGateway()
         integrations_rest.side_effect = [200, 200]
         flows_rest.side_effect = [200, 200]
 

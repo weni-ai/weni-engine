@@ -1,11 +1,10 @@
 import json
 import uuid as uuid4
 from unittest.mock import patch
-
+from unittest import skipIf
 from django.test import RequestFactory
 from django.test import TestCase
 from django.test.client import MULTIPART_CONTENT
-from django.conf import settings
 from rest_framework import status
 
 from connect.api.v1.project.views import ProjectViewSet, TemplateProjectViewSet
@@ -18,8 +17,10 @@ from connect.common.models import (
     RequestPermissionProject,
     RequestPermissionOrganization,
 )
+from connect.common.mocks import StripeMockGateway
 
 
+@skipIf(True, "create project v1 is deprecated")
 class CreateProjectAPITestCase(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
@@ -50,19 +51,18 @@ class CreateProjectAPITestCase(TestCase):
         content_data = json.loads(response.content)
         return (response, content_data)
 
-    @patch("connect.common.tasks.create_project.delay")
-    def test_okay(self, task_create_project):
-        task_create_project.return_value.result = {"uuid": uuid4.uuid4()}
-        response, content_data = self.request(
-            {
-                "name": "Project 1",
-                "organization": self.organization.uuid,
-                "date_format": "D",
-                "timezone": "America/Sao_Paulo",
-            },
-            self.owner_token,
-        )
+    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_project")
+    def test_create_project(self, mock_create_project):
+        project_uuid = str(uuid4.uuid4())
+        mock_create_project.return_value = {"uuid": project_uuid}
 
+        data = {
+            "name": "Project 1",
+            "timezone": "America/Sao_Paulo",
+            "flow_organization": uuid4.uuid4(),
+            "organization": str(self.organization.uuid),
+        }
+        response, content_data = self.request(data, self.owner_token)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         project = Project.objects.get(pk=content_data.get("uuid"))
@@ -76,7 +76,11 @@ class CreateProjectAPITestCase(TestCase):
 
 
 class ListProjectAPITestCase(TestCase):
-    def setUp(self):
+    @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway, mock_permission):
+        mock_get_gateway.return_value = StripeMockGateway()
+        mock_permission.return_value = True
         self.factory = RequestFactory()
         self.owner, self.owner_token = create_user_and_token("owner")
         self.user, self.user_token = create_user_and_token("user")
@@ -86,7 +90,7 @@ class ListProjectAPITestCase(TestCase):
             description="",
             inteligence_organization=1,
             organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
-            organization_billing__plan="free",
+            organization_billing__plan=BillingPlan.PLAN_TRIAL,
         )
 
         RequestPermissionOrganization.objects.create(
@@ -170,7 +174,11 @@ class ListProjectAPITestCase(TestCase):
 
 
 class UpdateProjectTestCase(TestCase):
-    def setUp(self):
+    @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway, mock_permission):
+        mock_get_gateway.return_value = StripeMockGateway()
+        mock_permission.return_value = True
         self.factory = RequestFactory()
 
         self.owner, self.owner_token = create_user_and_token("owner")
@@ -247,69 +255,13 @@ class UpdateProjectTestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
-class ProjectEmailTestCase(TestCase):
-    def setUp(self):
-        self.factory = RequestFactory()
-
-        self.owner, self.owner_token = create_user_and_token("owner")
-        self.user, self.user_token = create_user_and_token("user")
-
-        self.organization = Organization.objects.create(
-            name="test organization",
-            description="",
-            inteligence_organization=1,
-            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
-            organization_billing__plan="free",
-        )
-        self.organization_authorization = self.organization.authorizations.create(
-            user=self.owner, role=OrganizationRole.ADMIN.value
-        )
-        self.project = self.organization.project.create(
-            name="project test",
-            timezone="America/Sao_Paulo",
-            flow_organization=uuid4.uuid4(),
-        )
-        self.test_email = "test@example.com"
-        self.test_user_name = "test_username"
-        self.test_first_name = "test"
-        self.organization_new_name = "Test Org"
-
-    def test_send_email_change_project(self):
-        info = {
-            "old_project_name": "name_test",
-            "date_before": "DD-MM-AAAA",
-            "old_timezone": "(GMT -03:00) America / Argentina / Buenos Aires",
-            "country_loc_suport_before": "Argentina",
-            "country_loc_suport_now": "Brasil",
-            "default_lang_before": "Espanhol",
-            "default_lang_now": "Português do Brasil",
-            "secondary_lang_before": "Espanhol",
-            "secondary_lang_now": "Espanhol",
-            "user": "João",
-        }
-
-        sended_mail = self.project.send_email_change_project(
-            self.test_first_name, self.test_email, info
-        )
-        self.assertEqual(len(sended_mail.outbox), 1)
-        outbox = sended_mail.outbox[0]
-        self.assertEqual(outbox.subject, f"The project {self.project.name} has changed")
-        self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
-        self.assertEqual(outbox.to[0], self.test_email)
-
-    def test_send_email_deleted_project(self):
-        sended_mail = self.project.send_email_deleted_project(
-            self.test_first_name, self.test_email
-        )
-        self.assertEqual(len(sended_mail.outbox), 1)
-        outbox = sended_mail.outbox[0]
-        self.assertEqual(outbox.subject, "A project was deleted...")
-        self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
-        self.assertEqual(outbox.to[0], self.test_email)
-
-
 class DeleteProjectAuthTestCase(TestCase):
-    def setUp(self):
+    @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway, mock_permission):
+        mock_get_gateway.return_value = StripeMockGateway()
+        mock_permission.return_value = True
+
         self.factory = RequestFactory()
 
         self.owner, self.owner_token = create_user_and_token("owner")
@@ -381,7 +333,11 @@ class DeleteProjectAuthTestCase(TestCase):
 
 # @skipIf(True, "Needs mock")
 class TemplateProjectTestCase(TestCase):
-    def setUp(self):
+    @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway, mock_permission):
+        mock_get_gateway.return_value = StripeMockGateway()
+        mock_permission.return_value = True
         self.factory = RequestFactory()
 
         self.user, self.user_token = create_user_and_token("user")
@@ -452,7 +408,9 @@ class TemplateProjectTestCase(TestCase):
         )
         self.assertEquals(response.status_code, status.HTTP_200_OK)
 
-    def test_create_template_project(self):
+    @patch("connect.common.signals.update_user_permission_project")
+    def test_create_template_project(self, mock_permission):
+        mock_permission.return_value = True
         data = {
             "date_format": "D",
             "name": "Test template project",

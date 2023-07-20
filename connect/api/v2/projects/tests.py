@@ -4,22 +4,26 @@ from rest_framework import status
 from rest_framework.test import APIRequestFactory, force_authenticate
 
 from django.test import TestCase
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 from connect.api.v1.tests.utils import create_user_and_token
 from connect.common.models import Organization, BillingPlan, OrganizationRole, Project
 from connect.api.v2.projects.views import ProjectViewSet
+from connect.common.mocks import StripeMockGateway
 
 from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
 
 
 class ProjectViewSetTestCase(TestCase):
+    @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.billing.get_gateway")
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.update_user_permission_project")
     @patch("connect.api.v1.internal.integrations.integrations_rest_client.IntegrationsRESTClient.update_user_permission_project")
-    def setUp(self, integrations_rest, flows_rest):
+    def setUp(self, integrations_rest, flows_rest, mock_get_gateway, mock_permission):
         integrations_rest.side_effect = [200, 200]
         flows_rest.side_effect = [200, 200]
-
+        mock_get_gateway.return_value = StripeMockGateway()
+        mock_permission.return_value = True
         self.factory = APIRequestFactory()
         self.user, self.user_token = create_user_and_token("user")
 
@@ -66,7 +70,6 @@ class ProjectViewSetTestCase(TestCase):
 
         request = self.make_request(path, method, data)
         force_authenticate(request, user=user, token=user.auth_token)
-
         response = ProjectViewSet.as_view(method)(request, organization_uuid=pk, data=data, uuid=project_uuid)
         response.render()
 
@@ -110,15 +113,16 @@ class ProjectViewSetTestCase(TestCase):
         self.assertEquals(response.status_code, status.HTTP_200_OK)
         self.assertEquals(content_data["count"], 2)
 
+    @patch("connect.common.signals.update_user_permission_project")
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.update_user_permission_project")
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_project")
-    def test_create_blank_project(self, create_project, update_user_permission_project):
+    def test_create_blank_project(self, create_project, update_user_permission_project, mock_permission):
         create_project.side_effect = [{"id": 1, "flow_organization": str(uuid.uuid4())}]
         update_user_permission_project.side_effect = [
             dict(status=status.HTTP_201_CREATED, data={}),
 
         ]
-
+        mock_permission.return_value = True
         organization_uuid = str(self.org_1.uuid)
         data = {
             "date_format": "D",
@@ -145,7 +149,7 @@ class ProjectViewSetTestCase(TestCase):
     # @patch("connect.api.v1.internal.intelligence.intelligence_rest_client.IntelligenceRESTClient.get_access_token")
     # @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.update_user_permission_project")
     # @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_template_project")
-
+    @patch("connect.common.signals.update_user_permission_project")
     @patch("connect.api.v1.internal.integrations.integrations_rest_client.IntegrationsRESTClient.whatsapp_demo_integration")
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_flows")
     @patch("connect.api.v1.internal.chats.chats_rest_client.ChatsRESTClient.create_chat_project")
@@ -154,7 +158,7 @@ class ProjectViewSetTestCase(TestCase):
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_globals")
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.update_user_permission_project")
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_template_project")
-    def test_create_omie_project(self, create_template_project, update_user_permission_project, create_globals, get_access_token, create_classifier, create_chat_project, create_flows, whatsapp_demo_integration):
+    def test_create_omie_project(self, create_template_project, update_user_permission_project, create_globals, get_access_token, create_classifier, create_chat_project, create_flows, whatsapp_demo_integration, mock_permission):
         class GlobalResponse:
             status_code = 201
 
@@ -169,7 +173,7 @@ class ProjectViewSetTestCase(TestCase):
             "redirect_url": "https://example.com",
             "router_token": "rt_token"
         }
-
+        mock_permission.return_value = True
         update_user_permission_project.side_effect = [
             dict(status=status.HTTP_201_CREATED, data={}),
             dict(status=status.HTTP_201_CREATED, data={}),
@@ -304,6 +308,7 @@ class ProjectViewSetTestCase(TestCase):
 
         self.assertEquals(response.status_code, status.HTTP_204_NO_CONTENT)
 
+    @patch("connect.common.signals.update_user_permission_project")
     @patch("connect.api.v1.internal.integrations.integrations_rest_client.IntegrationsRESTClient.whatsapp_demo_integration")
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_flows")
     @patch("connect.api.v1.internal.chats.chats_rest_client.ChatsRESTClient.create_chat_project")
@@ -312,7 +317,7 @@ class ProjectViewSetTestCase(TestCase):
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_globals")
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.update_user_permission_project")
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_template_project")
-    def test_create_omie_financial_project(self, create_template_project, update_user_permission_project, create_globals, get_access_token, create_classifier, create_chat_project, create_flows, whatsapp_demo_integration):
+    def test_create_omie_financial_project(self, create_template_project, update_user_permission_project, create_globals, get_access_token, create_classifier, create_chat_project, create_flows, whatsapp_demo_integration, mock_permission):
         class GlobalResponse:
             status_code = 201
 
@@ -332,9 +337,9 @@ class ProjectViewSetTestCase(TestCase):
             dict(status=status.HTTP_201_CREATED, data={}),
             dict(status=status.HTTP_201_CREATED, data={}),
         ]
+        mock_permission.return_value = True
 
         class ChatsResponse:
-
             chats_data = {
                 "ticketer": {"uuid": str(uuid.uuid4()), "name": "Test Ticketer"},
                 "queue": {"uuid": str(uuid.uuid4()), "name": "Test Queue"},
@@ -381,6 +386,7 @@ class ProjectViewSetTestCase(TestCase):
 
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
 
+    @patch("connect.common.signals.update_user_permission_project")
     @patch("connect.api.v1.internal.integrations.integrations_rest_client.IntegrationsRESTClient.whatsapp_demo_integration")
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_flows")
     @patch("connect.api.v1.internal.chats.chats_rest_client.ChatsRESTClient.create_chat_project")
@@ -389,7 +395,7 @@ class ProjectViewSetTestCase(TestCase):
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_globals")
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.update_user_permission_project")
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_template_project")
-    def test_create_sac_chatgpt_project(self, create_template_project, update_user_permission_project, create_globals, get_access_token, create_classifier, create_chat_project, create_flows, whatsapp_demo_integration):
+    def test_create_sac_chatgpt_project(self, create_template_project, update_user_permission_project, create_globals, get_access_token, create_classifier, create_chat_project, create_flows, whatsapp_demo_integration, mock_permission):
         class GlobalResponse:
             status_code = 201
 
@@ -409,9 +415,9 @@ class ProjectViewSetTestCase(TestCase):
             dict(status=status.HTTP_201_CREATED, data={}),
             dict(status=status.HTTP_201_CREATED, data={}),
         ]
+        mock_permission.return_value = True
 
         class ChatsResponse:
-
             chats_data = {
                 "ticketer": {"uuid": str(uuid.uuid4()), "name": "Test Ticketer"},
                 "queue": {"uuid": str(uuid.uuid4()), "name": "Test Queue"},
@@ -460,11 +466,39 @@ class ProjectViewSetTestCase(TestCase):
 
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
 
+    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.update_project")
+    def test_update_flows_project(self, mock_update_project):
+
+        mock_response = Mock()
+        mock_response.status_code = status.HTTP_200_OK
+        mock_response.json.return_value = {"message": "Success"}
+
+        mock_update_project.return_value = mock_response
+
+        organization_uuid = str(self.org_1.uuid)
+        project_uuid = str(self.project1.uuid)
+
+        url = f"v2/organizations/{organization_uuid}/projects/{project_uuid}/"
+        data = {
+            "name": "Novo nome",
+            "timezone": "America/New_York",
+            "date_format": "D",
+        }
+        method = {"patch": "partial_update"}
+        response, content_data = self.request(url, method, data, user=self.user, pk=organization_uuid, project_uuid=project_uuid)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(content_data.get("name"), data.get("name"))
+        mock_update_project.assert_called_once_with(project_uuid, name="Novo nome", timezone="America/New_York", date_format="D")
+
 
 class ProjectTestCase(TestCase):
 
+    @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.billing.get_gateway")
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.update_user_permission_project")
-    def setUp(self, update_user_permission_project):
+    def setUp(self, update_user_permission_project, mock_get_gateway, mock_permissions):
+        mock_get_gateway.return_value = StripeMockGateway()
+        mock_permissions.return_value = True
         update_user_permission_project.side_effect = [True]
         self.organization = Organization.objects.create(
             name="Test project methods",

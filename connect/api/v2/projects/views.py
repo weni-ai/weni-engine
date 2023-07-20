@@ -4,12 +4,16 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 
+from connect.api.v1.organization.permissions import Has2FA
+from connect.api.v1.project.permissions import ProjectHasPermission
+
 from connect.common.models import (
     Project,
     OpenedProject,
 )
 from connect.api.v2.projects.serializers import (
     ProjectSerializer,
+    ProjectUpdateSerializer,
 )
 
 from django.utils import timezone
@@ -26,7 +30,7 @@ class ProjectViewSet(
     queryset = Project.objects
     serializer_class = ProjectSerializer
     lookup_field = "uuid"
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, ProjectHasPermission, Has2FA]
 
     def get_queryset(self, **kwargs):
         if getattr(self, "swagger_fake_view", False):
@@ -67,6 +71,10 @@ class ProjectViewSet(
         else:
             OpenedProject.objects.create(project=instance, user=user, day=timezone.now())
         return Response(data={"day": str(last_opened_on.day)}, status=status.HTTP_200_OK)
+
+    def update(self, request, *args, **kwargs):
+        self.serializer_class = ProjectUpdateSerializer
+        return super(ProjectViewSet, self).update(request, *args, **kwargs)
 
     def create(self, request, *args, **kwargs):
         request.data.update(

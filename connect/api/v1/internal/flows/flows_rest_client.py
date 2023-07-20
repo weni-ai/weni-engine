@@ -38,7 +38,7 @@ class FlowsRESTClient:
         sample_flow = add_classifier_to_flow(flow, classifier_uuid, template_type, ticketer, queue)
 
         body = dict(
-            org=project_uuid,
+            project=project_uuid,
             sample_flow=sample_flow,
             classifier_uuid=classifier_uuid
         )
@@ -64,19 +64,6 @@ class FlowsRESTClient:
         )
 
         return response.json()
-
-    def update_project(self, organization_uuid: str, organization_name: str):
-        body = {
-            "uuid": organization_uuid
-        }
-        if organization_name:
-            body['name'] = organization_name
-        response = requests.patch(
-            url=f"{self.base_url}/",
-            headers=self.authentication_instance.headers,
-            json=body
-        )
-        return dict(status=response.status_code, data=response.data)
 
     def delete_project(self, project_uuid: int, user_email: str):
         body = dict(
@@ -193,7 +180,7 @@ class FlowsRESTClient:
     def get_project_flows(self, project_uuid, flow_name):
         params = dict(
             flow_name=flow_name,
-            org_uuid=project_uuid
+            project=project_uuid
         )
         response = requests.get(
             url=f"{self.base_url}/api/v2/internals/project-flows/",
@@ -393,3 +380,14 @@ class FlowsRESTClient:
         )
 
         return response
+
+    def update_project(self, project_uuid: str, **kwargs: dict):
+        try:
+            response = requests.patch(
+                url=f'{self.base_url}/api/v2/internals/orgs/{project_uuid}/',
+                headers=self.authentication_instance.headers,
+                json=kwargs
+            )
+            return response.json()
+        except Exception as request_error:
+            return dict(error=str(request_error))

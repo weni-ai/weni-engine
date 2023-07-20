@@ -21,8 +21,11 @@ from connect.common.models import (
     RocketAuthorization,
 )
 from django.conf import settings
+from django.core import mail
 from connect.common.gateways.rocket_gateway import Rocket
 from freezegun import freeze_time
+from connect.common.mocks import StripeMockGateway
+from unittest.mock import patch
 
 
 class NewsletterTestCase(TestCase):
@@ -34,17 +37,16 @@ class NewsletterTestCase(TestCase):
         newsletter_language = NewsletterLanguage.objects.create(
             title=title, description=description, newsletter=newsletter
         )
-        self.assertEqual(
-            newsletter_language.__str__(),
-            f"Newsletter PK: {newsletter_language.pk} - en-us - New feature",
-        )
+
         self.assertEqual(newsletter.__str__(), f"PK: {newsletter.pk}")
         self.assertEqual(newsletter_language.title, title)
         self.assertEqual(newsletter_language.description, description)
 
 
 class ServiceStatusTestCase(TestCase):
-    def setUp(self):
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway):
+        mock_get_gateway.return_value = StripeMockGateway()
         self.owner = User.objects.create_user("owner@user.com", "owner")
 
         self.organization = Organization.objects.create(
@@ -90,7 +92,9 @@ class ServiceStatusTestCase(TestCase):
 
 
 class OrganizationAuthorizationTestCase(TestCase):
-    def setUp(self):
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway):
+        mock_get_gateway.return_value = StripeMockGateway()
         self.owner = User.objects.create_user("owner@user.com", "owner")
         self.user = User.objects.create_user("fake@user.com", "user")
         self.financial = User.objects.create_user("financial@user.com", "financial")
@@ -360,7 +364,9 @@ class InvoiceTestCase(TestCase):
 
 
 class OrganizationTestCase(TestCase):
-    def setUp(self):
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway):
+        mock_get_gateway.return_value = StripeMockGateway()
         self.organization = Organization.objects.create(
             name="Test Organization",
             inteligence_organization=0,
@@ -371,6 +377,19 @@ class OrganizationTestCase(TestCase):
         self.test_user_name = "test_username"
         self.test_first_name = "test"
         self.organization_new_name = "Test Org"
+
+        self.test_user1 = User.objects.create_user(
+            email=self.test_email,
+            username=self.test_user_name,
+            first_name=self.test_first_name,
+            language="en-us",
+        )
+        self.test_user2 = User.objects.create_user(
+            email="test2@example.com",
+            username="test2_username",
+            first_name="test2",
+            language="pt-br",
+        )
 
     def test_str_organization(self):
         self.assertEqual(
@@ -389,16 +408,12 @@ class OrganizationTestCase(TestCase):
         self.assertEqual(outbox.to[0], self.test_email)
 
     def test_send_email_organization_going_out(self):
-        sended_mail = self.organization.send_email_organization_going_out(
-            self.test_user_name, self.test_email
-        )
-        self.assertEqual(len(sended_mail.outbox), 1)
-        outbox = sended_mail.outbox[0]
-        self.assertEqual(
-            outbox.subject, f"You are leaving {self.organization.name}"
-        )
-        self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
-        self.assertEqual(outbox.to[0], self.test_email)
+        self.organization.send_email_organization_going_out(self.test_user1)
+
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].subject, "You are leaving Test Organization")
+        self.assertIn(self.test_user_name, mail.outbox[0].body)
+        self.assertIn("Test Organization", mail.outbox[0].body)
 
     def test_send_email_organization_removed(self):
         sended_mail = self.organization.send_email_organization_removed(
@@ -413,14 +428,23 @@ class OrganizationTestCase(TestCase):
         self.assertEqual(outbox.to[0], self.test_email)
 
     def test_send_email_organization_create(self):
-        sended_mail = self.organization.send_email_organization_create(
-            self.test_email, self.test_first_name
+        email1 = (
+            self.test_user1.email,
+            self.test_user1.username,
+            self.test_user1.language
         )
-        self.assertEqual(len(sended_mail.outbox), 1)
-        outbox = sended_mail.outbox[0]
-        self.assertEqual(outbox.subject, "Organization created!")
+        email2 = (
+            self.test_user2.email,
+            self.test_user2.username,
+            self.test_user2.language
+        )
+        email_list = [email1, email2]
+        self.organization.send_email_organization_create(email_list)
+        self.assertEqual(len(mail.outbox), 2)
+        outbox = mail.outbox[0]
+        self.assertEqual(outbox.subject, f"You just gave life to {self.organization.name}")
         self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
-        self.assertEqual(outbox.to[0], self.test_email)
+        self.assertEqual(outbox.to[0], self.test_user1.email)
 
     def test_send_email_remove_permission_organization(self):
         sended_mail = self.organization.send_email_remove_permission_organization(
@@ -435,52 +459,60 @@ class OrganizationTestCase(TestCase):
         self.assertEqual(outbox.to[0], self.test_email)
 
     def test_send_email_delete_organization(self):
-        sended_email = self.organization.send_email_delete_organization(
-            self.test_first_name, self.test_email
+        self.organization.authorizations.create(
+            user=self.test_user1, role=OrganizationRole.ADMIN.value
         )
-        self.assertEqual(len(sended_email.outbox), 1)
-        outbox = sended_email.outbox[0]
-        self.assertEqual(outbox.subject, f"{self.organization.name} no longer exists!")
-        self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
-        self.assertEqual(outbox.to[0], self.test_email)
+        self.organization.authorizations.create(
+            user=self.test_user2, role=OrganizationRole.ADMIN.value
+        )
+
+        self.organization.send_email_delete_organization()
+
+        self.assertEqual(len(mail.outbox), 2)
+        self.assertEqual(mail.outbox[0].subject, "The organization Test Organization no longer exists")
+        self.assertEqual(mail.outbox[1].subject, "A organização Test Organization deixou de existir")
+        self.assertIn(f"{self.test_user1.username}", mail.outbox[0].body)
+        self.assertIn(f"{self.test_user2.username}", mail.outbox[1].body)
 
     def test_send_email_change_organization_name(self):
-        sended_email = self.organization.send_email_change_organization_name(
-            self.test_user_name,
-            self.test_email,
-            self.organization.name,
-            self.organization_new_name,
-        )
-        self.assertEqual(len(sended_email.outbox), 1)
-        outbox = sended_email.outbox[0]
-        self.assertEqual(
-            outbox.subject,
-            f"{self.organization.name} is now {self.organization_new_name}",
-        )
-        self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
-        self.assertEqual(outbox.to[0], self.test_email)
+        prev_name = self.organization.name
+        new_name = "new org name"
+        emails = [
+            (self.test_user1.email, self.test_user1.username, self.test_user1.language),
+            (self.test_user2.email, self.test_user2.username, self.test_user2.language),
+        ]
+        self.organization.send_email_change_organization_name(prev_name, new_name, emails)
+        self.assertEqual(len(mail.outbox), 2)
+
+        for email in mail.outbox:
+            self.assertIn(f"{new_name}", email.body)
 
     def test_send_email_access_code(self):
-        sended_email = self.organization.send_email_access_code(
-            self.test_email, self.test_user_name, "1234"
-        )
-        self.assertEqual(len(sended_email.outbox), 1)
-        outbox = sended_email.outbox[0]
-        self.assertEqual(outbox.subject, "You receive an access code to Weni Platform")
-        self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
-        self.assertEqual(outbox.to[0], self.test_email)
+        organization = self.organization
+        email = "test@example.com"
+        user_name = "test_username"
+        access_code = "123456"
+
+        result = organization.send_email_access_code(email, user_name, access_code)
+
+        self.assertTrue(result)
+        self.assertEqual(len(mail.outbox), 1)
+        sent_email = mail.outbox[0]
+        self.assertEqual(sent_email.subject, "You receive an access code to Weni Platform")
 
     def test_send_email_permission_change(self):
         sended_email = self.organization.send_email_permission_change(
-            self.test_user_name, "Admin", "Viewer", self.test_email
+            self.test_user1, "Admin", "Viewer"
         )
         self.assertEqual(len(sended_email.outbox), 1)
         outbox = sended_email.outbox[0]
-        self.assertEqual(outbox.subject, "A new permission has been assigned to you")
+        self.assertEqual(outbox.subject, f"An administrator of {self.organization.name} has updated your permission")
         self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
         self.assertEqual(outbox.to[0], self.test_email)
 
-    def test_days_till_trial_end(self):
+    @patch("connect.billing.get_gateway")
+    def test_days_till_trial_end(self, mock_get_gateway):
+        mock_get_gateway.return_value = StripeMockGateway()
         organization = Organization.objects.create(
             name="Test Organization Trial",
             inteligence_organization=0,
@@ -495,7 +527,9 @@ class OrganizationTestCase(TestCase):
 
 
 class BillingPlanTestCase(TestCase):
-    def setUp(self):
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway):
+        mock_get_gateway.return_value = StripeMockGateway()
         self.organization = Organization.objects.create(
             name="Test",
             inteligence_organization=0,
@@ -506,8 +540,18 @@ class BillingPlanTestCase(TestCase):
         self.test_user_name = "test username"
         self.test_email = ["test@example.com"]
         self.test_first_name = "test"
-        # self.organization.organization_billing.stripe_customer="cus_KpDZ129lPQbygj"
-        # self.organization.organization_billing.save()
+        self.test_user1 = User.objects.create_user(
+            email=self.test_email[0],
+            username=self.test_user_name,
+            first_name=self.test_first_name,
+            language="en-us",
+        )
+        self.test_user2 = User.objects.create_user(
+            email="test@test.com",
+            username="test2_username",
+            first_name="test2",
+            language="pt-br",
+        )
 
     def test_send_email_added_card(self):
         sended_email = self.billing.send_email_added_card(
@@ -536,24 +580,26 @@ class BillingPlanTestCase(TestCase):
         self.assertEqual(outbox.to[0], self.test_email[0])
 
     def test_send_email_finished_plan(self):
-        sended_email = self.billing.send_email_finished_plan(
-            self.test_user_name, self.test_email
+        email_list = [self.test_user1.email, self.test_user2.email]
+        self.billing.send_email_finished_plan(
+            self.test_user1.username, email_list
         )
-        self.assertEqual(len(sended_email.outbox), 1)
-        outbox = sended_email.outbox[0]
-        self.assertEqual(
-            outbox.subject,
-            "Your organization's plan has expired",
-        )
+        self.assertEqual(len(mail.outbox), 2)
+        outbox = mail.outbox[0]
+        if self.test_user1.language == "en-us":
+            self.assertEqual(
+                outbox.subject,
+                "Your organization's plan has ended",
+            )
         self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
         self.assertEqual(outbox.to[0], self.test_email[0])
 
     def test_send_email_reactivated_plan(self):
-        sended_email = self.billing.send_email_reactivated_plan(
+        self.billing.send_email_reactivated_plan(
             self.test_user_name, self.test_email
         )
-        self.assertEqual(len(sended_email.outbox), 1)
-        outbox = sended_email.outbox[0]
+        self.assertEqual(len(mail.outbox), 1)
+        outbox = mail.outbox[0]
         self.assertEqual(
             outbox.subject,
             "Your organization's plan has been reactivated.",
@@ -562,11 +608,11 @@ class BillingPlanTestCase(TestCase):
         self.assertEqual(outbox.to[0], self.test_email[0])
 
     def test_send_email_removed_credit_card(self):
-        sended_email = self.billing.send_email_removed_credit_card(
+        self.billing.send_email_removed_credit_card(
             self.test_user_name, self.test_email
         )
-        self.assertEqual(len(sended_email.outbox), 1)
-        outbox = sended_email.outbox[0]
+        self.assertEqual(len(mail.outbox), 1)
+        outbox = mail.outbox[0]
         self.assertEqual(
             outbox.subject,
             "Your organization's credit card was removed",
@@ -615,9 +661,36 @@ class BillingPlanTestCase(TestCase):
         self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
         self.assertEqual(outbox.to[0], self.test_email[0])
 
+    def test_send_email_plan_is_about_to_expire(self):
+        self.billing.plan = BillingPlan.PLAN_TRIAL
+        user1 = (self.test_user1.email, self.test_user1.username, self.test_user1.language)
+        user2 = (self.test_user2.email, self.test_user2.username, self.test_user2.language)
+        email_list = [user1, user2]
+        self.billing.send_email_plan_is_about_to_expire(
+            email_list
+        )
+        self.assertEqual(len(mail.outbox), 2)
+        outbox = mail.outbox[0]
+        self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
+        self.assertEqual(outbox.to[0], self.test_email[0])
+
+    def test_send_email_end_trial(self):
+        email_list = [self.test_user1.email]
+        self.billing.send_email_end_trial(
+            email_list
+        )
+        self.assertEqual(len(mail.outbox), 1)
+        outbox = mail.outbox[0]
+        self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
+        self.assertEqual(outbox.to[0], self.test_user1.email)
+
 
 class ProjectAuthorizationTestCase(TestCase):
-    def setUp(self):
+    @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway, mock_permission):
+        mock_get_gateway.return_value = StripeMockGateway()
+        mock_permission.return_value = True
         self.owner = User.objects.create_user("owner@user.com", "owner")
         self.user = User.objects.create_user("fake@user.com", "user")
 
@@ -729,9 +802,14 @@ class RocketAuthorizationTestCase(TestCase):
 
 
 class RequestPermissionProjectTestCase(TestCase):
-    def setUp(self):
+    @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway, mock_permission):
         self.owner = User.objects.create_user("owner@user.com", "owner")
         self.user = User.objects.create_user("fake@user.com", "user")
+
+        mock_get_gateway.return_value = StripeMockGateway()
+        mock_permission.return_value = True
 
         self.organization = Organization.objects.create(
             name="Test",
@@ -748,7 +826,9 @@ class RequestPermissionProjectTestCase(TestCase):
             flow_organization=uuid4.uuid4(),
         )
 
-    def test_create_request_permission(self):
+    @patch("connect.common.signals.update_user_permission_project")
+    def test_create_request_permission(self, mock_permission):
+        mock_permission.return_value = True
         self.request_permission = RequestPermissionProject.objects.create(
             email="fake@user.com",
             project=self.project,

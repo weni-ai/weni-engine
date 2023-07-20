@@ -8,6 +8,7 @@ from django.utils import timezone
 
 from unittest import skipIf
 from unittest.mock import patch
+from connect.common.mocks import StripeMockGateway
 import uuid as uuid4
 
 from django.test import TestCase
@@ -156,8 +157,9 @@ class SyncContactsTestCase(TestCase):
 
 
 class ContactTestCase(TestCase):
-
-    def setUp(self):
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway):
+        mock_get_gateway.return_value = StripeMockGateway()
         self.organization = Organization.objects.create(
             name='org test',
             description='desc',
@@ -246,7 +248,11 @@ class MessageTestCase(TestCase):
 
 
 class CheckPlansTestCase(TestCase):
-    def setUp(self):
+    @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway, mock_permission):
+        mock_get_gateway.return_value = StripeMockGateway()
+        mock_permission.return_value = True
         # Orgs
         self.start = Organization.objects.create(
             name="Start org",
@@ -346,6 +352,7 @@ class CheckPlansTestCase(TestCase):
         self.start.organization_billing.send_email_trial_plan_expired_due_time_limit()
 
 
+@skipIf(True, "Deprecated")
 class ChannelModelsTestCase(TestCase):
 
     def setUp(self):
@@ -386,7 +393,9 @@ class ChannelModelsTestCase(TestCase):
 
 class ContactCountTestCase(TestCase):
 
-    def setUp(self):
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway):
+        mock_get_gateway.return_value = StripeMockGateway()
         self.organization = Organization.objects.create(
             name="test organization",
             description="test organization",

@@ -18,6 +18,9 @@ from connect.common.models import (
     BillingPlan,
     Invoice
 )
+from connect.common.mocks import StripeMockGateway
+from unittest import skipIf
+from unittest.mock import patch
 import pendulum
 from freezegun import freeze_time
 from connect.billing.tasks import end_trial_plan, check_organization_plans, daily_contact_count
@@ -51,7 +54,11 @@ class CreateOrganizationAPITestCase(TestCase):
         content_data = json.loads(response.content)
         return (response, content_data)
 
-    def test_create(self):
+    @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.billing.get_gateway")
+    def test_create(self, mock_get_gateway, mock_permission):
+        mock_get_gateway.return_value = StripeMockGateway()
+        mock_permission.return_value = True
         User.objects.create(
             email="e@mail.com",
         )
@@ -78,7 +85,11 @@ class CreateOrganizationAPITestCase(TestCase):
         response, content_data = self.request(data, self.owner_token)
         self.assertEquals(response.status_code, 201)
 
-    def test_create_org_with_customer(self):
+    @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.billing.get_gateway")
+    def test_create_org_with_customer(self, mock_get_gateway, mock_permission):
+        mock_get_gateway.return_value = StripeMockGateway()
+        mock_permission.return_value = True
         data = {
             "organization": {
                 "name": "Customer",
@@ -103,7 +114,11 @@ class CreateOrganizationAPITestCase(TestCase):
         org = Organization.objects.get(uuid=content_data["organization"]["uuid"])
         self.assertEqual(org.organization_billing.stripe_customer, "cus_tomer")
 
-    def test_create_template_project(self):
+    @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.billing.get_gateway")
+    def test_create_template_project(self, mock_get_gateway, mock_permission):
+        mock_get_gateway.return_value = StripeMockGateway()
+        mock_permission.return_value = True
         data = {
             "organization": {
                 "name": "name",
@@ -136,7 +151,11 @@ class CreateOrganizationAPITestCase(TestCase):
         self.assertEquals(Project.objects.count(), 1)
         self.assertEquals(ProjectAuthorization.objects.count(), 1)
 
-    def test_create_template_project_type_support(self):
+    @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.billing.get_gateway")
+    def test_create_template_project_type_support(self, mock_get_gateway, mock_permission):
+        mock_get_gateway.return_value = StripeMockGateway()
+        mock_permission.return_value = True
         data = {
             "organization": {
                 "name": "name",
@@ -159,11 +178,17 @@ class CreateOrganizationAPITestCase(TestCase):
             }
         }
         response, content_data = self.request(data, self.owner_token)
+        self.assertEquals(response.status_code, 201)
+        self.assertEquals(content_data.get("project").get("first_access"), True)
 
 
 class RetrieveOrganizationProjectsAPITestCase(TestCase):
 
-    def setUp(self) -> None:
+    @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway, mock_permission) -> None:
+        mock_get_gateway.return_value = StripeMockGateway()
+        mock_permission.return_value = True
         self.owner, self.owner_token = create_user_and_token("owner")
         self.factory = RequestFactory()
         self.organization = Organization.objects.create(
@@ -184,24 +209,7 @@ class RetrieveOrganizationProjectsAPITestCase(TestCase):
             is_template=True
         )
 
-    def request(self, organization_uuid, token=None):
-        authorization_header = (
-            {"HTTP_AUTHORIZATION": "Token {}".format(token.key)} if token else {}
-        )
-
-        request = self.factory.get(
-            f"/v1/organization/project/?organization={organization_uuid}&offset=0&limit=12&ordering=",
-            content_type="application/json",
-            format="json",
-            **authorization_header,
-        )
-
-        response = OrganizationViewSet.as_view({"get": "list"})(request)
-        response.render()
-        content_data = json.loads(response.content)
-        return (response, content_data)
-
-    def request2(self, project_uuid, token=None):
+    def request(self, project_uuid, token=None):
         authorization_header = (
             {"HTTP_AUTHORIZATION": "Token {}".format(token.key)} if token else {}
         )
@@ -217,13 +225,17 @@ class RetrieveOrganizationProjectsAPITestCase(TestCase):
         return response, content_data
 
     def test_is_template_project(self):
-        response, content_data = self.request2(self.project.uuid, self.owner_token)
-        print(content_data)
+        response, content_data = self.request(self.project.uuid, self.owner_token)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 
 class PlanAPITestCase(TestCase):
 
-    def setUp(self) -> None:
+    @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway, mock_permission) -> None:
+        mock_get_gateway.return_value = StripeMockGateway()
+        mock_permission.return_value = True
         self.owner, self.owner_token = create_user_and_token("owner")
         self.factory = RequestFactory()
         # Organizations
@@ -317,10 +329,12 @@ class PlanAPITestCase(TestCase):
         self.trial.organization_billing.end_trial_period()
         self.assertFalse(self.trial.organization_billing.is_active)
 
-    def test_task_end_trial_plan(self):
+    @patch("connect.billing.get_gateway")
+    def test_task_end_trial_plan(self, mock_get_gateway):
         """
         Test if 'task_end_trial_plan' suspends org that should after the trial periods end
         """
+        mock_get_gateway.return_value = StripeMockGateway()
         trial2 = Organization.objects.create(
             name="Trial 2",
             description="Trial 2",
@@ -335,7 +349,9 @@ class PlanAPITestCase(TestCase):
         self.assertTrue(org.is_suspended)
         self.assertFalse(org.organization_billing.is_active)
 
-    def test_upgrade_plan(self):
+    @patch("connect.billing.get_gateway")
+    def test_upgrade_plan(self, mock_get_gateway):
+        mock_get_gateway.return_value = StripeMockGateway()
         """Test upgrade plan view"""
         self.assertEqual(self.trial.organization_billing.plan, BillingPlan.PLAN_TRIAL)
         data = {
@@ -438,6 +454,7 @@ class BillingViewTestCase(TestCase):
         content_data = json.loads(response.content)
         return (response, content_data)
 
+    @skipIf("stripe" not in settings.BILLING_SETTINGS, "Stripe not configured")
     def test_setup_intent(self):
         response, content_data = self.request(path="setup-intent", method="setup_intent")
 
@@ -449,7 +466,11 @@ class BillingViewTestCase(TestCase):
         self.customer = content_data.get("customer")
         self.assertEqual(content_data.get("customer"), "cus_MYOrndkgpPHGK9")
 
-    def test_setup_plan(self):
+    @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.billing.get_gateway")
+    def test_setup_plan(self, mock_get_gateway, mock_permission):
+        mock_get_gateway.return_value = StripeMockGateway()
+        mock_permission.return_value = True
         data = {
             "plan": BillingPlan.PLAN_START,
             "customer": "cus_MYOrndkgpPHGK9",
@@ -484,7 +505,6 @@ class BillingViewTestCase(TestCase):
             }
         }
         response, content_data = self.request_create_org(create_org_data, self.owner_token)
-
         self.assertEqual(content_data["organization"]["organization_billing"]["plan"], BillingPlan.PLAN_START)
         self.assertEqual(content_data["organization"]["organization_billing"]["final_card_number"], '42')
         organization = Organization.objects.get(uuid=content_data["organization"]["uuid"])
@@ -501,7 +521,11 @@ class BillingViewTestCase(TestCase):
 @freeze_time("2022-11-14")
 class IntegrationTestCase(TestCase):
 
-    def setUp(self):
+    @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway, mock_permission):
+        mock_get_gateway.return_value = StripeMockGateway()
+        mock_permission.return_value = True
         self.factory = RequestFactory()
         self.owner, self.owner_token = create_user_and_token("owner")
 
@@ -543,7 +567,9 @@ class IntegrationTestCase(TestCase):
         content_data = json.loads(response.content)
         return response, content_data
 
-    def test(self):
+    @patch("connect.billing.get_gateway")
+    def test_plan_limits(self, mock_get_gateway):
+        mock_get_gateway.return_value = StripeMockGateway()
         # Creates more contacts than the plan limit allows
         num_contacts = BillingPlan.plan_info(self.organization.organization_billing.plan)["limit"] * 5 + 1
         self.assertTrue(self.organization.organization_billing.is_active)
