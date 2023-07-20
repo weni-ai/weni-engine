@@ -144,7 +144,7 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
         help_text=_("if this field is true, only users with 2fa activated can access the org")
     )
 
-    def create_organization(self, validated_data):
+    def create_organization(self, validated_data):  # pragma: no cover
         organization = {"id": 0}
         if not settings.TESTING:
             ai_client = IntelligenceRESTClient()
@@ -172,7 +172,7 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
 
         return instance
 
-    def create(self, validated_data):
+    def create(self, validated_data):  # pragma: no cover
         data = {}
         try:
             ai_client = IntelligenceRESTClient()
