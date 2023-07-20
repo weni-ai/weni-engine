@@ -8,7 +8,9 @@ from django.test import RequestFactory
 from django.test import TestCase
 from django.test.client import MULTIPART_CONTENT
 from rest_framework import status
-
+from connect.api.v1.organization.serializers import RequestPermissionOrganizationSerializer
+from connect.authentication.models import User
+from rest_framework.exceptions import ValidationError
 from connect.api.v1.organization.views import (
     OrganizationViewSet,
     OrganizationAuthorizationViewSet,
@@ -20,6 +22,7 @@ from connect.common.models import (
     BillingPlan,
     Project,
     OrganizationRole,
+    RequestPermissionOrganization
 )
 from connect.common.mocks import StripeMockGateway
 
@@ -1001,3 +1004,86 @@ class BillingPrecificationAPITestCase(TestCase):
             content_data["extra_whatsapp_integration"],
             settings.BILLING_COST_PER_WHATSAPP,
         )
+
+
+class RequestPermissionOrganizationSerializerTestCase(TestCase):
+
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway):
+        mock_get_gateway.return_value = StripeMockGateway()
+        self.test_serializer = RequestPermissionOrganizationSerializer()
+
+        self.org_test = Organization.objects.create(
+            name="test organization",
+            description="",
+            inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan="enterprise",
+        )
+
+        self.test_user = User.objects.create(
+            email="test@test.com",
+            username="test",
+            first_name="first_name",
+            last_name="last_name",
+        )
+        return super().setUp()
+
+    def test_fail_uppercase_email_validation(self):
+
+        with self.assertRaises(ValidationError) as context:
+            self.test_serializer.validate({
+                "email": "TEST@test.com",
+                "role": OrganizationRole.ADMIN.value,
+            })
+        self.assertEqual(
+            str(context.exception.detail[0]),
+            "Email field cannot have uppercase characters"
+        )
+
+    def test_simple_validation(self):
+
+        simple_validation = self.test_serializer.validate({
+            "email": "test@test.com",
+            "role": OrganizationRole.ADMIN.value,
+        })
+        self.assertEqual(simple_validation["email"], "test@test.com")
+        self.assertEqual(simple_validation["role"], OrganizationRole.ADMIN.value)
+
+    def test_fail_white_space_email_validation(self):
+
+        with self.assertRaises(ValidationError) as context:
+            self.test_serializer.validate({
+                "email": "test @test.com",
+                "role": OrganizationRole.ADMIN.value,
+            })
+        self.assertEqual(
+            str(context.exception.detail[0]),
+            "Email field cannot have spaces"
+        )
+
+    def test_get_existing_user_data(self):
+
+        request_permission = RequestPermissionOrganization.objects.create(
+            email="test@test.com",
+            role=OrganizationRole.ADMIN.value,
+            organization=self.org_test,
+            created_by=self.test_user,
+        )
+
+        data = self.test_serializer.get_user_data(request_permission)
+        self.assertEqual(f"{self.test_user.first_name} {self.test_user.last_name}", data["name"])
+
+    def test_get_non_existing_user_data(self):
+
+        non_existing_email = "test2@test.com"
+
+        request_permission = RequestPermissionOrganization.objects.create(
+            email=non_existing_email,
+            role=OrganizationRole.ADMIN.value,
+            organization=self.org_test,
+            created_by=self.test_user,
+        )
+
+        data = self.test_serializer.get_user_data(request_permission)
+        self.assertEqual(data["name"], non_existing_email)
