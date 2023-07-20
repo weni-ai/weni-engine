@@ -362,49 +362,6 @@ def sync_total_contact_count():
         project.save(update_fields=["total_contact_count"])
     return True
 
-
-@app.task()
-def sync_project_information():
-    if settings.USE_FLOW_REST:
-        flow_instance = FlowsRESTClient()
-    else:
-        flow_instance = utils.get_grpc_types().get("flow")
-    for project in Project.objects.order_by("-created_at"):
-        try:
-            flow_result = flow_instance.get_project_info(
-                project_uuid=str(project.uuid)
-            )
-            updated_fields = []
-            if "name" in flow_result:
-                project.name = flow_result.get("name")
-                updated_fields.append("name")
-
-            if "timezone" in flow_result:
-                project.timezone = str(flow_result.get("timezone"))
-                updated_fields.append("timezone")
-
-            if "data_format" in flow_result:
-                project.date_format = str(flow_result.get("date_format"))
-                updated_fields.append("data_format")
-
-            if "id" in flow_result:
-                project.flow_id = flow_result.get("id")
-                updated_fields.append("flow_id")
-
-            logger.info(f"project: {project.__str__()}")
-            if len(updated_fields) > 0:
-                project.save(update_fields=updated_fields)
-                if not settings.TESTING:
-                    chats_client = ChatsRESTClient()
-                    chats_client.update_chats_project(project_uuid=project.uuid)
-        except ConnectionError as c:
-            logger.error(f"Remote end closed connection without: {c} - Project: {project}")
-            continue
-        except Exception as e:
-            logger.error(f"Sync Project Information Exception {e}")
-            continue
-
-
 @app.task(name="sync_project_statistics")
 def sync_project_statistics():
     if settings.USE_FLOW_REST:
