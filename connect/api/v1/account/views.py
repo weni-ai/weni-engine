@@ -259,7 +259,7 @@ class MyUserProfileViewSet(
             return Response(status=200, data=response)
 
         except UserEmailSetup.DoesNotExist:
-            data.update(user=user)
+            data.update(user_instance=user)
             setup = UserEmailSetup.objects.create(**data)
             response = UserEmailSetupSerializer(setup).data
             return Response(status=200, data=response)

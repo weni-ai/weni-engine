@@ -266,7 +266,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class UserEmailSetup(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="email_setup")
+    user_instance = models.OneToOneField(User, on_delete=models.CASCADE, related_name="email_setup")
     receive_project_emails = models.BooleanField(default=True)
     receive_organization_emails = models.BooleanField(default=True)
 
