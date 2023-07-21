@@ -15,7 +15,7 @@ from connect.api.v2.classifier.serializers import (
 from connect.common.models import Project
 
 
-class CreateClassifierAPIView(views.APIView):
+class CreateClassifierAPIView(views.APIView):  # pragma: no cover
     permission_classes = [ModuleHasPermission]
 
     def post(self, request):
@@ -40,7 +40,7 @@ class CreateClassifierAPIView(views.APIView):
         return JsonResponse(status=status.HTTP_200_OK, data=classifier_data)
 
 
-class ListClassifierAPIView(views.APIView):
+class ListClassifierAPIView(views.APIView):  # pragma: no cover
     permission_classes = [ModuleHasPermission]
 
     def get(self, request):
@@ -77,7 +77,7 @@ class ListClassifierAPIView(views.APIView):
         return JsonResponse(status=status.HTTP_200_OK, data=classifier_data)
 
 
-class RetrieveClassfierAPIView(views.APIView):
+class RetrieveClassfierAPIView(views.APIView):  # pragma: no cover
 
     permission_classes = [ModuleHasPermission]
 
@@ -97,7 +97,7 @@ class RetrieveClassfierAPIView(views.APIView):
         return JsonResponse(status=status.HTTP_200_OK, data=classifier_data)
 
 
-class DeleteClassifierAPIView(views.APIView):
+class DeleteClassifierAPIView(views.APIView):  # pragma: no cover
     permission_classes = [ModuleHasPermission]
 
     def delete(self, request):

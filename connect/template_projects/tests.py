@@ -1,4 +1,9 @@
+import uuid
+from storages.backends.s3boto3 import S3Boto3Storage
 from django.test import TestCase
+from unittest.mock import patch
+from connect.storages import AvatarUserMediaStorage
+from connect.template_projects.storage import TemplateTypeImageStorage
 from connect.template_projects.models import TemplateType, TemplateAI, TemplateFeature
 
 
@@ -71,3 +76,50 @@ class TemplateFeatureModelTestCase(TestCase):
         str_response = self.template_feature_object.__str__()
         model_id = self.template_feature_object.id
         self.assertListEqual(str_response.split(), [str(model_id)])
+
+
+class StorageTestCase(TestCase):
+
+    @patch.object(S3Boto3Storage, 'get_available_name')
+    def test_avatar_storage_get_available_name_with_override(self, mock_get_available_name):
+        storage = AvatarUserMediaStorage()
+        storage.override_available_name = True
+
+        ext = "png"
+        filename = "av_%s.%s" % (uuid.uuid4(), ext)
+        mock_get_available_name.return_value = filename
+
+        name = "example.png"
+        max_length = 100
+
+        result = storage.get_available_name(name, max_length)
+
+        mock_get_available_name.assert_called_once()
+
+        args, kwargs = mock_get_available_name.call_args
+        self.assertTrue(args[0].startswith("av_"))
+        self.assertEqual(args[1], max_length)
+
+        self.assertEqual(result, filename)
+
+    @patch.object(S3Boto3Storage, 'get_available_name')
+    def test_template_storage_get_available_name_with_override(self, mock_get_available_name):
+        storage = TemplateTypeImageStorage()
+        storage.override_available_name = True
+
+        ext = "png"
+        filename = "av_%s.%s" % (uuid.uuid4(), ext)
+        mock_get_available_name.return_value = filename
+
+        name = "example.png"
+        max_length = 100
+
+        result = storage.get_available_name(name, max_length)
+
+        mock_get_available_name.assert_called_once()
+
+        args, kwargs = mock_get_available_name.call_args
+        self.assertTrue(args[0].startswith("av_"))
+        self.assertEqual(args[1], max_length)
+
+        self.assertEqual(result, filename)

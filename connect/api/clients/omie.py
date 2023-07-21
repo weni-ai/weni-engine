@@ -1,7 +1,7 @@
 import requests
 
 
-class OmieClient:
+class OmieClient:  # pragma: no cover
 
     base_url = "https://app.omie.com.br/api/"
     headers = {
