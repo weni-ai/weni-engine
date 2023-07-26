@@ -176,7 +176,7 @@ zstd = ["zstandard"]
 
 [[package]]
 name = "certifi"
-version = "2023.5.7"
+version = "2023.7.22"
 description = "Python package for providing Mozilla's CA Bundle."
 category = "main"
 optional = false
@@ -324,8 +324,8 @@ test-randomorder = ["pytest-randomly"]
 
 [[package]]
 name = "dill"
-version = "0.3.6"
-description = "serialize all of python"
+version = "0.3.7"
+description = "serialize all of Python"
 category = "main"
 optional = false
 python-versions = ">=3.7"
@@ -651,7 +651,7 @@ protobuf = ">=3.5.0.post1,<4.0dev"
 
 [[package]]
 name = "identify"
-version = "2.5.25"
+version = "2.5.26"
 description = "File identification library for Python"
 category = "main"
 optional = false
@@ -851,6 +851,19 @@ python-dateutil = ">=2.6,<3.0"
 pytzdata = ">=2020.1"
 
 [[package]]
+name = "pika"
+version = "1.3.2"
+description = "Pika Python AMQP Client Library"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.extras]
+gevent = ["gevent"]
+tornado = ["tornado"]
+twisted = ["twisted"]
+
+[[package]]
 name = "pillow"
 version = "8.3.2"
 description = "Python Imaging Library (Fork)"
@@ -958,14 +971,14 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [[package]]
 name = "pylint"
-version = "2.17.4"
+version = "2.17.5"
 description = "python code static checker"
 category = "main"
 optional = false
 python-versions = ">=3.7.2"
 
 [package.dependencies]
-astroid = ">=2.15.4,<=2.17.0-dev0"
+astroid = ">=2.15.6,<=2.17.0-dev0"
 colorama = {version = ">=0.4.5", markers = "sys_platform == \"win32\""}
 dill = [
     {version = ">=0.2", markers = "python_version < \"3.11\""},
@@ -1294,20 +1307,20 @@ python-versions = ">=3.6"
 
 [[package]]
 name = "virtualenv"
-version = "20.24.0"
+version = "20.24.2"
 description = "Virtual Python Environment builder"
 category = "main"
 optional = false
 python-versions = ">=3.7"
 
 [package.dependencies]
-distlib = ">=0.3.6,<1"
-filelock = ">=3.12,<4"
-platformdirs = ">=3.5.1,<4"
+distlib = ">=0.3.7,<1"
+filelock = ">=3.12.2,<4"
+platformdirs = ">=3.9.1,<4"
 
 [package.extras]
 docs = ["furo (>=2023.5.20)", "proselint (>=0.13)", "sphinx-argparse (>=0.4)", "sphinx (>=7.0.1)", "sphinxcontrib-towncrier (>=0.2.1a0)", "towncrier (>=23.6)"]
-test = ["covdefaults (>=2.3)", "coverage-enable-subprocess (>=1)", "coverage (>=7.2.7)", "flaky (>=3.7)", "packaging (>=23.1)", "pytest-env (>=0.8.1)", "pytest-freezer (>=0.4.6)", "pytest-mock (>=3.10)", "pytest-randomly (>=3.12)", "pytest-timeout (>=2.1)", "pytest (>=7.3.1)", "setuptools (>=67.8)", "time-machine (>=2.9)"]
+test = ["covdefaults (>=2.3)", "coverage-enable-subprocess (>=1)", "coverage (>=7.2.7)", "flaky (>=3.7)", "packaging (>=23.1)", "pytest-env (>=0.8.2)", "pytest-freezer (>=0.4.8)", "pytest-mock (>=3.11.1)", "pytest-randomly (>=3.12)", "pytest-timeout (>=2.1)", "pytest (>=7.4)", "setuptools (>=68)", "time-machine (>=2.10)"]
 
 [[package]]
 name = "wcwidth"
@@ -1351,7 +1364,7 @@ python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
 [metadata]
 lock-version = "1.1"
 python-versions = "~=3.8"
-content-hash = "549ecf105777ff9a3ecd949df3b52ad70e6ff35d4e3ca41a636629c573751314"
+content-hash = "07db6091f64ebfa75c166c576747f94da01a2c3b628fab1a20daecf9d72f5efa"
 
 [metadata.files]
 amqp = []
@@ -1419,6 +1432,7 @@ nodeenv = []
 packaging = []
 pathspec = []
 pendulum = []
+pika = []
 pillow = []
 platformdirs = []
 pre-commit = []

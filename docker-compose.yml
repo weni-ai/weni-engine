@@ -78,7 +78,14 @@ services:
     image: redis
     ports:
       - 6379:6379
-
+  rabbitmq:
+    image: rabbitmq:3.9.7-management
+    ports:
+      - "5672:5672"  # Port to connect to RabbitMQ
+      - "15672:15672"  # Port to access the RabbitMQ management interface
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD}
 networks:
   weni:
     external: true

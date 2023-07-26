@@ -2,14 +2,17 @@ import json
 import uuid
 from rest_framework import status
 from rest_framework.test import APIRequestFactory
+from rest_framework.exceptions import PermissionDenied
 
 from django.test import TestCase
 from unittest.mock import patch
 
+from connect.authentication.models import User
 from connect.api.v1.tests.utils import create_user_and_token
-from connect.common.models import Organization, BillingPlan, Project, OrganizationRole
+from connect.common.models import Organization, BillingPlan, Project, OrganizationRole, OrganizationLevelRole, RequestPermissionOrganization
 from connect.common.mocks import StripeMockGateway
 from connect.api.v2.internals.views import AIGetOrganizationView
+from connect.api.v2.internals.serializers import OrganizationAuthorizationRoleSerializer, RequestPermissionOrganizationSerializer
 
 
 class AIGetOrganizationViewTestCase(TestCase):
@@ -100,3 +103,123 @@ class AIGetOrganizationViewTestCase(TestCase):
 
         self.assertEquals(response.status_code, status.HTTP_200_OK)
         self.assertEquals(organization.inteligence_organization, data.get("intelligence_organization"))
+
+
+class RequestPermissionOrganizationSerializerTestCase(TestCase):
+
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway):
+        mock_get_gateway.return_value = StripeMockGateway()
+        self.test_serializer = RequestPermissionOrganizationSerializer()
+
+        self.org_test = Organization.objects.create(
+            name="test organization",
+            description="",
+            inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan="enterprise",
+        )
+
+        self.test_user = User.objects.create(
+            email="test@test.com",
+            username="test",
+            first_name="first_name",
+            last_name="last_name",
+        )
+
+    def test_validate_role_nothing(self):
+        attrs = {
+            "email": "test@example.com",
+            "role": OrganizationLevelRole.NOTHING.value,
+        }
+
+        with self.assertRaises(PermissionDenied) as context:
+            self.test_serializer.validate(attrs)
+
+        self.assertEqual(str(context.exception), "You cannot set user role 0")
+
+    def test_validate_role_valid(self):
+        attrs = {
+            "email": "test@example.com",
+            "role": OrganizationLevelRole.ADMIN.value,
+        }
+
+        try:
+            validated_attrs = self.test_serializer.validate(attrs)
+        except PermissionDenied:
+            self.fail("Unexpected PermissionDenied exception.")
+
+        self.assertEqual(attrs, validated_attrs)
+
+    def test_get_existing_user_data(self):
+
+        request_permission = RequestPermissionOrganization.objects.create(
+            email="test@test.com",
+            role=OrganizationRole.ADMIN.value,
+            organization=self.org_test,
+            created_by=self.test_user,
+        )
+
+        data = self.test_serializer.get_user_data(request_permission)
+        self.assertEqual(f"{self.test_user.first_name} {self.test_user.last_name}", data["name"])
+
+    def test_get_non_existing_user_data(self):
+
+        non_existing_email = "test2@test.com"
+
+        request_permission = RequestPermissionOrganization.objects.create(
+            email=non_existing_email,
+            role=OrganizationRole.ADMIN.value,
+            organization=self.org_test,
+            created_by=self.test_user,
+        )
+
+        data = self.test_serializer.get_user_data(request_permission)
+        self.assertEqual(data["name"], non_existing_email)
+
+
+class OrganizationAuthorizationRoleSerializerTestCase(TestCase):
+
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway):
+        mock_get_gateway.return_value = StripeMockGateway()
+        self.test_serializer = OrganizationAuthorizationRoleSerializer()
+
+        self.org_test = Organization.objects.create(
+            name="test organization",
+            description="",
+            inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan="enterprise",
+        )
+
+        self.test_user = User.objects.create(
+            email="test@test.com",
+            username="test",
+            first_name="first_name",
+            last_name="last_name",
+        )
+
+    def test_validate_role_nothing(self):
+        attrs = {
+            "email": "test@example.com",
+            "role": OrganizationLevelRole.NOTHING.value,
+        }
+
+        with self.assertRaises(PermissionDenied) as context:
+            self.test_serializer.validate(attrs)
+
+        self.assertEqual(str(context.exception), "You cannot set user role 0")
+
+    def test_validate_role_valid(self):
+        attrs = {
+            "email": "test@example.com",
+            "role": OrganizationLevelRole.ADMIN.value,
+        }
+
+        try:
+            validated_attrs = self.test_serializer.validate(attrs)
+        except PermissionDenied:
+            self.fail("Unexpected PermissionDenied exception.")
+
+        self.assertEqual(attrs, validated_attrs)

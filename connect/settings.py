@@ -144,6 +144,7 @@ INSTALLED_APPS = [
     "connect.common.apps.CommonConfig",
     "connect.billing",
     "connect.template_projects",
+    "connect.internals",
     "django_celery_results",
     "django_celery_beat",
     "storages",
@@ -541,3 +542,14 @@ CREATE_AI_ORGANIZATION = env.bool("CREATE_AI_ORGANIZATION")
 
 OMIE_APP_KEY = env.str("OMIE_APP_KEY", default="ap_test")
 OMIE_APP_SECRET = env.str("OMIE_APP_SECRET", default="sk_test")
+
+
+# Event driven architecture settings
+USE_EDA = env.bool("USE_EDA", default=False)
+
+if USE_EDA:
+
+    EDA_BROKER_HOST = env.str("EDA_BROKER_HOST", default="localhost")
+    EDA_BROKER_PORT = env.int("EDA_BROKER_PORT", default=5672)
+    EDA_BROKER_USER = env.str("EDA_BROKER_USER", default="guest")
+    EDA_BROKER_PASSWORD = env.str("EDA_BROKER_PASSWORD", default="guest")
