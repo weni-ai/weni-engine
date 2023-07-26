@@ -27,6 +27,7 @@ from connect.api.v1.internal.intelligence.intelligence_rest_client import (
     IntelligenceRESTClient,
 )
 from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
+from connect.template_projects.models import TemplateType
 # from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
 from rest_framework import status
 from connect.common.helpers import send_mass_html_mail
@@ -723,6 +724,13 @@ class Project(models.Model):
         help_text=_("Project template type"),
         null=True,
         blank=True,
+    )
+    project_template_type = models.ForeignKey(
+        TemplateType,
+        on_delete=models.SET_NULL,
+        related_name="template_projects",
+        null=True,
+        blank=True
     )
 
     def __str__(self):
