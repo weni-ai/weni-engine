@@ -24,4 +24,3 @@ class RabbitmqPublisher:  # pragma: no cover
         except Exception as e:
             print(e)
             raise e
-
