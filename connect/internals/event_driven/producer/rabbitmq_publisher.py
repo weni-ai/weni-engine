@@ -25,6 +25,3 @@ class RabbitmqPublisher:  # pragma: no cover
             print(e)
             raise e
 
-
-rabbitmq_publisher = RabbitmqPublisher()
-rabbitmq_publisher.send_message({"ola": "mundo"}, exchange="projects.topic", routing_key="")
