@@ -1,3 +1,5 @@
+import uuid as uuid4
+
 from django.db import models
 from .storage import TemplateTypeImageStorage
 
@@ -5,7 +7,9 @@ from .storage import TemplateTypeImageStorage
 class TemplateType(models.Model):
 
     level_field = [("low", 1), ("medium", 2), ("high", 3)]
-
+    uuid = models.UUIDField(
+        "UUID", default=uuid4.uuid4
+    )
     category = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
     name = models.CharField(max_length=255, null=True, blank=True)
