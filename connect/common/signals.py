@@ -368,16 +368,16 @@ def request_chats_permission(sender, instance, created, **kwargs):
 def send_email_create_project(sender, instance, created, **kwargs):
     if created:
         instance.send_email_create_project()
+        if not settings.TESTING:
+            message_body = {
+                "uuid": str(instance.uuid),
+                "name": instance.name,
+                "is_template": instance.is_template,
+                "user_email": instance.created_by.email if instance.created_by else None,
+                "date_format": instance.date_format,
+                "template_type_uuid": str(instance.project_template_type.uuid) if instance.project_template_type else None,
+                "timezone": str(instance.timezone)
+            }
 
-        message_body = {
-            "uuid": str(instance.uuid),
-            "name": instance.name,
-            "is_template": instance.is_template,
-            "user_email": instance.created_by.email if instance.created_by else None,
-            "date_format": instance.date_format,
-            "template_type_uuid": instance.project_template_type.uuid if instance.project_template_type else None,
-            "timezone": str(instance.timezone)
-        }
-
-        rabbitmq_publisher = RabbitmqPublisher()
-        rabbitmq_publisher.send_message(message_body, exchange="projects.topic", routing_key="")
+            rabbitmq_publisher = RabbitmqPublisher()
+            rabbitmq_publisher.send_message(message_body, exchange="projects.topic", routing_key="")
