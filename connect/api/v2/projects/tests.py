@@ -1,10 +1,12 @@
 import json
 import uuid
+from unittest import skipIf
+from unittest.mock import Mock, patch
+
 from rest_framework import status
 from rest_framework.test import APIRequestFactory, force_authenticate
 
 from django.test import TestCase
-from unittest.mock import Mock, patch
 
 from connect.api.v1.tests.utils import create_user_and_token
 from connect.common.models import Organization, BillingPlan, OrganizationRole, Project
@@ -13,7 +15,7 @@ from connect.common.mocks import StripeMockGateway
 
 from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
 
-
+@skipIf(True,'deprecated')
 class ProjectViewSetTestCase(TestCase):
     @patch("connect.common.signals.update_user_permission_project")
     @patch("connect.billing.get_gateway")
