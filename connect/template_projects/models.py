@@ -8,7 +8,7 @@ class TemplateType(models.Model):
 
     level_field = [("low", 1), ("medium", 2), ("high", 3)]
     uuid = models.UUIDField(
-        "UUID", primary_key=True, default=uuid4.uuid4, editable=False
+        "UUID", default=uuid4.uuid4
     )
     category = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
