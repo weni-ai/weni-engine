@@ -1,3 +1,5 @@
+import uuid
+
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
@@ -9,6 +11,9 @@ from connect.template_projects.models import TemplateType
 def create_template_type(sender, instance, created, **kwargs):
     if created:
         rabbitmq_publisher = RabbitmqPublisher()
+        if instance.uuid is None:
+            instance.uuid = uuid.uuid4()
+            instance.save()
 
         message_body = {
             "uuid": instance.uuid,
