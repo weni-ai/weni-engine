@@ -375,7 +375,7 @@ def send_email_create_project(sender, instance, created, **kwargs):
             "is_template": instance.is_template,
             "user_email": instance.created_by.email if instance.created_by else None,
             "date_format": instance.date_format,
-            "template_type_uuid": instance.project_template_type.uuid if instance.project_template_type else None,
+            "template_type_uuid": str(instance.project_template_type.uuid) if instance.project_template_type else None,
             "timezone": str(instance.timezone)
         }
 

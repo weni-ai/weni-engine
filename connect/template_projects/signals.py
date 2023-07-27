@@ -16,7 +16,7 @@ def create_template_type(sender, instance, created, **kwargs):
             instance.save()
 
         message_body = {
-            "uuid": instance.uuid,
+            "uuid": str(instance.uuid),
             "name": instance.name
         }
 
