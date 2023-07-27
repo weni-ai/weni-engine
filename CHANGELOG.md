@@ -1,7 +1,7 @@
 # 2.18.0
 
 ## *Add*
-  - utm now it updated on add_additional_information endpoint
+  - utm now is updated on add_additional_information endpoint
   - send the new utm field on marketing flow
 
 # 2.17.0
