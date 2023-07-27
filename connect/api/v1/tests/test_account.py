@@ -114,6 +114,7 @@ class AdditionalUserInfoTestCase(TestCase):
         user_info = {
             "phone": "5582555555555",
             "position": "test_manager",
+            "utm": {"utm_source": "instagram"},
         }
 
         body = dict(
@@ -127,3 +128,4 @@ class AdditionalUserInfoTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(company_info, company_response)
         self.assertEqual(user_info.get('phone'), user_response.get('phone'))
+        self.assertEqual(user_response.get("utm"), {"utm_source": "instagram"})
