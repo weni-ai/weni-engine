@@ -514,16 +514,10 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
 
         flow_uuid = data.get("uuid")
 
-        token = self.context._auth
-
-        created, whatsapp_data = project.whatsapp_demo_integration(token)
-        if not created:
-            return whatsapp_data
-
         template = project.template_project.create(
             authorization=authorization,
-            wa_demo_token=whatsapp_data.get("router_token"),
-            redirect_url=whatsapp_data.get("redirect_url"),
+            wa_demo_token="wa-demo-12345",
+            redirect_url="https://wa.me/5582123456?text=wa-demo-12345",
             flow_uuid=flow_uuid,
             classifier_uuid=classifier_uuid
         )
