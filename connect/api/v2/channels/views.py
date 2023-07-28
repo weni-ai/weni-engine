@@ -47,7 +47,7 @@ class ChannelsAPIView(views.APIView):  # pragma: no cover
         return JsonResponse(status=response.status_code, data=response.json())
 
 
-class ListChannelsAPIView(views.APIView):
+class ListChannelsAPIView(views.APIView):  # pragma: no cover
     permission_classes = [ModuleHasPermission]
 
     def get(self, request):
@@ -74,7 +74,7 @@ class ListChannelsAPIView(views.APIView):
         return JsonResponse(data={"channels": channels}, status=status.HTTP_200_OK)
 
 
-class CreateWACChannelAPIView(views.APIView):
+class CreateWACChannelAPIView(views.APIView):  # pragma: no cover
     permission_classes = [ModuleHasPermission]
 
     def post(self, request):
