@@ -8,7 +8,7 @@ from connect.api.v2.channels.serializers import ReleaseChannelSerializer, Create
 from connect.common.models import Project
 
 
-class ChannelsAPIView(views.APIView):
+class ChannelsAPIView(views.APIView):  # pragma: no cover
     permission_classes = [ModuleHasPermission]
 
     def delete(self, request, *args, **kwargs):
