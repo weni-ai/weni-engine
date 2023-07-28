@@ -1,20 +1,25 @@
 import json
 import uuid
 import pendulum
+from datetime import timedelta
 
+from django.utils import timezone
 from django.test import RequestFactory, TestCase
 from rest_framework import status
-
 from connect.api.v1.dashboard.views import StatusServiceViewSet, NewsletterViewSet
+from connect.api.v1.dashboard.serializers import StatusServiceSerializer
 from connect.api.v1.tests.utils import create_user_and_token
 from connect.common.models import (
     Service,
+    LogService,
     Organization,
+    Project,
     Newsletter,
     NewsletterLanguage,
     NewsletterOrganization,
     BillingPlan,
     OrganizationRole,
+    ServiceStatus,
 )
 from connect.common.mocks import StripeMockGateway
 from unittest.mock import patch
@@ -167,3 +172,62 @@ class ListNewsletterOrgTestCase(TestCase):
 
         newsletter = content_data[0]
         self.assertEquals(newsletter.get("title"), "trial-about-to-end")
+
+
+class StatusServiceSerializerTestCase(TestCase):
+
+    def setUp(self):
+        self.service = Service.objects.create(url="http://google.com", default=False)
+        self_test_org = Organization.objects.create(
+            name="Test Organization",
+            inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan=BillingPlan.PLAN_START,
+        )
+        self.project = Project.objects.create(
+            name="Test Project",
+            organization=self_test_org
+        )
+        self.service_status = ServiceStatus.objects.create(
+            service=self.service, project=self.project
+        )
+        self.serializer = StatusServiceSerializer(instance=self.service_status)
+
+    def test_service__status_offline(self):
+        self.service.maintenance = False
+        self.create_service_logs(total_fail=5, total_success=0)
+        self.assertEqual(
+            self.serializer.data["service__status"]["status"], "offline",
+            msg="Should return 'offline' status"
+        )
+
+    def test_service__status_maintenance(self):
+        self.service.maintenance = True
+        self.service.save()
+        self.assertEqual(
+            self.serializer.data["service__status"]["status"], "maintenance",
+            msg="Should return 'maintenance' status"
+        )
+
+    def test_service__status_intermittent(self):
+        self.service.maintenance = False
+        self.create_service_logs(total_fail=2, total_success=1)
+        self.assertEqual(
+            self.serializer.data["service__status"]["status"], "intermittent",
+            msg="Should return 'intermittent' status"
+        )
+
+    def create_service_logs(self, total_fail, total_success):
+        now = timezone.now()
+        for _ in range(total_fail):
+            self.create_log_object(status=False, created_at=now - timedelta(minutes=10))
+        for _ in range(total_success):
+            self.create_log_object(status=True, created_at=now - timedelta(minutes=10))
+
+    def create_log_object(self, status, created_at):
+        log_test = LogService.objects.create(
+            status=status,
+            created_at=created_at,
+            service=self.service
+        )
+        return log_test
