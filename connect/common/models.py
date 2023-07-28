@@ -982,23 +982,6 @@ class Project(models.Model):
             )
         return created, data
 
-    def whatsapp_demo_integration(self, token):
-        from connect.api.v1.internal.integrations.integrations_rest_client import IntegrationsRESTClient
-        created = False
-        integrations_client = IntegrationsRESTClient()
-        data = {}
-        try:
-            response = integrations_client.whatsapp_demo_integration(str(self.uuid), token=token)
-            created = True
-            data = response
-        except Exception as error:
-            logger.error(f"Could not integrate Whatsapp demo {error}")
-            data = {
-                "data": {"message": "Could not integrate Whatsapp demo"},
-                "status": status.HTTP_500_INTERNAL_SERVER_ERROR,
-            }
-        return created, data
-
     def send_email_invite_project(self, email):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover

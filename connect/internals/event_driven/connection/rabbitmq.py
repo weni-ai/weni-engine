@@ -16,6 +16,7 @@ class RabbitMQConnection:  # pragma: no cover
             self.connection = BlockingConnection(ConnectionParameters(
                 host=settings.EDA_BROKER_HOST,
                 port=settings.EDA_BROKER_PORT,
+                virtual_host=settings.EDA_VIRTUAL_HOST,
                 credentials=PlainCredentials(
                     username=settings.EDA_BROKER_USER,
                     password=settings.EDA_BROKER_PASSWORD
