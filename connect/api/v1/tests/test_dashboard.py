@@ -176,7 +176,9 @@ class ListNewsletterOrgTestCase(TestCase):
 
 class StatusServiceSerializerTestCase(TestCase):
 
-    def setUp(self):
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway):
+        mock_get_gateway.return_value = StripeMockGateway()
         self.service = Service.objects.create(url="http://google.com", default=False)
         self_test_org = Organization.objects.create(
             name="Test Organization",
