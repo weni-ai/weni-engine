@@ -15,7 +15,8 @@ from connect.common.mocks import StripeMockGateway
 
 from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
 
-@skipIf(True,'deprecated')
+
+@skipIf(True, 'deprecated')
 class ProjectViewSetTestCase(TestCase):
     @patch("connect.common.signals.update_user_permission_project")
     @patch("connect.billing.get_gateway")
