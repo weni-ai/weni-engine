@@ -7,7 +7,7 @@ from django.conf import settings
 
 class ElasticFlow(ElasticHandler):  # pragma: no cover
     base_url = settings.FLOWS_ELASTIC_URL
-    client = Elasticsearch(f"{base_url}")
+    client = Elasticsearch(f"{base_url}", timeout=settings.ELASTICSEARCH_TIMEOUT_REQUEST)
 
     def __init__(self) -> None:
         super().__init__()
