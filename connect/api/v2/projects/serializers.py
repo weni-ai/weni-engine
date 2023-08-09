@@ -212,9 +212,9 @@ class ProjectSerializer(serializers.ModelSerializer):
         is_template = extra_data.get("template")
         project_template_type = None
         if is_template:
-            project_template_type = TemplateType.objects.filter(name=extra_data.get("template_type"))
-            if project_template_type.exists():
-                project_template_type = project_template_type.first()
+            project_template_type_queryset = TemplateType.objects.filter(name=extra_data.get("template_type"))
+            if project_template_type_queryset.exists():
+                project_template_type = project_template_type_queryset.first()
 
         instance = Project.objects.create(
             name=validated_data.get("name"),
