@@ -179,7 +179,7 @@ class StatusServiceSerializerTestCase(TestCase):
     @patch("connect.billing.get_gateway")
     def setUp(self, mock_get_gateway):
         mock_get_gateway.return_value = StripeMockGateway()
-        self.service = Service.objects.create(url="http://google.com", default=False)
+        self.service = Service.objects.create(url="http://test.com", default=False)
         self_test_org = Organization.objects.create(
             name="Test Organization",
             inteligence_organization=1,
