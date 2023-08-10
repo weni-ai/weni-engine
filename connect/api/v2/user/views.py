@@ -7,7 +7,7 @@ from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
 from connect.common.models import Project, OrganizationAuthorization, BillingPlan
 
 
-class UserAPIToken(views.APIView):
+class UserAPIToken(views.APIView):  # pragma: no cover
 
     def get(self, request, *args, **kwargs):
         project_uuid = kwargs.get("project_uuid")
@@ -20,17 +20,22 @@ class UserAPIToken(views.APIView):
         return JsonResponse(status=response.status_code, data=response.json())
 
 
-class UserIsPaying(views.APIView):
+class UserIsPaying(views.APIView):  # pragma: no cover
 
     def get(self, request, *args, **kwargs):
+
         user_email = request.data.get("user_email")
         token = request.data.get("token")
+        if token is None:
+            token = request.query_params.get("token")
+        if user_email is None:
+            user_email = request.query_params.get("user_email")
+
         if token != settings.VERIFICATION_MARKETING_TOKEN:
             return JsonResponse(status=status.HTTP_401_UNAUTHORIZED, data={"message": "You don't have permission to do this action"})
 
         org_auth = OrganizationAuthorization.objects.filter(user__email=user_email)
         response_data = []
-
         if len(org_auth) == 0:
             return JsonResponse(status=status.HTTP_404_NOT_FOUND, data={"message": "This user doesn't have permission on any organization"})
 

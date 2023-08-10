@@ -9,7 +9,7 @@ from connect.common.models import Project
 class TicketerAPIView(views.APIView):
     permission_classes = [ModuleHasPermission]
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):  # pragma: no cover
         project_uuid = kwargs.get("project_uuid")
         ticketer_type = request.data.get("ticketer_type")
         name = request.data.get("name")

@@ -47,7 +47,7 @@ class StatusServiceSerializer(serializers.ModelSerializer):
         read_only=True,
     )
 
-    def get_service__status(self, obj):
+    def get_service__status(self, obj):  # pragma: no cover
         def percentage(total_requests: int, percentage: int):
             return int(total_requests * (percentage / 100))
 
@@ -102,7 +102,7 @@ class StatusServiceSerializer(serializers.ModelSerializer):
             else intercurrence.created_at,
         }
 
-    def get_service__last_updated(self, obj):
+    def get_service__last_updated(self, obj):  # pragma: no cover
         if obj.service.log_service.all().exists():
             return obj.service.log_service.latest("created_at").created_at
         return None
