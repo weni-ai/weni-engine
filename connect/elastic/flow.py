@@ -7,7 +7,7 @@ from django.conf import settings
 
 class ElasticFlow(ElasticHandler):  # pragma: no cover
     base_url = settings.FLOWS_ELASTIC_URL
-    client = Elasticsearch(f"{base_url}")
+    client = Elasticsearch(f"{base_url}", timeout=settings.ELASTICSEARCH_TIMEOUT_REQUEST)
 
     def __init__(self) -> None:
         super().__init__()
@@ -62,7 +62,7 @@ class ElasticFlow(ElasticHandler):  # pragma: no cover
             }
         }
 
-        page = self.client.search(index="contacts", body=query, scroll=settings.SCROLL_KEEP_ALIVE, size=settings.SCROLL_SIZE)
+        page = self.client.search(index="contacts", body=query, scroll=settings.SCROLL_KEEP_ALIVE, size=settings.SCROLL_SIZE, request_timeout=settings.ELASTICSEARCH_TIMEOUT_REQUEST)
         scroll_id = page["_scroll_id"]
         scroll_size = page["hits"]["total"]["value"]
         hits = page["hits"]["hits"]
