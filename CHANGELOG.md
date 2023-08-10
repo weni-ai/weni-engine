@@ -1,3 +1,9 @@
+# 2.18.1
+
+## *Add*
+  - Improve views testing coverage
+  - Adding a timeout to requests using ElasticFlow 
+
 # 2.18.0
 
 ## *Add*
