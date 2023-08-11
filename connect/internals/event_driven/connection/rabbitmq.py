@@ -35,7 +35,8 @@ class RabbitMQConnection:
             credentials=PlainCredentials(
                 username=settings.EDA_BROKER_USER,
                 password=settings.EDA_BROKER_PASSWORD
-            )
+            ),
+            virtual_host=settings.EDA_VIRTUAL_HOST
         ))
         self.channel = self.connection.channel()
 
