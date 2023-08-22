@@ -1,4 +1,3 @@
-import uuid as uuid4
 import json
 from django.test import TestCase, RequestFactory
 from .views import TemplateTypeViewSet, TemplateAIViewSet, TemplateFeatureViewSet
