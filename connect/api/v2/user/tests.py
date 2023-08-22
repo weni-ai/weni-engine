@@ -8,6 +8,7 @@ import uuid as uuid4
 from connect.api.v1.tests.utils import create_user_and_token
 from rest_framework import status
 from connect.common.models import Project, Organization, OrganizationRole, BillingPlan
+from django.conf import settings
 
 
 class UserAPITokenTestCase(TestCase):
@@ -60,13 +61,11 @@ class UserAPITokenTestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 
-@skipIf(True, "View need to be refactored")
 class UserIsPayingTestCase(TestCase):
 
     @patch("connect.common.signals.update_user_permission_project")
     @patch("connect.billing.get_gateway")
     def setUp(self, mock_get_gateway, mock_permission):
-        self.factory = APIRequestFactory()
         self.owner, self.owner_token = create_user_and_token("owner")
         mock_get_gateway.return_value = StripeMockGateway()
         mock_permission.return_value = True
@@ -86,41 +85,29 @@ class UserIsPayingTestCase(TestCase):
         )
         self.view = UserIsPaying.as_view()
 
-    @override_settings(VERIFICATION_MARKETING_TOKEN="valid_marketing_token")
+    def request(self, token, user_email):
+        self.factory = APIRequestFactory()
+        url = f"/v2/account/user-is-paying?user_email={user_email}"
+        request = self.factory.get(url, format="json")
+        request.META["HTTP_AUTHORIZATION"] = f"Bearer {token}"
+        return request
+
+    @override_settings(VERIFICATION_MARKETING_TOKEN="Bearer valid_marketing_token")
     def test_get_endpoint_valid_token_no_auth(self):
-        url = "/v2/account/user-is-paying"
-        user_email = self.owner.email
         token = "valid_marketing_token"
-
-        data = {"user_email": user_email, "token": token}
-        request = self.factory.get(url, data=data, format="json")
-
-        response = self.view(request)
+        response = self.view(self.request(token, self.owner.email))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_get_endpoint_invalid_token(self):
+        invalid_token = "invalid_marketing_token"
+        response = self.view(self.request(invalid_token, self.owner.email))
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-        request = self.factory.get(
-            "/v2/account/user-is-paying",
-            data={
-                "user_email": self.owner.email,
-                "token": "invalid_marketing_token"
-            }
-        )
-        response = self.view(request)
-
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-
-    @override_settings(VERIFICATION_MARKETING_TOKEN="valid_marketing_token")
+    @override_settings(VERIFICATION_MARKETING_TOKEN="Bearer valid_marketing_token")
     def test_get_endpoint_valid_token(self):
         self.organization.authorizations.create(
             user=self.owner, role=OrganizationRole.ADMIN.value
         )
-
-        url = "/v2/account/user-is-paying"
-        user_email = self.owner.email
         token = "valid_marketing_token"
-
-        response = self.client.get(url, {"user_email": user_email, "token": token})
-
+        response = self.view(self.request(token, self.owner.email))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
