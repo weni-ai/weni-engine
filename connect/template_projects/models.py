@@ -17,6 +17,7 @@ class TemplateType(models.Model):
     setup = models.JSONField(blank=True, null=True)
 
     photo = models.ImageField(storage=TemplateTypeImageStorage(), blank=True, null=True)
+    photo_description = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return f"{self.id}"
