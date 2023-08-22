@@ -1,3 +1,11 @@
+# 2.19.0
+
+## *Add*
+  - Adding new fields to template type model
+
+## *update*
+  - unit tests to see the new fields
+
 # 2.18.1
 
 ## *Add*
