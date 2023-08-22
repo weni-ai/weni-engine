@@ -1,4 +1,4 @@
-
+import uuid as uuid4
 import json
 from django.test import TestCase, RequestFactory
 from .views import TemplateTypeViewSet, TemplateAIViewSet, TemplateFeatureViewSet
@@ -41,6 +41,9 @@ class TemplateTypeViewSetTestCase(TestCase):
         response = self.request({"get": "list"}, "/v2/projects/template-type?category=category", user=self.owner, token=self.owner_token)
         self.assertEqual(response["count"], 1)
         response = self.request({"get": "list"}, "/v2/projects/template-type?id=1", user=self.owner, token=self.owner_token)
+        self.assertEqual(response["count"], 1)
+        obj_uuid = self.template_type_object.uuid
+        response = self.request({"get": "list"}, f"/v2/projects/template-type?uuid={obj_uuid}", user=self.owner, token=self.owner_token)
         self.assertEqual(response["count"], 1)
 
     def test_retrieve(self):
