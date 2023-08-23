@@ -102,6 +102,7 @@ env = environ.Env(
     CREATE_AI_ORGANIZATION=(bool, False),
     VERIFICATION_MARKETING_TOKEN=(str, ""),
     USE_CHATS_EDA=(bool, False),
+    ELASTICSEARCH_TIMEOUT_REQUEST=(int, 10)
 )
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -516,6 +517,7 @@ ROCKET_TEST_MODE = env.bool("ROCKET_TEST_MODE")
 
 # Elastic Search
 FLOWS_ELASTIC_URL = env.str("FLOWS_ELASTIC_URL")
+ELASTICSEARCH_TIMEOUT_REQUEST = env.int("ELASTICSEARCH_TIMEOUT_REQUEST")
 
 SCROLL_SIZE = env.str("SCROLL_SIZE")
 SCROLL_KEEP_ALIVE = env.int("SCROLL_KEEP_ALIVE")

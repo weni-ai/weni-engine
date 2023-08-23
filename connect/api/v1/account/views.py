@@ -203,16 +203,23 @@ class MyUserProfileViewSet(
             user.phone = user_info.get("phone")
             user.position = user_info.get("position")
             user.last_update_profile = timezone.now()
+
+            updated_fields = [
+                "company_name",
+                "company_sector",
+                "number_people",
+                "weni_helps",
+                "phone",
+                "last_update_profile",
+                "position"
+            ]
+
+            if "utm" in user_info:
+                user.utm = user_info.get("utm")
+                updated_fields.append("utm")
+
             user.save(
-                update_fields=[
-                    "company_name",
-                    "company_sector",
-                    "number_people",
-                    "weni_helps",
-                    "phone",
-                    "last_update_profile",
-                    "position"
-                ]
+                update_fields=updated_fields
             )
             data = dict(
                 send_request_flow=settings.SEND_REQUEST_FLOW,
@@ -231,7 +238,8 @@ class MyUserProfileViewSet(
                 user=dict(
                     phone=user.phone,
                     last_update_profile=user.last_update_profile,
-                    position=user.position
+                    position=user.position,
+                    utm=user.utm
                 )
             )
             return Response(status=200, data=response)
