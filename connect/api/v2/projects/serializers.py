@@ -520,6 +520,7 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
         if not created:
             # Project delete
             return classifier_uuid
+        data = {}
         if not settings.USE_CHATS_EDA:
             created, data = project.create_flows(classifier_uuid)
 
