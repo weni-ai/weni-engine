@@ -1,5 +1,6 @@
 import logging
 import json
+import uuid
 
 from django.contrib.auth import get_user_model
 from django.conf import settings
@@ -519,14 +520,14 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
         if not created:
             # Project delete
             return classifier_uuid
+        if not settings.USE_CHATS_EDA:
+            created, data = project.create_flows(classifier_uuid)
 
-        created, data = project.create_flows(classifier_uuid)
+            if not created:
+                # Project delete
+                return data
 
-        if not created:
-            # Project delete
-            return data
-
-        flow_uuid = data.get("uuid")
+        flow_uuid = data.get("uuid", uuid.uuid4())
 
         template = project.template_project.create(
             authorization=authorization,
