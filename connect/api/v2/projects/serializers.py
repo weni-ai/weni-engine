@@ -27,6 +27,7 @@ from connect.common.models import (
     RequestChatsPermission,
 )
 from connect.template_projects.models import TemplateType
+from connect.internals.event_driven.producer.rabbitmq_publisher import RabbitmqPublisher
 
 logger = logging.getLogger(__name__)
 User = get_user_model()
@@ -245,6 +246,18 @@ class ProjectSerializer(serializers.ModelSerializer):
                 token_authorization=settings.TOKEN_AUTHORIZATION_FLOW_PRODUCT
             )
             user.send_request_flow_user_info(data)
+        message_body = {
+            "uuid": str(instance.uuid),
+            "name": instance.name,
+            "is_template": instance.is_template,
+            "user_email": instance.created_by.email if instance.created_by else None,
+            "date_format": instance.date_format,
+            "template_type_uuid": str(instance.project_template_type.uuid) if instance.project_template_type else None,
+            "timezone": str(instance.timezone)
+        }
+
+        rabbitmq_publisher = RabbitmqPublisher()
+        rabbitmq_publisher.send_message(message_body, exchange="projects.topic", routing_key="")
 
         if is_template:
             extra_data.update(
