@@ -53,7 +53,7 @@ def create_service_status(sender, instance, created, **kwargs):
             except HTTPError as e:
                 raise APIException(e)
 
-            if not template:
+            if not template and not settings.USE_CHATS_EDA:
                 response = chats_client.create_chat_project(
                     project_uuid=str(instance.uuid),
                     project_name=instance.name,

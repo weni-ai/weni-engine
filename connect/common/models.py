@@ -957,7 +957,7 @@ class Project(models.Model):
         flow_instance = FlowsRESTClient()
         has_chats = self.template_type in Project.HAS_CHATS
 
-        if has_chats:
+        if has_chats and not settings.USE_CHATS_EDA:
             chats_created, chats_response = self.create_chats_project()
             if not chats_created:
                 return chats_created, chats_response

@@ -100,7 +100,8 @@ env = environ.Env(
     FLOW_PRODUCT_UUID=(str, None),
     TOKEN_AUTHORIZATION_FLOW_PRODUCT=(str, None),
     CREATE_AI_ORGANIZATION=(bool, False),
-    VERIFICATION_MARKETING_TOKEN=(str, "")
+    VERIFICATION_MARKETING_TOKEN=(str, ""),
+    USE_CHATS_EDA=(bool, False),
 )
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -555,3 +556,5 @@ if USE_EDA:
     EDA_BROKER_PASSWORD = env.str("EDA_BROKER_PASSWORD", default="guest")
     EDA_VIRTUAL_HOST = env.str("EDA_VIRTUAL_HOST", default="/")
     EDA_WAIT_TIME_RETRY = env.int("EDA_WAIT_TIME_RETRY", default=5)
+
+USE_CHATS_EDA = env.bool("USE_CHATS_EDA", default=False)
