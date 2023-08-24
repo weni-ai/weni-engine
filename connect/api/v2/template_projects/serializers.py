@@ -28,7 +28,7 @@ class TemplateTypeSerializer(ModelSerializer):
         fields = [
             'id', 'category', 'description', 'name',
             'level', 'setup', 'photo', 'features',
-            'ais', 'photo_description', 'uuid'
+            'ais', 'photo_description', 'uuid', 'base_project_uuid'
         ]
 
     def get_features(self, obj):

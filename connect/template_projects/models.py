@@ -10,6 +10,9 @@ class TemplateType(models.Model):
     uuid = models.UUIDField(
         "UUID", default=uuid4.uuid4
     )
+    base_project_uuid = models.UUIDField(
+        "base project", blank=True, null=True
+    )
     category = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
     name = models.CharField(max_length=255, null=True, blank=True)
