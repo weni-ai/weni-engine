@@ -554,3 +554,5 @@ if USE_EDA:
     EDA_BROKER_PORT = env.int("EDA_BROKER_PORT", default=5672)
     EDA_BROKER_USER = env.str("EDA_BROKER_USER", default="guest")
     EDA_BROKER_PASSWORD = env.str("EDA_BROKER_PASSWORD", default="guest")
+    EDA_VIRTUAL_HOST = env.str("EDA_VIRTUAL_HOST", default="/")
+    EDA_WAIT_TIME_RETRY = env.int("EDA_WAIT_TIME_RETRY", default=5)
