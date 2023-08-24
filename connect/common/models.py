@@ -31,6 +31,7 @@ from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
 from rest_framework import status
 from connect.common.helpers import send_mass_html_mail
 from django.db.models import Q
+from connect.template_projects.models import TemplateType
 
 logger = logging.getLogger(__name__)
 
@@ -724,6 +725,13 @@ class Project(models.Model):
         null=True,
         blank=True,
     )
+    project_template_type = models.ForeignKey(
+        TemplateType,
+        on_delete=models.SET_NULL,
+        related_name="template_projects",
+        null=True,
+        blank=True
+    )
 
     def __str__(self):
         return f"{self.uuid} - Project: {self.name} - Org: {self.organization.name}"
@@ -972,23 +980,6 @@ class Project(models.Model):
                     "status": status.HTTP_500_INTERNAL_SERVER_ERROR
                 }
             )
-        return created, data
-
-    def whatsapp_demo_integration(self, token):
-        from connect.api.v1.internal.integrations.integrations_rest_client import IntegrationsRESTClient
-        created = False
-        integrations_client = IntegrationsRESTClient()
-        data = {}
-        try:
-            response = integrations_client.whatsapp_demo_integration(str(self.uuid), token=token)
-            created = True
-            data = response
-        except Exception as error:
-            logger.error(f"Could not integrate Whatsapp demo {error}")
-            data = {
-                "data": {"message": "Could not integrate Whatsapp demo"},
-                "status": status.HTTP_500_INTERNAL_SERVER_ERROR,
-            }
         return created, data
 
     def send_email_invite_project(self, email):

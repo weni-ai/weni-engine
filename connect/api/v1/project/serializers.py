@@ -15,7 +15,6 @@ from connect.api.v1 import fields
 from connect.api.v1.fields import TextField
 from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
 from ..internal.intelligence.intelligence_rest_client import IntelligenceRESTClient
-from connect.api.v1.internal.integrations.integrations_rest_client import IntegrationsRESTClient
 from connect.api.v1.project.validators import CanContributeInOrganizationValidator
 from connect.celery import app as celery_app
 from connect.common import tasks
@@ -595,30 +594,8 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
         template.classifier_uuid = classifier_uuid
         template.flow_uuid = flow_uuid
 
-        # Integrate WhatsApp
-        token = request._auth
-        if not settings.TESTING:
-            try:
-                integrations_client = IntegrationsRESTClient()
-                response = integrations_client.whatsapp_demo_integration(str(project.uuid), token=token)
-            except Exception as error:
-                logger.error(error)
-                template.delete()
-                data.update(
-                    {
-                        "message": "Could not integrate Whatsapp demo",
-                        "status": "FAILED"
-                    }
-                )
-                return data
-        else:
-            response = {
-                "router_token": "wa-demo-12345",
-                "redirect_url": 'https://wa.me/5582123456?text=wa-demo-12345'
-            }
-
-        wa_demo_token = response.get("router_token")
-        redirect_url = response.get("redirect_url")
+        wa_demo_token = "wa-demo-12345"
+        redirect_url = "https://wa.me/5582123456?text=wa-demo-12345"
         template.wa_demo_token = wa_demo_token
         template.redirect_url = redirect_url
         template.save(update_fields=["classifier_uuid", "flow_uuid", "wa_demo_token", "redirect_url"])
