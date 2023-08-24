@@ -1,3 +1,15 @@
+# 3.0.0
+
+## *Add*
+  - New Event Driven Architectury to internal communication
+  - Publisher code on rabbitmq
+  - Connection class for connect the rabbitmq service
+  - send messages to rabbitmq for create project and template type actions
+  - template type now has the fields: uuid, base_project_uuid, description_photo
+
+## *Delete*
+  - Whatsapp Demo integration (now the integrations module make that)
+
 # 2.19.0
 
 ## *Add*
