@@ -31,6 +31,7 @@ from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
 from rest_framework import status
 from connect.common.helpers import send_mass_html_mail
 from django.db.models import Q
+from connect.template_projects.models import TemplateType
 
 logger = logging.getLogger(__name__)
 
@@ -723,6 +724,13 @@ class Project(models.Model):
         help_text=_("Project template type"),
         null=True,
         blank=True,
+    )
+    project_template_type = models.ForeignKey(
+        TemplateType,
+        on_delete=models.SET_NULL,
+        related_name="template_projects",
+        null=True,
+        blank=True
     )
 
     def __str__(self):

@@ -26,6 +26,7 @@ from connect.common.models import (
     TemplateProject,
     RequestChatsPermission,
 )
+from connect.template_projects.models import TemplateType
 
 logger = logging.getLogger(__name__)
 User = get_user_model()
@@ -211,13 +212,20 @@ class ProjectSerializer(serializers.ModelSerializer):
 
         is_template = extra_data.get("template")
 
+        project_template_type = None
+        if is_template:
+            project_template_type_queryset = TemplateType.objects.filter(name=extra_data.get("template_type"))
+            if project_template_type_queryset.exists():
+                project_template_type = project_template_type_queryset.first()
+
         instance = Project.objects.create(
             name=validated_data.get("name"),
             timezone=str(validated_data.get("timezone")),
             organization=validated_data.get("organization"),
             is_template=True if extra_data.get("template") else False,
             created_by=user,
-            template_type=extra_data.get("template_type")
+            template_type=extra_data.get("template_type"),
+            project_template_type=project_template_type,
         )
 
         created, flows_info = self.create_flows_project(validated_data, user, is_template, str(instance.uuid))
