@@ -303,7 +303,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             rocket_authorization = RequestRocketPermission.objects.filter(email=i.email)
             chats_authorization = RequestChatsPermission.objects.filter(email=i.email)
             chats_role = None
-            if(len(rocket_authorization) > 0):
+            if (len(rocket_authorization) > 0):
                 rocket_authorization = rocket_authorization.first()
                 chats_role = rocket_authorization.role
 
@@ -596,3 +596,76 @@ class ProjectUpdateSerializer(serializers.ModelSerializer):
         except Exception as error:
             logger.error(f"Update project: {error}")
             raise error
+
+
+class ProjectListAuthorizationSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Project
+        fields = [
+            "authorizations",
+            "pending_authorizations",
+        ]
+
+    authorizations = serializers.SerializerMethodField(style={"show": False})
+    pending_authorizations = serializers.SerializerMethodField(style={"show": False})
+
+    def get_authorizations(self, obj):
+        authorizations = self.get_existing_authorizations(obj)
+        return {
+            "count": len(authorizations),
+            "users": authorizations,
+        }
+
+    def get_existing_authorizations(self, obj):
+        exclude_roles = [ProjectRole.SUPPORT.value]
+        queryset = obj.project_authorizations.exclude(role__in=exclude_roles).select_related('user')
+
+        return [
+            {
+                "username": auth.user.username,
+                "email": auth.user.email,
+                "first_name": auth.user.first_name,
+                "last_name": auth.user.last_name,
+                "project_role": auth.role,
+                "photo_user": auth.user.photo_url,
+                "chats_role": self.get_chats_role(auth),
+            }
+            for auth in queryset
+        ]
+
+    def get_chats_role(self, authorization):
+        if authorization.rocket_authorization:
+            return authorization.rocket_authorization.role
+        elif authorization.chats_authorization:
+            return authorization.chats_authorization.role
+        return None
+
+    def get_pending_authorizations(self, obj):
+        pending_authorizations = self.get_pending_authorizations_data(obj)
+        return {
+            "count": len(pending_authorizations),
+            "users": pending_authorizations,
+        }
+
+    def get_pending_authorizations_data(self, obj):
+        pending_authorizations = obj.requestpermissionproject_set.all()
+        return [
+            {
+                "email": pending.email,
+                "project_role": pending.role,
+                "created_by": pending.created_by.email,
+                "chats_role": self.get_pending_chats_role(pending.email),
+            }
+            for pending in pending_authorizations
+        ]
+
+    def get_pending_chats_role(self, email):
+        rocket_authorization = RequestRocketPermission.objects.filter(email=email).first()
+        chats_authorization = RequestChatsPermission.objects.filter(email=email).first()
+
+        if rocket_authorization:
+            return rocket_authorization.role
+        elif chats_authorization:
+            return chats_authorization.role
+        return None
