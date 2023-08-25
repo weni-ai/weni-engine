@@ -1,5 +1,5 @@
 from rest_framework import mixins, status
-from rest_framework.viewsets import GenericViewSet
+from rest_framework.viewsets import GenericViewSet, ReadOnlyModelViewSet
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
@@ -14,6 +14,7 @@ from connect.common.models import (
 from connect.api.v2.projects.serializers import (
     ProjectSerializer,
     ProjectUpdateSerializer,
+    ProjectListAuthorizationSerializer,
 )
 
 from django.utils import timezone
@@ -90,3 +91,14 @@ class ProjectViewSet(
         instance.perform_destroy_flows_project(user_email)
 
         instance.delete()
+
+
+class ProjectAuthorizationViewSet(
+    mixins.ListModelMixin,
+    GenericViewSet
+):
+
+    queryset = Project.objects.all()
+    serializer_class = ProjectListAuthorizationSerializer
+    permission_classes = [IsAuthenticated, ProjectHasPermission, Has2FA]
+    lookup_field = "uuid"

@@ -1,3 +1,28 @@
+# 2.19.0
+
+## *Add*
+  - Adding new fields to template type model
+
+## *update*
+  - unit tests to see the new fields
+
+# 2.18.1
+
+## *Add*
+  - Improve views testing coverage
+  - Adding a timeout to requests using ElasticFlow 
+
+# 2.18.0
+
+## *Add*
+
+  - utm now is updated on add_additional_information endpoint
+  - send the new utm field on marketing flow
+
+## *Fix*
+
+  - Serializer file name sintax
+
 # 2.17.0
 
 ## *Add*

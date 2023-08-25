@@ -17,6 +17,7 @@ class TemplateTypeViewSet(ModelViewSet):
         id = self.request.query_params.get('id', None)
         name = self.request.query_params.get('name', None)
         category = self.request.query_params.get('category', None)
+        uuid = self.request.query_params.get('uuid', None)
 
         if name:
             queryset = self.queryset.filter(name__iexact=name)
@@ -26,6 +27,9 @@ class TemplateTypeViewSet(ModelViewSet):
 
         if id:
             queryset = self.queryset.filter(pk=id)
+
+        if uuid:
+            queryset = self.queryset.filter(uuid__iexact=uuid)
 
         return queryset
 
