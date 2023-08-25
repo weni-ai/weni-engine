@@ -1036,3 +1036,32 @@ class OrganizationTestCase(TestCase):
         self.assertFalse(created)
         self.assertEquals(data.get("status"), status.HTTP_500_INTERNAL_SERVER_ERROR)
         self.assertEquals(data.get("data").get("message"), "Could not create organization in AI module")
+
+
+class OrganizationAuthorizationTestCase(TestCase):
+
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway):
+        mock_get_gateway.return_value = StripeMockGateway()
+
+        self.owner, self.owner_token = create_user_and_token("owner")
+        self.org1 = Organization.objects.create(
+            name="Test project methods",
+            description="",
+            inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__payment_method=BillingPlan.PAYMENT_METHOD_CREDIT_CARD,
+            organization_billing__plan=BillingPlan.PLAN_ENTERPRISE,
+        )
+        self.organization_authorization = self.org1.authorizations.create(
+            user=self.owner, role=OrganizationRole.ADMIN.value
+        )
+
+    def test_list_project_authorizations(self):
+        organization = self.org1
+        url = f"/v2/organizations/{organization.uuid}/list-organization-authorizations"
+        response = self.client.get(url, HTTP_AUTHORIZATION=f"Token {self.owner_token}")
+        users_list = response.data['results'][0]['authorizations']['users']
+        users_count = len(users_list)
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(users_count, 1)

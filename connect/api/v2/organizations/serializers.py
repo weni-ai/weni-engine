@@ -1,22 +1,26 @@
 import logging
+import re
 
 from django.contrib.auth import get_user_model
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
 from rest_framework import serializers
+from rest_framework.exceptions import PermissionDenied, ValidationError
 
 from connect.common.models import (
     Organization,
     BillingPlan,
     OrganizationRole,
     RequestPermissionOrganization,
+    OrganizationLevelRole,
+    OrganizationAuthorization,
 )
 from connect.api.v1.organization.serializers import (
     BillingPlanSerializer,
     OrganizationAuthorizationSerializer,
 )
-
+from connect.api.v1.project.validators import CanContributeInOrganizationValidator
 User = get_user_model()
 logger = logging.getLogger(__name__)
 
@@ -139,3 +143,108 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
                 role=authorization.get("role"),
                 created_by=user
             )
+
+
+class PendingAuthorizationOrganizationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RequestPermissionOrganization
+        fields = ["id", "email", "organization", "role", "created_by", "user_data"]
+        ref_name = None
+
+    email = serializers.EmailField(max_length=254, required=True)
+    organization = serializers.PrimaryKeyRelatedField(
+        queryset=Organization.objects,
+        style={"show": False},
+        required=True,
+        validators=[CanContributeInOrganizationValidator()],
+    )
+    created_by = serializers.HiddenField(
+        default=serializers.CurrentUserDefault(), style={"show": False}
+    )
+    user_data = serializers.SerializerMethodField()
+
+    def validate(self, attrs):
+        self.validate_email(attrs["email"])
+        self.validate_role(attrs["role"])
+        return attrs
+
+    def validate_email(self, email):
+        if ' ' in email:
+            raise ValidationError(_("Email field cannot have spaces"))
+        if bool(re.match('[A-Z]', email)):
+            raise ValidationError(_("Email field cannot have uppercase characters"))
+
+    def validate_role(self, role):
+        if role == OrganizationLevelRole.NOTHING.value:
+            raise PermissionDenied(_("You cannot set user role 0"))
+
+    def get_user_data(self, obj):
+        user = User.objects.filter(email=obj.email).first()
+        return self.calculate_user_data(user)
+
+    def calculate_user_data(self, user):
+        if user:
+            return {
+                "name": f"{user.first_name} {user.last_name}",
+                "photo": user.photo_url
+            }
+        return {
+            "name": None,
+            "photo": None
+        }
+
+
+class OrganizationAuthorizationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrganizationAuthorization
+        fields = [
+            "uuid",
+            "user",
+            "user__id",
+            "user__username",
+            "user__email",
+            "user__photo",
+            "organization",
+            "role",
+            "can_read",
+            "can_contribute",
+            "can_contribute_billing",
+            "can_write",
+            "is_admin",
+            "is_financial",
+            "created_at",
+        ]
+        read_only = ["user", "user__username", "organization", "role", "created_at"]
+        ref_name = None
+
+    user__id = serializers.IntegerField(source="user.id", read_only=True)
+    user__username = serializers.SlugRelatedField(
+        source="user", slug_field="username", read_only=True
+    )
+    user__email = serializers.EmailField(
+        source="user.email", label=_("Email"), read_only=True
+    )
+    user__photo = serializers.ImageField(
+        source="user.photo", label=_("User photo"), read_only=True
+    )
+
+
+class NestedAuthorizationOrganizationSerializer(serializers.Serializer):
+    pending_permissions = PendingAuthorizationOrganizationSerializer(many=True)
+    existing_permissions = OrganizationAuthorizationSerializer(many=True)
+
+    def to_representation(self, instance):
+        existing_permissions = instance.organizationauthorization_set.all()
+        pending_permissions = instance.pendingauthorizationorganization_set.all()
+
+        pending_serializer = PendingAuthorizationOrganizationSerializer(
+            pending_permissions, many=True
+        )
+        existing_serializer = OrganizationAuthorizationSerializer(
+            existing_permissions, many=True
+        )
+
+        return {
+            "pending_permissions": pending_serializer.data,
+            "existing_permissions": existing_serializer.data,
+        }

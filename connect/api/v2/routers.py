@@ -40,6 +40,7 @@ urlpatterns = [
     path("projects/<project_uuid>/ticketer", TicketerAPIView.as_view(), name="ticketer"),
     path("projects/<project_uuid>/channel", ChannelsAPIView.as_view(), name="channels"),
     path("projects/<project_uuid>/list-project-authorizations", project_views.ProjectAuthorizationViewSet.as_view({"get": "list"}), name="list-project-authorizations"),
+    path("organizations/<organization_uuid>/list-organization-authorizations", organization_views.OrganizationAuthorizationViewSet.as_view({"get": "list"}), name="list-organization-authorizations"),
     path("projects/channels", ListChannelsAPIView.as_view(), name="list-channels"),
     path("projects/<project_uuid>/create-wac-channel", CreateWACChannelAPIView.as_view(), name="create-wac-channel"),
     path("projects/<project_uuid>/user-api-token", UserAPIToken.as_view(), name="user-api-token"),
