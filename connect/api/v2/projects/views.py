@@ -17,6 +17,7 @@ from connect.api.v2.projects.serializers import (
 )
 
 from django.utils import timezone
+from connect.api.v2.permissions import ProjectIPPermission
 
 
 class ProjectViewSet(
@@ -30,7 +31,7 @@ class ProjectViewSet(
     queryset = Project.objects
     serializer_class = ProjectSerializer
     lookup_field = "uuid"
-    permission_classes = [IsAuthenticated, ProjectHasPermission, Has2FA]
+    permission_classes = [IsAuthenticated, ProjectHasPermission, ProjectIPPermission, Has2FA]
 
     def get_queryset(self, **kwargs):
         if getattr(self, "swagger_fake_view", False):
