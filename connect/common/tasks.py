@@ -486,16 +486,22 @@ def capture_invoice():
     for invoice in Invoice.objects.filter(
         payment_status=Invoice.PAYMENT_STATUS_PENDING, capture_payment=True
     ):
-        gateway = billing.get_gateway("stripe")
-        purchase_result = gateway.purchase(
-            money=invoice.invoice_amount,
-            identification=invoice.organization.organization_billing.stripe_customer,
-            options={"id": invoice.pk},
-        )
-        if purchase_result.get("status") == "FAILURE":
-            invoice.capture_payment = False
-            invoice.save(update_fields=["capture_payment"])
-            # add send email
+        if invoice.invoice_amount:
+            gateway = billing.get_gateway("stripe")
+            purchase_result = gateway.purchase(
+                money=invoice.invoice_amount,
+                identification=invoice.organization.organization_billing.stripe_customer,
+                options={"id": invoice.pk},
+            )
+            if purchase_result.get("status") == "FAILURE":
+                invoice.capture_payment = False
+                invoice.save(update_fields=["capture_payment"])
+                # add send email
+            return
+
+        invoice.capture_payment = False
+        invoice.save(update_fields=["capture_payment"])
+        return
 
 
 @app.task()
