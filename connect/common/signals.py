@@ -31,7 +31,6 @@ from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
 from connect.common.tasks import update_user_permission_project
 from requests.exceptions import HTTPError
 from rest_framework.exceptions import APIException
-from connect.internals.event_driven.producer.rabbitmq_publisher import RabbitmqPublisher
 
 
 logger = logging.getLogger("connect.common.signals")
@@ -371,16 +370,10 @@ def send_email_create_project(sender, instance, created, **kwargs):
 
 
 @receiver(post_save, sender=ProjectAuthorization)
-def create_template_type(sender, instance, created, **kwargs):
-    if created:
-        print("PASSOU AQUI")
-        rabbitmq_publisher = RabbitmqPublisher()
-        role = instance.role
-        message_body = {
-            "action": "CREATE",
-            "role": role if role != 4 else 3,
-            "user_email": instance.user.email,
-            "project_uuid": str(instance.uuid),
-        }
+def update_project_authorization(sender, instance, created, **kwargs):
+    instance.publish_message("project-authorizations-update")
 
-        rabbitmq_publisher.send_message(message_body, exchange="project-authorizations.topic", routing_key="")
+
+@receiver(post_delete, sender=ProjectAuthorization)
+def delete_project_authorization(sender, instance, **kwargs):
+    instance.publish_message("project-authorizations-delete")
