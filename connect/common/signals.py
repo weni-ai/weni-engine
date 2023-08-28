@@ -378,7 +378,7 @@ def create_template_type(sender, instance, created, **kwargs):
         role = instance.role
         message_body = {
             "action": "CREATE",
-            "role": role if role < 3 else 3,
+            "role": role if role != 4 else 3,
             "user_email": instance.user.email,
             "project_uuid": str(instance.uuid),
         }
