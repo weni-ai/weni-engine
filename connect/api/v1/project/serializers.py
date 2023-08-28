@@ -19,7 +19,6 @@ from connect.api.v1.project.validators import CanContributeInOrganizationValidat
 from connect.celery import app as celery_app
 from connect.common import tasks
 from connect.common.models import (
-    ChatsRole,
     ProjectAuthorization,
     RocketAuthorization,
     Service,
@@ -32,7 +31,6 @@ from connect.common.models import (
     OpenedProject,
     ProjectRole,
     TemplateProject,
-    RequestChatsPermission,
     ChatsAuthorization,
 )
 
@@ -218,22 +216,15 @@ class ProjectSerializer(serializers.ModelSerializer):
         }
         for i in obj.requestpermissionproject_set.all():
             rocket_authorization = RequestRocketPermission.objects.filter(email=i.email)
-            chats_authorization = RequestChatsPermission.objects.filter(email=i.email)
-            chats_role = None
             if(len(rocket_authorization) > 0):
+                # TODO: Remove rocket
                 rocket_authorization = rocket_authorization.first()
-                chats_role = rocket_authorization.role
-
-            if len(chats_authorization) > 0:
-                chats_authorization = chats_authorization.first()
-                chats_role = chats_authorization.role
 
             response["users"].append(
                 dict(
                     email=i.email,
                     project_role=i.role,
                     created_by=i.created_by.email,
-                    chats_role=chats_role
                 )
             )
         return response
@@ -377,27 +368,6 @@ class RequestRocketPermissionSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         if attrs.get("role") == RocketRole.NOT_SETTED.value:
-            raise PermissionDenied(_("You cannot set user role 0"))
-        return attrs
-
-
-class RequestChatsPermissionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = RequestChatsPermission
-        fields = ["email", "project", "role", "created_by"]
-
-    email = serializers.EmailField(max_length=254, required=True)
-    project = serializers.PrimaryKeyRelatedField(
-        queryset=Project.objects,
-        style={"show": False},
-        required=True,
-    )
-    created_by = serializers.HiddenField(
-        default=serializers.CurrentUserDefault(), style={"show": False}
-    )
-
-    def validate(self, attrs):
-        if attrs.get("role") == ChatsRole.NOT_SETTED.value:
             raise PermissionDenied(_("You cannot set user role 0"))
         return attrs
 
