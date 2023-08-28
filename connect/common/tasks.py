@@ -124,36 +124,6 @@ def delete_project(project_uuid: str, user_email):
     return True
 
 
-@app.task(
-    name="update_user_permission_project",
-    autoretry_for=(_InactiveRpcError, Exception),
-    retry_kwargs={"max_retries": 5},
-    retry_backoff=True,
-)
-def update_user_permission_project(
-    project_uuid: str, flow_organization: str, user_email: str, permission: int
-):
-    if settings.USE_FLOW_REST:
-        flow_instance = FlowsRESTClient()
-    else:
-        flow_instance = utils.get_grpc_types().get("flow")
-
-    integrations_client = IntegrationsRESTClient()
-
-    flow_instance.update_user_permission_project(
-        organization_uuid=flow_organization,
-        user_email=user_email,
-        permission=permission,
-    )
-    integrations_client.update_user_permission_project(
-        project_uuid=project_uuid,
-        user_email=user_email,
-        role=permission
-    )
-
-    return True
-
-
 @app.task(name="migrate_organization")
 def migrate_organization(user_email: str):
     user = User.objects.get(email=user_email)
