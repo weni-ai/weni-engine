@@ -1237,17 +1237,6 @@ class RequestRocketPermission(models.Model):
     created_by = models.ForeignKey(User, models.CASCADE)
 
 
-class RequestChatsPermission(models.Model):
-    email = models.EmailField(_("email"))
-    role = models.PositiveIntegerField(
-        _("role"),
-        choices=ChatsAuthorization.ROLE_CHOICES,
-        default=ChatsRole.NOT_SETTED.value,
-    )
-    project = models.ForeignKey(Project, models.CASCADE)
-    created_by = models.ForeignKey(User, models.CASCADE)
-
-
 class Service(models.Model):
     class Meta:
         verbose_name = _("service")

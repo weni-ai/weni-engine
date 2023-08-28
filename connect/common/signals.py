@@ -7,7 +7,6 @@ from django.utils import timezone
 
 from connect.authentication.models import User
 from connect.common.models import (
-    ChatsRole,
     Project,
     Service,
     Organization,
@@ -21,7 +20,6 @@ from connect.common.models import (
     ProjectRoleLevel,
     RocketAuthorization,
     RequestRocketPermission,
-    RequestChatsPermission,
     OpenedProject,
     RecentActivity
 )
@@ -121,14 +119,47 @@ def request_permission_organization(sender, instance, created, **kwargs):
             usecase.create_authorization(auth_dto)
             instance.delete()
         instance.organization.send_email_invite_organization(email=instance.email)
-    return
+
+
+@receiver(post_save, sender=RequestPermissionProject)
+def request_permission_project(sender, instance, created, **kwargs):
+    if created:
+        user = User.objects.filter(email=instance.email)
+        if user.exists():
+            user = user.first()
+            org = instance.project.organization
+            org_auth = org.authorizations.filter(user__email=user.email)
+
+            if not org_auth.exists():
+                org_auth = org.authorizations.create(
+                    user=user, role=OrganizationRole.VIEWER.value
+                )
+            else:
+                org_auth = org_auth.first()
+
+            auth = instance.project.project_authorizations
+            auth_user = auth.filter(user=user)
+            if not auth_user.exists():
+                auth_user = ProjectAuthorization.objects.create(
+                    user=user,
+                    project=instance.project,
+                    organization_authorization=org_auth,
+                    role=instance.role,
+                )
+            else:
+                auth_user = auth_user.first()
+                auth_user.role = instance.role
+                auth_user.save(update_fields=["role"])
+            instance.delete()
+        instance.project.send_email_invite_project(email=instance.email)
 
 
 @receiver(post_save, sender=ProjectAuthorization)
 def project_authorization(sender, instance, created, **kwargs):
-    opened = OpenedProject.objects.filter(project=instance.project, user=instance.user)
-    if not opened.exists():
-        OpenedProject.objects.create(
+    if created:
+        RecentActivity.objects.create(
+            action="ADD",
+            entity="USER",
             user=instance.user,
             project=instance.project,
             day=instance.project.created_at
@@ -157,17 +188,6 @@ def request_rocket_permission(sender, instance, created, **kwargs):
                 project_auth.save(update_fields=["rocket_authorization"])
                 project_auth.rocket_authorization.update_rocket_permission()
             instance.delete()
-
-
-@receiver(post_save, sender=RequestChatsPermission)
-def request_chats_permission(sender, instance, created, **kwargs):
-    if created:
-        user = User.objects.filter(email=instance.email)
-        if user.exists():
-            user = user.first()
-            project_auth = instance.project.project_authorizations.filter(user=user)
-            if project_auth.exists():
-                instance.delete()
 
 
 @receiver(post_save, sender=Project)

@@ -196,6 +196,54 @@ class ProjectSerializer(serializers.ModelSerializer):
             ChatsRESTClient().update_chats_project(instance.uuid)
         return updated_instance
 
+    def get_authorizations(self, obj):
+        exclude_roles = [ProjectRole.SUPPORT.value]
+        queryset = obj.project_authorizations.exclude(role__in=exclude_roles)
+        response = dict(
+            count=queryset.count(),
+            users=[]
+        )
+        for i in queryset:
+            chats_role = None
+            if i.rocket_authorization:
+                chats_role = i.rocket_authorization.role
+            elif i.chats_authorization:
+                chats_role = i.chats_authorization.role
+            response['users'].append(
+                dict(
+                    username=i.user.username,
+                    email=i.user.email,
+                    first_name=i.user.first_name,
+                    last_name=i.user.last_name,
+                    project_role=i.role,
+                    photo_user=i.user.photo_url,
+                    chats_role=chats_role,
+                )
+            )
+        return response
+
+    def get_pending_authorizations(self, obj):  # pragma: no cover
+        response = {
+            "count": obj.requestpermissionproject_set.count(),
+            "users": [],
+        }
+        for i in obj.requestpermissionproject_set.all():
+            rocket_authorization = RequestRocketPermission.objects.filter(email=i.email)
+            chats_role = None
+            if(len(rocket_authorization) > 0):
+                rocket_authorization = rocket_authorization.first()
+                chats_role = rocket_authorization.role
+
+            response["users"].append(
+                dict(
+                    email=i.email,
+                    project_role=i.role,
+                    created_by=i.created_by.email,
+                    chats_role=chats_role
+                )
+            )
+        return response
+
     def get_authorization(self, obj):
         request = self.context.get("request")
         if not request or not request.user.is_authenticated:
