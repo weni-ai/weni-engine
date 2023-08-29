@@ -93,7 +93,7 @@ def update_user_permission_organization(
 
 @app.task(
     name="update_project",
-    autoretry_for=(Exception),
+    autoretry_for=(Exception,),
     retry_kwargs={"max_retries": 5},
     retry_backoff=True,
 )
@@ -120,7 +120,7 @@ def delete_project(project_uuid: str, user_email):
 
 @app.task(
     name="update_user_permission_project",
-    autoretry_for=(Exception),
+    autoretry_for=(Exception,),
     retry_kwargs={"max_retries": 5},
     retry_backoff=True,
 )
@@ -226,7 +226,7 @@ def create_template_project(project_name: str, user_email: str, project_timezone
 
 @app.task(
     name="update_user_language",
-    autoretry_for=(Exception),
+    autoretry_for=(Exception,),
     retry_kwargs={"max_retries": 5},
     retry_backoff=True,
 )
@@ -487,7 +487,7 @@ def delete_status_logs():
 
 @app.task(
     name="update_suspend_project",
-    autoretry_for=(Exception),
+    autoretry_for=(Exception,),
     retry_kwargs={"max_retries": 5},
     retry_backoff=True,
 )
@@ -559,7 +559,7 @@ def get_billing_total_statistics(project_uuid: str, before: str, after: str):
 
 @app.task(
     name="delete_user_permission_project",
-    autoretry_for=(Exception),
+    autoretry_for=(Exception,),
     retry_kwargs={"max_retries": 5},
     retry_backoff=True,
 )
