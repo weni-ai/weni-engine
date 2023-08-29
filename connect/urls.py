@@ -23,10 +23,6 @@ from drf_yasg2.views import get_schema_view
 from rest_framework import permissions
 
 from connect.api.v1 import urls as rookly_api_v1_urls
-from connect.api.grpc.project.handlers import grpc_handlers as grpc_project_handlers
-from connect.api.grpc.organization.handlers import (
-    grpc_handlers as grpc_organization_handlers,
-)
 from connect.billing.views import StripeHandler
 from connect.api.v2 import routers as api_v2_urls
 
@@ -52,11 +48,6 @@ urlpatterns = [
 ]
 
 urlpatterns += staticfiles_urlpatterns()
-
-
-def grpc_handlers(server):
-    grpc_project_handlers(server)
-    grpc_organization_handlers(server)
 
 
 if settings.DEBUG:
