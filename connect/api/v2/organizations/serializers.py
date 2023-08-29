@@ -194,7 +194,7 @@ class PendingAuthorizationOrganizationSerializer(serializers.ModelSerializer):
         }
 
 
-class OrganizationAuthorizationSerializer(serializers.ModelSerializer):
+class OrganizationExistingAuthorizationSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrganizationAuthorization
         fields = [
@@ -231,11 +231,11 @@ class OrganizationAuthorizationSerializer(serializers.ModelSerializer):
 
 class NestedAuthorizationOrganizationSerializer(serializers.Serializer):
     pending_permissions = PendingAuthorizationOrganizationSerializer(many=True)
-    existing_permissions = OrganizationAuthorizationSerializer(many=True)
+    existing_permissions = OrganizationExistingAuthorizationSerializer(many=True)
 
     def to_representation(self, instance):
-        existing_permissions = instance.organizationauthorization_set.all()
-        pending_permissions = instance.pendingauthorizationorganization_set.all()
+        existing_permissions = instance.authorizations.all()
+        pending_permissions = instance.requestpermissionorganization_set.all()
 
         pending_serializer = PendingAuthorizationOrganizationSerializer(
             pending_permissions, many=True
