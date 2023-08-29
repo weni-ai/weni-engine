@@ -22,10 +22,8 @@ app.conf.task_routes = {
     'count_contacts': {'queue': 'billing'},
     'retry_billing_tasks': {'queue': 'billing'},
     'create_contacts': {'queue': 'billing'},
-    # 'get_messages': {'queue': 'billing'},
     "end_trial_plan": {'queue': 'billing'},
     "check_organization_plans": {'queue': 'billing'},
-    'get_messages': {'queue': 'billing'},
     "daily_contact_count": {'queue': 'billing'},
 }
 
