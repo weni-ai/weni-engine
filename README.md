@@ -129,13 +129,7 @@ You can set environment variables in your OS, write on ```.env``` file or pass v
 | APM_SERVICE_NAME |  ```string``` | ```''``` | APM Service Name
 | APM_SECRET_TOKEN |  ```string``` | ```''``` | APM Secret Token
 | APM_SERVER_URL |  ```string``` | ```''``` | APM URL
-| FLOW_GRPC_ENDPOINT |  ```string``` | ```'localhost:8002'``` | gRPC Endpoint URL
-| INTELIGENCE_GRPC_ENDPOINT |  ```string``` | ```'localhost:8003'``` | gRPC Endpoint URL
-| INTEGRATIONS_GRPC_ENDPOINT |  ```string``` | ```'localhost:8004'``` | gRPC Endpoint URL
 | SYNC_ORGANIZATION_INTELIGENCE |  ```bool``` | ```False``` | Enable or Disable sync organization inteligences service
-| INTELIGENCE_CERTIFICATE_GRPC_CRT |  ```string``` | ```None``` | Absolute certificate path for secure grpc communication
-| FLOW_CERTIFICATE_GRPC_CRT |  ```string``` | ```None``` | Absolute certificate path for secure grpc communication
-| INTEGRATIONS_CERTIFICATE_GRPC_CRT |  ```string``` | ```None``` | Absolute certificate path for secure grpc communication
 | SEND_REQUEST_FLOW |  ```boolean``` | ```False``` | Enables or disables sending user information to flows
 | FLOW_MARKETING_UUID |  ```string``` | ```None``` | UUID Flow
 | TOKEN_AUTHORIZATION_FLOW_MARKETING |  ```string``` | ```None``` | Token Authorization API Flow

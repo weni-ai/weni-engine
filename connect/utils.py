@@ -21,16 +21,6 @@ def upload_photo_rocket(server_rocket: str, jwt_token: str, avatar_url: str) -> 
     return True if set_photo.status_code == 200 else False
 
 
-def get_grpc_types():  # pragma: no cover
-    """
-    Returns the possible types available for classifiers
-    :return:
-    """
-    from connect.grpc import TYPES
-
-    return TYPES
-
-
 def es_convert_datetime(before: str, after: str):
     """convert to an format that is accepted by elasticsearch query"""
     before = pendulum.parse(before)

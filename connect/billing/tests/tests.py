@@ -94,7 +94,7 @@ class SyncManagerTest(TestCase):
         self.assertEquals(self.manager.status, False)
 
 
-@skipIf(True, "Need elastic search and grpc to run this test")
+@skipIf(True, "Need to mock elastic search to run this test")
 class SyncContactsTestCase(TestCase):
     def setUp(self):
         self.first_sync = SyncManagerTask.objects.create(
