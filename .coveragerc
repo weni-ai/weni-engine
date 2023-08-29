@@ -14,9 +14,7 @@ omit =
     ./connect/api/apps.py
     ./connect/common/apps.py
     ./connect/authentication/apps.py
-    ./connect/grpc/*
     ./connect/api/v1/tests/*
-    ./connect/api/grpc/*
     ./connect/api/v1/swagger.py
     ./connect/authentication/apps.py
     ./connect/authentication/tests.py
