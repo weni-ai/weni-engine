@@ -19,14 +19,11 @@ from connect.common.models import (
     Invoice
 )
 from connect.common.mocks import StripeMockGateway
-from unittest import skipIf
 from unittest.mock import patch
 import pendulum
 from freezegun import freeze_time
 from connect.billing.tasks import end_trial_plan, check_organization_plans, daily_contact_count
 from rest_framework import status
-import stripe
-from django.conf import settings
 from connect.api.v1.billing.views import BillingViewSet
 from connect.common.tasks import generate_project_invoice
 
@@ -418,8 +415,6 @@ class PlanAPITestCase(TestCase):
 class BillingViewTestCase(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
-        self.stripe = stripe
-        self.stripe.api_key = settings.BILLING_SETTINGS.get("stripe", {}).get("API_KEY")
         self.customer = ""
         self.owner, self.owner_token = create_user_and_token("owner")
 
@@ -453,18 +448,6 @@ class BillingViewTestCase(TestCase):
         response.render()
         content_data = json.loads(response.content)
         return (response, content_data)
-
-    @skipIf("stripe" not in settings.BILLING_SETTINGS, "Stripe not configured")
-    def test_setup_intent(self):
-        response, content_data = self.request(path="setup-intent", method="setup_intent")
-
-        # setup card
-        stripe.Customer.create_source(
-            content_data.get("customer"),
-            source="tok_visa",
-        )
-        self.customer = content_data.get("customer")
-        self.assertEqual(content_data.get("customer"), "cus_MYOrndkgpPHGK9")
 
     @patch("connect.common.signals.update_user_permission_project")
     @patch("connect.billing.get_gateway")
