@@ -13,7 +13,6 @@ from connect.billing.models import (
     Message,
     SyncManagerTask,
     ContactCount,
-    Channel,
 )
 from connect.elastic.flow import ElasticFlow
 from django.utils import timezone
