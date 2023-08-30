@@ -6,4 +6,4 @@ class TemplateProjectsConfig(AppConfig):
     name = 'connect.template_projects'
 
     def ready(self):
-        from signals import create_template_type  # noqa: F401
+        from connect.template_projects.signals import create_template_type  # noqa: F401
