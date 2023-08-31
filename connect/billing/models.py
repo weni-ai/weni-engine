@@ -31,37 +31,6 @@ class SyncManagerTask(models.Model):
     after = models.DateTimeField(_("after"))
 
 
-class Channel(models.Model):
-    CHANNEL_CHOICES = [
-        ("WA", _("WhatsApp")),
-        ("TG", _("Telegram")),
-    ]
-    uuid = models.UUIDField(
-        _("UUID"), primary_key=True, default=uuid4.uuid4, editable=False
-    )
-    channel_type = models.CharField(
-        _("channel_type"), max_length=150, choices=CHANNEL_CHOICES
-    )
-    channel_flow_id = models.PositiveIntegerField(_("channel id"), unique=True)
-    project = models.ForeignKey("common.Project", models.CASCADE, related_name="channel")
-
-    @staticmethod
-    def create(*args, **kwargs):
-        if not Channel.channel_exists(kwargs["channel_flow_id"]):
-            channel = Channel.objects.create(
-                project=kwargs["project"],
-                channel_flow_id=kwargs["channel_flow_id"],
-                channel_type=kwargs["channel_type"],
-            )
-        else:
-            channel = Channel.objects.get(channel_flow_id=kwargs["channel_flow_id"])
-        return channel
-
-    @staticmethod
-    def channel_exists(channel_flow_id):
-        return Channel.objects.filter(channel_flow_id=channel_flow_id).exists()
-
-
 class ContactManager(models.Manager):
     def create(self, *args, **kwargs):
         contact = self.get_contact(kwargs.get("contact_flow_uuid"))
@@ -85,16 +54,11 @@ class Contact(models.Model):
     contact_flow_uuid = models.UUIDField(_("flow identification UUID"))
     name = models.CharField(_("contact name"), max_length=150, blank=True, null=True)
     last_seen_on = models.DateTimeField(blank=True, null=True)
-    channel = models.ForeignKey(Channel, models.CASCADE, related_name="channel", null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(blank=True, null=True)
     project = models.ForeignKey("common.Project", models.CASCADE, related_name="contacts", null=True)
 
     objects = ContactManager()
-
-    def update_channel(self, channel):
-        self.channel = channel
-        self.save(update_fields=["channel"])
 
 
 class Message(models.Model):
@@ -109,9 +73,6 @@ class Message(models.Model):
 
 
 class ContactCount(models.Model):
-    channel = models.ForeignKey(
-        Channel, models.CASCADE, related_name="contact_count_channel", null=True
-    )
     count = models.PositiveIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
     day = models.DateTimeField(null=True)
