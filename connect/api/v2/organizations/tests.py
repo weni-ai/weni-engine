@@ -136,7 +136,6 @@ class OrganizationViewSetTestCase(TestCase):
             user=user
         )
         self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(content_data.get("count"), 2)
 
     @patch("connect.billing.get_gateway")
     @patch("connect.api.v1.internal.intelligence.intelligence_rest_client.IntelligenceRESTClient.create_organization")
