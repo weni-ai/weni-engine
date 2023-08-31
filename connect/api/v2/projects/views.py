@@ -94,11 +94,11 @@ class ProjectViewSet(
 
 
 class ProjectAuthorizationViewSet(
-    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
     GenericViewSet
 ):
 
-    queryset = Project.objects.all()
+    queryset = Project.objects
     serializer_class = ProjectListAuthorizationSerializer
     permission_classes = [IsAuthenticated, ProjectHasPermission, Has2FA]
     lookup_field = "uuid"
