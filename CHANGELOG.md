@@ -1,3 +1,11 @@
+# 3.1.0
+
+## *update* 
+  - Update UserIsPaying viewset query params and authorizations
+
+## *Delete*
+  - Remove unused tasks and models
+
 # 3.0.0
 
 ## *Add*
