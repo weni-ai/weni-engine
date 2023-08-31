@@ -1,21 +1,25 @@
-from rest_framework.viewsets import GenericViewSet
 from rest_framework import mixins, status
+from rest_framework.viewsets import GenericViewSet
 from rest_framework.response import Response
-
-from connect.common.models import Organization, OrganizationAuthorization, OrganizationRole
-from connect.api.v2.organizations.serializers import OrganizationSeralizer, NestedAuthorizationOrganizationSerializer
-from connect.api.v2.projects.serializers import ProjectSerializer
-
-from drf_yasg2.utils import swagger_auto_schema
-from connect.api.v2.organizations.api_schemas import (
-    create_organization_schema,
-)
-
 from rest_framework.permissions import IsAuthenticated
+from drf_yasg2.utils import swagger_auto_schema
+
+from connect.common.models import (
+    Organization,
+    OrganizationAuthorization,
+    OrganizationRole
+)
 from connect.api.v1.organization.permissions import (
     Has2FA,
     OrganizationHasPermission,
-    OrganizationAdminManagerAuthorization,
+)
+from connect.api.v2.organizations.serializers import (
+    OrganizationSeralizer,
+    NestedAuthorizationOrganizationSerializer
+)
+from connect.api.v2.projects.serializers import ProjectSerializer
+from connect.api.v2.organizations.api_schemas import (
+    create_organization_schema,
 )
 
 
@@ -85,13 +89,12 @@ class OrganizationViewSet(
 
 
 class OrganizationAuthorizationViewSet(
-    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
     GenericViewSet,
 ):
-    queryset = Organization.objects.all()
-    permission_classes = [IsAuthenticated, OrganizationAdminManagerAuthorization]
-    # filter_class = RequestPermissionOrganizationFilter
-    # metadata_class = Metadata
+    queryset = Organization.objects
+    permission_classes = [IsAuthenticated, OrganizationHasPermission]
+    lookup_field = "uuid"
 
     def get_serializer_class(self):
         return NestedAuthorizationOrganizationSerializer
