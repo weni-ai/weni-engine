@@ -26,6 +26,8 @@ from connect.common.models import (
     TemplateProject,
     RequestChatsPermission,
 )
+from connect.internals.event_driven.producer.rabbitmq_publisher import RabbitmqPublisher
+from connect.template_projects.models import TemplateType
 
 logger = logging.getLogger(__name__)
 User = get_user_model()
@@ -211,13 +213,20 @@ class ProjectSerializer(serializers.ModelSerializer):
 
         is_template = extra_data.get("template")
 
+        project_template_type = None
+        if is_template:
+            project_template_type_queryset = TemplateType.objects.filter(name=extra_data.get("template_type"))
+            if project_template_type_queryset.exists():
+                project_template_type = project_template_type_queryset.first()
+
         instance = Project.objects.create(
             name=validated_data.get("name"),
             timezone=str(validated_data.get("timezone")),
             organization=validated_data.get("organization"),
             is_template=True if extra_data.get("template") else False,
             created_by=user,
-            template_type=extra_data.get("template_type")
+            template_type=extra_data.get("template_type"),
+            project_template_type=project_template_type,
         )
 
         created, flows_info = self.create_flows_project(validated_data, user, is_template, str(instance.uuid))
@@ -239,6 +248,20 @@ class ProjectSerializer(serializers.ModelSerializer):
                 token_authorization=settings.TOKEN_AUTHORIZATION_FLOW_PRODUCT
             )
             user.send_request_flow_user_info(data)
+
+        if not settings.TESTING:
+            message_body = {
+                "uuid": str(instance.uuid),
+                "name": instance.name,
+                "is_template": instance.is_template,
+                "user_email": instance.created_by.email if instance.created_by else None,
+                "date_format": instance.date_format,
+                "template_type_uuid": str(instance.project_template_type.uuid) if instance.project_template_type else None,
+                "timezone": str(instance.timezone)
+            }
+
+            rabbitmq_publisher = RabbitmqPublisher()
+            rabbitmq_publisher.send_message(message_body, exchange="projects.topic", routing_key="")
 
         if is_template:
             extra_data.update(
@@ -303,7 +326,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             rocket_authorization = RequestRocketPermission.objects.filter(email=i.email)
             chats_authorization = RequestChatsPermission.objects.filter(email=i.email)
             chats_role = None
-            if(len(rocket_authorization) > 0):
+            if (len(rocket_authorization) > 0):
                 rocket_authorization = rocket_authorization.first()
                 chats_role = rocket_authorization.role
 
@@ -508,16 +531,10 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
 
         flow_uuid = data.get("uuid")
 
-        token = self.context._auth
-
-        created, whatsapp_data = project.whatsapp_demo_integration(token)
-        if not created:
-            return whatsapp_data
-
         template = project.template_project.create(
             authorization=authorization,
-            wa_demo_token=whatsapp_data.get("router_token"),
-            redirect_url=whatsapp_data.get("redirect_url"),
+            wa_demo_token="wa-demo-12345",
+            redirect_url="https://wa.me/5582123456?text=wa-demo-12345",
             flow_uuid=flow_uuid,
             classifier_uuid=classifier_uuid
         )
@@ -596,3 +613,76 @@ class ProjectUpdateSerializer(serializers.ModelSerializer):
         except Exception as error:
             logger.error(f"Update project: {error}")
             raise error
+
+
+class ProjectListAuthorizationSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Project
+        fields = [
+            "authorizations",
+            "pending_authorizations",
+        ]
+
+    authorizations = serializers.SerializerMethodField(style={"show": False})
+    pending_authorizations = serializers.SerializerMethodField(style={"show": False})
+
+    def get_authorizations(self, obj):
+        authorizations = self.get_existing_authorizations(obj)
+        return {
+            "count": len(authorizations),
+            "users": authorizations,
+        }
+
+    def get_existing_authorizations(self, obj):
+        exclude_roles = [ProjectRole.SUPPORT.value]
+        queryset = obj.project_authorizations.exclude(role__in=exclude_roles).select_related('user')
+
+        return [
+            {
+                "username": auth.user.username,
+                "email": auth.user.email,
+                "first_name": auth.user.first_name,
+                "last_name": auth.user.last_name,
+                "project_role": auth.role,
+                "photo_user": auth.user.photo_url,
+                "chats_role": self.get_chats_role(auth),
+            }
+            for auth in queryset
+        ]
+
+    def get_chats_role(self, authorization):
+        if authorization.rocket_authorization:
+            return authorization.rocket_authorization.role
+        elif authorization.chats_authorization:
+            return authorization.chats_authorization.role
+        return None
+
+    def get_pending_authorizations(self, obj):
+        pending_authorizations = self.get_pending_authorizations_data(obj)
+        return {
+            "count": len(pending_authorizations),
+            "users": pending_authorizations,
+        }
+
+    def get_pending_authorizations_data(self, obj):
+        pending_authorizations = obj.requestpermissionproject_set.all()
+        return [
+            {
+                "email": pending.email,
+                "project_role": pending.role,
+                "created_by": pending.created_by.email,
+                "chats_role": self.get_pending_chats_role(pending.email),
+            }
+            for pending in pending_authorizations
+        ]
+
+    def get_pending_chats_role(self, email):
+        rocket_authorization = RequestRocketPermission.objects.filter(email=email).first()
+        chats_authorization = RequestChatsPermission.objects.filter(email=email).first()
+
+        if rocket_authorization:
+            return rocket_authorization.role
+        elif chats_authorization:
+            return chats_authorization.role
+        return None

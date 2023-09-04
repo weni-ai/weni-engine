@@ -25,7 +25,11 @@ class TemplateTypeSerializer(ModelSerializer):
 
     class Meta:
         model = TemplateType
-        fields = ['id', 'category', 'description', 'name', 'level', 'setup', 'photo', 'features', 'ais']
+        fields = [
+            'id', 'category', 'description', 'name',
+            'level', 'setup', 'photo', 'features',
+            'ais', 'photo_description', 'uuid', 'base_project_uuid'
+        ]
 
     def get_features(self, obj):
         return TemplateFeatureSerializer(obj.template_features.all(), many=True).data
@@ -38,4 +42,4 @@ class RetrieveTemplateSerializer(ModelSerializer):
 
     class Meta:
         model = TemplateType
-        fields = ['id', 'description', 'name']
+        fields = ['id', 'description', 'name', 'uuid']
