@@ -58,7 +58,7 @@ from connect.common import tasks
 from connect.utils import count_contacts
 from django.conf import settings
 import logging
-
+from connect.api.v2.permissions import ProjectIPPermission
 
 logger = logging.getLogger(__name__)
 
@@ -73,7 +73,7 @@ class ProjectViewSet(
 ):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
-    permission_classes = [IsAuthenticated, ProjectHasPermission, Has2FA]
+    permission_classes = [IsAuthenticated, ProjectIPPermission, ProjectHasPermission, Has2FA]
     filter_class = ProjectOrgFilter
     filter_backends = [OrderingFilter, SearchFilter, DjangoFilterBackend]
     lookup_field = "uuid"

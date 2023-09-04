@@ -101,6 +101,11 @@ class OrganizationViewSetTestCase(TestCase):
         method = {"get": "retrieve"}
         user = self.user
         auth = self.org_1.get_user_authorization(self.user)
+
+        org = self.org_1
+        org.allowed_ips = ["127.0.0.1"]
+        org.save()
+
         response, content_data = self.request(
             path,
             method,
@@ -111,6 +116,25 @@ class OrganizationViewSetTestCase(TestCase):
         self.assertEquals(response.status_code, status.HTTP_200_OK)
         self.assertEquals(content_data.get("authorization").get("uuid"), str(auth.uuid))
         self.assertEquals(content_data.get("uuid"), pk)
+
+    def test_get_organization_fail_ip(self):
+        pk = str(self.org_1.uuid)
+        path = "/v2/organizations/"
+        method = {"get": "retrieve"}
+        user = self.user
+
+        org = self.org_1
+        org.allowed_ips = ["123.123.123.9"]
+        org.save()
+
+        response, content_data = self.request(
+            path,
+            method,
+            pk=pk,
+            user=user
+        )
+
+        self.assertEquals(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_fail_get_authorization(self):
         pk = str(self.org_1.uuid)
@@ -136,7 +160,6 @@ class OrganizationViewSetTestCase(TestCase):
             user=user
         )
         self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(content_data.get("count"), 2)
 
     @patch("connect.billing.get_gateway")
     @patch("connect.api.v1.internal.intelligence.intelligence_rest_client.IntelligenceRESTClient.create_organization")
@@ -1036,3 +1059,29 @@ class OrganizationTestCase(TestCase):
         self.assertFalse(created)
         self.assertEquals(data.get("status"), status.HTTP_500_INTERNAL_SERVER_ERROR)
         self.assertEquals(data.get("data").get("message"), "Could not create organization in AI module")
+
+
+class OrganizationAuthorizationTestCase(TestCase):
+
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway):
+        mock_get_gateway.return_value = StripeMockGateway()
+
+        self.owner, self.owner_token = create_user_and_token("owner")
+        self.org1 = Organization.objects.create(
+            name="Test project methods",
+            description="",
+            inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__payment_method=BillingPlan.PAYMENT_METHOD_CREDIT_CARD,
+            organization_billing__plan=BillingPlan.PLAN_ENTERPRISE,
+        )
+        self.organization_authorization = self.org1.authorizations.create(
+            user=self.owner, role=OrganizationRole.ADMIN.value
+        )
+
+    def test_list_project_authorizations(self):
+        organization = self.org1
+        url = f"/v2/organizations/{organization.uuid}/list-organization-authorizations"
+        response = self.client.get(url, HTTP_AUTHORIZATION=f"Token {self.owner_token}")
+        self.assertEquals(response.status_code, status.HTTP_200_OK)

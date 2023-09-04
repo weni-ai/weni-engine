@@ -31,7 +31,9 @@ from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
 from rest_framework import status
 from connect.common.helpers import send_mass_html_mail
 from django.db.models import Q
+from django.contrib.postgres.fields import ArrayField
 from connect.template_projects.models import TemplateType
+
 
 logger = logging.getLogger(__name__)
 
@@ -136,6 +138,8 @@ class Organization(models.Model):
     )
     extra_integration = models.IntegerField(_("Whatsapp Extra Integration"), default=0)
     enforce_2fa = models.BooleanField(_("Only users with 2fa can access the organization"), default=False)
+    allowed_ips = ArrayField(base_field=models.CharField(max_length=255, blank=True), help_text=_("list of IPs from where the user can access the org"), null=True, blank=True)
+
     objects = OrganizationManager()
 
     def __str__(self):

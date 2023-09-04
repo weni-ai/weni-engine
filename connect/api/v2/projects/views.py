@@ -14,9 +14,11 @@ from connect.common.models import (
 from connect.api.v2.projects.serializers import (
     ProjectSerializer,
     ProjectUpdateSerializer,
+    ProjectListAuthorizationSerializer,
 )
 
 from django.utils import timezone
+from connect.api.v2.permissions import ProjectIPPermission
 
 
 class ProjectViewSet(
@@ -30,7 +32,7 @@ class ProjectViewSet(
     queryset = Project.objects
     serializer_class = ProjectSerializer
     lookup_field = "uuid"
-    permission_classes = [IsAuthenticated, ProjectHasPermission, Has2FA]
+    permission_classes = [IsAuthenticated, ProjectHasPermission, ProjectIPPermission, Has2FA]
 
     def get_queryset(self, **kwargs):
         if getattr(self, "swagger_fake_view", False):
@@ -90,3 +92,14 @@ class ProjectViewSet(
         instance.perform_destroy_flows_project(user_email)
 
         instance.delete()
+
+
+class ProjectAuthorizationViewSet(
+    mixins.RetrieveModelMixin,
+    GenericViewSet
+):
+
+    queryset = Project.objects
+    serializer_class = ProjectListAuthorizationSerializer
+    permission_classes = [IsAuthenticated, ProjectHasPermission, Has2FA]
+    lookup_field = "uuid"
