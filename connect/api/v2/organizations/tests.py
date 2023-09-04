@@ -112,18 +112,16 @@ class OrganizationViewSetTestCase(TestCase):
             pk=pk,
             user=user
         )
-    
 
         self.assertEquals(response.status_code, status.HTTP_200_OK)
         self.assertEquals(content_data.get("authorization").get("uuid"), str(auth.uuid))
         self.assertEquals(content_data.get("uuid"), pk)
-    
+
     def test_get_organization_fail_ip(self):
         pk = str(self.org_1.uuid)
         path = "/v2/organizations/"
         method = {"get": "retrieve"}
         user = self.user
-        auth = self.org_1.get_user_authorization(self.user)
 
         org = self.org_1
         org.allowed_ips = ["123.123.123.9"]

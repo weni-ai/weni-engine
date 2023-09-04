@@ -54,6 +54,7 @@ import pendulum
 from connect.common import tasks
 import logging
 import stripe
+from connect.api.v2.permissions import OrgIPPermission
 
 logger = logging.getLogger(__name__)
 
@@ -68,7 +69,7 @@ class OrganizationViewSet(
 ):
     queryset = Organization.objects.all()
     serializer_class = OrganizationSeralizer
-    permission_classes = [IsAuthenticated, OrganizationHasPermission, Has2FA]
+    permission_classes = [IsAuthenticated, OrgIPPermission, OrganizationHasPermission, Has2FA]
     lookup_field = "uuid"
     metadata_class = Metadata
 
