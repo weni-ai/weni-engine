@@ -1,3 +1,8 @@
+# 3.2.0
+
+## *Add*
+- Cursor pagination to v2 organizations and v2 projects
+
 # 3.1.0
 
 ## *update* 
