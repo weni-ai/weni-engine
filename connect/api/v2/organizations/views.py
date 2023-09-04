@@ -13,6 +13,9 @@ from connect.api.v1.organization.permissions import (
     Has2FA,
     OrganizationHasPermission,
 )
+
+from connect.api.v2.permissions import OrgIPPermission
+
 from connect.api.v2.organizations.serializers import (
     OrganizationSeralizer,
     NestedAuthorizationOrganizationSerializer
@@ -22,6 +25,7 @@ from connect.api.v2.organizations.api_schemas import (
     create_organization_schema,
 )
 from connect.api.v2.paginations import CustomCursorPagination
+
 
 
 class OrganizationViewSet(
@@ -35,8 +39,10 @@ class OrganizationViewSet(
     queryset = Organization.objects.all()
     serializer_class = OrganizationSeralizer
     lookup_field = "uuid"
-    permission_classes = [IsAuthenticated, OrganizationHasPermission, Has2FA]
+
+    permission_classes = [IsAuthenticated, OrgIPPermission, OrganizationHasPermission, Has2FA]
     pagination_class = CustomCursorPagination
+
 
     def get_queryset(self, *args, **kwargs):
         if getattr(self, "swagger_fake_view", False):
@@ -50,6 +56,10 @@ class OrganizationViewSet(
         )
 
         return self.queryset.filter(pk__in=auth)
+
+    def list(self, request, *args, **kwargs):
+        print(request.META.get("REMOTE_ADDR"))
+        return super().list(request, *args, **kwargs)
 
     @swagger_auto_schema(request_body=create_organization_schema)
     def create(self, request, *args, **kwargs):

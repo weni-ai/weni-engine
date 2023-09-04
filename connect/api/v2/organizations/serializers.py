@@ -41,6 +41,7 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
             "is_suspended",
             "extra_integration",
             "enforce_2fa",
+            "allowed_ips"
         ]
         ref_name = None
 
@@ -71,6 +72,7 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
             "if this field is true, only users with 2fa activated can access the org"
         ),
     )
+    allowed_ips = serializers.ListField(child=serializers.CharField(), required=False)
 
     def create(self, validated_data):
         # Billing Cycle
