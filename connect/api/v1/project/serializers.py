@@ -550,63 +550,64 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
                 return data
         else:
             classifier_uuid = uuid.uuid4()
-
+        data = {}
+        if not settings.USE_EDA:
         # Create Flow and Ticketer
-        if not settings.TESTING:
-            rest_client = FlowsRESTClient()
-            try:
-                is_support = project.template_type == Project.TYPE_SUPPORT
-                if is_support:
-                    chats_client = ChatsRESTClient()
-                    chats_response = chats_client.create_chat_project(
-                        project_uuid=str(project.uuid),
-                        project_name=project.name,
-                        date_format=project.date_format,
-                        timezone=str(project.timezone),
-                        is_template=True,
-                        user_email=project.created_by.email
+            if not settings.TESTING:
+                rest_client = FlowsRESTClient()
+                try:
+                    is_support = project.template_type == Project.TYPE_SUPPORT
+                    if is_support:
+                        chats_client = ChatsRESTClient()
+                        chats_response = chats_client.create_chat_project(
+                            project_uuid=str(project.uuid),
+                            project_name=project.name,
+                            date_format=project.date_format,
+                            timezone=str(project.timezone),
+                            is_template=True,
+                            user_email=project.created_by.email
+                        )
+                        chats_response = json.loads(chats_response.text)
+                    flows = rest_client.create_flows(
+                        str(project.uuid),
+                        str(classifier_uuid),
+                        project.template_type,
+                        ticketer=chats_response.get("ticketer") if is_support else None,
+                        queue=chats_response.get("queue") if is_support else None,
                     )
-                    chats_response = json.loads(chats_response.text)
-                flows = rest_client.create_flows(
-                    str(project.uuid),
-                    str(classifier_uuid),
-                    project.template_type,
-                    ticketer=chats_response.get("ticketer") if is_support else None,
-                    queue=chats_response.get("queue") if is_support else None,
-                )
-                if flows.get("status") == 201:
-                    flows = json.loads(flows.get("data"))
-            except Exception as error:
-                logger.error(error)
-                template.delete()
-                data.update(
-                    {
-                        "message": "Could not create flow",
-                        "status": "FAILED"
-                    }
-                )
-                return data
-        else:
-            flows = {"uuid": uuid.uuid4()}
+                    if flows.get("status") == 201:
+                        flows = json.loads(flows.get("data"))
+                except Exception as error:
+                    logger.error(error)
+                    template.delete()
+                    data.update(
+                        {
+                            "message": "Could not create flow",
+                            "status": "FAILED"
+                        }
+                    )
+                    return data
+            else:
+                flows = {"uuid": uuid.uuid4()}
 
-        flow_uuid = flows.get("uuid")
+            flow_uuid = flows.get("uuid")
 
-        template.classifier_uuid = classifier_uuid
-        template.flow_uuid = flow_uuid
+            template.classifier_uuid = classifier_uuid
+            template.flow_uuid = flow_uuid
 
-        wa_demo_token = "wa-demo-12345"
-        redirect_url = "https://wa.me/5582123456?text=wa-demo-12345"
-        template.wa_demo_token = wa_demo_token
-        template.redirect_url = redirect_url
-        template.save(update_fields=["classifier_uuid", "flow_uuid", "wa_demo_token", "redirect_url"])
+            wa_demo_token = "wa-demo-12345"
+            redirect_url = "https://wa.me/5582123456?text=wa-demo-12345"
+            template.wa_demo_token = wa_demo_token
+            template.redirect_url = redirect_url
+            template.save(update_fields=["classifier_uuid", "flow_uuid", "wa_demo_token", "redirect_url"])
 
-        data = {
-            "first_access": template.first_access,
-            "flow_uuid": str(template.flow_uuid),
-            "project_type": "template",
-            "wa_demo_token": template.wa_demo_token,
-            "redirect_url": redirect_url,
-        }
+            data = {
+                "first_access": template.first_access,
+                "flow_uuid": str(template.flow_uuid),
+                "project_type": "template",
+                "wa_demo_token": template.wa_demo_token,
+                "redirect_url": redirect_url,
+            }
 
         return data
 
