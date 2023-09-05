@@ -1,4 +1,3 @@
-from unittest import skipIf
 from unittest.mock import Mock, patch
 from django.test import TestCase, RequestFactory, override_settings
 from rest_framework.test import APIRequestFactory
@@ -8,7 +7,6 @@ import uuid as uuid4
 from connect.api.v1.tests.utils import create_user_and_token
 from rest_framework import status
 from connect.common.models import Project, Organization, OrganizationRole, BillingPlan
-from django.conf import settings
 
 
 class UserAPITokenTestCase(TestCase):
