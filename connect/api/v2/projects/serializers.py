@@ -1,5 +1,6 @@
 import logging
 import json
+import uuid
 
 from django.contrib.auth import get_user_model
 from django.conf import settings
@@ -259,7 +260,7 @@ class ProjectSerializer(serializers.ModelSerializer):
                 "template_type_uuid": str(instance.project_template_type.uuid) if instance.project_template_type else None,
                 "timezone": str(instance.timezone),
                 "organization_id": instance.organization.inteligence_organization,
-                "extra_fields": instance.project_template_type.extra_fields if instance.is_template else {},
+                "extra_fields": instance.project_template_type.setup if instance.is_template else {},
             }
 
             rabbitmq_publisher = RabbitmqPublisher()
@@ -524,14 +525,14 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
         if not created:
             # Project delete
             return classifier_uuid
+        if not settings.USE_EDA:
+            created, data = project.create_flows(classifier_uuid)
 
-        created, data = project.create_flows(classifier_uuid)
+            if not created:
+                # Project delete
+                return data
 
-        if not created:
-            # Project delete
-            return data
-
-        flow_uuid = data.get("uuid")
+        flow_uuid = data.get("uuid", str(project.flow_organization))
 
         template = project.template_project.create(
             authorization=authorization,
