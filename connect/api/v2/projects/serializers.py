@@ -487,7 +487,7 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         project = validated_data.get("project")
         authorization = validated_data.get("authorization")
-
+        data = {}
         if project.template_type in Project.HAS_GLOBALS:
 
             common_templates = [Project.TYPE_SAC_CHAT_GPT, Project.TYPE_LEAD_CAPTURE_CHAT_GPT]
