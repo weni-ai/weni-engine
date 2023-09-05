@@ -74,19 +74,21 @@ class ChatsRESTClient:
         is_template: bool,
         user_email: str
     ):
-        body = dict(
-            uuid=project_uuid,
-            name=project_name,
-            date_format=date_format,
-            timezone=timezone,
-            is_template=is_template,
-            user_email=user_email
-        )
-        response = requests.post(
-            url=f"{self.base_url}/v1/internal/project/",
-            headers=self.authentication_instance.headers,
-            json=body,
-        )
+        response = {}
+        if settings.USE_EDA:
+            body = dict(
+                uuid=project_uuid,
+                name=project_name,
+                date_format=date_format,
+                timezone=timezone,
+                is_template=is_template,
+                user_email=user_email
+            )
+            response = requests.post(
+                url=f"{self.base_url}/v1/internal/project/",
+                headers=self.authentication_instance.headers,
+                json=body,
+            )
         return response
 
     def delete_chat(self, project_uuid: str):
