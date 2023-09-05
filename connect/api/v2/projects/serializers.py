@@ -258,7 +258,8 @@ class ProjectSerializer(serializers.ModelSerializer):
                 "date_format": instance.date_format,
                 "template_type_uuid": str(instance.project_template_type.uuid) if instance.project_template_type else None,
                 "timezone": str(instance.timezone),
-                "organization_id": instance.organization.inteligence_organization
+                "organization_id": instance.organization.inteligence_organization,
+                "extra_fields": instance.project_template_type.setup if instance.is_template else {},
             }
 
             rabbitmq_publisher = RabbitmqPublisher()
