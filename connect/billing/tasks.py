@@ -10,7 +10,6 @@ from connect.common.models import (
 )
 from connect.billing.models import (
     Contact,
-    Message,
     SyncManagerTask,
     ContactCount,
 )

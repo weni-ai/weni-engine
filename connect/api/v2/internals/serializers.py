@@ -12,10 +12,24 @@ from connect.common.models import (
     RequestPermissionOrganization,
     OrganizationLevelRole,
     OrganizationRole,
+    Project,
 )
 
 User = get_user_model()
 logger = logging.getLogger(__name__)
+
+
+class InternalProjectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Project
+        fields = [
+            "uuid",
+            "name",
+            "flow_id"
+        ]
+
+    uuid = serializers.UUIDField(read_only=True)
+    name = serializers.CharField(read_only=True)
 
 
 class CustomParameterSerializer(serializers.Serializer):
