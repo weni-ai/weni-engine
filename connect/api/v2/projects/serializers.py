@@ -99,7 +99,9 @@ class ProjectSerializer(serializers.ModelSerializer):
     def get_flow_uuid(self, obj):
         if obj.is_template and obj.template_project.exists():
             template = obj.template_project.filter(flow_uuid__isnull=False, wa_demo_token__isnull=False, redirect_url__isnull=False).first()
-            return template.flow_uuid
+            if template:
+                return template.flow_uuid
+            ...
         ...
 
     def get_first_access(self, obj):
@@ -124,13 +126,17 @@ class ProjectSerializer(serializers.ModelSerializer):
     def get_wa_demo_token(self, obj):
         if obj.is_template and obj.template_project.exists():
             template = obj.template_project.filter(flow_uuid__isnull=False, wa_demo_token__isnull=False, redirect_url__isnull=False).first()
-            return template.wa_demo_token
+            if template:
+                return template.wa_demo_token
+            ...
         ...
 
     def get_redirect_url(self, obj):
         if obj.is_template and obj.template_project.exists():
             template = obj.template_project.filter(flow_uuid__isnull=False, wa_demo_token__isnull=False, redirect_url__isnull=False).first()
-            return template.redirect_url
+            if template:
+                return template.redirect_url
+            ...
         ...
 
     def get_menu(self, obj):
@@ -504,6 +510,19 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
         return created, response_data
 
     def create(self, validated_data):
+        project = validated_data.get("project")
+        authorization = validated_data.get("authorization")
+        template = project.template_project.create(
+            authorization=authorization,
+            wa_demo_token="wa-demo-12345",
+            redirect_url="https://wa.me/5582123456?text=wa-demo-12345",
+            flow_uuid=None,
+            classifier_uuid=None
+        )
+
+        return template
+
+    def _create(self, validated_data):
         project = validated_data.get("project")
         authorization = validated_data.get("authorization")
 
