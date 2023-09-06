@@ -105,7 +105,9 @@ class ProjectSerializer(serializers.ModelSerializer):
     def get_flow_uuid(self, obj):
         if obj.is_template and obj.template_project.exists():
             template = obj.template_project.filter(flow_uuid__isnull=False, wa_demo_token__isnull=False, redirect_url__isnull=False).first()
-            return template.flow_uuid
+            if template:
+                return template.flow_uuid
+            ...
         ...
 
     def get_first_access(self, obj):
@@ -130,13 +132,17 @@ class ProjectSerializer(serializers.ModelSerializer):
     def get_wa_demo_token(self, obj):
         if obj.is_template and obj.template_project.exists():
             template = obj.template_project.filter(flow_uuid__isnull=False, wa_demo_token__isnull=False, redirect_url__isnull=False).first()
-            return template.wa_demo_token
+            if template:
+                return template.wa_demo_token
+            ...
         ...
 
     def get_redirect_url(self, obj):
         if obj.is_template and obj.template_project.exists():
             template = obj.template_project.filter(flow_uuid__isnull=False, wa_demo_token__isnull=False, redirect_url__isnull=False).first()
-            return template.redirect_url
+            if template:
+                return template.redirect_url
+            ...
         ...
 
     def get_menu(self, obj):
