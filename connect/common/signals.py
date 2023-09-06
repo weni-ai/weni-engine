@@ -43,7 +43,6 @@ def create_service_status(sender, instance, created, **kwargs):
         for service in Service.objects.filter(default=True):
             instance.service_status.create(service=service)
         if not settings.TESTING:
-
             if len(Project.objects.filter(created_by=instance.created_by)) == 1:
                 data = dict(
                     send_request_flow=settings.SEND_REQUEST_FLOW_PRODUCT,
@@ -52,27 +51,12 @@ def create_service_status(sender, instance, created, **kwargs):
                 )
                 instance.created_by.send_request_flow_user_info(data)
 
-        if instance.flow_organization:
-            for permission in instance.project_authorizations.all():
-                update_user_permission_project(
-                    project_uuid=str(instance.uuid),
-                    flow_organization=str(instance.flow_organization),
-                    user_email=permission.user.email,
-                    permission=permission.role
-                )
-
         for authorization in instance.organization.authorizations.all():
             if authorization.can_contribute:
                 project_auth = instance.get_user_authorization(authorization.user)
                 project_auth.role = authorization.role
                 project_auth.save()
-                if not settings.TESTING and project_auth.is_moderator:
-                    RequestChatsPermission.objects.create(
-                        email=project_auth.user.email,
-                        role=ChatsRole.ADMIN.value,
-                        project=project_auth.project,
-                        created_by=project_auth.user
-                    )
+
     elif update_fields and "flow_organization" in update_fields:
         for permission in instance.project_authorizations.all():
             update_user_permission_project(
