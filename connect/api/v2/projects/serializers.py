@@ -100,7 +100,9 @@ class ProjectSerializer(serializers.ModelSerializer):
     def get_flow_uuid(self, obj):
         if obj.is_template and obj.template_project.exists():
             template = obj.template_project.filter(flow_uuid__isnull=False, wa_demo_token__isnull=False, redirect_url__isnull=False).first()
-            return template.flow_uuid
+            if template:
+                return template.flow_uuid
+            ...
         ...
 
     def get_first_access(self, obj):
@@ -125,13 +127,17 @@ class ProjectSerializer(serializers.ModelSerializer):
     def get_wa_demo_token(self, obj):
         if obj.is_template and obj.template_project.exists():
             template = obj.template_project.filter(flow_uuid__isnull=False, wa_demo_token__isnull=False, redirect_url__isnull=False).first()
-            return template.wa_demo_token
+            if template:
+                return template.wa_demo_token
+            ...
         ...
 
     def get_redirect_url(self, obj):
         if obj.is_template and obj.template_project.exists():
             template = obj.template_project.filter(flow_uuid__isnull=False, wa_demo_token__isnull=False, redirect_url__isnull=False).first()
-            return template.redirect_url
+            if template:
+                return template.redirect_url
+            ...
         ...
 
     def get_menu(self, obj):
@@ -148,8 +154,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             ),
         }
 
-    # deprecated
-    def _create(self, validated_data):  # pragma: no cover
+    def create(self, validated_data):
         user = self.context["request"].user
         extra_data = self.context["request"].data.get("project")
 
@@ -158,32 +163,26 @@ class ProjectSerializer(serializers.ModelSerializer):
                 "template": self.context["request"].data.get("template"),
                 "template_type": self.context["request"].data.get("template_type"),
             }
-
         is_template = extra_data.get("template")
 
-        created, flows_info = self.create_flows_project(validated_data, user, is_template)
-
-        if not created:
-            return flows_info
-
+        project_template_type = None
+        if is_template:
+            project_template_type_queryset = TemplateType.objects.filter(name=extra_data.get("template_type"))
+            if project_template_type_queryset.exists():
+                project_template_type = project_template_type_queryset.first()
+        
         instance = Project.objects.create(
             name=validated_data.get("name"),
-            flow_id=flows_info.get("id"),
-            flow_organization=flows_info.get("uuid"),
             timezone=str(validated_data.get("timezone")),
             organization=validated_data.get("organization"),
             is_template=True if extra_data.get("template") else False,
             created_by=user,
-            template_type=extra_data.get("template_type")
+            template_type=extra_data.get("template_type"),
+            project_template_type=project_template_type,
         )
 
-        if Project.objects.filter(created_by=user).count() == 1:
-            data = dict(
-                send_request_flow=settings.SEND_REQUEST_FLOW_PRODUCT,
-                flow_uuid=settings.FLOW_PRODUCT_UUID,
-                token_authorization=settings.TOKEN_AUTHORIZATION_FLOW_PRODUCT
-            )
-            user.send_request_flow_user_info(data)
+        self.send_request_flow_product(user)
+        self.publish_create_project_message(instance)
 
         if is_template:
             extra_data.update(
@@ -201,8 +200,9 @@ class ProjectSerializer(serializers.ModelSerializer):
                 return template_project
 
         return instance
+        
 
-    def create(self, validated_data):
+    def _create(self, validated_data):
         user = self.context["request"].user
         extra_data = self.context["request"].data.get("project")
 
@@ -282,6 +282,32 @@ class ProjectSerializer(serializers.ModelSerializer):
                 return template_project
 
         return instance
+
+    def publish_create_project_message(self, instance):
+        message_body = {
+                "uuid": str(instance.uuid),
+                "name": instance.name,
+                "is_template": instance.is_template,
+                "user_email": instance.created_by.email if instance.created_by else None,
+                "date_format": instance.date_format,
+                "template_type_uuid": str(instance.project_template_type.uuid) if instance.project_template_type else None,
+                "timezone": str(instance.timezone),
+                "organization_id": instance.organization.inteligence_organization,
+                "extra_fields": instance.project_template_type.setup if instance.is_template else {},
+            }
+
+        rabbitmq_publisher = RabbitmqPublisher()
+        rabbitmq_publisher.send_message(message_body, exchange="projects.topic", routing_key="")
+
+    def send_request_flow_product(self, user):
+        # TODO: change to an async call
+        if Project.objects.filter(created_by=user).count() == 1:
+            data = dict(
+                send_request_flow=settings.SEND_REQUEST_FLOW_PRODUCT,
+                flow_uuid=settings.FLOW_PRODUCT_UUID,
+                token_authorization=settings.TOKEN_AUTHORIZATION_FLOW_PRODUCT
+            )
+            user.send_request_flow_user_info(data)
 
     def update(self, instance, validated_data):
         name = validated_data.get("name", instance.name)
@@ -487,6 +513,20 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         project = validated_data.get("project")
         authorization = validated_data.get("authorization")
+        template = project.template_project.create(
+            authorization=authorization,
+            wa_demo_token="wa-demo-12345",
+            redirect_url="https://wa.me/5582123456?text=wa-demo-12345",
+            flow_uuid=None,
+            classifier_uuid=None
+        )
+
+        return template
+
+    def _create(self, validated_data):
+        project = validated_data.get("project")
+        authorization = validated_data.get("authorization")
+
         data = {}
         if project.template_type in Project.HAS_GLOBALS:
 
