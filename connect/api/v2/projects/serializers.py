@@ -284,6 +284,11 @@ class ProjectSerializer(serializers.ModelSerializer):
         return instance
 
     def publish_create_project_message(self, instance):
+        authorizations = []
+        for authorization in instance.organization.authorizations.all():
+            if authorization.can_contribute:
+                authorizations.append({"email": authorization.user.email, "role": authorization.role})
+
         message_body = {
                 "uuid": str(instance.uuid),
                 "name": instance.name,
