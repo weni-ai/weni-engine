@@ -29,8 +29,6 @@ from connect.celery import app as celery_app
 from connect.api.v1.internal.intelligence.intelligence_rest_client import IntelligenceRESTClient
 from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
 from connect.common.tasks import update_user_permission_project
-from requests.exceptions import HTTPError
-from rest_framework.exceptions import APIException
 
 
 logger = logging.getLogger("connect.common.signals")

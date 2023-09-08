@@ -556,7 +556,7 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
                 return data
         else:
             classifier_uuid = uuid.uuid4()
-       
+
     # Create Flow and Ticketer
         if not settings.TESTING and not settings.USE_EDA:
             rest_client = FlowsRESTClient()

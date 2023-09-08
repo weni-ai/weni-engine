@@ -1,6 +1,5 @@
 import logging
 import json
-import uuid
 
 from django.contrib.auth import get_user_model
 from django.conf import settings
@@ -170,7 +169,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             project_template_type_queryset = TemplateType.objects.filter(name=extra_data.get("template_type"))
             if project_template_type_queryset.exists():
                 project_template_type = project_template_type_queryset.first()
-        
+
         instance = Project.objects.create(
             name=validated_data.get("name"),
             timezone=str(validated_data.get("timezone")),
@@ -200,7 +199,6 @@ class ProjectSerializer(serializers.ModelSerializer):
                 return template_project
 
         return instance
-        
 
     def _create(self, validated_data):
         user = self.context["request"].user
@@ -285,16 +283,16 @@ class ProjectSerializer(serializers.ModelSerializer):
 
     def publish_create_project_message(self, instance):
         message_body = {
-                "uuid": str(instance.uuid),
-                "name": instance.name,
-                "is_template": instance.is_template,
-                "user_email": instance.created_by.email if instance.created_by else None,
-                "date_format": instance.date_format,
-                "template_type_uuid": str(instance.project_template_type.uuid) if instance.project_template_type else None,
-                "timezone": str(instance.timezone),
-                "organization_id": instance.organization.inteligence_organization,
-                "extra_fields": instance.project_template_type.setup if instance.is_template else {},
-            }
+            "uuid": str(instance.uuid),
+            "name": instance.name,
+            "is_template": instance.is_template,
+            "user_email": instance.created_by.email if instance.created_by else None,
+            "date_format": instance.date_format,
+            "template_type_uuid": str(instance.project_template_type.uuid) if instance.project_template_type else None,
+            "timezone": str(instance.timezone),
+            "organization_id": instance.organization.inteligence_organization,
+            "extra_fields": self.context["request"].data.get("globals") if instance.is_template else {},
+        }
 
         rabbitmq_publisher = RabbitmqPublisher()
         rabbitmq_publisher.send_message(message_body, exchange="projects.topic", routing_key="")
