@@ -18,7 +18,6 @@ class TemplateType(models.Model):
     name = models.CharField(max_length=255, null=True, blank=True)
     level = models.CharField(max_length=255, choices=level_field)
     setup = models.JSONField(blank=True, null=True)
-    extra_fields = models.JSONField(blank=True, null=True)
 
     photo = models.ImageField(storage=TemplateTypeImageStorage(), blank=True, null=True)
     photo_description = models.TextField(blank=True, null=True)
