@@ -8,6 +8,7 @@ from rest_framework import status
 from connect.api.v1.account.views import MyUserProfileViewSet
 from connect.api.v1.tests.utils import create_user_and_token
 from connect.common.models import Organization, BillingPlan, OrganizationRole
+from unittest.mock import patch
 
 
 class ListMyProfileTestCase(TestCase):
@@ -135,7 +136,6 @@ class AdditionalUserInfoTestCase(TestCase):
 
 class CompanyInfoTestCase(TestCase):
     def setUp(self):
-        self.factory = RequestFactory()
         self.owner, self.owner_token = create_user_and_token("owner")
         self.user, self.user_token = create_user_and_token("user")
 
@@ -174,3 +174,28 @@ class CompanyInfoTestCase(TestCase):
         response, content_data = self.request(self.user_token)
         self.assertEquals(list(content_data[0].keys()), ['organization', 'company'])
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+@patch("connect.api.v1.keycloak.KeycloakControl.verify_email")
+class EmailVerifiedTestCase(TestCase):
+
+    def setUp(self):
+        self.owner, self.owner_token = create_user_and_token("owner")
+        self.user, self.user_token = create_user_and_token("user")
+        self.factory = RequestFactory()
+        self.user, self.user_token = create_user_and_token()
+
+    def request(self, token):
+        authorization_header = {"HTTP_AUTHORIZATION": "Token {}".format(token.key)}
+        request = self.factory.patch(
+            "/v1/account/my-profile/verify_email/",
+            content_type="application/json",
+            format="json",
+            **authorization_header,
+        )
+        response = MyUserProfileViewSet.as_view({"patch": "verify_email"})(request,)
+        response.render()
+        return response
+
+    def test_okay(self, verify_email):
+        response = self.request(self.user_token)
+        self.assertEquals(response.status_code, status.HTTP_200_OK)

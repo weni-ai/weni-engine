@@ -155,6 +155,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     )
     first_login = models.BooleanField(default=False)
     first_login_token = models.TextField(null=True)
+    email_verified = models.BooleanField(default=False)
 
     objects = UserManager()
 
@@ -282,6 +283,11 @@ class User(AbstractBaseUser, PermissionsMixin):
             number_people=self.number_people,
             weni_helps=self.weni_helps
         )
+    def verify_email(self):
+        self.email_verified = True
+        keycloak = KeycloakControl()
+        keycloak.verify_email(self.email)
+        self.save(update_fields=["email_verified"])
 
 
 class UserEmailSetup(models.Model):
