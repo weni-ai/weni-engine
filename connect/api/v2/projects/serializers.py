@@ -297,6 +297,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             "timezone": str(instance.timezone),
             "organization_id": instance.organization.inteligence_organization,
             "extra_fields": self.context["request"].data.get("globals") if instance.is_template else {},
+            "authorizations": authorizations,
         }
 
         rabbitmq_publisher = RabbitmqPublisher()
