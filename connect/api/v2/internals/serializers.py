@@ -25,7 +25,8 @@ class InternalProjectSerializer(serializers.ModelSerializer):
         fields = [
             "uuid",
             "name",
-            "flow_id"
+            "flow_id",
+            "flow_organization",
         ]
 
     uuid = serializers.UUIDField(read_only=True)
