@@ -282,6 +282,11 @@ class ProjectSerializer(serializers.ModelSerializer):
         return instance
 
     def publish_create_project_message(self, instance):
+        authorizations = []
+        for authorization in instance.organization.authorizations.all():
+            if authorization.can_contribute:
+                authorizations.append({"email": authorization.user.email, "role": authorization.role})
+
         message_body = {
             "uuid": str(instance.uuid),
             "name": instance.name,
@@ -292,6 +297,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             "timezone": str(instance.timezone),
             "organization_id": instance.organization.inteligence_organization,
             "extra_fields": self.context["request"].data.get("globals") if instance.is_template else {},
+            "authorizations": authorizations,
         }
 
         rabbitmq_publisher = RabbitmqPublisher()
