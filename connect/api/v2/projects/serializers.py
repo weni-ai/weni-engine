@@ -285,7 +285,7 @@ class ProjectSerializer(serializers.ModelSerializer):
         authorizations = []
         for authorization in instance.organization.authorizations.all():
             if authorization.can_contribute:
-                authorizations.append({"email": authorization.user.email, "role": authorization.role})
+                authorizations.append({"user_email": authorization.user.email, "role": authorization.role})
 
         message_body = {
             "uuid": str(instance.uuid),
