@@ -29,6 +29,7 @@ class UserSerializer(serializers.ModelSerializer):
             "email_marketing",
             "has_2fa",
             "send_email_setup",
+            "email_verified"
         ]
         ref_name = None
 

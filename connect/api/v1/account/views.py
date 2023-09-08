@@ -274,6 +274,19 @@ class MyUserProfileViewSet(
         except Exception as e:
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR, data={"message": e})
 
+    @action(
+        detail=True,
+        methods=["PATCH"],
+        url_name="verify-email",
+    )
+    def verify_email(self, request, **kwargs):
+        user = request.user
+        try:
+            user.verify_email()
+            return Response(status=200)
+        except Exception as e:
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR, data={"message": e})
+
 
 class SearchUserViewSet(mixins.ListModelMixin, GenericViewSet):  # pragma: no cover
     serializer_class = SearchUserSerializer

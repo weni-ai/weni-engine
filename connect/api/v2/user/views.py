@@ -1,6 +1,5 @@
 from rest_framework import views, status
 
-from django.conf import settings
 from django.http import JsonResponse
 
 from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
