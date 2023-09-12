@@ -13,7 +13,6 @@ class TemplateFeatureSerializer(ModelSerializer):
 class TemplateTypeSerializer(ModelSerializer):
 
     features = serializers.SerializerMethodField()
-    ais = serializers.SerializerMethodField()
 
     class Meta:
         model = TemplateType
