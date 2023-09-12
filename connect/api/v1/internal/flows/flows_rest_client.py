@@ -123,7 +123,6 @@ class FlowsRESTClient:
             headers=self.authentication_instance.headers,
             json=body
         )
-        # TODO: check the response data its equals to gRPC endpoint return
         return dict(status=response.status_code, data=response.json())
 
     def delete_classifier(self, classifier_uuid: str, user_email: str):

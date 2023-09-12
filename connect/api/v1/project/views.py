@@ -416,18 +416,6 @@ class ProjectViewSet(
             )
             return JsonResponse(data=ticketer)
 
-    @action(
-        detail=True,
-        methods=["GET"],
-        url_name='list-flows',
-        permission_classes=[ModuleHasPermission],
-    )
-    def list_flows(self, request, **kwargs):
-        project_uuid = request.query_params.get('project_uuid')
-        project = get_object_or_404(Project, uuid=project_uuid)
-        task = tasks.list_project_flows(str(project.flow_organization))
-        return Response(task)
-
 
 class RequestPermissionProjectViewSet(
     mixins.ListModelMixin,
