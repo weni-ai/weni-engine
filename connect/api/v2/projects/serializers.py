@@ -288,12 +288,9 @@ class ProjectSerializer(serializers.ModelSerializer):
             if authorization.can_contribute:
                 authorizations.append({"user_email": authorization.user.email, "role": authorization.role})
 
-        extra_fields = self.context["request"].data.get("globals")
+        extra_fields = self.context["request"].data.get("globals") 
         if extra_fields is None:
-            project_data = self.context["request"].data.get("project")
-            if project_data:
-                extra_fields = project_data.get("globals")
-
+            extra_fields = self.context["request"].data.get("project", {}).get("globals", {})
 
         message_body = {
             "uuid": str(instance.uuid),
