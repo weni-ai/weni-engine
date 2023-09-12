@@ -282,6 +282,13 @@ class ProjectSerializer(serializers.ModelSerializer):
         return instance
 
     def publish_create_project_message(self, instance):
+
+        extra_fields = self.context["request"].data.get("globals")
+        if extra_fields is None:
+            project_data = self.context["request"].data.get("project")
+            if project_data:
+                extra_fields = project_data.get("globals")
+
         message_body = {
             "uuid": str(instance.uuid),
             "name": instance.name,
@@ -291,7 +298,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             "template_type_uuid": str(instance.project_template_type.uuid) if instance.project_template_type else None,
             "timezone": str(instance.timezone),
             "organization_id": instance.organization.inteligence_organization,
-            "extra_fields": self.context["request"].data.get("globals") if instance.is_template else {},
+            "extra_fields": extra_fields if instance.is_template else {},
         }
 
         rabbitmq_publisher = RabbitmqPublisher()
