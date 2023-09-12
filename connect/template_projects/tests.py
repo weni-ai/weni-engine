@@ -4,7 +4,7 @@ from django.test import TestCase
 from unittest.mock import patch
 from connect.storages import AvatarUserMediaStorage
 from connect.template_projects.storage import TemplateTypeImageStorage
-from connect.template_projects.models import TemplateType, TemplateAI, TemplateFeature
+from connect.template_projects.models import TemplateType, TemplateFeature
 
 
 class TemplateTypeModelTestCase(TestCase):
@@ -23,31 +23,6 @@ class TemplateTypeModelTestCase(TestCase):
 
         str_response = self.template_type_object.__str__()
         model_id = self.template_type_object.id
-        self.assertListEqual(str_response.split(), [str(model_id)])
-
-
-class TemplateAIModelTestCase(TestCase):
-
-    def setUp(self):
-
-        self.template_type_object = TemplateType.objects.create(
-            level=1,
-            category="category",
-            description="description",
-            name="name",
-            setup={"setup": "setup"}
-        )
-
-        self.template_ai_object = TemplateAI.objects.create(
-            name="name",
-            description="description",
-            template_type=self.template_type_object
-        )
-
-    def test_str(self):
-
-        str_response = self.template_ai_object.__str__()
-        model_id = self.template_ai_object.id
         self.assertListEqual(str_response.split(), [str(model_id)])
 
 
