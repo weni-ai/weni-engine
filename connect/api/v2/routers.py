@@ -55,4 +55,5 @@ urlpatterns += [
         "internals/connect/organizations/",
         connect_internal_views.AIGetOrganizationView.as_view(),
     ),
+    path("internals/connect/projects/<uuid>", connect_internal_views.InternalProjectViewSet.as_view({"patch": "partial_update"}))
 ]
