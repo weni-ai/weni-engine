@@ -366,7 +366,9 @@ class ContactCountTestCase(TestCase):
 
 class BillingTasksTestCase(TestCase):
 
-    def setUp(self):
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway):
+        mock_get_gateway.return_value = StripeMockGateway()
         self.organization = Organization.objects.create(
             name="test organization",
             description="test organization",
@@ -374,6 +376,13 @@ class BillingTasksTestCase(TestCase):
             organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
             organization_billing__plan=BillingPlan.PLAN_START,
             is_suspended=False
+        )
+        now = pendulum.now()
+        self.manager_task = SyncManagerTask.objects.create(
+            task_type="count_contacts",
+            started_at=now,
+            before=now,
+            after=now.subtract(days=1),
         )
 
         self.project = self.organization.project.create(
@@ -391,3 +400,28 @@ class BillingTasksTestCase(TestCase):
         org_updated = Organization.objects.get(name=self.organization.name)
         self.assertTrue(org_updated.is_suspended)
         self.assertFalse(org_updated.organization_billing.is_active)
+
+    def test_contact_count_task(self):
+
+        now = pendulum.now()
+        response = celery_app.send_task(name="count_contacts", args=[
+            now,
+            now.subtract(days=1),
+            self.project.uuid,
+            self.manager_task.uuid
+        ])
+
+        self.assertTrue(response.result)
+        self.manager_task.refresh_from_db()
+        self.assertTrue(self.manager_task.status)
+        self.assertIsNotNone(self.manager_task.finished_at)
+
+    def test_contact_count_without_task_uuid(self):
+        now = pendulum.now()
+        response = celery_app.send_task(name="count_contacts", args=[
+            now,
+            now.subtract(days=1),
+            self.project.uuid,
+        ])
+
+        self.assertTrue(response.result)
