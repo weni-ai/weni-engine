@@ -15,12 +15,13 @@ from django.test import TestCase
 from django.conf import settings
 
 from connect.billing import get_gateway
+from connect.celery import app as celery_app
 
 from connect.billing.models import Contact, ContactCount, Message, SyncManagerTask
 from connect.common.models import Organization, Project, BillingPlan, OrganizationRole
 
 from freezegun import freeze_time
-from connect.billing.tasks import sync_contacts, check_organization_plans
+from connect.billing.tasks import sync_contacts, check_organization_plans, problem_capture_invoice
 from connect.api.v1.tests.utils import create_contacts, create_user_and_token
 
 
@@ -361,3 +362,32 @@ class ContactCountTestCase(TestCase):
     def test_increase_contact_count(self):
         self.contact.increase_contact_count(1)
         self.assertEqual(self.contact.count, 2)
+
+
+class BillingTasksTestCase(TestCase):
+
+    def setUp(self):
+        self.organization = Organization.objects.create(
+            name="test organization",
+            description="test organization",
+            inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan=BillingPlan.PLAN_START,
+            is_suspended=False
+        )
+
+        self.project = self.organization.project.create(
+            name="project test",
+            timezone="America/Sao_Paulo",
+            flow_organization=uuid.uuid4(),
+        )
+
+    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.suspend_or_unsuspend_project")
+    @patch("connect.common.models.BillingPlan.problem_capture_invoice")
+    def test_problem_capture_invoice(self, mock_problem_capture_invoice, mock_update_suspend_project):
+        mock_problem_capture_invoice.side_effect = [True]
+
+        celery_app.send_task(name="problem_capture_invoice")
+        org_updated = Organization.objects.get(name=self.organization.name)
+        self.assertTrue(org_updated.is_suspended)
+        self.assertFalse(org_updated.organization_billing.is_active)
