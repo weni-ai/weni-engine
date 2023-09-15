@@ -14,6 +14,10 @@ from django.utils.translation import ugettext_lazy as _
 from connect.storages import AvatarUserMediaStorage
 
 from connect.api.v1.keycloak import KeycloakControl
+from django.core import mail
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
+from connect.authentication.helpers import generate_token
 
 
 class UserManager(BaseUserManager):
@@ -288,6 +292,28 @@ class User(AbstractBaseUser, PermissionsMixin):
         keycloak = KeycloakControl()
         keycloak.verify_email(self.email)
         self.save(update_fields=["email_verified"])
+
+    def send_email_verify_email(self):
+        if not settings.SEND_EMAILS:
+            return False  # pragma: no cover
+
+        context = {
+            "base_url": settings.BASE_URL,
+            "username": self.username,
+            "uid": urlsafe_base64_encode(force_bytes(self.pk)),
+            "token": generate_token.make_token(self)
+        }
+
+        mail.send_mail(
+            _("Confirm your registration at Weni"),
+            render_to_string("authentication/emails/verify_email.txt", context),
+            None,
+            [self.email],
+            html_message=render_to_string(
+                "authentication/emails/verify_email.html", context
+            ),
+        )
+        return mail
 
 
 class UserEmailSetup(models.Model):
