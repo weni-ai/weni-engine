@@ -1,3 +1,8 @@
+# 3.3.0
+
+## *Delete*
+  - Remove TemplateAI api, models and unittests.
+
 # 3.2.1
 
 ## *Add*
