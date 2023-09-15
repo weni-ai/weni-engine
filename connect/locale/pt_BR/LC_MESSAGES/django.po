@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-04 21:13+0000\n"
+"POT-Creation-Date: 2023-09-15 14:49+0000\n"
 "PO-Revision-Date: 2021-06-10 13:36+0000\n"
 "Last-Translator: Daniel Yohan <dyohan9@gmail.com>, 2021\n"
 "Language-Team: Portuguese (Brazil) (https://www.transifex.com/bothub/"
@@ -21,60 +21,63 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: connect/api/v1/account/serializers.py:34
+#: connect/api/v1/account/serializers.py:36
 msgid "ID"
 msgstr "Identificador"
 
-#: connect/api/v1/account/serializers.py:35
+#: connect/api/v1/account/serializers.py:37
 msgid "Username"
 msgstr "Nome do usuário"
 
-#: connect/api/v1/account/serializers.py:36
+#: connect/api/v1/account/serializers.py:38
 #: connect/api/v1/organization/serializers.py:267
-#: connect/api/v1/project/serializers.py:343
+#: connect/api/v1/project/serializers.py:342
 #: connect/api/v2/internals/serializers.py:103
 msgid "Email"
 msgstr "E-mail"
 
-#: connect/api/v1/account/serializers.py:37
+#: connect/api/v1/account/serializers.py:39
 #: connect/api/v1/organization/serializers.py:270
-#: connect/api/v1/project/serializers.py:346
+#: connect/api/v1/project/serializers.py:345
 msgid "User photo"
 msgstr "Foto do usuário"
 
-#: connect/api/v1/account/serializers.py:40 connect/authentication/models.py:88
+#: connect/api/v1/account/serializers.py:42 connect/authentication/models.py:94
 msgid "Phone Prefix Country"
 msgstr "Prefixo de telefone do país"
 
-#: connect/api/v1/account/serializers.py:41 connect/authentication/models.py:89
+#: connect/api/v1/account/serializers.py:43 connect/authentication/models.py:95
 msgid "Phone prefix of the user"
 msgstr "Prefixo do telefone do usuário"
 
-#: connect/api/v1/account/serializers.py:45 connect/authentication/models.py:94
+#: connect/api/v1/account/serializers.py:47
+#: connect/authentication/models.py:100
 msgid "Telephone Number"
 msgstr "Número de Telefone"
 
-#: connect/api/v1/account/serializers.py:46 connect/authentication/models.py:95
+#: connect/api/v1/account/serializers.py:48
+#: connect/authentication/models.py:101
 msgid "Phone number of the user; include area code"
 msgstr "Número de telefone do usuário; Incluindo o código de área"
 
-#: connect/api/v1/account/serializers.py:90
+#: connect/api/v1/account/serializers.py:100
 msgid "Password"
 msgstr "Senha"
 
-#: connect/api/v1/account/serializers.py:95 connect/authentication/models.py:75
+#: connect/api/v1/account/serializers.py:105
+#: connect/authentication/models.py:81
 msgid "Language"
 msgstr "Idioma"
 
-#: connect/api/v1/account/views.py:102 connect/api/v1/account/views.py:107
+#: connect/api/v1/account/views.py:108 connect/api/v1/account/views.py:113
 msgid "We accept images only in the formats: .png, .jpeg, .gif"
 msgstr "Aceitamos imagens apenas nos formatos: .png, .jpeg, .gif"
 
-#: connect/api/v1/account/views.py:144
+#: connect/api/v1/account/views.py:150
 msgid "System temporarily unavailable, please try again later."
 msgstr "Sistema temporariamente indisponível, tente novamente mais tarde."
 
-#: connect/api/v1/account/views.py:265
+#: connect/api/v1/account/views.py:345
 msgid "The search field needed the text to search."
 msgstr "O campo de pesquisa precisa do texto para pesquisar."
 
@@ -117,18 +120,18 @@ msgstr "UUID de organização inválido"
 msgid "Invalid Organization UUID"
 msgstr "UUID de organização inválido"
 
-#: connect/api/v1/organization/serializers.py:58 connect/common/models.py:1263
+#: connect/api/v1/organization/serializers.py:58 connect/common/models.py:1399
 msgid "billing cycle"
 msgstr "ciclo de pagamento"
 
-#: connect/api/v1/organization/serializers.py:63 connect/common/models.py:1269
-#: connect/common/models.py:1979
+#: connect/api/v1/organization/serializers.py:63 connect/common/models.py:1405
+#: connect/common/models.py:2121
 msgid "payment method"
 msgstr "método de pagamento"
 
 #: connect/api/v1/organization/serializers.py:69
 #: connect/api/v1/organization/serializers.py:129
-#: connect/api/v2/organizations/serializers.py:51 connect/common/models.py:1278
+#: connect/api/v2/organizations/serializers.py:51 connect/common/models.py:1414
 msgid "plan"
 msgstr "plano"
 
@@ -142,7 +145,7 @@ msgid "is suspended"
 msgstr "está suspenso"
 
 #: connect/api/v1/organization/serializers.py:138
-#: connect/api/v2/organizations/serializers.py:60 connect/common/models.py:134
+#: connect/api/v2/organizations/serializers.py:60 connect/common/models.py:135
 msgid "Whether this organization is currently suspended."
 msgstr "Se esta organização está atualmente suspensa."
 
@@ -160,41 +163,41 @@ msgstr ""
 
 #: connect/api/v1/organization/serializers.py:282
 #: connect/api/v1/organization/serializers.py:306
-#: connect/api/v1/project/serializers.py:303
-#: connect/api/v1/project/serializers.py:381
-#: connect/api/v1/project/serializers.py:402
+#: connect/api/v1/project/serializers.py:302
+#: connect/api/v1/project/serializers.py:380
+#: connect/api/v1/project/serializers.py:401
 #: connect/api/v2/internals/serializers.py:115
 #: connect/api/v2/internals/serializers.py:139
 msgid "You cannot set user role 0"
 msgstr "Você não pode definir o papel do usuário 0"
 
 #: connect/api/v1/organization/serializers.py:312
-#: connect/api/v1/project/serializers.py:309
+#: connect/api/v1/project/serializers.py:308
 msgid "Email field cannot have spaces"
 msgstr ""
 
 #: connect/api/v1/organization/serializers.py:317
-#: connect/api/v1/project/serializers.py:314
+#: connect/api/v1/project/serializers.py:313
 msgid "Email field cannot have uppercase characters"
 msgstr ""
 
-#: connect/api/v1/organization/views.py:323 connect/api/v1/project/views.py:160
+#: connect/api/v1/organization/views.py:339 connect/api/v1/project/views.py:160
 msgid "Need to pass 'before' and 'after' in query params"
 msgstr "É necessário passar os campos 'before' e 'after' nos query params"
 
-#: connect/api/v1/organization/views.py:388
+#: connect/api/v1/organization/views.py:404
 msgid "Need to pass 'organization_uuid'"
 msgstr "solicitar permissão organização"
 
-#: connect/api/v1/organization/views.py:588
+#: connect/api/v1/organization/views.py:605
 msgid "No changes received"
 msgstr "Nenhuma mudança recebida"
 
-#: connect/api/v1/project/serializers.py:276
+#: connect/api/v1/project/serializers.py:275
 msgid "Text Search"
 msgstr "Pesquisa de texto"
 
-#: connect/api/v1/project/serializers.py:278
+#: connect/api/v1/project/serializers.py:277
 msgid "Project UUID"
 msgstr "UUID do Projeto"
 
@@ -206,143 +209,152 @@ msgstr "Você não pode contribuir nesta organização"
 msgid "Your organization is suspended"
 msgstr "Sua organização está suspensa"
 
-#: connect/authentication/models.py:47 connect/common/models.py:891
-#: connect/common/models.py:946
+#: connect/authentication/models.py:53 connect/common/models.py:1027
+#: connect/common/models.py:1082
 msgid "user"
 msgstr "usuário"
 
-#: connect/authentication/models.py:48
+#: connect/authentication/models.py:54
 msgid "users"
 msgstr "usuários"
 
-#: connect/authentication/models.py:53
+#: connect/authentication/models.py:59
 msgid "first name"
 msgstr "primeiro nome"
 
-#: connect/authentication/models.py:54
+#: connect/authentication/models.py:60
 msgid "last name"
 msgstr "sobrenome"
 
-#: connect/authentication/models.py:55 connect/common/models.py:1052
-#: connect/common/models.py:1063 connect/common/models.py:1170
-#: connect/common/models.py:1185
+#: connect/authentication/models.py:61 connect/common/models.py:1188
+#: connect/common/models.py:1199 connect/common/models.py:1306
+#: connect/common/models.py:1321
 msgid "email"
 msgstr "email"
 
-#: connect/authentication/models.py:55
+#: connect/authentication/models.py:61
 msgid "User's email."
 msgstr "Email do usuário."
 
-#: connect/authentication/models.py:58
+#: connect/authentication/models.py:64
 msgid "username"
 msgstr "nome do usuário"
 
-#: connect/authentication/models.py:62
+#: connect/authentication/models.py:68
 msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
 "Obrigatório. 150 caracteres ou menos. Letras, dígitos e @ /. / + / - / _ "
 "apenas."
 
-#: connect/authentication/models.py:66
+#: connect/authentication/models.py:72
 msgid "A user with that username already exists."
 msgstr "Um usuário com esse nome já existe."
 
-#: connect/authentication/models.py:71
+#: connect/authentication/models.py:77
 msgid "photo user"
 msgstr "foto do usuário"
 
-#: connect/authentication/models.py:79
+#: connect/authentication/models.py:85
 msgid "The primary language used by this user"
 msgstr "O idioma principal usado por este usuário"
 
-#: connect/authentication/models.py:82
+#: connect/authentication/models.py:88
 msgid "staff status"
 msgstr "status da equipe"
 
-#: connect/authentication/models.py:83
+#: connect/authentication/models.py:89
 msgid "active"
 msgstr "ativo"
 
-#: connect/authentication/models.py:85
+#: connect/authentication/models.py:91
 msgid "joined at"
 msgstr "juntou-se a"
 
-#: connect/authentication/models.py:100
+#: connect/authentication/models.py:106
 msgid "Last Updated Profile"
 msgstr "Última atualização de perfil"
 
-#: connect/authentication/models.py:104
+#: connect/authentication/models.py:110
 msgid "UTM Marketing"
 msgstr "UTM Marketing"
 
-#: connect/authentication/models.py:106
+#: connect/authentication/models.py:112
 msgid "Allows receiving marketing emails"
 msgstr "Permite o recebimento de e-mails de marketing"
 
-#: connect/authentication/models.py:108
+#: connect/authentication/models.py:114
 msgid "Two factor authentication"
 msgstr "Autenticação de dois fatores"
 
-#: connect/authentication/models.py:111
+#: connect/authentication/models.py:117
 #, fuzzy
 #| msgid "contact name"
 msgid "company name"
 msgstr "nome do contato"
 
-#: connect/authentication/models.py:117
+#: connect/authentication/models.py:123
 msgid "number of people"
 msgstr "número de pessoas"
 
-#: connect/authentication/models.py:118
+#: connect/authentication/models.py:124
 msgid "number of people working in this company"
 msgstr "número de pessoas trabalhando nesta empresa"
 
-#: connect/authentication/models.py:123
+#: connect/authentication/models.py:129
 msgid "company sector"
 msgstr "setor da empresa"
 
-#: connect/authentication/models.py:129
+#: connect/authentication/models.py:135
 msgid "weni helps"
 msgstr "weni helps"
 
-#: connect/authentication/models.py:130
+#: connect/authentication/models.py:136
 msgid "how the weni platform will help your team"
 msgstr "como a plataforma weni vai ajudar seu time"
 
-#: connect/authentication/models.py:136
+#: connect/authentication/models.py:142
 msgid "company segment"
 msgstr "segmento da empresa"
 
-#: connect/authentication/models.py:137
+#: connect/authentication/models.py:143
 msgid "the segment of your company"
 msgstr "o segmento da sua empresa"
 
-#: connect/authentication/models.py:143
+#: connect/authentication/models.py:149
 #, fuzzy
 #| msgid "company sector"
 msgid "company position"
 msgstr "setor da empresa"
 
-#: connect/authentication/models.py:144
+#: connect/authentication/models.py:150
 #, fuzzy
 #| msgid "number of people working in this company"
 msgid "Your position in the company"
 msgstr "número de pessoas trabalhando nesta empresa"
 
-#: connect/authentication/models.py:164
+#: connect/authentication/models.py:173
 msgid "Password changed"
 msgstr "Senha alterada"
 
-#: connect/authentication/models.py:182
+#: connect/authentication/models.py:191
 msgid "Nickname changed"
 msgstr "Nome de usuário alterado"
 
-#: connect/authentication/templates/authentication/emails/access_code.html:16
-#: connect/authentication/templates/authentication/emails/access_code.txt:2
+#: connect/authentication/models.py:290
+#: connect/authentication/templates/authentication/emails/verify_email.html:40
+#: connect/authentication/templates/authentication/emails/verify_email.txt:6
+msgid "Confirm your registration at Weni"
+msgstr "Confirme seu cadastro na Weni"
+
+#: connect/authentication/templates/authentication/emails/access_code_en-us.html:16
+#: connect/authentication/templates/authentication/emails/access_code_en-us.txt:2
+#: connect/authentication/templates/authentication/emails/access_code_pt-br.txt:2
 #: connect/authentication/templates/authentication/emails/change_password.html:6
 #: connect/authentication/templates/authentication/emails/change_password.txt:2
 #: connect/authentication/templates/authentication/emails/nickname_changed.html:8
 #: connect/authentication/templates/authentication/emails/nickname_changed.txt:2
+#: connect/authentication/templates/authentication/emails/verify_email.html:16
+#: connect/authentication/templates/authentication/emails/verify_email.txt:4
 #: connect/billing/templates/billing/emails/added_card.html:7
 #: connect/billing/templates/billing/emails/added_card.txt:2
 #: connect/billing/templates/billing/emails/advanced_plan_is_about_to_expire.html:16
@@ -387,12 +399,13 @@ msgstr "Nome de usuário alterado"
 msgid "Hi"
 msgstr "Oi"
 
-#: connect/authentication/templates/authentication/emails/access_code.html:40
+#: connect/authentication/templates/authentication/emails/access_code_en-us.html:40
 msgid "Enter the access code below on the Weni platform"
 msgstr "Digite o código de acesso abaixo na plataforma Weni"
 
-#: connect/authentication/templates/authentication/emails/access_code.html:54
-#: connect/authentication/templates/authentication/emails/access_code.txt:4
+#: connect/authentication/templates/authentication/emails/access_code_en-us.html:54
+#: connect/authentication/templates/authentication/emails/access_code_en-us.txt:4
+#: connect/authentication/templates/authentication/emails/access_code_pt-br.txt:4
 msgid ""
 "You receive an access code to Weni Platform. When adding a organization in "
 "system press on "
@@ -400,13 +413,15 @@ msgstr ""
 "Você recebeu um código de acesso para a Plataforma Weni. Ao adicionar uma "
 "organização no sistema aperte em "
 
-#: connect/authentication/templates/authentication/emails/access_code.html:55
-#: connect/authentication/templates/authentication/emails/access_code.txt:5
+#: connect/authentication/templates/authentication/emails/access_code_en-us.html:55
+#: connect/authentication/templates/authentication/emails/access_code_en-us.txt:5
+#: connect/authentication/templates/authentication/emails/access_code_pt-br.txt:5
 msgid "Enter access code on Custom Plan"
 msgstr "Digite o código de acesso do Plano Personalizado"
 
-#: connect/authentication/templates/authentication/emails/access_code.html:56
-#: connect/authentication/templates/authentication/emails/access_code.txt:5
+#: connect/authentication/templates/authentication/emails/access_code_en-us.html:56
+#: connect/authentication/templates/authentication/emails/access_code_en-us.txt:5
+#: connect/authentication/templates/authentication/emails/access_code_pt-br.txt:5
 msgid " and apply the access code in text field"
 msgstr " e aplique o código de acesso no campo de texto"
 
@@ -460,12 +475,34 @@ msgstr " para "
 msgid " we hope you like your new nickname"
 msgstr " nós esperamos que você goste do seu novo nome de usuário"
 
-#: connect/billing/models.py:18 connect/billing/models.py:40
-#: connect/billing/models.py:83 connect/billing/models.py:102
-#: connect/common/models.py:125 connect/common/models.py:453
-#: connect/common/models.py:574 connect/common/models.py:988
-#: connect/common/models.py:2171 connect/common/models.py:2177
-#: connect/common/models.py:2180
+#: connect/authentication/templates/authentication/emails/verify_email.html:54
+#: connect/authentication/templates/authentication/emails/verify_email.txt:8
+msgid "We're happy to have you with us! To continue accessing your account, check your e-mail address by clicking on the button below."
+msgstr "Estamos felizes por tê-lo conosco! Para continuar acessando sua conta, verifique seu endereço de e-mail clicando no botão abaixo."
+
+#: connect/authentication/templates/authentication/emails/verify_email.html:55
+#: connect/authentication/templates/authentication/emails/verify_email.txt:9
+msgid "Stay tuned, the link expires in 5 minutes!"
+msgstr "Fique atento, pois o link expira em 5 minutos!"
+
+#: connect/authentication/templates/authentication/emails/verify_email.html:59
+#: connect/authentication/templates/authentication/emails/verify_email.txt:11
+msgid "Click here to confirm your email"
+msgstr "Clique aqui para confirmar seu e-mail"
+
+#: connect/authentication/templates/authentication/emails/verify_email.html:71
+msgid "If the button doesn't work"
+msgstr "Se o botão não funcionar"
+
+#: connect/authentication/templates/authentication/emails/verify_email.html:74
+msgid "click here"
+msgstr "clique aqui"
+
+#: connect/billing/models.py:18 connect/billing/models.py:52
+#: connect/billing/models.py:66 connect/common/models.py:126
+#: connect/common/models.py:559 connect/common/models.py:684
+#: connect/common/models.py:1124 connect/common/models.py:2313
+#: connect/common/models.py:2319 connect/common/models.py:2322
 msgid "UUID"
 msgstr "UUID"
 
@@ -501,34 +538,18 @@ msgstr "antes"
 msgid "after"
 msgstr "depois"
 
-#: connect/billing/models.py:36
-msgid "WhatsApp"
-msgstr "WhatsApp"
-
-#: connect/billing/models.py:37
-msgid "Telegram"
-msgstr "Telegram"
-
-#: connect/billing/models.py:43
-msgid "channel_type"
-msgstr "tipo de canal"
-
-#: connect/billing/models.py:45
-msgid "channel id"
-msgstr "id do canal"
-
-#: connect/billing/models.py:85 connect/billing/models.py:108
-#: connect/common/models.py:588
+#: connect/billing/models.py:54 connect/billing/models.py:72
+#: connect/common/models.py:698
 msgid "flow identification UUID"
 msgstr "UUID de identificação de fluxo"
 
-#: connect/billing/models.py:86 connect/billing/models.py:107
+#: connect/billing/models.py:55 connect/billing/models.py:71
 msgid "contact name"
 msgstr "nome do contato"
 
 #: connect/billing/templates/billing/emails/added_card.html:14
 #: connect/billing/templates/billing/emails/added_card.txt:3
-#: connect/common/models.py:1564
+#: connect/common/models.py:1706
 msgid "A credit card has been added to the organization"
 msgstr "Um cartão de crédito foi adicionado à organização"
 
@@ -718,7 +739,7 @@ msgstr "A organização"
 
 #: connect/billing/templates/billing/emails/free-plan-expired.html:40
 #: connect/billing/templates/billing/emails/free-plan-expired.txt:3
-#: connect/common/models.py:1710
+#: connect/common/models.py:1852
 msgid "has already surpassed 200 active contacts"
 msgstr "já ultrapassou 200 contatos ativos"
 
@@ -762,7 +783,7 @@ msgstr ""
 #: connect/billing/templates/billing/emails/plan_is_about_to_expire_en.html:41
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.html:42
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:3
-#: connect/common/models.py:1708 connect/common/models.py:1730
+#: connect/common/models.py:1850 connect/common/models.py:1872
 msgid "Your organization"
 msgstr "Sua organização"
 
@@ -960,599 +981,611 @@ msgstr "e escolha um plano que se adapte às suas necessidades comerciais."
 msgid "Olá"
 msgstr ""
 
-#: connect/common/models.py:40
+#: connect/common/models.py:41
 msgid "newsletter"
 msgstr "boletim informativo"
 
-#: connect/common/models.py:41
+#: connect/common/models.py:42
 msgid "newsletters"
 msgstr "boletim informativo"
 
-#: connect/common/models.py:43 connect/common/models.py:66
-#: connect/common/models.py:132 connect/common/models.py:462
-#: connect/common/models.py:598 connect/common/models.py:900
-#: connect/common/models.py:954 connect/common/models.py:1008
-#: connect/common/models.py:1122 connect/common/models.py:1148
-#: connect/common/models.py:1159 connect/common/models.py:2281
+#: connect/common/models.py:44 connect/common/models.py:67
+#: connect/common/models.py:133 connect/common/models.py:568
+#: connect/common/models.py:708 connect/common/models.py:1036
+#: connect/common/models.py:1090 connect/common/models.py:1144
+#: connect/common/models.py:1258 connect/common/models.py:1284
+#: connect/common/models.py:1295 connect/common/models.py:2423
 msgid "created at"
 msgstr "criado em"
 
-#: connect/common/models.py:51
+#: connect/common/models.py:52
 msgid "dashboard newsletter language"
 msgstr "linguagem do boletim informativo do painel"
 
-#: connect/common/models.py:52
+#: connect/common/models.py:53
 msgid "newsletter languages"
 msgstr "linguagem do boletim informativo"
 
-#: connect/common/models.py:56
+#: connect/common/models.py:57
 msgid "language"
 msgstr "língua"
 
-#: connect/common/models.py:61 connect/common/models.py:2273
+#: connect/common/models.py:62 connect/common/models.py:2415
 msgid "title"
 msgstr "título"
 
-#: connect/common/models.py:62 connect/common/models.py:2274
+#: connect/common/models.py:63 connect/common/models.py:2416
 msgid "description"
 msgstr "descrição"
 
-#: connect/common/models.py:121
+#: connect/common/models.py:122
 msgid "organization"
 msgstr "organização"
 
-#: connect/common/models.py:122
+#: connect/common/models.py:123
 msgid "organizations"
 msgstr "organizações"
 
-#: connect/common/models.py:127
+#: connect/common/models.py:128
 msgid "organization name"
 msgstr "nome da organização"
 
-#: connect/common/models.py:128
+#: connect/common/models.py:129
 msgid "organization description"
 msgstr "descrição da organização"
 
-#: connect/common/models.py:130
+#: connect/common/models.py:131
 msgid "inteligence organization id"
 msgstr "ID da organização de inteligência"
 
-#: connect/common/models.py:136 connect/common/models.py:2000
+#: connect/common/models.py:137 connect/common/models.py:2142
 msgid "Whatsapp Extra Integration"
 msgstr "Integração de whatsapp extra"
 
-#: connect/common/models.py:137
+#: connect/common/models.py:138
 msgid "Only users with 2fa can access the organization"
 msgstr ""
 "Apenas usuários com autenticação de dois fatores ativada pode acessar a "
 "organização"
 
-#: connect/common/models.py:170 connect/common/models.py:859
+#: connect/common/models.py:171 connect/common/models.py:995
 msgid "Invitation to join organization"
 msgstr "Convite para participar de organização"
 
-#: connect/common/models.py:191
-msgid "You are leaving"
+#: connect/common/models.py:197
+#, fuzzy, python-brace-format
+#| msgid "You are leaving"
+msgid "You are leaving {self.name}"
 msgstr "Você está deixando a organização "
 
-#: connect/common/models.py:210 connect/common/models.py:251
+#: connect/common/models.py:219 connect/common/models.py:291
 msgid "You have been removed from"
 msgstr "Você foi removido(a) de "
 
-#: connect/common/models.py:230
-msgid "Organization created!"
-msgstr "Organização criada!"
+#: connect/common/models.py:264
+#, fuzzy, python-brace-format
+#| msgid "You just gave life to"
+msgid "You just gave life to {self.name}"
+msgstr "Você acaba de dar vida à"
 
-#: connect/common/models.py:273
-msgid "no longer exists!"
-msgstr "não existe mais"
+#: connect/common/models.py:337
+#, fuzzy
+#| msgid "Organization {} does not exist"
+msgid "The organization { self.name } no longer exists"
+msgstr "Organização {} não existe"
 
-#: connect/common/models.py:302
-msgid "is now"
-msgstr "agora se chama"
+#: connect/common/models.py:389
+#, python-brace-format
+msgid "{prev_name} is now named {new_name}!"
+msgstr ""
 
-#: connect/common/models.py:324
+#: connect/common/models.py:420
 msgid "You receive an access code to Weni Platform"
 msgstr "Você recebeu um código de acesso para a plataforma Weni"
 
-#: connect/common/models.py:347
-#: connect/common/templates/common/emails/organization/permission_change.html:39
-#: connect/common/templates/common/emails/organization/permission_change.txt:3
-msgid "A new permission has been assigned to you"
-msgstr "Uma nova permissão foi atribuida a você"
+#: connect/common/models.py:450
+#, fuzzy
+#| msgid "has updated your permission"
+msgid "An administrator of {self.name } has updated your permission"
+msgstr "atualizou sua permissão"
 
-#: connect/common/models.py:439
+#: connect/common/models.py:545
 msgid "organization authorization"
 msgstr "autorização da organização"
 
-#: connect/common/models.py:440
+#: connect/common/models.py:546
 msgid "organization authorizations"
 msgstr "autorizações de organização"
 
-#: connect/common/models.py:444 connect/common/models.py:890
-#: connect/common/models.py:945 connect/common/models.py:980
+#: connect/common/models.py:550 connect/common/models.py:1026
+#: connect/common/models.py:1081 connect/common/models.py:1116
 msgid "not set"
 msgstr "não configurado"
 
-#: connect/common/models.py:445 connect/common/models.py:982
+#: connect/common/models.py:551 connect/common/models.py:1118
 msgid "contributor"
 msgstr "contribuinte"
 
-#: connect/common/models.py:446 connect/common/models.py:892
-#: connect/common/models.py:948
+#: connect/common/models.py:552 connect/common/models.py:1028
+#: connect/common/models.py:1084
 msgid "admin"
 msgstr "administrador"
 
-#: connect/common/models.py:447 connect/common/models.py:981
+#: connect/common/models.py:553 connect/common/models.py:1117
 msgid "viewer"
 msgstr "visualizador"
 
-#: connect/common/models.py:448
+#: connect/common/models.py:554
 msgid "financial"
 msgstr "financeiro"
 
-#: connect/common/models.py:449 connect/common/models.py:563
-#: connect/common/models.py:984
+#: connect/common/models.py:555 connect/common/models.py:671
+#: connect/common/models.py:1120
 msgid "support"
 msgstr "suporte"
 
-#: connect/common/models.py:460 connect/common/models.py:898
-#: connect/common/models.py:952 connect/common/models.py:1006
-#: connect/common/models.py:1054 connect/common/models.py:1065
-#: connect/common/models.py:1173 connect/common/models.py:1188
+#: connect/common/models.py:566 connect/common/models.py:1034
+#: connect/common/models.py:1088 connect/common/models.py:1142
+#: connect/common/models.py:1190 connect/common/models.py:1201
+#: connect/common/models.py:1309 connect/common/models.py:1324
 msgid "role"
 msgstr "função"
 
-#: connect/common/models.py:463
+#: connect/common/models.py:569
 msgid "2 factor authentication"
 msgstr "autenticação de dois fatores"
 
-#: connect/common/models.py:546
+#: connect/common/models.py:652
 msgid "project"
 msgstr "projeto"
 
-#: connect/common/models.py:564
+#: connect/common/models.py:672
 msgid "lead capture"
 msgstr ""
 
-#: connect/common/models.py:576
+#: connect/common/models.py:673
+msgid "lead_capture+chatgpt"
+msgstr ""
+
+#: connect/common/models.py:686
 msgid "project name"
 msgstr "Nome do Projeto"
 
-#: connect/common/models.py:580
+#: connect/common/models.py:690
 #: connect/common/templates/common/emails/project/project-changed.html:135
 #: connect/common/templates/common/emails/project/project-changed.txt:12
 msgid "Timezone"
 msgstr "Fuso horário"
 
-#: connect/common/models.py:582
+#: connect/common/models.py:692
 msgid "Date Format"
 msgstr "Formato de data"
 
-#: connect/common/models.py:586
+#: connect/common/models.py:696
 msgid "Whether day comes first or month comes first in dates"
 msgstr "Se o dia vem primeiro ou o mês vem primeiro nas datas"
 
-#: connect/common/models.py:590
+#: connect/common/models.py:700
 msgid "flow identification ID"
 msgstr "ID de identificação de fluxo"
 
-#: connect/common/models.py:592
+#: connect/common/models.py:702
 msgid "Intelligence count"
 msgstr "Contagem de inteligência"
 
-#: connect/common/models.py:593
+#: connect/common/models.py:703
 msgid "Flows count"
 msgstr "Contagem de fluxos"
 
-#: connect/common/models.py:594
+#: connect/common/models.py:704
 msgid "Contacts count"
 msgstr "Contagem de contatos"
 
-#: connect/common/models.py:596
+#: connect/common/models.py:706
 msgid "Contacts count of all time"
 msgstr "Contagem total de contatos"
 
-#: connect/common/models.py:600
+#: connect/common/models.py:710
 msgid "Whatsapp Integrations"
 msgstr "Integrações de Whatsapp"
 
-#: connect/common/models.py:611
+#: connect/common/models.py:721
 msgid "Template type"
 msgstr ""
 
-#: connect/common/models.py:614
+#: connect/common/models.py:724
 #, fuzzy
 #| msgid "Project Name"
 msgid "Project template type"
 msgstr "Nome do Projeto"
 
-#: connect/common/models.py:664
-#, python-brace-format
-msgid "You have been invited to join the {self.name} organization"
-msgstr "Você foi convidado a ingressar na organização {self.name}"
+#: connect/common/models.py:805
+#: connect/common/templates/common/emails/project/project_create.html:39
+#: connect/common/templates/common/emails/project/project_create.txt:3
+msgid "Your project has been successfully created!"
+msgstr "Seu projeto foi criado com sucesso!"
 
-#: connect/common/models.py:708
+#: connect/common/models.py:857
 #, python-brace-format
 msgid "The project {self.name} has changed"
 msgstr "O projeto {self.name} foi alterado"
 
-#: connect/common/models.py:728
+#: connect/common/models.py:877
 msgid "A project was deleted..."
 msgstr "Um projeto foi apagado..."
 
-#: connect/common/models.py:873
+#: connect/common/models.py:1009
 msgid "Day"
 msgstr "Dia"
 
-#: connect/common/models.py:893 connect/common/models.py:947
+#: connect/common/models.py:1029 connect/common/models.py:1083
 msgid "agent"
 msgstr "agente"
 
-#: connect/common/models.py:894
+#: connect/common/models.py:1030
 msgid "service manager"
 msgstr "gestor de serviços"
 
-#: connect/common/models.py:949
+#: connect/common/models.py:1085
 #, fuzzy
 #| msgid "service manager"
 msgid "service_manager"
 msgstr "gestor de serviços"
 
-#: connect/common/models.py:983
+#: connect/common/models.py:1119
 msgid "moderator"
 msgstr "moderador"
 
-#: connect/common/models.py:985
+#: connect/common/models.py:1121
 #, fuzzy
 #| msgid "photo user"
 msgid "Chat user"
 msgstr "foto do usuário"
 
-#: connect/common/models.py:1075
+#: connect/common/models.py:1211
 msgid "service"
 msgstr "serviço"
 
-#: connect/common/models.py:1084
+#: connect/common/models.py:1220
 msgid "Flows service"
 msgstr "Serviço de fluxos"
 
-#: connect/common/models.py:1088
+#: connect/common/models.py:1224
 msgid "Inteligence Service"
 msgstr "Serviço de inteligência"
 
-#: connect/common/models.py:1092
+#: connect/common/models.py:1228
 msgid "Chat Service"
 msgstr "Serviço de chat"
 
-#: connect/common/models.py:1103
+#: connect/common/models.py:1239
 msgid "Region Ireland"
 msgstr "Região Irlanda"
 
-#: connect/common/models.py:1107
+#: connect/common/models.py:1243
 msgid "Region Virginia"
 msgstr "Região Virgínia"
 
-#: connect/common/models.py:1111
+#: connect/common/models.py:1247
 msgid "Region São Paulo"
 msgstr "Região São Paulo"
 
-#: connect/common/models.py:1115
+#: connect/common/models.py:1251
 msgid "service url"
 msgstr "url de serviço"
 
-#: connect/common/models.py:1117
+#: connect/common/models.py:1253
 msgid "service type"
 msgstr "tipo de serviço"
 
-#: connect/common/models.py:1123
+#: connect/common/models.py:1259
 msgid "standard service for all projects"
 msgstr "serviço padrão para todos os projetos"
 
-#: connect/common/models.py:1125
+#: connect/common/models.py:1261
 msgid "service region"
 msgstr "região de serviço"
 
-#: connect/common/models.py:1131
+#: connect/common/models.py:1267
 msgid "Define if the service is under maintenance"
 msgstr "Defina se o serviço está em manutenção"
 
-#: connect/common/models.py:1134
+#: connect/common/models.py:1270
 msgid "date start maintenance"
 msgstr "data de início da manutenção"
 
-#: connect/common/models.py:1143
+#: connect/common/models.py:1279
 msgid "log service"
 msgstr "serviço de log"
 
-#: connect/common/models.py:1144
+#: connect/common/models.py:1280
 msgid "log services"
 msgstr "serviço de log"
 
-#: connect/common/models.py:1147
+#: connect/common/models.py:1283
 msgid "status service"
 msgstr "serviço de status"
 
-#: connect/common/models.py:1153
+#: connect/common/models.py:1289
 msgid "service status"
 msgstr "status do serviço"
 
-#: connect/common/models.py:1167
+#: connect/common/models.py:1303
 msgid "request permission organization"
 msgstr "solicitar permissão organização"
 
-#: connect/common/models.py:1182
+#: connect/common/models.py:1318
 msgid "request permission project"
 msgstr "Requisição de permissão de projeto"
 
-#: connect/common/models.py:1200
+#: connect/common/models.py:1336
 msgid "organization billing plan"
 msgstr "plano de faturamento da organização"
 
-#: connect/common/models.py:1213 connect/common/models.py:1251
+#: connect/common/models.py:1349 connect/common/models.py:1387
 msgid "free"
 msgstr "grátis"
 
-#: connect/common/models.py:1214
+#: connect/common/models.py:1350
 msgid "single"
 msgstr "único"
 
-#: connect/common/models.py:1215
+#: connect/common/models.py:1351
 msgid "monthly"
 msgstr "mensal"
 
-#: connect/common/models.py:1216
+#: connect/common/models.py:1352
 msgid "quarterly"
 msgstr "trimestral"
 
-#: connect/common/models.py:1217
+#: connect/common/models.py:1353
 msgid "semester"
 msgstr "semestral"
 
-#: connect/common/models.py:1218
+#: connect/common/models.py:1354
 msgid "annual"
 msgstr "anual"
 
-#: connect/common/models.py:1219
+#: connect/common/models.py:1355
 msgid "bienal"
 msgstr "bienal"
 
-#: connect/common/models.py:1220
+#: connect/common/models.py:1356
 msgid "trienal"
 msgstr "trienal"
 
-#: connect/common/models.py:1238
+#: connect/common/models.py:1374
 msgid "credit card"
 msgstr "cartão de crédito"
 
-#: connect/common/models.py:1239
+#: connect/common/models.py:1375
 msgid "payment slip"
 msgstr "boleto de pagamento"
 
-#: connect/common/models.py:1252
+#: connect/common/models.py:1388
 msgid "trial"
 msgstr "trial"
 
-#: connect/common/models.py:1253
+#: connect/common/models.py:1389
 #, fuzzy
 #| msgid "started at"
 msgid "start"
 msgstr "criado em"
 
-#: connect/common/models.py:1254
+#: connect/common/models.py:1390
 msgid "scale"
 msgstr "scale"
 
-#: connect/common/models.py:1255
+#: connect/common/models.py:1391
 #, fuzzy
 #| msgid "canceled"
 msgid "advanced"
 msgstr "cancelado"
 
-#: connect/common/models.py:1256
+#: connect/common/models.py:1392
 msgid "enterprise"
 msgstr "empresarial"
 
-#: connect/common/models.py:1271
+#: connect/common/models.py:1407
 msgid "last invoice"
 msgstr "última fatura"
 
-#: connect/common/models.py:1272
+#: connect/common/models.py:1408
 msgid "next due date"
 msgstr "próxima data de vencimento"
 
-#: connect/common/models.py:1273
+#: connect/common/models.py:1409
 msgid "termination date"
 msgstr "data de finalização"
 
-#: connect/common/models.py:1275
+#: connect/common/models.py:1411
 msgid "notes administration"
 msgstr "administrador de notas"
 
-#: connect/common/models.py:1277
+#: connect/common/models.py:1413
 msgid "fixed discount"
 msgstr "desconto fixado"
 
-#: connect/common/models.py:1279
+#: connect/common/models.py:1415
 msgid "date of contract plan"
 msgstr "data de contratação do plano"
 
-#: connect/common/models.py:1280
+#: connect/common/models.py:1416
 msgid "active plan"
 msgstr "plano ativo"
 
-#: connect/common/models.py:1282
+#: connect/common/models.py:1418
 msgid "Stripe Customer"
 msgstr "Cliente Stripe"
 
-#: connect/common/models.py:1286
+#: connect/common/models.py:1422
 msgid "Our Stripe customer id for your organization"
 msgstr "Nosso id do cliente do stripe para sua organização"
 
-#: connect/common/models.py:1289
+#: connect/common/models.py:1425
 msgid "Stripe Customer Configured Card"
 msgstr "Cartãod do cliente no stripe configurado"
 
-#: connect/common/models.py:1292
+#: connect/common/models.py:1428
 msgid "Final Card Number"
 msgstr "números do final do cartão"
 
-#: connect/common/models.py:1295
+#: connect/common/models.py:1431
 msgid "Card Expiration Date"
 msgstr "Data de expiração do cartão"
 
-#: connect/common/models.py:1298
+#: connect/common/models.py:1434
 msgid "Cardholder Name"
 msgstr "Nome no cartão"
 
-#: connect/common/models.py:1301
+#: connect/common/models.py:1437
 msgid "Card Brand"
 msgstr "Bandeira do cartão"
 
-#: connect/common/models.py:1312
+#: connect/common/models.py:1448
 msgid "Additional billing information"
 msgstr "Informações adicionais de faturamento"
 
-#: connect/common/models.py:1318
+#: connect/common/models.py:1454
 msgid "Card is valid"
 msgstr "Cartão é válido"
 
-#: connect/common/models.py:1319
+#: connect/common/models.py:1455
 #, fuzzy
 #| msgid "paid date"
 msgid "Trial end date"
 msgstr "data de pagamento"
 
-#: connect/common/models.py:1453
+#: connect/common/models.py:1591
 msgid "Unable to make payment"
 msgstr "Não pode fazer o pagamento"
 
-#: connect/common/models.py:1582
+#: connect/common/models.py:1724
 msgid "A credit card has been updated in the organization"
 msgstr "Um cartão de crédito foi atualizado na organização"
 
-#: connect/common/models.py:1613
+#: connect/common/models.py:1755
 #, fuzzy
 #| msgid "Your organization's plan has expired"
 msgid "Your organization's plan has ended"
 msgstr "O plano da sua organização expirou"
 
-#: connect/common/models.py:1617
+#: connect/common/models.py:1759
 msgid "O plano da sua organização foi encerrado."
 msgstr ""
 
-#: connect/common/models.py:1649
+#: connect/common/models.py:1791
 msgid "Your organization's plan has been reactivated."
 msgstr "O plano da sua organização foi reativado com sucesso."
 
-#: connect/common/models.py:1653
+#: connect/common/models.py:1795
 msgid "O plano da sua organização foi reativado."
 msgstr ""
 
-#: connect/common/models.py:1685
+#: connect/common/models.py:1827
 msgid "Your organization's credit card was removed"
 msgstr "O cartão de crédito da sua organização foi removido com sucesso"
 
-#: connect/common/models.py:1689
+#: connect/common/models.py:1831
 msgid "O cartão de crédito vinculado a sua organização foi removido"
 msgstr ""
 
-#: connect/common/models.py:1732
+#: connect/common/models.py:1874
 msgid "has the plan"
 msgstr "tem o seguinte plano"
 
-#: connect/common/models.py:1753
+#: connect/common/models.py:1895
 msgid "Your organization's plan has been updated"
 msgstr "O plano da sua organização foi atualizado"
 
-#: connect/common/models.py:1774 connect/common/models.py:1795
+#: connect/common/models.py:1916 connect/common/models.py:1937
 #, fuzzy
 #| msgid "Your organization's plan has expired"
 msgid "Your trial plan has expired"
 msgstr "O plano da sua organização expirou"
 
-#: connect/common/models.py:1842
+#: connect/common/models.py:1984
 #, python-brace-format
 msgid "You reached {self.plan_limit} attendances"
 msgstr "Você chegou a {self.plan_limit} atendimentos"
 
-#: connect/common/models.py:1844
+#: connect/common/models.py:1986
 #, fuzzy, python-brace-format
 #| msgid "You reached {self.plan_limit} attendances"
 msgid "Você atingiu {self.plan_limit} atendimentos"
 msgstr "Você chegou a {self.plan_limit} atendimentos"
 
-#: connect/common/models.py:1890
+#: connect/common/models.py:2032
 #, fuzzy, python-brace-format
 #| msgid "Your organization is suspended"
 msgid "Your organization is close to {self.plan_limit} attendances"
 msgstr "Sua organização está suspensa"
 
-#: connect/common/models.py:1894
+#: connect/common/models.py:2036
 #, fuzzy, python-brace-format
 #| msgid "Your organization is suspended"
 msgid "Sua organização estã proxima de {self.plan_limit} atendimentos"
 msgstr "Sua organização está suspensa"
 
-#: connect/common/models.py:1913
+#: connect/common/models.py:2055
 #, fuzzy
 #| msgid "Your organization is suspended"
 msgid "Your trial period has ended"
 msgstr "Sua organização está suspensa"
 
-#: connect/common/models.py:1952
+#: connect/common/models.py:2094
 msgid "organization billing invoice"
 msgstr "fatura de cobrança da organização"
 
-#: connect/common/models.py:1960
+#: connect/common/models.py:2102
 msgid "pending"
 msgstr "pendente"
 
-#: connect/common/models.py:1961
+#: connect/common/models.py:2103
 msgid "paid"
 msgstr "pago"
 
-#: connect/common/models.py:1962
+#: connect/common/models.py:2104
 msgid "canceled"
 msgstr "cancelado"
 
-#: connect/common/models.py:1963
+#: connect/common/models.py:2105
 msgid "fraud"
 msgstr "fraude"
 
-#: connect/common/models.py:1969
+#: connect/common/models.py:2111
 msgid "incremental invoice amount"
 msgstr "valor de invoice incrementado"
 
-#: connect/common/models.py:1970
+#: connect/common/models.py:2112
 msgid "due date"
 msgstr "data de vencimento"
 
-#: connect/common/models.py:1971
+#: connect/common/models.py:2113
 msgid "paid date"
 msgstr "data de pagamento"
 
-#: connect/common/models.py:1973
+#: connect/common/models.py:2115
 msgid "payment status"
 msgstr "status do pagamento"
 
-#: connect/common/models.py:1984
+#: connect/common/models.py:2126
 msgid "discount"
 msgstr "Desconto"
 
-#: connect/common/models.py:1985
+#: connect/common/models.py:2127
 msgid "notes"
 msgstr "Notas"
 
-#: connect/common/models.py:1987
+#: connect/common/models.py:2129
 msgid "Stripe Charge Id"
 msgstr "Código de cobrança do Stripe"
 
-#: connect/common/models.py:1991
+#: connect/common/models.py:2133
 msgid "The Stripe charge id for this charge"
 msgstr "O código de cobrança do stripe para essa cobrança"
 
-#: connect/common/models.py:1996
+#: connect/common/models.py:2138
 msgid ""
 "Controls whether the system will capture the payment, if not successful, the "
 "user will receive an alert to adjust the payment data"
@@ -1560,55 +1593,55 @@ msgstr ""
 "Controla se o sistema irá capturar o pagamento, caso não seja bem sucedido, "
 "oo usuário receberá um alerta para ajustar os dados de pagamento"
 
-#: connect/common/models.py:2002
+#: connect/common/models.py:2144
 msgid "cost per whatsapp"
 msgstr "custo por whatsapp"
 
-#: connect/common/models.py:2034
+#: connect/common/models.py:2176
 msgid "organization billing invoice project"
 msgstr "fatura de cobrança do projeto na organização"
 
-#: connect/common/models.py:2041
+#: connect/common/models.py:2183
 msgid "amount"
 msgstr "valor"
 
-#: connect/common/models.py:2043
+#: connect/common/models.py:2185
 msgid "active contact count"
 msgstr "Contagem de contatos ativos"
 
-#: connect/common/models.py:2048
+#: connect/common/models.py:2190
 msgid "Free active contacts limit"
 msgstr "limite de contatos ativos grátis"
 
-#: connect/common/models.py:2051
+#: connect/common/models.py:2193
 msgid "From 1 to 1000 active contacts"
 msgstr "De 1 até 1000 contatos ativos"
 
-#: connect/common/models.py:2057
+#: connect/common/models.py:2199
 msgid "From 1001 to 5000 active contacts"
 msgstr "De 1001 até 5000 contatos ativos"
 
-#: connect/common/models.py:2063
+#: connect/common/models.py:2205
 msgid "From 5001 to 10000 active contacts"
 msgstr "De 5001 até 10000 contatos ativos"
 
-#: connect/common/models.py:2069
+#: connect/common/models.py:2211
 msgid "From 10001 to 30000 active contacts"
 msgstr "De 10001 até 30000 contatos ativos"
 
-#: connect/common/models.py:2075
+#: connect/common/models.py:2217
 msgid "From 30001 to 50000 active contacts"
 msgstr "De 30001 até 50000 contatos ativos"
 
-#: connect/common/models.py:2081
+#: connect/common/models.py:2223
 msgid "From 50001 to 100000 active contacts"
 msgstr "De 50001 até 100000 contatos ativos"
 
-#: connect/common/models.py:2087 connect/common/models.py:2093
+#: connect/common/models.py:2229 connect/common/models.py:2235
 msgid "From 100001 to 250000 active contacts"
 msgstr "De 100001 até 250000 contatos ativos"
 
-#: connect/common/models.py:2227
+#: connect/common/models.py:2369
 #, fuzzy
 #| msgid "created at"
 msgid "created on"
@@ -1777,6 +1810,11 @@ msgstr ""
 "para te ajudar na construção de projetos e aumentar cada vez mais a maneira "
 "como você automatiza sua vida com nossas Inteligências e Fluxos"
 
+#: connect/common/templates/common/emails/organization/permission_change.html:39
+#: connect/common/templates/common/emails/organization/permission_change.txt:3
+msgid "A new permission has been assigned to you"
+msgstr "Uma nova permissão foi atribuida a você"
+
 #: connect/common/templates/common/emails/organization/permission_change.html:53
 #: connect/common/templates/common/emails/organization/permission_change.txt:5
 msgid "has updated your permission"
@@ -1911,11 +1949,6 @@ msgstr ""
 "foi deletado. Esperamos que tenha construído tudo o que desejava e que "
 "nossas inteligências tenham feito um bom trabalho"
 
-#: connect/common/templates/common/emails/project/project_create.html:39
-#: connect/common/templates/common/emails/project/project_create.txt:3
-msgid "Your project has been successfully created!"
-msgstr "Seu projeto foi criado com sucesso!"
-
 #: connect/common/templates/common/emails/project/project_create.html:53
 #: connect/common/templates/common/emails/project/project_create.txt:4
 msgid ""
@@ -1935,21 +1968,46 @@ msgstr "Lembre-se de que todos na organização"
 msgid "that you created the project in, can view it, ok"
 msgstr "em que você criou o projeto podem visualizar ele, ok ?!"
 
-#: connect/settings.py:225
+#: connect/settings.py:228
 msgid "An error has occurred"
 msgstr "ocorreu um erro"
 
-#: connect/settings.py:233
+#: connect/settings.py:236
 msgid "English"
 msgstr "Inglês"
 
-#: connect/settings.py:234
+#: connect/settings.py:237
 msgid "Portuguese"
 msgstr "Português"
 
-#: connect/settings.py:235
+#: connect/settings.py:238
 msgid "Spanish"
 msgstr "Espanhol"
+
+#~ msgid "WhatsApp"
+#~ msgstr "WhatsApp"
+
+#~ msgid "Telegram"
+#~ msgstr "Telegram"
+
+#~ msgid "channel_type"
+#~ msgstr "tipo de canal"
+
+#~ msgid "channel id"
+#~ msgstr "id do canal"
+
+#~ msgid "Organization created!"
+#~ msgstr "Organização criada!"
+
+#~ msgid "no longer exists!"
+#~ msgstr "não existe mais"
+
+#~ msgid "is now"
+#~ msgstr "agora se chama"
+
+#, python-brace-format
+#~ msgid "You have been invited to join the {self.name} organization"
+#~ msgstr "Você foi convidado a ingressar na organização {self.name}"
 
 #, fuzzy
 #~| msgid "Your organization's plan has been reactivated."

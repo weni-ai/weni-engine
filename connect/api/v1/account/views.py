@@ -26,6 +26,10 @@ from connect.utils import upload_photo_rocket
 from connect.celery import app as celery_app
 from rest_framework import status
 from connect.authentication.models import UserEmailSetup
+from django.utils.encoding import force_text
+from django.utils.http import urlsafe_base64_decode
+from django.shortcuts import get_object_or_404
+from connect.authentication.models import generate_token
 
 
 class MyUserProfileViewSet(
@@ -276,16 +280,41 @@ class MyUserProfileViewSet(
 
     @action(
         detail=True,
-        methods=["PATCH"],
-        url_name="verify-email",
+        methods=["POST"],
+        url_name="send-email-verification",
     )
-    def verify_email(self, request, **kwargs):
+    def send_email_verification(self, request, **kwargs):
         user = request.user
         try:
-            user.verify_email()
+            user.send_email_verify_email()
             return Response(status=200)
         except Exception as e:
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR, data={"message": e})
+            print(e)
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR, data={"message": str(e)})
+
+    @action(
+        detail=True,
+        methods=["GET"],
+        url_path="verify-email/(?P<uidb64>[^/.]+)/(?P<token>[^/.]+)",
+        permission_classes=[permissions.AllowAny]
+    )
+    def verify_email(self, request, **kwargs):
+
+        uidb64 = kwargs.get("uidb64")
+        token = kwargs.get("token")
+
+        try:
+            uid = force_text(urlsafe_base64_decode(uidb64))
+            user = get_object_or_404(User, pk=uid)
+
+            if generate_token.check_token(user, token):
+                user.verify_email()
+
+            return Response(status=200)
+
+        except Exception as e:
+            print(e)
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR, data={"message": str(e)})
 
 
 class SearchUserViewSet(mixins.ListModelMixin, GenericViewSet):  # pragma: no cover

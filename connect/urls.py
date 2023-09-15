@@ -221,6 +221,17 @@ if settings.DEBUG:
                             project_name="TestProject",
                         )
                     ),
+                    path(
+                        "verify-email",
+                        render_template(
+                            "authentication/emails/verify_email.html",
+                            base_url=settings.BASE_URL,
+                            webapp_base_url=settings.WEBAPP_BASE_URL,
+                            organization_name="Teste",
+                            project_name="TestProject",
+                            username="Usuario"
+                        ),
+                    ),
                 ]
             ),
         )
