@@ -665,7 +665,7 @@ class ProjectAuthorizationTestCase(TestCase):
         project = self.project1
         url = f"/v2/projects/{project.uuid}/list-project-authorizations"
         response = self.client.get(url, HTTP_AUTHORIZATION=f"Token {self.owner_token}")
-        users_list = response.data['results'][0]['authorizations']['users']
+        users_list = response.data['authorizations']['users']
         users_count = len(users_list)
         self.assertEquals(response.status_code, status.HTTP_200_OK)
         self.assertEquals(users_count, 1)

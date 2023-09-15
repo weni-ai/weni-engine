@@ -629,16 +629,14 @@ class ProjectListAuthorizationSerializer(serializers.ModelSerializer):
                 "last_name": auth.user.last_name,
                 "project_role": auth.role,
                 "photo_user": auth.user.photo_url,
-                "chats_role": self.get_chats_role(auth),
+                "chats_role": self.get_rocketchat_role(auth),
             }
             for auth in queryset
         ]
 
-    def get_chats_role(self, authorization):
+    def get_rocketchat_role(self, authorization):
         if authorization.rocket_authorization:
             return authorization.rocket_authorization.role
-        elif authorization.chats_authorization:
-            return authorization.chats_authorization.role
         return None
 
     def get_pending_authorizations(self, obj):
@@ -655,17 +653,14 @@ class ProjectListAuthorizationSerializer(serializers.ModelSerializer):
                 "email": pending.email,
                 "project_role": pending.role,
                 "created_by": pending.created_by.email,
-                "chats_role": self.get_pending_chats_role(pending.email),
+                "chats_role": self.get_pending_rocketchat_role(pending.email),
             }
             for pending in pending_authorizations
         ]
 
-    def get_pending_chats_role(self, email):
+    def get_pending_rocketchat_role(self, email):
         rocket_authorization = RequestRocketPermission.objects.filter(email=email).first()
-        chats_authorization = RequestChatsPermission.objects.filter(email=email).first()
 
         if rocket_authorization:
             return rocket_authorization.role
-        elif chats_authorization:
-            return chats_authorization.role
         return None
