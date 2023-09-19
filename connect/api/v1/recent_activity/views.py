@@ -5,6 +5,8 @@ from django.contrib.auth import get_user_model
 
 from connect.api.v1.internal.permissions import ModuleHasPermission
 from connect.common.models import Project, RecentActivity, Organization
+from connect.api.v1.recent_activity.serializers import RecentActivitySerializer
+from connect.api.v2.paginations import CustomCursorPagination
 
 User = get_user_model()
 
@@ -64,7 +66,10 @@ class RecentActivityAPIView(views.APIView):
         return Response(status=status.HTTP_200_OK)
 
 
-class RecentActivityListAPIView(views.APIView):
+class RecentActivityListAPIView(views.APIView, CustomCursorPagination):
+
+    ordering = "created_on"
+    page_size = 10
 
     def get(self, request):
 
@@ -75,5 +80,7 @@ class RecentActivityListAPIView(views.APIView):
             raise PermissionDenied()
 
         recent_activities = RecentActivity.objects.filter(project__uuid=project_uuid).order_by("-created_on")
-        data = [recent_activity.to_json for recent_activity in recent_activities]
-        return Response(status=status.HTTP_200_OK, data=data)
+        results = self.paginate_queryset(recent_activities, request, view=self)
+        serializer = RecentActivitySerializer(results, many=True)
+
+        return self.get_paginated_response(serializer.data)
