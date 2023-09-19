@@ -111,7 +111,6 @@ class ProjectViewSetTestCase(TestCase):
         )
 
         self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(content_data["count"], 2)
 
     @patch("connect.common.signals.update_user_permission_project")
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.update_user_permission_project")

@@ -1,4 +1,4 @@
-from rest_framework import mixins, status
+from rest_framework import mixins, status, views
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -15,10 +15,11 @@ from connect.api.v2.projects.serializers import (
     ProjectSerializer,
     ProjectUpdateSerializer,
     ProjectListAuthorizationSerializer,
+    shortProjectSerializer
 )
 
 from django.utils import timezone
-from connect.api.v2.permissions import ProjectIPPermission
+from connect.api.v2.paginations import CustomCursorPagination
 
 
 class ProjectViewSet(
@@ -32,7 +33,8 @@ class ProjectViewSet(
     queryset = Project.objects
     serializer_class = ProjectSerializer
     lookup_field = "uuid"
-    permission_classes = [IsAuthenticated, ProjectHasPermission, ProjectIPPermission, Has2FA]
+    permission_classes = [IsAuthenticated, ProjectHasPermission, Has2FA]
+    pagination_class = CustomCursorPagination
 
     def get_queryset(self, **kwargs):
         if getattr(self, "swagger_fake_view", False):
@@ -103,3 +105,12 @@ class ProjectAuthorizationViewSet(
     serializer_class = ProjectListAuthorizationSerializer
     permission_classes = [IsAuthenticated, ProjectHasPermission, Has2FA]
     lookup_field = "uuid"
+
+
+class OpenedProjectAPIView(views.APIView):
+
+    def get(self, request):
+        user = request.user
+        last_project = OpenedProject.objects.filter(user=user).order_by("day").last()
+        serializer = shortProjectSerializer(last_project.project)
+        return Response(data=serializer.data)

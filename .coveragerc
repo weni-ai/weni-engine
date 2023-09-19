@@ -33,6 +33,8 @@ omit =
     ./connect/billing/tests.py
     ./connect/billing/tests_billingv2.py
     ./connect/billing/migrations/*
+    ./connect/billing/gateway.py
+    ./connect/billing/gateways/*
     ./connect/template_projects/migrations/*
     ./connect/template_projects/tests.py
     ./connect/elastic/tests.py

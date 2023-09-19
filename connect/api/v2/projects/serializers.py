@@ -686,3 +686,19 @@ class ProjectListAuthorizationSerializer(serializers.ModelSerializer):
         elif chats_authorization:
             return chats_authorization.role
         return None
+
+
+class shortProjectSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Project
+        fields = [
+            "name",
+            "uuid",
+            "timezone",
+            "date_format"
+        ]
+
+    name = serializers.CharField(max_length=500, required=False)
+    timezone = fields.TimezoneField(required=False)
+    date_format = serializers.CharField(max_length=1, required=False)
