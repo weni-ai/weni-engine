@@ -1,3 +1,12 @@
+# 3.4.0
+
+## *Add*
+  - New authorzation endpoint on v2
+  - New unittests for billing tasks
+
+## *Fix*
+  - Flake8 issues
+
 # 3.3.0
 
 ## *Delete*
@@ -8,13 +17,14 @@
 ## *Add*
   - register ready from template type
   - internal endpoint to update project
+
 ## *Fix*
   - recent activity external user don't create a RecentActivity object
 
 # 3.2.0
 
 ## *Add*
-- Cursor pagination to v2 organizations and v2 projects
+  - Cursor pagination to v2 organizations and v2 projects
 
 # 3.1.0
 
