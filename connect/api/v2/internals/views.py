@@ -3,16 +3,25 @@ import json
 from rest_framework import views
 from rest_framework.response import Response
 
-from connect.common.models import Organization
+from connect.common.models import Organization, Project
 from connect.api.v2.internals.serializers import (
     OrganizationAISerializer,
     CustomParameterSerializer,
+    InternalProjectSerializer,
 )
 from connect.api.v1.internal.permissions import ModuleHasPermission
 
 from django.shortcuts import get_object_or_404
 
 from drf_yasg2.utils import swagger_auto_schema
+from rest_framework.viewsets import ModelViewSet
+
+
+class InternalProjectViewSet(ModelViewSet):
+    permission_classes = [ModuleHasPermission]
+    queryset = Project.objects.all()
+    lookup_field = "uuid"
+    serializer_class = InternalProjectSerializer
 
 
 class AIGetOrganizationView(views.APIView):

@@ -1,6 +1,5 @@
 import json
 import pendulum
-import requests
 import grpc
 from grpc._channel import _InactiveRpcError
 
@@ -12,7 +11,6 @@ from connect import utils, billing
 from connect.authentication.models import User
 from connect.celery import app
 from connect.common.models import (
-    Service,
     Organization,
     Project,
     LogService,
@@ -30,31 +28,6 @@ import logging
 
 
 logger = logging.getLogger(__name__)
-
-
-@app.task()
-def status_service() -> None:
-    def is_page_available(url: str, method_request: requests, **kwargs) -> bool:
-        """This function retreives the status code of a website by requesting
-        HEAD data from the host. This means that it only requests the headers.
-        If the host cannot be reached or something else goes wrong, it returns
-        False.
-        """
-        try:
-            response = method_request(url=url, **kwargs)
-            if int(response.status_code) == 200:
-                return True
-            return False
-        except Exception:
-            return False
-
-    for service in Service.objects.all():
-        if not service.maintenance:
-            service.log_service.create(
-                status=is_page_available(
-                    url=service.url, method_request=requests.get, timeout=10
-                )
-            )
 
 
 @app.task(name="delete_organization")

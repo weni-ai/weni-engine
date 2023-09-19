@@ -14,11 +14,14 @@ class RecentActivityAPIView(views.APIView):
     permission_classes = [ModuleHasPermission]
 
     def post(self, request):
+        try:
+            user = User.objects.get(email=request.data.get("user"))
+        except User.DoesNotExist:
+            return Response(status=status.HTTP_200_OK, data={"message": "The User does not exist. Action ignored"})
 
         action = request.data.get("action")
         entity = request.data.get("entity")
         entity_name = request.data.get("entity_name")
-        user = User.objects.get(email=request.data.get("user"))
         intelligence_id = request.data.get("intelligence_id", None)
         flow_organization = request.data.get("flow_organization", None)
         project_uuid = request.data.get("project_uuid", None)

@@ -1,3 +1,41 @@
+# 3.3.0
+
+## *Delete*
+  - Remove TemplateAI api, models and unittests.
+
+# 3.2.1
+
+## *Add*
+  - register ready from template type
+  - internal endpoint to update project
+## *Fix*
+  - recent activity external user don't create a RecentActivity object
+
+# 3.2.0
+
+## *Add*
+- Cursor pagination to v2 organizations and v2 projects
+
+# 3.1.0
+
+## *update* 
+  - Update UserIsPaying viewset query params and authorizations
+
+## *Delete*
+  - Remove unused tasks and models
+
+# 3.0.0
+
+## *Add*
+  - New Event Driven Architectury to internal communication
+  - Publisher code on rabbitmq
+  - Connection class for connect the rabbitmq service
+  - send messages to rabbitmq for create project and template type actions
+  - template type now has the fields: uuid, base_project_uuid, description_photo
+
+## *Delete*
+  - Whatsapp Demo integration (now the integrations module make that)
+
 # 2.19.0
 
 ## *Add*

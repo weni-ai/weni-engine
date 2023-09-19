@@ -16,7 +16,7 @@ from django.conf import settings
 
 from connect.billing import get_gateway
 
-from connect.billing.models import Contact, Channel, ContactCount, Message, SyncManagerTask
+from connect.billing.models import Contact, ContactCount, Message, SyncManagerTask
 from connect.common.models import Organization, Project, BillingPlan, OrganizationRole
 
 from freezegun import freeze_time
@@ -176,12 +176,6 @@ class ContactTestCase(TestCase):
             organization=self.organization
         )
 
-        self.channel = Channel.create(
-            channel_type="WhatsApp",
-            channel_flow_id=1,
-            project=self.project,
-        )
-
         self.contact = Contact.objects.create(
             contact_flow_uuid=uuid4.uuid4(),
             name='contact test 1',
@@ -193,13 +187,8 @@ class ContactTestCase(TestCase):
         self.assertEquals(self.contact.last_seen_on, datetime(2022, 4, 8, 10, 20, 0, 0, pytz.UTC))
 
     def test_create_existing_contact(self):
-
         existing_contact = Contact.objects.create(contact_flow_uuid=self.contact.contact_flow_uuid)
         self.assertEquals(existing_contact, self.contact)
-
-    def test_update_contact(self):
-        self.contact.update_channel(self.channel)
-        self.assertEquals(self.contact.channel, self.channel)
 
 
 @skipIf(True, "message not saved yet.")
@@ -222,17 +211,9 @@ class MessageTestCase(TestCase):
             organization=self.organization
         )
 
-        self.channel = Channel.objects.create(
-            name='channel test',
-            channel_type='WA',
-            channel_flow_uuid=uuid4.uuid4(),
-            project=self.project
-        )
-
         self.contact = Contact.objects.create(
             contact_flow_uuid=uuid4.uuid4(),
             name='contact test 1',
-            channel=self.channel
         )
 
         self.message = Message.objects.create(
@@ -352,45 +333,6 @@ class CheckPlansTestCase(TestCase):
         self.start.organization_billing.send_email_trial_plan_expired_due_time_limit()
 
 
-@skipIf(True, "Deprecated")
-class ChannelModelsTestCase(TestCase):
-
-    def setUp(self):
-        self.organization = Organization.objects.create(
-            name="test organization",
-            description="test organization",
-            inteligence_organization=1,
-            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
-            organization_billing__plan="trial",
-        )
-
-        self.project = self.organization.project.create(
-            name="project test",
-            timezone="America/Sao_Paulo",
-            flow_organization=uuid.uuid4(),
-        )
-
-        self.channel = Channel.create(
-            channel_type="WhatsApp",
-            channel_flow_id=1,
-            project=self.project,
-        )
-
-    def test_create_channel(self):
-
-        self.assertEqual(self.channel.channel_type, "WhatsApp")
-        self.assertEqual(self.channel.channel_flow_id, 1)
-        self.assertEqual(self.channel.project, self.project)
-
-    def test_create_existing_channel(self):
-
-        existing_channel = Channel.create(channel_flow_id=1)
-        self.assertEqual(existing_channel, self.channel)
-
-    def test_channel_exists(self):
-        self.assertTrue(self.channel.channel_exists(self.channel.channel_flow_id))
-
-
 class ContactCountTestCase(TestCase):
 
     @patch("connect.billing.get_gateway")
@@ -410,14 +352,7 @@ class ContactCountTestCase(TestCase):
             flow_organization=uuid.uuid4(),
         )
 
-        self.channel = Channel.create(
-            channel_type="WhatsApp",
-            channel_flow_id=1,
-            project=self.project,
-        )
-
         self.contact = ContactCount.objects.create(
-            channel=self.channel,
             count=1,
             day=None,
             project=self.project,

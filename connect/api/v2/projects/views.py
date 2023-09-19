@@ -18,6 +18,7 @@ from connect.api.v2.projects.serializers import (
 )
 
 from django.utils import timezone
+from connect.api.v2.paginations import CustomCursorPagination
 
 
 class ProjectViewSet(
@@ -32,6 +33,7 @@ class ProjectViewSet(
     serializer_class = ProjectSerializer
     lookup_field = "uuid"
     permission_classes = [IsAuthenticated, ProjectHasPermission, Has2FA]
+    pagination_class = CustomCursorPagination
 
     def get_queryset(self, **kwargs):
         if getattr(self, "swagger_fake_view", False):

@@ -10,6 +10,9 @@ class TemplateType(models.Model):
     uuid = models.UUIDField(
         "UUID", default=uuid4.uuid4
     )
+    base_project_uuid = models.UUIDField(
+        "base project", blank=True, null=True
+    )
     category = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
     name = models.CharField(max_length=255, null=True, blank=True)
@@ -18,16 +21,6 @@ class TemplateType(models.Model):
 
     photo = models.ImageField(storage=TemplateTypeImageStorage(), blank=True, null=True)
     photo_description = models.TextField(blank=True, null=True)
-
-    def __str__(self):
-        return f"{self.id}"
-
-
-class TemplateAI(models.Model):
-
-    name = models.CharField(max_length=255)
-    description = models.TextField(blank=True, null=True)
-    template_type = models.ForeignKey(TemplateType, on_delete=models.CASCADE, related_name='template_ais')
 
     def __str__(self):
         return f"{self.id}"
