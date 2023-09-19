@@ -7,7 +7,7 @@ from connect.api.v2.ticketer.views import TicketerAPIView
 from connect.api.v2.user.views import UserAPIToken, UserIsPaying
 from connect.api.v2.omie.views import OmieAccountAPIView, OmieOriginAPIView, OmieSolutionsAPIView, OmieUsersAPIView
 
-from connect.api.v2.template_projects.views import TemplateTypeViewSet, TemplateFeatureViewSet, TemplateAIViewSet
+from connect.api.v2.template_projects.views import TemplateTypeViewSet, TemplateFeatureViewSet
 
 from connect.api.v2.organizations import views as organization_views
 from connect.api.v2.projects import views as project_views
@@ -16,7 +16,6 @@ from connect.api.v2.internals import views as connect_internal_views
 
 router = routers.SimpleRouter()
 router.register(r"projects/template-type", TemplateTypeViewSet, basename="template-type")
-router.register(r"projects/template-ai", TemplateAIViewSet, basename="template-ai")
 router.register(r"projects/template-features", TemplateFeatureViewSet, basename="template-features")
 
 router.register(
@@ -55,4 +54,5 @@ urlpatterns += [
         "internals/connect/organizations/",
         connect_internal_views.AIGetOrganizationView.as_view(),
     ),
+    path("internals/connect/projects/<uuid>", connect_internal_views.InternalProjectViewSet.as_view({"patch": "partial_update"}))
 ]

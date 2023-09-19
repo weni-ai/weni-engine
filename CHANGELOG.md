@@ -1,3 +1,16 @@
+# 3.3.0
+
+## *Delete*
+  - Remove TemplateAI api, models and unittests.
+
+# 3.2.1
+
+## *Add*
+  - register ready from template type
+  - internal endpoint to update project
+## *Fix*
+  - recent activity external user don't create a RecentActivity object
+
 # 3.2.0
 
 ## *Add*
