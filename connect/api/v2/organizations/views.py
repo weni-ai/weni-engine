@@ -26,7 +26,6 @@ from connect.api.v2.organizations.api_schemas import (
 from connect.api.v2.paginations import CustomCursorPagination
 
 
-
 class OrganizationViewSet(
     mixins.RetrieveModelMixin,
     mixins.ListModelMixin,
