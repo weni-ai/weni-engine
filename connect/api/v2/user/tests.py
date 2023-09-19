@@ -1,14 +1,13 @@
-from unittest import skipIf
+
+import uuid as uuid4
 from unittest.mock import Mock, patch
-from django.test import TestCase, RequestFactory, override_settings
+from rest_framework import status
 from rest_framework.test import APIRequestFactory
+from django.test import TestCase, RequestFactory, override_settings
 from .views import UserAPIToken, UserIsPaying
 from connect.common.mocks import StripeMockGateway
-import uuid as uuid4
 from connect.api.v1.tests.utils import create_user_and_token
-from rest_framework import status
 from connect.common.models import Project, Organization, OrganizationRole, BillingPlan
-from django.conf import settings
 
 
 class UserAPITokenTestCase(TestCase):

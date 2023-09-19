@@ -21,7 +21,7 @@ from connect.billing.models import Contact, ContactCount, Message, SyncManagerTa
 from connect.common.models import Organization, Project, BillingPlan, OrganizationRole
 
 from freezegun import freeze_time
-from connect.billing.tasks import sync_contacts, check_organization_plans, problem_capture_invoice
+from connect.billing.tasks import sync_contacts, check_organization_plans
 from connect.api.v1.tests.utils import create_contacts, create_user_and_token
 
 

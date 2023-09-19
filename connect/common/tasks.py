@@ -1,6 +1,5 @@
 import json
 import pendulum
-import requests
 import grpc
 from grpc._channel import _InactiveRpcError
 
@@ -12,7 +11,6 @@ from connect import utils, billing
 from connect.authentication.models import User
 from connect.celery import app
 from connect.common.models import (
-    Service,
     Organization,
     Project,
     LogService,
