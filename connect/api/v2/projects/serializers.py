@@ -665,3 +665,19 @@ class ProjectUpdateSerializer(serializers.ModelSerializer):
         except Exception as error:
             logger.error(f"Update project: {error}")
             raise error
+
+
+class shortProjectSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Project
+        fields = [
+            "name",
+            "uuid",
+            "timezone",
+            "date_format"
+        ]
+
+    name = serializers.CharField(max_length=500, required=False)
+    timezone = fields.TimezoneField(required=False)
+    date_format = serializers.CharField(max_length=1, required=False)

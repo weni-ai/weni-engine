@@ -1,4 +1,4 @@
-from rest_framework import mixins, status
+from rest_framework import mixins, status, views
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -14,6 +14,7 @@ from connect.common.models import (
 from connect.api.v2.projects.serializers import (
     ProjectSerializer,
     ProjectUpdateSerializer,
+    shortProjectSerializer
 )
 
 from django.utils import timezone
@@ -92,3 +93,12 @@ class ProjectViewSet(
         instance.perform_destroy_flows_project(user_email)
 
         instance.delete()
+
+
+class OpenedProjectAPIView(views.APIView):
+
+    def get(self, request):
+        user = request.user
+        last_project = OpenedProject.objects.filter(user=user).order_by("day").last()
+        serializer = shortProjectSerializer(last_project.project)
+        return Response(data=serializer.data)
