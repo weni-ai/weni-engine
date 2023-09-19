@@ -460,3 +460,48 @@ class BillingTasksTestCase(TestCase):
             name="sync_contacts"
         )
         self.assertTrue(response.result)
+
+    @patch("connect.elastic.flow.ElasticFlow.get_paginated_contacts")
+    @patch("connect.elastic.flow.ElasticFlow.clear_scroll")
+    def test_sync_contacts_task(self, mock_clear_scroll, mock_get_paginated_contacts):
+        mock_clear_scroll.return_value = True
+
+        mock_scroll = {
+            "scroll_id": "123",
+            "scroll_size": 100
+        }
+        mock_hits = "test"
+
+        mock_get_paginated_contacts.return_value = mock_scroll, mock_hits
+
+        self.project.flow_id = 1
+        self.project.save()
+
+        response = celery_app.send_task(
+            name="sync_contacts",
+            args=[
+                str(self.manager_task.before),
+                str(self.manager_task.after),
+                str(self.manager_task.uuid)
+            ]
+        )
+        self.assertTrue(response.result)
+
+    @patch("connect.elastic.flow.ElasticFlow.get_paginated_contacts")
+    @patch("connect.elastic.flow.ElasticFlow.clear_scroll")
+    def test_exception_sync_contacts_task(self, mock_clear_scroll, mock_get_paginated_contacts):
+        mock_clear_scroll.return_value = True
+        mock_get_paginated_contacts.side_effect = Exception("test")
+
+        self.project.flow_id = 1
+        self.project.save()
+
+        response = celery_app.send_task(
+            name="sync_contacts",
+            args=[
+                str(self.manager_task.before),
+                str(self.manager_task.after),
+                str(self.manager_task.uuid)
+            ]
+        )
+        self.assertFalse(response.result)
