@@ -109,8 +109,8 @@ def retry_billing_tasks():
         task.retried = True
         task.save()
 
-        if task.task_type == "sync_contacts":
-            current_app.send_task(  # pragma: no cover
+        if task.task_type == "sync_contacts":  # pragma: no cover
+            current_app.send_task(
                 name="sync_contacts", args=[task.before, task.after, task.uuid]
             )
 

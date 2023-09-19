@@ -425,3 +425,38 @@ class BillingTasksTestCase(TestCase):
         ])
 
         self.assertTrue(response.result)
+
+    def test_retry_billing_tasks(self):
+        self.manager_task.status = False
+        self.manager_task.retried = False
+        self.manager_task.save()
+
+        response = celery_app.send_task(name="retry_billing_tasks")
+        self.assertTrue(response.result)
+
+    @patch("connect.elastic.flow.ElasticFlow.clear_scroll")
+    @patch("connect.elastic.flow.ElasticFlow.get_paginated_contacts")
+    def test_sync_contacts_task_no_projects(self, mock_clear_scroll, mock_get_paginated_contacts):
+        mock_clear_scroll.return_value = True
+        mock_get_paginated_contacts.return_value = True
+
+        response = celery_app.send_task(
+            name="sync_contacts",
+            args=[
+                str(self.manager_task.before),
+                str(self.manager_task.after),
+                str(self.manager_task.uuid)
+            ]
+        )
+        self.assertTrue(response.result)
+
+    @patch("connect.elastic.flow.ElasticFlow.clear_scroll")
+    @patch("connect.elastic.flow.ElasticFlow.get_paginated_contacts")
+    def test_sync_contacts_else_task(self, mock_clear_scroll, mock_get_paginated_contacts):
+        mock_clear_scroll.return_value = True
+        mock_get_paginated_contacts.return_value = True
+
+        response = celery_app.send_task(
+            name="sync_contacts"
+        )
+        self.assertTrue(response.result)
