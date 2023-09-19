@@ -47,6 +47,7 @@ urlpatterns = [
     path("omie/origins", OmieOriginAPIView.as_view(), name="omie-origins"),
     path("omie/solutions", OmieSolutionsAPIView.as_view(), name="omie-solutions"),
     path("omie/users", OmieUsersAPIView.as_view(), name="omie-users"),
+    path("projects/get-last-project", project_views.OpenedProjectAPIView.as_view(), name="get-last-project")
 ]
 urlpatterns += [
     path("", include(projects_router.urls)),
