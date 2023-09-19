@@ -1,7 +1,7 @@
 # 3.4.0
 
 ## *Add*
-  - New authorzation endpoint on v2
+  - New authorization endpoint on v2
   - New unittests for billing tasks
 
 ## *Fix*
