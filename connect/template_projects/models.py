@@ -43,3 +43,21 @@ class TemplateFeature(models.Model):
 
     def __str__(self):
         return f"{self.id}"
+
+
+class TemplateSuggestion(models.Model):
+
+    suggestion = models.TextField()
+    suggestion_type = [
+        ("feature", "feature"),
+        ("template", "template"),
+        ("flow", "flow"),
+        ("integration", "integration"),
+        ("intelligence", "intelligence")
+    ]
+    type = models.CharField(max_length=255, choices=suggestion_type, default="template")
+    created_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=255, default="pending")
+
+    def __str__(self):
+        return f"{self.id}, {self.status}"
