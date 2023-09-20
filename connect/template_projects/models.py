@@ -60,4 +60,4 @@ class TemplateSuggestion(models.Model):
     status = models.CharField(max_length=255, default="pending")
 
     def __str__(self):
-        return f"{self.id}, {self.status}"
+        return f"{self.status}"
