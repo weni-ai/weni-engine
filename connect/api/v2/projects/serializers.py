@@ -24,7 +24,6 @@ from connect.common.models import (
     OpenedProject,
     ProjectRole,
     TemplateProject,
-    RequestChatsPermission,
 )
 from connect.internals.event_driven.producer.rabbitmq_publisher import RabbitmqPublisher
 from connect.template_projects.models import TemplateType
@@ -324,15 +323,10 @@ class ProjectSerializer(serializers.ModelSerializer):
         }
         for i in obj.requestpermissionproject_set.all():
             rocket_authorization = RequestRocketPermission.objects.filter(email=i.email)
-            chats_authorization = RequestChatsPermission.objects.filter(email=i.email)
             chats_role = None
             if (len(rocket_authorization) > 0):
                 rocket_authorization = rocket_authorization.first()
                 chats_role = rocket_authorization.role
-
-            if len(chats_authorization) > 0:
-                chats_authorization = chats_authorization.first()
-                chats_role = chats_authorization.role
 
             response["users"].append(
                 dict(
