@@ -1,5 +1,5 @@
 from rest_framework.serializers import ModelSerializer
-from connect.template_projects.models import TemplateType, TemplateFeature
+from connect.template_projects.models import TemplateType, TemplateFeature, TemplateSuggestion
 from rest_framework import serializers
 
 
@@ -31,3 +31,10 @@ class RetrieveTemplateSerializer(ModelSerializer):
     class Meta:
         model = TemplateType
         fields = ['id', 'description', 'name', 'uuid']
+
+
+class TemplateSuggestionSerializer(ModelSerializer):
+
+    class Meta:
+        model = TemplateSuggestion
+        fields = "__all__"
