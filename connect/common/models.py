@@ -719,7 +719,7 @@ class Project(models.Model):
     )
     template_type = models.CharField(
         verbose_name=_("Template type"),
-        max_length=30,
+        max_length=255,
         choices=TEMPLATE_TYPES,
         help_text=_("Project template type"),
         null=True,
