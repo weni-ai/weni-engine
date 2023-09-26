@@ -165,7 +165,7 @@ class ProjectSerializer(serializers.ModelSerializer):
 
         project_template_type = None
         if is_template:
-            project_template_type_queryset = TemplateType.objects.filter(name=extra_data.get("template_type"))
+            project_template_type_queryset = TemplateType.objects.filter(uuid=extra_data.get("uuid"))
             if project_template_type_queryset.exists():
                 project_template_type = project_template_type_queryset.first()
 
