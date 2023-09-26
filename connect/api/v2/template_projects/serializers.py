@@ -1,6 +1,5 @@
 from rest_framework.serializers import ModelSerializer
 from connect.template_projects.models import TemplateType, TemplateFeature, TemplateSuggestion
-from rest_framework import serializers
 
 
 class TemplateFeatureSerializer(ModelSerializer):
@@ -12,29 +11,27 @@ class TemplateFeatureSerializer(ModelSerializer):
 
 class TemplateTypeSerializer(ModelSerializer):
 
-    features = serializers.SerializerMethodField()
+    template_features = TemplateFeatureSerializer(many=True)
 
     class Meta:
         model = TemplateType
         fields = [
-            'id', 'category', 'description', 'name',
-            'level', 'setup', 'photo', 'features',
-            'photo_description', 'uuid', 'base_project_uuid'
+            'uuid', 'category', 'description', 'name',
+            'level', 'setup', 'photo', 'template_features',
+            'photo_description', 'base_project_uuid'
         ]
-
-    def get_features(self, obj):
-        return TemplateFeatureSerializer(obj.template_features.all(), many=True).data
+        read_only_fields = ['uuid', 'template_features']
 
 
 class RetrieveTemplateSerializer(ModelSerializer):
 
     class Meta:
         model = TemplateType
-        fields = ['id', 'description', 'name', 'uuid']
+        fields = ['uuid', 'description', 'name']
 
 
 class TemplateSuggestionSerializer(ModelSerializer):
 
     class Meta:
         model = TemplateSuggestion
-        fields = "__all__"
+        fields = ['suggestion', 'created_at', 'status']

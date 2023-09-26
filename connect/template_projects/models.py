@@ -14,7 +14,7 @@ class TemplateType(models.Model):
     base_project_uuid = models.UUIDField(
         "base project", blank=True, null=True
     )
-    category = ArrayField(models.CharField(max_length=255))
+    category = ArrayField(base_field=models.CharField(max_length=255), default=list)
     description = models.TextField(blank=True, null=True)
     name = models.CharField(max_length=255, null=True, blank=True)
     level = models.CharField(max_length=255, choices=level_field)
@@ -42,7 +42,7 @@ class TemplateFeature(models.Model):
     template_type = models.ForeignKey(TemplateType, on_delete=models.CASCADE, related_name='template_features')
 
     def __str__(self):
-        return f"{self.id}"
+        return self.name
 
 
 class TemplateSuggestion(models.Model):
