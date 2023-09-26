@@ -1,6 +1,7 @@
 import uuid as uuid4
 
 from django.db import models
+from django.contrib.postgres.fields import ArrayField
 from .storage import TemplateTypeImageStorage
 
 
@@ -13,7 +14,7 @@ class TemplateType(models.Model):
     base_project_uuid = models.UUIDField(
         "base project", blank=True, null=True
     )
-    category = models.CharField(max_length=255)
+    category = ArrayField(base_field=models.CharField(max_length=255), default=list)
     description = models.TextField(blank=True, null=True)
     name = models.CharField(max_length=255, null=True, blank=True)
     level = models.CharField(max_length=255, choices=level_field)
@@ -23,7 +24,7 @@ class TemplateType(models.Model):
     photo_description = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        return f"{self.id}"
+        return self.name if self.name else str(self.uuid)
 
 
 class TemplateFeature(models.Model):
@@ -41,4 +42,22 @@ class TemplateFeature(models.Model):
     template_type = models.ForeignKey(TemplateType, on_delete=models.CASCADE, related_name='template_features')
 
     def __str__(self):
-        return f"{self.id}"
+        return self.name
+
+
+class TemplateSuggestion(models.Model):
+
+    suggestion = models.TextField()
+    suggestion_type = [
+        ("feature", "feature"),
+        ("template", "template"),
+        ("flow", "flow"),
+        ("integration", "integration"),
+        ("intelligence", "intelligence")
+    ]
+    type = models.CharField(max_length=255, choices=suggestion_type, default="template")
+    created_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=255, default="pending")
+
+    def __str__(self):
+        return f"{self.status}"
