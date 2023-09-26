@@ -44,7 +44,6 @@ from connect.common.models import (
     ChatsAuthorization,
     OrganizationAuthorization,
     Project,
-    RequestChatsPermission,
     RequestPermissionProject,
     RequestRocketPermission,
     ProjectAuthorization,
@@ -461,9 +460,7 @@ class RequestPermissionProjectViewSet(
         project_auth = project.project_authorizations.filter(user__email=email)
 
         request_rocket_authorization = RequestRocketPermission.objects.filter(email=email, project=project)
-        request_chats_authorization = RequestChatsPermission.objects.filter(email=email, project=project)
         rocket_authorization = None
-        chats_authorization = None
 
         user_name = ''
         first_name = ''
@@ -480,7 +477,6 @@ class RequestPermissionProjectViewSet(
         elif project_auth.exists():
             project_auth = project_auth.first()
             rocket_authorization = project_auth.rocket_authorization
-            chats_authorization = project_auth.chats_authorization
             user_name = project_auth.user.username
             first_name = project_auth.user.first_name
             last_name = project_auth.user.last_name
@@ -506,12 +502,6 @@ class RequestPermissionProjectViewSet(
         else:
             if chats_role and len([item for item in ChatsAuthorization.ROLE_CHOICES if item[0] == chats_role]) == 0:
                 return Response({"status": 422, "message": f"{chats_role} is not a valid chats role!"})
-            if request_chats_authorization.exists():
-                request_chats_authorization = request_chats_authorization.first()
-                request_chats_authorization.role = chats_role
-                request_chats_authorization.save()
-            elif chats_authorization or chats_role:
-                RequestChatsPermission.objects.create(email=email, role=chats_role, project=project, created_by=created_by)
 
         return Response({
             "status": 200,
