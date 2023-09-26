@@ -8,7 +8,7 @@ from .permission import IsAdminOrReadOnly
 
 class TemplateTypeViewSet(ModelViewSet):
 
-    queryset = TemplateType.objects.prefetch_related('template_features').all()
+    queryset = TemplateType.objects.all()
     serializer_class = TemplateTypeSerializer
     permission_classes = [IsAdminOrReadOnly]
 
