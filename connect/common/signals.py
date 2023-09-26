@@ -27,8 +27,6 @@ from connect.celery import app as celery_app
 from connect.api.v1.internal.intelligence.intelligence_rest_client import IntelligenceRESTClient
 from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
 from connect.common.tasks import update_user_permission_project
-from requests.exceptions import HTTPError
-from rest_framework.exceptions import APIException
 
 
 logger = logging.getLogger("connect.common.signals")
@@ -41,26 +39,6 @@ def create_service_status(sender, instance, created, **kwargs):
         for service in Service.objects.filter(default=True):
             instance.service_status.create(service=service)
         if not settings.TESTING:
-            chats_client = ChatsRESTClient()
-            ai_client = IntelligenceRESTClient()
-
-            template = instance.is_template and instance.template_type in Project.HAS_CHATS
-
-            try:
-                ai_client.create_project(instance.uuid)
-            except HTTPError as e:
-                raise APIException(e)
-
-            if not template:
-                response = chats_client.create_chat_project(
-                    project_uuid=str(instance.uuid),
-                    project_name=instance.name,
-                    date_format=instance.date_format,
-                    timezone=str(instance.timezone),
-                    is_template=template,
-                    user_email=instance.created_by.email
-                )
-                logger.info(f'[ * ] {response}')
 
             if len(Project.objects.filter(created_by=instance.created_by)) == 1:
                 data = dict(
