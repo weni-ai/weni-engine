@@ -1,13 +1,14 @@
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
-from connect.template_projects.models import TemplateType, TemplateFeature
-from .serializers import TemplateTypeSerializer, RetrieveTemplateSerializer, TemplateFeatureSerializer
+from rest_framework.permissions import IsAuthenticated
+from connect.template_projects.models import TemplateType, TemplateFeature, TemplateSuggestion
+from .serializers import TemplateTypeSerializer, RetrieveTemplateSerializer, TemplateFeatureSerializer, TemplateSuggestionSerializer
 from .permission import IsAdminOrReadOnly
 
 
 class TemplateTypeViewSet(ModelViewSet):
 
-    queryset = TemplateType.objects.all()
+    queryset = TemplateType.objects.prefetch_related('template_features').all()
     serializer_class = TemplateTypeSerializer
     permission_classes = [IsAdminOrReadOnly]
 
@@ -23,7 +24,7 @@ class TemplateTypeViewSet(ModelViewSet):
             queryset = self.queryset.filter(name__iexact=name)
 
         if category:
-            queryset = self.queryset.filter(category__iexact=category)
+            queryset = self.queryset.filter(category__contains=[category])
 
         if id:
             queryset = self.queryset.filter(pk=id)
@@ -52,6 +53,19 @@ class TemplateFeatureViewSet(ModelViewSet):
         name = self.request.query_params.get('name', None)
         if name:
             queryset = self.queryset.filter(name__iexact=name)
+        if id:
+            queryset = self.queryset.filter(pk=id)
+        return queryset
+
+
+class TemplateSuggestionViewSet(ModelViewSet):
+    queryset = TemplateSuggestion.objects.all()
+    serializer_class = TemplateSuggestionSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = self.queryset
+        id = self.request.query_params.get('id', None)
         if id:
             queryset = self.queryset.filter(pk=id)
         return queryset

@@ -17,6 +17,7 @@ from connect.api.v2.internals import views as connect_internal_views
 router = routers.SimpleRouter()
 router.register(r"projects/template-type", TemplateTypeViewSet, basename="template-type")
 router.register(r"projects/template-features", TemplateFeatureViewSet, basename="template-features")
+router.register(r"projects/template-suggestions", TemplateTypeViewSet, basename="template-suggestions")
 
 router.register(
     "organizations", organization_views.OrganizationViewSet, basename="organizations"
