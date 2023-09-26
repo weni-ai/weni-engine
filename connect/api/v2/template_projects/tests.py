@@ -15,7 +15,7 @@ class TemplateTypeViewSetTestCase(TestCase):
 
         self.template_type_object = TemplateType.objects.create(
             level=1,
-            category="category",
+            category=["category"],
             description="description",
             name="name"
         )
@@ -68,7 +68,7 @@ class TemplateFeatureViewSetTest(TestCase):
 
         self.template_type_object = TemplateType.objects.create(
             level=1,
-            category="category",
+            category=["category"],
             description="description",
             name="name"
         )
