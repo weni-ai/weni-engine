@@ -155,7 +155,7 @@ class ProjectSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user = self.context["request"].user
-        extra_data = self.context["request"].data.get("project")
+        extra_data = self.context["request"].data.get("project", {})
 
         template_uuid = self.context["request"].data.get("uuid")
         is_template = self.context["request"].data.get("template", False)
