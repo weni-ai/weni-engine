@@ -155,19 +155,19 @@ class ProjectSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = self.context["request"].user
         extra_data = self.context["request"].data.get("project")
-        is_template = extra_data.get("template")
-        project_template_type = None
 
+        template_uuid = self.context["request"].data.get("uuid")
+        is_template = self.context["request"].data.get("template", False)
+
+        if extra_data:
+            template_uuid = extra_data.get("uuid", template_uuid)
+            is_template = extra_data.get("template", is_template)
+
+        project_template_type = None
         if is_template:
-            project_template_type_queryset = TemplateType.objects.filter(uuid=extra_data.get("uuid"))
+            project_template_type_queryset = TemplateType.objects.filter(uuid=template_uuid)
             if project_template_type_queryset.exists():
                 project_template_type = project_template_type_queryset.first()
-
-        if not extra_data:
-            extra_data = {
-                "template": self.context["request"].data.get("template"),
-                "template_type": project_template_type.name,
-            }
 
         instance = Project.objects.create(
             name=validated_data.get("name"),
