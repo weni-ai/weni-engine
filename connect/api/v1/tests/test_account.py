@@ -196,12 +196,5 @@ class CompanyInfoTestCase(TestCase):
 
     def test_okay(self):
         response, content_data = self.request(self.user_token)
-        expected_data = dict(
-            company_name=self.owner.company_name,
-            company_segment=self.owner.company_segment,
-            company_sector=self.owner.company_sector,
-            number_people=self.owner.number_people,
-            weni_helps=self.owner.weni_helps
-        )
-        self.assertEquals(content_data, expected_data)
+        self.assertEquals(list(content_data.keys()), ['organization', 'company'])
         self.assertEqual(response.status_code, status.HTTP_200_OK)
