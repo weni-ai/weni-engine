@@ -213,10 +213,12 @@ class ProjectSerializer(serializers.ModelSerializer):
             is_template = extra_data.get("template", is_template)
 
         project_template_type = None
+        template_name = "blank"
         if is_template:
             project_template_type_queryset = TemplateType.objects.filter(uuid=template_uuid)
             if project_template_type_queryset.exists():
                 project_template_type = project_template_type_queryset.first()
+                template_name = project_template_type.name
 
         instance = Project.objects.create(
             name=validated_data.get("name"),
@@ -224,7 +226,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             organization=validated_data.get("organization"),
             is_template=is_template,
             created_by=user,
-            template_type=project_template_type.name if is_template else "blank",
+            template_type=template_name,
             project_template_type=project_template_type,
         )
 
