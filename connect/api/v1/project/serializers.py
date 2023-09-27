@@ -19,7 +19,6 @@ from connect.api.v1.project.validators import CanContributeInOrganizationValidat
 from connect.celery import app as celery_app
 from connect.common import tasks
 from connect.common.models import (
-    ChatsRole,
     ProjectAuthorization,
     RocketAuthorization,
     Service,
@@ -32,7 +31,6 @@ from connect.common.models import (
     OpenedProject,
     ProjectRole,
     TemplateProject,
-    RequestChatsPermission,
     ChatsAuthorization,
 )
 
@@ -105,7 +103,9 @@ class ProjectSerializer(serializers.ModelSerializer):
     def get_flow_uuid(self, obj):
         if obj.is_template and obj.template_project.exists():
             template = obj.template_project.filter(flow_uuid__isnull=False, wa_demo_token__isnull=False, redirect_url__isnull=False).first()
-            return template.flow_uuid
+            if template:
+                return template.flow_uuid
+            ...
         ...
 
     def get_first_access(self, obj):
@@ -118,9 +118,8 @@ class ProjectSerializer(serializers.ModelSerializer):
                 template = obj.template_project.get(authorization__user__email=email)
                 return template.first_access
             except TemplateProject.DoesNotExist:
-                template_project = obj.template_project.filter(flow_uuid__isnull=False, wa_demo_token__isnull=False, redirect_url__isnull=False).first()
+                template_project = obj.template_project.filter(wa_demo_token__isnull=False, redirect_url__isnull=False).first()
                 template = obj.template_project.create(
-                    flow_uuid=template_project.flow_uuid,
                     wa_demo_token=template_project.wa_demo_token,
                     redirect_url=template_project.redirect_url,
                     authorization=authorization
@@ -130,13 +129,17 @@ class ProjectSerializer(serializers.ModelSerializer):
     def get_wa_demo_token(self, obj):
         if obj.is_template and obj.template_project.exists():
             template = obj.template_project.filter(flow_uuid__isnull=False, wa_demo_token__isnull=False, redirect_url__isnull=False).first()
-            return template.wa_demo_token
+            if template:
+                return template.wa_demo_token
+            ...
         ...
 
     def get_redirect_url(self, obj):
         if obj.is_template and obj.template_project.exists():
             template = obj.template_project.filter(flow_uuid__isnull=False, wa_demo_token__isnull=False, redirect_url__isnull=False).first()
-            return template.redirect_url
+            if template:
+                return template.redirect_url
+            ...
         ...
 
     def get_menu(self, obj):
@@ -218,22 +221,15 @@ class ProjectSerializer(serializers.ModelSerializer):
         }
         for i in obj.requestpermissionproject_set.all():
             rocket_authorization = RequestRocketPermission.objects.filter(email=i.email)
-            chats_authorization = RequestChatsPermission.objects.filter(email=i.email)
-            chats_role = None
             if(len(rocket_authorization) > 0):
+                # TODO: Remove rocket
                 rocket_authorization = rocket_authorization.first()
-                chats_role = rocket_authorization.role
-
-            if len(chats_authorization) > 0:
-                chats_authorization = chats_authorization.first()
-                chats_role = chats_authorization.role
 
             response["users"].append(
                 dict(
                     email=i.email,
                     project_role=i.role,
                     created_by=i.created_by.email,
-                    chats_role=chats_role
                 )
             )
         return response
@@ -377,27 +373,6 @@ class RequestRocketPermissionSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         if attrs.get("role") == RocketRole.NOT_SETTED.value:
-            raise PermissionDenied(_("You cannot set user role 0"))
-        return attrs
-
-
-class RequestChatsPermissionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = RequestChatsPermission
-        fields = ["email", "project", "role", "created_by"]
-
-    email = serializers.EmailField(max_length=254, required=True)
-    project = serializers.PrimaryKeyRelatedField(
-        queryset=Project.objects,
-        style={"show": False},
-        required=True,
-    )
-    created_by = serializers.HiddenField(
-        default=serializers.CurrentUserDefault(), style={"show": False}
-    )
-
-    def validate(self, attrs):
-        if attrs.get("role") == ChatsRole.NOT_SETTED.value:
             raise PermissionDenied(_("You cannot set user role 0"))
         return attrs
 
@@ -551,8 +526,8 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
         else:
             classifier_uuid = uuid.uuid4()
 
-        # Create Flow and Ticketer
-        if not settings.TESTING:
+    # Create Flow and Ticketer
+        if not settings.TESTING and not settings.USE_EDA:
             rest_client = FlowsRESTClient()
             try:
                 is_support = project.template_type == Project.TYPE_SUPPORT

@@ -719,7 +719,7 @@ class Project(models.Model):
     )
     template_type = models.CharField(
         verbose_name=_("Template type"),
-        max_length=30,
+        max_length=255,
         choices=TEMPLATE_TYPES,
         help_text=_("Project template type"),
         null=True,
@@ -1190,17 +1190,6 @@ class RequestRocketPermission(models.Model):
         _("role"),
         choices=RocketAuthorization.ROLE_CHOICES,
         default=RocketRole.NOT_SETTED.value,
-    )
-    project = models.ForeignKey(Project, models.CASCADE)
-    created_by = models.ForeignKey(User, models.CASCADE)
-
-
-class RequestChatsPermission(models.Model):
-    email = models.EmailField(_("email"))
-    role = models.PositiveIntegerField(
-        _("role"),
-        choices=ChatsAuthorization.ROLE_CHOICES,
-        default=ChatsRole.NOT_SETTED.value,
     )
     project = models.ForeignKey(Project, models.CASCADE)
     created_by = models.ForeignKey(User, models.CASCADE)
@@ -2316,10 +2305,10 @@ class TemplateProject(models.Model):
         Project, models.CASCADE, related_name="template_project"
     )
     wa_demo_token = models.CharField(max_length=30)
-    classifier_uuid = models.UUIDField(_("UUID"), default=uuid4.uuid4)
+    classifier_uuid = models.UUIDField(_("UUID"), default=uuid4.uuid4, null=True)
     first_access = models.BooleanField(default=True)
     authorization = models.ForeignKey(ProjectAuthorization, on_delete=models.CASCADE)
-    flow_uuid = models.UUIDField(_("UUID"), default=uuid4.uuid4)
+    flow_uuid = models.UUIDField(_("UUID"), default=uuid4.uuid4, null=True)
     redirect_url = models.URLField(null=True)
 
     @property

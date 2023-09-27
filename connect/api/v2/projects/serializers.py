@@ -24,7 +24,6 @@ from connect.common.models import (
     OpenedProject,
     ProjectRole,
     TemplateProject,
-    RequestChatsPermission,
 )
 from connect.internals.event_driven.producer.rabbitmq_publisher import RabbitmqPublisher
 from connect.template_projects.models import TemplateType
@@ -99,7 +98,9 @@ class ProjectSerializer(serializers.ModelSerializer):
     def get_flow_uuid(self, obj):
         if obj.is_template and obj.template_project.exists():
             template = obj.template_project.filter(flow_uuid__isnull=False, wa_demo_token__isnull=False, redirect_url__isnull=False).first()
-            return template.flow_uuid
+            if template:
+                return template.flow_uuid
+            ...
         ...
 
     def get_first_access(self, obj):
@@ -124,13 +125,17 @@ class ProjectSerializer(serializers.ModelSerializer):
     def get_wa_demo_token(self, obj):
         if obj.is_template and obj.template_project.exists():
             template = obj.template_project.filter(flow_uuid__isnull=False, wa_demo_token__isnull=False, redirect_url__isnull=False).first()
-            return template.wa_demo_token
+            if template:
+                return template.wa_demo_token
+            ...
         ...
 
     def get_redirect_url(self, obj):
         if obj.is_template and obj.template_project.exists():
             template = obj.template_project.filter(flow_uuid__isnull=False, wa_demo_token__isnull=False, redirect_url__isnull=False).first()
-            return template.redirect_url
+            if template:
+                return template.redirect_url
+            ...
         ...
 
     def get_menu(self, obj):
@@ -147,121 +152,37 @@ class ProjectSerializer(serializers.ModelSerializer):
             ),
         }
 
-    # deprecated
-    def _create(self, validated_data):  # pragma: no cover
-        user = self.context["request"].user
-        extra_data = self.context["request"].data.get("project")
-
-        if not extra_data:
-            extra_data = {
-                "template": self.context["request"].data.get("template"),
-                "template_type": self.context["request"].data.get("template_type"),
-            }
-
-        is_template = extra_data.get("template")
-
-        created, flows_info = self.create_flows_project(validated_data, user, is_template)
-
-        if not created:
-            return flows_info
-
-        instance = Project.objects.create(
-            name=validated_data.get("name"),
-            flow_id=flows_info.get("id"),
-            flow_organization=flows_info.get("uuid"),
-            timezone=str(validated_data.get("timezone")),
-            organization=validated_data.get("organization"),
-            is_template=True if extra_data.get("template") else False,
-            created_by=user,
-            template_type=extra_data.get("template_type")
-        )
-
-        if Project.objects.filter(created_by=user).count() == 1:
-            data = dict(
-                send_request_flow=settings.SEND_REQUEST_FLOW_PRODUCT,
-                flow_uuid=settings.FLOW_PRODUCT_UUID,
-                token_authorization=settings.TOKEN_AUTHORIZATION_FLOW_PRODUCT
-            )
-            user.send_request_flow_user_info(data)
-
-        if is_template:
-            extra_data.update(
-                {
-                    "project": instance.uuid,
-                    "authorization": instance.get_user_authorization(user).uuid
-                }
-            )
-
-            template_serializer = TemplateProjectSerializer(data=extra_data, context=self.context["request"])
-            template_serializer.is_valid()
-            template_project = template_serializer.save()
-
-            if type(template_project) == dict:
-                return template_project
-
-        return instance
-
     def create(self, validated_data):
         user = self.context["request"].user
         extra_data = self.context["request"].data.get("project")
 
-        if not extra_data:
-            extra_data = {
-                "template": self.context["request"].data.get("template"),
-                "template_type": self.context["request"].data.get("template_type"),
-            }
+        template_uuid = self.context["request"].data.get("uuid")
+        is_template = self.context["request"].data.get("template", False)
 
-        is_template = extra_data.get("template")
+        if extra_data:
+            template_uuid = extra_data.get("uuid", template_uuid)
+            is_template = extra_data.get("template", is_template)
 
         project_template_type = None
+        template_name = "blank"
         if is_template:
-            project_template_type_queryset = TemplateType.objects.filter(name=extra_data.get("template_type"))
+            project_template_type_queryset = TemplateType.objects.filter(uuid=template_uuid)
             if project_template_type_queryset.exists():
                 project_template_type = project_template_type_queryset.first()
+                template_name = project_template_type.name
 
         instance = Project.objects.create(
             name=validated_data.get("name"),
             timezone=str(validated_data.get("timezone")),
             organization=validated_data.get("organization"),
-            is_template=True if extra_data.get("template") else False,
+            is_template=is_template,
             created_by=user,
-            template_type=extra_data.get("template_type"),
+            template_type=template_name,
             project_template_type=project_template_type,
         )
 
-        created, flows_info = self.create_flows_project(validated_data, user, is_template, str(instance.uuid))
-
-        if not created:
-            return flows_info
-
-        instance.flow_id = flows_info.get("id")
-        instance.flow_organization = flows_info.get("flow_organization")
-
-        instance.save(
-            update_fields=["flow_id", "flow_organization"]
-        )
-
-        if Project.objects.filter(created_by=user).count() == 1:
-            data = dict(
-                send_request_flow=settings.SEND_REQUEST_FLOW_PRODUCT,
-                flow_uuid=settings.FLOW_PRODUCT_UUID,
-                token_authorization=settings.TOKEN_AUTHORIZATION_FLOW_PRODUCT
-            )
-            user.send_request_flow_user_info(data)
-
-        if not settings.TESTING:
-            message_body = {
-                "uuid": str(instance.uuid),
-                "name": instance.name,
-                "is_template": instance.is_template,
-                "user_email": instance.created_by.email if instance.created_by else None,
-                "date_format": instance.date_format,
-                "template_type_uuid": str(instance.project_template_type.uuid) if instance.project_template_type else None,
-                "timezone": str(instance.timezone)
-            }
-
-            rabbitmq_publisher = RabbitmqPublisher()
-            rabbitmq_publisher.send_message(message_body, exchange="projects.topic", routing_key="")
+        self.send_request_flow_product(user)
+        self.publish_create_project_message(instance)
 
         if is_template:
             extra_data.update(
@@ -279,6 +200,43 @@ class ProjectSerializer(serializers.ModelSerializer):
                 return template_project
 
         return instance
+
+    def publish_create_project_message(self, instance):
+
+        authorizations = []
+        for authorization in instance.organization.authorizations.all():
+            if authorization.can_contribute:
+                authorizations.append({"user_email": authorization.user.email, "role": authorization.role})
+
+        extra_fields = self.context["request"].data.get("globals") 
+        if extra_fields is None:
+            extra_fields = self.context["request"].data.get("project", {}).get("globals", {})
+
+        message_body = {
+            "uuid": str(instance.uuid),
+            "name": instance.name,
+            "is_template": instance.is_template,
+            "user_email": instance.created_by.email if instance.created_by else None,
+            "date_format": instance.date_format,
+            "template_type_uuid": str(instance.project_template_type.uuid) if instance.project_template_type else None,
+            "timezone": str(instance.timezone),
+            "organization_id": instance.organization.inteligence_organization,
+            "extra_fields": extra_fields if instance.is_template else {},
+            "authorizations": authorizations,
+        }
+
+        rabbitmq_publisher = RabbitmqPublisher()
+        rabbitmq_publisher.send_message(message_body, exchange="projects.topic", routing_key="")
+
+    def send_request_flow_product(self, user):
+        # TODO: change to an async call
+        if Project.objects.filter(created_by=user).count() == 1:
+            data = dict(
+                send_request_flow=settings.SEND_REQUEST_FLOW_PRODUCT,
+                flow_uuid=settings.FLOW_PRODUCT_UUID,
+                token_authorization=settings.TOKEN_AUTHORIZATION_FLOW_PRODUCT
+            )
+            user.send_request_flow_user_info(data)
 
     def update(self, instance, validated_data):
         name = validated_data.get("name", instance.name)
@@ -324,15 +282,10 @@ class ProjectSerializer(serializers.ModelSerializer):
         }
         for i in obj.requestpermissionproject_set.all():
             rocket_authorization = RequestRocketPermission.objects.filter(email=i.email)
-            chats_authorization = RequestChatsPermission.objects.filter(email=i.email)
             chats_role = None
-            if(len(rocket_authorization) > 0):
+            if (len(rocket_authorization) > 0):
                 rocket_authorization = rocket_authorization.first()
                 chats_role = rocket_authorization.role
-
-            if len(chats_authorization) > 0:
-                chats_authorization = chats_authorization.first()
-                chats_role = chats_authorization.role
 
             response["users"].append(
                 dict(
@@ -484,7 +437,21 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         project = validated_data.get("project")
         authorization = validated_data.get("authorization")
+        template = project.template_project.create(
+            authorization=authorization,
+            wa_demo_token="wa-demo-12345",
+            redirect_url="https://wa.me/5582123456?text=wa-demo-12345",
+            flow_uuid=None,
+            classifier_uuid=None
+        )
 
+        return template
+
+    def _create(self, validated_data):
+        project = validated_data.get("project")
+        authorization = validated_data.get("authorization")
+
+        data = {}
         if project.template_type in Project.HAS_GLOBALS:
 
             common_templates = [Project.TYPE_SAC_CHAT_GPT, Project.TYPE_LEAD_CAPTURE_CHAT_GPT]
@@ -522,14 +489,14 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
         if not created:
             # Project delete
             return classifier_uuid
+        if not settings.USE_EDA:
+            created, data = project.create_flows(classifier_uuid)
 
-        created, data = project.create_flows(classifier_uuid)
+            if not created:
+                # Project delete
+                return data
 
-        if not created:
-            # Project delete
-            return data
-
-        flow_uuid = data.get("uuid")
+        flow_uuid = data.get("uuid", str(project.flow_organization))
 
         template = project.template_project.create(
             authorization=authorization,
@@ -613,3 +580,71 @@ class ProjectUpdateSerializer(serializers.ModelSerializer):
         except Exception as error:
             logger.error(f"Update project: {error}")
             raise error
+
+
+class ProjectListAuthorizationSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Project
+        fields = [
+            "authorizations",
+            "pending_authorizations",
+        ]
+
+    authorizations = serializers.SerializerMethodField(style={"show": False})
+    pending_authorizations = serializers.SerializerMethodField(style={"show": False})
+
+    def get_authorizations(self, obj):
+        authorizations = self.get_existing_authorizations(obj)
+        return {
+            "count": len(authorizations),
+            "users": authorizations,
+        }
+
+    def get_existing_authorizations(self, obj):
+        exclude_roles = [ProjectRole.SUPPORT.value]
+        queryset = obj.project_authorizations.exclude(role__in=exclude_roles).select_related('user')
+
+        return [
+            {
+                "username": auth.user.username,
+                "email": auth.user.email,
+                "first_name": auth.user.first_name,
+                "last_name": auth.user.last_name,
+                "project_role": auth.role,
+                "photo_user": auth.user.photo_url,
+                "chats_role": self.get_rocketchat_role(auth),
+            }
+            for auth in queryset
+        ]
+
+    def get_rocketchat_role(self, authorization):
+        if authorization.rocket_authorization:
+            return authorization.rocket_authorization.role
+        return None
+
+    def get_pending_authorizations(self, obj):
+        pending_authorizations = self.get_pending_authorizations_data(obj)
+        return {
+            "count": len(pending_authorizations),
+            "users": pending_authorizations,
+        }
+
+    def get_pending_authorizations_data(self, obj):
+        pending_authorizations = obj.requestpermissionproject_set.all()
+        return [
+            {
+                "email": pending.email,
+                "project_role": pending.role,
+                "created_by": pending.created_by.email,
+                "chats_role": self.get_pending_rocketchat_role(pending.email),
+            }
+            for pending in pending_authorizations
+        ]
+
+    def get_pending_rocketchat_role(self, email):
+        rocket_authorization = RequestRocketPermission.objects.filter(email=email).first()
+
+        if rocket_authorization:
+            return rocket_authorization.role
+        return None
