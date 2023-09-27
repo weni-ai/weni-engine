@@ -173,7 +173,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             name=validated_data.get("name"),
             timezone=str(validated_data.get("timezone")),
             organization=validated_data.get("organization"),
-            is_template=True if extra_data.get("template") else False,
+            is_template=is_template,
             created_by=user,
             template_type=project_template_type.name,
             project_template_type=project_template_type,
