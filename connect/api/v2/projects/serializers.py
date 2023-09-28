@@ -226,7 +226,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             organization=validated_data.get("organization"),
             is_template=is_template,
             created_by=user,
-            template_type=template_name,
+            template_type=project_template_type.get_template_code(template_name) if is_template else "blank",
             project_template_type=project_template_type,
         )
 
