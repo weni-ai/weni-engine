@@ -13,6 +13,7 @@ from connect.api.v1.organization.permissions import (
     Has2FA,
     OrganizationHasPermission,
 )
+from connect.api.v2.paginations import CustomCursorPagination
 
 from connect.api.v2.organizations.serializers import (
     OrganizationSeralizer,
