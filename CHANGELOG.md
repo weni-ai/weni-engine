@@ -1,3 +1,12 @@
+# 3.5.0
+
+## *Add*
+  - New TemplateSuggestion api and model
+  - Endpoint for obtaining company information from another user in the same organization
+
+## *Update*
+  - Fields changes on project serializer
+
 # 3.4.0
 
 ## *Add*
