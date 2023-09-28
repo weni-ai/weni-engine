@@ -1,3 +1,11 @@
+# 3.5.1
+
+## *Fix*
+  - value from template_type to get code
+
+## *Add*
+  - method to mapping the template code from template name
+
 # 3.5.0
 
 ## *Add*
