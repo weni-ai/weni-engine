@@ -27,7 +27,7 @@ from connect.api.v1.internal.intelligence.intelligence_rest_client import (
     IntelligenceRESTClient,
 )
 from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
-# from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
+from connect.internals.event_driven.producer.rabbitmq_publisher import RabbitmqPublisher
 from rest_framework import status
 from connect.common.helpers import send_mass_html_mail
 from django.db.models import Q
@@ -1182,6 +1182,17 @@ class ProjectAuthorization(models.Model):
             ProjectRoleLevel.CONTRIBUTOR.value,
             ProjectRoleLevel.SUPPORT.value,
         ]
+
+    def publish_message(self, routing_key: str):
+        rabbitmq_publisher = RabbitmqPublisher()
+        role = self.role
+        message_body = {
+            "role": role if role != 4 else 3,
+            "user_email": self.user.email,
+            "project_uuid": str(self.uuid),
+        }
+
+        rabbitmq_publisher.send_message(message_body, exchange="project-authorizations.topic", routing_key=routing_key)
 
 
 class RequestRocketPermission(models.Model):

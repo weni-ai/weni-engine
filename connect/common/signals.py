@@ -367,3 +367,13 @@ def request_chats_permission(sender, instance, created, **kwargs):
 def send_email_create_project(sender, instance, created, **kwargs):
     if created:
         instance.send_email_create_project()
+
+
+@receiver(post_save, sender=ProjectAuthorization)
+def update_project_authorization(sender, instance, created, **kwargs):
+    instance.publish_message("project-authorizations-update")
+
+
+@receiver(post_delete, sender=ProjectAuthorization)
+def delete_project_authorization(sender, instance, **kwargs):
+    instance.publish_message("project-authorizations-delete")
