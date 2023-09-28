@@ -22,19 +22,13 @@ app.conf.task_routes = {
     'count_contacts': {'queue': 'billing'},
     'retry_billing_tasks': {'queue': 'billing'},
     'create_contacts': {'queue': 'billing'},
-    # 'get_messages': {'queue': 'billing'},
     "end_trial_plan": {'queue': 'billing'},
     "check_organization_plans": {'queue': 'billing'},
-    'get_messages': {'queue': 'billing'},
     "daily_contact_count": {'queue': 'billing'},
 }
 
 
 app.conf.beat_schedule = {
-    "check-status-services": {
-        "task": "connect.common.tasks.status_service",
-        "schedule": schedules.crontab(minute="*/3"),
-    },
     "delete-status-logs": {
         "task": "connect.common.tasks.delete_status_logs",
         "schedule": schedules.crontab(hour="22", minute=0),

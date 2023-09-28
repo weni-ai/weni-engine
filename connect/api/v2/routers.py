@@ -7,7 +7,7 @@ from connect.api.v2.ticketer.views import TicketerAPIView
 from connect.api.v2.user.views import UserAPIToken, UserIsPaying
 from connect.api.v2.omie.views import OmieAccountAPIView, OmieOriginAPIView, OmieSolutionsAPIView, OmieUsersAPIView
 
-from connect.api.v2.template_projects.views import TemplateTypeViewSet, TemplateFeatureViewSet, TemplateAIViewSet
+from connect.api.v2.template_projects.views import TemplateTypeViewSet, TemplateFeatureViewSet, TemplateSuggestionViewSet
 
 from connect.api.v2.organizations import views as organization_views
 from connect.api.v2.projects import views as project_views
@@ -16,8 +16,8 @@ from connect.api.v2.internals import views as connect_internal_views
 
 router = routers.SimpleRouter()
 router.register(r"projects/template-type", TemplateTypeViewSet, basename="template-type")
-router.register(r"projects/template-ai", TemplateAIViewSet, basename="template-ai")
 router.register(r"projects/template-features", TemplateFeatureViewSet, basename="template-features")
+router.register(r"projects/template-suggestions", TemplateSuggestionViewSet, basename="template-suggestions")
 
 router.register(
     "organizations", organization_views.OrganizationViewSet, basename="organizations"
@@ -39,6 +39,8 @@ urlpatterns = [
     path("projects/<project_uuid>/delete-classifier", DeleteClassifierAPIView.as_view(), name="delete-classifier"),
     path("projects/<project_uuid>/ticketer", TicketerAPIView.as_view(), name="ticketer"),
     path("projects/<project_uuid>/channel", ChannelsAPIView.as_view(), name="channels"),
+    path("projects/<uuid>/list-project-authorizations", project_views.ProjectAuthorizationViewSet.as_view({"get": "retrieve"}), name="list-project-authorizations"),
+    path("organizations/<uuid>/list-organization-authorizations", organization_views.OrganizationAuthorizationViewSet.as_view({"get": "retrieve"}), name="list-organization-authorizations"),
     path("projects/channels", ListChannelsAPIView.as_view(), name="list-channels"),
     path("projects/<project_uuid>/create-wac-channel", CreateWACChannelAPIView.as_view(), name="create-wac-channel"),
     path("projects/<project_uuid>/user-api-token", UserAPIToken.as_view(), name="user-api-token"),
@@ -55,4 +57,5 @@ urlpatterns += [
         "internals/connect/organizations/",
         connect_internal_views.AIGetOrganizationView.as_view(),
     ),
+    path("internals/connect/projects/<uuid>", connect_internal_views.InternalProjectViewSet.as_view({"patch": "partial_update"}))
 ]

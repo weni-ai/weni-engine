@@ -15,8 +15,9 @@ from django.test import TestCase
 from django.conf import settings
 
 from connect.billing import get_gateway
+from connect.celery import app as celery_app
 
-from connect.billing.models import Contact, Channel, ContactCount, Message, SyncManagerTask
+from connect.billing.models import Contact, ContactCount, Message, SyncManagerTask
 from connect.common.models import Organization, Project, BillingPlan, OrganizationRole
 
 from freezegun import freeze_time
@@ -176,12 +177,6 @@ class ContactTestCase(TestCase):
             organization=self.organization
         )
 
-        self.channel = Channel.create(
-            channel_type="WhatsApp",
-            channel_flow_id=1,
-            project=self.project,
-        )
-
         self.contact = Contact.objects.create(
             contact_flow_uuid=uuid4.uuid4(),
             name='contact test 1',
@@ -193,13 +188,8 @@ class ContactTestCase(TestCase):
         self.assertEquals(self.contact.last_seen_on, datetime(2022, 4, 8, 10, 20, 0, 0, pytz.UTC))
 
     def test_create_existing_contact(self):
-
         existing_contact = Contact.objects.create(contact_flow_uuid=self.contact.contact_flow_uuid)
         self.assertEquals(existing_contact, self.contact)
-
-    def test_update_contact(self):
-        self.contact.update_channel(self.channel)
-        self.assertEquals(self.contact.channel, self.channel)
 
 
 @skipIf(True, "message not saved yet.")
@@ -222,17 +212,9 @@ class MessageTestCase(TestCase):
             organization=self.organization
         )
 
-        self.channel = Channel.objects.create(
-            name='channel test',
-            channel_type='WA',
-            channel_flow_uuid=uuid4.uuid4(),
-            project=self.project
-        )
-
         self.contact = Contact.objects.create(
             contact_flow_uuid=uuid4.uuid4(),
             name='contact test 1',
-            channel=self.channel
         )
 
         self.message = Message.objects.create(
@@ -352,45 +334,6 @@ class CheckPlansTestCase(TestCase):
         self.start.organization_billing.send_email_trial_plan_expired_due_time_limit()
 
 
-@skipIf(True, "Deprecated")
-class ChannelModelsTestCase(TestCase):
-
-    def setUp(self):
-        self.organization = Organization.objects.create(
-            name="test organization",
-            description="test organization",
-            inteligence_organization=1,
-            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
-            organization_billing__plan="trial",
-        )
-
-        self.project = self.organization.project.create(
-            name="project test",
-            timezone="America/Sao_Paulo",
-            flow_organization=uuid.uuid4(),
-        )
-
-        self.channel = Channel.create(
-            channel_type="WhatsApp",
-            channel_flow_id=1,
-            project=self.project,
-        )
-
-    def test_create_channel(self):
-
-        self.assertEqual(self.channel.channel_type, "WhatsApp")
-        self.assertEqual(self.channel.channel_flow_id, 1)
-        self.assertEqual(self.channel.project, self.project)
-
-    def test_create_existing_channel(self):
-
-        existing_channel = Channel.create(channel_flow_id=1)
-        self.assertEqual(existing_channel, self.channel)
-
-    def test_channel_exists(self):
-        self.assertTrue(self.channel.channel_exists(self.channel.channel_flow_id))
-
-
 class ContactCountTestCase(TestCase):
 
     @patch("connect.billing.get_gateway")
@@ -410,14 +353,7 @@ class ContactCountTestCase(TestCase):
             flow_organization=uuid.uuid4(),
         )
 
-        self.channel = Channel.create(
-            channel_type="WhatsApp",
-            channel_flow_id=1,
-            project=self.project,
-        )
-
         self.contact = ContactCount.objects.create(
-            channel=self.channel,
             count=1,
             day=None,
             project=self.project,
@@ -426,3 +362,146 @@ class ContactCountTestCase(TestCase):
     def test_increase_contact_count(self):
         self.contact.increase_contact_count(1)
         self.assertEqual(self.contact.count, 2)
+
+
+class BillingTasksTestCase(TestCase):
+
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway):
+        mock_get_gateway.return_value = StripeMockGateway()
+        self.organization = Organization.objects.create(
+            name="test organization",
+            description="test organization",
+            inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan=BillingPlan.PLAN_START,
+            is_suspended=False
+        )
+        now = pendulum.now()
+        self.manager_task = SyncManagerTask.objects.create(
+            task_type="count_contacts",
+            started_at=now,
+            before=now,
+            after=now.subtract(days=1),
+        )
+
+        self.project = self.organization.project.create(
+            name="project test",
+            timezone="America/Sao_Paulo",
+            flow_organization=uuid.uuid4(),
+        )
+
+    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.suspend_or_unsuspend_project")
+    @patch("connect.common.models.BillingPlan.problem_capture_invoice")
+    def test_problem_capture_invoice(self, mock_problem_capture_invoice, mock_update_suspend_project):
+        mock_problem_capture_invoice.side_effect = [True]
+
+        celery_app.send_task(name="problem_capture_invoice")
+        org_updated = Organization.objects.get(name=self.organization.name)
+        self.assertTrue(org_updated.is_suspended)
+        self.assertFalse(org_updated.organization_billing.is_active)
+
+    def test_contact_count_task(self):
+
+        now = pendulum.now()
+        response = celery_app.send_task(name="count_contacts", args=[
+            now,
+            now.subtract(days=1),
+            self.project.uuid,
+            self.manager_task.uuid
+        ])
+
+        self.assertTrue(response.result)
+        self.manager_task.refresh_from_db()
+        self.assertTrue(self.manager_task.status)
+        self.assertIsNotNone(self.manager_task.finished_at)
+
+    def test_contact_count_without_task_uuid(self):
+        now = pendulum.now()
+        response = celery_app.send_task(name="count_contacts", args=[
+            now,
+            now.subtract(days=1),
+            self.project.uuid,
+        ])
+
+        self.assertTrue(response.result)
+
+    def test_retry_billing_tasks(self):
+        self.manager_task.status = False
+        self.manager_task.retried = False
+        self.manager_task.save()
+
+        response = celery_app.send_task(name="retry_billing_tasks")
+        self.assertTrue(response.result)
+
+    @patch("connect.elastic.flow.ElasticFlow.clear_scroll")
+    @patch("connect.elastic.flow.ElasticFlow.get_paginated_contacts")
+    def test_sync_contacts_task_no_projects(self, mock_clear_scroll, mock_get_paginated_contacts):
+        mock_clear_scroll.return_value = True
+        mock_get_paginated_contacts.return_value = True
+
+        response = celery_app.send_task(
+            name="sync_contacts",
+            args=[
+                str(self.manager_task.before),
+                str(self.manager_task.after),
+                str(self.manager_task.uuid)
+            ]
+        )
+        self.assertTrue(response.result)
+
+    @patch("connect.elastic.flow.ElasticFlow.clear_scroll")
+    @patch("connect.elastic.flow.ElasticFlow.get_paginated_contacts")
+    def test_sync_contacts_else_task(self, mock_clear_scroll, mock_get_paginated_contacts):
+        mock_clear_scroll.return_value = True
+        mock_get_paginated_contacts.return_value = True
+
+        response = celery_app.send_task(
+            name="sync_contacts"
+        )
+        self.assertTrue(response.result)
+
+    @patch("connect.elastic.flow.ElasticFlow.get_paginated_contacts")
+    @patch("connect.elastic.flow.ElasticFlow.clear_scroll")
+    def test_sync_contacts_task(self, mock_clear_scroll, mock_get_paginated_contacts):
+        mock_clear_scroll.return_value = True
+
+        mock_scroll = {
+            "scroll_id": "123",
+            "scroll_size": 100
+        }
+        mock_hits = "test"
+
+        mock_get_paginated_contacts.return_value = mock_scroll, mock_hits
+
+        self.project.flow_id = 1
+        self.project.save()
+
+        response = celery_app.send_task(
+            name="sync_contacts",
+            args=[
+                str(self.manager_task.before),
+                str(self.manager_task.after),
+                str(self.manager_task.uuid)
+            ]
+        )
+        self.assertTrue(response.result)
+
+    @patch("connect.elastic.flow.ElasticFlow.get_paginated_contacts")
+    @patch("connect.elastic.flow.ElasticFlow.clear_scroll")
+    def test_exception_sync_contacts_task(self, mock_clear_scroll, mock_get_paginated_contacts):
+        mock_clear_scroll.return_value = True
+        mock_get_paginated_contacts.side_effect = Exception("test")
+
+        self.project.flow_id = 1
+        self.project.save()
+
+        response = celery_app.send_task(
+            name="sync_contacts",
+            args=[
+                str(self.manager_task.before),
+                str(self.manager_task.after),
+                str(self.manager_task.uuid)
+            ]
+        )
+        self.assertFalse(response.result)

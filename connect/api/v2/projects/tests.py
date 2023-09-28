@@ -634,3 +634,37 @@ class ProjectTestCase(TestCase):
         classifier_uuid = uuid.uuid4()
         template_type = "omie"
         flows.create_flows(project_uuid, classifier_uuid, template_type)
+
+
+class ProjectAuthorizationTestCase(TestCase):
+
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway):
+        mock_get_gateway.return_value = StripeMockGateway()
+
+        self.owner, self.owner_token = create_user_and_token("owner")
+        self.org1 = Organization.objects.create(
+            name="Test project methods",
+            description="",
+            inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__payment_method=BillingPlan.PAYMENT_METHOD_CREDIT_CARD,
+            organization_billing__plan=BillingPlan.PLAN_ENTERPRISE,
+        )
+        self.organization_authorization = self.org1.authorizations.create(
+            user=self.owner, role=OrganizationRole.ADMIN.value
+        )
+        self.project1 = self.org1.project.create(
+            name="Project 1",
+            timezone="America/Sao_Paulo",
+            flow_organization=uuid.uuid4(),
+        )
+
+    def test_list_project_authorizations(self):
+        project = self.project1
+        url = f"/v2/projects/{project.uuid}/list-project-authorizations"
+        response = self.client.get(url, HTTP_AUTHORIZATION=f"Token {self.owner_token}")
+        users_list = response.data['authorizations']['users']
+        users_count = len(users_list)
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(users_count, 1)

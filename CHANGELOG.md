@@ -1,3 +1,56 @@
+# 3.5.1
+
+## *Fix*
+  - value from template_type to get code
+
+## *Add*
+  - method to mapping the template code from template name
+
+# 3.5.0
+
+## *Add*
+  - New TemplateSuggestion api and model
+  - Endpoint for obtaining company information from another user in the same organization
+
+## *Update*
+  - Fields changes on project serializer
+
+# 3.4.0
+
+## *Add*
+  - New authorization endpoint on v2
+  - New unittests for billing tasks
+
+## *Fix*
+  - Flake8 issues
+
+# 3.3.0
+
+## *Delete*
+  - Remove TemplateAI api, models and unittests.
+
+# 3.2.1
+
+## *Add*
+  - register ready from template type
+  - internal endpoint to update project
+
+## *Fix*
+  - recent activity external user don't create a RecentActivity object
+
+# 3.2.0
+
+## *Add*
+  - Cursor pagination to v2 organizations and v2 projects
+
+# 3.1.0
+
+## *update* 
+  - Update UserIsPaying viewset query params and authorizations
+
+## *Delete*
+  - Remove unused tasks and models
+
 # 3.0.0
 
 ## *Add*

@@ -14,6 +14,7 @@ from connect.common.models import (
 from connect.api.v2.projects.serializers import (
     ProjectSerializer,
     ProjectUpdateSerializer,
+    ProjectListAuthorizationSerializer,
 )
 
 from django.utils import timezone
@@ -92,3 +93,14 @@ class ProjectViewSet(
         instance.perform_destroy_flows_project(user_email)
 
         instance.delete()
+
+
+class ProjectAuthorizationViewSet(
+    mixins.RetrieveModelMixin,
+    GenericViewSet
+):
+
+    queryset = Project.objects
+    serializer_class = ProjectListAuthorizationSerializer
+    permission_classes = [IsAuthenticated, ProjectHasPermission, Has2FA]
+    lookup_field = "uuid"

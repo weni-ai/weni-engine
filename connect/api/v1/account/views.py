@@ -274,6 +274,39 @@ class MyUserProfileViewSet(
         except Exception as e:
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR, data={"message": e})
 
+    @action(
+        detail=True,
+        methods=["GET"],
+        url_name="user-company-info",
+        url_path="user-company-info",
+    )
+    def get_user_company_info(self, request, **kwargs):
+        user = self.request.user
+        authorizations = user.authorizations_user
+        if authorizations.count() == 1:
+            organization = authorizations.first().organization
+            first_user = organization.authorizations.order_by("created_at").first().user
+            if first_user.id != user.id:
+                organization = dict(
+                    uuid=str(organization.uuid),
+                    name=organization.name,
+                    authorization=authorizations.first().role
+                )
+                company = dict(
+                    company_name=first_user.company_name,
+                    company_segment=first_user.company_segment,
+                    company_sector=first_user.company_sector,
+                    number_people=first_user.number_people,
+                    weni_helps=first_user.weni_helps
+                )
+                data = dict(
+                    organization=organization,
+                    company=company
+                )
+                return Response(status=status.HTTP_200_OK, data=data)
+
+        return Response(status=status.HTTP_200_OK, data={})
+
 
 class SearchUserViewSet(mixins.ListModelMixin, GenericViewSet):  # pragma: no cover
     serializer_class = SearchUserSerializer

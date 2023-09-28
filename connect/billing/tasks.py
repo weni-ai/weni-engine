@@ -10,76 +10,14 @@ from connect.common.models import (
 )
 from connect.billing.models import (
     Contact,
-    Message,
     SyncManagerTask,
     ContactCount,
-    Channel,
 )
 from connect.elastic.flow import ElasticFlow
 from django.utils import timezone
 from connect import utils
 from celery import current_app
 from django.conf import settings
-
-
-@app.task(name="get_messages", ignore_result=True)
-def get_messages(temp_channel_uuid: str, before: str, after: str, project_uuid: str):
-    manager = SyncManagerTask.objects.create(
-        task_type="get_messages",
-        started_at=pendulum.now(),
-        before=pendulum.parse(before),
-        after=pendulum.parse(after),
-    )
-
-    flow_instance = utils.get_grpc_types().get("flow")
-    project = Project.objects.get(uuid=project_uuid)
-    contacts = Contact.objects.filter(
-        channel__uuid=temp_channel_uuid, last_seen_on__range=(after, before)
-    )
-    for contact in contacts:
-        message = flow_instance.get_message(
-            str(project.flow_organization),
-            str(contact.contact_flow_uuid),
-            before,
-            after,
-        )
-
-        if not message:
-            last_message = Message.objects.filter(
-                contact=contact,
-                created_on__date__month=timezone.now().date().month,
-                created_on__date__year=timezone.now().date().year,
-            )
-
-        if not last_message.exists():
-            contact.delete()
-            manager.fail_message.create(
-                message="Contact don't have delivery/received message"
-            )
-
-            continue
-
-        try:
-            Message.objects.get(message_flow_uuid=message.uuid)
-        except Message.DoesNotExist:
-            Message.objects.create(
-                contact=contact,
-                text=message.text,
-                created_on=message.created_on,
-                direction=message.direction,
-                message_flow_uuid=message.uuid,
-            )
-
-        channel = Channel.create(
-            channel_type=message.channel_type,
-            channel_flow_id=message.channel_id,
-            project=project,
-        )
-        contact.update_channel(channel)
-
-    count_contacts.apply_async(args=[manager.before, manager.after, project_uuid])
-
-    return True
 
 
 @app.task(name="create_contacts", ignore_result=True)
@@ -170,8 +108,8 @@ def retry_billing_tasks():
         task.retried = True
         task.save()
 
-        if task.task_type == "sync_contacts":
-            current_app.send_task(  # pragma: no cover
+        if task.task_type == "sync_contacts":  # pragma: no cover
+            current_app.send_task(
                 name="sync_contacts", args=[task.before, task.after, task.uuid]
             )
 

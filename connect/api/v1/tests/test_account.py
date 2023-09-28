@@ -7,6 +7,7 @@ from rest_framework import status
 
 from connect.api.v1.account.views import MyUserProfileViewSet
 from connect.api.v1.tests.utils import create_user_and_token
+from connect.common.models import Organization, BillingPlan, OrganizationRole
 
 
 class ListMyProfileTestCase(TestCase):
@@ -129,3 +130,46 @@ class AdditionalUserInfoTestCase(TestCase):
         self.assertEqual(company_info, company_response)
         self.assertEqual(user_info.get('phone'), user_response.get('phone'))
         self.assertEqual(user_response.get("utm"), {"utm_source": "instagram"})
+
+
+class CompanyInfoTestCase(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.owner, self.owner_token = create_user_and_token("owner")
+        self.user, self.user_token = create_user_and_token("user")
+
+        owner = self.owner
+
+        owner.company_name = "Test Company"
+        owner.company_segment = "Segment"
+        owner.company_sector = "Sector"
+        owner.number_people = 5
+        owner.weni_helps = ""
+        owner.save()
+
+        self.organization = Organization.objects.create(
+            name="test organization",
+            description="test organization",
+            inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan=BillingPlan.PLAN_TRIAL,
+        )
+        self.organization_authorization = self.organization.authorizations.create(
+            user=self.owner, role=OrganizationRole.ADMIN.value
+        )
+        self.organization_authorization2 = self.organization.authorizations.create(
+            user=self.user, role=OrganizationRole.ADMIN.value
+        )
+
+    def request(self, token):
+        authorization_header = {"HTTP_AUTHORIZATION": "Token {}".format(token.key)}
+        request = self.factory.get("/v1/account/user-company-info/", **authorization_header)
+        response = MyUserProfileViewSet.as_view({"get": "get_user_company_info"})(request)
+        response.render()
+        content_data = json.loads(response.content)
+        return (response, content_data)
+
+    def test_okay(self):
+        response, content_data = self.request(self.user_token)
+        self.assertEquals(list(content_data.keys()), ['organization', 'company'])
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
