@@ -26,6 +26,18 @@ class TemplateType(models.Model):
     def __str__(self):
         return self.name if self.name else str(self.uuid)
 
+    def get_template_code(self, template_name):
+        mapping_template = {
+            "Suporte": "support",
+            "Financeiro Integrado com a Omie | ChatGPT": "omie_financial+chatgpt",
+            "Captura de Leads | ChatGPT": "lead_capture+chatgpt",
+            "Captura de Leads": "lead_capture",
+            "SAC | ChatGPT": "sac+chatgpt",
+            "Financeiro Integrado com a Omie": "omie_financial",
+            "Captura de leads com Omie": "omie_lead_capture",
+        }
+        return mapping_template.get(template_name, "blank")
+
 
 class TemplateFeature(models.Model):
 
