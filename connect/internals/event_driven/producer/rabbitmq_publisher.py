@@ -35,4 +35,5 @@ class RabbitmqPublisher:  # pragma: no cover
             except Exception as err:
                 print(f"error: {err}")
                 self.rabbitmq_connection.make_connection()
-            sleep(settings.EDA_WAIT_TIME_RETRY)
+            if not sended:
+                sleep(settings.EDA_WAIT_TIME_RETRY)
