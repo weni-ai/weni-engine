@@ -4,7 +4,7 @@ from django.test import TestCase
 from unittest.mock import patch
 from connect.storages import AvatarUserMediaStorage
 from connect.template_projects.storage import TemplateTypeImageStorage
-from connect.template_projects.models import TemplateType, TemplateFeature
+from connect.template_projects.models import TemplateType, TemplateFeature, TemplateSuggestion
 
 
 class TemplateTypeModelTestCase(TestCase):
@@ -51,6 +51,23 @@ class TemplateFeatureModelTestCase(TestCase):
         str_response = self.template_feature_object.__str__()
         model_id = self.template_feature_object.id
         self.assertListEqual(str_response.split(), [str(model_id)])
+
+
+class TemplateSuggestionModelTestCase(TestCase):
+
+    def setUp(self):
+
+        self.template_suggestion_object = TemplateSuggestion.objects.create(
+            suggestion="suggestion",
+            type="type",
+            status="status"
+        )
+
+    def test_str(self):
+
+        str_response = self.template_suggestion_object.__str__()
+        template_status = self.template_suggestion_object.status
+        self.assertEqual(str_response, str(template_status))
 
 
 class StorageTestCase(TestCase):

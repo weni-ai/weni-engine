@@ -1,5 +1,5 @@
 from rest_framework.serializers import ModelSerializer
-from connect.template_projects.models import TemplateType, TemplateFeature
+from connect.template_projects.models import TemplateType, TemplateFeature, TemplateSuggestion
 from rest_framework import serializers
 
 
@@ -17,9 +17,9 @@ class TemplateTypeSerializer(ModelSerializer):
     class Meta:
         model = TemplateType
         fields = [
-            'id', 'category', 'description', 'name',
+            'uuid', 'category', 'description', 'name',
             'level', 'setup', 'photo', 'features',
-            'photo_description', 'uuid', 'base_project_uuid'
+            'photo_description', 'base_project_uuid'
         ]
 
     def get_features(self, obj):
@@ -30,4 +30,11 @@ class RetrieveTemplateSerializer(ModelSerializer):
 
     class Meta:
         model = TemplateType
-        fields = ['id', 'description', 'name', 'uuid']
+        fields = ['uuid', 'description', 'name']
+
+
+class TemplateSuggestionSerializer(ModelSerializer):
+
+    class Meta:
+        model = TemplateSuggestion
+        fields = ['suggestion', 'created_at', 'status']
