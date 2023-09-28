@@ -1,3 +1,13 @@
+# 3.6.0
+## *Add*
+  - authorizations project on create project message
+
+## *Fix*
+  - NoneType object has no attribute flow_uuid
+
+## *Delete*
+  - EDA: remove rest from project creation
+
 # 3.5.1
 
 ## *Fix*
