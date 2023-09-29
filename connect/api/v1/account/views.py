@@ -211,7 +211,8 @@ class MyUserProfileViewSet(
                 "weni_helps",
                 "phone",
                 "last_update_profile",
-                "position"
+                "position",
+                "company_segment"
             ]
 
             if "utm" in user_info:
