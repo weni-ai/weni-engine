@@ -1,3 +1,7 @@
+# 3.6.1
+## *Fix*
+  - Add company_segment to update_fields
+
 # 3.6.0
 ## *Add*
   - authorizations project on create project message
