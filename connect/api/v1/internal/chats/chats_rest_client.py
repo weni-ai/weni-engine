@@ -11,6 +11,11 @@ class ChatsRESTClient:
     def __init__(self):
         self.base_url = settings.CHATS_REST_ENDPOINT
         self.authentication_instance = InternalAuthentication()
+        self.permission_mapper = {
+            ChatsRole.ADMIN.value: 1,
+            ChatsRole.AGENT.value: 2,
+            ChatsRole.SERVICE_MANAGER.value: 3
+        }
 
     def update_user_permission(
         self, permission: int, user_email: str, project_uuid: str
@@ -129,6 +134,24 @@ class ChatsRESTClient:
         )
         requests.patch(
             url=f"{self.base_url}/v1/internal/project/{project_uuid}/",
+            headers=self.authentication_instance.headers,
+            json=body
+        )
+        return True
+
+    def delete_user_permission_project(
+        self,
+        project_uuid: str,
+        user_email: str,
+        permission: int
+    ):
+        body = dict(
+            user=user_email,
+            project=str(project_uuid),
+            role=self.permission_mapper.get(permission, 0)
+        )
+        requests.delete(
+            url=f"{self.base_url}/v1/internal/permission/project/",
             headers=self.authentication_instance.headers,
             json=body
         )
