@@ -39,19 +39,10 @@ def es_convert_datetime(before: str, after: str):
 
 
 def count_contacts(project: Project, before: str, after: str):
-    # contacts_day_count = ContactCount.objects.filter(project=project).filter(created_at__range=(after, before))
-    # contacts_day_count = Contact.objects.filter(project=project).filter(last_seen_on__range=(after, before)).distinct("contact_flow_uuid").count()
     tz = pendulum.timezone("America/Maceio")
     after = pendulum.parse(after).in_timezone(tz)
     before = pendulum.parse(before).in_timezone(tz)
-
-    if project.organization.organization_billing.plan in [BillingPlan.PLAN_CUSTOM, BillingPlan.PLAN_ENTERPRISE]:
-        total_for_custom = Contact.objects.filter(project=project).filter(last_seen_on__range=(after, before)).distinct("contact_flow_uuid").count()
-        return total_for_custom
-
-    contacts_day_count = ContactCount.objects.filter(project=project, day__range=(after, before))
-    total = sum([day_count.count for day_count in contacts_day_count])
-    return total
+    return project.get_contacts(before, after)
 
 
 def check_module_permission(claims, user):

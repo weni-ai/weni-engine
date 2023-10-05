@@ -1004,6 +1004,19 @@ class Project(models.Model):
         )
         return mail
 
+    def get_contacts(self, before: str, after: str, counting_method: str = None):
+        from connect.billing.models import Contact, ContactCount
+        if not counting_method:
+            counting_method = self.organization.organization_billing.plan_method
+        
+        if counting_method == BillingPlan.ACTIVE_CONTACTS:
+            return Contact.objects.filter(project=self).filter(last_seen_on__range=(after, before)).distinct("contact_flow_uuid").count()
+        
+        contacts_day_count = ContactCount.objects.filter(project=self, day__range=(after, before))
+        total = sum([day_count.count for day_count in contacts_day_count])
+        return total
+        
+
 
 class OpenedProject(models.Model):
     day = models.DateTimeField(_("Day"))
