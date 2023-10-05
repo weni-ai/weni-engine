@@ -155,5 +155,4 @@ class ChatsRESTClient:
             headers=self.authentication_instance.headers,
             json=body
         )
-        print("[+] Chats", r.text)
         return True
