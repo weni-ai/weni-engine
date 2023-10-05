@@ -1392,6 +1392,14 @@ class BillingPlan(models.Model):
         (PLAN_ENTERPRISE, _("enterprise")),
     ]
 
+    ATTENDANCES = "attendances"
+    ACTIVE_CONTACTS = "active_contacts"
+
+    PLAN_METHOD_CHOICES = [
+        (ATTENDANCES, _("attendances")),
+        (ACTIVE_CONTACTS, _("active_contacts")),
+    ]
+
     organization = models.OneToOneField(
         Organization, models.CASCADE, related_name="organization_billing"
     )
@@ -1412,6 +1420,7 @@ class BillingPlan(models.Model):
     )
     fixed_discount = models.FloatField(_("fixed discount"), default=0)
     plan = models.CharField(_("plan"), max_length=10, choices=PLAN_CHOICES)
+    plan_method = models.CharField(_("plan_method"), max_length=15, choices=PLAN_METHOD_CHOICES, default=ATTENDANCES)
     contract_on = models.DateField(_("date of contract plan"), auto_now_add=True)
     is_active = models.BooleanField(_("active plan"), default=True)
     stripe_customer = models.CharField(
