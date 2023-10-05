@@ -150,9 +150,10 @@ class ChatsRESTClient:
             project=str(project_uuid),
             role=self.permission_mapper.get(permission, 0)
         )
-        requests.delete(
+        r = requests.delete(
             url=f"{self.base_url}/v1/internal/permission/project/",
             headers=self.authentication_instance.headers,
             json=body
         )
+        print("[+] Chats", r.text)
         return True
