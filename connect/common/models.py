@@ -1011,11 +1011,10 @@ class Project(models.Model):
         
         if counting_method == BillingPlan.ACTIVE_CONTACTS:
             return Contact.objects.filter(project=self).filter(last_seen_on__range=(after, before)).distinct("contact_flow_uuid").count()
-        
+
         contacts_day_count = ContactCount.objects.filter(project=self, day__range=(after, before))
         total = sum([day_count.count for day_count in contacts_day_count])
         return total
-        
 
 
 class OpenedProject(models.Model):

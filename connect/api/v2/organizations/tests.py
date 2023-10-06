@@ -16,6 +16,10 @@ from connect.api.v2.organizations.views import OrganizationViewSet
 from connect.common.mocks import StripeMockGateway
 
 from django.conf import settings
+from connect.api.v1.tests.utils import create_contacts
+from connect.billing.models import Contact
+from connect.billing.tasks import count_contacts, daily_contact_count
+import pendulum
 
 
 class OrganizationViewSetTestCase(TestCase):
@@ -1060,4 +1064,44 @@ class OrganizationAuthorizationTestCase(TestCase):
         organization = self.org1
         url = f"/v2/organizations/{organization.uuid}/list-organization-authorizations"
         response = self.client.get(url, HTTP_AUTHORIZATION=f"Token {self.owner_token}")
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+
+
+class CustomCountTestCase(TestCase):
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway) -> None:
+        mock_get_gateway.return_value = StripeMockGateway()
+
+        self.owner, self.owner_token = create_user_and_token("owner")
+        self.org1 = Organization.objects.create(
+            name="Test project methods",
+            description="",
+            inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__payment_method=BillingPlan.PAYMENT_METHOD_CREDIT_CARD,
+            organization_billing__plan=BillingPlan.PLAN_ENTERPRISE,
+        )
+        self.project = self.org1.project.create(name="test case")
+        self.organization_authorization = self.org1.authorizations.create(
+            user=self.owner, role=OrganizationRole.ADMIN.value
+        )
+
+    def test_view(self):
+        from freezegun import freeze_time
+        # too many loops
+        start = pendulum.now().start_of("month")
+        end = start.end_of("month")
+        period = end - start
+        ran = period.range("days")
+
+        for day in ran:
+            freezer = freeze_time(day)
+            freezer.start()
+            create_contacts(num_contacts=10, day=day)
+            daily_contact_count()
+            freezer.stop()
+
+        organization = self.org1
+        url = f"/v2/organizations/{organization.uuid}/get_contact_active?before={end.date()}&after={start.date()}"
+        response = self.client.get(url, HTTP_AUTHORIZATION=f"Token {self.owner_token}", follow=True)
         self.assertEquals(response.status_code, status.HTTP_200_OK)
