@@ -124,6 +124,8 @@ class OrganizationViewSet(
                 {
                     "uuid": project.uuid,
                     "name": project.name,
+                    "plan": project.organization.organization_billing.plan,
+                    "plan_method": project.organization.organization_billing.plan_method,
                     "flow_organization": project.flow_organization,
                     "active_contacts": project.get_contacts(before=str(before), after=str(after), counting_method=BillingPlan.ACTIVE_CONTACTS),
                     "attendances": project.get_contacts(before=str(before), after=str(after), counting_method=BillingPlan.ATTENDANCES),
