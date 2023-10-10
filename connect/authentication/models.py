@@ -264,6 +264,16 @@ class User(AbstractBaseUser, PermissionsMixin):
 
         self.save(update_fields=["first_login"])
 
+    @property
+    def get_company_data(self):
+        return dict(
+            company_name=self.company_name,
+            company_segment=self.company_segment,
+            company_sector=self.company_sector,
+            number_people=self.number_people,
+            weni_helps=self.weni_helps
+        )
+
 
 class UserEmailSetup(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="email_setup")
