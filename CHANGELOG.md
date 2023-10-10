@@ -1,3 +1,7 @@
+# 3.6.2
+## *Add*
+  - Endpoint to v2/organizations to return contacts
+  - attribute plan_method to model BillingPlan
 # 3.6.1
 ## *Fix*
   - Add company_segment to update_fields
