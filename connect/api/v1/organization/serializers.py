@@ -38,6 +38,7 @@ class BillingPlanSerializer(serializers.ModelSerializer):
             "fixed_discount",
             "payment_method",
             "plan",
+            "plan_method",
             "is_active",
             "final_card_number",
             "card_expiration_date",

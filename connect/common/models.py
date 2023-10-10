@@ -1004,6 +1004,18 @@ class Project(models.Model):
         )
         return mail
 
+    def get_contacts(self, before: str, after: str, counting_method: str = None):
+        from connect.billing.models import Contact, ContactCount
+        if not counting_method:
+            counting_method = self.organization.organization_billing.plan_method
+        
+        if counting_method == BillingPlan.ACTIVE_CONTACTS:
+            return Contact.objects.filter(project=self).filter(last_seen_on__range=(after, before)).distinct("contact_flow_uuid").count()
+
+        contacts_day_count = ContactCount.objects.filter(project=self, day__range=(after, before))
+        total = sum([day_count.count for day_count in contacts_day_count])
+        return total
+
 
 class OpenedProject(models.Model):
     day = models.DateTimeField(_("Day"))
@@ -1392,6 +1404,14 @@ class BillingPlan(models.Model):
         (PLAN_ENTERPRISE, _("enterprise")),
     ]
 
+    ATTENDANCES = "attendances"
+    ACTIVE_CONTACTS = "active_contacts"
+
+    PLAN_METHOD_CHOICES = [
+        (ATTENDANCES, _("attendances")),
+        (ACTIVE_CONTACTS, _("active_contacts")),
+    ]
+
     organization = models.OneToOneField(
         Organization, models.CASCADE, related_name="organization_billing"
     )
@@ -1412,6 +1432,7 @@ class BillingPlan(models.Model):
     )
     fixed_discount = models.FloatField(_("fixed discount"), default=0)
     plan = models.CharField(_("plan"), max_length=10, choices=PLAN_CHOICES)
+    plan_method = models.CharField(_("plan_method"), max_length=15, choices=PLAN_METHOD_CHOICES, default=ATTENDANCES)
     contract_on = models.DateField(_("date of contract plan"), auto_now_add=True)
     is_active = models.BooleanField(_("active plan"), default=True)
     stripe_customer = models.CharField(

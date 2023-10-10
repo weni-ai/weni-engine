@@ -1,13 +1,16 @@
 from rest_framework import mixins, status
+from rest_framework.decorators import action
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from drf_yasg2.utils import swagger_auto_schema
+from django.utils.translation import ugettext_lazy as _
 
 from connect.common.models import (
     Organization,
     OrganizationAuthorization,
-    OrganizationRole
+    OrganizationRole,
+    BillingPlan
 )
 from connect.api.v1.organization.permissions import (
     Has2FA,
@@ -23,9 +26,9 @@ from connect.api.v2.projects.serializers import ProjectSerializer
 from connect.api.v2.organizations.api_schemas import (
     create_organization_schema,
 )
-
+from rest_framework.exceptions import ValidationError
 from connect.api.v2.paginations import CustomCursorPagination
-
+import pendulum
 
 class OrganizationViewSet(
     mixins.RetrieveModelMixin,
@@ -91,6 +94,45 @@ class OrganizationViewSet(
         user_email = self.request.user.email
         instance.perform_destroy_ai_organization(user_email)
         instance.delete()
+    
+    @action(
+        detail=True,
+        methods=["GET"],
+        url_name="get-contact-active",
+    )
+    def get_contact_active(
+        self, request, **kwargs
+    ):  # pragma: no cover
+
+        organization = self.get_object()
+
+        before = request.query_params.get("before")
+        after = request.query_params.get("after")
+
+        if not before or not after:
+            raise ValidationError(
+                _("Need to pass 'before' and 'after' in query params")
+            )
+
+        before = pendulum.parse(before, strict=False).end_of("day")
+        after = pendulum.parse(after, strict=False).start_of("day")
+
+        result = {"projects": []}
+
+        for project in organization.project.all():
+            result["projects"].append(
+                {
+                    "uuid": project.uuid,
+                    "name": project.name,
+                    "plan": project.organization.organization_billing.plan,
+                    "plan_method": project.organization.organization_billing.plan_method,
+                    "flow_organization": project.flow_organization,
+                    "active_contacts": project.get_contacts(before=str(before), after=str(after), counting_method=BillingPlan.ACTIVE_CONTACTS),
+                    "attendances": project.get_contacts(before=str(before), after=str(after), counting_method=BillingPlan.ATTENDANCES),
+                }
+            )
+
+        return Response(data=result, status=status.HTTP_200_OK)
 
 
 class OrganizationAuthorizationViewSet(

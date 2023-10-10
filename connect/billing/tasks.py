@@ -250,9 +250,7 @@ def daily_contact_count():
     """Daily contacts"""
     today = pendulum.now().end_of("day")
 
-    for project in Project.objects.exclude(
-        organization__organization_billing__plan=BillingPlan.PLAN_CUSTOM
-    ):
+    for project in Project.objects.all():
         after = today.start_of("day")
         before = today
         total_day_calls = (

@@ -14,9 +14,10 @@ def create_user_and_token(nickname="fake"):
     return user, token
 
 
-def create_contacts(num_contacts: int):
+def create_contacts(num_contacts: int, day = None):
     """This function creates contacts that were active multiple times a day."""
-    day = pendulum.now().start_of("day")
+    if not day:
+        day = pendulum.now().start_of("day")
 
     contact_list = []
 
