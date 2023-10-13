@@ -283,30 +283,28 @@ class MyUserProfileViewSet(
     )
     def get_user_company_info(self, request, **kwargs):
         user = self.request.user
-        authorizations = user.authorizations_user
-        if authorizations.count() == 1:
-            organization = authorizations.first().organization
+        authorizations = user.authorizations_user.all()
+        response = []
+
+        for authorization in authorizations:
+
+            organization = authorization.organization
             first_user = organization.authorizations.order_by("created_at").first().user
+
             if first_user.id != user.id:
-                organization = dict(
+                organization_data = dict(
                     uuid=str(organization.uuid),
                     name=organization.name,
-                    authorization=authorizations.first().role
+                    authorization=authorization.role
                 )
-                company = dict(
-                    company_name=first_user.company_name,
-                    company_segment=first_user.company_segment,
-                    company_sector=first_user.company_sector,
-                    number_people=first_user.number_people,
-                    weni_helps=first_user.weni_helps
+                response.append(
+                    dict(
+                        organization=organization_data,
+                        company=first_user.get_company_data
+                    )
                 )
-                data = dict(
-                    organization=organization,
-                    company=company
-                )
-                return Response(status=status.HTTP_200_OK, data=data)
 
-        return Response(status=status.HTTP_200_OK, data={})
+        return Response(status=status.HTTP_200_OK, data=response)
 
 
 class SearchUserViewSet(mixins.ListModelMixin, GenericViewSet):  # pragma: no cover
