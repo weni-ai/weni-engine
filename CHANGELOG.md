@@ -1,3 +1,7 @@
+# 3.6.3
+## *Update*
+  - Return all organization and company data to invite user in your first login
+
 # 3.6.2
 ## *Add*
   - Endpoint to v2/organizations to return contacts
