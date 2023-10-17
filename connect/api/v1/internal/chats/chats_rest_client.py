@@ -7,6 +7,7 @@ from connect.api.v1.internal.internal_authentication import InternalAuthenticati
 
 class ChatsRESTClient:
     def __init__(self):
+        from connect.common.models import ChatsRole
         self.base_url = settings.CHATS_REST_ENDPOINT
         self.authentication_instance = InternalAuthentication()
         self.permission_mapper = {
