@@ -242,7 +242,7 @@ class MyUserProfileViewSet(
                 user=dict(
                     phone=user.phone,
                     last_update_profile=user.last_update_profile,
-                    position=user.position.split(":")[1] if self.position and "other:" in self.position else user.position,
+                    position=user.position.split(":")[1] if user.position and "other:" in user.position else user.position,
                     utm=user.utm
                 )
             )
