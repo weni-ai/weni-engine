@@ -1,3 +1,8 @@
+# 3.7.0
+## *Add*
+  - Add new company phone field
+  - Add new property for other fields position
+
 # 3.6.3
 ## *Update*
   - Return all organization and company data to invite user in your first login
