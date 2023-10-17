@@ -29,7 +29,7 @@ from connect.celery import app as celery_app
 from connect.api.v1.internal.intelligence.intelligence_rest_client import IntelligenceRESTClient
 from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
 from connect.common.tasks import update_user_permission_project
-
+from connect.common import tasks
 
 logger = logging.getLogger("connect.common.signals")
 
@@ -151,6 +151,9 @@ def delete_authorizations(instance, **kwargs):
             organization_id=instance.organization.inteligence_organization,
             user_email=instance.user.email
         )
+        for project in instance.organization.project.all():
+            permission = project.get_user_authorization(instance.user).role
+            tasks.delete_user_permission_project.delay(str(project.uuid), instance.user.email, permission)
 
     instance.organization.send_email_remove_permission_organization(
         first_name=instance.user.first_name, email=instance.user.email
