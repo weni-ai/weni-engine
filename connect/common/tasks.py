@@ -579,12 +579,17 @@ def get_billing_total_statistics(project_uuid: str, before: str, after: str):
     retry_kwargs={"max_retries": 5},
     retry_backoff=True,
 )
-def delete_user_permission_project(project_uuid: str, user_email: str, permission: int):
-    if settings.USE_FLOW_REST:
-        flow_instance = FlowsRESTClient()
-    else:
-        flow_instance = utils.get_grpc_types().get("flow")
+def delete_user_permission_project(flow_organization: str, project_uuid: str, user_email: str, permission: int):
+    flow_instance = FlowsRESTClient()
+    chats_instance = ChatsRESTClient()
+
     flow_instance.delete_user_permission_project(
+        project_uuid=flow_organization,
+        user_email=user_email,
+        permission=permission
+    )
+
+    chats_instance.delete_user_permission_project(
         project_uuid=project_uuid,
         user_email=user_email,
         permission=permission
