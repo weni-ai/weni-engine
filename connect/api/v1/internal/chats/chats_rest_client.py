@@ -2,9 +2,7 @@ from django.conf import settings
 
 import requests
 
-from connect.common.models import Project
 from connect.api.v1.internal.internal_authentication import InternalAuthentication
-from connect.common.models import ChatsRole
 
 
 class ChatsRESTClient:
@@ -20,6 +18,7 @@ class ChatsRESTClient:
     def update_user_permission(
         self, permission: int, user_email: str, project_uuid: str
     ):
+        from connect.common.models import ChatsRole
         permission_mapper = {
             ChatsRole.ADMIN.value: 1,
             ChatsRole.AGENT.value: 2,
@@ -106,6 +105,7 @@ class ChatsRESTClient:
         user_email: str,
         permission: int
     ):
+        from connect.common.models import ChatsRole
         permission_mapper = {
             ChatsRole.ADMIN.value: 1,
             ChatsRole.AGENT.value: 2,
@@ -125,6 +125,7 @@ class ChatsRESTClient:
         return True
 
     def update_chats_project(self, project_uuid):
+        from connect.common.models import Project
         project = Project.objects.get(uuid=project_uuid)
         body = dict(
             project=str(project.uuid),
