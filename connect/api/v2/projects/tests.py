@@ -232,6 +232,7 @@ class ProjectViewSetTestCase(TestCase):
         project_uuid = str(self.project1.uuid)
         data = {
             "name": "Test V2 Project (update)",
+            "timezone": "America/Argentina/Buenos_Aires"
         }
         path = f"/v2/organizations/{organization_uuid}projects/{project_uuid}"
         method = {"patch": "update"}
@@ -245,8 +246,8 @@ class ProjectViewSetTestCase(TestCase):
             project_uuid=project_uuid,
             data=data
         )
-        # Project.objects.get(uuid=content_data.get("uuid"))
-        # self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals("America/Argentina/Buenos_Aires", content_data.get("timezone"))
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
 
     @patch("connect.api.v1.internal.intelligence.intelligence_rest_client.IntelligenceRESTClient.get_organization_intelligences")
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.get_project_flows")

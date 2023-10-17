@@ -382,6 +382,9 @@ class FlowsRESTClient:
         return response
 
     def update_project(self, project_uuid: str, **kwargs: dict):
+        from connect.common.models import Project
+        project = Project.objects.get(uuid=project_uuid)
+        kwargs.update({"timezone": str(project.timezone)})
         try:
             response = requests.patch(
                 url=f'{self.base_url}/api/v2/internals/orgs/{project_uuid}/',

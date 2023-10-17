@@ -73,12 +73,11 @@ def update_user_permission_organization(
     retry_backoff=True,
 )
 def update_project(organization_uuid: str, organization_name: str):
-    if settings.USE_FLOW_REST:
-        flow_instance = FlowsRESTClient()
-    else:
-        flow_instance = utils.get_grpc_types().get("flow")
+    flow_instance = FlowsRESTClient()
+    chats = ChatsRESTClient()
+    chats.update_chats_project(project_uuid=organization_uuid)
     flow_instance.update_project(
-        organization_uuid=organization_uuid,
+        project_uuid=organization_uuid,
         organization_name=organization_name,
     )
     return True
