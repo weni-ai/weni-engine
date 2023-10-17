@@ -1,3 +1,6 @@
+# 3.7.2
+## *Fix*
+  - NameError: name 'ChatsRole' is not defined
 # 3.7.1
 ## *Add*
   - Request update chats and flows after project update
