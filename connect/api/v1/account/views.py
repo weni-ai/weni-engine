@@ -198,6 +198,7 @@ class MyUserProfileViewSet(
             user.company_name = company_info.get("name")
             user.company_segment = company_info.get("segment")
             user.company_sector = company_info.get("sector")
+            user.company_phone_number = company_info.get("company_phone_number")
             user.number_people = company_info.get("number_people")
             user.weni_helps = company_info.get("weni_helps")
             user.phone = user_info.get("phone")
@@ -212,7 +213,8 @@ class MyUserProfileViewSet(
                 "phone",
                 "last_update_profile",
                 "position",
-                "company_segment"
+                "company_segment",
+                "company_phone_number"
             ]
 
             if "utm" in user_info:
@@ -234,12 +236,13 @@ class MyUserProfileViewSet(
                     sector=user.company_sector,
                     segment=user.company_segment,
                     number_people=user.number_people,
-                    weni_helps=user.weni_helps
+                    weni_helps=user.weni_helps,
+                    company_phone_number=user.company_phone_number
                 ),
                 user=dict(
                     phone=user.phone,
                     last_update_profile=user.last_update_profile,
-                    position=user.position,
+                    position=user.position.split(":")[1] if user.position and "other:" in user.position else user.position,
                     utm=user.utm
                 )
             )

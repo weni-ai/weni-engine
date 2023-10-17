@@ -115,6 +115,11 @@ class User(AbstractBaseUser, PermissionsMixin):
         null=True,
         blank=True,
     )
+    company_phone_number = models.BigIntegerField(
+        verbose_name=_("company phone number"),
+        help_text=_("company phone number"),
+        null=True,
+    )
     number_people = models.IntegerField(
         verbose_name=_("number of people"),
         help_text=_("number of people working in this company"),
@@ -156,6 +161,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     @property
     def token_generator(self):
         return PasswordResetTokenGenerator()
+
+    @property
+    def other_positions(self):
+        return self.position.split(":")[1] if self.position and "other:" in self.position else None
 
     def check_password_reset_token(self, token):
         return self.token_generator.check_token(self, token)
