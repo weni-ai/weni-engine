@@ -1,3 +1,8 @@
+# 3.7.1
+## *Add*
+  - Request update chats and flows after project update
+  - Request to delete user permission project in chats
+
 # 3.7.0
 ## *Add*
   - Add new company phone field
