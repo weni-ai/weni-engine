@@ -29,6 +29,7 @@ from connect.common.models import (
 from connect.internals.event_driven.producer.rabbitmq_publisher import RabbitmqPublisher
 from connect.template_projects.models import TemplateType
 
+
 logger = logging.getLogger(__name__)
 User = get_user_model()
 
@@ -209,7 +210,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             if authorization.can_contribute:
                 authorizations.append({"user_email": authorization.user.email, "role": authorization.role})
 
-        extra_fields = self.context["request"].data.get("globals") 
+        extra_fields = self.context["request"].data.get("globals")
         if extra_fields is None:
             extra_fields = self.context["request"].data.get("project", {}).get("globals", {})
 
@@ -571,17 +572,19 @@ class ProjectUpdateSerializer(serializers.ModelSerializer):
     date_format = serializers.CharField(max_length=1, required=False)
 
     def update(self, instance, validated_data):  # pragma: no cover
-        flow_client = FlowsRESTClient()
         data = validated_data
+
         if validated_data.get("timezone"):
             data["timezone"] = str(data["timezone"])
 
         try:
-            flow_client.update_project(
-                str(instance.uuid),
-                **data
+            instance = super().update(instance, validated_data)
+            name = validated_data.get("name", instance.name)
+            celery_app.send_task(
+                "update_project",
+                args=[instance.uuid, name],
             )
-            return super().update(instance, validated_data)
+            return instance
         except Exception as error:
             logger.error(f"Update project: {error}")
             raise error
