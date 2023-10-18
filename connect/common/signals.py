@@ -7,7 +7,6 @@ from django.utils import timezone
 
 from connect.authentication.models import User
 from connect.common.models import (
-    ChatsRole,
     Project,
     Service,
     Organization,
@@ -21,7 +20,6 @@ from connect.common.models import (
     ProjectRoleLevel,
     RocketAuthorization,
     RequestRocketPermission,
-    RequestChatsPermission,
     OpenedProject,
     RecentActivity
 )
@@ -64,13 +62,7 @@ def create_service_status(sender, instance, created, **kwargs):
                 project_auth = instance.get_user_authorization(authorization.user)
                 project_auth.role = authorization.role
                 project_auth.save()
-                if not settings.TESTING and project_auth.is_moderator:
-                    RequestChatsPermission.objects.create(
-                        email=project_auth.user.email,
-                        role=ChatsRole.ADMIN.value,
-                        project=project_auth.project,
-                        created_by=project_auth.user
-                    )
+
     elif update_fields and "flow_organization" in update_fields:
         for permission in instance.project_authorizations.all():
             update_user_permission_project(
@@ -227,14 +219,6 @@ def request_permission_project(sender, instance, created, **kwargs):
                 auth_user = auth_user.first()
                 auth_user.role = instance.role
                 auth_user.save(update_fields=["role"])
-
-            if not settings.TESTING and auth_user.is_moderator:
-                RequestChatsPermission.objects.create(
-                    email=instance.email,
-                    role=ChatsRole.ADMIN.value,
-                    project=instance.project,
-                    created_by=instance.created_by
-                )
             instance.delete()
         instance.project.send_email_invite_project(email=instance.email)
 
@@ -242,21 +226,6 @@ def request_permission_project(sender, instance, created, **kwargs):
 @receiver(post_save, sender=ProjectAuthorization)
 def project_authorization(sender, instance, created, **kwargs):
     if created:
-        if instance.is_moderator:
-            RequestChatsPermission.objects.create(
-                email=instance.user.email,
-                role=ChatsRole.ADMIN.value,
-                project=instance.project,
-                created_by=instance.user
-            )
-        else:
-            RequestChatsPermission.objects.create(
-                email=instance.user.email,
-                role=ChatsRole.AGENT.value,
-                project=instance.project,
-                created_by=instance.user
-            )
-
         RecentActivity.objects.create(
             action="ADD",
             entity="USER",
@@ -311,37 +280,6 @@ def request_rocket_permission(sender, instance, created, **kwargs):
                 project_auth.save(update_fields=["rocket_authorization"])
                 project_auth.rocket_authorization.update_rocket_permission()
             instance.delete()
-
-
-@receiver(post_save, sender=RequestChatsPermission)
-def request_chats_permission(sender, instance, created, **kwargs):
-    if created:
-        user = User.objects.filter(email=instance.email)
-        if user.exists():
-            user = user.first()
-            project_auth = instance.project.project_authorizations.filter(user=user)
-            chats_instance = ChatsRESTClient()
-            if project_auth.exists():
-                project_auth = project_auth.first()
-                chats_role = ChatsRole.ADMIN.value if project_auth.is_moderator else ChatsRole.AGENT.value
-                if not project_auth.chats_authorization:
-                    if not settings.TESTING:
-                        chats_instance.update_user_permission(
-                            project_uuid=str(instance.project.uuid),
-                            user_email=user.email,
-                            permission=chats_role
-                        )
-                else:
-                    # project_auth.chats_authorization.role = chats_role
-                    # project_auth.chats_authorization.save(update_fields=["role"])
-                    if not settings.TESTING:
-                        chats_instance.update_user_permission(
-                            permission=chats_role,
-                            user_email=user.email,
-                            project_uuid=str(instance.project.uuid)
-                        )
-                # project_auth.save(update_fields=["chats_authorization"])
-                instance.delete()
 
 
 @receiver(post_save, sender=Project)
