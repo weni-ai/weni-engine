@@ -1,6 +1,6 @@
 # 3.7.3
 ## *Fix*
-  - Fix remove user authentication
+  - Fix task delete user permission
 
 # 3.7.2
 ## *Fix*
