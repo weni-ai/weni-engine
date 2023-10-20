@@ -2,19 +2,24 @@ from django.conf import settings
 
 import requests
 
-from connect.common.models import Project
 from connect.api.v1.internal.internal_authentication import InternalAuthentication
-from connect.common.models import ChatsRole
 
 
 class ChatsRESTClient:
     def __init__(self):
+        from connect.common.models import ChatsRole
         self.base_url = settings.CHATS_REST_ENDPOINT
         self.authentication_instance = InternalAuthentication()
+        self.permission_mapper = {
+            ChatsRole.ADMIN.value: 1,
+            ChatsRole.AGENT.value: 2,
+            ChatsRole.SERVICE_MANAGER.value: 3
+        }
 
     def update_user_permission(
         self, permission: int, user_email: str, project_uuid: str
     ):
+        from connect.common.models import ChatsRole
         permission_mapper = {
             ChatsRole.ADMIN.value: 1,
             ChatsRole.AGENT.value: 2,
@@ -101,6 +106,7 @@ class ChatsRESTClient:
         user_email: str,
         permission: int
     ):
+        from connect.common.models import ChatsRole
         permission_mapper = {
             ChatsRole.ADMIN.value: 1,
             ChatsRole.AGENT.value: 2,
@@ -120,6 +126,7 @@ class ChatsRESTClient:
         return True
 
     def update_chats_project(self, project_uuid):
+        from connect.common.models import Project
         project = Project.objects.get(uuid=project_uuid)
         body = dict(
             project=str(project.uuid),
@@ -129,6 +136,24 @@ class ChatsRESTClient:
         )
         requests.patch(
             url=f"{self.base_url}/v1/internal/project/{project_uuid}/",
+            headers=self.authentication_instance.headers,
+            json=body
+        )
+        return True
+
+    def delete_user_permission_project(
+        self,
+        project_uuid: str,
+        user_email: str,
+        permission: int
+    ):
+        body = dict(
+            user=user_email,
+            project=str(project_uuid),
+            role=self.permission_mapper.get(permission, 0)
+        )
+        r = requests.delete(
+            url=f"{self.base_url}/v1/internal/permission/project/",
             headers=self.authentication_instance.headers,
             json=body
         )

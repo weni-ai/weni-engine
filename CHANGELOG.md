@@ -1,3 +1,16 @@
+# 3.7.2
+## *Fix*
+  - NameError: name 'ChatsRole' is not defined
+# 3.7.1
+## *Add*
+  - Request update chats and flows after project update
+  - Request to delete user permission project in chats
+
+# 3.7.0
+## *Add*
+  - Add new company phone field
+  - Add new property for other fields position
+
 # 3.6.3
 ## *Update*
   - Return all organization and company data to invite user in your first login

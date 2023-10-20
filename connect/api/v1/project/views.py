@@ -109,10 +109,11 @@ class ProjectViewSet(
 
     def perform_project_authorization_destroy(self, instance, is_request_permission):
         flow_organization = instance.project.flow_organization
+        project_uuid = instance.project.uuid
         if not is_request_permission:
             celery_app.send_task(
                 "delete_user_permission_project",
-                args=[flow_organization, instance.user.email, instance.role],
+                args=[str(flow_organization), str(project_uuid), instance.user.email, instance.role],
             )
         instance.delete()
 
