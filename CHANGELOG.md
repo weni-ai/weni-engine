@@ -1,3 +1,7 @@
+# 3.7.3
+## *Fix*
+  - Fix task delete user permission
+
 # 3.7.2
 ## *Fix*
   - NameError: name 'ChatsRole' is not defined
