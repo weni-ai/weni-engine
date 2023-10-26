@@ -1,3 +1,7 @@
+# 3.8.0
+## *Update*
+  - Remove keycloak signal data update to make it on user serializer
+
 # 3.7.3
 ## *Fix*
   - Fix task delete user permission
