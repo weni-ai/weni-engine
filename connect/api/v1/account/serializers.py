@@ -3,8 +3,10 @@ from django.contrib.auth.password_validation import validate_password
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
+from keycloak import exceptions
 
 from connect.api.v1.fields import PasswordField
+from connect.api.v1.keycloak import KeycloakControl
 from connect.authentication.models import User, UserEmailSetup
 
 from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
@@ -86,6 +88,8 @@ class UserSerializer(serializers.ModelSerializer):
                 last_name=update_instance.last_name
             )
 
+            self.keycloak_update(update_instance)
+
         return update_instance
 
     def get_send_email_setup(self, obj):
@@ -94,6 +98,22 @@ class UserSerializer(serializers.ModelSerializer):
             return UserEmailSetupSerializer(setup).data
         except Exception:
             return {}
+
+    def keycloak_update(self, update_instance):
+        try:
+            keycloak_instance = KeycloakControl()
+
+            user_id = keycloak_instance.get_user_id_by_email(email=update_instance.email)
+            keycloak_instance.get_instance().update_user(
+                user_id=user_id,
+                payload={
+                    "firstName": update_instance.first_name,
+                    "lastName": update_instance.last_name,
+                },
+            )
+        except exceptions.KeycloakGetError as error:
+            return error
+        return True
 
 
 class UserPhotoSerializer(serializers.Serializer):
