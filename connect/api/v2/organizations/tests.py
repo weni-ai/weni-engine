@@ -136,6 +136,27 @@ class OrganizationViewSetTestCase(TestCase):
 
         self.assertEquals(response.status_code, status.HTTP_403_FORBIDDEN)
 
+    def test_get_organization_email_weni(self):
+        pk = str(self.org_1.uuid)
+        path = "/v2/organizations/"
+        method = {"get": "retrieve"}
+        user = self.user
+        user.email = "test@weni.ai"
+        user.save()
+
+        org = self.org_1
+        org.allowed_ips = ["123.123.123.9"]
+        org.save()
+
+        response, content_data = self.request(
+            path,
+            method,
+            pk=pk,
+            user=user
+        )
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+
     def test_fail_get_authorization(self):
         pk = str(self.org_1.uuid)
         path = "/v2/organizations/"

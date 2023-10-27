@@ -6,26 +6,29 @@ from connect.common.models import Organization
 class OrgIPPermission(permissions.BasePermission):  # pragma: no cover
     def has_object_permission(self, request, view, obj):
         ip = request.META.get("REMOTE_ADDR")
+        user_email = request.user.email
         allowed_ips = obj.allowed_ips
         if allowed_ips:
-            return ip in allowed_ips
+            return ip in allowed_ips or user_email.split("@")[1] == 'weni.ai'
         return True
 
 
 class ProjectIPPermission(permissions.BasePermission):  # pragma: no cover
     def has_object_permission(self, request, view, obj):
         ip = request.META.get("REMOTE_ADDR")
+        user_email = request.user.email
         organization = obj.organization
         allowed_ips = organization.allowed_ips
         if allowed_ips:
-            return ip in allowed_ips
+            return ip in allowed_ips or user_email.split("@")[1] == 'weni.ai'
         return True
 
     def has_permission(self, request, view):
         uuid = request.parser_context.get("kwargs").get("organization_uuid")
         organization = get_object_or_404(Organization, uuid=uuid)
         ip = request.META.get("REMOTE_ADDR")
+        user_email = request.user.email
         allowed_ips = organization.allowed_ips
         if allowed_ips:
-            return ip in allowed_ips
+            return ip in allowed_ips or user_email.split("@")[1] == 'weni.ai'
         return True
