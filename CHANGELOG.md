@@ -1,3 +1,6 @@
+# 3.8.1
+## *Fix*
+  - get_contact_active_detailed filter contacts by project
 # 3.8.0
 ## *Update*
   - Remove keycloak signal data update to make it on user serializer
