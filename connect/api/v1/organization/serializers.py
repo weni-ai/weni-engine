@@ -216,13 +216,13 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
             "count": obj.authorizations.count(),
             "users": [
                 {
-                    "username": i.user.username,
-                    "first_name": i.user.first_name,
-                    "last_name": i.user.last_name,
-                    "role": i.role,
-                    "photo_user": i.user.photo_url,
+                    "username": authoirization.user.username,
+                    "first_name": authoirization.user.first_name,
+                    "last_name": authoirization.user.last_name,
+                    "role": authoirization.role,
+                    "photo_user": authoirization.user.photo_url,
                 }
-                for i in obj.authorizations.select_related("user").exclude(role__in=exclude_roles)
+                for authoirization in obj.authorizations.select_related("user").exclude(role__in=exclude_roles)
             ],
         }
 
