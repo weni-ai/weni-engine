@@ -1,3 +1,6 @@
+# 3.8.2
+## *Update*
+  - method to count attendances
 # 3.8.1
 ## *Fix*
   - get_contact_active_detailed filter contacts by project
