@@ -1,3 +1,7 @@
+# 3.9.0
+## *Add*
+  - Overwritte the saving method on admin billing plan to remove newsletter after changes.
+
 # 3.8.2
 ## *Update*
   - method to count attendances
