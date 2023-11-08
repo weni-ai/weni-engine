@@ -1014,7 +1014,7 @@ class Project(models.Model):
         if counting_method == BillingPlan.ACTIVE_CONTACTS:
             return Contact.objects.filter(project=self).filter(last_seen_on__range=(after, before)).distinct("contact_flow_uuid").count()
 
-        total = get_attendances(self, after, before)
+        total = get_attendances(self, str(after), str(before))
 
         return total
 
