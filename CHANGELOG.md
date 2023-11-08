@@ -1,3 +1,6 @@
+# 3.9.1
+## *Fix*
+  - get_attendances call
 # 3.9.0
 ## *Add*
   - Overwritte the saving method on admin billing plan to remove newsletter after changes.
