@@ -6,6 +6,7 @@ from connect.api.v2.classifier.views import CreateClassifierAPIView, ListClassif
 from connect.api.v2.ticketer.views import TicketerAPIView
 from connect.api.v2.user.views import UserAPIToken, UserIsPaying
 from connect.api.v2.omie.views import OmieAccountAPIView, OmieOriginAPIView, OmieSolutionsAPIView, OmieUsersAPIView
+from connect.api.v2.recent_activity.views import RecentActivityViewSet
 
 from connect.api.v2.template_projects.views import TemplateTypeViewSet, TemplateFeatureViewSet, TemplateSuggestionViewSet
 
@@ -50,6 +51,7 @@ urlpatterns = [
     path("omie/origins", OmieOriginAPIView.as_view(), name="omie-origins"),
     path("omie/solutions", OmieSolutionsAPIView.as_view(), name="omie-solutions"),
     path("omie/users", OmieUsersAPIView.as_view(), name="omie-users"),
+    path("recent-activities", RecentActivityViewSet.as_view({"post": "create", "get": "list"}), name="recent-activities"),
 ]
 urlpatterns += [
     path("", include(projects_router.urls)),
