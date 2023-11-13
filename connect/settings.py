@@ -379,6 +379,9 @@ OIDC_DRF_AUTH_BACKEND = env.str(
 )
 OIDC_RP_SCOPES = env.str("OIDC_RP_SCOPES", default="openid email")
 
+OIDC_CACHE_TOKEN = env.bool("OIDC_CACHE_TOKEN", default=False)  # Enable/disable user token caching (default: False).
+OIDC_CACHE_TTL = env.int("OIDC_CACHE_TTL", default=600)  # Time-to-live for cached user tokens (default: 600 seconds).
+
 # Swagger
 
 SWAGGER_SETTINGS = {
