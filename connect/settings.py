@@ -395,13 +395,26 @@ SWAGGER_SETTINGS = {
 
 # Celery
 
+REDIS_URL = env.str("CELERY_BROKER_URL", default="redis://localhost:6379/1")
+
 CELERY_RESULT_BACKEND = "django-db"
-CELERY_BROKER_URL = env.str("CELERY_BROKER_URL")
+CELERY_BROKER_URL = REDIS_URL
 CELERY_ACCEPT_CONTENT = ["application/json"]
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TASK_SERIALIZER = "json"
 
 SYNC_CONTACTS_SCHEDULE = env.str("SYNC_CONTACTS_SCHEDULE")
+
+
+# Cache
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": REDIS_URL,
+        "OPTIONS": {"CLIENT_CLASS": "django_redis.client.DefaultClient"},
+    }
+}
 
 # AWS
 
