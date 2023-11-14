@@ -1,3 +1,4 @@
+import json
 import logging
 
 from django.conf import settings
@@ -23,18 +24,21 @@ class WeniOIDCAuthenticationBackend(OIDCAuthenticationBackend):
     """
 
     cache_token = settings.OIDC_CACHE_TOKEN
-    cache_ttl = getattr(settings, "OIDC_CACHE_TTL", 600)
+    cache_ttl = settings.OIDC_CACHE_TTL
 
     def get_userinfo(self, access_token, *args):
         if not self.cache_token:
             return super().get_userinfo(access_token, *args)
 
         redis_connection = get_redis_connection()
+
         userinfo = redis_connection.get(access_token)
 
-        if userinfo is None:
-            userinfo = super().get_userinfo(access_token, *args)
-            redis_connection.set(access_token, userinfo, self.cache_ttl)
+        if userinfo is not None:
+            return json.loads(userinfo)
+
+        userinfo = super().get_userinfo(access_token, *args)
+        redis_connection.set(access_token, json.dumps(userinfo), self.cache_ttl)
 
         return userinfo
 
