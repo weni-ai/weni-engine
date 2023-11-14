@@ -1,7 +1,9 @@
+import json
 import logging
 
 from django.conf import settings
 from django.utils import translation
+from django_redis import get_redis_connection
 from mozilla_django_oidc.auth import OIDCAuthenticationBackend
 from mozilla_django_oidc.contrib.drf import OIDCAuthentication
 from rest_framework import HTTP_HEADER_ENCODING, exceptions
@@ -20,6 +22,25 @@ class WeniOIDCAuthenticationBackend(OIDCAuthenticationBackend):
     """
     Custom authentication class for django-admin.
     """
+
+    cache_token = settings.OIDC_CACHE_TOKEN
+    cache_ttl = settings.OIDC_CACHE_TTL
+
+    def get_userinfo(self, access_token, *args):
+        if not self.cache_token:
+            return super().get_userinfo(access_token, *args)
+
+        redis_connection = get_redis_connection()
+
+        userinfo = redis_connection.get(access_token)
+
+        if userinfo is not None:
+            return json.loads(userinfo)
+
+        userinfo = super().get_userinfo(access_token, *args)
+        redis_connection.set(access_token, json.dumps(userinfo), self.cache_ttl)
+
+        return userinfo
 
     def verify_claims(self, claims):
         # validação de permissão
