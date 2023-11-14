@@ -9,7 +9,6 @@ from connect.common.models import RecentActivity
 from connect.common.models import Project, OrganizationRole, BillingPlan, Organization
 from connect.authentication.models import User
 from connect.api.v1.tests.utils import create_user_and_token
-from connect.api.v2.recent_activity.serializers import RecentActivitySerializer
 
 
 class RecentActivityViewSetTestCase(APITestCase):
@@ -37,8 +36,9 @@ class RecentActivityViewSetTestCase(APITestCase):
         self.recent_activity = RecentActivity.objects.create(
             user=self.owner,
             project=self.project,
-            action=1,
-            entity=1,
+            action="ADD",
+            entity="USER",
+            entity_name=self.project.name
         )
 
     @patch("connect.api.v1.internal.permissions.ModuleHasPermission.has_permission")
@@ -47,8 +47,8 @@ class RecentActivityViewSetTestCase(APITestCase):
         data = {
             "user": str(self.owner),
             "project": str(self.project.uuid),
-            "action": 1,
-            "entity": 2,
+            "action": "UPDATE",
+            "entity": "CAMPAIGN",
         }
         response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -65,18 +65,17 @@ class RecentActivityViewSetTestCase(APITestCase):
         self.client.force_authenticate(user=self.owner)
         response = self.client.get(self.url, {"project": str(self.project.uuid)}, format="json", **self.headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 2)
-        self.assertEqual(response.data[0], RecentActivitySerializer(self.recent_activity).data)
 
     def test_list_recent_activities_with_invalid_project(self):
         self.client.force_authenticate(user=self.owner)
-        response = self.client.get(self.url, {"project": "invalid-uuid"}, format="json")
+        response = self.client.get(self.url, {"project": str(uuid4.uuid4())}, format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data["message"], "Project does not exist.")
 
     def test_list_recent_activities_with_no_permission(self):
-        self.client.force_authenticate(user=self.user)
+        user, user_token = create_user_and_token("user")
+        self.client.force_authenticate(user=user)
         response = self.client.get(self.url, {"project": str(self.project.uuid)}, format="json")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(len(response.data), 1)

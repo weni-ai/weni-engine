@@ -28,10 +28,10 @@ class RecentActivitySerializer(serializers.ModelSerializer):
         fields = ['user', 'action', 'entity', 'entity_name', 'intelligence_id', 'flow_organization', 'project_uuid', 'project']
         list_serializer_class = RecentActivityListSerializer
 
-    user = serializers.SlugRelatedField(slug_field='email', queryset=User.objects.all())
-    project = serializers.SlugRelatedField(slug_field='uuid', queryset=Project.objects.all())
-    action = serializers.CharField()
-    entity = serializers.CharField()
+    user = serializers.SlugRelatedField(slug_field='email', queryset=User.objects.all(), required=False)
+    project = serializers.SlugRelatedField(slug_field='uuid', queryset=Project.objects.all(), required=False)
+    action = serializers.CharField(required=False)
+    entity = serializers.CharField(required=False)
     entity_name = serializers.CharField(required=False)
     intelligence_id = serializers.CharField(required=False)
     flow_organization = serializers.CharField(required=False)
