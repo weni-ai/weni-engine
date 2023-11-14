@@ -2440,44 +2440,29 @@ class RecentActivity(models.Model):
         entity_name = validated_data.get('entity_name')
         intelligence_id = validated_data.get('intelligence_id')
         flow_organization = validated_data.get('flow_organization')
-        project_uuid = validated_data.get('project_uuid')
-
-        new_recent_activities = []
+        project = validated_data.get('project')
 
         if intelligence_id:
             organization = Organization.objects.get(intelligence_organization=intelligence_id)
-            for project in organization.project.all():
-                new_recent_activities.append(
-                    RecentActivity(
-                        action=action,
-                        entity=entity,
-                        user=user,
-                        project=project,
-                        entity_name=entity_name
-                    )
-                )
+            project = organization.project.first()
         else:
             if flow_organization:
-                project = Project.objects.filter(flow_organization=flow_organization)
+                project = Project.objects.filter(flow_organization=flow_organization).first()
             else:
-                project = Project.objects.filter(uuid=project_uuid)
+                project = Project.objects.filter(uuid=project.uuid).first()
 
-            if len(project) > 0:
-                project = project.first()
-            else:
-                raise Exception("Project not found")
+        if not project:
+            raise Exception("Project not found")
 
-            new_recent_activities.append(
-                RecentActivity(
-                    action=action,
-                    entity=entity,
-                    user=user,
-                    project=project,
-                    entity_name=entity_name
-                )
-            )
+        new_recent_activities = RecentActivity.objects.create(
+            action=action,
+            entity=entity,
+            user=user,
+            project=project,
+            entity_name=entity_name
+        )
+        new_recent_activities.save()
 
-        RecentActivity.objects.bulk_create(new_recent_activities)
         return new_recent_activities
 
 

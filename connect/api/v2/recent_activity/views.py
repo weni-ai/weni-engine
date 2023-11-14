@@ -1,4 +1,4 @@
-from rest_framework import status, mixins
+from rest_framework import status, mixins, permissions
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
@@ -18,7 +18,7 @@ class RecentActivityViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, Gene
 
     def get_permissions(self):
         if self.action == "create":
-            self.permission_classes = [ModuleHasPermission()]
+            self.permission_classes = [ModuleHasPermission]
         return super().get_permissions()
 
     def create(self, request):
@@ -34,6 +34,7 @@ class RecentActivityViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, Gene
         except Project.DoesNotExist:
             return Response({"message": "Project does not exist."}, status=status.HTTP_404_NOT_FOUND)
 
+        print("Request: ", request)
         if not project.project_authorizations.filter(user__email=request.user.email).exists():
             return Response({"message": "Permission denied."}, status=status.HTTP_403_FORBIDDEN)
 

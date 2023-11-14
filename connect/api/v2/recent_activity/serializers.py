@@ -25,18 +25,18 @@ class RecentActivitySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = RecentActivity
-        fields = ['user', 'action', 'entity', 'entity_name', 'intelligence_id', 'flow_organization', 'project_uuid']
+        fields = ['user', 'action', 'entity', 'entity_name', 'intelligence_id', 'flow_organization', 'project_uuid', 'project']
         list_serializer_class = RecentActivityListSerializer
 
     user = serializers.SlugRelatedField(slug_field='email', queryset=User.objects.all())
     project = serializers.SlugRelatedField(slug_field='uuid', queryset=Project.objects.all())
     action = serializers.CharField()
     entity = serializers.CharField()
-    entity_name = serializers.CharField()
+    entity_name = serializers.CharField(required=False)
     intelligence_id = serializers.CharField(required=False)
     flow_organization = serializers.CharField(required=False)
     project_uuid = serializers.CharField(required=False)
 
     def create(self, validated_data):
-        user = self.context['request'].user
+        user = validated_data.get('user')
         return RecentActivity.create_recent_activities(validated_data, user)
