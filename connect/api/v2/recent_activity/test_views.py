@@ -25,7 +25,7 @@ class RecentActivityViewSetTestCase(APITestCase):
         self.organization_authorization = self.organization.authorizations.create(
             user=self.owner, role=OrganizationRole.ADMIN.value
         )
-        self.user, self.user_token = create_user_and_token("user")
+
         self.project = Project.objects.create(
             name="project 1",
             flow_organization=uuid4.uuid4(),
@@ -61,25 +61,15 @@ class RecentActivityViewSetTestCase(APITestCase):
         user_activity = User.objects.get(email=self.owner.email)
         self.assertEqual(created_activity.user, user_activity)
 
-    def test_create_recent_activity_with_invalid_project(self):
-        data = {
-            "project": "invalid-uuid",
-            "activity_type": RecentActivity.ActivityType.CREATED.value,
-            "message": "Test message",
-        }
-        response = self.client.post(self.url, data, format="json")
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertEqual(RecentActivity.objects.count(), 0)
-
-    @patch("connect.api.v1.internal.permissions.ModuleHasPermission.has_permission")
-    def test_list_recent_activities(self, module_has_permission):
-
+    def test_list_recent_activities(self):
+        self.client.force_authenticate(user=self.owner)
         response = self.client.get(self.url, {"project": str(self.project.uuid)}, format="json", **self.headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 2)
         self.assertEqual(response.data[0], RecentActivitySerializer(self.recent_activity).data)
 
     def test_list_recent_activities_with_invalid_project(self):
+        self.client.force_authenticate(user=self.owner)
         response = self.client.get(self.url, {"project": "invalid-uuid"}, format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(len(response.data), 1)

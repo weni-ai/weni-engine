@@ -34,7 +34,6 @@ class RecentActivityViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, Gene
         except Project.DoesNotExist:
             return Response({"message": "Project does not exist."}, status=status.HTTP_404_NOT_FOUND)
 
-        print("Request: ", request)
         if not project.project_authorizations.filter(user__email=request.user.email).exists():
             return Response({"message": "Permission denied."}, status=status.HTTP_403_FORBIDDEN)
 
