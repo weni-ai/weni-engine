@@ -14,8 +14,12 @@ User = get_user_model()
 class RecentActivityViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, GenericViewSet):
     queryset = RecentActivity.objects.all()
     serializer_class = RecentActivitySerializer
-    permission_classes = [ModuleHasPermission]
     pagination_class = CustomCursorPagination
+
+    def get_permissions(self):
+        if self.action == "create":
+            self.permission_classes = [ModuleHasPermission()]
+        return super().get_permissions()
 
     def create(self, request):
         serializer = self.get_serializer(data=request.data)
