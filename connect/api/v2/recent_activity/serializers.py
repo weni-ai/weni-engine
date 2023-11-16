@@ -22,3 +22,27 @@ class RecentActivitySerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = validated_data.get('user')
         return RecentActivity.create_recent_activities(validated_data, user)
+
+
+class ListRecentActivitySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = RecentActivity
+        fields = ['user', 'action', 'created_at', 'name']
+
+    created_at = serializers.SerializerMethodField()
+    action = serializers.SerializerMethodField()
+    name = serializers.SerializerMethodField()
+    user = serializers.SerializerMethodField()
+
+    def get_action(self, instance):
+        return instance.action_description_key
+
+    def get_created_at(self, instance):
+        return instance.created_on
+
+    def get_name(self, instance):
+        return instance.entity_name
+
+    def get_user(self, instance):
+        return instance.user_name

@@ -3,7 +3,7 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
 
-from .serializers import RecentActivitySerializer
+from .serializers import RecentActivitySerializer, ListRecentActivitySerializer
 from connect.api.v2.recent_activity.paginations import CustomCursorPagination
 from connect.api.v1.internal.permissions import ModuleHasPermission
 from connect.common.models import Project, RecentActivity
@@ -13,13 +13,18 @@ User = get_user_model()
 
 class RecentActivityViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, GenericViewSet):
     queryset = RecentActivity.objects.all()
-    serializer_class = RecentActivitySerializer
+    # serializer_class = RecentActivitySerializer
     pagination_class = CustomCursorPagination
 
     def get_permissions(self):
         if self.action == "create":
             self.permission_classes = [ModuleHasPermission]
         return super().get_permissions()
+
+    def get_serializer_class(self):
+        if self.action == "list":
+            return ListRecentActivitySerializer
+        return RecentActivitySerializer
 
     def create(self, request):
         serializer = self.get_serializer(data=request.data)
@@ -38,7 +43,7 @@ class RecentActivityViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, Gene
         if not project.project_authorizations.filter(user__email=request.user.email).exists():
             return Response({"message": "Permission denied."}, status=status.HTTP_403_FORBIDDEN)
 
-        queryset = RecentActivity.objects.filter(project__uuid=project_uuid).order_by("-created_on")
+        queryset = RecentActivity.objects.select_related("user").filter(project__uuid=project_uuid).order_by("-created_on")
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)
 
