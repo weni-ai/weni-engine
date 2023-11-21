@@ -1,3 +1,8 @@
+# 3.10.0
+## *Add*
+  - Create RecentActivity v2 create and list endpoint
+  - New Pagination class for recent activity
+
 # 3.9.1
 ## *Fix*
   - get_attendances call
