@@ -13,7 +13,6 @@ User = get_user_model()
 
 class RecentActivityViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, GenericViewSet):
     queryset = RecentActivity.objects.all()
-    # serializer_class = RecentActivitySerializer
     pagination_class = CustomCursorPagination
 
     def get_permissions(self):
