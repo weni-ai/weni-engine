@@ -2433,6 +2433,38 @@ class RecentActivity(models.Model):
 
         return data
 
+    @staticmethod
+    def create_recent_activities(validated_data, user):
+        action = validated_data.get('action')
+        entity = validated_data.get('entity')
+        entity_name = validated_data.get('entity_name')
+        intelligence_id = validated_data.get('intelligence_id')
+        flow_organization = validated_data.get('flow_organization')
+        project = validated_data.get('project')
+
+        if intelligence_id:
+            organization = Organization.objects.get(intelligence_organization=intelligence_id)
+            project = organization.project.first()
+        else:
+            if flow_organization:
+                project = Project.objects.filter(flow_organization=flow_organization).first()
+            else:
+                project = Project.objects.filter(uuid=project.uuid).first()
+
+        if not project:
+            raise Exception("Project not found")
+
+        new_recent_activities = RecentActivity.objects.create(
+            action=action,
+            entity=entity,
+            user=user,
+            project=project,
+            entity_name=entity_name
+        )
+        new_recent_activities.save()
+
+        return new_recent_activities
+
 
 class NewsletterOrganization(models.Model):
     title = models.CharField(_("title"), max_length=50)
