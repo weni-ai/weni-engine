@@ -1,3 +1,6 @@
+# 3.10.1
+  - improve elasticsearch query
+
 # 3.10.0
 ## *Add*
   - Create RecentActivity v2 create and list endpoint
