@@ -17,8 +17,12 @@ class ElasticFlow(ElasticHandler):  # pragma: no cover
         before, after = es_convert_datetime(before, after)
 
         qs = Q(
-            'bool', must=[Q('match', is_active='true') & Q('match', org_id=flow_id)]) \
-            & Q(
+            'bool', must=[
+                Q('match', is_active='true'),
+                Q('match', org_id=flow_id),
+                Q('nested', path='urns', query=Q('bool', must=[Q('exists', field='urns.path')]))
+            ]
+        ) & Q(
             "range", last_seen_on={
                 "gte": str(after),
                 "lte": str(before)}
