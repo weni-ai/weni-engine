@@ -54,6 +54,18 @@ class ElasticFlow(ElasticHandler):  # pragma: no cover
                             }
                         },
                         {
+                            "nested": {
+                                "path": "urns",
+                                "query": {
+                                    "bool": {
+                                        "must": [
+                                            {"exists": {"field": "urns.path"}} 
+                                        ]
+                                    }
+                                }
+                            }
+                        },
+                        {
                             "range": {
                                 "last_seen_on": {
                                     "gte": str(after),
