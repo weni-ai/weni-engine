@@ -1,3 +1,6 @@
+# 3.11.0
+  - Configure OIDC middleware to send user token to cache 
+  - improve query in get_paginated_contacts
 # 3.10.1
   - improve elasticsearch query
 
