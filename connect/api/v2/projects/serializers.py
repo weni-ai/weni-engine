@@ -225,6 +225,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             "organization_id": instance.organization.inteligence_organization,
             "extra_fields": extra_fields if instance.is_template else {},
             "authorizations": authorizations,
+            "organization_uuid": str(instance.organization.uuid)
         }
         rabbitmq_publisher = RabbitmqPublisher()
         rabbitmq_publisher.send_message(message_body, exchange="projects.topic", routing_key="")
