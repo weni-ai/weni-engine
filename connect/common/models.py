@@ -1006,17 +1006,18 @@ class Project(models.Model):
 
     def get_contacts(self, before: str, after: str, counting_method: str = None):
         from connect.billing.models import Contact
-        from connect.billing.utils import get_attendances
+        from connect.billing.utils import get_attendances, custom_get_attendances
 
         if not counting_method:
             counting_method = self.organization.organization_billing.plan_method
 
         if counting_method == BillingPlan.ACTIVE_CONTACTS:
             return Contact.objects.filter(project=self).filter(last_seen_on__range=(after, before)).distinct("contact_flow_uuid").count()
+        
+        if pendulum.parse(after) < pendulum.parse(settings.NEW_ATTENDANCE_DATE).end_of("day"):
+            return get_attendances(self, str(after), str(before))
 
-        total = get_attendances(self, str(after), str(before))
-
-        return total
+        return custom_get_attendances(self, str(after), str(before))
 
 
 class OpenedProject(models.Model):
