@@ -1,3 +1,6 @@
+# 3.11.1
+  - change counting method for new attendances
+
 # 3.11.0
   - Configure OIDC middleware to send user token to cache 
   - improve query in get_paginated_contacts
