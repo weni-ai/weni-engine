@@ -1014,7 +1014,7 @@ class Project(models.Model):
         if counting_method == BillingPlan.ACTIVE_CONTACTS:
             return Contact.objects.filter(project=self).filter(last_seen_on__range=(after, before)).distinct("contact_flow_uuid").count()
         
-        if pendulum.parse(after) < pendulum.parse(settings.NEW_ATTENDANCE_DATE).end_of("day"):
+        if pendulum.parse(str(after)) < pendulum.parse(settings.NEW_ATTENDANCE_DATE).end_of("day"):
             return get_attendances(self, str(after), str(before))
 
         return custom_get_attendances(self, str(after), str(before))
