@@ -51,8 +51,6 @@ class ProjectSerializer(serializers.ModelSerializer):
             "total_contact_count",
             "menu",
             "created_at",
-            "authorizations",
-            "pending_authorizations",
             "authorization",
             "last_opened_on",
             "project_type",
@@ -72,7 +70,6 @@ class ProjectSerializer(serializers.ModelSerializer):
         style={"show": False},
     )
     timezone = fields.TimezoneField(required=True)
-    menu = serializers.SerializerMethodField()
     flow_organization = serializers.UUIDField(style={"show": False}, read_only=True)
     inteligence_count = serializers.IntegerField(read_only=True)
     flow_count = serializers.IntegerField(read_only=True)
@@ -81,8 +78,8 @@ class ProjectSerializer(serializers.ModelSerializer):
     created_at = serializers.DateTimeField(
         required=False, read_only=True, style={"show": False}
     )
-    authorizations = serializers.SerializerMethodField(style={"show": False})
-    pending_authorizations = serializers.SerializerMethodField(style={"show": False})
+
+    menu = serializers.SerializerMethodField()
     authorization = serializers.SerializerMethodField(style={"show": False})
     last_opened_on = serializers.SerializerMethodField()
     project_type = serializers.SerializerMethodField()
@@ -249,59 +246,6 @@ class ProjectSerializer(serializers.ModelSerializer):
         if not settings.TESTING:
             ChatsRESTClient().update_chats_project(instance.uuid)
         return updated_instance
-
-    def get_authorizations(self, obj):
-        exclude_roles = [ProjectRole.SUPPORT.value]
-        queryset = obj.project_authorizations.exclude(role__in=exclude_roles)
-        response = dict(
-            count=queryset.count(),
-            users=[]
-        )
-        for i in queryset:
-            chats_role = None
-            if i.rocket_authorization:
-                chats_role = i.rocket_authorization.role
-            elif i.chats_authorization:
-                chats_role = i.chats_authorization.role
-            response['users'].append(
-                dict(
-                    username=i.user.username,
-                    email=i.user.email,
-                    first_name=i.user.first_name,
-                    last_name=i.user.last_name,
-                    project_role=i.role,
-                    photo_user=i.user.photo_url,
-                    chats_role=chats_role,
-                )
-            )
-        return response
-
-    def get_pending_authorizations(self, obj):  # pragma: no cover
-        response = {
-            "count": obj.requestpermissionproject_set.count(),
-            "users": [],
-        }
-        for i in obj.requestpermissionproject_set.all():
-            rocket_authorization = RequestRocketPermission.objects.filter(email=i.email)
-            chats_authorization = RequestChatsPermission.objects.filter(email=i.email)
-            chats_role = None
-            if (len(rocket_authorization) > 0):
-                rocket_authorization = rocket_authorization.first()
-                chats_role = rocket_authorization.role
-
-            if len(chats_authorization) > 0:
-                chats_authorization = chats_authorization.first()
-                chats_role = chats_authorization.role
-
-            response["users"].append(
-                dict(
-                    email=i.email,
-                    project_role=i.role,
-                    created_by=i.created_by.email,
-                    chats_role=chats_role
-                )
-            )
-        return response
 
     def get_authorization(self, obj):
         request = self.context.get("request")
