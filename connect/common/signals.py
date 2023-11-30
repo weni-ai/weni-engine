@@ -59,18 +59,6 @@ def create_service_status(sender, instance, created, **kwargs):
                     permission=permission.role
                 )
 
-        for authorization in instance.organization.authorizations.all():
-            if authorization.can_contribute:
-                project_auth = instance.get_user_authorization(authorization.user)
-                project_auth.role = authorization.role
-                project_auth.save()
-                if not settings.TESTING and project_auth.is_moderator:
-                    RequestChatsPermission.objects.create(
-                        email=project_auth.user.email,
-                        role=ChatsRole.ADMIN.value,
-                        project=project_auth.project,
-                        created_by=project_auth.user
-                    )
     elif update_fields and "flow_organization" in update_fields:
         for permission in instance.project_authorizations.all():
             update_user_permission_project(
