@@ -540,22 +540,6 @@ SCROLL_KEEP_ALIVE = env.int("SCROLL_KEEP_ALIVE")
 FLOWS_REST_ENDPOINT = env.str("FLOWS_REST_ENDPOINT")
 
 
-# AI
-AI_FAREWELL_N_GREETINGS = env.str("AI_FAREWELL_N_GREETINGS")
-AI_BINARY_ANSWERS = env.str("AI_BINARY_ANSWERS")
-AI_CRISTAL = env.str("AI_CRISTAL")
-
-REPOSITORY_IDS = {
-    "lead_capture": AI_FAREWELL_N_GREETINGS,
-    "lead_capture+chatgpt": AI_FAREWELL_N_GREETINGS,
-    "support": AI_BINARY_ANSWERS,
-    "omie_financial": AI_CRISTAL,
-    "omie_financial+chatgpt": AI_CRISTAL,
-    "omie_lead_capture": AI_CRISTAL,
-    "sac+chatgpt": AI_CRISTAL,
-}
-
-
 CREATE_AI_ORGANIZATION = env.bool("CREATE_AI_ORGANIZATION")
 
 OMIE_APP_KEY = env.str("OMIE_APP_KEY", default="ap_test")
