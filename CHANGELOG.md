@@ -1,3 +1,8 @@
+# 3.12.0
+## *Remove*
+  - Remove project authorization list from api return
+  - AI unused env vars
+
 # 3.11.1
   - change counting method for new attendances
 
