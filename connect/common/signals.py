@@ -64,13 +64,7 @@ def create_service_status(sender, instance, created, **kwargs):
                 project_auth = instance.get_user_authorization(authorization.user)
                 project_auth.role = authorization.role
                 project_auth.save()
-                if not settings.TESTING and project_auth.is_moderator:
-                    RequestChatsPermission.objects.create(
-                        email=project_auth.user.email,
-                        role=ChatsRole.ADMIN.value,
-                        project=project_auth.project,
-                        created_by=project_auth.user
-                    )
+
     elif update_fields and "flow_organization" in update_fields:
         for permission in instance.project_authorizations.all():
             update_user_permission_project(
@@ -228,13 +222,6 @@ def request_permission_project(sender, instance, created, **kwargs):
                 auth_user.role = instance.role
                 auth_user.save(update_fields=["role"])
 
-            if not settings.TESTING and auth_user.is_moderator:
-                RequestChatsPermission.objects.create(
-                    email=instance.email,
-                    role=ChatsRole.ADMIN.value,
-                    project=instance.project,
-                    created_by=instance.created_by
-                )
             instance.delete()
         instance.project.send_email_invite_project(email=instance.email)
 
@@ -242,20 +229,6 @@ def request_permission_project(sender, instance, created, **kwargs):
 @receiver(post_save, sender=ProjectAuthorization)
 def project_authorization(sender, instance, created, **kwargs):
     if created:
-        if instance.is_moderator:
-            RequestChatsPermission.objects.create(
-                email=instance.user.email,
-                role=ChatsRole.ADMIN.value,
-                project=instance.project,
-                created_by=instance.user
-            )
-        else:
-            RequestChatsPermission.objects.create(
-                email=instance.user.email,
-                role=ChatsRole.AGENT.value,
-                project=instance.project,
-                created_by=instance.user
-            )
 
         RecentActivity.objects.create(
             action="ADD",
