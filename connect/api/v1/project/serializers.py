@@ -36,6 +36,9 @@ from connect.common.models import (
     ChatsAuthorization,
 )
 
+
+from connect.internals.event_driven.producer.rabbitmq_publisher import RabbitmqPublisher
+
 logger = logging.getLogger(__name__)
 
 
@@ -120,7 +123,7 @@ class ProjectSerializer(serializers.ModelSerializer):
                 template = obj.template_project.get(authorization__user__email=email)
                 return template.first_access
             except TemplateProject.DoesNotExist:
-                template_project = obj.template_project.filter(wa_demo_token__isnull=False, redirect_url__isnull=False).first()
+                template_project = obj.template_project.filter(wa_demo_token__isnull=Fal7se, redirect_url__isnull=False).first()
                 template = obj.template_project.create(
                     wa_demo_token=template_project.wa_demo_token,
                     redirect_url=template_project.redirect_url,
@@ -181,6 +184,7 @@ class ProjectSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         name = validated_data.get("name", instance.name)
+        rabbitmq_publisher = RabbitmqPublisher()
         celery_app.send_task(
             "update_project",
             args=[instance.uuid, name],
@@ -188,6 +192,11 @@ class ProjectSerializer(serializers.ModelSerializer):
         updated_instance = super().update(instance, validated_data)
         if not settings.TESTING:
             ChatsRESTClient().update_chats_project(instance.uuid)
+        message_body = {
+            "project_uuid": str(updated_instance.uuid),
+            "description": updated_instance.description
+        }
+        rabbitmq_publisher.send_message(message_body, exchange="projects-update.topic", routing_key="")
         return updated_instance
 
     def get_authorizations(self, obj):
