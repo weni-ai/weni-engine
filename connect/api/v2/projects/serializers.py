@@ -58,6 +58,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             "first_access",
             "wa_demo_token",
             "redirect_url",
+            "description",
         ]
         ref_name = None
 
@@ -78,6 +79,7 @@ class ProjectSerializer(serializers.ModelSerializer):
     created_at = serializers.DateTimeField(
         required=False, read_only=True, style={"show": False}
     )
+    description = serializers.CharField(max_length=1000, required=False)
 
     menu = serializers.SerializerMethodField()
     authorization = serializers.SerializerMethodField(style={"show": False})
@@ -178,6 +180,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             created_by=user,
             template_type=template_name,
             project_template_type=project_template_type,
+            description=validated_data.get("description")
         )
 
         self.send_request_flow_product(user)
@@ -222,6 +225,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             "organization_id": instance.organization.inteligence_organization,
             "extra_fields": extra_fields if instance.is_template else {},
             "authorizations": authorizations,
+            "description": instance.description
         }
         rabbitmq_publisher = RabbitmqPublisher()
         rabbitmq_publisher.send_message(message_body, exchange="projects.topic", routing_key="")
