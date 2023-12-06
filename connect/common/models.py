@@ -732,6 +732,7 @@ class Project(models.Model):
         null=True,
         blank=True
     )
+    description = models.CharField("Project description with the context", null=True, blank=True, max_length=1000)
 
     def __str__(self):
         return f"{self.uuid} - Project: {self.name} - Org: {self.organization.name}"
