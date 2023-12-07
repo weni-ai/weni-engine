@@ -1,3 +1,10 @@
+# 3.13.0
+## *Add*
+  - project description
+
+## *Update*
+  - project description sended on project create and update
+
 # 3.12.0
 ## *Remove*
   - Remove project authorization list from api return
