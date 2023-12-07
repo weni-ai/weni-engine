@@ -58,11 +58,13 @@ class ProjectSerializer(serializers.ModelSerializer):
             "first_access",
             "wa_demo_token",
             "redirect_url",
+            "description",
         ]
         ref_name = None
 
     uuid = serializers.UUIDField(style={"show": False}, read_only=True)
     name = serializers.CharField(max_length=500, required=True)
+    description = serializers.CharField(max_length=1000, required=False)
     organization = serializers.PrimaryKeyRelatedField(
         queryset=Organization.objects,
         validators=[CanContributeInOrganizationValidator()],
@@ -178,6 +180,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             created_by=user,
             template_type=template_name,
             project_template_type=project_template_type,
+            description=validated_data.get("description", None)
         )
 
         self.send_request_flow_product(user)
@@ -222,6 +225,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             "organization_id": instance.organization.inteligence_organization,
             "extra_fields": extra_fields if instance.is_template else {},
             "authorizations": authorizations,
+            "description": instance.description,
         }
         rabbitmq_publisher = RabbitmqPublisher()
         rabbitmq_publisher.send_message(message_body, exchange="projects.topic", routing_key="")
@@ -238,9 +242,10 @@ class ProjectSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         name = validated_data.get("name", instance.name)
+        description = validated_data.get("description", instance.description)
         celery_app.send_task(
             "update_project",
-            args=[instance.uuid, name],
+            args=[instance.uuid, name, description],
         )
         updated_instance = super().update(instance, validated_data)
         if not settings.TESTING:
@@ -508,10 +513,12 @@ class ProjectUpdateSerializer(serializers.ModelSerializer):
             "timezone",
             "date_format",
             "uuid",
+            "description"
         ]
         ref_name = None
 
     name = serializers.CharField(max_length=500, required=False)
+    description = serializers.CharField(max_length=1000, required=False)
     timezone = fields.TimezoneField(required=False)
     date_format = serializers.CharField(max_length=1, required=False)
 
@@ -524,9 +531,10 @@ class ProjectUpdateSerializer(serializers.ModelSerializer):
         try:
             instance = super().update(instance, validated_data)
             name = validated_data.get("name", instance.name)
+            description = validated_data.get("description", instance.description)
             celery_app.send_task(
                 "update_project",
-                args=[instance.uuid, name],
+                args=[instance.uuid, name, description],
             )
             return instance
         except Exception as error:
