@@ -65,6 +65,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             "first_access",
             "wa_demo_token",
             "redirect_url",
+            "description",
         ]
         ref_name = None
 
@@ -86,6 +87,7 @@ class ProjectSerializer(serializers.ModelSerializer):
     created_at = serializers.DateTimeField(
         required=False, read_only=True, style={"show": False}
     )
+    description = serializers.CharField(max_length=1000, required=False)
     authorizations = serializers.SerializerMethodField(style={"show": False})
     pending_authorizations = serializers.SerializerMethodField(style={"show": False})
     authorization = serializers.SerializerMethodField(style={"show": False})
