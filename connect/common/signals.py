@@ -125,13 +125,6 @@ def org_authorizations(sender, instance, created, **kwargs):
                     if instance.role > project_perm.role:
                         project_perm.role = project_role
                         project_perm.save(update_fields=["role"])
-        if not settings.TESTING:
-            ai_client = IntelligenceRESTClient()
-            ai_client.update_user_permission_organization(
-                organization_id=instance.organization.inteligence_organization,
-                user_email=instance.user.email,
-                permission=instance.role
-            )
 
 
 @receiver(post_delete, sender=OrganizationAuthorization)
