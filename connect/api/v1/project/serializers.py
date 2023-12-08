@@ -35,6 +35,7 @@ from connect.common.models import (
     RequestChatsPermission,
     ChatsAuthorization,
 )
+from connect.internals.event_driven.producer.rabbitmq_publisher import RabbitmqPublisher
 
 logger = logging.getLogger(__name__)
 
@@ -183,6 +184,13 @@ class ProjectSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         name = validated_data.get("name", instance.name)
+        description = validated_data.get("description", instance.description)
+        message_body = {
+            "project_uuid": str(instance.uuid),
+            "description": description
+        }
+        rabbitmq_publisher = RabbitmqPublisher()
+        rabbitmq_publisher.send_message(message_body, exchange="update-projects.topic", routing_key="")
         celery_app.send_task(
             "update_project",
             args=[instance.uuid, name],
