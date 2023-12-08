@@ -73,7 +73,7 @@ def update_user_permission_organization(
     retry_kwargs={"max_retries": 5},
     retry_backoff=True,
 )
-def update_project(organization_uuid: str, organization_name: str, organization_description: str = None):
+def update_project(organization_uuid: str, organization_name: str):
     flow_instance = FlowsRESTClient()
     chats = ChatsRESTClient()
     chats.update_chats_project(project_uuid=organization_uuid)
@@ -81,13 +81,6 @@ def update_project(organization_uuid: str, organization_name: str, organization_
         project_uuid=organization_uuid,
         organization_name=organization_name,
     )
-    if organization_description:
-        message_body = {
-            "project_uuid": str(organization_uuid),
-            "description": organization_description
-        }
-        rabbitmq_publisher = RabbitmqPublisher()
-        rabbitmq_publisher.send_message(message_body, exchange="update-projects.topic", routing_key="")
     return True
 
 
