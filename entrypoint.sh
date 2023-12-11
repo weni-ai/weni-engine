@@ -35,6 +35,6 @@ if [[ "start" == "$1" ]]; then
     echo "Running collectstatic"
     do_gosu "${APP_USER}:${APP_GROUP}" python manage.py collectstatic --noinput
     echo "Starting server"
-    do_gosu "${APP_USER}:${APP_GROUP}" exec gunicorn "${GUNICORN_APP}" --timeout 999999 -c "${GUNICORN_CONF}"   
+    do_gosu "${APP_USER}:${APP_GROUP}" exec gunicorn "${GUNICORN_APP}" -c "${GUNICORN_CONF}"   
 fi
 exec "$@"
