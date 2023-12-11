@@ -1,6 +1,10 @@
-# 3.13.1
+# 3.13.2
 ## *Fix*
 - synchronous call to delete_user_permission_project
+
+# 3.13.1
+## *Hotfix*
+- remove send_message from tasks
 
 # 3.13.0
 ## *Add*
