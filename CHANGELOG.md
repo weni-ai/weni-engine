@@ -1,3 +1,7 @@
+# 3.13.1
+## *Fix*
+- synchronous call to delete_user_permission_project
+
 # 3.13.0
 ## *Add*
   - project description
