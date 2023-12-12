@@ -4,36 +4,23 @@ ARG PYTHON_VERSION="3.8"
 ARG POETRY_VERSION="1.2.2"
 
 ARG BUILD_DEPS="\
-  python3-dev \
-  python3-cffi \
-  python3-gdal \
+  gcc bzip2 git curl libpq-dev gettext \
+  libgdal-dev python3-cffi python3-gdal \
+  python3-dev default-libmysqlclient-dev build-essential \
   build-essential \
-  gettext \
-  libpq-dev \
-  libgdal-dev \
-  libjpeg-dev \
-  libgpgme-dev \
-  linux-libc-dev \
-  libffi-dev \
-  libssl-dev \
-  musl-dev \
   cmake \
-  pkg-config \
-  autoconf \
-  libtool \
-  automake"
+  autoconf pkg-config autoconf libtool automake \
+  libmariadb-dev"
 
 ARG RUNTIME_DEPS="\
-  apt-utils \
-  gcc \
-  bzip2 \
   git \
+  tzdata \
+  postgresql-client \
+  netcat-traditional \
   curl \
-  nginx \
-  vim \
   gosu \
-  gettext \
-  postgresql-client"
+  gdal-bin"
+
 
 FROM python:${PYTHON_VERSION}-slim as base
 
@@ -102,7 +89,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   && rm -rf /usr/share/man /usr/share/doc
 
 COPY --from=build /install /usr/local
-COPY --chown=${PROJECT_USER}:${PROJECT_GROUP} . ${PROJECT_PATH}
+COPY --chown=${PROJECT_USER}:${PROJECT_GROUP} ./ ${PROJECT_PATH}
 
 USER "${PROJECT_USER}:${PROJECT_USER}"
 EXPOSE 8000
