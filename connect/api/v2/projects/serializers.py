@@ -114,14 +114,12 @@ class ProjectSerializer(serializers.ModelSerializer):
                 template = obj.template_project.get(authorization__user__email=email)
                 return template.first_access
             except TemplateProject.DoesNotExist:
-                template_project = obj.template_project.filter(flow_uuid__isnull=False, wa_demo_token__isnull=False, redirect_url__isnull=False).first()
+                template_project = obj.template_project.filter(wa_demo_token__isnull=False, redirect_url__isnull=False).first()
                 template = obj.template_project.create(
-                    flow_uuid=template_project.flow_uuid,
                     wa_demo_token=template_project.wa_demo_token,
                     redirect_url=template_project.redirect_url,
                     authorization=authorization
                 )
-        ...
 
     def get_wa_demo_token(self, obj):
         if obj.is_template and obj.template_project.exists():
