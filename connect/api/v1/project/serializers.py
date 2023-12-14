@@ -35,6 +35,8 @@ from connect.common.models import (
     RequestChatsPermission,
     ChatsAuthorization,
 )
+from connect.internals.event_driven.producer.rabbitmq_publisher import RabbitmqPublisher
+from connect.usecases.project.update_project import UpdateProjectUseCase
 
 logger = logging.getLogger(__name__)
 
@@ -182,14 +184,10 @@ class ProjectSerializer(serializers.ModelSerializer):
         return instance
 
     def update(self, instance, validated_data):
-        name = validated_data.get("name", instance.name)
-        celery_app.send_task(
-            "update_project",
-            args=[instance.uuid, name],
-        )
+        print("ahaha")
         updated_instance = super().update(instance, validated_data)
-        if not settings.TESTING:
-            ChatsRESTClient().update_chats_project(instance.uuid)
+        user = self.context["request"].user
+        UpdateProjectUseCase().send_updated_project(instance, user.email)
         return updated_instance
 
     def get_authorizations(self, obj):

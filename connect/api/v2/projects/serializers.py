@@ -28,6 +28,7 @@ from connect.common.models import (
 )
 from connect.internals.event_driven.producer.rabbitmq_publisher import RabbitmqPublisher
 from connect.template_projects.models import TemplateType
+from connect.usecases.project.update_project import UpdateProjectUseCase
 
 
 logger = logging.getLogger(__name__)
@@ -241,9 +242,15 @@ class ProjectSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         name = validated_data.get("name", instance.name)
         description = validated_data.get("description", instance.description)
+        message_body = {
+            "project_uuid": str(instance.uuid),
+            "description": description
+        }
+        rabbitmq_publisher = RabbitmqPublisher()
+        rabbitmq_publisher.send_message(message_body, exchange="update-projects.topic", routing_key="")
         celery_app.send_task(
             "update_project",
-            args=[instance.uuid, name, description],
+            args=[instance.uuid, name],
         )
         updated_instance = super().update(instance, validated_data)
         if not settings.TESTING:
@@ -528,12 +535,8 @@ class ProjectUpdateSerializer(serializers.ModelSerializer):
 
         try:
             instance = super().update(instance, validated_data)
-            name = validated_data.get("name", instance.name)
-            description = validated_data.get("description", instance.description)
-            celery_app.send_task(
-                "update_project",
-                args=[instance.uuid, name, description],
-            )
+            user = self.context["request"].user
+            UpdateProjectUseCase().send_updated_project(instance, user.email)
             return instance
         except Exception as error:
             logger.error(f"Update project: {error}")

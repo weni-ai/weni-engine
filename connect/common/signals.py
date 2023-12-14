@@ -140,7 +140,7 @@ def delete_authorizations(instance, **kwargs):
         )
         for project in instance.organization.project.all():
             permission = project.get_user_authorization(instance.user).role
-            tasks.delete_user_permission_project.delay(str(project.flow_organization), str(project.uuid), instance.user.email, permission)
+            tasks.delete_user_permission_project(str(project.flow_organization), str(project.uuid), instance.user.email, permission)
 
     instance.organization.send_email_remove_permission_organization(
         first_name=instance.user.first_name, email=instance.user.email
