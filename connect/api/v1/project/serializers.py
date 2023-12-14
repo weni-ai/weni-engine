@@ -184,7 +184,6 @@ class ProjectSerializer(serializers.ModelSerializer):
         return instance
 
     def update(self, instance, validated_data):
-        print("ahaha")
         updated_instance = super().update(instance, validated_data)
         user = self.context["request"].user
         UpdateProjectUseCase().send_updated_project(instance, user.email)
