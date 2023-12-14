@@ -41,7 +41,23 @@ class ProjectViewSet(
 
         return super().get_queryset().filter(organization__uuid=self.kwargs["organization_uuid"])
 
-    
+    def get_ordering(self):
+        valid_ordering_params = [
+            'last_opened_on',
+            'created_at',
+            'name',
+            '-last_opened_on',
+            '-created_at',
+            '-name'
+        ]
+        ordering = self.request.query_params.get("ordering", 'created_at')
+        if ordering in valid_ordering_params:
+            ordering = 'created_at'
+        else:
+            return Response(
+                'Invalid ordering parameter',
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
 
     @action(
