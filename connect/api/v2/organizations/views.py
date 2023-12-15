@@ -57,19 +57,16 @@ class OrganizationViewSet(
         return self.queryset.filter(pk__in=auth)
 
     def get_ordering(self):
-        valid_ordering_params = [
-            "created_at",
-            "-created_at",
-            "name",
-            "-name",
-        ]
-        ordering = self.request.query_params.get("ordering", "created_at")
-        if ordering in valid_ordering_params:
-            return ordering
-        return Response(
-            _('Invalid ordering parameter'),
-            status=status.HTTP_400_BAD_REQUEST
-        )
+        valid_fields = (org_fields.name for org_fields in Organization._meta.get_fields())
+        ordering = []
+        for param in self.request.query_params.getlist('ordering'):
+            if param.startswith('-'):
+                field = param[1:]
+            else:
+                field = param
+            if field in valid_fields:
+                ordering.append(param)
+        return ordering if ordering else None
 
     @swagger_auto_schema(request_body=create_organization_schema)
     def create(self, request, *args, **kwargs):

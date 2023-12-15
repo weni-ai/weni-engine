@@ -6,7 +6,5 @@ class CustomCursorPagination(CursorPagination):
     page_size = 20
 
     def paginate_queryset(self, queryset, request, view=None):
-        ordering = view.get_ordering()
-        if ordering:
-            queryset = queryset.order_by(ordering)
+        self.ordering = view.get_ordering()
         return super().paginate_queryset(queryset, request, view)
