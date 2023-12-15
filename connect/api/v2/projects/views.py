@@ -42,7 +42,9 @@ class ProjectViewSet(
         return super().get_queryset().filter(organization__uuid=self.kwargs["organization_uuid"])
 
     def get_ordering(self):
-        valid_fields = (org_fields.name for org_fields in Project._meta.get_fields())
+        valid_fields = (
+            org_fields.name for org_fields in Project._meta.get_fields() + {'last_opened_on'}
+        )
         ordering = []
         for param in self.request.query_params.getlist('ordering'):
             if param.startswith('-'):
