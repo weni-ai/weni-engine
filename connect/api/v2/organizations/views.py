@@ -67,9 +67,8 @@ class OrganizationViewSet(
                 field = param
             if field in valid_fields:
                 ordering.append(param)
-            if not ordering:
-                ordering.append("created_at")
-        return ordering
+        return ordering or ["created_at"]
+
 
     @swagger_auto_schema(request_body=create_organization_schema)
     def create(self, request, *args, **kwargs):

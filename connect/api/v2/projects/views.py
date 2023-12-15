@@ -51,9 +51,7 @@ class ProjectViewSet(
                 field = param
             if field in valid_fields:
                 ordering.append(param)
-            if not ordering:
-                ordering.append("created_at")
-        return ordering
+        return ordering or ["created_at"]
 
     @action(
         detail=True,
