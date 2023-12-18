@@ -15,6 +15,7 @@ from connect.api.v2.projects.serializers import (
     ProjectSerializer,
     ProjectUpdateSerializer,
     ProjectListAuthorizationSerializer,
+    OpenedProjectSerializer
 )
 
 from django.utils import timezone
@@ -43,7 +44,7 @@ class ProjectViewSet(
 
     def get_ordering(self):
         valid_fields = (
-            org_fields.name for org_fields in Project._meta.get_fields() + {'last_opened_on'}
+            org_fields.name for org_fields in Project._meta.get_fields()
         )
         ordering = []
         for param in self.request.query_params.getlist('ordering'):
@@ -118,3 +119,38 @@ class ProjectAuthorizationViewSet(
     serializer_class = ProjectListAuthorizationSerializer
     permission_classes = [IsAuthenticated, ProjectHasPermission, Has2FA]
     lookup_field = "uuid"
+
+
+class OpenedProjectViewSet(
+    mixins.ListModelMixin,
+    GenericViewSet
+):
+
+    queryset = OpenedProject.objects.select_related("project", "user")
+    serializer_class = OpenedProjectSerializer
+    permission_classes = [IsAuthenticated, ProjectHasPermission, Has2FA]
+    lookup_field = "uuid"
+    pagination_class = CustomCursorPagination
+
+    def get_queryset(self, **kwargs):
+        if getattr(self, "swagger_fake_view", False):
+            return OpenedProject.objects.none()  # pragma: no cover
+
+        organization__uuid = self.kwargs["organization_uuid"]
+        projects = Project.objects.filter(organization__uuid=organization__uuid)
+
+        return super().get_queryset().filter(project__in=projects)
+
+    def get_ordering(self):
+        valid_fields = (
+            opened_project.name for opened_project in OpenedProject._meta.get_fields()
+        )
+        ordering = []
+        for param in self.request.query_params.getlist('ordering'):
+            if param.startswith('-'):
+                field = param[1:]
+            else:
+                field = param
+            if field in valid_fields:
+                ordering.append(param)
+        return ordering or ["day"]
