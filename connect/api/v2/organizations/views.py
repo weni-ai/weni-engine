@@ -30,6 +30,7 @@ from rest_framework.exceptions import ValidationError
 from connect.api.v2.paginations import CustomCursorPagination
 import pendulum
 
+
 class OrganizationViewSet(
     mixins.RetrieveModelMixin,
     mixins.ListModelMixin,
@@ -94,7 +95,7 @@ class OrganizationViewSet(
         user_email = self.request.user.email
         instance.perform_destroy_ai_organization(user_email)
         instance.delete()
-    
+
     @action(
         detail=True,
         methods=["GET"],
