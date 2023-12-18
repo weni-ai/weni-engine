@@ -48,6 +48,7 @@ omit =
     ./connect/api/v1/internal/intelligence/intelligence_rest_client.py
     ./connect/api/v1/internal/flows/flows_rest_client.py
     ./connect/api/v1/project/serializers.py
+    Dockerfile
 
 [report]
 fail_under = 74

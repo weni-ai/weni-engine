@@ -80,7 +80,7 @@ jobs:
         # Now, checkout in kubernetes manifests to update image in deployments patches
         uses: actions/checkout@master
         with:
-          ref: main
+          ref: main 
           repository: "${{ env.MANIFESTS_REPOSITORY }}"
           token: "${{ secrets.DEVOPS_GITHUB_PERMANENT_TOKEN }}"
           path: ./kubernetes-manifests/
