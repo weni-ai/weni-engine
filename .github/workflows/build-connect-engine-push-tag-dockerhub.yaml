@@ -80,8 +80,7 @@ jobs:
         # Now, checkout in kubernetes manifests to update image in deployments patches
         uses: actions/checkout@master
         with:
-          #ref: main
-          ref: feat/connect-engine-new-image 
+          ref: main 
           repository: "${{ env.MANIFESTS_REPOSITORY }}"
           token: "${{ secrets.DEVOPS_GITHUB_PERMANENT_TOKEN }}"
           path: ./kubernetes-manifests/
@@ -140,7 +139,6 @@ jobs:
           github_token: "${{ secrets.DEVOPS_GITHUB_PERMANENT_TOKEN }}"
           repository: "${{ env.MANIFESTS_REPOSITORY }}"
           directory: ./kubernetes-manifests/
-          #branch: main
-          branch: feat/connect-engine-new-image 
+          branch: main
           message: "From Weni Engine (Connect) Build (Push Tag ${{ env.MANIFESTS_ENVIRONMENT }})"
           
