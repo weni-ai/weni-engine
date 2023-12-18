@@ -138,8 +138,9 @@ class OpenedProjectViewSet(
 
         organization__uuid = self.kwargs["organization_uuid"]
         projects = Project.objects.filter(organization__uuid=organization__uuid)
-        opened_projects = super().get_queryset().filter(project__in=projects).order_by('day').distinct('project')
-        return opened_projects
+        opened_projects = super().get_queryset().filter(project__in=projects).order_by('project__uuid', 'day')
+        filtered_projects = opened_projects.distinct('project__uuid', 'day')
+        return filtered_projects
 
     def get_ordering(self):
         valid_fields = (
