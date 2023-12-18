@@ -1,3 +1,12 @@
+# 3.14.0
+## *Change*
+  - update project using usecase to send all messages
+  - send organization uuid when send eda project creation message 
+  - ensure that the image is more secure and effective, using a non-administrative user, using high ports (now using 8000), using multi-stage build, only one process per container, writing to /tmp and state check endpoints
+
+## *Remove*:
+- Remove ChatsPermission and IA permission when creating a organization and project.
+
 # 3.13.2
 ## *Fix*
 - synchronous call to delete_user_permission_project
