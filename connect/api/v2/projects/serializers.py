@@ -630,5 +630,9 @@ class OpenedProjectSerializer(serializers.ModelSerializer):
     project = serializers.SerializerMethodField()
 
     def get_project(self, obj):
-        data = ProjectSerializer(obj.project).data
+        data = ProjectSerializer(
+            obj.project,
+            context=self.context
+        ).data
+
         return data

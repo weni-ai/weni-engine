@@ -19,7 +19,7 @@ from connect.api.v2.projects.serializers import (
 )
 
 from django.utils import timezone
-from connect.api.v2.paginations import CustomCursorPagination
+from connect.api.v2.paginations import CustomCursorPagination, OpenedProjectCustomCursorPagination
 
 
 class ProjectViewSet(
@@ -130,7 +130,7 @@ class OpenedProjectViewSet(
     serializer_class = OpenedProjectSerializer
     permission_classes = [IsAuthenticated, ProjectHasPermission, Has2FA]
     lookup_field = "uuid"
-    pagination_class = CustomCursorPagination
+    pagination_class = OpenedProjectCustomCursorPagination
 
     def get_queryset(self, **kwargs):
         if getattr(self, "swagger_fake_view", False):
@@ -138,15 +138,14 @@ class OpenedProjectViewSet(
 
         organization__uuid = self.kwargs["organization_uuid"]
         projects = Project.objects.filter(organization__uuid=organization__uuid)
-        opened_projects = super().get_queryset().filter(project__in=projects).order_by('project__uuid', 'day')
-        filtered_projects = opened_projects.distinct('project__uuid', 'day')
-        return filtered_projects
+        opened_projects = super().get_queryset().filter(project__in=projects)
+        return opened_projects
 
     def get_ordering(self):
         valid_fields = (
             opened_project.name for opened_project in OpenedProject._meta.get_fields()
         )
-        ordering = []
+        ordering = ["project"]
         for param in self.request.query_params.getlist('ordering'):
             if param.startswith('-'):
                 field = param[1:]
@@ -154,4 +153,4 @@ class OpenedProjectViewSet(
                 field = param
             if field in valid_fields:
                 ordering.append(param)
-        return ordering or ["day"]
+        return ordering or ["project", "day"]
