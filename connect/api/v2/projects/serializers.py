@@ -610,3 +610,30 @@ class ProjectListAuthorizationSerializer(serializers.ModelSerializer):
         if rocket_authorization:
             return rocket_authorization.role
         return None
+
+
+class OpenedProjectSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = OpenedProject
+        fields = [
+            "day",
+            "project",
+            "user",
+        ]
+
+    user = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects,
+        required=True,
+        style={"show": False},
+    )
+    day = serializers.DateTimeField(required=False)
+    project = serializers.SerializerMethodField()
+
+    def get_project(self, obj):
+        data = ProjectSerializer(
+            obj.project,
+            context=self.context
+        ).data
+
+        return data
