@@ -8,3 +8,10 @@ class CustomCursorPagination(CursorPagination):
     def paginate_queryset(self, queryset, request, view=None):
         self.ordering = view.get_ordering()
         return super().paginate_queryset(queryset, request, view)
+
+
+class OpenedProjectCustomCursorPagination(CursorPagination):
+    def paginate_queryset(self, queryset, request, view=None):
+        self.ordering = view.get_ordering()
+        self.queryset = queryset.order_by(*self.ordering).distinct('project')
+        return super().paginate_queryset(queryset, request, view)
