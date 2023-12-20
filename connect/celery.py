@@ -25,6 +25,10 @@ app.conf.task_routes = {
     "end_trial_plan": {'queue': 'billing'},
     "check_organization_plans": {'queue': 'billing'},
     "daily_contact_count": {'queue': 'billing'},
+    "sync-project-statistics": {'queue': 'sync'},
+    "sync-channels-statistics": {'queue': 'sync'},
+    "sync-total-active-contacts": {'queue': 'sync'},
+    "sync-active-contacts": {'queue': 'sync'},
 }
 
 
