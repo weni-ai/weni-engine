@@ -31,6 +31,9 @@ projects_router = routers.NestedSimpleRouter(
 projects_router.register(
     "projects", project_views.ProjectViewSet, basename="organization-projects"
 )
+projects_router.register(
+    "opened-projects", project_views.OpenedProjectViewSet, basename="opened-projects"
+)
 
 urlpatterns = [
     path("", include(router.urls)),
