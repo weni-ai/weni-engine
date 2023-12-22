@@ -2,16 +2,17 @@ from django.test import TestCase
 from django.conf import settings
 
 from .alerts_factory import AlertFactory
-from ..update import update_alert
+from ..update import AlertUpdateUseCase
 
 
 class TestUpdateAlert(TestCase):
     def setUp(self):
+        self.usecase = AlertUpdateUseCase()
         self.alert = AlertFactory.create()
         self.token = settings.VERIFICATION_MARKETING_TOKEN
 
     def test_update_alert(self):
-        alert = update_alert(
+        alert = self.usecase.update_alert(
             alert_id=self.alert.uuid,
             token=self.token,
             can_be_closed=False,

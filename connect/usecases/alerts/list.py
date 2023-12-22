@@ -2,12 +2,14 @@ from connect.alerts.models import Alert
 from .auths import AlertAuthsUseCase
 
 
-def list_alerts(
-    token: str,
-) -> Alert:
+class AlertListUseCase:
+    def list_alerts(
+        self,
+        token: str,
+    ) -> Alert:
 
-    AlertAuthsUseCase().has_permission(token=token)
+        AlertAuthsUseCase().has_permission(token=token)
 
-    alerts = Alert.objects.all()
+        alerts = Alert.objects.all()
 
-    return alerts
+        return alerts

@@ -3,30 +3,33 @@ from .get_by_uuid import get_alert_by_uuid
 from connect.alerts.models import Alert
 
 
-def update_alert(
-    alert_id: int,
-    token: str,
-    can_be_closed: bool = None,
-    text: str = None,
-    type: int = None,
-) -> Alert:
+class AlertUpdateUseCase:
 
-    AlertAuthsUseCase().has_permission(token=token)
+    def update_alert(
+        self,
+        alert_id: int,
+        token: str,
+        can_be_closed: bool = None,
+        text: str = None,
+        type: int = None,
+    ) -> Alert:
 
-    alert = get_alert_by_uuid(
-        uuid=alert_id,
-        token=token
-    )
+        AlertAuthsUseCase().has_permission(token=token)
 
-    if can_be_closed is not None:
-        alert.can_be_closed = can_be_closed
+        alert = get_alert_by_uuid(
+            uuid=alert_id,
+            token=token
+        )
 
-    if text is not None:
-        alert.text = text
+        if can_be_closed is not None:
+            alert.can_be_closed = can_be_closed
 
-    if type is not None:
-        alert.type = type
+        if text is not None:
+            alert.text = text
 
-    alert.save()
+        if type is not None:
+            alert.type = type
 
-    return alert
+        alert.save()
+
+        return alert

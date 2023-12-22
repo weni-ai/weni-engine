@@ -3,16 +3,18 @@ from .auths import AlertAuthsUseCase
 from connect.alerts.models import Alert
 
 
-def retrieve_alert(
-    alert_uuid: int,
-    token: str,
-) -> Alert:
+class AlertRetrieveUseCase:
+    def retrieve_alert(
+        self,
+        alert_uuid: int,
+        token: str,
+    ) -> Alert:
 
-    AlertAuthsUseCase().has_permission(token=token)
+        AlertAuthsUseCase().has_permission(token=token)
 
-    alert = get_alert_by_uuid(
-        uuid=alert_uuid,
-        token=token
-    )
+        alert = get_alert_by_uuid(
+            uuid=alert_uuid,
+            token=token
+        )
 
-    return alert
+        return alert
