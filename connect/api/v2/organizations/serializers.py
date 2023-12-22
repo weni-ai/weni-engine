@@ -35,7 +35,6 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
             "organization_billing",
             "organization_billing_plan",
             "inteligence_organization",
-            "authorizations",
             "authorization",
             "created_at",
             "is_suspended",
