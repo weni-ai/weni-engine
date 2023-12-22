@@ -12,5 +12,4 @@ class HasValidMarketingPermission(BasePermission):
         return token == settings.VERIFICATION_MARKETING_TOKEN
 
     def has_object_permission(self, request, view, obj):
-        print("entro aqui obj permission")
         return self.has_permission(request, view)
