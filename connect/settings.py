@@ -146,6 +146,7 @@ INSTALLED_APPS = [
     "connect.billing",
     "connect.internals",
     "connect.template_projects",
+    "connect.alerts",
     "django_celery_results",
     "django_celery_beat",
     "storages",
