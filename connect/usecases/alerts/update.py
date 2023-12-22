@@ -7,7 +7,7 @@ class AlertUpdateUseCase:
 
     def update_alert(
         self,
-        alert_id: int,
+        alert_uuid: str,
         token: str,
         can_be_closed: bool = None,
         text: str = None,
@@ -17,7 +17,7 @@ class AlertUpdateUseCase:
         AlertAuthsUseCase().has_permission(token=token)
 
         alert = get_alert_by_uuid(
-            uuid=alert_id,
+            uuid=alert_uuid,
             token=token
         )
 
