@@ -13,7 +13,7 @@ class TestUpdateAlert(TestCase):
 
     def test_update_alert(self):
         alert = self.usecase.update_alert(
-            alert_id=self.alert.uuid,
+            alert_uuid=self.alert.uuid,
             token=self.token,
             can_be_closed=False,
             text='test',
