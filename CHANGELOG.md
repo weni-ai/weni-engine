@@ -1,3 +1,10 @@
+# 3.15.0
+## *Add*
+  - Sync queue for longer tasks on celery
+  - Order function for Organization and Project API, ordering by any pre-existing valid field on the model.
+  - Alert app and usecase functions
+  - Alert CRUD
+
 # 3.14.0
 ## *Change*
   - update project using usecase to send all messages
