@@ -1,8 +1,10 @@
+import pendulum
 from rest_framework import mixins, status
 from rest_framework.decorators import action
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.exceptions import ValidationError
 from drf_yasg2.utils import swagger_auto_schema
 from django.utils.translation import ugettext_lazy as _
 
@@ -17,7 +19,6 @@ from connect.api.v1.organization.permissions import (
     OrganizationHasPermission,
 )
 from connect.api.v2.paginations import CustomCursorPagination
-
 from connect.api.v2.organizations.serializers import (
     OrganizationSeralizer,
     NestedAuthorizationOrganizationSerializer
@@ -26,9 +27,7 @@ from connect.api.v2.projects.serializers import ProjectSerializer
 from connect.api.v2.organizations.api_schemas import (
     create_organization_schema,
 )
-from rest_framework.exceptions import ValidationError
-from connect.api.v2.paginations import CustomCursorPagination
-import pendulum
+
 
 
 class OrganizationViewSet(
@@ -57,6 +56,19 @@ class OrganizationViewSet(
         )
 
         return self.queryset.filter(pk__in=auth)
+
+    def get_ordering(self):
+        valid_fields = (org_fields.name for org_fields in Organization._meta.get_fields())
+        ordering = []
+        for param in self.request.query_params.getlist('ordering'):
+            if param.startswith('-'):
+                field = param[1:]
+            else:
+                field = param
+            if field in valid_fields:
+                ordering.append(param)
+        return ordering or ["created_at"]
+
 
     @swagger_auto_schema(request_body=create_organization_schema)
     def create(self, request, *args, **kwargs):
