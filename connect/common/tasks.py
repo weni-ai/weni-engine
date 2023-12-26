@@ -300,7 +300,7 @@ def check_organization_free_plan():
     return True
 
 
-@app.task()
+@app.task(name="sync_active_contacts")
 def sync_active_contacts():
     for project in Project.objects.all()[:10]:
         try:
@@ -321,7 +321,7 @@ def sync_active_contacts():
     return True
 
 
-@app.task()
+@app.task(name="sync_total_contact_count")
 def sync_total_contact_count():
     if settings.USE_FLOW_REST:
         flow_instance = FlowsRESTClient()

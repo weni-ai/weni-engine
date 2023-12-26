@@ -24,7 +24,6 @@ from connect.common.models import (
     OpenedProject,
     ProjectRole,
     TemplateProject,
-    RequestChatsPermission,
 )
 from connect.internals.event_driven.producer.rabbitmq_publisher import RabbitmqPublisher
 from connect.template_projects.models import TemplateType
@@ -231,14 +230,14 @@ class ProjectSerializer(serializers.ModelSerializer):
         rabbitmq_publisher.send_message(message_body, exchange="projects.topic", routing_key="")
 
     def send_request_flow_product(self, user):
-        # TODO: change to an async call
+
         if Project.objects.filter(created_by=user).count() == 1:
             data = dict(
                 send_request_flow=settings.SEND_REQUEST_FLOW_PRODUCT,
                 flow_uuid=settings.FLOW_PRODUCT_UUID,
                 token_authorization=settings.TOKEN_AUTHORIZATION_FLOW_PRODUCT
             )
-            user.send_request_flow_user_info(data)
+            celery_app.send_task("send_user_flow_info", args=[data, user])
 
     def update(self, instance, validated_data):
         name = validated_data.get("name", instance.name)

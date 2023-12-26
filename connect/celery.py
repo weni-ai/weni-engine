@@ -25,6 +25,10 @@ app.conf.task_routes = {
     "end_trial_plan": {'queue': 'billing'},
     "check_organization_plans": {'queue': 'billing'},
     "daily_contact_count": {'queue': 'billing'},
+    "sync_project_statistics": {'queue': 'sync'},
+    "sync_channels_statistics": {'queue': 'sync'},
+    "sync_total_contact_count": {'queue': 'sync'},
+    "sync_active_contacts": {'queue': 'sync'},
 }
 
 
@@ -37,11 +41,11 @@ app.conf.beat_schedule = {
         "task": "connect.common.tasks.check_organization_free_plan",
         "schedule": schedules.crontab(minute="*/6"),
     },
-    "sync-project-statistics": {
+    "sync_project_statistics": {
         "task": "sync_project_statistics",
         "schedule": schedules.crontab(minute="*/6")
     },
-    "sync-channels-statistics": {
+    "sync_channels_statistics": {
         "task": "sync_channels_statistics",
         "schedule": schedules.crontab(minute="*/7")
     },
@@ -49,11 +53,11 @@ app.conf.beat_schedule = {
         "task": "connect.common.tasks.generate_project_invoice",
         "schedule": schedules.crontab(hour="12", minute=0),
     },
-    "sync-total-active-contacts": {
+    "sync_total_contact_count": {
         "task": "connect.common.tasks.sync_total_contact_count",
         "schedule": schedules.crontab(hour="3", minute=0)
     },
-    "sync-active-contacts": {
+    "sync_active_contacts": {
         "task": "connect.common.tasks.sync_active_contacts",
         "schedule": schedules.crontab(hour="*/6", minute=0)
     },
