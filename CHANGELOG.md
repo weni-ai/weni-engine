@@ -1,3 +1,7 @@
+# 3.15.1
+## *Fix*
+  - Async flow start not capable of handleling user instances
+
 # 3.15.0
 ## *Add*
   - Sync queue for longer tasks on celery
