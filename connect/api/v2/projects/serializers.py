@@ -237,7 +237,7 @@ class ProjectSerializer(serializers.ModelSerializer):
                 flow_uuid=settings.FLOW_PRODUCT_UUID,
                 token_authorization=settings.TOKEN_AUTHORIZATION_FLOW_PRODUCT
             )
-            celery_app.send_task("send_user_flow_info", args=[data, user])
+            celery_app.send_task("send_user_flow_info", args=[data, user.email])
 
     def update(self, instance, validated_data):
         name = validated_data.get("name", instance.name)
