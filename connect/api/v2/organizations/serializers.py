@@ -35,7 +35,6 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
             "organization_billing",
             "organization_billing_plan",
             "inteligence_organization",
-            "authorizations",
             "authorization",
             "created_at",
             "is_suspended",
@@ -47,7 +46,6 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
     uuid = serializers.UUIDField(style={"show": False}, read_only=True)
     name = serializers.CharField(max_length=40, required=True)
     inteligence_organization = serializers.IntegerField(read_only=True)
-    authorizations = serializers.SerializerMethodField(style={"show": False})
     authorization = serializers.SerializerMethodField(style={"show": False})
     organization_billing = BillingPlanSerializer(read_only=True)
     organization_billing_plan = serializers.ChoiceField(
@@ -96,26 +94,6 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
         self.create_authorizations(instance, authorizations, user)
 
         return instance
-
-    def get_authorizations(self, obj):
-        exclude_roles = [
-            OrganizationRole.NOT_SETTED.value,
-            OrganizationRole.VIEWER.value,
-            OrganizationRole.SUPPORT.value,
-        ]
-        return {
-            "count": obj.authorizations.count(),
-            "users": [
-                {
-                    "username": i.user.username,
-                    "first_name": i.user.first_name,
-                    "last_name": i.user.last_name,
-                    "role": i.role,
-                    "photo_user": i.user.photo_url,
-                }
-                for i in obj.authorizations.exclude(role__in=exclude_roles)
-            ],
-        }
 
     def get_authorization(self, obj):
         request = self.context.get("request")
