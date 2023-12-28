@@ -1,3 +1,7 @@
+# 3.16.0
+## *Remove*
+  - Remove authorizations list on org list api to improve overall performace.
+
 # 3.15.1
 ## *Fix*
   - Async flow start not capable of handleling user instances
