@@ -53,7 +53,6 @@ class ProjectSerializer(serializers.ModelSerializer):
             "authorization",
             "last_opened_on",
             "project_type",
-            "first_access",
             "description",
         ]
         ref_name = None
