@@ -1,3 +1,7 @@
+# 3.17.0
+## *Remove*
+  - Remove not used fields on project serializer to impro overall performace
+
 # 3.16.0
 ## *Remove*
   - Remove authorizations list on org list api to improve overall performace.
