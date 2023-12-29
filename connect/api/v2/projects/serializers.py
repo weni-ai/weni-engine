@@ -91,65 +91,10 @@ class ProjectSerializer(serializers.ModelSerializer):
     redirect_url = serializers.SerializerMethodField()
 
     def get_project_type(self, obj):
-        if obj.is_template and obj.template_project.exists():
+        if obj.is_template:
             return f"template:{obj.template_type}"
         else:
             return "blank"
-
-    def get_flow_uuid(self, obj):
-        if obj.is_template and obj.template_project.exists():
-            template = obj.template_project.filter(flow_uuid__isnull=False, wa_demo_token__isnull=False, redirect_url__isnull=False).first()
-            if template:
-                return template.flow_uuid
-            ...
-        ...
-
-    def get_first_access(self, obj):
-        if obj.is_template and obj.template_project.exists():
-            user = self.context["request"].user
-            email = user.email
-            authorization = obj.get_user_authorization(user)
-
-            try:
-                template = obj.template_project.get(authorization__user__email=email)
-                return template.first_access
-            except TemplateProject.DoesNotExist:
-                template_project = obj.template_project.filter(wa_demo_token__isnull=False, redirect_url__isnull=False).first()
-                template = obj.template_project.create(
-                    wa_demo_token=template_project.wa_demo_token,
-                    redirect_url=template_project.redirect_url,
-                    authorization=authorization
-                )
-
-    def get_wa_demo_token(self, obj):
-        if obj.is_template and obj.template_project.exists():
-            template = obj.template_project.filter(flow_uuid__isnull=False, wa_demo_token__isnull=False, redirect_url__isnull=False).first()
-            if template:
-                return template.wa_demo_token
-            ...
-        ...
-
-    def get_redirect_url(self, obj):
-        if obj.is_template and obj.template_project.exists():
-            template = obj.template_project.filter(flow_uuid__isnull=False, wa_demo_token__isnull=False, redirect_url__isnull=False).first()
-            if template:
-                return template.redirect_url
-            ...
-        ...
-
-    def get_menu(self, obj):
-        chats_formatted_url = settings.CHATS_URL + "loginexternal/{{token}}/"
-        return {
-            "inteligence": settings.INTELIGENCE_URL,
-            "flows": settings.FLOWS_URL,
-            "integrations": settings.INTEGRATIONS_URL,
-            "chats": chats_formatted_url,
-            "chat": list(
-                obj.service_status.filter(
-                    service__service_type=Service.SERVICE_TYPE_CHAT
-                ).values_list("service__url", flat=True)
-            ),
-        }
 
     def create(self, validated_data):
         user = self.context["request"].user
