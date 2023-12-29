@@ -51,7 +51,6 @@ class ProjectSerializer(serializers.ModelSerializer):
             "total_contact_count",
             "created_at",
             "authorization",
-            "last_opened_on",
             "project_type",
             "description",
         ]
@@ -76,9 +75,7 @@ class ProjectSerializer(serializers.ModelSerializer):
         required=False, read_only=True, style={"show": False}
     )
 
-    menu = serializers.SerializerMethodField()
     authorization = serializers.SerializerMethodField(style={"show": False})
-    last_opened_on = serializers.SerializerMethodField()
     project_type = serializers.SerializerMethodField()
 
     def get_project_type(self, obj):
@@ -202,17 +199,6 @@ class ProjectSerializer(serializers.ModelSerializer):
             obj.get_user_authorization(request.user)
         ).data
         return data
-
-    def get_last_opened_on(self, obj):
-        request = self.context.get("request")
-        if not request or not request.user.is_authenticated:
-            return None
-        opened = OpenedProject.objects.filter(user__email=request.user, project=obj.uuid)
-        response = None
-        if opened.exists():
-            opened = opened.first()
-            response = opened.day
-        return response
 
     def create_flows_project(self, data: dict, user: User, is_template: bool, project_uuid: str):
         flow_instance = FlowsRESTClient()
