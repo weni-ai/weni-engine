@@ -17,8 +17,7 @@ from connect.common.mocks import StripeMockGateway
 
 from django.conf import settings
 from connect.api.v1.tests.utils import create_contacts
-from connect.billing.models import Contact
-from connect.billing.tasks import count_contacts, daily_contact_count
+from connect.billing.tasks import daily_contact_count
 import pendulum
 
 

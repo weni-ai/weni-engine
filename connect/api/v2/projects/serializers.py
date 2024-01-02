@@ -17,7 +17,6 @@ from connect.api.v1.project.serializers import ProjectAuthorizationSerializer
 from connect.celery import app as celery_app
 from connect.common.models import (
     ProjectAuthorization,
-    Service,
     Project,
     Organization,
     RequestRocketPermission,

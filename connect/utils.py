@@ -1,7 +1,7 @@
 import requests
 import pendulum
-from connect.common.models import Project, BillingPlan
-from connect.billing.models import Contact, ContactCount
+
+from connect.common.models import Project
 
 
 def upload_photo_rocket(server_rocket: str, jwt_token: str, avatar_url: str) -> bool:  # pragma: no cover

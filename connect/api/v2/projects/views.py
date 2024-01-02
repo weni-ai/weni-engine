@@ -30,7 +30,7 @@ class ProjectViewSet(
     mixins.DestroyModelMixin,
     GenericViewSet
 ):
-    queryset = Project.objects
+    queryset = Project.objects.order_by('opened_project__day')
     serializer_class = ProjectSerializer
     lookup_field = "uuid"
     permission_classes = [IsAuthenticated, ProjectHasPermission, Has2FA]

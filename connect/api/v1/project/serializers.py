@@ -5,18 +5,16 @@ import re
 
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
-from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
 from rest_framework import serializers
-
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.exceptions import ValidationError
 
+from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
 from connect.api.v1 import fields
 from connect.api.v1.fields import TextField
 from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
 from ..internal.intelligence.intelligence_rest_client import IntelligenceRESTClient
 from connect.api.v1.project.validators import CanContributeInOrganizationValidator
-from connect.celery import app as celery_app
 from connect.common import tasks
 from connect.common.models import (
     ChatsRole,
@@ -35,7 +33,6 @@ from connect.common.models import (
     RequestChatsPermission,
     ChatsAuthorization,
 )
-from connect.internals.event_driven.producer.rabbitmq_publisher import RabbitmqPublisher
 from connect.usecases.project.update_project import UpdateProjectUseCase
 
 logger = logging.getLogger(__name__)

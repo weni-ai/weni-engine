@@ -152,7 +152,7 @@ class ChatsRESTClient:
             project=str(project_uuid),
             role=self.permission_mapper.get(permission, 0)
         )
-        r = requests.delete(
+        requests.delete(
             url=f"{self.base_url}/v1/internal/permission/project/",
             headers=self.authentication_instance.headers,
             json=body

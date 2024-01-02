@@ -1,9 +1,7 @@
-from django.conf import settings
-
-from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
 from connect.celery import app as celery_app
 from connect.common.models import Project
 from connect.internals.event_driven.producer.rabbitmq_publisher import RabbitmqPublisher
+
 
 class UpdateProjectUseCase:
 
