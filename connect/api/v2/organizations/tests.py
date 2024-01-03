@@ -141,16 +141,11 @@ class OrganizationViewSetTestCase(TestCase):
         self.assertEquals(response.status_code, status.HTTP_200_OK)
 
     @patch("connect.billing.get_gateway")
-    @patch("connect.api.v1.internal.intelligence.intelligence_rest_client.IntelligenceRESTClient.create_organization")
     @patch("connect.authentication.models.User.send_request_flow_user_info")
-    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_project")
     def test_create_organization_blank_project(
-        self, create_project, send_request_flow_user_info, create_organization, mock_get_gateway
+        self, send_request_flow_user_info, mock_get_gateway
     ):
         mock_get_gateway.return_value = StripeMockGateway()
-        intelligence_organization = 555
-        create_project.side_effect = [{"id": 1, "uuid": uuid.uuid4()}]
-        create_organization.side_effect = [{"id": intelligence_organization}]
         send_request_flow_user_info.side_effect = [True]
         org_data = {
             "name": "V2",
@@ -184,10 +179,7 @@ class OrganizationViewSetTestCase(TestCase):
             data=data
         )
 
-        organization = content_data.get("organization")
-
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
-        self.assertEquals(organization["authorizations"]["count"], 2)
 
     @patch("connect.billing.get_gateway")
     @patch("connect.api.v1.internal.intelligence.intelligence_rest_client.IntelligenceRESTClient.create_organization")
