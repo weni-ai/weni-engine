@@ -224,7 +224,12 @@ class UpdateProjectTestCase(TestCase):
         content_data = json.loads(response.content)
         return (response, content_data)
 
-    def test_okay_update_name(self):
+    @patch("connect.internals.event_driven.producer.rabbitmq_publisher.RabbitmqPublisher.send_message")
+    def test_okay_update_name(
+        self,
+        mock_publisher
+    ):
+        mock_publisher.side_effect = [True]
         response, content_data = self.request(
             self.project,
             {"name": "Project new"},

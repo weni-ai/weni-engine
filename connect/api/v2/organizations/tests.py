@@ -139,11 +139,17 @@ class OrganizationViewSetTestCase(TestCase):
 
     @patch("connect.billing.get_gateway")
     @patch("connect.authentication.models.User.send_request_flow_user_info")
+    @patch("connect.internals.event_driven.producer.rabbitmq_publisher.RabbitmqPublisher.send_message")
     def test_create_organization_project(
-        self, send_request_flow_user_info, mock_get_gateway
+        self,
+        mock_publisher,
+        send_request_flow_user_info,
+        mock_get_gateway
     ):
+        print("MOCK TEST")
         mock_get_gateway.return_value = StripeMockGateway()
         send_request_flow_user_info.side_effect = [True]
+        mock_publisher.side_effect = [True]
         org_data = {
             "name": "V2",
             "description": "V2 desc",
@@ -178,10 +184,16 @@ class OrganizationViewSetTestCase(TestCase):
 
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
 
+    @patch("connect.internals.event_driven.producer.rabbitmq_publisher.RabbitmqPublisher.send_message")
     @patch("connect.authentication.models.User.send_request_flow_user_info")
-    def test_user_email_setup(self, send_request_flow_user_info):
+    def test_user_email_setup(
+        self,
+        mock_publisher,
+        send_request_flow_user_info
+    ):
         UserEmailSetup.objects.create(user=self.user, receive_project_emails=False, receive_organization_emails=False)
         send_request_flow_user_info.side_effect = [True]
+        mock_publisher.side_effect = [True]
         org_data = {
             "name": "Email Setup",
             "description": "Email Setup",

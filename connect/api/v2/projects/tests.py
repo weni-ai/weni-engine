@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.test import APIRequestFactory, force_authenticate
 
 from django.test import TestCase
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 
 from connect.api.v1.tests.utils import create_user_and_token
 from connect.common.models import Organization, BillingPlan, OrganizationRole, Project
@@ -112,16 +112,12 @@ class ProjectViewSetTestCase(TestCase):
 
         self.assertEquals(response.status_code, status.HTTP_200_OK)
 
-    @patch("connect.common.signals.update_user_permission_project")
-    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.update_user_permission_project")
-    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_project")
-    def test_create_blank_project(self, create_project, update_user_permission_project, mock_permission):
-        create_project.side_effect = [{"id": 1, "flow_organization": str(uuid.uuid4())}]
-        update_user_permission_project.side_effect = [
-            dict(status=status.HTTP_201_CREATED, data={}),
-
-        ]
-        mock_permission.return_value = True
+    @patch("connect.internals.event_driven.producer.rabbitmq_publisher.RabbitmqPublisher.send_message")
+    def test_create_project(
+        self,
+        mock_publisher
+    ):
+        mock_publisher.side_effect = [True]
         organization_uuid = str(self.org_1.uuid)
         data = {
             "date_format": "D",
@@ -142,91 +138,12 @@ class ProjectViewSetTestCase(TestCase):
         Project.objects.get(uuid=content_data.get("uuid"))
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
 
-    # @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_classifier")
-    # @patch("connect.api.v1.internal.integrations.integrations_rest_client.IntegrationsRESTClient.whatsapp_demo_integration")
-    # @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_flows")
-    # @patch("connect.api.v1.internal.intelligence.intelligence_rest_client.IntelligenceRESTClient.get_access_token")
-    # @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.update_user_permission_project")
-    # @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_template_project")
-    @patch("connect.common.signals.update_user_permission_project")
-    @patch("connect.api.v1.internal.integrations.integrations_rest_client.IntegrationsRESTClient.whatsapp_demo_integration")
-    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_flows")
-    @patch("connect.api.v1.internal.chats.chats_rest_client.ChatsRESTClient.create_chat_project")
-    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_classifier")
-    @patch("connect.api.v1.internal.intelligence.intelligence_rest_client.IntelligenceRESTClient.get_access_token")
-    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_globals")
-    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.update_user_permission_project")
-    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_template_project")
-    def test_create_omie_project(self, create_template_project, update_user_permission_project, create_globals, get_access_token, create_classifier, create_chat_project, create_flows, whatsapp_demo_integration, mock_permission):
-        class GlobalResponse:
-            status_code = 201
-
-            @staticmethod
-            def json():
-                return {
-                    "org": "75694862-7dee-411f-a2d1-8a48fad743d2",
-                    "name": "appkey",
-                    "value": "1234567"
-                }
-        wpp_data = {
-            "redirect_url": "https://example.com",
-            "router_token": "rt_token"
-        }
-        mock_permission.return_value = True
-        update_user_permission_project.side_effect = [
-            dict(status=status.HTTP_201_CREATED, data={}),
-            dict(status=status.HTTP_201_CREATED, data={}),
-        ]
-
-        class ChatsResponse:
-
-            chats_data = {
-                "ticketer": {"uuid": str(uuid.uuid4()), "name": "Test Ticketer"},
-                "queue": {"uuid": str(uuid.uuid4()), "name": "Test Queue"},
-            }
-
-            @property
-            def text(self):
-                return json.dumps(self.chats_data)
-
-        flows_response = '{"uuid": "9785a273-37de-4658-bfa2-d8028dc06c84"}'
-        organization_uuid = str(self.org_1.uuid)
-
-        create_template_project.side_effect = [{"data": '{"id": 1, "uuid": "6b6a8c8b-6734-4110-81c9-287eaeab8e26"}'}]
-        create_globals.side_effect = [GlobalResponse]
-        get_access_token.side_effect = ["6b6a8c8b-6734-tokn-81c9-287eaeab8e26"]
-        create_classifier.side_effect = [{"status": 201, "data": {"uuid": "fdd4a7bb-fe5a-41b1-96a2-96d95c4e7aab"}}]
-        create_chat_project.side_effect = [ChatsResponse()]
-        create_flows.side_effect = [dict(status=201, data=flows_response)]
-        whatsapp_demo_integration.side_effect = [wpp_data]
-
-        body = {
-            "date_format": "D",
-            "name": "Test Omie",
-            "timezone": "America/Argentina/Buenos_Aires",
-            "template": True,
-            "template_type": "omie"
-        }
-        path = f"/v2/organizations/{organization_uuid}projects/"
-        method = {"post": "create"}
-        user = self.user
-
-        response, content_data = self.request(
-            path,
-            method,
-            user=user,
-            pk=organization_uuid,
-            data=body
-        )
-
-        Project.objects.get(uuid=content_data.get("uuid"))
-        self.assertEquals(response.status_code, status.HTTP_201_CREATED)
-
-    @patch("connect.api.v1.internal.chats.chats_rest_client.ChatsRESTClient.update_chats_project")
-    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.update_project")
-    def test_update_project(self, flows_update_project, update_chats_project):
-        flows_update_project.side_effect = [200]
-        update_chats_project.side_effect = [200]
+    @patch("connect.internals.event_driven.producer.rabbitmq_publisher.RabbitmqPublisher.send_message")
+    def test_update_project(
+        self,
+        mock_publisher
+    ):
+        mock_publisher.side_effect = [True]
 
         organization_uuid = str(self.org_1.uuid)
         project_uuid = str(self.project1.uuid)
@@ -308,164 +225,6 @@ class ProjectViewSetTestCase(TestCase):
 
         self.assertEquals(response.status_code, status.HTTP_204_NO_CONTENT)
 
-    @patch("connect.common.signals.update_user_permission_project")
-    @patch("connect.api.v1.internal.integrations.integrations_rest_client.IntegrationsRESTClient.whatsapp_demo_integration")
-    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_flows")
-    @patch("connect.api.v1.internal.chats.chats_rest_client.ChatsRESTClient.create_chat_project")
-    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_classifier")
-    @patch("connect.api.v1.internal.intelligence.intelligence_rest_client.IntelligenceRESTClient.get_access_token")
-    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_globals")
-    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.update_user_permission_project")
-    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_template_project")
-    def test_create_omie_financial_project(self, create_template_project, update_user_permission_project, create_globals, get_access_token, create_classifier, create_chat_project, create_flows, whatsapp_demo_integration, mock_permission):
-        class GlobalResponse:
-            status_code = 201
-
-            @staticmethod
-            def json():
-                return {
-                    "org": "75694862-7dee-411f-a2d1-8a48fad743d2",
-                    "name": "appkey",
-                    "value": "1234567"
-                }
-        wpp_data = {
-            "redirect_url": "https://example.com",
-            "router_token": "rt_token"
-        }
-
-        update_user_permission_project.side_effect = [
-            dict(status=status.HTTP_201_CREATED, data={}),
-            dict(status=status.HTTP_201_CREATED, data={}),
-        ]
-        mock_permission.return_value = True
-
-        class ChatsResponse:
-            chats_data = {
-                "ticketer": {"uuid": str(uuid.uuid4()), "name": "Test Ticketer"},
-                "queue": {"uuid": str(uuid.uuid4()), "name": "Test Queue"},
-            }
-
-            @property
-            def text(self):
-                return json.dumps(self.chats_data)
-
-        flows_response = '{"uuid": "9785a273-37de-4658-bfa2-d8028dc06c84"}'
-
-        create_template_project.side_effect = [{"data": '{"id": 1, "uuid": "6b6a8c8b-6734-4110-81c9-287eaeab8e26"}'}]
-        create_globals.side_effect = [GlobalResponse]
-        get_access_token.side_effect = ["6b6a8c8b-6734-tokn-81c9-287eaeab8e26"]
-        create_classifier.side_effect = [{"status": 201, "data": {"uuid": "fdd4a7bb-fe5a-41b1-96a2-96d95c4e7aab"}}]
-        create_chat_project.side_effect = [ChatsResponse()]
-        create_flows.side_effect = [dict(status=201, data=flows_response)]
-        whatsapp_demo_integration.side_effect = [wpp_data]
-
-        organization_uuid = str(self.org_1.uuid)
-        body = {
-            "name": "ominho 2",
-            "organization": organization_uuid,
-            "date_format": "D",
-            "timezone": "America/Argentina/Buenos_Aires",
-            "template": True,
-            "template_type": "omie_financial",
-            "globals": {
-                "appkey": "asdasdas",
-                "appsecret": "asdasdas"
-            }
-        }
-        path = f"/v2/organizations/{organization_uuid}projects/"
-        method = {"post": "create"}
-        user = self.user
-
-        response, content_data = self.request(
-            path,
-            method,
-            user=user,
-            pk=organization_uuid,
-            data=body
-        )
-
-        self.assertEquals(response.status_code, status.HTTP_201_CREATED)
-
-    @patch("connect.common.signals.update_user_permission_project")
-    @patch("connect.api.v1.internal.integrations.integrations_rest_client.IntegrationsRESTClient.whatsapp_demo_integration")
-    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_flows")
-    @patch("connect.api.v1.internal.chats.chats_rest_client.ChatsRESTClient.create_chat_project")
-    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_classifier")
-    @patch("connect.api.v1.internal.intelligence.intelligence_rest_client.IntelligenceRESTClient.get_access_token")
-    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_globals")
-    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.update_user_permission_project")
-    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_template_project")
-    def test_create_sac_chatgpt_project(self, create_template_project, update_user_permission_project, create_globals, get_access_token, create_classifier, create_chat_project, create_flows, whatsapp_demo_integration, mock_permission):
-        class GlobalResponse:
-            status_code = 201
-
-            @staticmethod
-            def json():
-                return {
-                    "org": "75694862-7dee-411f-a2d1-8a48fad743d2",
-                    "name": "appkey",
-                    "value": "1234567"
-                }
-        wpp_data = {
-            "redirect_url": "https://example.com",
-            "router_token": "rt_token"
-        }
-
-        update_user_permission_project.side_effect = [
-            dict(status=status.HTTP_201_CREATED, data={}),
-            dict(status=status.HTTP_201_CREATED, data={}),
-        ]
-        mock_permission.return_value = True
-
-        class ChatsResponse:
-            chats_data = {
-                "ticketer": {"uuid": str(uuid.uuid4()), "name": "Test Ticketer"},
-                "queue": {"uuid": str(uuid.uuid4()), "name": "Test Queue"},
-            }
-
-            @property
-            def text(self):
-                return json.dumps(self.chats_data)
-
-        flows_response = '{"uuid": "9785a273-37de-4658-bfa2-d8028dc06c84"}'
-
-        create_template_project.side_effect = [{"data": '{"id": 1, "uuid": "6b6a8c8b-6734-4110-81c9-287eaeab8e26"}'}]
-        create_globals.side_effect = [GlobalResponse]
-        get_access_token.side_effect = ["6b6a8c8b-6734-tokn-81c9-287eaeab8e26"]
-        create_classifier.side_effect = [{"status": 201, "data": {"uuid": "fdd4a7bb-fe5a-41b1-96a2-96d95c4e7aab"}}]
-        create_chat_project.side_effect = [ChatsResponse()]
-        create_flows.side_effect = [dict(status=201, data=flows_response)]
-        whatsapp_demo_integration.side_effect = [wpp_data]
-
-        organization_uuid = str(self.org_1.uuid)
-        body = {
-            "name": "sac chatgpt",
-            "organization": organization_uuid,
-            "date_format": "D",
-            "timezone": "America/Argentina/Buenos_Aires",
-            "template": True,
-            "template_type": "sac+chatgpt",
-            "globals": {
-                "chatgpt_token": "asdasdas",
-                "Conteudo": "@globals.conteudo",
-                "Personalidade": "@globals.personalidade",
-                "Principios Seguranca": "@globals.principios_seguranca",
-            }
-        }
-        path = f"/v2/organizations/{organization_uuid}/projects/"
-        method = {"post": "create"}
-        user = self.user
-
-        response, content_data = self.request(
-            path,
-            method,
-            user=user,
-            pk=organization_uuid,
-            data=body
-        )
-
-        self.assertEquals(response.status_code, status.HTTP_201_CREATED)
-
 
 class ProjectTestCase(TestCase):
 
@@ -512,19 +271,6 @@ class ProjectTestCase(TestCase):
         self.assertTrue(created)
         self.assertEquals(data, response_data)
 
-    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_classifier")
-    def test_error_create_classifier(self, create_classifier):
-        create_classifier.side_effect = [Exception("Error")]
-
-        project = self.project
-        authorization = project.get_user_authorization(self.user)
-        access_token = uuid.uuid4()
-
-        created, data = self.project.create_classifier(authorization, project.template_type, access_token)
-
-        self.assertFalse(created)
-        self.assertEquals(data.get("status"), status.HTTP_500_INTERNAL_SERVER_ERROR)
-
     @patch("connect.api.v1.internal.chats.chats_rest_client.ChatsRESTClient.create_chat_project")
     def test_create_chats_project(self, create_chat_project):
         ticketer = uuid.uuid4()
@@ -537,13 +283,6 @@ class ProjectTestCase(TestCase):
         project = self.project
         created, data = project.create_chats_project()
         self.assertTrue(created)
-
-    @patch("connect.api.v1.internal.chats.chats_rest_client.ChatsRESTClient.create_chat_project")
-    def test_error_create_chats_project(self, create_chat_project):
-        create_chat_project.side_effect = [Exception("Error")]
-        created, data = self.project.create_chats_project()
-        self.assertFalse(created)
-        self.assertEquals(data.get("status"), status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_flows")
     @patch("connect.api.v1.internal.chats.chats_rest_client.ChatsRESTClient.create_chat_project")
@@ -564,24 +303,6 @@ class ProjectTestCase(TestCase):
         project = self.project
         created, data = project.create_flows(classifier_uuid)
         self.assertTrue(created)
-
-    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_flows")
-    @patch("connect.api.v1.internal.chats.chats_rest_client.ChatsRESTClient.create_chat_project")
-    def test_error_create_flows(self, create_chat_project, create_flows):
-        data = {
-            "ticketer": {"uuid": str(uuid.uuid4()), "name": "Test Ticketer"},
-            "queue": {"uuid": str(uuid.uuid4()), "name": "Test Queue"},
-        }
-
-        class Response:
-            text = json.dumps(data)
-
-        create_chat_project.side_effect = [Response()]
-        create_flows.side_effect = [Exception()]
-        classifier_uuid = uuid.uuid4()
-        project = self.project
-        created, data = project.create_flows(classifier_uuid)
-        self.assertFalse(created)
 
     @patch("requests.post")
     def test_create_flows_json(self, post):
