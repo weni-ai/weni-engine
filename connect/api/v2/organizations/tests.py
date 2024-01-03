@@ -1,21 +1,18 @@
 import json
-import uuid
 
 from rest_framework import status
 from rest_framework.test import APIRequestFactory, force_authenticate
-from rest_framework.response import Response
 
 from django.test import TestCase
 
 from unittest.mock import patch
 
 from connect.api.v1.tests.utils import create_user_and_token
-from connect.common.models import Organization, BillingPlan, OrganizationRole, Project
+from connect.common.models import Organization, BillingPlan, OrganizationRole
 from connect.authentication.models import UserEmailSetup
 from connect.api.v2.organizations.views import OrganizationViewSet
 from connect.common.mocks import StripeMockGateway
 
-from django.conf import settings
 from connect.api.v1.tests.utils import create_contacts
 from connect.billing.tasks import daily_contact_count
 import pendulum
