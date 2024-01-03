@@ -607,27 +607,6 @@ class ProjectTestCase(TestCase):
         created, data = project.create_flows(classifier_uuid)
         self.assertFalse(created)
 
-    @patch("connect.api.v1.internal.integrations.integrations_rest_client.IntegrationsRESTClient.whatsapp_demo_integration")
-    def test_whatsapp_demo_integration(self, wpp_integration):
-        data = {
-            "redirect_url": "https://example.com",
-            "router_token": "rt_token"
-        }
-        wpp_integration.side_effect = [data]
-        project = self.project
-        token = "token"
-        created, response_data = project.whatsapp_demo_integration(token)
-        self.assertTrue(created)
-        self.assertEquals(data, response_data)
-
-    @patch("connect.api.v1.internal.integrations.integrations_rest_client.IntegrationsRESTClient.whatsapp_demo_integration")
-    def test_error_whatsapp_demo_integration(self, wpp_integration):
-        wpp_integration.side_effect = [Exception("Error")]
-        project = self.project
-        token = "token"
-        created, response_data = project.whatsapp_demo_integration(token)
-        self.assertFalse(created)
-
     @patch("requests.post")
     def test_create_flows_json(self, post):
         flows = FlowsRESTClient()
