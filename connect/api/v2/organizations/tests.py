@@ -13,17 +13,10 @@ from connect.common.models import Organization, BillingPlan, OrganizationRole
 from connect.authentication.models import UserEmailSetup
 from connect.api.v2.organizations.views import OrganizationViewSet
 from connect.common.mocks import StripeMockGateway
-from connect.common.models import Project
 
 from connect.api.v1.tests.utils import create_contacts
 from connect.billing.tasks import daily_contact_count
 import pendulum
-
-
-class MockUpdateProjectUseCase:
-
-    def send_updated_project(self, project: Project, user_email: str):
-        return True
 
 
 class OrganizationViewSetTestCase(TestCase):
@@ -156,7 +149,7 @@ class OrganizationViewSetTestCase(TestCase):
     ):
         mock_get_gateway.return_value = StripeMockGateway()
         send_request_flow_user_info.side_effect = [True]
-        mock_publisher.return_value = MockUpdateProjectUseCase()
+        mock_publisher.side_effect = [True]
         org_data = {
             "name": "V2",
             "description": "V2 desc",
