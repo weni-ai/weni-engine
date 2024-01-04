@@ -38,7 +38,7 @@ class CiUtils(object):
                 BILLING_COST_PER_WHATSAPP=199
                 BILLING_TEST_MODE=True
                 USE_EDA=True
-                DEFAULT_DATABASE=postgres://weni:weni@localhost:5432/weni
+                TESTING=True
             """.replace(" ", "").strip()
         return env
 
