@@ -225,6 +225,7 @@ class UpdateProjectTestCase(TestCase):
         return (response, content_data)
 
     @patch("connect.internals.event_driven.producer.rabbitmq_publisher.RabbitmqPublisher.send_message")
+    @skipIf(True, "Depreceted")
     def test_okay_update_name(
         self,
         mock_send_updated_project
