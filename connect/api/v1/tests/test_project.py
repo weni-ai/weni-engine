@@ -224,7 +224,7 @@ class UpdateProjectTestCase(TestCase):
         content_data = json.loads(response.content)
         return (response, content_data)
 
-    @patch("connect.usecases.project.update_project.UpdateProjectUseCase.send_updated_project")
+    @patch("connect.internals.event_driven.producer.rabbitmq_publisher.RabbitmqPublisher.send_message")
     def test_okay_update_name(
         self,
         mock_send_updated_project
