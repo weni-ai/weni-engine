@@ -139,7 +139,7 @@ class OrganizationViewSetTestCase(TestCase):
 
     @patch("connect.billing.get_gateway")
     @patch("connect.authentication.models.User.send_request_flow_user_info")
-    @patch("connect.usecases.project.update_project.UpdateProjectUseCase.send_updated_project")
+    @patch("connect.usecases.project.update_project.UpdateProjectUseCase")
     def test_create_organization_project(
         self,
         mock_publisher,
