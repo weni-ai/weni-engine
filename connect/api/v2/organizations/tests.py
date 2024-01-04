@@ -146,7 +146,6 @@ class OrganizationViewSetTestCase(TestCase):
         send_request_flow_user_info,
         mock_get_gateway
     ):
-        print("MOCK TEST")
         mock_get_gateway.return_value = StripeMockGateway()
         send_request_flow_user_info.side_effect = [True]
         mock_publisher.side_effect = [True]
