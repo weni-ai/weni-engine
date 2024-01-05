@@ -31,8 +31,10 @@ ENV PYTHONUNBUFFERED=1 \
   DEBIAN_FRONTEND=noninteractive \
   PROJECT=Weni-engine \
   PROJECT_PATH=/home/app \
-  PROJECT_USER=app_user \
-  PROJECT_GROUP=app_group \
+  APP_USER=app_user \
+  APP_GROUP=app_group \
+  USER_ID=1999 \
+  GROUP_ID=1999 \
   PIP_DISABLE_PIP_VERSION_CHECK=1 \
   PATH="/install/bin:${PATH}" \
   APP_PORT=${APP_PORT} \
@@ -45,8 +47,8 @@ ENV PYTHONUNBUFFERED=1 \
 ARG COMPRESS_ENABLED
 ARG BRANDING_ENABLED
 
-RUN addgroup --gid 1999 "${PROJECT_GROUP}" \
-  && useradd --system -m -d "${PROJECT_PATH}" -u 1999 -g 1999 "${PROJECT_USER}"
+RUN addgroup --gid "${GROUP_ID}" "${APP_GROUP}" \
+  && useradd --system -m -d "${PROJECT_PATH}" -u "${USER_ID}" -g "${GROUP_ID}" "${APP_USER}"
 
 WORKDIR "${PROJECT_PATH}"
 
@@ -89,9 +91,9 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   && rm -rf /usr/share/man /usr/share/doc
 
 COPY --from=build /install /usr/local
-COPY --chown=${PROJECT_USER}:${PROJECT_GROUP} ./ ${PROJECT_PATH}
+COPY --chown=${APP_USER}:${APP_GROUP} ./ ${PROJECT_PATH}
 
-USER "${PROJECT_USER}:${PROJECT_USER}"
+USER "${APP_USER}:${APP_GROUP}"
 EXPOSE 8000
 ENTRYPOINT ["bash", "./entrypoint.sh"]
 CMD ["start"]
