@@ -1,3 +1,7 @@
+# 3.17.1
+## *Add*
+  - adding call to chats_update_permission on update_project_permission task
+
 # 3.17.0
 ## *Remove*
   - Remove not used fields on project serializer to impro overall performace
