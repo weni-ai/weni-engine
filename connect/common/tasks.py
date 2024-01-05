@@ -111,7 +111,7 @@ def update_user_permission_project(
         flow_instance = FlowsRESTClient()
     else:
         flow_instance = utils.get_grpc_types().get("flow")
-    chats_clinent = ChatsRESTClient()
+    chats_client = ChatsRESTClient()
     integrations_client = IntegrationsRESTClient()
 
     flow_instance.update_user_permission_project(
@@ -124,7 +124,7 @@ def update_user_permission_project(
         user_email=user_email,
         role=permission
     )
-    chats_clinent.update_user_permission(
+    chats_client.update_user_permission(
         permission=permission,
         user_email=user_email,
         project_uuid=project_uuid
