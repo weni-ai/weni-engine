@@ -93,7 +93,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 COPY --from=build /install /usr/local
 COPY --chown=${APP_USER}:${APP_GROUP} ./ ${PROJECT_PATH}
 
-USER "${APP_USER}:${APP_USER}"
+USER "${APP_USER}:${APP_GROUP}"
 EXPOSE 8000
 ENTRYPOINT ["bash", "./entrypoint.sh"]
 CMD ["start"]
