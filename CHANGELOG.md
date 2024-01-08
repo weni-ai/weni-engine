@@ -1,3 +1,10 @@
+# 3.17.2
+## *Fix*
+  - Flake8 imports and pep8
+  - Remove unused unittest causing issues regarding updates
+  - Fix CI issues regarding unittests
+  - Fix celery not finding correct task no unittest
+
 # 3.17.1
 ## *Add*
   - adding call to chats_update_permission on update_project_permission task
