@@ -1,7 +1,8 @@
+from django.conf import settings
+
 from connect.celery import app as celery_app
 from connect.common.models import Project
 from connect.internals.event_driven.producer.rabbitmq_publisher import RabbitmqPublisher
-from django.conf import settings
 
 
 class UpdateProjectUseCase:
