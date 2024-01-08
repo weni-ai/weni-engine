@@ -59,7 +59,7 @@ class ElasticFlow(ElasticHandler):  # pragma: no cover
                                 "query": {
                                     "bool": {
                                         "must": [
-                                            {"exists": {"field": "urns.path"}} 
+                                            {"exists": {"field": "urns.path"}}
                                         ]
                                     }
                                 }

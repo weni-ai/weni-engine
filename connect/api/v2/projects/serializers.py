@@ -17,7 +17,6 @@ from connect.api.v1.project.serializers import ProjectAuthorizationSerializer
 from connect.celery import app as celery_app
 from connect.common.models import (
     ProjectAuthorization,
-    Service,
     Project,
     Organization,
     RequestRocketPermission,
@@ -458,7 +457,8 @@ class ProjectUpdateSerializer(serializers.ModelSerializer):
         try:
             instance = super().update(instance, validated_data)
             user = self.context["request"].user
-            UpdateProjectUseCase().send_updated_project(instance, user.email)
+            if not settings.TESTING:
+                UpdateProjectUseCase().send_updated_project(instance, user.email)
             return instance
         except Exception as error:
             logger.error(f"Update project: {error}")

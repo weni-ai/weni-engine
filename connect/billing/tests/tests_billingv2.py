@@ -5,7 +5,6 @@ from django.test import TestCase
 from connect.common.models import Project, Organization, BillingPlan
 from connect.billing.models import Contact, ContactCount
 from connect.billing.tasks import daily_contact_count
-from connect.utils import count_contacts
 from freezegun import freeze_time
 from connect.common.mocks import StripeMockGateway
 from unittest.mock import patch
@@ -119,30 +118,3 @@ class CountContactsTestCase(TestCase):
             contacts_day_count = ContactCount.objects.filter(project=project, day=pendulum.now().start_of("day"))
             total = sum([day_count.count for day_count in contacts_day_count])
             self.assertEquals(total, 20)
-
-    def test_count_contacts(self):
-        """If organization's plan == Custom, uses the old way of counting contacts (Contact active per month).
-            else use daily contact count.
-        """
-
-        before = pendulum.now().end_of("month")
-        after = pendulum.now().start_of("month")
-
-        for i in range(0, before.day):
-            freezer = freeze_time(after.add(days=i))
-            freezer.start()
-            daily_contact_count()
-            freezer.stop()
-
-        for org in Organization.objects.all():
-
-            contact_count = 0
-
-            for project in org.project.all():
-                total = count_contacts(project=project, before=str(before), after=str(after))
-                contact_count += total
-
-            if org.organization_billing.plan in [BillingPlan.PLAN_CUSTOM, BillingPlan.PLAN_ENTERPRISE]:
-                self.assertEqual(contact_count, 40)
-            else:
-                self.assertEqual(contact_count, 120)

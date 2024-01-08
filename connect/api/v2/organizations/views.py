@@ -29,7 +29,6 @@ from connect.api.v2.organizations.api_schemas import (
 )
 
 
-
 class OrganizationViewSet(
     mixins.RetrieveModelMixin,
     mixins.ListModelMixin,
@@ -68,7 +67,6 @@ class OrganizationViewSet(
             if field in valid_fields:
                 ordering.append(param)
         return ordering or ["created_at"]
-
 
     @swagger_auto_schema(request_body=create_organization_schema)
     def create(self, request, *args, **kwargs):

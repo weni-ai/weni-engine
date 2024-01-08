@@ -13,7 +13,7 @@ class TemplateTypeModelTestCase(TestCase):
 
         self.template_type_object = TemplateType.objects.create(
             level=1,
-            category="category",
+            category=["category"],
             description="description",
             name="name",
             setup={"setup": "setup"}
@@ -22,8 +22,8 @@ class TemplateTypeModelTestCase(TestCase):
     def test_str(self):
 
         str_response = self.template_type_object.__str__()
-        model_id = self.template_type_object.id
-        self.assertListEqual(str_response.split(), [str(model_id)])
+        model_name = self.template_type_object.name
+        self.assertListEqual(str_response.split(), [model_name])
 
 
 class TemplateFeatureModelTestCase(TestCase):
@@ -32,7 +32,7 @@ class TemplateFeatureModelTestCase(TestCase):
 
         self.template_type_object = TemplateType.objects.create(
             level=1,
-            category="category",
+            category=["category"],
             description="description",
             name="name",
             setup={"setup": "setup"}
@@ -49,8 +49,8 @@ class TemplateFeatureModelTestCase(TestCase):
     def test_str(self):
 
         str_response = self.template_feature_object.__str__()
-        model_id = self.template_feature_object.id
-        self.assertListEqual(str_response.split(), [str(model_id)])
+        model_name = self.template_feature_object.name
+        self.assertListEqual(str_response.split(), [str(model_name)])
 
 
 class TemplateSuggestionModelTestCase(TestCase):
