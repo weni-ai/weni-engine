@@ -109,7 +109,8 @@ class AdditionalUserInfoTestCase(TestCase):
             "number_people": "0",
             "segment": "test",
             "sector": "ti",
-            "weni_helps": "ti.incidentes"
+            "weni_helps": "ti.incidentes",
+            "company_phone_number": "5582555555555",
         }
 
         user_info = {

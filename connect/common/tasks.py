@@ -789,3 +789,17 @@ def list_project_flows(flow_organization: str):
 def delete_recent_activities():
     date_limit = pendulum.now().start_of("day").subtract(30)
     RecentActivity.objects.filter(created_on__lte=date_limit).delete()
+
+
+@app.task(name="send_user_flow_info", ignore_result=True)
+def send_user_flow_info(
+    flow_data: dict,
+    user_email: str,
+) -> bool:
+    try:
+        user = User.objects.get(email=user_email)
+        user.send_request_flow_user_info(flow_data=flow_data)
+        return True
+    except Exception as e:
+        logger.error(e)
+        return False
