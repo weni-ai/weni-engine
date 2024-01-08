@@ -24,6 +24,7 @@ from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
 from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
 from connect.api.v1.internal.integrations.integrations_rest_client import IntegrationsRESTClient
 from connect.api.v1.internal.intelligence.intelligence_rest_client import IntelligenceRESTClient
+
 import logging
 
 
@@ -109,7 +110,7 @@ def update_user_permission_project(
         flow_instance = FlowsRESTClient()
     else:
         flow_instance = utils.get_grpc_types().get("flow")
-
+    chats_client = ChatsRESTClient()
     integrations_client = IntegrationsRESTClient()
 
     flow_instance.update_user_permission_project(
@@ -122,7 +123,11 @@ def update_user_permission_project(
         user_email=user_email,
         role=permission
     )
-
+    chats_client.update_user_permission(
+        permission=permission,
+        user_email=user_email,
+        project_uuid=project_uuid
+    )
     return True
 
 
