@@ -95,7 +95,7 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
                 return data
 
         self.create_authorizations(instance, authorizations, user)
-        self.publish_create_org_message(instance)
+        self.publish_create_org_message(instance, user)
         return instance
 
     def get_authorization(self, obj):
@@ -125,7 +125,7 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
                 created_by=user
             )
 
-    def publish_create_org_message(self, instance):
+    def publish_create_org_message(self, instance: Organization, user: User):
 
         authorizations = []
         for authorization in instance.authorizations.all():
@@ -136,6 +136,7 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
             "uuid": str(instance.uuid),
             "name": instance.name,
             "authorizations": authorizations,
+            "user_email": user.email,
         }
         print(message_body)
         rabbitmq_publisher = RabbitmqPublisher()
