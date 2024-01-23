@@ -654,7 +654,7 @@ class OrganizationAuthorization(models.Model):
             "role": self.role
         }
         rabbitmq_publisher = RabbitmqPublisher()
-        rabbitmq_publisher.send_message(message_body, exchange="orgs.topic", routing_key="org.authorizations")
+        rabbitmq_publisher.send_message(message_body, exchange="orgs-auths.topic", routing_key="")
         
 
 class Project(models.Model):
