@@ -138,7 +138,6 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
             "authorizations": authorizations,
             "user_email": user.email,
         }
-        print(message_body)
         rabbitmq_publisher = RabbitmqPublisher()
         rabbitmq_publisher.send_message(message_body, exchange="orgs.topic", routing_key="")
 

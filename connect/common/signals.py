@@ -103,7 +103,6 @@ def delete_opened_project(sender, instance, **kwargs):
 
 @receiver(post_save, sender=OrganizationAuthorization)
 def org_authorizations(sender, instance, created, **kwargs):
-    # if settings.CREATE_AI_ORGANIZATION:
     if instance.role is not OrganizationLevelRole.NOTHING.value:
         if created:
             organization_permission_mapper = {
@@ -111,6 +110,7 @@ def org_authorizations(sender, instance, created, **kwargs):
                 OrganizationRole.CONTRIBUTOR.value: ProjectRole.CONTRIBUTOR.value,
                 OrganizationRole.SUPPORT.value: ProjectRole.SUPPORT.value,
             }
+            instance.publish_create_org_authorization_message()
             for project in instance.organization.project.all():
                 project_perm = project.project_authorizations.filter(user=instance.user)
                 project_role = organization_permission_mapper.get(instance.role, ProjectRole.NOT_SETTED.value)
