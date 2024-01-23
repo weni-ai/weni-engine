@@ -110,7 +110,6 @@ def org_authorizations(sender, instance, created, **kwargs):
                 OrganizationRole.CONTRIBUTOR.value: ProjectRole.CONTRIBUTOR.value,
                 OrganizationRole.SUPPORT.value: ProjectRole.SUPPORT.value,
             }
-            instance.publish_create_org_authorization_message()
             for project in instance.organization.project.all():
                 project_perm = project.project_authorizations.filter(user=instance.user)
                 project_role = organization_permission_mapper.get(instance.role, ProjectRole.NOT_SETTED.value)
@@ -160,6 +159,7 @@ def request_permission_organization(sender, instance, created, **kwargs):
                 perm.has_2fa = True
                 update_fields.append("has_2fa")
             perm.save(update_fields=update_fields)
+            perm.publish_create_org_authorization_message()
             if perm.can_contribute:
                 organization_permission_mapper = {
                     OrganizationRole.ADMIN.value: ProjectRole.MODERATOR.value,
