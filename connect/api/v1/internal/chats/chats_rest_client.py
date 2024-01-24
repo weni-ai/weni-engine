@@ -3,6 +3,7 @@ from django.conf import settings
 import requests
 
 from connect.api.v1.internal.internal_authentication import InternalAuthentication
+from connect.common.models import ProjectAuthorization, ProjectRole
 
 
 class ChatsRESTClient:
@@ -19,14 +20,26 @@ class ChatsRESTClient:
     def update_user_permission(
         self, permission: int, user_email: str, project_uuid: str
     ):
-        from connect.common.models import ChatsRole
-        permission_mapper = {
-            ChatsRole.ADMIN.value: 1,
-            ChatsRole.AGENT.value: 2,
-            ChatsRole.SERVICE_MANAGER.value: 3
+        user_auth = ProjectAuthorization.objects.get(user__email=user_email, project=project_uuid)
+        user_role = user_auth.role
+        chats_role = None
+        dict_admin_role = {
+            ProjectRole.CONTRIBUTOR.value: 2,
+            ProjectRole.MODERATOR.value: 3
         }
+        dict_attendent_role = {
+            ProjectRole.VIEWER.value: 1,
+            ProjectRole.CHAT_USER.value: 2,
+        }
+        if user_role in dict_admin_role:
+            chats_role = 1
+        elif user_role in dict_attendent_role:
+            chats_role = 2
+        else:
+            raise Exception("User role not found")
+
         body = dict(
-            role=permission_mapper.get(permission, 0),
+            role=chats_role,
             user=user_email,
             project=project_uuid
         )
