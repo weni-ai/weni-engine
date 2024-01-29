@@ -104,6 +104,7 @@ def delete_opened_project(sender, instance, **kwargs):
 @receiver(post_save, sender=OrganizationAuthorization)
 def org_authorizations(sender, instance, created, **kwargs):
     if instance.role is not OrganizationLevelRole.NOTHING.value:
+        instance.publish_create_org_authorization_message()
         if created:
             organization_permission_mapper = {
                 OrganizationRole.ADMIN.value: ProjectRole.MODERATOR.value,
