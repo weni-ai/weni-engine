@@ -1,3 +1,7 @@
+# 3.18.0
+## *Add*
+  - Event driven publisher for orgs and org authorizations
+
 # 3.17.3
 ## *Fix*
   - Fix wrong chats role mapping
