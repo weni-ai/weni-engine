@@ -21,6 +21,9 @@ from connect.api.v1.organization.serializers import (
     OrganizationAuthorizationSerializer,
 )
 from connect.api.v1.project.validators import CanContributeInOrganizationValidator
+from connect.internals.event_driven.producer.rabbitmq_publisher import RabbitmqPublisher
+
+
 User = get_user_model()
 logger = logging.getLogger(__name__)
 
@@ -92,7 +95,7 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
                 return data
 
         self.create_authorizations(instance, authorizations, user)
-
+        self.publish_create_org_message(instance, user)
         return instance
 
     def get_authorization(self, obj):
@@ -121,6 +124,22 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
                 role=authorization.get("role"),
                 created_by=user
             )
+
+    def publish_create_org_message(self, instance: Organization, user: User):
+
+        authorizations = []
+        for authorization in instance.authorizations.all():
+            if authorization.can_contribute:
+                authorizations.append({"user_email": authorization.user.email, "role": authorization.role})
+
+        message_body = {
+            "uuid": str(instance.uuid),
+            "name": instance.name,
+            "authorizations": authorizations,
+            "user_email": user.email,
+        }
+        rabbitmq_publisher = RabbitmqPublisher()
+        rabbitmq_publisher.send_message(message_body, exchange="orgs.topic", routing_key="")
 
 
 class PendingAuthorizationOrganizationSerializer(serializers.ModelSerializer):

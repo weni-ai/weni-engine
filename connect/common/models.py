@@ -27,11 +27,12 @@ from connect.api.v1.internal.intelligence.intelligence_rest_client import (
     IntelligenceRESTClient,
 )
 from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
-# from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
 from rest_framework import status
 from connect.common.helpers import send_mass_html_mail
 from django.db.models import Q
 from connect.template_projects.models import TemplateType
+
+from connect.internals.event_driven.producer.rabbitmq_publisher import RabbitmqPublisher
 
 logger = logging.getLogger(__name__)
 
@@ -646,6 +647,15 @@ class OrganizationAuthorization(models.Model):
             auth.has_2fa = True
             auth.save()
 
+    def publish_create_org_authorization_message(self):
+        message_body = {
+            "organization_uuid": str(self.organization.uuid),
+            "user_email": self.user.email,
+            "role": self.role
+        }
+        rabbitmq_publisher = RabbitmqPublisher()
+        rabbitmq_publisher.send_message(message_body, exchange="orgs-auths.topic", routing_key="")
+        
 
 class Project(models.Model):
     class Meta:
