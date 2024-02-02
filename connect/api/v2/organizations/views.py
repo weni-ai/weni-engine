@@ -61,7 +61,7 @@ class OrganizationViewSet(
     
     def get_object(self):
         if _is_orm_user(self.request.user):
-            return get_object_or_404(Organization, self.kwargs["uuid"])
+            return get_object_or_404(Organization, uuid=self.kwargs["uuid"])
         return super().get_object()
 
     def get_ordering(self):
