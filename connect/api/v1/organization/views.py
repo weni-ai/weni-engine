@@ -74,6 +74,10 @@ class OrganizationViewSet(
     lookup_field = "uuid"
     metadata_class = Metadata
 
+    def get_permissions(self):
+        print(self.action)
+        return super().get_permissions()
+
     def get_queryset(self, *args, **kwargs):
         if getattr(self, "swagger_fake_view", False):
             # queryset just for schema generation metadata
@@ -327,7 +331,7 @@ class OrganizationViewSet(
         return JsonResponse(data={"status": False}, status=status.HTTP_304_NOT_MODIFIED)
 
     @action(
-        detail=True,
+        detail=False,
         methods=["GET"],
         url_name="get-contact-active",
         url_path="grpc/contact-active/(?P<organization_uuid>[^/.]+)",
@@ -388,7 +392,6 @@ class OrganizationViewSet(
         methods=["GET"],
         url_name="get-org-active-contacts",
         url_path="org-active-contacts/(?P<organization_uuid>[^/.]+)",
-        permission_classes=[IsAuthenticated, OrganizationHasPermission|IsCRMUser, Has2FA],
     )
     def get_active_org_contacts(self, request, organization_uuid):
         organization = get_object_or_404(Organization, uuid=organization_uuid)
