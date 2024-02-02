@@ -1,3 +1,7 @@
+# 3.19.0
+## *Add*
+  - Add IsCRMUser permission
+
 # 3.18.0
 ## *Add*
   - Event driven publisher for orgs and org authorizations
