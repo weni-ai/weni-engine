@@ -24,6 +24,7 @@ from connect.api.v1.organization.permissions import (
     Has2FA,
     OrganizationHasPermission,
     OrganizationAdminManagerAuthorization,
+    IsCRMUser,
 )
 from connect.api.v1.organization.serializers import (
     OrganizationSeralizer,
@@ -68,7 +69,7 @@ class OrganizationViewSet(
 ):
     queryset = Organization.objects.all()
     serializer_class = OrganizationSeralizer
-    permission_classes = [IsAuthenticated, OrganizationHasPermission, Has2FA]
+    permission_classes = [IsAuthenticated, OrganizationHasPermission|IsCRMUser, Has2FA]
     lookup_field = "uuid"
     metadata_class = Metadata
 

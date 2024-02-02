@@ -299,6 +299,8 @@ class CustomCountTestCase(TestCase):
         mock_get_gateway.return_value = StripeMockGateway()
 
         self.owner, self.owner_token = create_user_and_token("owner")
+        self.crm, self.crm_token = create_user_and_token("crm")
+
         self.org1 = Organization.objects.create(
             name="Test project methods",
             description="",
@@ -330,4 +332,27 @@ class CustomCountTestCase(TestCase):
         organization = self.org1
         url = f"/v2/organizations/{organization.uuid}/get_contact_active?before={end.date()}&after={start.date()}"
         response = self.client.get(url, HTTP_AUTHORIZATION=f"Token {self.owner_token}", follow=True)
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+
+    def test_view_crm(self):
+        from freezegun import freeze_time
+        from django.conf import settings
+
+        start = pendulum.now().start_of("month")
+        end = start.end_of("month")
+        period = end - start
+        ran = period.range("days")
+
+        for day in ran:
+            freezer = freeze_time(day)
+            freezer.start()
+            create_contacts(num_contacts=10, day=day)
+            daily_contact_count()
+            freezer.stop()
+
+        settings.CRM_EMAILS_LIST = [self.crm.email]
+
+        organization = self.org1
+        url = f"/v2/organizations/{organization.uuid}/get_contact_active?before={end.date()}&after={start.date()}"
+        response = self.client.get(url, HTTP_AUTHORIZATION=f"Token {self.crm_token}", follow=True)
         self.assertEquals(response.status_code, status.HTTP_200_OK)
