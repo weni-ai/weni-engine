@@ -1,3 +1,7 @@
+# 3.19.1
+## *Fix*
+  - fix IsCRMUser get_object_or_404
+
 # 3.19.0
 ## *Add*
   - Add IsCRMUser permission
