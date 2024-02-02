@@ -3,6 +3,7 @@ from rest_framework import permissions
 
 from connect.api.v1 import READ_METHODS, WRITE_METHODS
 from connect.common.models import Organization, Project
+from django.conf import settings
 
 
 class OrganizationHasPermission(permissions.BasePermission):  # pragma: no cover
@@ -67,3 +68,26 @@ class Has2FA(permissions.BasePermission):
             return auth.has_2fa
         else:
             return True
+
+
+def _is_orm_user(user):
+    if not settings.ALLOW_CRM_ACCESS:
+        return False
+
+    if user.email not in settings.CRM_EMAILS_LIST:
+        return False
+
+    return True
+
+
+class IsCRMUser(permissions.IsAuthenticated):
+    def has_permission(self, request, view) -> bool:
+        is_authenticated = super().has_permission(request, view)
+
+        if not is_authenticated:
+            return False
+
+        return _is_orm_user(request.user)
+
+    def has_object_permission(self, request, view, obj):
+        return _is_orm_user(request.user)

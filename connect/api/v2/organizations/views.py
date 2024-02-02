@@ -7,6 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import ValidationError
 from drf_yasg2.utils import swagger_auto_schema
 from django.utils.translation import ugettext_lazy as _
+from django.shortcuts import get_object_or_404
 
 from connect.common.models import (
     Organization,
@@ -17,6 +18,8 @@ from connect.common.models import (
 from connect.api.v1.organization.permissions import (
     Has2FA,
     OrganizationHasPermission,
+    IsCRMUser,
+    _is_orm_user
 )
 from connect.api.v2.paginations import CustomCursorPagination
 from connect.api.v2.organizations.serializers import (
@@ -40,7 +43,7 @@ class OrganizationViewSet(
     queryset = Organization.objects.all()
     serializer_class = OrganizationSeralizer
     lookup_field = "uuid"
-    permission_classes = [IsAuthenticated, OrganizationHasPermission, Has2FA]
+    permission_classes = [IsAuthenticated, OrganizationHasPermission|IsCRMUser, Has2FA]
     pagination_class = CustomCursorPagination
 
     def get_queryset(self, *args, **kwargs):
@@ -55,6 +58,11 @@ class OrganizationViewSet(
         )
 
         return self.queryset.filter(pk__in=auth)
+    
+    def get_object(self):
+        if _is_orm_user(self.request.user):
+            return get_object_or_404(Organization, self.kwargs["uuid"])
+        return super().get_object()
 
     def get_ordering(self):
         valid_fields = (org_fields.name for org_fields in Organization._meta.get_fields())
@@ -114,7 +122,6 @@ class OrganizationViewSet(
     def get_contact_active(
         self, request, **kwargs
     ):  # pragma: no cover
-
         organization = self.get_object()
 
         before = request.query_params.get("before")

@@ -559,3 +559,9 @@ if USE_EDA:
     EDA_WAIT_TIME_RETRY = env.int("EDA_WAIT_TIME_RETRY", default=5)
 
 NEW_ATTENDANCE_DATE = env.str("NEW_ATTENDANCE_DATE", default="2023-09-30")
+
+
+ALLOW_CRM_ACCESS = env.bool("ALLOW_CRM_ACCESS", default=True)
+
+if ALLOW_CRM_ACCESS:
+    CRM_EMAILS_LIST = env.list("CRM_EMAILS_LIST")

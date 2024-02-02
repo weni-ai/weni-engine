@@ -24,6 +24,8 @@ from connect.api.v1.organization.permissions import (
     Has2FA,
     OrganizationHasPermission,
     OrganizationAdminManagerAuthorization,
+    IsCRMUser,
+    _is_orm_user
 )
 from connect.api.v1.organization.serializers import (
     OrganizationSeralizer,
@@ -68,7 +70,7 @@ class OrganizationViewSet(
 ):
     queryset = Organization.objects.all()
     serializer_class = OrganizationSeralizer
-    permission_classes = [IsAuthenticated, OrganizationHasPermission, Has2FA]
+    permission_classes = [IsAuthenticated, OrganizationHasPermission|IsCRMUser, Has2FA]
     lookup_field = "uuid"
     metadata_class = Metadata
 
@@ -83,6 +85,11 @@ class OrganizationViewSet(
             .values("organization")
         )
         return self.queryset.filter(pk__in=auth)
+
+    def get_object(self):
+        if _is_orm_user(self.request.user):
+            return get_object_or_404(Organization, self.kwargs["uuid"])
+        return super().get_object()
 
     def list(self, request, *args, **kwargs):
         page = self.paginate_queryset(
