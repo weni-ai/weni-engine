@@ -25,6 +25,7 @@ from connect.api.v1.organization.permissions import (
     OrganizationHasPermission,
     OrganizationAdminManagerAuthorization,
     IsCRMUser,
+    _is_orm_user
 )
 from connect.api.v1.organization.serializers import (
     OrganizationSeralizer,
@@ -84,6 +85,11 @@ class OrganizationViewSet(
             .values("organization")
         )
         return self.queryset.filter(pk__in=auth)
+
+    def get_object(self):
+        if _is_orm_user(self.request.user):
+            return get_object_or_404(Organization, self.kwargs["uuid"])
+        return super().get_object()
 
     def list(self, request, *args, **kwargs):
         page = self.paginate_queryset(
@@ -378,7 +384,6 @@ class OrganizationViewSet(
         return JsonResponse(data=response, status=status.HTTP_200_OK)
 
     @action(
-        detail=True,
         methods=["GET"],
         url_name="get-org-active-contacts",
         url_path="org-active-contacts/(?P<organization_uuid>[^/.]+)",

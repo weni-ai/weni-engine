@@ -7,6 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import ValidationError
 from drf_yasg2.utils import swagger_auto_schema
 from django.utils.translation import ugettext_lazy as _
+from django.shortcuts import get_object_or_404
 
 from connect.common.models import (
     Organization,
@@ -60,7 +61,7 @@ class OrganizationViewSet(
     
     def get_object(self):
         if _is_orm_user(self.request.user):
-            return self.queryset.get(uuid=self.kwargs["uuid"])
+            return get_object_or_404(Organization, self.kwargs["uuid"])
         return super().get_object()
 
     def get_ordering(self):
