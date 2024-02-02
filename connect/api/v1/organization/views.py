@@ -384,7 +384,7 @@ class OrganizationViewSet(
         return JsonResponse(data=response, status=status.HTTP_200_OK)
 
     @action(
-        detail=False,
+        detail=True,
         methods=["GET"],
         url_name="get-org-active-contacts",
         url_path="org-active-contacts/(?P<organization_uuid>[^/.]+)",
