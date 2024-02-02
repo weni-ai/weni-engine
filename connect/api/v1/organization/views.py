@@ -388,6 +388,7 @@ class OrganizationViewSet(
         methods=["GET"],
         url_name="get-org-active-contacts",
         url_path="org-active-contacts/(?P<organization_uuid>[^/.]+)",
+        permission_classes=[IsAuthenticated, OrganizationHasPermission|IsCRMUser, Has2FA],
     )
     def get_active_org_contacts(self, request, organization_uuid):
         organization = get_object_or_404(Organization, uuid=organization_uuid)
