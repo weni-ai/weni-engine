@@ -550,6 +550,8 @@ OMIE_APP_SECRET = env.str("OMIE_APP_SECRET", default="sk_test")
 USE_EDA = env.bool("USE_EDA", default=False)
 
 if USE_EDA:
+    EDA_CONNECTION_BACKEND = "connect.internals.event_driven.connection.pymqp.PyAMQPConnectionBackend"
+    EDA_CONSUMERS_HANDLE = "connect.internals.event_driven.handle.handle_consumers"
 
     EDA_BROKER_HOST = env.str("EDA_BROKER_HOST", default="localhost")
     EDA_BROKER_PORT = env.int("EDA_BROKER_PORT", default=5672)
