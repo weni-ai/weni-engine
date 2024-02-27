@@ -2453,9 +2453,13 @@ class RecentActivity(models.Model):
         intelligence_id = validated_data.get('intelligence_id')
         flow_organization = validated_data.get('flow_organization')
         project = validated_data.get('project')
+        org_uuid = validated_data.get('org_uuid')
 
         if intelligence_id:
             organization = Organization.objects.get(intelligence_organization=intelligence_id)
+            project = organization.project.first()
+        elif org_uuid:
+            organization = Organization.objects.get(uuid=org_uuid)
             project = organization.project.first()
         else:
             if flow_organization:
