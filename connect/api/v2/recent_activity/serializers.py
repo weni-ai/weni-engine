@@ -18,6 +18,7 @@ class RecentActivitySerializer(serializers.ModelSerializer):
     intelligence_id = serializers.CharField(required=False)
     flow_organization = serializers.CharField(required=False)
     project_uuid = serializers.CharField(required=False)
+    org_uuid = serializers.CharField(required=False)
 
     def create(self, validated_data):
         user = validated_data.get('user')
