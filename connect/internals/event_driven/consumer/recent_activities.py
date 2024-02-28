@@ -12,10 +12,10 @@ class RecentActivitiesConsumer(EDAConsumer):
 
     def consume(self, message: amqp.Message):
         try:
-            body = JSONParser.parse(message.body)
-            print(f"[RecentActivitiesConsumer] - Consuming a message. Body: {body}")
+            msg_body = JSONParser.parse(message.body)
+            print(f"[RecentActivitiesConsumer] - Consuming a message. Body: {msg_body}")
             usecase = RecentActivityUseCase()
-            usecase.create_recent_activity(msg_body=body)
+            usecase.create_recent_activity(msg_body)
 
             message.channel.basic_ack(message.delivery_tag)
             print("[RecentActivitiesConsumer] - Recent activity created.")
