@@ -5,19 +5,22 @@ from .rabbitmq_consumer import EDAConsumer
 
 from connect.usecases.recent_activities.create import RecentActivityUseCase
 
+from .parsers.json_parser import JSONParser
+
 
 class RecentActivitiesConsumer(EDAConsumer):
 
     def consume(self, message: amqp.Message):
-        print(f"[RecentActivitiesConsumer] - Consuming a message. Body: {message.body}")
         try:
+            body = JSONParser.parse(message.body)
+            print(f"[RecentActivitiesConsumer] - Consuming a message. Body: {body}")
             usecase = RecentActivityUseCase()
             usecase.create_recent_activity(
-                user_email=message.body["user_email"],
-                project_uuid=message.body["project_uuid"],
-                action=message.body["action"],
-                entity=message.body["entity"],
-                entity_name=message.body["entity_name"]
+                user_email=body.get("user"),
+                project_uuid=body.get("project_uuid"),
+                action=body.get("action"),
+                entity=body.get("entity"),
+                entity_name=body.get("entity_name")
             )
 
             message.channel.basic_ack(message.delivery_tag)
