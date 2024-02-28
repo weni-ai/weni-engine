@@ -1,27 +1,14 @@
-from connect.common.models import Project
 from connect.authentication.models import User
 from connect.common.models import RecentActivity
 
 
 class RecentActivityUseCase:
     def create_recent_activity(
-        self,
-        user_email: str,
-        project_uuid: str,
-        action: str,
-        entity: str,
-        entity_name: str
+        msg_body
     ) -> RecentActivity:
 
-        user = User.objects.get(email=user_email)
-        project = Project.objects.get(uuid=project_uuid)
+        user = User.objects.get(email=msg_body.get("user"))
 
-        recet_activity = RecentActivity.objects.create(
-            user=user,
-            project=project,
-            action=action,
-            entity=entity,
-            entity_name=entity_name
-        )
+        new_activity = RecentActivity.create_recent_activities(msg_body, user)
 
-        return recet_activity
+        return new_activity

@@ -15,13 +15,7 @@ class RecentActivitiesConsumer(EDAConsumer):
             body = JSONParser.parse(message.body)
             print(f"[RecentActivitiesConsumer] - Consuming a message. Body: {body}")
             usecase = RecentActivityUseCase()
-            usecase.create_recent_activity(
-                user_email=body.get("user"),
-                project_uuid=body.get("project_uuid"),
-                action=body.get("action"),
-                entity=body.get("entity"),
-                entity_name=body.get("entity_name")
-            )
+            usecase.create_recent_activity(msg_body=body)
 
             message.channel.basic_ack(message.delivery_tag)
             print("[RecentActivitiesConsumer] - Recent activity created.")
