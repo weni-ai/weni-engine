@@ -4,6 +4,7 @@ from connect.common.models import RecentActivity
 
 class RecentActivityUseCase:
     def create_recent_activity(
+        self,
         msg_body
     ) -> RecentActivity:
 
