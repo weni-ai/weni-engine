@@ -2455,7 +2455,7 @@ class RecentActivity(models.Model):
         project = validated_data.get('project')
 
         if intelligence_id:
-            organization = Organization.objects.get(intelligence_organization=intelligence_id)
+            organization = Organization.objects.get(inteligence_organization=intelligence_id)
             project = organization.project.first()
         else:
             if flow_organization:
