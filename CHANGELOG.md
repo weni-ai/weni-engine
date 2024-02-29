@@ -1,3 +1,9 @@
+# 3.20.0
+## *Add*
+  - RabbitMQ Consumer
+  - RecentActivities usecases
+  - Consuming RecentActivities messages using AMQP
+
 # 3.19.1
 ## *Fix*
   - fix IsCRMUser get_object_or_404
