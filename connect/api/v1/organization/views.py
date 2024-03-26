@@ -56,6 +56,8 @@ import pendulum
 from connect.common import tasks
 import logging
 import stripe
+from connect.usecases.organization_authorizations.create import CreateOrgAuthUseCase
+
 
 logger = logging.getLogger(__name__)
 
@@ -829,18 +831,22 @@ class OrganizationAuthorizationViewSet(
         ]
 
         data = self.request.data
+
         if data.get("role"):
             instance = self.get_object()
-
             if instance.user == self.request.user:
                 raise PermissionDenied("Can't change own permission")
-            old_permission = OrganizationRole(instance.role).name
-            new_permission = OrganizationRole(int(data.get("role"))).name
-            instance.organization.send_email_permission_change(instance.user, old_permission, new_permission)
 
-        response = super().update(*args, **kwargs)
-        # instance.send_new_role_email(self.request.user)
-        return response
+            # instance.organization.send_email_permission_change(instance.user, old_permission, new_permission) async
+        msg_body = {
+            "user": instance.user.email,
+            "org_uuid": str(instance.organization.uuid),
+            "role": int(data.get("role")),
+        }
+        usecase = CreateOrgAuthUseCase()
+        authorization = usecase.update_organization_authorization(msg_body)
+        # instance.send_new_role_email(self.request.user) async
+        return Response({"role": authorization.role})
 
     def list(self, request, *args, **kwargs):
         self.lookup_fields = []

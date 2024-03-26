@@ -31,6 +31,9 @@ from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
 from connect.common.tasks import update_user_permission_project
 from connect.common import tasks
 
+from connect.usecases.project_authorizations.create import ProjectAuthorizationUseCase
+from connect.usecases.organization_authorizations.create import CreateOrgAuthUseCase
+
 logger = logging.getLogger("connect.common.signals")
 
 
@@ -101,31 +104,6 @@ def delete_opened_project(sender, instance, **kwargs):
         opened.delete()
 
 
-@receiver(post_save, sender=OrganizationAuthorization)
-def org_authorizations(sender, instance, created, **kwargs):
-    if instance.role is not OrganizationLevelRole.NOTHING.value:
-        if created:
-            organization_permission_mapper = {
-                OrganizationRole.ADMIN.value: ProjectRole.MODERATOR.value,
-                OrganizationRole.CONTRIBUTOR.value: ProjectRole.CONTRIBUTOR.value,
-                OrganizationRole.SUPPORT.value: ProjectRole.SUPPORT.value,
-            }
-            for project in instance.organization.project.all():
-                project_perm = project.project_authorizations.filter(user=instance.user)
-                project_role = organization_permission_mapper.get(instance.role, ProjectRole.NOT_SETTED.value)
-                if not project_perm.exists():
-                    project.project_authorizations.create(
-                        user=instance.user,
-                        role=project_role,
-                        organization_authorization=instance,
-                    )
-                else:
-                    project_perm = project_perm.first()
-                    if instance.role > project_perm.role:
-                        project_perm.role = project_role
-                        project_perm.save(update_fields=["role"])
-
-
 @receiver(post_delete, sender=OrganizationAuthorization)
 def delete_authorizations(instance, **kwargs):
     for project in instance.organization.project.all():
@@ -151,78 +129,37 @@ def request_permission_organization(sender, instance, created, **kwargs):
     if created:
         user = User.objects.filter(email=instance.email)
         if user.exists():
-            user = user.first()
-            perm = instance.organization.get_user_authorization(user=user)
-            perm.role = instance.role
-            update_fields = ["role"]
-            if user.has_2fa:
-                perm.has_2fa = True
-                update_fields.append("has_2fa")
-            perm.save(update_fields=update_fields)
-            perm.publish_create_org_authorization_message()
-            if perm.can_contribute:
-                organization_permission_mapper = {
-                    OrganizationRole.ADMIN.value: ProjectRole.MODERATOR.value,
-                    OrganizationRole.CONTRIBUTOR.value: ProjectRole.CONTRIBUTOR.value,
-                    OrganizationRole.SUPPORT.value: ProjectRole.SUPPORT.value,
-                }
-                for proj in instance.organization.project.all():
-                    project_perm = proj.project_authorizations.filter(user=user)
-                    project_role = organization_permission_mapper.get(perm.role, None)
-                    if not project_perm.exists() and project_role is not None:
-                        proj.project_authorizations.create(
-                            user=user,
-                            role=project_role,
-                            organization_authorization=perm,
-                        )
-                    else:
-                        project_perm = project_perm.first()
-                        project_role = organization_permission_mapper.get(perm.role, None)
-                        if project_perm.role < perm.role and project_role is not None:
-                            project_perm.role = project_role
-                            project_perm.save()
+            msg_body = {
+                "user": instance.email,
+                "org_uuid": str(instance.organization.uuid),
+                "role": instance.role,
+            }
+            usecase = CreateOrgAuthUseCase()
+            usecase.create_organization_authorization(msg_body)
             instance.delete()
-        instance.organization.send_email_invite_organization(email=instance.email)
-
+            # instance.project.send_email_invite_project(email=instance.email) async
 
 @receiver(post_save, sender=RequestPermissionProject)
 def request_permission_project(sender, instance, created, **kwargs):
     if created:
+        print("[+1] - Ta chamando o RequestPermissionProject")
         user = User.objects.filter(email=instance.email)
         if user.exists():
-            user = user.first()
-            org = instance.project.organization
-            org_auth = org.authorizations.filter(user__email=user.email)
-
-            if not org_auth.exists():
-                org_auth = org.authorizations.create(
-                    user=user, role=OrganizationRole.VIEWER.value
-                )
-            else:
-                org_auth = org_auth.first()
-
-            auth = instance.project.project_authorizations
-            auth_user = auth.filter(user=user)
-            if not auth_user.exists():
-                auth_user = ProjectAuthorization.objects.create(
-                    user=user,
-                    project=instance.project,
-                    organization_authorization=org_auth,
-                    role=instance.role,
-                )
-            else:
-                auth_user = auth_user.first()
-                auth_user.role = instance.role
-                auth_user.save(update_fields=["role"])
-
+            msg_body = {
+                "user": instance.email,
+                "org_uuid": str(instance.project.organization.uuid),
+                "project_uuid": str(instance.project.uuid),
+                "role": instance.role,
+            }
+            usecase = ProjectAuthorizationUseCase()
+            usecase.create_project_authorization(msg_body)
             instance.delete()
-        instance.project.send_email_invite_project(email=instance.email)
+            # instance.project.send_email_invite_project(email=instance.email) async
 
 
 @receiver(post_save, sender=ProjectAuthorization)
 def project_authorization(sender, instance, created, **kwargs):
     if created:
-
         RecentActivity.objects.create(
             action="ADD",
             entity="USER",
@@ -262,6 +199,7 @@ def project_authorization(sender, instance, created, **kwargs):
 @receiver(post_save, sender=RequestRocketPermission)
 def request_rocket_permission(sender, instance, created, **kwargs):
     if created:
+        
         user = User.objects.filter(email=instance.email)
         if user.exists():
             user = user.first()

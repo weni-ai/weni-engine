@@ -1,0 +1,2 @@
+class ProjectDoesNotExist(BaseException):
+    pass

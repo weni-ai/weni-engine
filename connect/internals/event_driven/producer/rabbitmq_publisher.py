@@ -27,7 +27,7 @@ class RabbitmqPublisher:  # pragma: no cover
                         delivery_mode=2
                     )
                 )
-                print(f"Message sent {body}")
+                print(f"Message sent {body} to exchange: {exchange}")
                 sended = True
             except StreamLostError as e:
                 print(f"stream lost error: {e}")

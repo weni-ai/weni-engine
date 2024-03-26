@@ -647,13 +647,14 @@ class OrganizationAuthorization(models.Model):
             auth.has_2fa = True
             auth.save()
 
-    def publish_create_org_authorization_message(self):
+    def publish_create_org_authorization_message(self, publisher, action: str = "create"):
         message_body = {
+            "action": action,
             "organization_uuid": str(self.organization.uuid),
             "user_email": self.user.email,
             "role": self.role
         }
-        rabbitmq_publisher = RabbitmqPublisher()
+        rabbitmq_publisher = publisher()
         rabbitmq_publisher.send_message(message_body, exchange="orgs-auths.topic", routing_key="")
         
 
@@ -1209,6 +1210,19 @@ class ProjectAuthorization(models.Model):
             ProjectRoleLevel.SUPPORT.value,
         ]
 
+    def publish_project_authorization_message(self, action: str = "create"):
+        message_body = {
+            "action": action,
+            "project_uuid": str(self.project.uuid),
+            "user_email": self.user.email,
+            "role": self.role
+        }
+        rabbitmq_publisher = RabbitmqPublisher()
+        rabbitmq_publisher.send_message(message_body, exchange="project-auths.topic", routing_key="")
+        
+    def update_role(self, role: int):
+        self.role = role
+        self.save(update_fields=["role"])
 
 class RequestRocketPermission(models.Model):
     email = models.EmailField(_("email"))

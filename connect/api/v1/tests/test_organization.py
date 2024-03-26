@@ -1,7 +1,7 @@
 import json
 from unittest import skipIf
 import uuid as uuid4
-from unittest.mock import patch, Mock
+from unittest.mock import patch, Mock, MagicMock
 from django.conf import settings
 from django.http import JsonResponse
 from django.test import RequestFactory
@@ -22,7 +22,8 @@ from connect.common.models import (
     BillingPlan,
     Project,
     OrganizationRole,
-    RequestPermissionOrganization
+    RequestPermissionOrganization,
+    RequestPermissionProject
 )
 from connect.common.mocks import StripeMockGateway
 
@@ -1087,3 +1088,66 @@ class RequestPermissionOrganizationSerializerTestCase(TestCase):
 
         data = self.test_serializer.get_user_data(request_permission)
         self.assertEqual(data["name"], non_existing_email)
+
+import factory
+import uuid as uuid4
+from typing import Dict
+# class OrganizationFactory(factory.django.DjangoModelFactory):
+#     class Meta:
+#         model = Organization
+
+#     uuid = uuid4.uuid4()
+#     name = factory.Sequence(lambda n: 'test%d' % n)
+#     organization_billing__cycle = "monthly"
+#     organization_billing__plan = "enterprise"
+
+class MockmqPublisher:
+    def send_message(message_body: Dict, exchange: str, routing_key: str):
+        pass
+
+class RequestPermissionTestCase(TestCase):
+    def setUp(self) -> None:
+        self.org = Organization.objects.create(
+            uuid=uuid4.uuid4(),
+            name="Teste",
+            organization_billing__cycle="monthly",
+            organization_billing__plan="enterprise"
+        )
+        self.project = Project.objects.create(
+            name="Teste",
+            organization=self.org
+
+        )
+        self.crm_user = User.objects.create(
+            email="crm@test.com",
+            username="crm@test.com"
+        )
+        self.user = User.objects.create(
+            email="test@email.com",
+            username="test@email.com"
+        )
+
+    @patch("connect.common.models.RabbitmqPublisher")
+    def test_criando_request_permission_organization(self, publisher):
+        publisher = MagicMock()
+        publisher.send_message.return_value = True
+
+        role = 3
+        r = RequestPermissionOrganization.objects.create(
+            email=self.user.email,
+            organization=self.org,
+            role=role,
+            created_by=self.crm_user,
+        )
+        print(r)
+
+    @patch("connect.common.models.RabbitmqPublisher")
+    def test_criando_request_permission_project(self, publisher):
+        role = 3
+        r = RequestPermissionProject.objects.create(
+            email=self.user.email,
+            project=self.project,
+            role=role,
+            created_by=self.crm_user,
+        )
+        print(r)
