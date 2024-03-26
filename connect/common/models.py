@@ -1214,7 +1214,7 @@ class ProjectAuthorization(models.Model):
         message_body = {
             "action": action,
             "project_uuid": str(self.project.uuid),
-            "user_email": self.user.email,
+            "user": self.user.email,
             "role": self.role
         }
         rabbitmq_publisher = RabbitmqPublisher()
