@@ -89,6 +89,7 @@ class ProjectSerializer(serializers.ModelSerializer):
 
         template_uuid = self.context["request"].data.get("uuid")
         is_template = self.context["request"].data.get("template", False)
+        brain_on = self.context["request"].data.get("brain_on", False)
 
         if extra_data:
             template_uuid = extra_data.get("uuid", template_uuid)
@@ -114,7 +115,7 @@ class ProjectSerializer(serializers.ModelSerializer):
         )
 
         self.send_request_flow_product(user)
-        self.publish_create_project_message(instance)
+        self.publish_create_project_message(instance, brain_on)
 
         if is_template:
             extra_data.update(
@@ -133,7 +134,11 @@ class ProjectSerializer(serializers.ModelSerializer):
 
         return instance
 
-    def publish_create_project_message(self, instance):
+    def publish_create_project_message(
+        self,
+        instance,
+        brain_on: bool = False
+    ):
 
         authorizations = []
         for authorization in instance.organization.authorizations.all():
@@ -156,7 +161,8 @@ class ProjectSerializer(serializers.ModelSerializer):
             "extra_fields": extra_fields if instance.is_template else {},
             "authorizations": authorizations,
             "description": instance.description,
-            "organization_uuid": str(instance.organization.uuid)
+            "organization_uuid": str(instance.organization.uuid),
+            "brain_on": brain_on,
         }
         rabbitmq_publisher = RabbitmqPublisher()
         rabbitmq_publisher.send_message(message_body, exchange="projects.topic", routing_key="")
