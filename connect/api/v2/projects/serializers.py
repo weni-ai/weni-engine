@@ -89,7 +89,6 @@ class ProjectSerializer(serializers.ModelSerializer):
 
         template_uuid = self.context["request"].data.get("uuid")
         is_template = self.context["request"].data.get("template", False)
-        brain_on = self.context["request"].data.get("brain_on", False)
 
         if extra_data:
             template_uuid = extra_data.get("uuid", template_uuid)
@@ -103,6 +102,7 @@ class ProjectSerializer(serializers.ModelSerializer):
                 project_template_type = project_template_type_queryset.first()
                 template_name = project_template_type.name
 
+        brain_on = True if template_name == "blank" else False
         instance = Project.objects.create(
             name=validated_data.get("name"),
             timezone=str(validated_data.get("timezone")),
