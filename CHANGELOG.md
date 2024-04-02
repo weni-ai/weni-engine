@@ -1,3 +1,7 @@
+# 3.20.1
+## *Add*
+  - RabbitMQ now sends brain_on status on project creation
+
 # 3.20.0
 ## *Add*
   - RabbitMQ Consumer
