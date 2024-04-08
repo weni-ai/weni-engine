@@ -12,3 +12,7 @@ def handle_consumers(
         "recent-activity.projects",
         callback=RecentActivitiesConsumer().handle
     )
+    channel.basic_consume(
+        "recent-activity.connect",
+        callback=RecentActivitiesConsumer().handle
+    )
