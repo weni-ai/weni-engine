@@ -1030,6 +1030,22 @@ class Project(models.Model):
 
         return custom_get_attendances(self, str(after), str(before))
 
+    def increment_inteligence_count(self):
+        self.inteligence_count += 1
+        self.save()
+
+    def decrement_inteligence_count(self):
+        self.inteligence_count -= 1
+        self.save()
+
+    def increment_flow_count(self):
+        self.flow_count += 1
+        self.save()
+
+    def decrement_flow_count(self):
+        self.flow_count -= 1
+        self.save()
+
 
 class OpenedProject(models.Model):
     day = models.DateTimeField(_("Day"))
@@ -2368,6 +2384,7 @@ class RecentActivity(models.Model):
     UPDATE = "UPDATE"
     INTEGRATE = "INTEGRATE"
     TRAIN = "TRAIN"
+    DELETE = "DELETE"
 
     ACTIONS_CHOICES = {
         (ADD, "Add"),
@@ -2375,6 +2392,7 @@ class RecentActivity(models.Model):
         (UPDATE, "Entity updated"),
         (INTEGRATE, "Entity integrated"),
         (TRAIN, "Entity Trained"),
+        (DELETE, "Entity Deleted"),
     }
 
     USER = "USER"
@@ -2474,6 +2492,20 @@ class RecentActivity(models.Model):
             entity_name=entity_name
         )
         new_recent_activities.save()
+
+        action_map = {
+            RecentActivity.FLOW: {
+                RecentActivity.ADD: project.increment_flow_count,
+                RecentActivity.DELETE: project.decrement_flow_count
+            },
+            RecentActivity.AI: {
+                RecentActivity.ADD: project.increment_inteligence_count,
+                RecentActivity.DELETE: project.decrement_inteligence_count
+            }
+        }
+
+        if entity in action_map and action in action_map[entity]:
+            action_map[entity][action]()
 
         return new_recent_activities
 
