@@ -1,4 +1,8 @@
-# 3.20.1
+# 3.21.1
+## *Update*
+  - Set brain_on to always send false temporarily
+
+# 3.21.1
 ## *Add*
   - RabbitMQ now sends brain_on status on project creation
 
