@@ -70,7 +70,7 @@ class OrganizationViewSet(
 ):
     queryset = Organization.objects.all()
     serializer_class = OrganizationSeralizer
-    permission_classes = [IsAuthenticated, OrganizationHasPermission|IsCRMUser, Has2FA]
+    permission_classes = [IsAuthenticated, OrganizationHasPermission | IsCRMUser, Has2FA]
     lookup_field = "uuid"
     metadata_class = Metadata
 

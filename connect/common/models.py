@@ -655,7 +655,7 @@ class OrganizationAuthorization(models.Model):
         }
         rabbitmq_publisher = RabbitmqPublisher()
         rabbitmq_publisher.send_message(message_body, exchange="orgs-auths.topic", routing_key="")
-        
+
 
 class Project(models.Model):
     class Meta:
