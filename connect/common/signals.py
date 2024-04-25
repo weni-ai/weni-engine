@@ -250,6 +250,16 @@ def request_permission_project(sender, instance, created, **kwargs):
 @receiver(post_save, sender=ProjectAuthorization)
 def project_authorization(sender, instance, created, **kwargs):
     if settings.USE_EDA_PERMISSIONS:
+        opened = OpenedProject.objects.filter(project=instance.project, user=instance.user)
+        if not opened.exists():
+            OpenedProject.objects.create(
+                user=instance.user,
+                project=instance.project,
+                day=instance.project.created_at
+            )
+            opened = opened.first()
+            opened.day = timezone.now()
+            opened.save()
         return
     if created:
 
