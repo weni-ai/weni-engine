@@ -55,7 +55,7 @@ class UpdateAuthorizationUseCase(AuthorizationUseCase):
         if auth_dto.user_email:
             user: User = RetrieveUserUseCase().get_user_by_email(email=auth_dto.user_email)
         elif auth_dto.id:
-            user: User = RetrieveUserUseCase().get_user_by_id(email=auth_dto.id)
+            user: User = RetrieveUserUseCase().get_user_by_id(id=auth_dto.id)
 
         org: Organization = RetrieveOrganizationUseCase().get_organization_by_uuid(org_uuid=auth_dto.org_uuid)
 
