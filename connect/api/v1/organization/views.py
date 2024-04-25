@@ -834,6 +834,7 @@ class OrganizationAuthorizationViewSet(
             OrganizationAdminManagerAuthorization,
         ]
         if settings.USE_EDA_PERMISSIONS:
+            instance = self.get_object()
 
             old_permission = OrganizationRole(instance.role).name
             new_permission = OrganizationRole(int(data.get("role"))).name
