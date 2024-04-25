@@ -57,6 +57,12 @@ from connect.common import tasks
 import logging
 import stripe
 
+from connect.internals.event_driven.producer.rabbitmq_publisher import RabbitmqPublisher
+from connect.usecases.authorizations.update import UpdateAuthorizationUseCase
+from connect.usecases.authorizations.dto import DeleteAuthorizationDTO, UpdateAuthorizationDTO
+from connect.usecases.authorizations.delete import DeleteAuthorizationUseCase
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -827,13 +833,33 @@ class OrganizationAuthorizationViewSet(
             IsAuthenticated,
             OrganizationAdminManagerAuthorization,
         ]
+        if settings.USE_EDA_PERMISSIONS:
 
+            old_permission = OrganizationRole(instance.role).name
+            new_permission = OrganizationRole(int(data.get("role"))).name
+
+            auth_dto = UpdateAuthorizationDTO(
+                id=self.kwargs.get("user__id"),
+                org_uuid=self.kwargs.get("organization__uuid"),
+                role=new_permission,
+                request_user=self.request.user
+            )
+
+            usecase = UpdateAuthorizationUseCase(message_publisher=RabbitmqPublisher())
+            authorization = usecase.update_authorization(auth_dto)
+
+            instance.organization.send_email_permission_change(instance.user, old_permission, new_permission)
+
+            return Response(data={"role": authorization.role})
+
+        # TODO: delete code below later
         data = self.request.data
         if data.get("role"):
             instance = self.get_object()
 
             if instance.user == self.request.user:
                 raise PermissionDenied("Can't change own permission")
+
             old_permission = OrganizationRole(instance.role).name
             new_permission = OrganizationRole(int(data.get("role"))).name
             instance.organization.send_email_permission_change(instance.user, old_permission, new_permission)
@@ -853,6 +879,19 @@ class OrganizationAuthorizationViewSet(
         ]
         self.filter_class = None
         self.lookup_field = "user__id"
+
+        if settings.USE_EDA_PERMISSIONS:
+            auth_dto = DeleteAuthorizationDTO(
+                id=self.kwargs.get("user__id"),
+                org_uuid=self.kwargs.get("organization__uuid"),
+                request_user=self.request.user,
+            )
+
+            usecase = DeleteAuthorizationUseCase(message_publisher=RabbitmqPublisher())
+            usecase.delete_authorization(auth_dto)
+
+            return Response()
+
         return super().destroy(request, *args, **kwargs)
 
     @action(
