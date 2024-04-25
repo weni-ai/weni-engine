@@ -833,6 +833,7 @@ class OrganizationAuthorizationViewSet(
             IsAuthenticated,
             OrganizationAdminManagerAuthorization,
         ]
+        data = self.request.data
         if settings.USE_EDA_PERMISSIONS:
             instance = self.get_object()
 
@@ -854,7 +855,6 @@ class OrganizationAuthorizationViewSet(
             return Response(data={"role": authorization.role})
 
         # TODO: delete code below later
-        data = self.request.data
         if data.get("role"):
             instance = self.get_object()
 
