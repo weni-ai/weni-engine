@@ -843,7 +843,7 @@ class OrganizationAuthorizationViewSet(
             auth_dto = UpdateAuthorizationDTO(
                 id=self.kwargs.get("user__id"),
                 org_uuid=self.kwargs.get("organization__uuid"),
-                role=new_permission,
+                role=int(data.get("role")),
                 request_user=self.request.user
             )
 
