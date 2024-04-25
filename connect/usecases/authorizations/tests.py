@@ -25,6 +25,7 @@ from connect.usecases.authorizations.dto import (
     CreateProjectAuthorizationDTO,
 )
 
+from connect.api.v2.organizations.views import OrganizationViewSet
 from connect.api.v1.project.views import RequestPermissionProjectViewSet, ProjectViewSet
 from connect.api.v1.tests.utils import create_user_and_token
 
@@ -353,3 +354,61 @@ class EDAProjectAuthorizationsViewsTestCase(TestCase, TestCaseSetUp):
         self.assertEquals(response.status_code, 204)
         with self.assertRaises(ProjectAuthorization.DoesNotExist):
             ProjectAuthorization.objects.get(uuid=project_auth.uuid)
+
+
+# @skipIf(True, "Tests views and rabbitmq connection")
+class OrganizationViewSetTestCase(TestCase, TestCaseSetUp):
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.org = Organization.objects.create(
+            name="Org",
+            description="Org",
+            organization_billing__plan="enterprise",
+            organization_billing__cycle="monthly",
+        )
+        self.project = self.org.project.create(name="Project")
+
+        self.owner, self.owner_token = create_user_and_token("owner")
+        self.owner_auth = self.org.authorizations.create(user=self.owner, role=3)
+        self.authorization_header = (
+            {
+                "HTTP_AUTHORIZATION": "Token {}".format(self.owner_token.key),
+                "Content-Type": "application/json"
+            }
+        )
+
+    def request_permission_project(self, data):
+            request = self.factory.post(
+                "/v2/organizations/",
+                json.dumps(data),
+                content_type="application/json",
+                **self.authorization_header
+            )
+            response = OrganizationViewSet.as_view({"post": "create"})(request)
+            response.render()
+            content_data = json.loads(response.content)
+            return content_data
+
+    def test_create_org(self):
+        user, _ = create_user_and_token("user")
+        data = {
+            "organization": {
+                "name": "1",
+                "description": "1",
+                "organization_billing_plan": "trial",
+                "customer": "",
+                "authorizations": [{"user_email": user.email, "role": "3"}]
+            },
+            "project": {
+                "date_format": "D",
+                "name": "1",
+                "description": "1",
+                "timezone": "America/Sao_Paulo",
+                "template": False,
+                "uuid": "blank",
+                "globals": {}
+            }
+        }
+
+        content_data = self.request_permission_project(data)
+        self.assertEquals(ProjectAuthorization.objects.count(), 2)

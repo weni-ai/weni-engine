@@ -11,11 +11,16 @@ from connect.usecases.authorizations.create import CreateAuthorizationUseCase
 from connect.usecases.authorizations.dto import CreateAuthorizationDTO, CreateProjectAuthorizationDTO
 from connect.internals.event_driven.producer.rabbitmq_publisher import RabbitmqPublisher
 
+
 logger = logging.getLogger("connect.authentication.signals")
 
 
 @receiver(models.signals.post_save, sender=User)
 def signal_user(instance, created, **kwargs):
+    from connect.common.models import (
+        RequestPermissionOrganization,
+        RequestPermissionProject,
+    )
     if settings.USE_EDA_PERMISSIONS and created:
         requests_permission_organizations = RequestPermissionOrganization.objects.filter(
             email=instance.email
@@ -50,10 +55,6 @@ def signal_user(instance, created, **kwargs):
 
     # TODO: remove code below
     if created:
-        from connect.common.models import (
-            RequestPermissionOrganization,
-            RequestPermissionProject,
-        )
 
         requests_perm = RequestPermissionOrganization.objects.filter(
             email=instance.email
