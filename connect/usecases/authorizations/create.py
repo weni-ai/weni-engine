@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Union
 from connect.internals.event_driven.producer.rabbitmq_publisher import RabbitmqPublisher
 from django.db.models import QuerySet
 from connect.common.models import (
@@ -81,7 +81,7 @@ class CreateAuthorizationUseCase(AuthorizationUseCase):
                 )
         return org_auth
 
-    def create_authorization_for_a_single_project(self, auth_dto: CreateProjectAuthorizationDTO) -> ProjectAuthorization | RequestPermissionProject:
+    def create_authorization_for_a_single_project(self, auth_dto: CreateProjectAuthorizationDTO) -> Union[ProjectAuthorization, RequestPermissionProject]:
         org: Organization = RetrieveOrganizationUseCase().get_organization_by_project_uuid(project_uuid=auth_dto.project_uuid)
         project: Project = org.project.get(uuid=auth_dto.project_uuid)
 
