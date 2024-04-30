@@ -17,6 +17,7 @@ class MockRabbitMQPublisher:
 
 class AuthorizationUseCase:
     organization_permission_mapper = {
+        OrganizationRole.VIEWER.value: ProjectRole.VIEWER.value,
         OrganizationRole.ADMIN.value: ProjectRole.MODERATOR.value,
         OrganizationRole.CONTRIBUTOR.value: ProjectRole.CONTRIBUTOR.value,
         OrganizationRole.SUPPORT.value: ProjectRole.SUPPORT.value,
