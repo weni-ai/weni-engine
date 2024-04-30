@@ -18,17 +18,20 @@ from connect.usecases.authorizations.usecase import AuthorizationUseCase
 
 class DeleteAuthorizationUseCase(AuthorizationUseCase):
     def delete_organization_authorization(self, user: User, org: Organization):
-        authorization = org.authorizations.get(user=user)
-        authorization.delete()
+        try:
+            authorization = org.authorizations.get(user=user)
+            authorization.delete()
 
-        if self.publish_message:
-            self.publish_organization_authorization_message(
-                action="delete",
-                org_uuid=str(org.uuid),
-                user_email=user.email,
-                role=authorization.role,
-                org_intelligence=org.inteligence_organization
-            )
+            if self.publish_message:
+                self.publish_organization_authorization_message(
+                    action="delete",
+                    org_uuid=str(org.uuid),
+                    user_email=user.email,
+                    role=authorization.role,
+                    org_intelligence=org.inteligence_organization
+                )
+        except OrganizationAuthorization.DoesNotExist:
+            print(f"OrganizationAuthorization matching query does not exist: Org {org.uuid} User {user.email}")
 
     def delete_project_authorization(self, project: Project, user: User, role: int = None):
 
