@@ -53,7 +53,7 @@ class AuthorizationUseCase:
     ) -> None:
         message_body = {
             "action": action,
-            "project_uuid": project_uuid,
+            "project": project_uuid,
             "user": user_email,
             "role": role
         }
