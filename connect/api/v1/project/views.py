@@ -59,6 +59,10 @@ from connect.utils import count_contacts
 from django.conf import settings
 import logging
 
+from connect.usecases.authorizations.dto import CreateProjectAuthorizationDTO, DeleteProjectAuthorizationDTO
+from connect.usecases.authorizations.create import CreateAuthorizationUseCase
+from connect.usecases.authorizations.delete import DeleteAuthorizationUseCase
+from connect.internals.event_driven.producer.rabbitmq_publisher import RabbitmqPublisher
 
 logger = logging.getLogger(__name__)
 
@@ -188,6 +192,20 @@ class ProjectViewSet(
         url_path="grpc/destroy-user-permission/(?P<project_uuid>[^/.]+)",
     )
     def destroy_user_permission(self, request, project_uuid):
+        user_email = request.data.get('email')
+        if settings.USE_EDA_PERMISSIONS:
+
+            auth_dto = DeleteProjectAuthorizationDTO(
+                user_email=user_email,
+                project_uuid=project_uuid
+            )
+
+            usecase = DeleteAuthorizationUseCase(RabbitmqPublisher())
+            usecase.delete_single_project_permission(auth_dto)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        # TODO: remove code below
+
         user_email = request.data.get('email')
         project = get_object_or_404(Project, uuid=project_uuid)
 
@@ -441,12 +459,70 @@ class RequestPermissionProjectViewSet(
     permission_classes = [IsAuthenticated]
     metadata_class = Metadata
 
-    def create(request, *args, **kwargs):
-        created_by = request.request.user
-        role = request.request.data.get('role')
-        email = request.request.data.get('email')
-        project_uuid = request.request.data.get('project')
-        chats_role = request.request.data.get('chats_role')
+    def create(self, request, *args, **kwargs):
+
+        if settings.USE_EDA_PERMISSIONS:
+
+            created_by: User = self.request.user
+            role: int = int(self.request.data.get('role'))
+            email: str = self.request.data.get('email')
+            project_uuid: str = self.request.data.get('project')
+
+            user = User.objects.filter(email=email)
+
+            auth_dto = CreateProjectAuthorizationDTO(
+                user_email=email,
+                project_uuid=project_uuid,
+                role=role,
+                created_by_email=created_by.email
+            )
+
+            data = {
+                "created_by": created_by.email,
+                "role": role,
+                "email": email,
+                "project": str(project_uuid),
+            }
+
+            usecase = CreateAuthorizationUseCase(RabbitmqPublisher())
+            if user.exists():                
+                auth: ProjectAuthorization = usecase.create_authorization_for_a_single_project(auth_dto=auth_dto)
+                is_pendent = False
+
+                data.update({
+                    "username": auth.user.username,
+                    "first_name": auth.user.first_name,
+                    "last_name": auth.user.last_name,
+                    "photo_user": auth.user.photo_url,
+                    "is_pendent": False
+                })
+                
+
+                return Response({
+                    "status": 200,
+                    "data": data
+                })
+
+            request_auth: RequestPermissionProject = usecase.create_authorization_for_a_single_project(auth_dto=auth_dto)
+            data.update({
+                "username": '',
+                "first_name": '',
+                "last_name": '',
+                "photo_user": '',
+                "is_pendent": True
+            })
+            
+            return Response({
+                "status": 200,
+                "data": data
+            })
+
+        # TODO: remove code below
+        created_by = self.request.user
+        role = self.request.data.get('role')
+        email = self.request.data.get('email')
+        project_uuid = self.request.data.get('project')
+        chats_role = self.request.data.get('chats_role')
         project = Project.objects.filter(uuid=project_uuid)
 
         if len(email) == 0:

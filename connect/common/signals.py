@@ -31,6 +31,11 @@ from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
 from connect.common.tasks import update_user_permission_project
 from connect.common import tasks
 
+from connect.usecases.authorizations.create import CreateAuthorizationUseCase
+from connect.usecases.authorizations.dto import CreateAuthorizationDTO
+from connect.internals.event_driven.producer.rabbitmq_publisher import RabbitmqPublisher
+
+
 logger = logging.getLogger("connect.common.signals")
 
 
@@ -103,6 +108,8 @@ def delete_opened_project(sender, instance, **kwargs):
 
 @receiver(post_save, sender=OrganizationAuthorization)
 def org_authorizations(sender, instance, created, **kwargs):
+    if settings.USE_EDA_PERMISSIONS:
+        return
     if instance.role is not OrganizationLevelRole.NOTHING.value:
         if created:
             organization_permission_mapper = {
@@ -128,6 +135,8 @@ def org_authorizations(sender, instance, created, **kwargs):
 
 @receiver(post_delete, sender=OrganizationAuthorization)
 def delete_authorizations(instance, **kwargs):
+    if settings.USE_EDA_PERMISSIONS:
+        return
     for project in instance.organization.project.all():
         project.project_authorizations.filter(user__email=instance.user.email).delete()
 
@@ -148,6 +157,23 @@ def delete_authorizations(instance, **kwargs):
 
 @receiver(post_save, sender=RequestPermissionOrganization)
 def request_permission_organization(sender, instance, created, **kwargs):
+    if settings.USE_EDA_PERMISSIONS:
+        if created:
+            user = User.objects.filter(email=instance.email)
+            if user.exists():
+                auth_dto = CreateAuthorizationDTO(
+                    user_email=instance.email,
+                    org_uuid=str(instance.organization.uuid),
+                    role=instance.role,
+                )
+                rabbitmq_publisher = RabbitmqPublisher()
+                usecase = CreateAuthorizationUseCase(rabbitmq_publisher)
+                usecase.create_authorization(auth_dto)
+                instance.delete()
+            instance.organization.send_email_invite_organization(email=instance.email)
+        return
+
+    # TODO: remove code below later
     if created:
         user = User.objects.filter(email=instance.email)
         if user.exists():
@@ -187,6 +213,8 @@ def request_permission_organization(sender, instance, created, **kwargs):
 
 @receiver(post_save, sender=RequestPermissionProject)
 def request_permission_project(sender, instance, created, **kwargs):
+    if settings.USE_EDA_PERMISSIONS:
+        return
     if created:
         user = User.objects.filter(email=instance.email)
         if user.exists():
@@ -221,6 +249,18 @@ def request_permission_project(sender, instance, created, **kwargs):
 
 @receiver(post_save, sender=ProjectAuthorization)
 def project_authorization(sender, instance, created, **kwargs):
+    if settings.USE_EDA_PERMISSIONS:
+        opened = OpenedProject.objects.filter(project=instance.project, user=instance.user)
+        if not opened.exists():
+            OpenedProject.objects.create(
+                user=instance.user,
+                project=instance.project,
+                day=instance.project.created_at
+            )
+            opened = opened.first()
+            opened.day = timezone.now()
+            opened.save()
+        return
     if created:
 
         RecentActivity.objects.create(

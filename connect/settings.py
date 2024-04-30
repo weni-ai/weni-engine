@@ -567,3 +567,5 @@ ALLOW_CRM_ACCESS = env.bool("ALLOW_CRM_ACCESS", default=True)
 
 if ALLOW_CRM_ACCESS:
     CRM_EMAILS_LIST = env.list("CRM_EMAILS_LIST")
+
+USE_EDA_PERMISSIONS = env.bool("USE_EDA_PERMISSIONS", default=True)
