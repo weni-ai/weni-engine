@@ -5,6 +5,8 @@ from connect.common.models import (
     Project,
     OrganizationAuthorization,
     RequestPermissionProject,
+    ProjectAuthorization,
+
 )
 from connect.usecases.organizations.retrieve import RetrieveOrganizationUseCase
 from connect.usecases.users.retrieve import RetrieveUserUseCase
@@ -32,6 +34,10 @@ class DeleteAuthorizationUseCase(AuthorizationUseCase):
 
         authorization = project.project_authorizations.get(user=user)
         authorization.delete()
+
+        if not project.organization.authorizations.filter(user=user).exists():
+        if 
+            self.delete_organization_authorization(user=user, org=project.organization)
 
         if not role:
             role = authorization.role
