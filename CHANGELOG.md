@@ -1,3 +1,7 @@
+# 3.22.1
+## *Fix*
+  - fix role null
+
 # 3.22.0
 ## *Add*
   - Send permissions via EDA
