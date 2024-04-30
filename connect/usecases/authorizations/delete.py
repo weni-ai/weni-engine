@@ -34,9 +34,8 @@ class DeleteAuthorizationUseCase(AuthorizationUseCase):
 
         authorization = project.project_authorizations.get(user=user)
         authorization.delete()
-
-        if not project.organization.authorizations.filter(user=user).exists():
-        if 
+        
+        if not ProjectAuthorization.objects.filter(user=user, organization_authorization=authorization.organization_authorization).exists():
             self.delete_organization_authorization(user=user, org=project.organization)
 
         if not role:
