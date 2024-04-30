@@ -25,6 +25,7 @@ class DeleteAuthorizationUseCase(AuthorizationUseCase):
                 org_uuid=str(org.uuid),
                 user_email=user.email,
                 role=authorization.role,
+                org_intelligence=org.inteligence_organization
             )
 
     def delete_project_authorization(self, project: Project, user: User, role: int = None):

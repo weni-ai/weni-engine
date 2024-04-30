@@ -27,6 +27,7 @@ class CreateAuthorizationUseCase(AuthorizationUseCase):
                 org_uuid=str(org.uuid),
                 user_email=user.email,
                 role=authorization.role,
+                org_intelligence=org.inteligence_organization
             )
         return authorization
 

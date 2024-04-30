@@ -31,14 +31,16 @@ class AuthorizationUseCase:
             action: str,
             org_uuid: str,
             user_email: str,
-            role: int
+            role: int,
+            org_intelligence: int,
         ) -> None:
 
         message_body = {
             "action": action,
             "organization_uuid": org_uuid,
             "user_email": user_email,
-            "role": role
+            "role": role,
+            "org_intelligence": org_intelligence
         }
         self.message_publisher.send_message(message_body, exchange="orgs-auths.topic", routing_key="")
 
