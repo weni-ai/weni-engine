@@ -1,3 +1,11 @@
+# 3.22.1
+## *Fix*
+  - fix role null
+
+# 3.22.0
+## *Add*
+  - Send permissions via EDA
+
 # 3.21.1
 ## *Update*
   - Set brain_on to always send false temporarily
