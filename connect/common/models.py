@@ -2481,11 +2481,11 @@ class RecentActivity(models.Model):
 
         action_map = {
             RecentActivity.FLOW: {
-                RecentActivity.ADD: 'increment_flow_count',
+                RecentActivity.CREATE: 'increment_flow_count',
                 RecentActivity.DELETE: 'decrement_flow_count'
             },
             RecentActivity.AI: {
-                RecentActivity.ADD: 'increment_inteligence_count',
+                RecentActivity.CREATE: 'increment_inteligence_count',
                 RecentActivity.DELETE: 'decrement_inteligence_count'
             },
             RecentActivity.NEXUS: {
