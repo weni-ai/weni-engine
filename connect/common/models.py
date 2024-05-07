@@ -2434,6 +2434,7 @@ class RecentActivity(models.Model):
                 FLOW="created-flow",
                 CHANNEL="created-channel",
                 AI="created-ai",
+                NEXUS="created-ai",
             ),
             UPDATE=dict(
                 TRIGGER="edited-trigger",
@@ -2443,6 +2444,11 @@ class RecentActivity(models.Model):
             ),
             INTEGRATE=dict(AI="integrated-ai"),
             TRAIN=dict(AI="trained-ai"),
+            DELETE=dict(
+                FLOW="deleted-flow",
+                AI="deleted-ai",
+                NEXUS="deleted-ai",
+            ),
         )
         return actions[self.action][self.entity]
 
