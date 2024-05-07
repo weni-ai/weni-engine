@@ -1,3 +1,7 @@
+# 3.23.0
+## *Add*
+  - RecentActivity via EDA
+
 # 3.22.1
 ## *Fix*
   - fix role null
