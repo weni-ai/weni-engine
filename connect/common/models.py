@@ -655,7 +655,7 @@ class OrganizationAuthorization(models.Model):
         }
         rabbitmq_publisher = RabbitmqPublisher()
         rabbitmq_publisher.send_message(message_body, exchange="orgs-auths.topic", routing_key="")
-        
+
 
 class Project(models.Model):
     class Meta:
@@ -1029,6 +1029,22 @@ class Project(models.Model):
             return get_attendances(self, str(after), str(before))
 
         return custom_get_attendances(self, str(after), str(before))
+
+    def increment_inteligence_count(self):
+        self.inteligence_count += 1
+        self.save()
+
+    def decrement_inteligence_count(self):
+        self.inteligence_count -= 1
+        self.save()
+
+    def increment_flow_count(self):
+        self.flow_count += 1
+        self.save()
+
+    def decrement_flow_count(self):
+        self.flow_count -= 1
+        self.save()
 
 
 class OpenedProject(models.Model):
@@ -2368,6 +2384,7 @@ class RecentActivity(models.Model):
     UPDATE = "UPDATE"
     INTEGRATE = "INTEGRATE"
     TRAIN = "TRAIN"
+    DELETE = "DELETE"
 
     ACTIONS_CHOICES = {
         (ADD, "Add"),
@@ -2375,6 +2392,7 @@ class RecentActivity(models.Model):
         (UPDATE, "Entity updated"),
         (INTEGRATE, "Entity integrated"),
         (TRAIN, "Entity Trained"),
+        (DELETE, "Entity Deleted"),
     }
 
     USER = "USER"
@@ -2383,6 +2401,8 @@ class RecentActivity(models.Model):
     TRIGGER = "TRIGGER"
     CAMPAIGN = "CAMPAIGN"
     AI = "AI"
+    NEXUS = "NEXUS"
+
     ENTITY_CHOICES = (
         (USER, "User Entity"),
         (FLOW, "Flow Entity"),
@@ -2390,6 +2410,7 @@ class RecentActivity(models.Model):
         (TRIGGER, "Trigger Entity"),
         (CAMPAIGN, "Campaign Entity"),
         (AI, "Artificial Intelligence Entity"),
+        (NEXUS, "Artificial Intelligence Entity")
     )
 
     project = models.ForeignKey(
@@ -2413,6 +2434,7 @@ class RecentActivity(models.Model):
                 FLOW="created-flow",
                 CHANNEL="created-channel",
                 AI="created-ai",
+                NEXUS="created-ai",
             ),
             UPDATE=dict(
                 TRIGGER="edited-trigger",
@@ -2422,6 +2444,11 @@ class RecentActivity(models.Model):
             ),
             INTEGRATE=dict(AI="integrated-ai"),
             TRAIN=dict(AI="trained-ai"),
+            DELETE=dict(
+                FLOW="deleted-flow",
+                AI="deleted-ai",
+                NEXUS="deleted-ai",
+            ),
         )
         return actions[self.action][self.entity]
 
@@ -2453,27 +2480,57 @@ class RecentActivity(models.Model):
         intelligence_id = validated_data.get('intelligence_id')
         flow_organization = validated_data.get('flow_organization')
         project = validated_data.get('project')
+        organization_uuid = validated_data.get('organization_uuid')
+
+        list_projects = []
+        organization = None
+
+        action_map = {
+            RecentActivity.FLOW: {
+                RecentActivity.CREATE: 'increment_flow_count',
+                RecentActivity.DELETE: 'decrement_flow_count'
+            },
+            RecentActivity.AI: {
+                RecentActivity.CREATE: 'increment_inteligence_count',
+                RecentActivity.DELETE: 'decrement_inteligence_count'
+            },
+            RecentActivity.NEXUS: {
+                RecentActivity.CREATE: 'increment_inteligence_count',
+                RecentActivity.DELETE: 'decrement_inteligence_count'
+            }
+        }
 
         if intelligence_id:
             organization = Organization.objects.get(inteligence_organization=intelligence_id)
-            project = organization.project.first()
+            list_projects.append(organization.project.first())
+        elif organization_uuid:
+            organization = Organization.objects.get(uuid=organization_uuid)
+            list_projects = list(organization.project.all())
         else:
-            if flow_organization:
-                project = Project.objects.filter(flow_organization=flow_organization).first()
-            else:
-                project = Project.objects.filter(uuid=project.uuid).first()
+            list_projects = [Project.objects.filter(flow_organization=flow_organization).first()] if flow_organization else [Project.objects.filter(uuid=project.uuid).first()]
 
-        if not project:
+        if not list_projects:
             raise Exception("Project not found")
 
-        new_recent_activities = RecentActivity.objects.create(
-            action=action,
-            entity=entity,
-            user=user,
-            project=project,
-            entity_name=entity_name
-        )
-        new_recent_activities.save()
+        recent_activities = []
+        for project in list_projects:
+            try:
+                action_method = action_map.get(entity, {}).get(action)
+                if action_method:
+                    getattr(project, action_method)()
+                recent_activities.append(
+                    RecentActivity(
+                        action=action,
+                        entity=entity,
+                        user=user,
+                        project=project,
+                        entity_name=entity_name
+                    )
+                )
+            except Exception as e:
+                print(f"Failed to execute action: {e}")
+
+        new_recent_activities = RecentActivity.objects.bulk_create(recent_activities)
 
         return new_recent_activities
 

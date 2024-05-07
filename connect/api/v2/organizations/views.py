@@ -43,7 +43,7 @@ class OrganizationViewSet(
     queryset = Organization.objects.all()
     serializer_class = OrganizationSeralizer
     lookup_field = "uuid"
-    permission_classes = [IsAuthenticated, OrganizationHasPermission|IsCRMUser, Has2FA]
+    permission_classes = [IsAuthenticated, OrganizationHasPermission | IsCRMUser, Has2FA]
     pagination_class = CustomCursorPagination
 
     def get_queryset(self, *args, **kwargs):
@@ -58,7 +58,7 @@ class OrganizationViewSet(
         )
 
         return self.queryset.filter(pk__in=auth)
-    
+
     def get_object(self):
         if _is_orm_user(self.request.user):
             return get_object_or_404(Organization, uuid=self.kwargs["uuid"])
