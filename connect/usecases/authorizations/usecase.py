@@ -21,6 +21,7 @@ class AuthorizationUseCase:
         OrganizationRole.ADMIN.value: ProjectRole.MODERATOR.value,
         OrganizationRole.CONTRIBUTOR.value: ProjectRole.CONTRIBUTOR.value,
         OrganizationRole.SUPPORT.value: ProjectRole.SUPPORT.value,
+        OrganizationRole.VIEWER.value: ProjectRole.CHAT_USER.value,
     }
 
     def __init__(self, message_publisher = MockRabbitMQPublisher(), publish_message: bool = True) -> None:
