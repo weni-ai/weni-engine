@@ -834,40 +834,24 @@ class OrganizationAuthorizationViewSet(
             OrganizationAdminManagerAuthorization,
         ]
         data = self.request.data
-        if settings.USE_EDA_PERMISSIONS:
-            instance = self.get_object()
+        instance = self.get_object()
 
-            old_permission = OrganizationRole(instance.role).name
-            new_permission = OrganizationRole(int(data.get("role"))).name
+        old_permission = OrganizationRole(instance.role).name
+        new_permission = OrganizationRole(int(data.get("role"))).name
 
-            auth_dto = UpdateAuthorizationDTO(
-                id=self.kwargs.get("user__id"),
-                org_uuid=self.kwargs.get("organization__uuid"),
-                role=int(data.get("role")),
-                request_user=self.request.user
-            )
+        auth_dto = UpdateAuthorizationDTO(
+            id=self.kwargs.get("user__id"),
+            org_uuid=self.kwargs.get("organization__uuid"),
+            role=int(data.get("role")),
+            request_user=self.request.user
+        )
 
-            usecase = UpdateAuthorizationUseCase(message_publisher=RabbitmqPublisher())
-            authorization = usecase.update_authorization(auth_dto)
+        usecase = UpdateAuthorizationUseCase(message_publisher=RabbitmqPublisher())
+        authorization = usecase.update_authorization(auth_dto)
 
-            instance.organization.send_email_permission_change(instance.user, old_permission, new_permission)
+        instance.organization.send_email_permission_change(instance.user, old_permission, new_permission)
 
-            return Response(data={"role": authorization.role})
-
-        # TODO: delete code below later
-        if data.get("role"):
-            instance = self.get_object()
-
-            if instance.user == self.request.user:
-                raise PermissionDenied("Can't change own permission")
-
-            old_permission = OrganizationRole(instance.role).name
-            new_permission = OrganizationRole(int(data.get("role"))).name
-            instance.organization.send_email_permission_change(instance.user, old_permission, new_permission)
-
-        response = super().update(*args, **kwargs)
-        # instance.send_new_role_email(self.request.user)
-        return response
+        return Response(data={"role": authorization.role})
 
     def list(self, request, *args, **kwargs):
         self.lookup_fields = []
@@ -881,19 +865,16 @@ class OrganizationAuthorizationViewSet(
         self.filter_class = None
         self.lookup_field = "user__id"
 
-        if settings.USE_EDA_PERMISSIONS:
-            auth_dto = DeleteAuthorizationDTO(
-                id=self.kwargs.get("user__id"),
-                org_uuid=self.kwargs.get("organization__uuid"),
-                request_user=self.request.user,
-            )
+        auth_dto = DeleteAuthorizationDTO(
+            id=self.kwargs.get("user__id"),
+            org_uuid=self.kwargs.get("organization__uuid"),
+            request_user=self.request.user,
+        )
 
-            usecase = DeleteAuthorizationUseCase(message_publisher=RabbitmqPublisher())
-            usecase.delete_authorization(auth_dto)
+        usecase = DeleteAuthorizationUseCase(message_publisher=RabbitmqPublisher())
+        usecase.delete_authorization(auth_dto)
 
-            return Response()
-
-        return super().destroy(request, *args, **kwargs)
+        return Response()
 
     @action(
         detail=True,
