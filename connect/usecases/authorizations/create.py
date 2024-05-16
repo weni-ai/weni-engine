@@ -32,11 +32,9 @@ class CreateAuthorizationUseCase(AuthorizationUseCase):
         return authorization
 
     def create_project_authorization(self, project: Project, user: User, role: int, org_auth: OrganizationAuthorization) -> ProjectAuthorization:
-        project_role = self.organization_permission_mapper.get(role)
-
         try:
             project_auth: ProjectAuthorization = project.project_authorizations.get(user=user)
-            project_auth.role = project_role
+            project_auth.role = role
             project_auth.save()
             action = "update"
 
@@ -45,7 +43,7 @@ class CreateAuthorizationUseCase(AuthorizationUseCase):
             project_auth: ProjectAuthorization = project.project_authorizations.create(
                 user=user,
                 organization_authorization=org_auth,
-                role=project_role
+                role=role
             )
 
         if self.publish_message:

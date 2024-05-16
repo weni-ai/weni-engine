@@ -193,45 +193,15 @@ class ProjectViewSet(
     )
     def destroy_user_permission(self, request, project_uuid):
         user_email = request.data.get('email')
-        if settings.USE_EDA_PERMISSIONS:
-
-            auth_dto = DeleteProjectAuthorizationDTO(
-                user_email=user_email,
-                project_uuid=project_uuid
-            )
-
-            usecase = DeleteAuthorizationUseCase(RabbitmqPublisher())
-            usecase.delete_single_project_permission(auth_dto)
-            return Response(status=status.HTTP_204_NO_CONTENT)
-
-        # TODO: remove code below
-
-        user_email = request.data.get('email')
-        project = get_object_or_404(Project, uuid=project_uuid)
-
-        project_permission = project.project_authorizations.filter(
-            user__email=user_email
-        )
-        request_permission = project.requestpermissionproject_set.filter(
-            email=user_email
+        auth_dto = DeleteProjectAuthorizationDTO(
+            user_email=user_email,
+            project_uuid=project_uuid
         )
 
-        organization_auth = project.organization.authorizations.filter(
-            user__email=user_email
-        )
+        usecase = DeleteAuthorizationUseCase(RabbitmqPublisher())
+        usecase.delete_single_project_permission(auth_dto)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
-        if request_permission.exists():
-            self.perform_project_authorization_destroy(request_permission.first(), True)
-            return Response(status=status.HTTP_204_NO_CONTENT)
-
-        elif project_permission.exists() and organization_auth.exists():
-            organization_auth = organization_auth.first()
-            if not organization_auth.is_admin:
-                self.perform_project_authorization_destroy(project_permission.first(), False)
-                return Response(status=status.HTTP_204_NO_CONTENT)
-            else:
-                return Response(status=status.HTTP_401_UNAUTHORIZED)
-        return Response(status=status.HTTP_404_NOT_FOUND)
 
     @action(
         detail=True,
@@ -460,150 +430,56 @@ class RequestPermissionProjectViewSet(
     metadata_class = Metadata
 
     def create(self, request, *args, **kwargs):
+        created_by: User = self.request.user
+        role: int = int(self.request.data.get('role'))
+        email: str = self.request.data.get('email')
+        project_uuid: str = self.request.data.get('project')
 
-        if settings.USE_EDA_PERMISSIONS:
+        user = User.objects.filter(email=email)
 
-            created_by: User = self.request.user
-            role: int = int(self.request.data.get('role'))
-            email: str = self.request.data.get('email')
-            project_uuid: str = self.request.data.get('project')
+        auth_dto = CreateProjectAuthorizationDTO(
+            user_email=email,
+            project_uuid=project_uuid,
+            role=role,
+            created_by_email=created_by.email
+        )
 
-            user = User.objects.filter(email=email)
+        data = {
+            "created_by": created_by.email,
+            "role": role,
+            "email": email,
+            "project": str(project_uuid),
+        }
 
-            auth_dto = CreateProjectAuthorizationDTO(
-                user_email=email,
-                project_uuid=project_uuid,
-                role=role,
-                created_by_email=created_by.email
-            )
+        usecase = CreateAuthorizationUseCase(RabbitmqPublisher())
+        if user.exists():
+            auth: ProjectAuthorization = usecase.create_authorization_for_a_single_project(auth_dto=auth_dto)
 
-            data = {
-                "created_by": created_by.email,
-                "role": role,
-                "email": email,
-                "project": str(project_uuid),
-            }
-
-            usecase = CreateAuthorizationUseCase(RabbitmqPublisher())
-            if user.exists():                
-                auth: ProjectAuthorization = usecase.create_authorization_for_a_single_project(auth_dto=auth_dto)
-                is_pendent = False
-
-                data.update({
-                    "username": auth.user.username,
-                    "first_name": auth.user.first_name,
-                    "last_name": auth.user.last_name,
-                    "photo_user": auth.user.photo_url,
-                    "is_pendent": False
-                })
-                
-
-                return Response({
-                    "status": 200,
-                    "data": data
-                })
-
-            request_auth: RequestPermissionProject = usecase.create_authorization_for_a_single_project(auth_dto=auth_dto)
             data.update({
-                "username": '',
-                "first_name": '',
-                "last_name": '',
-                "photo_user": '',
-                "is_pendent": True
+                "username": auth.user.username,
+                "first_name": auth.user.first_name,
+                "last_name": auth.user.last_name,
+                "photo_user": auth.user.photo_url,
+                "is_pendent": False
             })
-            
+
             return Response({
                 "status": 200,
                 "data": data
             })
 
-        # TODO: remove code below
-        created_by = self.request.user
-        role = self.request.data.get('role')
-        email = self.request.data.get('email')
-        project_uuid = self.request.data.get('project')
-        chats_role = self.request.data.get('chats_role')
-        project = Project.objects.filter(uuid=project_uuid)
-
-        if len(email) == 0:
-            return Response({"status": 400, "message": "E-mail field isn't valid!"})
-
-        if len([item for item in ProjectAuthorization.ROLE_CHOICES if item[0] == role]) == 0:
-            return Response({"status": 422, "message": f"{role} is not a valid role!"})
-        if len(project) == 0:
-            return Response({"status": 404, "message": f"Project {project_uuid} not found!"})
-        project = project.first()
-
-        request_permission = RequestPermissionProject.objects.filter(email=email, project=project)
-        project_auth = project.project_authorizations.filter(user__email=email)
-
-        request_rocket_authorization = RequestRocketPermission.objects.filter(email=email, project=project)
-        request_chats_authorization = RequestChatsPermission.objects.filter(email=email, project=project)
-        rocket_authorization = None
-        chats_authorization = None
-
-        user_name = ''
-        first_name = ''
-        last_name = ''
-        photo = ''
-        is_pendent = False
-        has_rocket = project.service_status.filter(service__service_type=Service.SERVICE_TYPE_CHAT).exists()
-
-        if request_permission.exists():
-            request_permission = request_permission.first()
-            is_pendent = True
-            request_permission.role = role
-            request_permission.save()
-        elif project_auth.exists():
-            project_auth = project_auth.first()
-            rocket_authorization = project_auth.rocket_authorization
-            chats_authorization = project_auth.chats_authorization
-            user_name = project_auth.user.username
-            first_name = project_auth.user.first_name
-            last_name = project_auth.user.last_name
-            photo = project_auth.user.photo_url
-            project_auth.role = role
-            project_auth.save()
-        else:
-            RequestPermissionProject.objects.create(created_by=created_by, email=email, role=role, project=project)
-            is_pendent = RequestPermissionProject.objects.filter(email=email, project=project).exists()
-
-        if has_rocket:
-            if chats_role and len([item for item in RocketAuthorization.ROLE_CHOICES if item[0] == chats_role]) == 0:
-                return Response({"status": 422, "message": f"{chats_role} is not a valid rocket role!"})
-            if request_rocket_authorization.exists():
-                request_rocket_authorization = request_rocket_authorization.first()
-                request_rocket_authorization.role = chats_role
-                request_rocket_authorization.save()
-            elif rocket_authorization:
-                rocket_authorization.role = chats_role
-                rocket_authorization.save()
-            elif chats_role:
-                RequestRocketPermission.objects.create(email=email, role=chats_role, project=project, created_by=created_by)
-        else:
-            if chats_role and len([item for item in ChatsAuthorization.ROLE_CHOICES if item[0] == chats_role]) == 0:
-                return Response({"status": 422, "message": f"{chats_role} is not a valid chats role!"})
-            if request_chats_authorization.exists():
-                request_chats_authorization = request_chats_authorization.first()
-                request_chats_authorization.role = chats_role
-                request_chats_authorization.save()
-            elif chats_authorization or chats_role:
-                RequestChatsPermission.objects.create(email=email, role=chats_role, project=project, created_by=created_by)
+        request_auth: RequestPermissionProject = usecase.create_authorization_for_a_single_project(auth_dto=auth_dto)
+        data.update({
+            "username": '',
+            "first_name": '',
+            "last_name": '',
+            "photo_user": '',
+            "is_pendent": True
+        })
 
         return Response({
             "status": 200,
-            "data": {
-                "created_by": created_by.email,
-                "role": role,
-                "chats_role": chats_role,
-                "email": email,
-                "project": str(project_uuid),
-                "username": user_name,
-                "first_name": first_name,
-                "last_name": last_name,
-                "photo_user": photo,
-                "is_pendent": is_pendent
-            }
+            "data": data
         })
 
 

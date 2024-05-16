@@ -106,197 +106,37 @@ def delete_opened_project(sender, instance, **kwargs):
         opened.delete()
 
 
-@receiver(post_save, sender=OrganizationAuthorization)
-def org_authorizations(sender, instance, created, **kwargs):
-    if settings.USE_EDA_PERMISSIONS:
-        return
-    if instance.role is not OrganizationLevelRole.NOTHING.value:
-        if created:
-            organization_permission_mapper = {
-                OrganizationRole.ADMIN.value: ProjectRole.MODERATOR.value,
-                OrganizationRole.CONTRIBUTOR.value: ProjectRole.CONTRIBUTOR.value,
-                OrganizationRole.SUPPORT.value: ProjectRole.SUPPORT.value,
-            }
-            for project in instance.organization.project.all():
-                project_perm = project.project_authorizations.filter(user=instance.user)
-                project_role = organization_permission_mapper.get(instance.role, ProjectRole.NOT_SETTED.value)
-                if not project_perm.exists():
-                    project.project_authorizations.create(
-                        user=instance.user,
-                        role=project_role,
-                        organization_authorization=instance,
-                    )
-                else:
-                    project_perm = project_perm.first()
-                    if instance.role > project_perm.role:
-                        project_perm.role = project_role
-                        project_perm.save(update_fields=["role"])
-
-
-@receiver(post_delete, sender=OrganizationAuthorization)
-def delete_authorizations(instance, **kwargs):
-    if settings.USE_EDA_PERMISSIONS:
-        return
-    for project in instance.organization.project.all():
-        project.project_authorizations.filter(user__email=instance.user.email).delete()
-
-    if not settings.TESTING:
-        ai_client = IntelligenceRESTClient()
-        ai_client.delete_user_permission(
-            organization_id=instance.organization.inteligence_organization,
-            user_email=instance.user.email
-        )
-        for project in instance.organization.project.all():
-            permission = project.get_user_authorization(instance.user).role
-            tasks.delete_user_permission_project(str(project.flow_organization), str(project.uuid), instance.user.email, permission)
-
-    instance.organization.send_email_remove_permission_organization(
-        first_name=instance.user.first_name, email=instance.user.email
-    )
-
-
 @receiver(post_save, sender=RequestPermissionOrganization)
 def request_permission_organization(sender, instance, created, **kwargs):
-    if settings.USE_EDA_PERMISSIONS:
-        if created:
-            user = User.objects.filter(email=instance.email)
-            if user.exists():
-                auth_dto = CreateAuthorizationDTO(
-                    user_email=instance.email,
-                    org_uuid=str(instance.organization.uuid),
-                    role=instance.role,
-                )
-                rabbitmq_publisher = RabbitmqPublisher()
-                usecase = CreateAuthorizationUseCase(rabbitmq_publisher)
-                usecase.create_authorization(auth_dto)
-                instance.delete()
-            instance.organization.send_email_invite_organization(email=instance.email)
-        return
-
-    # TODO: remove code below later
     if created:
         user = User.objects.filter(email=instance.email)
         if user.exists():
-            user = user.first()
-            perm = instance.organization.get_user_authorization(user=user)
-            perm.role = instance.role
-            update_fields = ["role"]
-            if user.has_2fa:
-                perm.has_2fa = True
-                update_fields.append("has_2fa")
-            perm.save(update_fields=update_fields)
-            perm.publish_create_org_authorization_message()
-            if perm.can_contribute:
-                organization_permission_mapper = {
-                    OrganizationRole.ADMIN.value: ProjectRole.MODERATOR.value,
-                    OrganizationRole.CONTRIBUTOR.value: ProjectRole.CONTRIBUTOR.value,
-                    OrganizationRole.SUPPORT.value: ProjectRole.SUPPORT.value,
-                }
-                for proj in instance.organization.project.all():
-                    project_perm = proj.project_authorizations.filter(user=user)
-                    project_role = organization_permission_mapper.get(perm.role, None)
-                    if not project_perm.exists() and project_role is not None:
-                        proj.project_authorizations.create(
-                            user=user,
-                            role=project_role,
-                            organization_authorization=perm,
-                        )
-                    else:
-                        project_perm = project_perm.first()
-                        project_role = organization_permission_mapper.get(perm.role, None)
-                        if project_perm.role < perm.role and project_role is not None:
-                            project_perm.role = project_role
-                            project_perm.save()
+            auth_dto = CreateAuthorizationDTO(
+                user_email=instance.email,
+                org_uuid=str(instance.organization.uuid),
+                role=instance.role,
+            )
+            rabbitmq_publisher = RabbitmqPublisher()
+            usecase = CreateAuthorizationUseCase(rabbitmq_publisher)
+            usecase.create_authorization(auth_dto)
             instance.delete()
         instance.organization.send_email_invite_organization(email=instance.email)
-
-
-@receiver(post_save, sender=RequestPermissionProject)
-def request_permission_project(sender, instance, created, **kwargs):
-    if settings.USE_EDA_PERMISSIONS:
-        return
-    if created:
-        user = User.objects.filter(email=instance.email)
-        if user.exists():
-            user = user.first()
-            org = instance.project.organization
-            org_auth = org.authorizations.filter(user__email=user.email)
-
-            if not org_auth.exists():
-                org_auth = org.authorizations.create(
-                    user=user, role=OrganizationRole.VIEWER.value
-                )
-            else:
-                org_auth = org_auth.first()
-
-            auth = instance.project.project_authorizations
-            auth_user = auth.filter(user=user)
-            if not auth_user.exists():
-                auth_user = ProjectAuthorization.objects.create(
-                    user=user,
-                    project=instance.project,
-                    organization_authorization=org_auth,
-                    role=instance.role,
-                )
-            else:
-                auth_user = auth_user.first()
-                auth_user.role = instance.role
-                auth_user.save(update_fields=["role"])
-
-            instance.delete()
-        instance.project.send_email_invite_project(email=instance.email)
+    return
 
 
 @receiver(post_save, sender=ProjectAuthorization)
 def project_authorization(sender, instance, created, **kwargs):
-    if settings.USE_EDA_PERMISSIONS:
-        opened = OpenedProject.objects.filter(project=instance.project, user=instance.user)
-        if not opened.exists():
-            OpenedProject.objects.create(
-                user=instance.user,
-                project=instance.project,
-                day=instance.project.created_at
-            )
-            opened = opened.first()
-            opened.day = timezone.now()
-            opened.save()
-        return
-    if created:
-
-        RecentActivity.objects.create(
-            action="ADD",
-            entity="USER",
+    opened = OpenedProject.objects.filter(project=instance.project, user=instance.user)
+    if not opened.exists():
+        OpenedProject.objects.create(
             user=instance.user,
             project=instance.project,
-            entity_name=instance.project.name
+            day=instance.project.created_at
         )
-    if instance.role is not ProjectRoleLevel.NOTHING.value:
-        instance_user = (
-            instance.organization_authorization.organization.get_user_authorization(
-                instance.user
-            )
-        )
-        opened = OpenedProject.objects.filter(project=instance.project, user=instance.user)
-        if not opened.exists():
-            OpenedProject.objects.create(
-                user=instance.user,
-                project=instance.project,
-                day=instance.project.created_at
-            )
-        else:
-            opened = opened.first()
-            opened.day = timezone.now()
-            opened.save()
-        if instance_user.level == OrganizationLevelRole.NOTHING.value:
-            instance_user.role = OrganizationRole.VIEWER.value
-            instance_user.save(update_fields=["role"])
-        if instance.project.flow_organization:
-            update_user_permission_project(
-                project_uuid=str(instance.project.uuid),
-                flow_organization=str(instance.project.flow_organization),
-                user_email=instance.user.email,
-                permission=instance.role
-            )
+        opened = opened.first()
+        opened.day = timezone.now()
+        opened.save()
+    return
 
 
 @receiver(post_save, sender=RequestRocketPermission)
