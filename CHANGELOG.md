@@ -1,3 +1,7 @@
+# 3.24.0
+## *Fix*
+  - Fix inconsistent value for CHAT_USER permission when it's added in the project
+
 # 3.23.0
 ## *Add*
   - RecentActivity via EDA
