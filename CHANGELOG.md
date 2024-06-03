@@ -1,3 +1,7 @@
+# 3.25.0
+## *Add*
+  - Send email invitation when creating project authorization
+
 # 3.24.0
 ## *Fix*
   - Fix inconsistent value for CHAT_USER permission when it's added in the project
