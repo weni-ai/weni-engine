@@ -100,6 +100,7 @@ class CreateAuthorizationUseCase(AuthorizationUseCase):
                 role=auth_dto.role,
                 org_auth=org_auth,
             )
+            project.send_email_invite_project(user.email)
             return project_auth
 
         except OrganizationAuthorization.DoesNotExist:
@@ -116,6 +117,7 @@ class CreateAuthorizationUseCase(AuthorizationUseCase):
                 role=auth_dto.role,
                 org_auth=org_auth,
             )
+            project.send_email_invite_project(user.email)
             return project_auth
 
     def create_request_permission_for_user_that_dosent_exist(self, project: Project, auth_dto: CreateProjectAuthorizationDTO):
@@ -125,12 +127,15 @@ class CreateAuthorizationUseCase(AuthorizationUseCase):
             request_permission.role = auth_dto.role
             request_permission.created_by = created_by_user
             request_permission.save()
+            project.send_email_invite_project(request_permission.email)
             return request_permission
-            
+
         except RequestPermissionProject.DoesNotExist:
-            return RequestPermissionProject.objects.create(
+            request_permission = RequestPermissionProject.objects.create(
                 email=auth_dto.user_email,
                 project=project,
                 role=auth_dto.role,
                 created_by=created_by_user
             )
+            project.send_email_invite_project(request_permission.email)
+            return request_permission
