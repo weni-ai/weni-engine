@@ -96,6 +96,10 @@ app.conf.beat_schedule = {
     "check_organization_plans": {
         "task": "check_organization_plans",
         "schedule": schedules.crontab(hour="22", minute=0)
+    },
+    "keycloak_logs_cleanup_routine": {
+        "task": "keycloak_logs_cleanup_routine",
+        "schedule": schedules.crontab(hour="23", minute=30)
     }
 }
 

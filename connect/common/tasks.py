@@ -24,6 +24,7 @@ from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
 from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
 from connect.api.v1.internal.integrations.integrations_rest_client import IntegrationsRESTClient
 from connect.api.v1.internal.intelligence.intelligence_rest_client import IntelligenceRESTClient
+from connect.common.keycloak import KeycloakCleanup
 
 import logging
 
@@ -803,3 +804,12 @@ def send_user_flow_info(
     except Exception as e:
         logger.error(e)
         return False
+
+
+@app.task
+def keycloak_logs_cleanup_routine():
+    time = pendulum.now().subtract(months=1)
+    event_time = time.timestamp() * 1000
+    client = KeycloakCleanup()
+    client.delete(event_time)
+    client.vacuum()
