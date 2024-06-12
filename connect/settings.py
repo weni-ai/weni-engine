@@ -569,6 +569,7 @@ if ALLOW_CRM_ACCESS:
     CRM_EMAILS_LIST = env.list("CRM_EMAILS_LIST")
 
 USE_EDA_PERMISSIONS = env.bool("USE_EDA_PERMISSIONS", default=True)
+
 KC_DB_NAME = env.str("KC_DB_NAME")
 KC_DB_USER = env.str("KC_DB_USER")
 KC_DB_PASSWORD = env.str("KC_DB_PASSWORD")
