@@ -21,14 +21,14 @@ class KeycloakCleanup:
             port: str = settings.KC_DB_PORT,
             realm_id: str = settings.OIDC_RP_REALM_NAME
     ):
-        self.conn = self.connection()
-        self.cur = self.cursor()
         self.dbname = dbname
         self.user = user
         self.password = password
         self.host = host
         self.port = port
         self.realm_id = realm_id
+        self.conn = self.connection()
+        self.cur = self.cursor()
 
     def connection(self):
         try:
