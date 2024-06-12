@@ -82,7 +82,3 @@ class KeycloakCleanup:
     def close_connection(self) -> None:
         self.cur.close()
         self.conn.close()
-
-
-from connect.common.tasks import keycloak_logs_cleanup_routine
-keycloak_logs_cleanup_routine.delay()
