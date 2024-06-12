@@ -1,12 +1,4 @@
-import logging
-
-import pendulum
-import psycopg2
-from django.conf import settings
 from django.core.mail import get_connection, EmailMultiAlternatives
-
-
-logger = logging.getLogger(__name__)
 
 
 def send_mass_html_mail(datatuple, fail_silently=False, user=None, password=None,
