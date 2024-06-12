@@ -52,14 +52,16 @@ class KeycloakCleanup:
         print(len(results))
         return len(results), results
 
-    def delete(self, event_time=None) -> None:
-        if not event_time:
-            time = pendulum.now().end_of("day")
-            event_time = time.timestamp() * 1000
+    def delete(self, date_time=None) -> None:
+
+        if not date_time:
+            date_time = pendulum.now().end_of("day")
+
+        event_time = date_time.timestamp() * 1000
 
         query = f"DELETE FROM event_entity WHERE realm_id='{self.realm_id}' AND event_time < {event_time}"
 
-        print(f"{query} ({time})")
+        print(f"{query} ({date_time})")
 
         self.cur.execute(query)
         self.conn.commit()
@@ -80,3 +82,7 @@ class KeycloakCleanup:
     def close_connection(self) -> None:
         self.cur.close()
         self.conn.close()
+
+
+from connect.common.tasks import keycloak_logs_cleanup_routine
+keycloak_logs_cleanup_routine.delay()

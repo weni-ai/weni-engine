@@ -808,8 +808,7 @@ def send_user_flow_info(
 
 @app.task
 def keycloak_logs_cleanup_routine():
-    time = pendulum.now().subtract(months=1)
-    event_time = time.timestamp() * 1000
+    date_time = pendulum.now().subtract(months=1)
     client = KeycloakCleanup()
-    client.delete(event_time)
+    client.delete(date_time)
     client.vacuum()
