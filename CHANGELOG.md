@@ -1,3 +1,7 @@
+# 3.26.0
+## *Add*
+  - Add celery task to remove keycloak logs
+
 # 3.25.0
 ## *Add*
   - Send email invitation when creating project authorization
