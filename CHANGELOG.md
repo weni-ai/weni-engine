@@ -1,4 +1,9 @@
 # 3.26.0
+## *Fix*
+  - Fix error in permissions when create new user
+  - Add new environment variable to set the max upload number fields
+
+# 3.26.0
 ## *Add*
   - Add celery task to remove keycloak logs
 
