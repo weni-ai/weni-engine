@@ -39,8 +39,7 @@ def signal_user(instance, created, **kwargs):
             )
             usecase.create_authorization(auth_dto)
             requests_permission_organization.delete()
-            
-        
+
         for requests_permission_project in requests_permission_projects:
             auth_dto = CreateProjectAuthorizationDTO(
                 user_email=requests_permission_project.email,
@@ -49,30 +48,9 @@ def signal_user(instance, created, **kwargs):
                 created_by_email=requests_permission_project.created_by.email
             )
             usecase.create_authorization_for_a_single_project(auth_dto=auth_dto)
-            requests_permission_organization.delete()
+            requests_permission_project.delete()
 
         return
-
-    # TODO: remove code below
-    if created:
-
-        requests_perm = RequestPermissionOrganization.objects.filter(
-            email=instance.email
-        )
-        for perm in requests_perm:
-            perm.organization.get_user_authorization(
-                user=instance, defaults={"role": perm.role}
-            )
-        requests_perm.delete()
-
-        requests_perm_project = RequestPermissionProject.objects.filter(
-            email=instance.email
-        )
-        for perm in requests_perm_project:
-            perm.project.get_user_authorization(
-                user=instance, defaults={"role": perm.role}
-            )
-        requests_perm_project.delete()
 
 
 @receiver(models.signals.post_delete, sender=User)
