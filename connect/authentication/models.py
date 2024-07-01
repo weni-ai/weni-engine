@@ -159,7 +159,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     )
     first_login = models.BooleanField(default=False)
     first_login_token = models.TextField(null=True)
-    email_verified = models.BooleanField(default=False)
 
     objects = UserManager()
 

@@ -315,9 +315,6 @@ class MyUserProfileViewSet(
 
     @action(
         detail=True,
-        methods=["GET"],
-        methods=["PATCH"],
-        url_name="verify-email",
         methods=["POST"],
         url_name="send-email-verification",
     )
