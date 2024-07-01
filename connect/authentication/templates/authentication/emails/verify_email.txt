@@ -1,0 +1,12 @@
+{% autoescape off %}
+{% load static i18n %}
+
+{% trans "Hi" %}, {{ username }}!
+
+{% trans "Confirm your registration at Weni" %}
+
+{% trans "We're happy to have you with us! To continue accessing your account, check your e-mail address by clicking on the button below." %}
+{% trans "Stay tuned, the link expires in 5 minutes!" %}"
+
+{% trans "Click here to confirm your email" %} {{base_url}}{% url 'user-verify-email' uidb64=uid token=token %}
+{% endautoescape %}

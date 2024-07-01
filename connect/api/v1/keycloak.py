@@ -7,6 +7,11 @@ import json
 class KeycloakControl:  # pragma: no cover
     def __init__(self):
         self.instance = self.get_instance()
+        self.token = self.instance._token["access_token"]
+        self.headers = {
+            "Authorization": f"Bearer {self.token}",
+            "Content-Type": "application/json",
+        }
 
     def get_instance(self) -> KeycloakAdmin:
         return KeycloakAdmin(
@@ -105,3 +110,10 @@ class KeycloakControl:  # pragma: no cover
             return response
         else:
             return 'User not found'
+
+    def verify_email(self, email: str):
+        payload = json.dumps({"emailVerified": True})
+        user_id = self.get_user_id_by_email(email)
+        path = f"{settings.OIDC_RP_SERVER_URL}admin/realms/{settings.OIDC_RP_REALM_NAME}/users/{user_id}"
+        response = requests.put(path, headers=self.headers, data=payload)
+        response.raise_for_status()

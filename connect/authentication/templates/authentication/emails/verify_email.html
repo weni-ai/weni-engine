@@ -1,0 +1,79 @@
+{% extends 'authentication/emails/base.html' %}
+{% load static i18n %}
+
+{% block main-content %}
+    <section style="width: 574px; margin: 48px">
+          <div
+            style="
+              font-family: 'Lato', sans-serif;
+              font-style: normal;
+              font-weight: normal;
+              font-size: 20px;
+              line-height: 28px;
+              color: #808080;
+            "
+          >
+          {% trans "Hi" %},
+            <span
+              style="
+                font-family: 'Lato', sans-serif;
+                color: #262626;
+                font-size: 20px;
+                font-weight: bold;
+                line-height: 28px;
+                font-style: normal;
+              "
+              >{{ username }}!</span
+            >
+          </div>
+
+          <div
+            style="
+              font-family: 'Lato', sans-serif;
+              font-weight: bold;
+              font-size: 20px;
+              line-height: 28px;
+              color: #262626;
+              margin-top: 24px;
+            "
+          >
+            {% trans "Confirm your registration at Weni" %}
+          </div>
+
+          <div
+            style="
+              font-family: 'Lato', sans-serif;
+              font-style: normal;
+              font-weight: normal;
+              font-size: 16px;
+              line-height: 24px;
+              color: #808080;
+              margin-top: 24px;
+            "
+        >
+          {% trans "We're happy to have you with us! To continue accessing your account, check your e-mail address by clicking on the button below." %}
+          <strong> {% trans "Stay tuned, the link expires in 5 minutes!" %}" </strong>
+        </div>
+        <div style="cursor:pointer; margin: auto; width: 400px; text-align: center;background: #3B414D;color: #FFFFFF;font-size: 16px;
+            font-family: Lato;margin-top:20px;border-radius: 4px; padding: 10px 0;">
+            {% trans "Click here to confirm your email" %}
+        </div>
+        <div
+            style="
+              font-family: 'Lato', sans-serif;
+              font-style: normal;
+              font-weight: normal;
+              font-size: 16px;
+              line-height: 24px;
+              color: #808080;
+              margin-top: 24px;
+            "
+        > {% trans "If the button doesn't work" %} 
+          <a href="{{base_url}}{% url 'user-verify-email' uidb64=uid token=token %}" 
+            style="color: #009E96; text-decoration: underline; text-underline-offset: 4px;"
+          > {% trans "click here" %}</a>
+        </div> 
+    </section>
+
+{% endblock %} 
+
