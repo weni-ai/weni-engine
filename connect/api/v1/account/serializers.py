@@ -8,6 +8,7 @@ from keycloak import exceptions
 from connect.api.v1.fields import PasswordField
 from connect.api.v1.keycloak import KeycloakControl
 from connect.authentication.models import User, UserEmailSetup
+from connect.common.models import OrganizationAuthorization
 
 from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
 from connect.api.v1.internal.integrations.integrations_rest_client import IntegrationsRESTClient
@@ -58,6 +59,7 @@ class UserSerializer(serializers.ModelSerializer):
     utm = serializers.JSONField(required=False, initial=dict)
     email_marketing = serializers.BooleanField(required=False)
     send_email_setup = serializers.SerializerMethodField()
+    can_update_password = serializers.SerializerMethodField()
 
     def update(self, instance, validated_data):
         instance.last_update_profile = timezone.now()
@@ -91,6 +93,13 @@ class UserSerializer(serializers.ModelSerializer):
             self.keycloak_update(update_instance)
 
         return update_instance
+
+    def get_can_update_password(self, obj):
+        auth_orgs = OrganizationAuthorization.objects.filter(
+            user=obj,
+            organization__require_external_provider_for_access=True
+        )
+        return not auth_orgs.exists()
 
     def get_send_email_setup(self, obj):
         try:

@@ -137,6 +137,7 @@ class Organization(models.Model):
     )
     extra_integration = models.IntegerField(_("Whatsapp Extra Integration"), default=0)
     enforce_2fa = models.BooleanField(_("Only users with 2fa can access the organization"), default=False)
+    require_external_provider_for_access = models.BooleanField(_("Only users with external provider can access the organization"), default=False)
     objects = OrganizationManager()
 
     def __str__(self):
