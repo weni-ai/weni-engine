@@ -33,6 +33,7 @@ class UserSerializer(serializers.ModelSerializer):
             "email_marketing",
             "has_2fa",
             "send_email_setup",
+            "can_update_password"
         ]
         ref_name = None
 
