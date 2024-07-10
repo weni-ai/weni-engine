@@ -68,6 +68,7 @@ class WeniOIDCAuthenticationBackend(OIDCAuthenticationBackend):
         user.last_name = claims.get("family_name", "")
         user.email = claims.get("email", "")
         user.first_login = True
+        user.identity_provider = claims.get("identity_provider", "")
 
         if locale:
             if locale.lower() == "pt-br":
@@ -95,6 +96,7 @@ class WeniOIDCAuthenticationBackend(OIDCAuthenticationBackend):
     def update_user(self, user, claims):
         user.name = claims.get("name", "")
         user.email = claims.get("email", "")
+        user.identity_provider = claims.get("identity_provider", "")
         user.save()
 
         check_module_permission(claims, user)
