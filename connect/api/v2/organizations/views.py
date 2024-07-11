@@ -19,7 +19,8 @@ from connect.api.v1.organization.permissions import (
     Has2FA,
     OrganizationHasPermission,
     IsCRMUser,
-    _is_orm_user
+    _is_orm_user,
+    HasExternalProviderAccess
 )
 from connect.api.v2.paginations import CustomCursorPagination
 from connect.api.v2.organizations.serializers import (
@@ -43,7 +44,7 @@ class OrganizationViewSet(
     queryset = Organization.objects.all()
     serializer_class = OrganizationSeralizer
     lookup_field = "uuid"
-    permission_classes = [IsAuthenticated, OrganizationHasPermission | IsCRMUser, Has2FA]
+    permission_classes = [IsAuthenticated, OrganizationHasPermission | IsCRMUser, Has2FA, HasExternalProviderAccess]
     pagination_class = CustomCursorPagination
 
     def get_queryset(self, *args, **kwargs):
