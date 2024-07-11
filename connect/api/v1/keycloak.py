@@ -18,6 +18,13 @@ class KeycloakControl:  # pragma: no cover
             auto_refresh_token=["get", "post", "put", "delete"],
         )
 
+    def get_user_by_email(self, email: str):
+        """
+        Get user by email
+        """
+        user_id = self.get_user_id_by_email(email)
+        return self.instance.get_user(user_id)
+
     def get_user_id_by_email(self, email: str) -> str:
         """
         Get internal keycloak user id from email

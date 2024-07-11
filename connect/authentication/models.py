@@ -275,8 +275,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def set_identity_providers(self):
         keycloak = KeycloakControl()
-        user_id = keycloak.get_user_id_by_email(self.email)
-        response = keycloak.get_user(user_id)
+        response = keycloak.get_user_by_email(self.email)
         federated_identities = response.get("federatedIdentities", [])
         for identity in federated_identities:
             self.identity_provider.get_or_create(
