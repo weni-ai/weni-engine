@@ -155,7 +155,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     )
     first_login = models.BooleanField(default=False)
     first_login_token = models.TextField(null=True)
-    identity_provider = models.CharField(max_length=255, null=True, blank=True)
 
     objects = UserManager()
 
@@ -274,6 +273,17 @@ class User(AbstractBaseUser, PermissionsMixin):
 
         self.save(update_fields=["first_login"])
 
+    def set_identity_providers(self):
+        keycloak = KeycloakControl()
+        user_id = keycloak.get_user_id_by_email(self.email)
+        response = keycloak.get_user(user_id)
+        federated_identities = response.get("federatedIdentities", [])
+        for identity in federated_identities:
+            self.identity_provider.get_or_create(
+                provider=identity.get("identityProvider"),
+                provider_user_id=identity.get("userId")
+            )
+
     @property
     def get_company_data(self):
         return dict(
@@ -292,3 +302,9 @@ class UserEmailSetup(models.Model):
 
     def __str__(self) -> str:
         return f"User: Receive Organization emails: {self.receive_organization_emails}, Receive Project emails: {self.receive_project_emails}"
+
+
+class UserIdentityProvider(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="identity_provider")
+    provider = models.CharField(max_length=255)
+    provider_user_id = models.CharField(max_length=255)
