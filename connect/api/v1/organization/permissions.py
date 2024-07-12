@@ -91,10 +91,3 @@ class IsCRMUser(permissions.IsAuthenticated):
 
     def has_object_permission(self, request, view, obj):
         return _is_orm_user(request.user)
-
-
-class HasExternalProviderAccess(permissions.BasePermission):
-    def has_object_permission(self, request, view, obj):
-        return obj.require_external_provider_for_access and (
-            request.user.identity_provider.exists() or bool(request.user.password)
-        )
