@@ -1,4 +1,9 @@
-# 3.26.0
+# 3.27.0
+  - Add mapper to identity_provider on keycloak
+  - Add new fields to organization
+  - Add new update password rule
+
+# 3.26.1
 ## *Fix*
   - Fix error in permissions when create new user
   - Add new environment variable to set the max upload number fields
