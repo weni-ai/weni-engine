@@ -278,10 +278,11 @@ class User(AbstractBaseUser, PermissionsMixin):
         response = keycloak.get_user_by_email(self.email)
         federated_identities = response.get("federatedIdentities", [])
         for identity in federated_identities:
-            self.identity_provider.get_or_create(
-                provider=identity.get("identityProvider"),
-                provider_user_id=identity.get("userId")
-            )
+            provider = identity.get("identityProvider")
+            provider_user_id = identity.get("userId")
+            if self.identity_provider.filter(provider=provider).exists():
+                continue
+            self.identity_provider.create(provider=provider, provider_user_id=provider_user_id)
 
     @property
     def get_company_data(self):
