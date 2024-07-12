@@ -112,7 +112,9 @@ class OrganizationManager(models.Manager):
         if organization_billing__plan:
             new_kwargs.update({"plan": organization_billing__plan})
         if organization_billing__stripe_customer:
-            new_kwargs.update({"stripe_customer": organization_billing__stripe_customer})
+            new_kwargs.update(
+                {"stripe_customer": organization_billing__stripe_customer}
+            )
 
         BillingPlan.objects.create(organization=instance, **new_kwargs)
         return instance
@@ -136,8 +138,13 @@ class Organization(models.Model):
         default=False, help_text=_("Whether this organization is currently suspended.")
     )
     extra_integration = models.IntegerField(_("Whatsapp Extra Integration"), default=0)
-    enforce_2fa = models.BooleanField(_("Only users with 2fa can access the organization"), default=False)
-    require_external_provider_for_access = models.BooleanField(_("Only users with external provider can access the organization"), default=False)
+    enforce_2fa = models.BooleanField(
+        _("Only users with 2fa can access the organization"), default=False
+    )
+    require_external_provider_for_access = models.BooleanField(
+        _("Only users with external provider can access the organization"),
+        default=False,
+    )
     objects = OrganizationManager()
 
     def __str__(self):
@@ -183,7 +190,6 @@ class Organization(models.Model):
         return mail
 
     def send_email_organization_going_out(self, user: User):
-
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
 
@@ -233,8 +239,7 @@ class Organization(models.Model):
             return False  # pragma: no cover
 
         if not emails:
-            filter = Q(
-                role=OrganizationRole.VIEWER.value) | Q(
+            filter = Q(role=OrganizationRole.VIEWER.value) | Q(
                 user__email_setup__receive_organization_emails=False
             )
             emails = (
@@ -254,7 +259,6 @@ class Organization(models.Model):
         msg_list = []
 
         for email in emails:
-
             username = email[1]
             context["first_name"] = username
 
@@ -309,9 +313,7 @@ class Organization(models.Model):
 
         if not emails:
             emails = (
-                self.authorizations.exclude(
-                    role=OrganizationRole.VIEWER.value
-                )
+                self.authorizations.exclude(role=OrganizationRole.VIEWER.value)
                 .values_list("user__email", "user__username", "user__language")
                 .order_by("user__language")
             )
@@ -327,7 +329,6 @@ class Organization(models.Model):
         msg_list = []
 
         for email in emails:
-
             username = email[1]
             context["first_name"] = username
 
@@ -354,15 +355,15 @@ class Organization(models.Model):
         html_mail = send_mass_html_mail(msg_list, fail_silently=False)
         return html_mail
 
-    def send_email_change_organization_name(self, prev_name: str, new_name: str, emails: list = None):
+    def send_email_change_organization_name(
+        self, prev_name: str, new_name: str, emails: list = None
+    ):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
 
         if not emails:
             emails = (
-                self.authorizations.exclude(
-                    role=OrganizationRole.VIEWER.value
-                )
+                self.authorizations.exclude(role=OrganizationRole.VIEWER.value)
                 .values_list("user__email", "user__username", "user__language")
                 .order_by("user__language")
             )
@@ -379,7 +380,6 @@ class Organization(models.Model):
         msg_list = []
 
         for email in emails:
-
             username = email[1]
             context["user_name"] = username
 
@@ -420,7 +420,9 @@ class Organization(models.Model):
 
         mail.send_mail(
             _("You receive an access code to Weni Platform"),
-            render_to_string(f"authentication/emails/access_code_{user.language}.txt", context),
+            render_to_string(
+                f"authentication/emails/access_code_{user.language}.txt", context
+            ),
             None,
             [email],
             html_message=render_to_string(
@@ -432,7 +434,6 @@ class Organization(models.Model):
     def send_email_permission_change(
         self, user: User, old_permission: str, new_permission: str
     ):
-
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
 
@@ -447,7 +448,9 @@ class Organization(models.Model):
         activate(user.language)
 
         if user.language == "pt-br":
-            subject = f"Um administrador da organização { self.name } atualizou sua permissão"
+            subject = (
+                f"Um administrador da organização { self.name } atualizou sua permissão"
+            )
         else:
             subject = _(f"An administrator of {self.name } has updated your permission")
 
@@ -491,10 +494,12 @@ class Organization(models.Model):
 
         try:
             repository_uuid = settings.REPOSITORY_IDS.get(project.template_type)
-            access_token = intelligence_client.get_access_token(user_email, repository_uuid)
+            access_token = intelligence_client.get_access_token(
+                user_email, repository_uuid
+            )
 
             if not access_token:
-                raise(Exception("access token is None"))
+                raise (Exception("access token is None"))
 
             data = access_token
             ok = True
@@ -502,7 +507,7 @@ class Organization(models.Model):
             logger.error(f"GET AI: {error}")
             data = {
                 "data": {"message": "Could not get access token"},
-                "status": status.HTTP_500_INTERNAL_SERVER_ERROR
+                "status": status.HTTP_500_INTERNAL_SERVER_ERROR,
             }
         return ok, data
 
@@ -511,13 +516,12 @@ class Organization(models.Model):
         created = False
         try:
             ai_org = ai_client.create_organization(
-                user_email=user_email,
-                organization_name=self.name
+                user_email=user_email, organization_name=self.name
             )
             data = ai_org.get("id")
 
             if not data:
-                raise(Exception(ai_org))
+                raise (Exception(ai_org))
 
             self.inteligence_organization = int(ai_org.get("id"))
             self.save(update_fields=["inteligence_organization"])
@@ -527,7 +531,7 @@ class Organization(models.Model):
         except Exception as error:
             data = {
                 "data": {"message": "Could not create organization in AI module"},
-                "status": status.HTTP_500_INTERNAL_SERVER_ERROR
+                "status": status.HTTP_500_INTERNAL_SERVER_ERROR,
             }
             logger.error(error)
 
@@ -613,11 +617,17 @@ class OrganizationAuthorization(models.Model):
 
     @property
     def can_write(self):
-        return self.level in [OrganizationLevelRole.ADMIN.value, OrganizationLevelRole.SUPPORT.value]
+        return self.level in [
+            OrganizationLevelRole.ADMIN.value,
+            OrganizationLevelRole.SUPPORT.value,
+        ]
 
     @property
     def is_admin(self):
-        return self.level in [OrganizationLevelRole.ADMIN.value, OrganizationLevelRole.SUPPORT.value]
+        return self.level in [
+            OrganizationLevelRole.ADMIN.value,
+            OrganizationLevelRole.SUPPORT.value,
+        ]
 
     @property
     def is_financial(self):
@@ -652,10 +662,12 @@ class OrganizationAuthorization(models.Model):
         message_body = {
             "organization_uuid": str(self.organization.uuid),
             "user_email": self.user.email,
-            "role": self.role
+            "role": self.role,
         }
         rabbitmq_publisher = RabbitmqPublisher()
-        rabbitmq_publisher.send_message(message_body, exchange="orgs-auths.topic", routing_key="")
+        rabbitmq_publisher.send_message(
+            message_body, exchange="orgs-auths.topic", routing_key=""
+        )
 
 
 class Project(models.Model):
@@ -688,8 +700,20 @@ class Project(models.Model):
         (TYPE_SAC_CHAT_GPT, "sac+chatgpt"),
     )
 
-    HAS_GLOBALS = [TYPE_OMIE_LEAD_CAPTURE, TYPE_OMIE_PAYMENT_FINANCIAL, TYPE_OMIE_PAYMENT_FINANCIAL_CHAT_GPT, TYPE_LEAD_CAPTURE_CHAT_GPT, TYPE_SAC_CHAT_GPT]
-    HAS_CHATS = [TYPE_OMIE_LEAD_CAPTURE, TYPE_OMIE_PAYMENT_FINANCIAL, TYPE_OMIE_PAYMENT_FINANCIAL_CHAT_GPT, TYPE_SUPPORT, TYPE_SAC_CHAT_GPT]
+    HAS_GLOBALS = [
+        TYPE_OMIE_LEAD_CAPTURE,
+        TYPE_OMIE_PAYMENT_FINANCIAL,
+        TYPE_OMIE_PAYMENT_FINANCIAL_CHAT_GPT,
+        TYPE_LEAD_CAPTURE_CHAT_GPT,
+        TYPE_SAC_CHAT_GPT,
+    ]
+    HAS_CHATS = [
+        TYPE_OMIE_LEAD_CAPTURE,
+        TYPE_OMIE_PAYMENT_FINANCIAL,
+        TYPE_OMIE_PAYMENT_FINANCIAL_CHAT_GPT,
+        TYPE_SUPPORT,
+        TYPE_SAC_CHAT_GPT,
+    ]
 
     uuid = models.UUIDField(
         _("UUID"), primary_key=True, default=uuid4.uuid4, editable=False
@@ -706,7 +730,9 @@ class Project(models.Model):
         default=DATE_FORMAT_DAY_FIRST,
         help_text=_("Whether day comes first or month comes first in dates"),
     )
-    flow_organization = models.UUIDField(_("flow identification UUID"), unique=True, null=True, blank=True)
+    flow_organization = models.UUIDField(
+        _("flow identification UUID"), unique=True, null=True, blank=True
+    )
     flow_id = models.PositiveIntegerField(
         _("flow identification ID"), unique=True, null=True
     )
@@ -741,9 +767,11 @@ class Project(models.Model):
         on_delete=models.SET_NULL,
         related_name="template_projects",
         null=True,
-        blank=True
+        blank=True,
     )
-    description = models.CharField("Project description with the context", null=True, blank=True, max_length=1000)
+    description = models.CharField(
+        "Project description with the context", null=True, blank=True, max_length=1000
+    )
 
     def __str__(self):
         return f"{self.uuid} - Project: {self.name} - Org: {self.organization.name}"
@@ -785,8 +813,7 @@ class Project(models.Model):
             return False  # pragma: no cover
 
         if not emails:
-            filter = Q(
-                role=OrganizationRole.VIEWER.value) | Q(
+            filter = Q(role=OrganizationRole.VIEWER.value) | Q(
                 user__email_setup__receive_project_emails=False
             )
             emails = (
@@ -805,7 +832,6 @@ class Project(models.Model):
         }
 
         for email in emails:
-
             username = email[1]
             context["first_name"] = username
 
@@ -923,7 +949,7 @@ class Project(models.Model):
             status_code = response.get("status")
 
             if status_code not in range(200, 299):
-                raise(Exception(f"Status: {status_code}"))
+                raise (Exception(f"Status: {status_code}"))
 
             created = True
             data = response.get("data").get("uuid")
@@ -932,13 +958,16 @@ class Project(models.Model):
             logger.error(f"Could not create classifier {error}")
             data = {
                 "data": {"message": "Could not create classifier"},
-                "status": status.HTTP_500_INTERNAL_SERVER_ERROR
+                "status": status.HTTP_500_INTERNAL_SERVER_ERROR,
             }
 
         return created, data
 
     def create_chats_project(self):
-        from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient  # to avoid circular import
+        from connect.api.v1.internal.chats.chats_rest_client import (
+            ChatsRESTClient,
+        )  # to avoid circular import
+
         created = False
         chats_client = ChatsRESTClient()
         try:
@@ -948,7 +977,7 @@ class Project(models.Model):
                 date_format=self.date_format,
                 timezone=str(self.timezone),
                 is_template=True,
-                user_email=self.created_by.email
+                user_email=self.created_by.email,
             )
             chats_response = json.loads(chats_response.text)
             data = chats_response
@@ -957,7 +986,7 @@ class Project(models.Model):
             logger.error(f"Could not create chats {error}")
             data = {
                 "data": {"message": "Could not create chats"},
-                "status": status.HTTP_500_INTERNAL_SERVER_ERROR
+                "status": status.HTTP_500_INTERNAL_SERVER_ERROR,
             }
         return created, data
 
@@ -989,7 +1018,7 @@ class Project(models.Model):
             data.update(
                 {
                     "data": {"message": "Could not create flow"},
-                    "status": status.HTTP_500_INTERNAL_SERVER_ERROR
+                    "status": status.HTTP_500_INTERNAL_SERVER_ERROR,
                 }
             )
         return created, data
@@ -1005,9 +1034,7 @@ class Project(models.Model):
         }
         mail.send_mail(
             _("Invitation to join organization"),
-            render_to_string(
-                "common/emails/project/invite_project.txt", context
-            ),
+            render_to_string("common/emails/project/invite_project.txt", context),
             None,
             [email],
             html_message=render_to_string(
@@ -1024,9 +1051,16 @@ class Project(models.Model):
             counting_method = self.organization.organization_billing.plan_method
 
         if counting_method == BillingPlan.ACTIVE_CONTACTS:
-            return Contact.objects.filter(project=self).filter(last_seen_on__range=(after, before)).distinct("contact_flow_uuid").count()
+            return (
+                Contact.objects.filter(project=self)
+                .filter(last_seen_on__range=(after, before))
+                .distinct("contact_flow_uuid")
+                .count()
+            )
 
-        if pendulum.parse(str(after)) < pendulum.parse(settings.NEW_ATTENDANCE_DATE).end_of("day"):
+        if pendulum.parse(str(after)) < pendulum.parse(
+            settings.NEW_ATTENDANCE_DATE
+        ).end_of("day"):
             return get_attendances(self, str(after), str(before))
 
         return custom_get_attendances(self, str(after), str(before))
@@ -1050,9 +1084,7 @@ class Project(models.Model):
 
 class OpenedProject(models.Model):
     day = models.DateTimeField(_("Day"))
-    project = models.ForeignKey(
-        Project, models.CASCADE, related_name="opened_project"
-    )
+    project = models.ForeignKey(Project, models.CASCADE, related_name="opened_project")
     user = models.ForeignKey(User, models.CASCADE, related_name="user")
 
 
@@ -1202,11 +1234,17 @@ class ProjectAuthorization(models.Model):
 
     @property
     def is_moderator(self):
-        return self.level in [ProjectRoleLevel.MODERATOR.value, ProjectRoleLevel.SUPPORT.value]
+        return self.level in [
+            ProjectRoleLevel.MODERATOR.value,
+            ProjectRoleLevel.SUPPORT.value,
+        ]
 
     @property
     def can_write(self):
-        return self.level in [ProjectRoleLevel.MODERATOR.value, ProjectRoleLevel.SUPPORT.value]
+        return self.level in [
+            ProjectRoleLevel.MODERATOR.value,
+            ProjectRoleLevel.SUPPORT.value,
+        ]
 
     @property
     def can_read(self):
@@ -1215,7 +1253,7 @@ class ProjectAuthorization(models.Model):
             ProjectRoleLevel.CONTRIBUTOR.value,
             ProjectRoleLevel.VIEWER.value,
             ProjectRoleLevel.SUPPORT.value,
-            ProjectRoleLevel.CHAT_USER.value
+            ProjectRoleLevel.CHAT_USER.value,
         ]
 
     @property
@@ -1463,7 +1501,12 @@ class BillingPlan(models.Model):
     )
     fixed_discount = models.FloatField(_("fixed discount"), default=0)
     plan = models.CharField(_("plan"), max_length=10, choices=PLAN_CHOICES)
-    plan_method = models.CharField(_("plan_method"), max_length=15, choices=PLAN_METHOD_CHOICES, default=ATTENDANCES)
+    plan_method = models.CharField(
+        _("plan_method"),
+        max_length=15,
+        choices=PLAN_METHOD_CHOICES,
+        default=ATTENDANCES,
+    )
     contract_on = models.DateField(_("date of contract plan"), auto_now_add=True)
     is_active = models.BooleanField(_("active plan"), default=True)
     stripe_customer = models.CharField(
@@ -1506,7 +1549,14 @@ class BillingPlan(models.Model):
     card_is_valid = models.BooleanField(_("Card is valid"), default=False)
     trial_end_date = models.DateTimeField(_("Trial end date"), null=True, blank=True)
 
-    def save(self, force_insert=False, force_update=False, using=None, update_fields=None, **kwargs):
+    def save(
+        self,
+        force_insert=False,
+        force_update=False,
+        using=None,
+        update_fields=None,
+        **kwargs,
+    ):
         _adding = self._state.adding
         if _adding or kwargs.get("change_plan"):
             from connect import billing
@@ -1546,8 +1596,8 @@ class BillingPlan(models.Model):
                     paid_date=pendulum.now(),
                     due_date=pendulum.now(),
                     payment_status=Invoice.PAYMENT_STATUS_PAID,
-                    payment_method='credit_card',
-                    invoice_amount=(charges["data"][0]["amount"] / 100)
+                    payment_method="credit_card",
+                    invoice_amount=(charges["data"][0]["amount"] / 100),
                 )
                 for project in self.organization.project.all():  # pragma: no cover
                     current_app.send_task(
@@ -1558,11 +1608,9 @@ class BillingPlan(models.Model):
 
     @staticmethod
     def plan_info(plan):
-
         plans_list = [plan[0] for plan in BillingPlan.PLAN_CHOICES]
 
         if plan in plans_list:
-
             if plan == BillingPlan.PLAN_TRIAL:
                 price = settings.PLAN_TRIAL_PRICE
                 limit = settings.PLAN_TRIAL_LIMIT
@@ -1705,7 +1753,10 @@ class BillingPlan(models.Model):
         if self.plan != self.PLAN_ENTERPRISE:
             amount_currenty = Decimal(
                 BillingPlan.plan_info(self.plan)["price"]
-                + (settings.BILLING_COST_PER_WHATSAPP * self.organization.extra_integration)
+                + (
+                    settings.BILLING_COST_PER_WHATSAPP
+                    * self.organization.extra_integration
+                )
             ).quantize(Decimal(".01"), decimal.ROUND_HALF_UP)
         else:
             amount_currenty = BillingPlan.plan_info(self.plan)["price"]
@@ -1723,7 +1774,10 @@ class BillingPlan(models.Model):
                 self.organization.is_suspended = False
                 self.organization.save(update_fields=["is_suspended"])
                 self.is_active = True
-                self.save(update_fields=["plan", "contract_on", "next_due_date", "is_active"], change_plan=True)
+                self.save(
+                    update_fields=["plan", "contract_on", "next_due_date", "is_active"],
+                    change_plan=True,
+                )
                 # send mail here
                 break
         return _is_valid
@@ -1793,23 +1847,16 @@ class BillingPlan(models.Model):
         from_email = None
         msg_list = []
         for user_email in email:
-
             language_code = User.objects.get(email=user_email).language
             activate(language_code)
-            message = render_to_string(
-                "billing/emails/finished-plan.txt", context
-            )
+            message = render_to_string("billing/emails/finished-plan.txt", context)
             html_message = render_to_string(
                 "billing/emails/finished-plan.html", context
             )
             if language_code == "en-us":
-                subject = _(
-                    "Your organization's plan has ended"
-                )
+                subject = _("Your organization's plan has ended")
             else:
-                subject = _(
-                    "O plano da sua organização foi encerrado."
-                )
+                subject = _("O plano da sua organização foi encerrado.")
 
             recipient_list = [user_email]
             msg = (subject, message, html_message, from_email, recipient_list)
@@ -1829,23 +1876,16 @@ class BillingPlan(models.Model):
         from_email = None
         msg_list = []
         for user_email in email:
-
             language_code = User.objects.get(email=user_email).language
             activate(language_code)
-            message = render_to_string(
-                "billing/emails/reactived-plan.txt", context
-            )
+            message = render_to_string("billing/emails/reactived-plan.txt", context)
             html_message = render_to_string(
                 "billing/emails/reactived-plan.html", context
             )
             if language_code == "en-us":
-                subject = _(
-                    "Your organization's plan has been reactivated."
-                )
+                subject = _("Your organization's plan has been reactivated.")
             else:
-                subject = _(
-                    "O plano da sua organização foi reativado."
-                )
+                subject = _("O plano da sua organização foi reativado.")
 
             recipient_list = [user_email]
             msg = (subject, message, html_message, from_email, recipient_list)
@@ -1865,19 +1905,12 @@ class BillingPlan(models.Model):
         from_email = None
         msg_list = []
         for user_email in email:
-
             language_code = User.objects.get(email=user_email).language
             activate(language_code)
-            message = render_to_string(
-                "billing/emails/removed_card.txt", context
-            )
-            html_message = render_to_string(
-                "billing/emails/removed_card.html", context
-            )
+            message = render_to_string("billing/emails/removed_card.txt", context)
+            html_message = render_to_string("billing/emails/removed_card.html", context)
             if language_code == "en-us":
-                subject = _(
-                    "Your organization's credit card was removed"
-                )
+                subject = _("Your organization's credit card was removed")
             else:
                 subject = _(
                     "O cartão de crédito vinculado a sua organização foi removido"
@@ -1975,7 +2008,6 @@ class BillingPlan(models.Model):
 
         msg_list = []
         for email in emails:
-
             language_code = email[2]
             username = email[1]
             context["user_name"] = username
@@ -2021,7 +2053,6 @@ class BillingPlan(models.Model):
         }
 
         for email in emails:
-
             language_code = email[2]
             activate(language_code)
             username = email[1]
@@ -2068,7 +2099,6 @@ class BillingPlan(models.Model):
         }
 
         for email in emails:
-
             username = email[1]
             language_code = email[2]
             activate(language_code)
@@ -2121,7 +2151,7 @@ class BillingPlan(models.Model):
             newsletter=newsletter,
             title="trial-ended",
             description=f"Your trial period of the organization {self.organization.name}, has ended, do an upgrade.",
-            organization=self.organization
+            organization=self.organization,
         )
 
         self.is_active = False
@@ -2411,7 +2441,7 @@ class RecentActivity(models.Model):
         (TRIGGER, "Trigger Entity"),
         (CAMPAIGN, "Campaign Entity"),
         (AI, "Artificial Intelligence Entity"),
-        (NEXUS, "Artificial Intelligence Entity")
+        (NEXUS, "Artificial Intelligence Entity"),
     )
 
     project = models.ForeignKey(
@@ -2475,40 +2505,46 @@ class RecentActivity(models.Model):
 
     @staticmethod
     def create_recent_activities(validated_data, user):
-        action = validated_data.get('action')
-        entity = validated_data.get('entity')
-        entity_name = validated_data.get('entity_name')
-        intelligence_id = validated_data.get('intelligence_id')
-        flow_organization = validated_data.get('flow_organization')
-        project = validated_data.get('project')
-        organization_uuid = validated_data.get('organization_uuid')
+        action = validated_data.get("action")
+        entity = validated_data.get("entity")
+        entity_name = validated_data.get("entity_name")
+        intelligence_id = validated_data.get("intelligence_id")
+        flow_organization = validated_data.get("flow_organization")
+        project = validated_data.get("project")
+        organization_uuid = validated_data.get("organization_uuid")
 
         list_projects = []
         organization = None
 
         action_map = {
             RecentActivity.FLOW: {
-                RecentActivity.CREATE: 'increment_flow_count',
-                RecentActivity.DELETE: 'decrement_flow_count'
+                RecentActivity.CREATE: "increment_flow_count",
+                RecentActivity.DELETE: "decrement_flow_count",
             },
             RecentActivity.AI: {
-                RecentActivity.CREATE: 'increment_inteligence_count',
-                RecentActivity.DELETE: 'decrement_inteligence_count'
+                RecentActivity.CREATE: "increment_inteligence_count",
+                RecentActivity.DELETE: "decrement_inteligence_count",
             },
             RecentActivity.NEXUS: {
-                RecentActivity.CREATE: 'increment_inteligence_count',
-                RecentActivity.DELETE: 'decrement_inteligence_count'
-            }
+                RecentActivity.CREATE: "increment_inteligence_count",
+                RecentActivity.DELETE: "decrement_inteligence_count",
+            },
         }
 
         if intelligence_id:
-            organization = Organization.objects.get(inteligence_organization=intelligence_id)
+            organization = Organization.objects.get(
+                inteligence_organization=intelligence_id
+            )
             list_projects.append(organization.project.first())
         elif organization_uuid:
             organization = Organization.objects.get(uuid=organization_uuid)
             list_projects = list(organization.project.all())
         else:
-            list_projects = [Project.objects.filter(flow_organization=flow_organization).first()] if flow_organization else [Project.objects.filter(uuid=project.uuid).first()]
+            list_projects = (
+                [Project.objects.filter(flow_organization=flow_organization).first()]
+                if flow_organization
+                else [Project.objects.filter(uuid=project.uuid).first()]
+            )
 
         if not list_projects:
             raise Exception("Project not found")
@@ -2525,7 +2561,7 @@ class RecentActivity(models.Model):
                         entity=entity,
                         user=user,
                         project=project,
-                        entity_name=entity_name
+                        entity_name=entity_name,
                     )
                 )
             except Exception as e:
@@ -2542,13 +2578,13 @@ class NewsletterOrganization(models.Model):
     organization = models.ForeignKey(
         Organization, models.CASCADE, related_name="org_newsletter"
     )
-    newsletter = models.ForeignKey(
-        Newsletter, models.CASCADE
-    )
+    newsletter = models.ForeignKey(Newsletter, models.CASCADE)
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
 
     def __str__(self):
-        return f"Newsletter PK: {self.newsletter.pk} - {self.organization} - {self.title}"
+        return (
+            f"Newsletter PK: {self.newsletter.pk} - {self.organization} - {self.title}"
+        )
 
     @property
     def organization_name(self):

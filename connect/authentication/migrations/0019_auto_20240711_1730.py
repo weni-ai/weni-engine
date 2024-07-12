@@ -6,23 +6,37 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('authentication', '0018_user_identity_provider'),
+        ("authentication", "0018_user_identity_provider"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='user',
-            name='identity_provider',
+            model_name="user",
+            name="identity_provider",
         ),
         migrations.CreateModel(
-            name='UserIdentityProvider',
+            name="UserIdentityProvider",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('provider', models.CharField(max_length=255)),
-                ('provider_user_id', models.CharField(max_length=255)),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='identity_provider', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("provider", models.CharField(max_length=255)),
+                ("provider_user_id", models.CharField(max_length=255)),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="identity_provider",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
     ]

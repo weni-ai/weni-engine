@@ -11,7 +11,9 @@ from connect.authentication.models import User, UserEmailSetup
 from connect.common.models import OrganizationAuthorization
 
 from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
-from connect.api.v1.internal.integrations.integrations_rest_client import IntegrationsRESTClient
+from connect.api.v1.internal.integrations.integrations_rest_client import (
+    IntegrationsRESTClient,
+)
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -33,7 +35,7 @@ class UserSerializer(serializers.ModelSerializer):
             "email_marketing",
             "has_2fa",
             "send_email_setup",
-            "can_update_password"
+            "can_update_password",
         ]
         ref_name = None
 
@@ -71,24 +73,23 @@ class UserSerializer(serializers.ModelSerializer):
             data = dict(
                 send_request_flow=settings.SEND_REQUEST_FLOW,
                 flow_uuid=settings.FLOW_MARKETING_UUID,
-                token_authorization=settings.TOKEN_AUTHORIZATION_FLOW_MARKETING
+                token_authorization=settings.TOKEN_AUTHORIZATION_FLOW_MARKETING,
             )
             instance.send_request_flow_user_info(data)
 
         if "first_name" in validated_data or "last_name" in validated_data:
-
             integrations_client = IntegrationsRESTClient()
             chats_client = ChatsRESTClient()
 
             integrations_client.update_user(
                 user_email=update_instance.email,
                 first_name=update_instance.first_name,
-                last_name=update_instance.last_name
+                last_name=update_instance.last_name,
             )
             chats_client.update_user(
                 user_email=update_instance.email,
                 first_name=update_instance.first_name,
-                last_name=update_instance.last_name
+                last_name=update_instance.last_name,
             )
 
             self.keycloak_update(update_instance)
@@ -99,8 +100,7 @@ class UserSerializer(serializers.ModelSerializer):
         if not obj.identity_provider.exists():
             return True
         auth_orgs = OrganizationAuthorization.objects.filter(
-            user=obj,
-            organization__require_external_provider_for_access=True
+            user=obj, organization__require_external_provider_for_access=True
         )
         return not auth_orgs.exists()
 
@@ -115,7 +115,9 @@ class UserSerializer(serializers.ModelSerializer):
         try:
             keycloak_instance = KeycloakControl()
 
-            user_id = keycloak_instance.get_user_id_by_email(email=update_instance.email)
+            user_id = keycloak_instance.get_user_id_by_email(
+                email=update_instance.email
+            )
             keycloak_instance.get_instance().update_user(
                 user_id=user_id,
                 payload={
