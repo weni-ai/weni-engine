@@ -137,21 +137,21 @@ class User(AbstractBaseUser, PermissionsMixin):
         help_text=_("how the weni platform will help your team"),
         max_length=100,
         null=True,
-        blank=True
+        blank=True,
     )
     company_segment = models.CharField(
         verbose_name=_("company segment"),
         help_text=_("the segment of your company"),
         max_length=100,
         null=True,
-        blank=True
+        blank=True,
     )
     position = models.CharField(
         verbose_name=_("company position"),
         help_text=_("Your position in the company"),
         max_length=100,
         null=True,
-        blank=True
+        blank=True,
     )
     first_login = models.BooleanField(default=False)
     first_login_token = models.TextField(null=True)
@@ -164,7 +164,11 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     @property
     def other_positions(self):
-        return self.position.split(":")[1] if self.position and "other:" in self.position else None
+        return (
+            self.position.split(":")[1]
+            if self.position and "other:" in self.position
+            else None
+        )
 
     def check_password_reset_token(self, token):
         return self.token_generator.check_token(self, token)
@@ -189,7 +193,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         context = {
             "user_name": self.first_name,
             "before_nickname": before_nickname,
-            "new_nickname": new_nickname
+            "new_nickname": new_nickname,
         }
         send_mail(
             _("Nickname changed"),
@@ -202,7 +206,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         )
 
     def send_request_flow_user_info(self, flow_data):  # pragma: no cover
-        if not flow_data.get('send_request_flow'):
+        if not flow_data.get("send_request_flow"):
             return False
         company_size_mapping = [
             "1 - 20",
@@ -212,12 +216,12 @@ class User(AbstractBaseUser, PermissionsMixin):
             "1001+",
             "somente eu",
             "2 - 10",
-            "11 - 20"
+            "11 - 20",
         ]
         requests.post(
             url=f"{settings.FLOWS_URL}api/v2/flow_starts.json",
             json={
-                "flow": flow_data.get('flow_uuid'),
+                "flow": flow_data.get("flow_uuid"),
                 "params": {
                     "first_name": self.first_name,
                     "last_name": self.last_name,
@@ -227,7 +231,9 @@ class User(AbstractBaseUser, PermissionsMixin):
                     "phone": self.phone,
                     "utm": self.utm,
                     "email_marketing": self.email_marketing,
-                    "company_colaborators": company_size_mapping[self.number_people] if self.number_people else None,
+                    "company_colaborators": company_size_mapping[self.number_people]
+                    if self.number_people
+                    else None,
                     "company_name": self.company_name,
                     "company_sector": self.company_sector,
                     "company_segment": self.company_segment,
@@ -236,9 +242,7 @@ class User(AbstractBaseUser, PermissionsMixin):
                 },
                 "urns": [f"mailto:{self.email}"],
             },
-            headers={
-                "Authorization": f"Token {flow_data.get('token_authorization')}"
-            },
+            headers={"Authorization": f"Token {flow_data.get('token_authorization')}"},
         )
 
     @property
@@ -249,7 +253,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     def update_language(self, language: str):
         from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
         from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
-        from connect.api.v1.internal.intelligence.intelligence_rest_client import IntelligenceRESTClient
+        from connect.api.v1.internal.intelligence.intelligence_rest_client import (
+            IntelligenceRESTClient,
+        )
 
         chats_rest = ChatsRESTClient()
         flows_rest = FlowsRESTClient()
@@ -266,12 +272,24 @@ class User(AbstractBaseUser, PermissionsMixin):
         self.save(update_fields=["first_login_token"])
 
     def set_verify_email(self):
-
         self.first_login = False
         keycloak = KeycloakControl()
         keycloak.set_verify_email(self.email)
 
         self.save(update_fields=["first_login"])
+
+    def set_identity_providers(self):
+        keycloak = KeycloakControl()
+        response = keycloak.get_user_by_email(self.email)
+        federated_identities = response.get("federatedIdentities", [])
+        for identity in federated_identities:
+            provider = identity.get("identityProvider")
+            provider_user_id = identity.get("userId")
+            if self.identity_provider.filter(provider=provider).exists():
+                continue
+            self.identity_provider.create(
+                provider=provider, provider_user_id=provider_user_id
+            )
 
     @property
     def get_company_data(self):
@@ -280,14 +298,24 @@ class User(AbstractBaseUser, PermissionsMixin):
             company_segment=self.company_segment,
             company_sector=self.company_sector,
             number_people=self.number_people,
-            weni_helps=self.weni_helps
+            weni_helps=self.weni_helps,
         )
 
 
 class UserEmailSetup(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="email_setup")
+    user = models.OneToOneField(
+        User, on_delete=models.CASCADE, related_name="email_setup"
+    )
     receive_project_emails = models.BooleanField(default=True)
     receive_organization_emails = models.BooleanField(default=True)
 
     def __str__(self) -> str:
         return f"User: Receive Organization emails: {self.receive_organization_emails}, Receive Project emails: {self.receive_project_emails}"
+
+
+class UserIdentityProvider(models.Model):
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="identity_provider"
+    )
+    provider = models.CharField(max_length=255)
+    provider_user_id = models.CharField(max_length=255)

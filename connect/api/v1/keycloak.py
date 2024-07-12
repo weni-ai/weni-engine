@@ -18,6 +18,13 @@ class KeycloakControl:  # pragma: no cover
             auto_refresh_token=["get", "post", "put", "delete"],
         )
 
+    def get_user_by_email(self, email: str):
+        """
+        Get user by email
+        """
+        user_id = self.get_user_id_by_email(email)
+        return self.instance.get_user(user_id)
+
     def get_user_id_by_email(self, email: str) -> str:
         """
         Get internal keycloak user id from email
@@ -42,24 +49,29 @@ class KeycloakControl:  # pragma: no cover
         if user_id is not None:
             if active:
                 response = self.instance.update_user(
-                    user_id=user_id,
-                    payload={'requiredActions': ['CONFIGURE_TOTP']}
+                    user_id=user_id, payload={"requiredActions": ["CONFIGURE_TOTP"]}
                 )
                 return response
             else:
                 # remove required action
                 response = self.instance.update_user(
-                    user_id=user_id,
-                    payload={'requiredActions': []}
+                    user_id=user_id, payload={"requiredActions": []}
                 )
                 # remove otp credential
                 credentials = self.get_credentials(email)
-                credential_id = next((credential["id"] for credential in credentials if credential["type"] == "otp"), None)
+                credential_id = next(
+                    (
+                        credential["id"]
+                        for credential in credentials
+                        if credential["type"] == "otp"
+                    ),
+                    None,
+                )
                 if credential_id:
                     self.remove_credential(user_id, credential_id)
                 return response
         else:
-            return 'User not found'
+            return "User not found"
 
     def get_credentials(self, email):
         # using requests until we update python-keycloak version
@@ -70,7 +82,10 @@ class KeycloakControl:  # pragma: no cover
 
         headers = {"Authorization": f"Bearer {token}"}
 
-        r = requests.get(f"{server_url}admin/realms/{realm_name}/users/{user_id}/credentials", headers=headers)
+        r = requests.get(
+            f"{server_url}admin/realms/{realm_name}/users/{user_id}/credentials",
+            headers=headers,
+        )
         return json.loads(r.text)
 
     def remove_credential(self, user_id, credential_id):
@@ -80,7 +95,10 @@ class KeycloakControl:  # pragma: no cover
 
         headers = {"Authorization": f"Bearer {token}"}
 
-        r = requests.delete(f"{server_url}admin/realms/{realm_name}/users/{user_id}/credentials/{credential_id}", headers=headers)
+        r = requests.delete(
+            f"{server_url}admin/realms/{realm_name}/users/{user_id}/credentials/{credential_id}",
+            headers=headers,
+        )
 
         return r.status_code
 
@@ -91,7 +109,9 @@ class KeycloakControl:  # pragma: no cover
 
         headers = {"Authorization": f"Bearer {token}"}
 
-        r = requests.delete(f"{server_url}admin/realms/{realm_name}/users/{user_id}", headers=headers)
+        r = requests.delete(
+            f"{server_url}admin/realms/{realm_name}/users/{user_id}", headers=headers
+        )
 
         return r.status_code
 
@@ -99,9 +119,8 @@ class KeycloakControl:  # pragma: no cover
         user_id = self.get_user_id_by_email(email)
         if user_id is not None:
             response = self.instance.update_user(
-                user_id=user_id,
-                payload={'requiredActions': ['VERIFY_EMAIL']}
+                user_id=user_id, payload={"requiredActions": ["VERIFY_EMAIL"]}
             )
             return response
         else:
-            return 'User not found'
+            return "User not found"
