@@ -18,7 +18,7 @@ import sentry_sdk
 from django.utils.log import DEFAULT_LOGGING
 from django.utils.translation import ugettext_lazy as _
 from sentry_sdk.integrations.django import DjangoIntegration
-
+from .sentry_config import ignore_msgs
 environ.Env.read_env(env_file=(environ.Path(__file__) - 2)(".env"))
 
 env = environ.Env(
@@ -344,6 +344,7 @@ if USE_SENTRY:
         dsn=env.str("SENTRY_URL"),
         integrations=[DjangoIntegration()],
         environment=env.str("ENVIRONMENT"),
+        before_send=ignore_msgs,
     )
 
 # Elastic Observability APM
