@@ -788,8 +788,8 @@ def list_project_flows(flow_organization: str):
 
 @app.task(name="delete_recent_activities")
 def delete_recent_activities():
-    date_limit = pendulum.now().start_of("day").subtract(30)
-    RecentActivity.objects.filter(created_on__lte=date_limit).delete()
+    date_limit = pendulum.now().start_of("day").subtract(days=180)
+    RecentActivity.objects.filter(created_on__lte=date_limit).count()
 
 
 @app.task(name="send_user_flow_info", ignore_result=True)
