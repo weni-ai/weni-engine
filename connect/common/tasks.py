@@ -788,7 +788,7 @@ def list_project_flows(flow_organization: str):
 
 @app.task(name="delete_recent_activities")
 def delete_recent_activities():
-    date_limit = pendulum.now().start_of("day").subtract(30)
+    date_limit = pendulum.now().start_of("day").subtract(days=180)
     RecentActivity.objects.filter(created_on__lte=date_limit).delete()
 
 

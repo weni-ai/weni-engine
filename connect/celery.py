@@ -100,6 +100,10 @@ app.conf.beat_schedule = {
     "keycloak_logs_cleanup_routine": {
         "task": "keycloak_logs_cleanup_routine",
         "schedule": schedules.crontab(hour="23", minute=30)
+    },
+    "recent_activity_cleanup_routine": {
+        "task": "delete_recent_activities",
+        "schedule": schedules.crontab(hour="23", minute=0)
     }
 }
 
