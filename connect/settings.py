@@ -14,10 +14,8 @@ import os
 import sys
 
 import environ
-import sentry_sdk
 from django.utils.log import DEFAULT_LOGGING
 from django.utils.translation import ugettext_lazy as _
-from sentry_sdk.integrations.django import DjangoIntegration
 
 environ.Env.read_env(env_file=(environ.Path(__file__) - 2)(".env"))
 
@@ -101,7 +99,8 @@ env = environ.Env(
     TOKEN_AUTHORIZATION_FLOW_PRODUCT=(str, None),
     CREATE_AI_ORGANIZATION=(bool, False),
     VERIFICATION_MARKETING_TOKEN=(str, ""),
-    ELASTICSEARCH_TIMEOUT_REQUEST=(int, 10)
+    ELASTICSEARCH_TIMEOUT_REQUEST=(int, 10),
+    FILTER_SENTRY_EVENTS=(list, []),
 )
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -147,6 +146,7 @@ INSTALLED_APPS = [
     "connect.internals",
     "connect.template_projects",
     "connect.alerts",
+    "connect.sentry",
     "django_celery_results",
     "django_celery_beat",
     "storages",
@@ -335,16 +335,9 @@ CSRF_COOKIE_SECURE = env.bool("CSRF_COOKIE_SECURE")
 # Sentry Environment
 
 USE_SENTRY = env.bool("USE_SENTRY")
-
-
-# Sentry
-
-if USE_SENTRY:
-    sentry_sdk.init(
-        dsn=env.str("SENTRY_URL"),
-        integrations=[DjangoIntegration()],
-        environment=env.str("ENVIRONMENT"),
-    )
+SENTRY_URL = env.str("SENTRY_URL")
+ENVIRONMENT = env.str("ENVIRONMENT")
+FILTER_SENTRY_EVENTS = env.list("FILTER_SENTRY_EVENTS")
 
 # Elastic Observability APM
 ELASTIC_APM = {
