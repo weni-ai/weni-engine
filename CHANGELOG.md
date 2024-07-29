@@ -1,3 +1,8 @@
+# 3.27.1
+## *Add*
+  - Add celery task to remove Recent Activities after 180 days
+  - Add filter to exceptions on Sentry
+
 # 3.27.0
   - Add mapper to identity_provider on keycloak
   - Add new fields to organization
