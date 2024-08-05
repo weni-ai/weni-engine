@@ -29,24 +29,18 @@ class WeniOIDCAuthenticationBackend(OIDCAuthenticationBackend):
 
     def get_userinfo(self, access_token, *args):
         if not self.cache_token:
-            return self._fetch_userinfo(access_token, *args)
+            return super().get_userinfo(access_token, *args)
 
         redis_connection = get_redis_connection()
-        cached_userinfo = redis_connection.get(access_token)
 
-        if cached_userinfo:
-            return json.loads(cached_userinfo)
+        userinfo = redis_connection.get(access_token)
 
-        userinfo = self._fetch_userinfo(access_token, *args)
+        if userinfo is not None:
+            return json.loads(userinfo)
+
+        userinfo = super().get_userinfo(access_token, *args)
         redis_connection.set(access_token, json.dumps(userinfo), self.cache_ttl)
 
-        return userinfo
-
-    def _fetch_userinfo(self, access_token, *args):
-        userinfo = super().get_userinfo(access_token, *args)
-        userinfo["identity_provider"] = jwt.decode(
-            access_token, options={"verify_signature": False}
-        ).get("identity_provider")
         return userinfo
 
     def verify_claims(self, claims):
@@ -68,7 +62,6 @@ class WeniOIDCAuthenticationBackend(OIDCAuthenticationBackend):
 
         username = self.get_username(claims)
         user = self.UserModel.objects.create_user(email, username)
-        identity_provider = claims.get("identity_provider")
 
         old_username = user.username
         user.username = claims.get("preferred_username", old_username)
@@ -88,8 +81,6 @@ class WeniOIDCAuthenticationBackend(OIDCAuthenticationBackend):
             user.language = language
 
         user.save()
-
-        user.set_identity_providers(identity_provider=identity_provider)
         check_module_permission(claims, user)
 
         if settings.SYNC_ORGANIZATION_INTELIGENCE:
@@ -102,12 +93,8 @@ class WeniOIDCAuthenticationBackend(OIDCAuthenticationBackend):
         return user
 
     def update_user(self, user, claims):
-        identity_provider = claims.get("identity_provider")
         user.name = claims.get("name", "")
         user.email = claims.get("email", "")
-
-        if identity_provider:
-            user.set_identity_providers(identity_provider=identity_provider)
         user.save()
 
         check_module_permission(claims, user)
@@ -118,7 +105,9 @@ class WeniOIDCAuthenticationBackend(OIDCAuthenticationBackend):
 class WeniOIDCAuthentication(OIDCAuthentication):
     def authenticate(self, request):
         instance = super().authenticate(request=request)
-
+        identity_provider = jwt.decode(
+            instance[1], options={"verify_signature": False}
+        ).get("identity_provider")
         if instance is None:
             return instance
 
@@ -135,6 +124,9 @@ class WeniOIDCAuthentication(OIDCAuthentication):
 
         if user.first_login and not user.first_login_token:
             user.save_first_login_token(instance[1])
+
+        if identity_provider:
+            user.set_identity_providers(identity_provider=identity_provider)
 
         WeniOIDCAuthentication.verify_login(user, instance[1])
 
