@@ -1,9 +1,14 @@
+# 3.27.2
+## *Add*
+  - Add user Identity Provider on authentication
+
 # 3.27.1
 ## *Add*
   - Add celery task to remove Recent Activities after 180 days
   - Add filter to exceptions on Sentry
 
 # 3.27.0
+## *Add*
   - Add mapper to identity_provider on keycloak
   - Add new fields to organization
   - Add new update password rule
