@@ -282,8 +282,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         if not self.identity_provider.filter(provider=identity_provider).exists():
             self.identity_provider.create(provider=identity_provider)
 
-        self.save()
-
     @property
     def get_company_data(self):
         return dict(
