@@ -1,3 +1,7 @@
+# 3.27.3
+## *Fix*
+  - Fix error when try set Identity Provider for users
+
 # 3.27.2
 ## *Add*
   - Add user Identity Provider on authentication
