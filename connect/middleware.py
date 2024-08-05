@@ -1,5 +1,6 @@
 import json
 import logging
+import jwt
 
 from django.conf import settings
 from django.utils import translation
@@ -68,7 +69,6 @@ class WeniOIDCAuthenticationBackend(OIDCAuthenticationBackend):
         user.last_name = claims.get("family_name", "")
         user.email = claims.get("email", "")
         user.first_login = True
-        user.set_identity_providers()
 
         if locale:
             if locale.lower() == "pt-br":
@@ -81,7 +81,6 @@ class WeniOIDCAuthenticationBackend(OIDCAuthenticationBackend):
             user.language = language
 
         user.save()
-
         check_module_permission(claims, user)
 
         if settings.SYNC_ORGANIZATION_INTELIGENCE:
@@ -96,7 +95,6 @@ class WeniOIDCAuthenticationBackend(OIDCAuthenticationBackend):
     def update_user(self, user, claims):
         user.name = claims.get("name", "")
         user.email = claims.get("email", "")
-        user.set_identity_providers()
         user.save()
 
         check_module_permission(claims, user)
@@ -107,7 +105,9 @@ class WeniOIDCAuthenticationBackend(OIDCAuthenticationBackend):
 class WeniOIDCAuthentication(OIDCAuthentication):
     def authenticate(self, request):
         instance = super().authenticate(request=request)
-
+        identity_provider = jwt.decode(
+            instance[1], options={"verify_signature": False}
+        ).get("identity_provider")
         if instance is None:
             return instance
 
@@ -124,6 +124,9 @@ class WeniOIDCAuthentication(OIDCAuthentication):
 
         if user.first_login and not user.first_login_token:
             user.save_first_login_token(instance[1])
+
+        if identity_provider:
+            user.set_identity_providers(identity_provider=identity_provider)
 
         WeniOIDCAuthentication.verify_login(user, instance[1])
 
