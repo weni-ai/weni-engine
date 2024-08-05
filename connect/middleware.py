@@ -105,11 +105,11 @@ class WeniOIDCAuthenticationBackend(OIDCAuthenticationBackend):
 class WeniOIDCAuthentication(OIDCAuthentication):
     def authenticate(self, request):
         instance = super().authenticate(request=request)
+        if instance is None:
+            return instance
         identity_provider = jwt.decode(
             instance[1], options={"verify_signature": False}
         ).get("identity_provider")
-        if instance is None:
-            return instance
 
         if not instance[0] or instance[0].is_anonymous:
             return instance
