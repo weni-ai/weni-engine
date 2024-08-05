@@ -47,6 +47,7 @@ gunicorn = "19.9.0"
 gevent = "22.10.2"
 setuptools = "*"
 factory-boy = "^3.3.0"
+pyjwt = "^2.9.0"
 
 [tool.poetry.dev-dependencies]
 flake8 = "~=3.9.2"

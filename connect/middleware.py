@@ -1,5 +1,6 @@
 import json
 import logging
+import jwt
 
 from django.conf import settings
 from django.utils import translation
@@ -28,18 +29,24 @@ class WeniOIDCAuthenticationBackend(OIDCAuthenticationBackend):
 
     def get_userinfo(self, access_token, *args):
         if not self.cache_token:
-            return super().get_userinfo(access_token, *args)
+            return self._fetch_userinfo(access_token, *args)
 
         redis_connection = get_redis_connection()
+        cached_userinfo = redis_connection.get(access_token)
 
-        userinfo = redis_connection.get(access_token)
+        if cached_userinfo:
+            return json.loads(cached_userinfo)
 
-        if userinfo is not None:
-            return json.loads(userinfo)
-
-        userinfo = super().get_userinfo(access_token, *args)
+        userinfo = self._fetch_userinfo(access_token, *args)
         redis_connection.set(access_token, json.dumps(userinfo), self.cache_ttl)
 
+        return userinfo
+
+    def _fetch_userinfo(self, access_token, *args):
+        userinfo = super().get_userinfo(access_token, *args)
+        userinfo["identity_provider"] = jwt.decode(
+            access_token, options={"verify_signature": False}
+        ).get("identity_provider")
         return userinfo
 
     def verify_claims(self, claims):
@@ -61,6 +68,7 @@ class WeniOIDCAuthenticationBackend(OIDCAuthenticationBackend):
 
         username = self.get_username(claims)
         user = self.UserModel.objects.create_user(email, username)
+        identity_provider = claims.get("identity_provider")
 
         old_username = user.username
         user.username = claims.get("preferred_username", old_username)
@@ -68,7 +76,6 @@ class WeniOIDCAuthenticationBackend(OIDCAuthenticationBackend):
         user.last_name = claims.get("family_name", "")
         user.email = claims.get("email", "")
         user.first_login = True
-        user.set_identity_providers()
 
         if locale:
             if locale.lower() == "pt-br":
@@ -82,6 +89,7 @@ class WeniOIDCAuthenticationBackend(OIDCAuthenticationBackend):
 
         user.save()
 
+        user.set_identity_providers(identity_provider=identity_provider)
         check_module_permission(claims, user)
 
         if settings.SYNC_ORGANIZATION_INTELIGENCE:
@@ -94,9 +102,12 @@ class WeniOIDCAuthenticationBackend(OIDCAuthenticationBackend):
         return user
 
     def update_user(self, user, claims):
+        identity_provider = claims.get("identity_provider")
         user.name = claims.get("name", "")
         user.email = claims.get("email", "")
-        user.set_identity_providers()
+
+        if identity_provider:
+            user.set_identity_providers(identity_provider=identity_provider)
         user.save()
 
         check_module_permission(claims, user)

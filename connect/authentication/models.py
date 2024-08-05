@@ -278,18 +278,11 @@ class User(AbstractBaseUser, PermissionsMixin):
 
         self.save(update_fields=["first_login"])
 
-    def set_identity_providers(self):
-        keycloak = KeycloakControl()
-        response = keycloak.get_user_by_email(self.email)
-        federated_identities = response.get("federatedIdentities", [])
-        for identity in federated_identities:
-            provider = identity.get("identityProvider")
-            provider_user_id = identity.get("userId")
-            if self.identity_provider.filter(provider=provider).exists():
-                continue
-            self.identity_provider.create(
-                provider=provider, provider_user_id=provider_user_id
-            )
+    def set_identity_providers(self, identity_provider: str) -> None:
+        if not self.identity_provider.filter(provider=identity_provider).exists():
+            self.identity_provider.create(provider=identity_provider)
+
+        self.save()
 
     @property
     def get_company_data(self):
@@ -318,4 +311,3 @@ class UserIdentityProvider(models.Model):
         User, on_delete=models.CASCADE, related_name="identity_provider"
     )
     provider = models.CharField(max_length=255)
-    provider_user_id = models.CharField(max_length=255)
