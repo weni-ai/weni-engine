@@ -63,9 +63,10 @@ class DeleteAuthorizationUseCase(AuthorizationUseCase):
 
         org_auth = org.authorizations.get(user=user)
 
-        projects: QuerySet[Project] = org.project.all()
+        projects_uuids: QuerySet = user.project_authorizations_user.all().values_list("project", flat=True)
 
-        for project in projects:
+        for project_uuid in projects_uuids:
+            project = Project.objects.get(uuid=project_uuid)
             project_role = self.organization_permission_mapper.get(org_auth.role)
             self.delete_project_authorization(
                 project=project,
