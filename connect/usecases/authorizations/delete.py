@@ -63,7 +63,7 @@ class DeleteAuthorizationUseCase(AuthorizationUseCase):
 
         org_auth = org.authorizations.get(user=user)
 
-        projects_uuids: QuerySet = user.project_authorizations_user.all().values_list("project", flat=True)
+        projects_uuids: QuerySet = user.project_authorizations_user.filter(organization_authorization__organization=org).values_list("project", flat=True)
 
         for project_uuid in projects_uuids:
             project = Project.objects.get(uuid=project_uuid)
