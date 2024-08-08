@@ -1,3 +1,7 @@
+# 3.27.4
+## *Fix*
+  - Implemented adjustment to remove only user-present projects when revoking organization permission.
+
 # 3.27.3
 ## *Fix*
   - Fix error when try set Identity Provider for users
