@@ -52,6 +52,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             "authorization",
             "project_type",
             "description",
+            "brain_on"
         ]
         ref_name = None
 
@@ -76,7 +77,6 @@ class ProjectSerializer(serializers.ModelSerializer):
 
     authorization = serializers.SerializerMethodField(style={"show": False})
     project_type = serializers.SerializerMethodField()
-    brain_on = serializers.BooleanField(default=False)
 
     def get_project_type(self, obj):
         if obj.is_template:
@@ -103,7 +103,7 @@ class ProjectSerializer(serializers.ModelSerializer):
                 project_template_type = project_template_type_queryset.first()
                 template_name = project_template_type.name
 
-        brain_on = validated_data.get("brain_on", False)
+        brain_on = self.context["request"].data.get("brain_on", False)
 
         instance = Project.objects.create(
             name=validated_data.get("name"),
