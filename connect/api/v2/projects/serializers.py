@@ -77,6 +77,7 @@ class ProjectSerializer(serializers.ModelSerializer):
 
     authorization = serializers.SerializerMethodField(style={"show": False})
     project_type = serializers.SerializerMethodField()
+    brain_on = serializers.BooleanField(default=False)
 
     def get_project_type(self, obj):
         if obj.is_template:
