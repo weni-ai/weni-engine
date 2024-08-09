@@ -65,10 +65,10 @@ app.conf.beat_schedule = {
         "task": "connect.common.tasks.capture_invoice",
         "schedule": schedules.crontab(hour="8,10,13,15,17", minute=0),
     },
-    "sync_contacts": {
-        "task": "sync_contacts",
-        "schedule": schedules.crontab(hour=settings.SYNC_CONTACTS_SCHEDULE, minute=0)
-    },
+    # "sync_contacts": {
+    #     "task": "sync_contacts",
+    #     "schedule": schedules.crontab(hour=settings.SYNC_CONTACTS_SCHEDULE, minute=0)
+    # },
     # "sync-repositories-statistics": {
     #     "task": "connect.common.tasks.sync_repositories_statistics",
     #     "schedule": schedules.crontab(minute="*/8")
