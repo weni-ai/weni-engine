@@ -102,8 +102,8 @@ class ProjectSerializer(serializers.ModelSerializer):
                 project_template_type = project_template_type_queryset.first()
                 template_name = project_template_type.name
 
-        # brain_on = True if template_name == "blank" else False
-        brain_on = False
+        brain_on = validated_data.get("brain_on", False)
+
         instance = Project.objects.create(
             name=validated_data.get("name"),
             timezone=str(validated_data.get("timezone")),
