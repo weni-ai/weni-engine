@@ -91,6 +91,7 @@ class ProjectSerializer(serializers.ModelSerializer):
 
         template_uuid = self.context["request"].data.get("uuid")
         is_template = self.context["request"].data.get("template", False)
+        brain_on = self.context["request"].data.get('brain_on', False)
 
         if extra_data:
             template_uuid = extra_data.get("uuid", template_uuid)
