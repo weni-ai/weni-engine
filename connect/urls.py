@@ -17,6 +17,7 @@ from django.conf import settings
 from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+from django.http import HttpResponse
 from django.urls import path, include
 from drf_yasg2 import openapi
 from drf_yasg2.views import get_schema_view
@@ -24,7 +25,6 @@ from rest_framework import permissions
 
 from connect.api.v1 import urls as rookly_api_v1_urls
 from connect.api.grpc.project.handlers import grpc_handlers as grpc_project_handlers
-from connect.internals.views import HealthCheckView
 from connect.api.grpc.organization.handlers import (
     grpc_handlers as grpc_organization_handlers,
 )
@@ -45,7 +45,7 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
-    path("", HealthCheckView.as_view()),
+    path("", lambda _: HttpResponse()),
     path("docs/", schema_view.with_ui("redoc")),
     path("admin/", admin.site.urls),
     path("v1/", include(rookly_api_v1_urls)),
