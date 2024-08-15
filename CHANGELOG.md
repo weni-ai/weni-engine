@@ -1,3 +1,13 @@
+# 3.27.6
+## *Add*
+  - Send the `brain_on` boolean via EDA on Project creation
+  - Create the path for the HealthCheck
+  - Update the path for the API documentation
+
+# 3.27.5
+## *Fix*
+  - Deactivate unused tasks on Celery
+
 # 3.27.4
 ## *Fix*
   - Implemented adjustment to remove only user-present projects when revoking organization permission.
