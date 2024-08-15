@@ -24,6 +24,7 @@ from rest_framework import permissions
 
 from connect.api.v1 import urls as rookly_api_v1_urls
 from connect.api.grpc.project.handlers import grpc_handlers as grpc_project_handlers
+from connect.internals.views import HealthCheckView
 from connect.api.grpc.organization.handlers import (
     grpc_handlers as grpc_organization_handlers,
 )
@@ -44,7 +45,8 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
-    path("", schema_view.with_ui("redoc")),
+    path("", HealthCheckView.as_view()),
+    path("docs/", schema_view.with_ui("redoc")),
     path("admin/", admin.site.urls),
     path("v1/", include(rookly_api_v1_urls)),
     path("v2/", include(api_v2_urls)),
