@@ -145,6 +145,7 @@ class Organization(models.Model):
         _("Only users with external provider can access the organization"),
         default=False,
     )
+    config = models.JSONField(default=dict)
     objects = OrganizationManager()
 
     def __str__(self):
