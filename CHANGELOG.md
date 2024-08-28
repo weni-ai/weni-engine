@@ -1,3 +1,7 @@
+# 3.27.7
+## *Add*
+  - Add `show_chat_help` to Organization Serializer
+
 # 3.27.6
 ## *Add*
   - Send the `brain_on` boolean via EDA on Project creation
