@@ -115,7 +115,8 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
             "created_at",
             "is_suspended",
             "extra_integration",
-            "enforce_2fa"
+            "enforce_2fa",
+            "show_chat_help",
         ]
         ref_name = None
 
@@ -144,6 +145,8 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
         required=False,
         help_text=_("if this field is true, only users with 2fa activated can access the org")
     )
+
+    show_chat_help = serializers.SerializerMethodField()
 
     def create_organization(self, validated_data):  # pragma: no cover
         organization = {"id": 0}
@@ -235,6 +238,11 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
             obj.get_user_authorization(request.user)
         ).data
         return data
+
+    def get_show_chat_help(self, obj):
+        if obj.config.get("show_chat_help"):
+            return True
+        return obj.authorizations.order_by("created_at").first().user.number_people == 4
 
 
 class OrganizationAuthorizationSerializer(serializers.ModelSerializer):
