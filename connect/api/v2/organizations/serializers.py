@@ -43,7 +43,7 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
             "is_suspended",
             "extra_integration",
             "enforce_2fa",
-            'show_chat_help'
+            "show_chat_help",
         ]
         ref_name = None
 
@@ -90,7 +90,9 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
         instance = super(OrganizationSeralizer, self).create(validated_data)
         user = self.context["request"].user
 
-        authorizations = self.context["request"].data.get("organization").get("authorizations")
+        authorizations = (
+            self.context["request"].data.get("organization").get("authorizations")
+        )
 
         if settings.CREATE_AI_ORGANIZATION:
             created, data = instance.create_ai_organization(user.email)
@@ -111,11 +113,11 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
         ).data
         return data
 
-    def create_authorizations(self, instance: Organization, authorizations: list, user: User):
+    def create_authorizations(
+        self, instance: Organization, authorizations: list, user: User
+    ):
         # Create authorization for the organization owner
-        instance.authorizations.create(
-            user=user, role=OrganizationRole.ADMIN.value
-        )
+        instance.authorizations.create(user=user, role=OrganizationRole.ADMIN.value)
 
         instance.send_email_organization_create()
 
@@ -125,7 +127,7 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
                 email=authorization.get("user_email"),
                 organization=instance,
                 role=authorization.get("role"),
-                created_by=user
+                created_by=user,
             )
 
     def publish_create_org_message(self, instance: Organization, user: User):
@@ -133,7 +135,9 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
         authorizations = []
         for authorization in instance.authorizations.all():
             if authorization.can_contribute:
-                authorizations.append({"user_email": authorization.user.email, "role": authorization.role})
+                authorizations.append(
+                    {"user_email": authorization.user.email, "role": authorization.role}
+                )
 
         message_body = {
             "uuid": str(instance.uuid),
@@ -142,10 +146,12 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
             "user_email": user.email,
         }
         rabbitmq_publisher = RabbitmqPublisher()
-        rabbitmq_publisher.send_message(message_body, exchange="orgs.topic", routing_key="")
+        rabbitmq_publisher.send_message(
+            message_body, exchange="orgs.topic", routing_key=""
+        )
 
     def get_show_chat_help(self, obj):
-        if obj.config.get('show_chat_help'):
+        if obj.config.get("show_chat_help"):
             return True
         return obj.authorizations.order_by("created_at").first().user.number_people == 4
 
@@ -174,9 +180,9 @@ class PendingAuthorizationOrganizationSerializer(serializers.ModelSerializer):
         return attrs
 
     def validate_email(self, email):
-        if ' ' in email:
+        if " " in email:
             raise ValidationError(_("Email field cannot have spaces"))
-        if bool(re.match('[A-Z]', email)):
+        if bool(re.match("[A-Z]", email)):
             raise ValidationError(_("Email field cannot have uppercase characters"))
 
     def validate_role(self, role):
@@ -191,12 +197,9 @@ class PendingAuthorizationOrganizationSerializer(serializers.ModelSerializer):
         if user:
             return {
                 "name": f"{user.first_name} {user.last_name}",
-                "photo": user.photo_url
+                "photo": user.photo_url,
             }
-        return {
-            "name": None,
-            "photo": None
-        }
+        return {"name": None, "photo": None}
 
 
 class OrganizationExistingAuthorizationSerializer(serializers.ModelSerializer):
