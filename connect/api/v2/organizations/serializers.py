@@ -43,6 +43,7 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
             "is_suspended",
             "extra_integration",
             "enforce_2fa",
+            'show_chat_help'
         ]
         ref_name = None
 
@@ -72,6 +73,8 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
             "if this field is true, only users with 2fa activated can access the org"
         ),
     )
+
+    show_chat_help = serializers.SerializerMethodField()
 
     def create(self, validated_data):
         # Billing Cycle
@@ -140,6 +143,11 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
         }
         rabbitmq_publisher = RabbitmqPublisher()
         rabbitmq_publisher.send_message(message_body, exchange="orgs.topic", routing_key="")
+
+    def get_show_chat_help(self, obj):
+        if obj.config.get('show_chat_help'):
+            return True
+        return obj.authorizations.order_by("created_at").first().user.number_people == 4
 
 
 class PendingAuthorizationOrganizationSerializer(serializers.ModelSerializer):
