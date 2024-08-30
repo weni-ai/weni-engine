@@ -1,3 +1,7 @@
+# 3.27.8
+## *Add*
+  - Add to `show_chat_help` rule E-Commerce organizations
+
 # 3.27.7
 ## *Add*
   - Add `show_chat_help` to Organization Serializer
