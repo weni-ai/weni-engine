@@ -153,7 +153,8 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
     def get_show_chat_help(self, obj):
         if obj.config.get("show_chat_help"):
             return True
-        return obj.authorizations.order_by("created_at").first().user.number_people == 4
+        user = obj.authorizations.order_by("created_at").first().user
+        return user.number_people == 4 or user.company_segment in ['E-commerce', 'Comercio electrónico']
 
 
 class PendingAuthorizationOrganizationSerializer(serializers.ModelSerializer):
