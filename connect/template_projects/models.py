@@ -2,11 +2,17 @@ import uuid as uuid4
 
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
+from django.conf import settings
 from .storage import TemplateTypeImageStorage
 
 
 class TemplateType(models.Model):
-
+    language = models.CharField(
+        "language",
+        max_length=10,
+        choices=settings.LANGUAGES,
+        default='pt-br',
+    )
     level_field = [("low", 1), ("medium", 2), ("high", 3)]
     uuid = models.UUIDField(
         "UUID", default=uuid4.uuid4
@@ -40,7 +46,6 @@ class TemplateType(models.Model):
 
 
 class TemplateFeature(models.Model):
-
     features_types = [
         ("Flows", "Flows"),
         ("Integrations", "Integrations"),
