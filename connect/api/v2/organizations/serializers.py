@@ -22,7 +22,7 @@ from connect.api.v1.organization.serializers import (
 )
 from connect.api.v1.project.validators import CanContributeInOrganizationValidator
 from connect.internals.event_driven.producer.rabbitmq_publisher import RabbitmqPublisher
-
+from connect.api.v2.organizations.validators import IsHyperlinkValidator
 
 User = get_user_model()
 logger = logging.getLogger(__name__)
@@ -48,7 +48,7 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
         ref_name = None
 
     uuid = serializers.UUIDField(style={"show": False}, read_only=True)
-    name = serializers.CharField(max_length=40, required=True)
+    name = serializers.CharField(max_length=40, required=True, validators=[IsHyperlinkValidator()])
     inteligence_organization = serializers.IntegerField(read_only=True)
     authorization = serializers.SerializerMethodField(style={"show": False})
     organization_billing = BillingPlanSerializer(read_only=True)

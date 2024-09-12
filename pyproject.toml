@@ -48,6 +48,7 @@ gevent = "22.10.2"
 setuptools = "*"
 factory-boy = "^3.3.0"
 pyjwt = "^2.9.0"
+validators = "^0.34.0"
 
 [tool.poetry.dev-dependencies]
 flake8 = "~=3.9.2"
