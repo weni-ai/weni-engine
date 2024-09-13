@@ -8,12 +8,8 @@ from .storage import TemplateTypeImageStorage
 
 class TemplateType(models.Model):
     level_field = [("low", 1), ("medium", 2), ("high", 3)]
-    uuid = models.UUIDField(
-        "UUID", default=uuid4.uuid4
-    )
-    base_project_uuid = models.UUIDField(
-        "base project", blank=True, null=True
-    )
+    uuid = models.UUIDField("UUID", default=uuid4.uuid4)
+    base_project_uuid = models.UUIDField("base project", blank=True, null=True)
     category = ArrayField(base_field=models.CharField(max_length=255), default=list)
     description = models.TextField(blank=True, null=True)
     name = models.CharField(max_length=255, null=True, blank=True)
@@ -31,13 +27,15 @@ class TemplateTypeTranslation(models.Model):
     class Meta:
         unique_together = ["language", "template_type"]
 
-    template_type = models.ForeignKey(TemplateType, on_delete=models.CASCADE, related_name='translations')
+    template_type = models.ForeignKey(
+        TemplateType, on_delete=models.CASCADE, related_name="translations"
+    )
     category = ArrayField(base_field=models.CharField(max_length=255), default=list)
     language = models.CharField(
         "language",
         max_length=10,
         choices=settings.LANGUAGES,
-        default=settings.DEFAULT_LANGUAGE
+        default=settings.DEFAULT_LANGUAGE,
     )
     description = models.TextField(blank=True, null=True)
     name = models.CharField(max_length=255, null=True, blank=True)
@@ -50,14 +48,20 @@ class TemplateFeature(models.Model):
     features_types = [
         ("Flows", "Flows"),
         ("Integrations", "Integrations"),
-        ("Intelligences", "Intelligences")
+        ("Intelligences", "Intelligences"),
     ]
 
     description = models.TextField()
-    name = models.CharField(max_length=255)  # description="Name of the AI, only available if type == 'Intelligences'"
+    name = models.CharField(
+        max_length=255
+    )  # description="Name of the AI, only available if type == 'Intelligences'"
     type = models.CharField(max_length=255, choices=features_types)
-    feature_identifier = models.CharField(max_length=255)  # description="Identifier of the feature"
-    template_type = models.ForeignKey(TemplateType, on_delete=models.CASCADE, related_name='template_features')
+    feature_identifier = models.CharField(
+        max_length=255
+    )  # description="Identifier of the feature"
+    template_type = models.ForeignKey(
+        TemplateType, on_delete=models.CASCADE, related_name="template_features"
+    )
 
     def __str__(self):
         return self.name
@@ -67,12 +71,14 @@ class TemplateFeatureTranslation(models.Model):
     class Meta:
         unique_together = ["language", "template_feature"]
 
-    template_feature = models.ForeignKey(TemplateFeature, on_delete=models.CASCADE, related_name='translations')
+    template_feature = models.ForeignKey(
+        TemplateFeature, on_delete=models.CASCADE, related_name="translations"
+    )
     language = models.CharField(
         "language",
         max_length=10,
         choices=settings.LANGUAGES,
-        default=settings.DEFAULT_LANGUAGE
+        default=settings.DEFAULT_LANGUAGE,
     )
     description = models.TextField()
     name = models.CharField(max_length=255)
@@ -86,7 +92,7 @@ class TemplateSuggestion(models.Model):
         ("template", "template"),
         ("flow", "flow"),
         ("integration", "integration"),
-        ("intelligence", "intelligence")
+        ("intelligence", "intelligence"),
     ]
     type = models.CharField(max_length=255, choices=suggestion_type, default="template")
     created_at = models.DateTimeField(auto_now_add=True)

@@ -4,11 +4,14 @@ from django.test import TestCase
 from unittest.mock import patch
 from connect.storages import AvatarUserMediaStorage
 from connect.template_projects.storage import TemplateTypeImageStorage
-from connect.template_projects.models import TemplateType, TemplateFeature, TemplateSuggestion
+from connect.template_projects.models import (
+    TemplateType,
+    TemplateFeature,
+    TemplateSuggestion,
+)
 
 
 class TemplateTypeModelTestCase(TestCase):
-
     def setUp(self):
 
         self.template_type_object = TemplateType.objects.create(
@@ -16,7 +19,7 @@ class TemplateTypeModelTestCase(TestCase):
             category=["category"],
             description="description",
             name="name",
-            setup={"setup": "setup"}
+            setup={"setup": "setup"},
         )
 
     def test_str(self):
@@ -27,7 +30,6 @@ class TemplateTypeModelTestCase(TestCase):
 
 
 class TemplateFeatureModelTestCase(TestCase):
-
     def setUp(self):
 
         self.template_type_object = TemplateType.objects.create(
@@ -35,7 +37,7 @@ class TemplateFeatureModelTestCase(TestCase):
             category=["category"],
             description="description",
             name="name",
-            setup={"setup": "setup"}
+            setup={"setup": "setup"},
         )
 
         self.template_feature_object = TemplateFeature.objects.create(
@@ -43,7 +45,7 @@ class TemplateFeatureModelTestCase(TestCase):
             description="description",
             type="type",
             feature_identifier="feature_identifier",
-            template_type=self.template_type_object
+            template_type=self.template_type_object,
         )
 
     def test_str(self):
@@ -54,13 +56,10 @@ class TemplateFeatureModelTestCase(TestCase):
 
 
 class TemplateSuggestionModelTestCase(TestCase):
-
     def setUp(self):
 
         self.template_suggestion_object = TemplateSuggestion.objects.create(
-            suggestion="suggestion",
-            type="type",
-            status="status"
+            suggestion="suggestion", type="type", status="status"
         )
 
     def test_str(self):
@@ -71,9 +70,10 @@ class TemplateSuggestionModelTestCase(TestCase):
 
 
 class StorageTestCase(TestCase):
-
-    @patch.object(S3Boto3Storage, 'get_available_name')
-    def test_avatar_storage_get_available_name_with_override(self, mock_get_available_name):
+    @patch.object(S3Boto3Storage, "get_available_name")
+    def test_avatar_storage_get_available_name_with_override(
+        self, mock_get_available_name
+    ):
         storage = AvatarUserMediaStorage()
         storage.override_available_name = True
 
@@ -94,8 +94,10 @@ class StorageTestCase(TestCase):
 
         self.assertEqual(result, filename)
 
-    @patch.object(S3Boto3Storage, 'get_available_name')
-    def test_template_storage_get_available_name_with_override(self, mock_get_available_name):
+    @patch.object(S3Boto3Storage, "get_available_name")
+    def test_template_storage_get_available_name_with_override(
+        self, mock_get_available_name
+    ):
         storage = TemplateTypeImageStorage()
         storage.override_available_name = True
 

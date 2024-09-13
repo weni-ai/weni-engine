@@ -1,5 +1,10 @@
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
-from connect.template_projects.models import TemplateType, TemplateFeature, TemplateSuggestion
+
+from connect.template_projects.models import (
+    TemplateFeature,
+    TemplateSuggestion,
+    TemplateType,
+)
 
 
 class TemplateFeatureSerializer(ModelSerializer):
@@ -9,15 +14,15 @@ class TemplateFeatureSerializer(ModelSerializer):
     class Meta:
         model = TemplateFeature
         fields = [
-            'description',
-            'name',
-            'type',
-            'feature_identifier',
-            'template_type',
+            "description",
+            "name",
+            "type",
+            "feature_identifier",
+            "template_type",
         ]
 
     def _get_language(self):
-        request = self.context.get('request')
+        request = self.context.get("request")
         return request.user.language
 
     def get_description(self, obj):
@@ -42,13 +47,20 @@ class TemplateTypeSerializer(ModelSerializer):
     class Meta:
         model = TemplateType
         fields = [
-            'uuid', 'category', 'description', 'name',
-            'level', 'setup', 'photo', 'features',
-            'photo_description', 'base_project_uuid'
+            "uuid",
+            "category",
+            "description",
+            "name",
+            "level",
+            "setup",
+            "photo",
+            "features",
+            "photo_description",
+            "base_project_uuid",
         ]
 
     def _get_language(self):
-        request = self.context.get('request')
+        request = self.context.get("request")
         return request.user.language
 
     def get_name(self, obj):
@@ -77,7 +89,9 @@ class TemplateTypeSerializer(ModelSerializer):
         return obj.translations.get(language=lang).category
 
     def get_features(self, obj):
-        return TemplateFeatureSerializer(obj.template_features.all(), many=True, context=self.context).data
+        return TemplateFeatureSerializer(
+            obj.template_features.all(), many=True, context=self.context
+        ).data
 
 
 class RetrieveTemplateSerializer(ModelSerializer):
@@ -86,10 +100,10 @@ class RetrieveTemplateSerializer(ModelSerializer):
 
     class Meta:
         model = TemplateType
-        fields = ['uuid', 'description', 'name']
+        fields = ["uuid", "description", "name"]
 
     def _get_language(self):
-        request = self.context.get('request')
+        request = self.context.get("request")
         return request.user.language
 
     def get_description(self, obj):
@@ -102,7 +116,6 @@ class RetrieveTemplateSerializer(ModelSerializer):
 
 
 class TemplateSuggestionSerializer(ModelSerializer):
-
     class Meta:
         model = TemplateSuggestion
-        fields = ['suggestion', 'created_at', 'status']
+        fields = ["suggestion", "created_at", "status"]

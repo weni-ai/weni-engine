@@ -1,9 +1,20 @@
-from rest_framework.viewsets import ModelViewSet
-from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from connect.template_projects.models import TemplateType, TemplateFeature, TemplateSuggestion
-from .serializers import TemplateTypeSerializer, RetrieveTemplateSerializer, TemplateFeatureSerializer, TemplateSuggestionSerializer
+from rest_framework.response import Response
+from rest_framework.viewsets import ModelViewSet
+
+from connect.template_projects.models import (
+    TemplateFeature,
+    TemplateSuggestion,
+    TemplateType,
+)
+
 from .permission import IsAdminOrReadOnly
+from .serializers import (
+    RetrieveTemplateSerializer,
+    TemplateFeatureSerializer,
+    TemplateSuggestionSerializer,
+    TemplateTypeSerializer,
+)
 
 
 class TemplateTypeViewSet(ModelViewSet):
@@ -14,10 +25,10 @@ class TemplateTypeViewSet(ModelViewSet):
 
     def get_queryset(self):
         queryset = self.queryset
-        id = self.request.query_params.get('id', None)
-        name = self.request.query_params.get('name', None)
-        category = self.request.query_params.get('category', None)
-        uuid = self.request.query_params.get('uuid', None)
+        id = self.request.query_params.get("id", None)
+        name = self.request.query_params.get("name", None)
+        category = self.request.query_params.get("category", None)
+        uuid = self.request.query_params.get("uuid", None)
 
         if name:
             queryset = self.queryset.filter(name__iexact=name)
@@ -48,8 +59,8 @@ class TemplateFeatureViewSet(ModelViewSet):
 
     def get_queryset(self):
         queryset = self.queryset
-        id = self.request.query_params.get('id', None)
-        name = self.request.query_params.get('name', None)
+        id = self.request.query_params.get("id", None)
+        name = self.request.query_params.get("name", None)
         if name:
             queryset = self.queryset.filter(name__iexact=name)
         if id:
@@ -64,7 +75,7 @@ class TemplateSuggestionViewSet(ModelViewSet):
 
     def get_queryset(self):
         queryset = self.queryset
-        id = self.request.query_params.get('id', None)
+        id = self.request.query_params.get("id", None)
         if id:
             queryset = self.queryset.filter(pk=id)
         return queryset

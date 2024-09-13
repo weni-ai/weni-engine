@@ -19,7 +19,9 @@ def create_template_type(sender, instance, created, **kwargs):
         message_body = {
             "uuid": str(instance.uuid),
             "name": instance.name,
-            "project_uuid": str(instance.base_project_uuid)
+            "project_uuid": str(instance.base_project_uuid),
         }
 
-        rabbitmq_publisher.send_message(message_body, exchange="template-types.topic", routing_key="")
+        rabbitmq_publisher.send_message(
+            message_body, exchange="template-types.topic", routing_key=""
+        )
