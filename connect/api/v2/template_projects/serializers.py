@@ -131,13 +131,17 @@ class RetrieveTemplateSerializer(ModelSerializer):
 
     def get_description(self, obj):
         lang = self._get_language()
-        translation = obj.translations.get(language=lang)
-        return translation.description if translation else None
+        if obj.translations.filter(language=lang).exists():
+            translation = obj.translations.get(language=lang)
+            return translation.description
+        return None
 
     def get_name(self, obj):
         lang = self._get_language()
-        translation = obj.translations.get(language=lang)
-        return translation.name if translation else None
+        if obj.translations.filter(language=lang).exists():
+            translation = obj.translations.get(language=lang)
+            return translation.name
+        return None
 
 
 class TemplateSuggestionSerializer(ModelSerializer):
