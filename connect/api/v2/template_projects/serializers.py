@@ -36,6 +36,7 @@ class TemplateTypeSerializer(ModelSerializer):
     setup = SerializerMethodField()
     photo = SerializerMethodField()
     photo_description = SerializerMethodField()
+    category = SerializerMethodField()
     features = SerializerMethodField()
 
     class Meta:
