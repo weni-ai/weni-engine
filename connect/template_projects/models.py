@@ -26,24 +26,13 @@ class TemplateType(models.Model):
     def __str__(self):
         return self.name if self.name else str(self.uuid)
 
-    def get_template_code(self, template_name):
-        mapping_template = {
-            "Suporte": "support",
-            "Financeiro Integrado com a Omie | ChatGPT": "omie_financial+chatgpt",
-            "Captura de Leads | ChatGPT": "lead_capture+chatgpt",
-            "Captura de Leads": "lead_capture",
-            "SAC | ChatGPT": "sac+chatgpt",
-            "Financeiro Integrado com a Omie": "omie_financial",
-            "Captura de leads com Omie": "omie_lead_capture",
-        }
-        return mapping_template.get(template_name, "blank")
-
 
 class TemplateTypeTranslation(models.Model):
     class Meta:
         unique_together = ["language", "template_type"]
 
     template_type = models.ForeignKey(TemplateType, on_delete=models.CASCADE, related_name='translations')
+    category = ArrayField(base_field=models.CharField(max_length=255), default=list)
     language = models.CharField(
         "language",
         max_length=10,

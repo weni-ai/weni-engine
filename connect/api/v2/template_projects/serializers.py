@@ -71,6 +71,10 @@ class TemplateTypeSerializer(ModelSerializer):
         lang = self._get_language()
         return obj.translations.get(language=lang).photo_description
 
+    def get_category(self, obj):
+        lang = self._get_language()
+        return obj.translations.get(language=lang).category
+
     def get_features(self, obj):
         return TemplateFeatureSerializer(obj.template_features.all(), many=True, context=self.context).data
 
