@@ -27,11 +27,17 @@ class TemplateFeatureSerializer(ModelSerializer):
 
     def get_description(self, obj):
         lang = self._get_language()
-        return obj.translations.get(language=lang).description
+        if obj.translations.filter(language=lang).exists():
+            translation = obj.translations.get(language=lang)
+            return translation.description
+        return None
 
     def get_name(self, obj):
         lang = self._get_language()
-        return obj.translations.get(language=lang).name
+        if obj.translations.filter(language=lang).exists():
+            translation = obj.translations.get(language=lang)
+            return translation.name
+        return None
 
 
 class TemplateTypeSerializer(ModelSerializer):
@@ -65,28 +71,45 @@ class TemplateTypeSerializer(ModelSerializer):
 
     def get_name(self, obj):
         lang = self._get_language()
-        return obj.translations.get(language=lang).name
+        if obj.translations.filter(language=lang).exists():
+            translation = obj.translations.get(language=lang)
+            return translation.name
+        return None
 
     def get_description(self, obj):
         lang = self._get_language()
-        return obj.translations.get(language=lang).description
+        if obj.translations.filter(language=lang).exists():
+            translation = obj.translations.get(language=lang)
+            return translation.description
+        return None
 
     def get_setup(self, obj):
         lang = self._get_language()
-        return obj.translations.get(language=lang).setup
+        if obj.translations.filter(language=lang).exists():
+            translation = obj.translations.get(language=lang)
+            return translation.setup
+        return None
 
     def get_photo(self, obj):
         lang = self._get_language()
-        translation = obj.translations.get(language=lang)
-        return translation.photo.url if translation.photo else None
+        if obj.translations.filter(language=lang).exists():
+            translation = obj.translations.get(language=lang)
+            return translation.photo.url
+        return None
 
     def get_photo_description(self, obj):
         lang = self._get_language()
-        return obj.translations.get(language=lang).photo_description
+        if obj.translations.filter(language=lang).exists():
+            translation = obj.translations.get(language=lang)
+            return translation.photo_description
+        return None
 
     def get_category(self, obj):
         lang = self._get_language()
-        return obj.translations.get(language=lang).category
+        if obj.translations.filter(language=lang).exists():
+            translation = obj.translations.get(language=lang)
+            return translation.category
+        return None
 
     def get_features(self, obj):
         return TemplateFeatureSerializer(
@@ -108,11 +131,13 @@ class RetrieveTemplateSerializer(ModelSerializer):
 
     def get_description(self, obj):
         lang = self._get_language()
-        return obj.translations.get(language=lang).description
+        translation = obj.translations.get(language=lang)
+        return translation.description if translation else None
 
     def get_name(self, obj):
         lang = self._get_language()
-        return obj.translations.get(language=lang).name
+        translation = obj.translations.get(language=lang)
+        return translation.name if translation else None
 
 
 class TemplateSuggestionSerializer(ModelSerializer):
