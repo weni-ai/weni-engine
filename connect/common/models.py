@@ -2418,14 +2418,14 @@ class RecentActivity(models.Model):
     TRAIN = "TRAIN"
     DELETE = "DELETE"
 
-    ACTIONS_CHOICES = {
+    ACTIONS_CHOICES = [
         (ADD, "Add"),
         (CREATE, "Entity Created"),
         (UPDATE, "Entity updated"),
         (INTEGRATE, "Entity integrated"),
         (TRAIN, "Entity Trained"),
         (DELETE, "Entity Deleted"),
-    }
+    ]
 
     USER = "USER"
     FLOW = "FLOW"
@@ -2435,7 +2435,7 @@ class RecentActivity(models.Model):
     AI = "AI"
     NEXUS = "NEXUS"
 
-    ENTITY_CHOICES = (
+    ENTITY_CHOICES = [
         (USER, "User Entity"),
         (FLOW, "Flow Entity"),
         (CHANNEL, "Channel Entity"),
@@ -2443,7 +2443,7 @@ class RecentActivity(models.Model):
         (CAMPAIGN, "Campaign Entity"),
         (AI, "Artificial Intelligence Entity"),
         (NEXUS, "Artificial Intelligence Entity"),
-    )
+    ]
 
     project = models.ForeignKey(
         Project, on_delete=models.CASCADE, related_name="project_recent_activity"
