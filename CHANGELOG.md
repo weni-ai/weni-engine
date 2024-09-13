@@ -1,3 +1,7 @@
+# 3.28.0
+## *Add*
+  - Add to the `TemplateType` and `TemplateFeature` models to enable content translation.
+
 # 3.27.8
 ## *Add*
   - Add to `show_chat_help` rule E-Commerce organizations
