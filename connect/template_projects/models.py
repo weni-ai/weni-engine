@@ -7,12 +7,6 @@ from .storage import TemplateTypeImageStorage
 
 
 class TemplateType(models.Model):
-    language = models.CharField(
-        "language",
-        max_length=10,
-        choices=settings.LANGUAGES,
-        default='pt-br',
-    )
     level_field = [("low", 1), ("medium", 2), ("high", 3)]
     uuid = models.UUIDField(
         "UUID", default=uuid4.uuid4
@@ -45,6 +39,24 @@ class TemplateType(models.Model):
         return mapping_template.get(template_name, "blank")
 
 
+class TemplateTypeTranslation(models.Model):
+    class Meta:
+        unique_together = ["language", "template_type"]
+
+    template_type = models.ForeignKey(TemplateType, on_delete=models.CASCADE, related_name='translations')
+    language = models.CharField(
+        "language",
+        max_length=10,
+        choices=settings.LANGUAGES,
+        default=settings.DEFAULT_LANGUAGE
+    )
+    description = models.TextField(blank=True, null=True)
+    name = models.CharField(max_length=255, null=True, blank=True)
+    setup = models.JSONField(blank=True, null=True)
+    photo = models.ImageField(storage=TemplateTypeImageStorage(), blank=True, null=True)
+    photo_description = models.TextField(blank=True, null=True)
+
+
 class TemplateFeature(models.Model):
     features_types = [
         ("Flows", "Flows"),
@@ -60,6 +72,21 @@ class TemplateFeature(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class TemplateFeatureTranslation(models.Model):
+    class Meta:
+        unique_together = ["language", "template_feature"]
+
+    template_feature = models.ForeignKey(TemplateFeature, on_delete=models.CASCADE, related_name='translations')
+    language = models.CharField(
+        "language",
+        max_length=10,
+        choices=settings.LANGUAGES,
+        default=settings.DEFAULT_LANGUAGE
+    )
+    description = models.TextField()
+    name = models.CharField(max_length=255)
 
 
 class TemplateSuggestion(models.Model):

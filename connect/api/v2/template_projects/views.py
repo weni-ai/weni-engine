@@ -13,7 +13,7 @@ class TemplateTypeViewSet(ModelViewSet):
     permission_classes = [IsAdminOrReadOnly]
 
     def get_queryset(self):
-        queryset = self.queryset.filter(language=self.request.user.language)
+        queryset = self.queryset
         id = self.request.query_params.get('id', None)
         name = self.request.query_params.get('name', None)
         category = self.request.query_params.get('category', None)
