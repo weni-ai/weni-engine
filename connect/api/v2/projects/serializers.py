@@ -27,7 +27,7 @@ from connect.common.models import (
 from connect.internals.event_driven.producer.rabbitmq_publisher import RabbitmqPublisher
 from connect.template_projects.models import TemplateType
 from connect.usecases.project.update_project import UpdateProjectUseCase
-
+from connect.api.v2.organizations.validators import IsHyperlinkValidator
 
 logger = logging.getLogger(__name__)
 User = get_user_model()
@@ -57,7 +57,7 @@ class ProjectSerializer(serializers.ModelSerializer):
         ref_name = None
 
     uuid = serializers.UUIDField(style={"show": False}, read_only=True)
-    name = serializers.CharField(max_length=500, required=True)
+    name = serializers.CharField(max_length=500, required=True, validators=[IsHyperlinkValidator()])
     description = serializers.CharField(max_length=1000, required=False)
     organization = serializers.PrimaryKeyRelatedField(
         queryset=Organization.objects,
