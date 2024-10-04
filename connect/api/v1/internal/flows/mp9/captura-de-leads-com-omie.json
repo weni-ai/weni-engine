@@ -20,7 +20,7 @@
       "metadata": {
         "expires": 10080
       },
-      "name": "Apagar dados do Lead",
+      "name": "Delete Lead Data",
       "nodes": [
         {
           "actions": [
@@ -53,8 +53,8 @@
             },
             {
               "field": {
-                "key": "codigo_conta",
-                "name": "Codigo Conta"
+                "key": "account_code",
+                "name": "Account Code"
               },
               "type": "set_contact_field",
               "uuid": "7e86446a-4d25-4d40-a3b9-676ef84ddd0d",
@@ -62,8 +62,8 @@
             },
             {
               "field": {
-                "key": "codigo_origem",
-                "name": "Codigo Origem"
+                "key": "source_code",
+                "name": "Source Code"
               },
               "type": "set_contact_field",
               "uuid": "b68c487c-9488-41bf-94d1-aace6e9ced8d",
@@ -71,8 +71,8 @@
             },
             {
               "field": {
-                "key": "codigo_solucao",
-                "name": "Codigo Solucao"
+                "key": "solution_code",
+                "name": "Solution Code"
               },
               "type": "set_contact_field",
               "uuid": "b65da39f-be78-446d-8c18-114c1d263936",
@@ -80,8 +80,8 @@
             },
             {
               "field": {
-                "key": "codigo_vendedor",
-                "name": "Codigo Vendedor"
+                "key": "seller_code",
+                "name": "Seller Code"
               },
               "type": "set_contact_field",
               "uuid": "8d565c8c-07fb-4e0b-9a19-dd78b0eb399e",
@@ -124,8 +124,8 @@
             "config": {
               "cases": {},
               "operand": {
-                "id": "codigo_origem",
-                "name": "Codigo Origem",
+                "id": "source_code",
+                "name": "Source Code",
                 "type": "field"
               }
             },
@@ -139,8 +139,8 @@
             "config": {
               "cases": {},
               "operand": {
-                "id": "codigo_conta",
-                "name": "Codigo Conta",
+                "id": "account_code",
+                "name": "Account Code",
                 "type": "field"
               }
             },
@@ -154,8 +154,8 @@
             "config": {
               "cases": {},
               "operand": {
-                "id": "codigo_vendedor",
-                "name": "Codigo Vendedor",
+                "id": "seller_code",
+                "name": "Seller Code",
                 "type": "field"
               }
             },
@@ -254,8 +254,8 @@
             "config": {
               "cases": {},
               "operand": {
-                "id": "codigo_solucao",
-                "name": "Codigo Solucao",
+                "id": "solution_code",
+                "name": "Solution Code",
                 "type": "field"
               }
             },
@@ -275,7 +275,7 @@
         },
         "stickies": {
           "5c15cfbf-f388-432b-ae13-212d494dfc30": {
-            "body": "Nesta etapa geramos um c\u00f3digo unico da integra\u00e7\u00e3o da oportunidade.\n\nCada oportunidade deve ter um c\u00f3digo diferente",
+            "body": "In this step, we generate a unique code for the opportunity integration.\n\nEach opportunity must have a different code",
             "color": "purple",
             "position": {
               "bottom": null,
@@ -283,10 +283,10 @@
               "right": null,
               "top": 200
             },
-            "title": "Gera\u00e7\u00e3o do codigo da oportunidade"
+            "title": "Opportunity Code Generation"
           },
           "a2ac18e0-e654-4358-ad45-019c141e7bcb": {
-            "body": "Para cadastrar oportunidade precisamos de alguns c\u00f3digos:\n\n\ncCodIntOp: C\u00f3digo de integra\u00e7\u00e3o da oportunidade.+\ncDesOp: Descri\u00e7\u00e3o da oportunidade.\nnCodContato: C\u00f3digo do contato.+\nnCodSolucao: C\u00f3digo da solu\u00e7\u00e3o.+\nnCodOrigem: C\u00f3digo da origem.+\nnCodConta: C\u00f3digo da conta.+\nnCodVendedor: C\u00f3digo do vendedor.+",
+            "body": "To register an opportunity, we need some codes:\n\n\ncCodIntOp: Opportunity integration code.\ncDesOp: Opportunity description.\nnCodContato: Contact code.\nnCodSolucao: Solution code.\nnCodOrigem: Source code.\nnCodConta: Account code.\nnCodVendedor: Seller code.",
             "color": "purple",
             "position": {
               "bottom": 700,
@@ -294,7 +294,7 @@
               "right": 160,
               "top": 1360
             },
-            "title": "Aten\u00e7\u00e3o"
+            "title": "Attention"
           }
         }
       },
@@ -304,7 +304,7 @@
       "metadata": {
         "expires": 10080
       },
-      "name": "Cadastro de Lead - Incluir Oportunidade",
+      "name": "Lead Registration - Include Opportunity",
       "nodes": [
         {
           "actions": [],
@@ -330,7 +330,7 @@
             "categories": [
               {
                 "exit_uuid": "8758b5c1-73fb-404b-9a86-9c3304403b9a",
-                "name": "Lead j\u00e1 criado",
+                "name": "Lead already created",
                 "uuid": "dcc46b8b-03b2-432a-bade-fb9bd19217db"
               },
               {
@@ -349,7 +349,7 @@
           "actions": [
             {
               "flow": {
-                "name": "Cadastro de Lead - Incluir Contato",
+                "name": "Lead Registration - Include Contact",
                 "uuid": "3e8a2013-5155-4a48-99af-e7be710ac79a"
               },
               "type": "enter_flow",
@@ -447,7 +447,7 @@
             "categories": [
               {
                 "exit_uuid": "b366edd0-2c0b-4206-ac4e-b4675a75e54b",
-                "name": "Tem C\u00f3digo da Conta",
+                "name": "Has Account Code",
                 "uuid": "dded2797-660e-4855-804b-29df7412fd13"
               },
               {
@@ -457,7 +457,7 @@
               }
             ],
             "default_category_uuid": "823bfe0d-8eaa-414c-bf84-129707f2e0f0",
-            "operand": "@fields.codigo_conta",
+            "operand": "@fields.account_code",
             "type": "switch"
           },
           "uuid": "4eb4b60b-8da2-494a-aee6-dd047f71d4e9"
@@ -466,12 +466,12 @@
           "actions": [
             {
               "field": {
-                "key": "codigo_conta",
-                "name": "Codigo Conta"
+                "key": "account_code",
+                "name": "Account Code"
               },
               "type": "set_contact_field",
               "uuid": "53d28b43-aaab-425c-a256-7bccafc1d40f",
-              "value": "@globals.codigo_da_conta"
+              "value": "@globals.account_code"
             }
           ],
           "exits": [
@@ -506,7 +506,7 @@
             "categories": [
               {
                 "exit_uuid": "d77b9b9e-0517-4ca7-8ea9-22f32e5932c9",
-                "name": "Tem c\u00f3digo Vendedor",
+                "name": "Has Seller Code",
                 "uuid": "a3ae77dc-88de-4723-8ad6-850a28466eb9"
               },
               {
@@ -516,7 +516,7 @@
               }
             ],
             "default_category_uuid": "1655e472-bcbc-49a7-8942-802ff13f76aa",
-            "operand": "@fields.codigo_vendedor",
+            "operand": "@fields.seller_code",
             "type": "switch"
           },
           "uuid": "4edc4107-3a3a-416c-a95f-fd745b7bdc33"
@@ -525,12 +525,12 @@
           "actions": [
             {
               "field": {
-                "key": "codigo_vendedor",
-                "name": "Codigo Vendedor"
+                "key": "seller_code",
+                "name": "Seller Code"
               },
               "type": "set_contact_field",
               "uuid": "c812265a-39e4-474b-b712-7ce1535ccc7e",
-              "value": "@globals.codigo_do_vendedor"
+              "value": "@globals.seller_code"
             }
           ],
           "exits": [
@@ -565,7 +565,7 @@
             "categories": [
               {
                 "exit_uuid": "5fe22c9e-3aa0-45ec-bee4-235090f3f98b",
-                "name": "Tem c\u00f3digo Solu\u00e7\u00e3o",
+                "name": "Has Solution Code",
                 "uuid": "c89c3c2b-a797-4257-aba7-ebf1dedecc3e"
               },
               {
@@ -575,7 +575,7 @@
               }
             ],
             "default_category_uuid": "e7df663b-aab1-4af8-8b83-d9c3863fdd05",
-            "operand": "@fields.codigo_solucao",
+            "operand": "@fields.solution_code",
             "type": "switch"
           },
           "uuid": "f58f3f91-2fd1-438b-a9d3-bda61d1df272"
@@ -584,12 +584,12 @@
           "actions": [
             {
               "field": {
-                "key": "codigo_solucao",
-                "name": "Codigo Solucao"
+                "key": "solution_code",
+                "name": "Solution Code"
               },
               "type": "set_contact_field",
               "uuid": "b798205e-1651-4a34-bd93-aed192578074",
-              "value": "@globals.codigo_da_solucao"
+              "value": "@globals.solution_code"
             }
           ],
           "exits": [
@@ -624,7 +624,7 @@
             "categories": [
               {
                 "exit_uuid": "f54abc95-c804-4fcb-8cb9-bcd94277d24b",
-                "name": "Tem c\u00f3digo da Origem",
+                "name": "Has Source Code",
                 "uuid": "6f243299-c407-4914-897b-6a53fbe98f79"
               },
               {
@@ -634,7 +634,7 @@
               }
             ],
             "default_category_uuid": "df031c3c-3896-4aea-9dd9-166c0af9409f",
-            "operand": "@fields.codigo_origem",
+            "operand": "@fields.source_code",
             "type": "switch"
           },
           "uuid": "47a00589-835d-43a3-8fb7-8ca829d0dadd"
@@ -643,12 +643,12 @@
           "actions": [
             {
               "field": {
-                "key": "codigo_origem",
-                "name": "Codigo Origem"
+                "key": "source_code",
+                "name": "Source Code"
               },
               "type": "set_contact_field",
               "uuid": "78eef40b-929c-494c-84a3-69f06ead0576",
-              "value": "@globals.codigo_da_origem"
+              "value": "@globals.source_code"
             }
           ],
           "exits": [
@@ -662,12 +662,12 @@
         {
           "actions": [
             {
-              "body": "{\"call\":\"IncluirOportunidade\",\"app_key\":\"@globals.appkey\",\"app_secret\":\"@globals.appsecret\",\"param\":[{\"identificacao\":{\"cCodIntOp\":\"@fields.ccodintop\",\"cDesOp\":\"Chatbot Weni - @fields.ccodintop\",\"nCodConta\":@fields.codigo_conta,\"nCodContato\":@fields.ncod,\"nCodOrigem\":@fields.codigo_origem,\"nCodSolucao\":@fields.codigo_solucao,\"nCodVendedor\":@fields.codigo_vendedor}}]}",
+              "body": "{\"call\":\"IncludeOpportunity\",\"app_key\":\"@globals.appkey\",\"app_secret\":\"@globals.appsecret\",\"param\":[{\"identificacao\":{\"cCodIntOp\":\"@fields.ccodintop\",\"cDesOp\":\"Chatbot Weni - @fields.ccodintop\",\"nCodConta\":@fields.account_code,\"nCodContato\":@fields.ncod,\"nCodOrigem\":@fields.codigo_origem,\"nCodSolucao\":@fields.solution_code,\"nCodVendedor\":@fields.seller_code}}]}",
               "headers": {
                 "Content-Type": "application/json"
               },
               "method": "POST",
-              "result_name": "IncluirOportunidade",
+              "result_name": "IncludeOpportunity",
               "type": "call_webhook",
               "url": "https://app.omie.com.br/api/v1/crm/oportunidades/",
               "uuid": "d5e4caed-c6c4-40b9-8e7c-ba6cb0c6cadc"
@@ -707,7 +707,7 @@
               }
             ],
             "default_category_uuid": "f09f104e-b541-453a-bdc1-b3ea24827d97",
-            "operand": "@results.incluiroportunidade.category",
+            "operand": "@results.includeopportunity.category",
             "type": "switch"
           },
           "uuid": "25b954ae-e2be-49e2-b914-91c50a0d54ce"
@@ -728,7 +728,7 @@
             "cases": [
               {
                 "arguments": [
-                  "Contato cadastrado com sucesso!"
+                  "Contact registered successfully!"
                 ],
                 "category_uuid": "1beba62c-199f-46bb-8a25-8cd6d8cc384b",
                 "type": "has_phrase",
@@ -738,7 +738,7 @@
             "categories": [
               {
                 "exit_uuid": "770da164-e012-4981-ab68-b2eac540153b",
-                "name": "Contato cadastrado com sucesso!",
+                "name": "Contact registered successfully!",
                 "uuid": "1beba62c-199f-46bb-8a25-8cd6d8cc384b"
               },
               {
@@ -769,7 +769,7 @@
             "cases": [
               {
                 "arguments": [
-                  "Oportunidade j\u00e1 cadastrada"
+                  "Opportunity already registered"
                 ],
                 "category_uuid": "97fdb7ab-2eba-4060-9c5b-9317941f26d4",
                 "type": "has_phrase",
@@ -777,7 +777,7 @@
               },
               {
                 "arguments": [
-                  "ERROR: Oportundiade j\\u00e1 cadastrada."
+                  "ERROR: Opportunity already registered."
                 ],
                 "category_uuid": "97fdb7ab-2eba-4060-9c5b-9317941f26d4",
                 "type": "has_phrase",
@@ -785,7 +785,7 @@
               },
               {
                 "arguments": [
-                  "ERROR: Oportundiade j\u00e1 cadastrada."
+                  "ERROR: Opportunity already registered."
                 ],
                 "category_uuid": "97fdb7ab-2eba-4060-9c5b-9317941f26d4",
                 "type": "has_phrase",
@@ -793,7 +793,7 @@
               },
               {
                 "arguments": [
-                  "ERROR: Oportundiade j\\u00e1 cadastrada."
+                  "ERROR: Opportunity already registered."
                 ],
                 "category_uuid": "97fdb7ab-2eba-4060-9c5b-9317941f26d4",
                 "type": "has_phrase",
@@ -801,7 +801,7 @@
               },
               {
                 "arguments": [
-                  "ERROR: Oportundiade j\u00e1 cadastrada."
+                  "ERROR: Opportunity already registered."
                 ],
                 "category_uuid": "97fdb7ab-2eba-4060-9c5b-9317941f26d4",
                 "type": "has_phrase",
@@ -811,7 +811,7 @@
             "categories": [
               {
                 "exit_uuid": "bea5925f-8288-40ac-97f2-2324550fd3a2",
-                "name": "Oportunidade j\u00e1 cadastrada",
+                "name": "Opportunity already registered",
                 "uuid": "97fdb7ab-2eba-4060-9c5b-9317941f26d4"
               },
               {
@@ -832,8 +832,8 @@
               "addresses": [
                 "teste@weni.ai"
               ],
-              "body": "Erro ao Incluir contato\n\nUUID: @contact.uuid \n\nNome: @contact.name \n\nExtra: @webhook.extra",
-              "subject": "Erro ao Incluir Oportunidade Omie - @globals.nome_da_empresa",
+              "body": "Error including contact\n\nUUID: @contact.uuid \n\nName: @contact.name \n\nExtra: @webhook.extra",
+              "subject": "Error including Opportunity Omie - @globals.nome_da_empresa",
               "type": "send_email",
               "uuid": "d8c6cfdf-9336-4b46-808f-8c0e02869cd5"
             }
@@ -852,7 +852,7 @@
               "groups": [
                 {
                   "count": 0,
-                  "name": "Oportunidade Enviada",
+                  "name": "Opportunity Sent",
                   "query": null,
                   "status": "ready",
                   "uuid": "f739f49d-431c-4715-aa7d-0dceaa2599dd"
@@ -865,7 +865,7 @@
               "all_groups": false,
               "groups": [
                 {
-                  "name": "Oportunidade n\u00e3o enviada",
+                  "name": "Opportunity not sent",
                   "uuid": "e62d7cfb-293c-4ef2-94bc-4e822047ba79"
                 }
               ],
@@ -887,7 +887,7 @@
               "groups": [
                 {
                   "count": 0,
-                  "name": "Oportunidade n\u00e3o enviada",
+                  "name": "Opportunity not sent",
                   "query": null,
                   "status": "ready",
                   "uuid": "e62d7cfb-293c-4ef2-94bc-4e822047ba79"
@@ -900,7 +900,7 @@
               "all_groups": false,
               "groups": [
                 {
-                  "name": "Oportunidade Enviada",
+                  "name": "Opportunity Sent",
                   "uuid": "f739f49d-431c-4715-aa7d-0dceaa2599dd"
                 }
               ],
@@ -943,7 +943,7 @@
         },
         "stickies": {
           "0fbdcf20-b3f2-425a-81b6-352b8d6542c1": {
-            "body": "Inicia-se o fluxo Captura de Leads - Omie, no qual ir\u00e1 capturar nome, telefone e email e criar o contato e a oportunidade na Omie.",
+            "body": "The Leads Capture - Omie flow begins, which will capture name, phone number and email and create the contact and opportunity in Omie.",
             "color": "purple",
             "position": {
               "left": 320,
@@ -951,16 +951,16 @@
               "right": 300,
               "bottom": -360
             },
-            "title": "N\u00e3o cliente"
+            "title": "Not customer"
           },
           "661c29b4-542c-4c75-938d-c722aba3bd24": {
-            "body": "Aqui enviamos uma mensagem de boas vindas que pode ser personalizada. Atualmente usamos vari\u00e1veis globais para enviar o nome da empresa e do bot.",
+            "body": "Here we send a welcome message that can be customized. Currently we use global variables to send the name of the company and the bot.",
             "color": "purple",
             "position": {
               "left": 320,
               "top": 60
             },
-            "title": "Boas vindas"
+            "title": "Welcome"
           }
         }
       },
@@ -970,14 +970,14 @@
       "metadata": {
         "expires": 10080
       },
-      "name": "Fluxo Principal",
+      "name": "Main Flow",
       "nodes": [
         {
           "actions": [
             {
               "attachments": [],
               "quick_replies": [],
-              "text": "Ol\u00e1, sou a @globals.nome_do_bot, assistente de atendimento da @globals.nome_da_empresa \ud83d\ude0a\n\nHoje \u00e9 um dia especial...",
+              "text": "Hello, I'm @globals.nome_do_bot, the support assistant from @globals.nome_da_empresa \ud83d\ude0a\n\nToday is a special day...",
               "type": "send_msg",
               "uuid": "a853899b-71c4-41da-ad5d-a17cbac0ca87"
             },
@@ -985,7 +985,7 @@
               "all_groups": false,
               "groups": [
                 {
-                  "name": "Satisfeito",
+                  "name": "Satisfied",
                   "uuid": "2071332e-da02-4146-a2ac-b035ec02e9e3"
                 }
               ],
@@ -1005,7 +1005,7 @@
           "actions": [
             {
               "flow": {
-                "name": "Captura de Leads - Omie",
+                "name": "Leads Capture - Omie",
                 "uuid": "b22f09a0-91c6-42a0-b1b1-6600c1db3f6f"
               },
               "type": "enter_flow",
@@ -1206,16 +1206,16 @@
         },
         "stickies": {
           "190d66d0-2d0e-492d-872d-03460a5ddf18": {
-            "body": "Aqui adicionamos o usu\u00e1rio ao grupo lead Cadastrado e removemos do grupo Lead N\u00e3o Cadastrado",
+            "body": "Here we add the user to the Registered Lead group and remove them from the Unregistered Lead group",
             "color": "purple",
             "position": {
               "left": 220,
               "top": 1740
             },
-            "title": "Adicione a um grupo"
+            "title": "Add to a group"
           },
           "268bd6c6-dc15-47d1-a299-9d1a52a39928": {
-            "body": "Aqui adicionamos o usu\u00e1rio ao grupo Lead N\u00e3o Cadastrado e removemos do grupo Lead Cadastrado",
+            "body": "Here we add the user to the Unregistered Lead group and remove them from the Registered Lead group",
             "color": "purple",
             "position": {
               "bottom": null,
@@ -1223,19 +1223,19 @@
               "right": null,
               "top": 1460
             },
-            "title": "Adicione a um grupo"
+            "title": "Add to a group"
           },
           "43331efc-86a5-4b90-a101-5e40d8f5afca": {
-            "body": "Aqui verificamos se o contato j\u00e1 existe na Omie pesquisando pelo email, se sim, salvamos o nCod e o cCodInt.",
+            "body": "Here we check if the contact already exists in Omie by searching for the email, if so, we save the nCod and cCodInt.",
             "color": "purple",
             "position": {
               "left": 460,
               "top": 40
             },
-            "title": "VerificarContato"
+            "title": "Check Contact"
           },
           "815c3486-660c-4b27-92ef-e3745455a036": {
-            "body": "Aqui inclu\u00edmos o contato na Omie, passando nome, telefone e email.",
+            "body": "Here we include the contact in Omie, passing name, phone and email.",
             "color": "purple",
             "position": {
               "bottom": null,
@@ -1243,10 +1243,10 @@
               "right": null,
               "top": 640
             },
-            "title": "IncluirContato"
+            "title": "Include Contact"
           },
           "9292f7cb-4062-453f-a3eb-1b8f111e9ff9": {
-            "body": "Nesta etapa geramos um c\u00f3digo unico da integra\u00e7\u00e3o do lead",
+            "body": "Here we generate a unique integration code for the lead",
             "color": "purple",
             "position": {
               "bottom": null,
@@ -1254,19 +1254,19 @@
               "right": null,
               "top": 640
             },
-            "title": "Gera c\u00f3digo de integra\u00e7\u00e3o do lead"
+            "title": "Generate Lead Integration Code"
           },
           "ccd2c621-21b0-464f-9d80-594e8324eddb": {
-            "body": "Adicione seu email para receber notifica\u00e7\u00f5es sempre que uma falha acontecer",
+            "body": "Add your email to receive notifications whenever a failure occurs",
             "color": "purple",
             "position": {
               "left": 1320,
               "top": 1100
             },
-            "title": "Enviar Email"
+            "title": "Send Email"
           },
           "e6ae774b-ac9b-4506-b9bc-d464ec700237": {
-            "body": "Aqui salvamos as informa\u00e7\u00f5es do contato criado",
+            "body": "Here we save the contact creation information",
             "color": "purple",
             "position": {
               "bottom": null,
@@ -1274,10 +1274,10 @@
               "right": null,
               "top": 1080
             },
-            "title": "Atualizar contato"
+            "title": "Update Contact"
           },
           "e7491a8e-28ca-47a3-aa87-d7a56a9df179": {
-            "body": "Aqui fazemos uma verifica\u00e7\u00e3o dupla caso a inclus\u00e3o do contato falhe. Verificamos se o contato j\u00e1 existe pesquisando pelo nome do contato",
+            "body": "Here we make a double check if the contact inclusion fails. We check if the contact already exists by searching for the contact name",
             "color": "purple",
             "position": {
               "bottom": null,
@@ -1285,16 +1285,16 @@
               "right": null,
               "top": 900
             },
-            "title": "Verifica\u00e7\u00e3o dupla"
+            "title": "Double Check"
           },
           "ff1553a1-7b6e-4e7f-a088-4413facd0850": {
-            "body": "Adicione seu email para receber notifica\u00e7\u00f5es sempre que uma falha acontecer",
+            "body": "Add your email to receive notifications whenever a failure occurs",
             "color": "purple",
             "position": {
               "left": 1060,
               "top": 1560
             },
-            "title": "Enviar email"
+            "title": "Send Email"
           }
         }
       },
@@ -1304,17 +1304,17 @@
       "metadata": {
         "expires": 10080
       },
-      "name": "Cadastro de Lead - Incluir Contato",
+      "name": "Leads Capture - Include Contact",
       "nodes": [
         {
           "actions": [
             {
-              "body": "{\"call\":\"VerificarContato\",\"app_key\":\"@globals.appkey\",\"app_secret\":\"@globals.appsecret\",\"param\":[{\"cNome\":\"\",\"cEmail\":\"@fields.email\"}]}",
+              "body": "{\"call\":\"VerifyContact\",\"app_key\":\"@globals.appkey\",\"app_secret\":\"@globals.appsecret\",\"param\":[{\"cName\":\"\",\"cEmail\":\"@fields.email\"}]}",
               "headers": {
                 "Content-Type": "application/json"
               },
               "method": "POST",
-              "result_name": "VerificarContato",
+              "result_name": "VerifyContact",
               "type": "call_webhook",
               "url": "https://app.omie.com.br/api/v1/crm/contatos/",
               "uuid": "c4aa57c2-a516-4ac9-b431-09bbdd683f59"
@@ -1354,7 +1354,7 @@
               }
             ],
             "default_category_uuid": "9bebaec3-ba76-410f-a870-e3b3a82f8708",
-            "operand": "@results.verificarcontato.category",
+            "operand": "@results.verifycontact.category",
             "type": "switch"
           },
           "uuid": "53220982-de11-4fce-8f6d-8cdc2bd8efbc"
@@ -1383,7 +1383,7 @@
             "categories": [
               {
                 "exit_uuid": "fbca0aa7-3c24-48c5-a5c2-9ae830c64658",
-                "name": "Tem nCod",
+                "name": "Has nCod",
                 "uuid": "48cb8946-9bc9-41e1-a040-ad3a70407498"
               },
               {
@@ -1451,7 +1451,7 @@
             "categories": [
               {
                 "exit_uuid": "cd245765-978b-43eb-bae1-7dded3d65e47",
-                "name": "Tem c\u00f3digo de integra\u00e7\u00e3o do Lead",
+                "name": "Has Lead integration code",
                 "uuid": "3ab6841c-bcb3-4d56-855a-38c21f896825"
               },
               {
@@ -1489,7 +1489,7 @@
         {
           "actions": [
             {
-              "body": "{\"call\":\"IncluirContato\",\"app_key\":\"@globals.appkey\",\"app_secret\":\"@globals.appsecret\",\"param\":[{\"identificacao\":{\"cCodInt\":\"@fields.ccodint\", \"cNome\":\"@contact.name\", \"cSobrenome\":\"\", \"dDtNasc\":\"\"}, \"endereco\":{\"cEndereco\":\"\",\"cCompl\":\"\",\"cCEP\":\"\",\"cBairro\":\"\",\"cCidade\":\"\",\"cUF\":\"\",\"cPais\":\"\"}, \"telefone_email\":{\"cDDDCel1\":\"\",\"cNumCel1\":\"@fields.telefone\",\"cEmail\":\"@fields.email\",\"cWebsite\":\"\"}}]}",
+              "body": "{\"call\":\"IncludeContact\",\"app_key\":\"@globals.appkey\",\"app_secret\":\"@globals.appsecret\",\"param\":[{\"identification\":{\"cCodInt\":\"@fields.ccodint\", \"cNome\":\"@contact.name\", \"cSobrenome\":\"\", \"dDtNasc\":\"\"}, \"address\":{\"cEndereco\":\"\",\"cCompl\":\"\",\"cCEP\":\"\",\"cBairro\":\"\",\"cCidade\":\"\",\"cUF\":\"\",\"cPais\":\"\"}, \"telephone_email\":{\"cDDDCel1\":\"\",\"cNumCel1\":\"@fields.telefone\",\"cEmail\":\"@fields.email\",\"cWebsite\":\"\"}}]}",
               "headers": {
                 "Content-Type": "application/json"
               },
@@ -1555,7 +1555,7 @@
             "cases": [
               {
                 "arguments": [
-                  "Contato cadastrado com sucesso!"
+                  "Contact registered successfully!"
                 ],
                 "category_uuid": "e502b095-2956-43e4-9a9e-c3f60389c1b7",
                 "type": "has_phrase",
@@ -1565,7 +1565,7 @@
             "categories": [
               {
                 "exit_uuid": "e2ab85a3-2d57-4edf-a926-c537bed126ff",
-                "name": "Contato cadastrado com sucesso!",
+                "name": "Contact registered successfully!",
                 "uuid": "e502b095-2956-43e4-9a9e-c3f60389c1b7"
               },
               {
@@ -1596,7 +1596,7 @@
             "cases": [
               {
                 "arguments": [
-                  "ERROR: Contato j\\u00e1 cadastrado para o C\\u00f3digo de Integra\\u00e7\\u00e3o"
+                  "ERROR: Contact already exists for Integration Code"
                 ],
                 "category_uuid": "8da83efe-052c-4f5b-8c1a-1b02eddd5776",
                 "type": "has_all_words",
@@ -1604,7 +1604,7 @@
               },
               {
                 "arguments": [
-                  "ERROR: Contato j\u00e1 cadastrado para o C\u00f3digo de Integra\u00e7\u00e3o"
+                  "ERROR: Contact already exists for Integration Code"
                 ],
                 "category_uuid": "8da83efe-052c-4f5b-8c1a-1b02eddd5776",
                 "type": "has_all_words",
@@ -1612,7 +1612,7 @@
               },
               {
                 "arguments": [
-                  "ERROR: Contato ja cadastrado para o Codigo de Integracao"
+                  "ERROR: Contact already exists for Integration Code"
                 ],
                 "category_uuid": "8da83efe-052c-4f5b-8c1a-1b02eddd5776",
                 "type": "has_all_words",
@@ -1620,7 +1620,7 @@
               },
               {
                 "arguments": [
-                  "ERROR: Contato j\u00e1 cadastrado"
+                  "ERROR: Contact already exists"
                 ],
                 "category_uuid": "8da83efe-052c-4f5b-8c1a-1b02eddd5776",
                 "type": "has_all_words",
@@ -1628,7 +1628,7 @@
               },
               {
                 "arguments": [
-                  "ERROR: Contato ja cadastrado"
+                  "ERROR: Contact already exists"
                 ],
                 "category_uuid": "8da83efe-052c-4f5b-8c1a-1b02eddd5776",
                 "type": "has_all_words",
@@ -1638,7 +1638,7 @@
             "categories": [
               {
                 "exit_uuid": "84a1ee9b-b83d-49aa-b1f5-608bb832f0da",
-                "name": "Contato j\u00e1 existente",
+                "name": "Contact already exists",
                 "uuid": "8da83efe-052c-4f5b-8c1a-1b02eddd5776"
               },
               {
@@ -1697,8 +1697,8 @@
               "addresses": [
                 "teste@weni.ai"
               ],
-              "body": "Erro ao Incluir contato\n\nUUID: @contact.uuid \n\nNome: @contact.name \n\nExtra: @webhook.extra",
-              "subject": "Erro ao Incluir contato OMIE - @globals.nome_da_empresa",
+              "body": "Error including contact\n\nUUID: @contact.uuid \n\nName: @contact.name \n\nExtra: @webhook.extra",
+              "subject": "Error including contact OMIE - @globals.nome_da_empresa",
               "type": "send_email",
               "uuid": "488cc833-5e42-42bd-bc16-6f75a1ca464f"
             }
@@ -1714,12 +1714,12 @@
         {
           "actions": [
             {
-              "body": "{\"call\":\"VerificarContato\",\"app_key\":\"@globals.appkey\",\"app_secret\":\"@globals.appsecret\",\"param\":[{\"cNome\":\"@contact.name\",\"cEmail\":\"\"}]}",
+              "body": "{\"call\":\"VerifyContact\",\"app_key\":\"@globals.appkey\",\"app_secret\":\"@globals.appsecret\",\"param\":[{\"cName\":\"@contact.name\",\"cEmail\":\"\"}]}",
               "headers": {
                 "Content-Type": "application/json"
               },
               "method": "POST",
-              "result_name": "VerificarContato",
+              "result_name": "VerifyContact",
               "type": "call_webhook",
               "url": "https://app.omie.com.br/api/v1/crm/contatos/",
               "uuid": "6092d41d-bec6-4b77-ac7f-25b0432cbc8d"
@@ -1759,7 +1759,7 @@
               }
             ],
             "default_category_uuid": "ea39d060-28cf-4dc7-85cc-8c248f1d6670",
-            "operand": "@results.verificarcontato.category",
+            "operand": "@results.verifycontact.category",
             "type": "switch"
           },
           "uuid": "7ac1c5fb-6334-4e38-ad15-ad9456627d92"
@@ -1788,7 +1788,7 @@
             "categories": [
               {
                 "exit_uuid": "8b34a2ca-5903-4361-af57-0e74bd4b6274",
-                "name": "Tem nCod",
+                "name": "Has nCod",
                 "uuid": "a5813f52-a70e-49e3-abd8-c52eed7f096b"
               },
               {
@@ -1809,8 +1809,8 @@
               "addresses": [
                 "teste@weni.ai"
               ],
-              "body": "Erro ao consultar contato Omie\n\nuuid: @contact.uuid\n\n@webhook.extra",
-              "subject": "Erro ao consultar contato j\u00e1 existente Omie - @globals.nome_da_empresa ",
+              "body": "Error searching contact Omie\n\nuuid: @contact.uuid\n\n@webhook.extra",
+              "subject": "Error searching contact already exists Omie - @globals.nome_da_empresa ",
               "type": "send_email",
               "uuid": "2e6d402a-7977-4e65-b63a-f80cadc8f454"
             }
@@ -1829,7 +1829,7 @@
               "groups": [
                 {
                   "count": 0,
-                  "name": "Lead N\u00e3o cadastrado",
+                  "name": "Lead Not Registered",
                   "query": null,
                   "status": "ready",
                   "uuid": "66e35bc2-c943-418d-9e49-769702167623"
@@ -1842,7 +1842,7 @@
               "all_groups": false,
               "groups": [
                 {
-                  "name": "Lead Cadastrado",
+                  "name": "Lead Registered",
                   "uuid": "9634ff85-f5f8-4b1f-a34e-d8eef6e2c108"
                 }
               ],
@@ -1893,7 +1893,7 @@
               "groups": [
                 {
                   "count": 0,
-                  "name": "Lead Cadastrado",
+                  "name": "Lead Registered",
                   "query": null,
                   "status": "ready",
                   "uuid": "9634ff85-f5f8-4b1f-a34e-d8eef6e2c108"
@@ -1906,7 +1906,7 @@
               "all_groups": false,
               "groups": [
                 {
-                  "name": "Lead N\u00e3o cadastrado",
+                  "name": "Lead Not Registered",
                   "uuid": "66e35bc2-c943-418d-9e49-769702167623"
                 }
               ],
@@ -1979,7 +1979,7 @@
         },
         "stickies": {
           "3981ad9d-3de2-4bdc-a2ba-2c91c09ec24e": {
-            "body": "Aqui enviamos uma mensagem para o caso do usu\u00e1rio digitar \"N\u00e3o\"",
+            "body": "Here we send a message for the case when the user types \"No\"",
             "color": "purple",
             "position": {
               "bottom": 20,
@@ -1987,10 +1987,10 @@
               "right": 0,
               "top": 860
             },
-            "title": "Enviar mensagem"
+            "title": "Send message"
           },
           "6de238a2-56d2-454c-8326-e9ada2498d0f": {
-            "body": "Adicionamos o email do usu\u00e1rio na URN e-mail. Essa URN \u00e9 o canal em que o usu\u00e1rio pode ser contatado.\n\nOBS: Voc\u00ea disparar emails ativamente se o usu\u00e1rio tiver a URN email",
+            "body": "We add the user's email in the URN email. This URN is the channel in which the user can be contacted.\n\nOBS: You actively send emails if the user has the URN email",
             "color": "purple",
             "position": {
               "bottom": null,
@@ -1998,10 +1998,10 @@
               "right": null,
               "top": 620
             },
-            "title": "Adicione URN"
+            "title": "Add URN"
           },
           "6f578108-e997-41db-9a1c-0c2d07eaa7eb": {
-            "body": "A categoria No Response serve para quando o fluxo continua sem que o usu\u00e1rio tenha respondido \u00e0 pergunta. Normalmente \u00e9 utilizado para n\u00e3o deixar o usu\u00e1rio preso em uma pergunta.\n\nAl\u00e9m disso, adicionamos o usu\u00e1rio no grupo \"Conversa encerrada\" pois antes de enviar outra mensagem ou entrar em outro fluxo podemos verificar se o usu\u00e1rio est\u00e1 nesse grupo e evitar o envio de mensagens",
+            "body": "The No Response category is used when the flow continues without the user answering the question. It is usually used to avoid the user being stuck in a question.\n\nIn addition, we add the user to the \"Conversation closed\" group because before sending another message or entering another flow, we can check if the user is in that group and avoid sending messages",
             "color": "purple",
             "position": {
               "bottom": null,
@@ -2009,10 +2009,10 @@
               "right": null,
               "top": 300
             },
-            "title": "Categoria No response"
+            "title": "No response category"
           },
           "74277e9b-662a-4587-8582-26c3377cc96d": {
-            "body": "Tamb\u00e9m salvamos no campo de contato Email. Esse dado poder\u00e1 ser visto em detalhes no hist\u00f3rico de cada contato e pode ser usado em qualquer fluxo de mensagem pois a informa\u00e7\u00e3o est\u00e1 sendo salva no contato e n\u00e3o em um fluxo de mensagem espec\u00edfico.",
+            "body": "We also save the Email field in the contact. This data can be seen in the details of each contact and can be used in any message flow since the information is being saved in the contact and not in a specific message flow.",
             "color": "purple",
             "position": {
               "bottom": -120,
@@ -2020,10 +2020,10 @@
               "right": 200,
               "top": 840
             },
-            "title": "Atualizar o contato"
+            "title": "Update contact"
           },
           "da002ce3-4e18-4a22-9b36-96a48f982a3e": {
-            "body": "Aqui verificamos que o usu\u00e1rio n\u00e3o digitou um email e perguntamos se ele pode informar e damos a op\u00e7\u00e3o de Sim e N\u00e3o. \n\nImportante lembrar que nessa etapa, se o usu\u00e1rio j\u00e1 responder com seu email, conseguiremos detectar, pois todas as regras est\u00e3o no mesmo card \"Aguarde por resposta\".",
+            "body": "Here we check that the user did not enter an email and ask if they can inform it and give the option of Sim and Não. \n\nIt is important to remember that in this step, if the user has already responded with their email, we will be able to detect it, since all the rules are in the same card \"Wait for response\".",
             "color": "purple",
             "position": {
               "bottom": 40,
@@ -2031,10 +2031,10 @@
               "right": 0,
               "top": 840
             },
-            "title": "Enviar mensagem"
+            "title": "Send message"
           },
           "e28fcce8-0b2d-4fc5-83d8-add72e8a1821": {
-            "body": "Aqui aguardamos pela resposta do usu\u00e1rio e usamos a regra \"tem um email\".\n\nTamb\u00e9m usamos a regra de Sim e N\u00e3o para verificar se o usu\u00e1rio quer ou n\u00e3o informar o email.",
+            "body": "Here we wait for the user's response and use the \"has an email\" rule. \n\nWe also use the rules of Sim and Não to check if the user wants or does not want to inform the email.",
             "color": "purple",
             "position": {
               "bottom": null,
@@ -2042,10 +2042,10 @@
               "right": null,
               "top": 300
             },
-            "title": "Aguarde por resposta"
+            "title": "Wait for response"
           },
           "f279df0d-d508-4321-98b7-5d1f3d3c8c56": {
-            "body": "Aqui perguntamos o email do usu\u00e1rio. Voc\u00ea pode personalizar essa mensagem para a que preferir",
+            "body": "Here we ask the user for their email. You can personalize this message to your liking",
             "color": "purple",
             "position": {
               "bottom": null,
@@ -2053,7 +2053,7 @@
               "right": null,
               "top": 20
             },
-            "title": "Enviar mensagem"
+            "title": "Send message"
           }
         }
       },
@@ -2064,14 +2064,14 @@
         "expires": 10080,
         "revision": 11
       },
-      "name": "Coleta de E-mail",
+      "name": "Email Capture",
       "nodes": [
         {
           "actions": [
             {
               "attachments": [],
               "quick_replies": [],
-              "text": "@(title(contact.first_name)), qual o seu e-mail?",
+              "text": "@(title(contact.first_name)), what is your email?",
               "type": "send_msg",
               "uuid": "d12548cc-67ca-4696-8acf-1f4540e9612d"
             }
@@ -2090,7 +2090,7 @@
               "groups": [
                 {
                   "count": 0,
-                  "name": "Conversa Encerrada",
+                  "name": "Conversation closed",
                   "query": null,
                   "status": "ready",
                   "uuid": "d01833de-92d9-4bb1-96eb-dde0c96665aa"
@@ -2102,7 +2102,7 @@
             {
               "attachments": [],
               "quick_replies": [],
-              "text": "Por falta de resposta, encerrei esse atendimento. Mas quando quiser \u00e9 s\u00f3 falar comigo \ud83d\ude09",
+              "text": "Due to lack of response, I ended this conversation. But when you want, just talk to me \ud83d\ude09",
               "type": "send_msg",
               "uuid": "61558159-10f4-4c97-95a2-896dfc6067e7"
             }
@@ -2149,7 +2149,7 @@
               },
               {
                 "arguments": [
-                  "Sim si s"
+                  "Yes ye y"
                 ],
                 "category_uuid": "c7966b82-0275-4b6d-98fa-1794bdc23111",
                 "type": "has_any_word",
@@ -2157,7 +2157,7 @@
               },
               {
                 "arguments": [
-                  "N\u00e3o nao n nau"
+                  "No not n"
                 ],
                 "category_uuid": "41e7c02d-2bb5-4c21-8bc9-53188055e22e",
                 "type": "has_any_word",
@@ -2167,17 +2167,17 @@
             "categories": [
               {
                 "exit_uuid": "a0243fcb-8d59-4849-bb33-d8fdaf4dbafb",
-                "name": "Tem email",
+                "name": "Has email",
                 "uuid": "7dd6c033-d189-42c4-8f71-086a7a3a7692"
               },
               {
                 "exit_uuid": "62ffb95d-9271-4907-9391-1ff871805202",
-                "name": "Sim",
+                "name": "Yes",
                 "uuid": "c7966b82-0275-4b6d-98fa-1794bdc23111"
               },
               {
                 "exit_uuid": "cfabf73c-4e42-4182-a7d9-97b6d2a5cc76",
-                "name": "N\u00e3o",
+                "name": "No",
                 "uuid": "41e7c02d-2bb5-4c21-8bc9-53188055e22e"
               },
               {
@@ -2236,7 +2236,7 @@
             {
               "attachments": [],
               "quick_replies": [],
-              "text": "Entendi, mas nesse caso precisamos dessa informa\u00e7\u00e3o para entrar em contato com voc\u00ea.",
+              "text": "Understood, but in this case we need this information to contact you.",
               "type": "send_msg",
               "uuid": "08cdde80-256e-407e-9963-15e0217b15fc"
             }
@@ -2254,10 +2254,10 @@
             {
               "attachments": [],
               "quick_replies": [
-                "Sim",
-                "N\u00e3o"
+                "Yes",
+                "No"
               ],
-              "text": "Essa \u00e9 uma informa\u00e7\u00e3o muito importante pra gente! Voc\u00ea pode nos informar?",
+              "text": "This is very important information for us! Can you tell us?",
               "type": "send_msg",
               "uuid": "6f15cc2d-844c-4f3a-aead-9396680df2e0"
             }
@@ -2305,8 +2305,8 @@
             "config": {
               "cases": {},
               "operand": {
-                "id": "contador_de_erros",
-                "name": "contador de erros",
+                "id": "error_counter",
+                "name": "error counter",
                 "type": "result"
               }
             },
@@ -2401,7 +2401,7 @@
         },
         "stickies": {
           "08f7ed6b-1062-46af-b107-ada9320e4d8d": {
-            "body": "A categoria No Response serve para quando o fluxo continua sem que o usu\u00e1rio tenha respondido \u00e0 pergunta. Normalmente \u00e9 utilizado para n\u00e3o deixar o usu\u00e1rio preso em uma pergunta.\n\nAl\u00e9m disso, adicionamos o usu\u00e1rio no grupo \"Conversa encerrada\" pois antes de enviar outra mensagem ou entrar em outro fluxo podemos verificar se o usu\u00e1rio est\u00e1 nesse grupo e evitar o envio de mensagens.",
+            "body": "The No Response category is used when the flow continues without the user answering the question. It is usually used to avoid leaving the user stuck in a question.\n\nIn addition, we add the user to the \"Conversation closed\" group so that before sending another message or entering another flow, we can check if the user is in that group and avoid sending messages.",
             "color": "purple",
             "position": {
               "bottom": null,
@@ -2409,10 +2409,10 @@
               "right": null,
               "top": 260
             },
-            "title": "Categoria No response"
+            "title": "No Response Category"
           },
           "13885c2e-3797-447e-996b-a538ec066b2b": {
-            "body": "Aqui verificamos o contador de erros. Se ainda for 0, categorizamos como \"Primeiro erro\" e tratamos de acordo, se for o segundo erro, o usu\u00e1rio passa pela categoria Other.",
+            "body": "Here we check the error counter. If it's still 0, we categorize it as \"First error\" and handle it accordingly. If it's the second error, the user goes through the Other category.",
             "color": "purple",
             "position": {
               "bottom": 140,
@@ -2420,10 +2420,10 @@
               "right": 140,
               "top": 840
             },
-            "title": "Dividir por Resultado de Fluxo"
+            "title": "Split by Run Result"
           },
           "3355ec0f-ea5a-4121-9c7a-25f9bd08d558": {
-            "body": "Aguardamos a resposta do usu\u00e1rio.\n\nLembre que voc\u00ea pode clicar na op\u00e7\u00e3o \"Continue quando n\u00e3o houver resposta...\" e escolher o tempo que deseja esperar.\n\nDentro do card \"Aguarde por resposta\" usamos criar regra usando REGEX para saber se o usu\u00e1rio digitou o n\u00famero na formata\u00e7\u00e3o correta. Se for preciso, voc\u00ea pdoe adicionar outras regras de \"corresponde a regex\".",
+            "body": "We wait for the user's response.\n\nRemember that you can click on the option \"Continue when there is no response...\" and choose the time you want to wait.\n\nInside the \"Wait for response\" card, we create a rule using REGEX to know if the user entered the number in the correct format. If necessary, you can add other rules of \"matches regex\".",
             "color": "purple",
             "position": {
               "bottom": 140,
@@ -2431,19 +2431,19 @@
               "right": 140,
               "top": 480
             },
-            "title": "Aguarde por resposta"
+            "title": "Wait for Response"
           },
           "348999b7-47f6-4357-ab9d-801bef51ada4": {
-            "body": "Se o usu\u00e1rio errar o n\u00famero por uma segunda vez, enviamos um email para o respons\u00e1vel do setor e o deixamos prosseguir, visto que pode ser um n\u00famero de outro pa\u00eds etc.\n\nVoc\u00ea pode editar o email para receber uma sinaliza\u00e7\u00e3o quando algum usu\u00e1rio passar por esse cen\u00e1rio.\n\nDepois de enviar o email, salvamos o telefone e deixamos o usu\u00e1rio prosseguir para o pr\u00f3ximo fluxo.",
+            "body": "If the user enters the number incorrectly for a second time, we send an email to the responsible for the sector and let them proceed, as it may be a number from another country, etc.\n\nYou can edit the email to receive a signal when any user passes through this scenario.\n\nAfter sending the email, we save the phone and let the user proceed to the next flow.",
             "color": "purple",
             "position": {
               "left": 1320,
               "top": 840
             },
-            "title": "Enviar Email"
+            "title": "Send Email"
           },
           "5372c1d7-3a93-46ea-931f-3f1418de89a0": {
-            "body": "Se for o primeiro erro do usu\u00e1rio mas a mensagem dele tiver um n\u00famero, informamos que precisamos de certa formata\u00e7\u00e3o. Por\u00e9m se n\u00e3o tiver um n\u00famero, mandamos uma mensagem diferente",
+            "body": "If it's the first error of the user but their message has a number, we inform that we need a certain format. However, if it doesn't have a number, we send a different message.",
             "color": "purple",
             "position": {
               "bottom": 20,
@@ -2451,10 +2451,10 @@
               "right": -40,
               "top": 1080
             },
-            "title": "Dividir por express\u00e3o"
+            "title": "Split by Expression"
           },
           "58129c8a-2535-46bb-9cbf-ba607b665791": {
-            "body": "Aqui perguntamos qual o telefone do usu\u00e1rio mostrando o formato aceito pelo REGEX",
+            "body": "Here we ask the user for their phone number showing the format accepted by REGEX",
             "color": "purple",
             "position": {
               "bottom": 140,
@@ -2462,10 +2462,10 @@
               "right": 140,
               "top": 220
             },
-            "title": "Enviar mensagem"
+            "title": "Send Message"
           },
           "affaf933-fe99-47c8-b6b2-4c67c0390c46": {
-            "body": "Aqui salvamos +1 no contador de erros. Isso vai servir para verificarmos se \u00e9 ou n\u00e3o a primeira vez que o usu\u00e1rio errou o formato de n\u00famero desejado.\n\nSe o usu\u00e1rio errar por uma segunda vez, enviamos um email para o respons\u00e1vel do setor e o deixamos prosseguir.",
+            "body": "Here we save +1 in the error counter. This will serve to verify whether it is or is not the first time the user has entered the wrong number format desired.\n\nIf the user enters the number incorrectly for a second time, we send an email to the responsible for the sector and let them proceed.",
             "color": "purple",
             "position": {
               "bottom": null,
@@ -2473,10 +2473,10 @@
               "right": null,
               "top": 1360
             },
-            "title": "Salvar Resultado do Fluxo"
+            "title": "Save Run Result"
           },
           "caa6bf9a-787c-4c12-b38f-7bd2c6d8b9d9": {
-            "body": "Aqui salvamos um resultado chamado contador de erros. Ele sempre ser\u00e1 salvo como 0 no in\u00edcio do fluxo de mensagem e usaremos ele posteriormente para verificar se o usu\u00e1rio digitou um formato de n\u00famero diferente do esperado",
+            "body": "Here we save a result called error counter. It will always be saved as 0 at the beginning of the message flow and we will use it later to verify if the user entered a number format different from the expected one.",
             "color": "purple",
             "position": {
               "bottom": 0,
@@ -2484,10 +2484,10 @@
               "right": 660,
               "top": 0
             },
-            "title": "Salvar Resultado do Fluxo"
+            "title": "Save Run Result"
           },
           "f4981608-a886-4f03-98bd-c02234ec92ae": {
-            "body": "Aqui salvamos o telefone informado no campo de contato Telefone para que o dado seja salvo no contato e n\u00e3o somente no fluxo de mensagem.",
+            "body": "Here we save the phone number entered in the Telefone contact field so that the data is saved in the contact and not just in the message flow.",
             "color": "purple",
             "position": {
               "bottom": 80,
@@ -2495,7 +2495,7 @@
               "right": 20,
               "top": 1020
             },
-            "title": "Atualizar contato"
+            "title": "Update Contact"
           }
         }
       },
@@ -2506,7 +2506,7 @@
         "expires": 10080,
         "revision": 75
       },
-      "name": "Coleta de Telefone",
+      "name": "Phone Capture",
       "nodes": [
         {
           "actions": [],
@@ -2554,10 +2554,10 @@
             {
               "attachments": [],
               "quick_replies": [
-                "Sim",
-                "N\u00e3o"
+                "Yes",
+                "No"
               ],
-              "text": "Posso salvar seu Whatsapp @(replace(urns.whatsapp, \"whatsapp:\", \"\")) como seu contato principal?",
+              "text": "Can I save your Whatsapp @(replace(urns.whatsapp, \"whatsapp:\", \"\")) as your main contact?",
               "type": "send_msg",
               "uuid": "ea2fd43b-8101-4866-b056-83fb478fe67f"
             }
@@ -2574,7 +2574,7 @@
           "actions": [
             {
               "category": "",
-              "name": "contador de erros",
+              "name": "error counter",
               "type": "set_run_result",
               "uuid": "39b42a32-6288-4ce2-8d8f-dac974ad8f8a",
               "value": "0"
@@ -2582,7 +2582,7 @@
             {
               "attachments": [],
               "quick_replies": [],
-              "text": "Voc\u00ea poderia me informar o seu telefone com DDD? \n\n_Nesse formato (DD) 9xxxx-xxxx_",
+              "text": "Could you tell me your phone number with the DDD? \n\n_In this format (DD) 9xxxx-xxxx_",
               "type": "send_msg",
               "uuid": "52d4ca58-251d-4837-b5ce-dd97e2f73a94"
             }
@@ -2615,7 +2615,7 @@
             "cases": [
               {
                 "arguments": [
-                  "Sim aim asim si ss sss yes"
+                  "Yes ye y"
                 ],
                 "category_uuid": "44adeb60-decb-4aaa-b423-40ea49c87b06",
                 "type": "has_any_word",
@@ -2625,7 +2625,7 @@
             "categories": [
               {
                 "exit_uuid": "088035de-f47a-4d97-803c-dbee2c413e72",
-                "name": "Sim",
+                "name": "Yes",
                 "uuid": "44adeb60-decb-4aaa-b423-40ea49c87b06"
               },
               {
@@ -2641,7 +2641,7 @@
             ],
             "default_category_uuid": "01fc0810-f375-43d6-bbef-7632c4a5ed37",
             "operand": "@input.text",
-            "result_name": "confirmacao",
+            "result_name": "confirmation",
             "type": "switch",
             "wait": {
               "timeout": {
@@ -2671,7 +2671,7 @@
             {
               "attachments": [],
               "quick_replies": [],
-              "text": "Por falta de resposta, encerrei esse atendimento. Mas quando quiser \u00e9 s\u00f3 falar comigo \ud83d\ude09",
+              "text": "Due to lack of response, I closed this conversation. But if you want, you can talk to me \ud83d\ude09",
               "type": "send_msg",
               "uuid": "8264bea2-c14a-49ee-8639-46b1d6adbfe9"
             }
@@ -2720,7 +2720,7 @@
             "categories": [
               {
                 "exit_uuid": "3456de66-4dc2-454c-9005-d2ca13422082",
-                "name": "Telefone",
+                "name": "Phone",
                 "uuid": "63ff5cb3-9716-4a61-b294-4d273853ba81"
               },
               {
@@ -2736,7 +2736,7 @@
             ],
             "default_category_uuid": "d3048221-ec68-4612-a512-8c42d4c91472",
             "operand": "@input.text",
-            "result_name": "Telefone",
+            "result_name": "Phone",
             "type": "switch",
             "wait": {
               "timeout": {
@@ -2754,7 +2754,7 @@
               "groups": [
                 {
                   "count": 0,
-                  "name": "Conversa Encerrada",
+                  "name": "Conversation Closed",
                   "query": null,
                   "status": "ready",
                   "uuid": "d01833de-92d9-4bb1-96eb-dde0c96665aa"
@@ -2766,7 +2766,7 @@
             {
               "attachments": [],
               "quick_replies": [],
-              "text": "Por falta de resposta, encerrei esse atendimento. Mas quando quiser \u00e9 s\u00f3 falar comigo \ud83d\ude09",
+              "text": "Due to lack of response, I closed this conversation. But if you want, you can talk to me \ud83d\ude09",
               "type": "send_msg",
               "uuid": "04b62db2-2a9e-4a7c-a0c4-408597b59a93"
             }
@@ -2783,8 +2783,8 @@
           "actions": [
             {
               "field": {
-                "key": "telefone",
-                "name": "Telefone"
+                "key": "phone",
+                "name": "Phone"
               },
               "type": "set_contact_field",
               "uuid": "ec803d03-b355-4ebf-b1e2-065a3b5e4e41",
@@ -2825,7 +2825,7 @@
             "categories": [
               {
                 "exit_uuid": "979a59a5-ec64-47f0-a543-89aa25334a1c",
-                "name": "Primeiro erro",
+                "name": "First error",
                 "uuid": "7c6d2846-8e64-4cd6-8b35-6e50d69bbbd2"
               },
               {
@@ -2835,7 +2835,7 @@
               }
             ],
             "default_category_uuid": "30af4fc8-f5f5-4570-94d3-becd2aa5500b",
-            "operand": "@results.contador_de_erros",
+            "operand": "@results.error_counter",
             "type": "switch"
           },
           "uuid": "61a64662-6c2e-4629-99d6-7a2b145eb83f"
@@ -2846,8 +2846,8 @@
               "addresses": [
                 "weni@weni.ai"
               ],
-              "body": "Cliente com n\u00famero diferente da formata\u00e7\u00e3o - Chatbot\n\nNumero informado no Chatbot: @results.telefone.value\n\nNome: @contact.name\n\nUUID: @contact.uuid ",
-              "subject": "Usu\u00e1rio com n\u00famero diferente da formata\u00e7\u00e3o - Chatbot",
+              "body": "Client with a different number from the format - Chatbot\n\nNumber informed in the Chatbot: @results.phone.value\n\nName: @contact.name\n\nUUID: @contact.uuid ",
+              "subject": "User with a different number from the format - Chatbot",
               "type": "send_email",
               "uuid": "74d2114a-9c9a-42e8-bb66-5964ae46be45"
             }
@@ -2864,12 +2864,12 @@
           "actions": [
             {
               "field": {
-                "key": "telefone",
-                "name": "Telefone"
+                "key": "phone",
+                "name": "Phone"
               },
               "type": "set_contact_field",
               "uuid": "330f31b8-b63c-4a74-8d8c-146c2df691e9",
-              "value": "@results.telefone"
+              "value": "@results.phone"
             }
           ],
           "exits": [
@@ -2924,16 +2924,16 @@
             {
               "attachments": [],
               "quick_replies": [],
-              "text": "Ent\u00e3o @(title(contact.first_name)), eu preciso de um n\u00famero v\u00e1lido! Por favor, digita seu n\u00famero abaixo. (DD) 9xxxx-xxxx",
+              "text": "Then @(title(contact.first_name)), I need a valid number! Please, type your number below. (DD) 9xxxx-xxxx",
               "type": "send_msg",
               "uuid": "43bad6f1-3268-4f1c-92c1-105043957bcc"
             },
             {
               "category": "",
-              "name": "contador de erros",
+              "name": "error counter",
               "type": "set_run_result",
               "uuid": "f438a9db-d0cd-42ee-8991-d55d4a5ff03e",
-              "value": "@(contador_de_erros +1)"
+              "value": "@(error_counter +1)"
             }
           ],
           "exits": [
@@ -2949,7 +2949,7 @@
             {
               "attachments": [],
               "quick_replies": [],
-              "text": "Preciso desta informa\u00e7\u00e3o caso eu precise te contatar \ud83d\ude14",
+              "text": "I need this information in case I need to contact you \ud83d\ude14",
               "type": "send_msg",
               "uuid": "4cda4fc9-4703-4291-b325-4a2270d1790c"
             }
@@ -3062,7 +3062,7 @@
         },
         "stickies": {
           "120ac629-cc94-49b3-913f-98cb60f36419": {
-            "body": "O card \"Enviar mensagem\" serve para enviarmos mensagens ao usu\u00e1rio atrav\u00e9s de um canal.\n\nEssa mensagem pode ser personalizada, por exemplo, perguntando qual o nome social dessa pessoa.",
+            "body": "The \"Send message\" card is used to send messages to the user through a channel.\n\nThis message can be personalized, for example, asking for the person's preferred name.",
             "color": "purple",
             "position": {
               "bottom": 180,
@@ -3070,10 +3070,10 @@
               "right": 180,
               "top": 300
             },
-            "title": "Enviar mensagem"
+            "title": "Send message"
           },
           "63fee139-f00e-4b5a-b4a8-935535ce09a8": {
-            "body": "Aqui verificamos se o usu\u00e1rio est\u00e1 no grupo \"Informou nome\", pois se tiver \u00e9 porque j\u00e1 informou seu nome anteriormente visto que o usu\u00e1rio s\u00f3 \u00e9 adicionado neste grupo ap\u00f3s informar o nome.\n\nSe voc\u00ea n\u00e3o quiser perguntar o nome novamente, \u00e9 s\u00f3 retirar a liga\u00e7\u00e3o da categoria Informou Nome ou abaixar o card at\u00e9 que o fluxo de mensagem se inicie no primeiro card \"Enviar mensagem\"",
+            "body": "Here we check if the user is in the \"Informed Name\" group, because if they are, it's because they have already informed their name previously, as the user is only added to this group after informing their name.\n\nIf you don't want to ask for the name again, just remove the link from the Informed Name category or lower the card until the message flow starts in the first \"Send message\" card",
             "color": "purple",
             "position": {
               "bottom": -120,
@@ -3081,10 +3081,10 @@
               "right": 0,
               "top": 20
             },
-            "title": "Dividir por filia\u00e7\u00e3o de grupo"
+            "title": "Split by group"
           },
           "69abfbd6-e457-451e-bca5-38cc5cc9c833": {
-            "body": "Aqui atualizamos o campo de contato \"name\" e poder\u00e1 ser visto no m\u00f3dulo Est\u00fadio > Contatos",
+            "body": "Here we update the contact field \"name\" and it can be seen in the Studio > Contacts module",
             "color": "purple",
             "position": {
               "bottom": 460,
@@ -3092,10 +3092,10 @@
               "right": 20,
               "top": 1280
             },
-            "title": "Atualizar o contato"
+            "title": "Update contact"
           },
           "76fcd361-ae53-47f7-86aa-0e1b3c7ec8c8": {
-            "body": "Apagamos o C\u00f3digo do Contato sempre que o mesmo informar seu nome pois criamos a possibilidade de mais de 1 lead chegar pelo canal.\n\nIsso quer dizer que se o usu\u00e1rio informar que o nome dele mudou, sempre ser\u00e1 gerado um novo c\u00f3digo de contato para cadastrar na API da Omie.",
+            "body": "We delete the Contact Code whenever the user informs their name because we created the possibility of more than 1 lead arriving through the channel.\n\nThis means that if the user informs that their name has changed, a new contact code will always be generated to register in the Omie API.",
             "color": "purple",
             "position": {
               "left": 820,
@@ -3104,7 +3104,7 @@
             "title": "nCod"
           },
           "7e207b33-679c-41fd-af4d-a1fde0396bba": {
-            "body": "A categoria No Response serve para quando o fluxo continua sem que o usu\u00e1rio tenha respondido \u00e0 pergunta. Normalmente \u00e9 utilizado para n\u00e3o deixar o usu\u00e1rio preso em uma pergunta.\n\nAl\u00e9m disso, adicionamos o usu\u00e1rio no grupo \"Conversa encerrada\" pois antes de enviar outra mensagem ou entrar em outro fluxo podemos verificar se o usu\u00e1rio est\u00e1 nesse grupo e evitar o envio de mensagens.",
+            "body": "The No Response category is used when the flow continues without the user answering the question. It's usually used to not leave the user stuck in a question.\n\nIn addition, we add the user to the \"Conversation ended\" group so that before sending another message or entering another flow we can check if the user is in that group and avoid sending messages.",
             "color": "purple",
             "position": {
               "bottom": 140,
@@ -3112,10 +3112,10 @@
               "right": -40,
               "top": 660
             },
-            "title": "Categoria No Response"
+            "title": "No Response category"
           },
           "b7e2987e-79af-4cc3-b44d-3ea6ff72f024": {
-            "body": "Esse card serve para parar a fluidez do fluxo de mensagem e aguardar um momento para que haja uma resposta do usu\u00e1rio.\n\n\u00c9 muito importante ser usado para deixar a conversa mais humana.\n\nLembre que voc\u00ea pode clicar na op\u00e7\u00e3o \"Continue quando n\u00e3o houver resposta...\" e escolher o tempo que deseja esperar.\n\nDentro do card \"Aguarde por resposta\" tamb\u00e9m podemos criar regras para caso, quando o usu\u00e1rio responder, j\u00e1 verificar se h\u00e1 alguma palavra ou se \u00e9 um texto.",
+            "body": "This card serves to stop the flow of messages and wait for a moment for the user to respond.\n\nIt's very important to be used to make the conversation more human.\n\nRemember that you can click on the option \"Continue when there's no response...\" and choose the time you want to wait.\n\nInside the \"Wait for response\" card we can also create rules for when, when the user responds, already check if there's any word or if it's a text.",
             "color": "purple",
             "position": {
               "bottom": 160,
@@ -3123,10 +3123,10 @@
               "right": -100,
               "top": 560
             },
-            "title": "Aguarde por resposta"
+            "title": "Wait for response"
           },
           "e922c5c2-ad35-482a-8655-07435c3e2139": {
-            "body": "Aqui tratamos a excess\u00e3o para caso o usu\u00e1rio n\u00e3o digite um texto, podendo ter enviado a foto de seu documento etc.",
+            "body": "Here we treat the exception for when the user doesn't type a text, possibly having sent a photo of their document, etc.",
             "color": "purple",
             "position": {
               "bottom": 160,
@@ -3137,7 +3137,7 @@
             "title": "Other"
           },
           "ff7c6bad-90a1-4867-99dc-5f2ac3dad3e6": {
-            "body": "A categoria Encerrar serve para quando o fluxo de mensagem continua sem que o usu\u00e1rio tenha respondido \u00e0 pergunta. Normalmente \u00e9 utilizado para n\u00e3o deixar o usu\u00e1rio preso em uma pergunta.\n\nAl\u00e9m disso, adicionamos o usu\u00e1rio no grupo \"Conversa encerrada\" pois antes de enviar outra mensagem ou entrar em outro fluxo de mensagem podemos verificar se o usu\u00e1rio est\u00e1 nesse grupo e evitar o envio de mensagens.",
+            "body": "The Close category is used when the message flow continues without the user having responded to the question. It is typically used to prevent the user from being stuck on a question.\n\nAdditionally, we add the user to the \"Conversation ended\" group because before sending another message or entering another message flow, we can check if the user is in this group and avoid sending messages.",
             "color": "purple",
             "position": {
               "bottom": 200,
@@ -3145,7 +3145,7 @@
               "right": 20,
               "top": 920
             },
-            "title": "Categoria Encerrar"
+            "title": "Close category"
           }
         }
       },
@@ -3156,7 +3156,7 @@
         "expires": 10080,
         "revision": 1
       },
-      "name": "Coleta do Nome",
+      "name": "Name Capture",
       "nodes": [
         {
           "actions": [],
@@ -3175,7 +3175,7 @@
               {
                 "arguments": [
                   "30bcaa89-ebfb-482c-a696-c71ab13a679b",
-                  "Informou Nome"
+                  "Name informed"
                 ],
                 "category_uuid": "19d222be-d8b6-4bdc-8117-e81e4aeb07a5",
                 "type": "has_group",
@@ -3185,7 +3185,7 @@
             "categories": [
               {
                 "exit_uuid": "2d3030ab-19cc-4065-a0a2-5a51566cb595",
-                "name": "Informou Nome",
+                "name": "Name informed",
                 "uuid": "19d222be-d8b6-4bdc-8117-e81e4aeb07a5"
               },
               {
@@ -3206,10 +3206,10 @@
             {
               "attachments": [],
               "quick_replies": [
-                "Sim",
-                "N\u00e3o"
+                "Yes",
+                "No"
               ],
-              "text": "Confirma para mim, @contact.name \u00e9 o seu nome?",
+              "text": "Can you confirm for me, is @contact.name your name?",
               "type": "send_msg",
               "uuid": "7100e2b2-39d1-4b10-a380-60f12a07b508"
             }
@@ -3246,7 +3246,7 @@
             "cases": [
               {
                 "arguments": [
-                  "Sim si aim s ss"
+                  "Yes ye y"
                 ],
                 "category_uuid": "1f5a8f9f-4c2a-4287-bb8f-f65a2f47eedd",
                 "type": "has_any_word",
@@ -3254,7 +3254,7 @@
               },
               {
                 "arguments": [
-                  "N\u00e3o nao nau nop"
+                  "No n"
                 ],
                 "category_uuid": "a6ee8809-a6a6-4ecb-be18-518acd5bab5c",
                 "type": "has_any_word",
@@ -3264,12 +3264,12 @@
             "categories": [
               {
                 "exit_uuid": "740212e7-40c5-48c9-aa85-61a264263da0",
-                "name": "Sim",
+                "name": "Yes",
                 "uuid": "1f5a8f9f-4c2a-4287-bb8f-f65a2f47eedd"
               },
               {
                 "exit_uuid": "fc5ae013-84ed-4aff-81d2-787c18190ec5",
-                "name": "N\u00e3o",
+                "name": "No",
                 "uuid": "a6ee8809-a6a6-4ecb-be18-518acd5bab5c"
               },
               {
@@ -3285,7 +3285,7 @@
             ],
             "default_category_uuid": "2f411ffa-2591-4bf8-8ff9-5295d1f10fcf",
             "operand": "@input.text",
-            "result_name": "confirmacao",
+            "result_name": "confirmation",
             "type": "switch",
             "wait": {
               "timeout": {
@@ -3302,7 +3302,7 @@
             {
               "attachments": [],
               "quick_replies": [],
-              "text": "Gostaria de te conhecer melhor \ud83d\ude0a",
+              "text": "I'd like to get to know you better \ud83d\ude0a",
               "type": "send_msg",
               "uuid": "a9c0dbef-5841-4805-a2a9-ede261c83892"
             }
@@ -3320,7 +3320,7 @@
             {
               "attachments": [],
               "quick_replies": [],
-              "text": "Preciso que me envie em formato de texto...",
+              "text": "I need you to send me in text format...",
               "type": "send_msg",
               "uuid": "58425171-24b8-477b-8133-d96e315a002f"
             }
@@ -3338,7 +3338,7 @@
             {
               "attachments": [],
               "quick_replies": [],
-              "text": "Por favor, qual o seu nome completo?",
+              "text": "Please, what is your full name?",
               "type": "send_msg",
               "uuid": "1eb3299e-309f-4b65-9e2d-add16520ce51"
             }
@@ -3375,7 +3375,7 @@
             "cases": [
               {
                 "arguments": [
-                  "desistir sair encerrar"
+                  "quit exit end"
                 ],
                 "category_uuid": "5e939fe0-dd1b-4a0e-b97d-7aa7fcbf179f",
                 "type": "has_any_word",
@@ -3391,12 +3391,12 @@
             "categories": [
               {
                 "exit_uuid": "4509ee1e-1cc9-48d4-a6b0-4c51da3186cf",
-                "name": "Encerrar",
+                "name": "End",
                 "uuid": "5e939fe0-dd1b-4a0e-b97d-7aa7fcbf179f"
               },
               {
                 "exit_uuid": "36d5ebc6-a691-4c0c-9fec-c64960003548",
-                "name": "Nome",
+                "name": "Name",
                 "uuid": "f8577bcb-245d-46b4-bba8-6ef21de4b09a"
               },
               {
@@ -3412,7 +3412,7 @@
             ],
             "default_category_uuid": "c311587c-fef7-4da7-957b-01f8b797633d",
             "operand": "@input.text",
-            "result_name": "nome",
+            "result_name": "name",
             "type": "switch",
             "wait": {
               "timeout": {
@@ -3430,7 +3430,7 @@
               "groups": [
                 {
                   "count": 0,
-                  "name": "Conversa Encerrada",
+                  "name": "Conversation Ended",
                   "query": null,
                   "status": "ready",
                   "uuid": "d01833de-92d9-4bb1-96eb-dde0c96665aa"
@@ -3442,7 +3442,7 @@
             {
               "attachments": [],
               "quick_replies": [],
-              "text": "Por falta de resposta, encerrei esse atendimento. Mas quando quiser \u00e9 s\u00f3 falar comigo \ud83d\ude09",
+              "text": "Due to lack of response, I ended this conversation. But when you want, just talk to me \ud83d\ude09",
               "type": "send_msg",
               "uuid": "643948cf-a317-4288-ba85-e4b843629bd6"
             }
@@ -3461,7 +3461,7 @@
               "groups": [
                 {
                   "count": 2,
-                  "name": "Conversa Encerrada",
+                  "name": "Conversation Ended",
                   "query": null,
                   "status": "ready",
                   "uuid": "d01833de-92d9-4bb1-96eb-dde0c96665aa"
@@ -3473,7 +3473,7 @@
             {
               "attachments": [],
               "quick_replies": [],
-              "text": "Certo, quando quiser \u00e9 s\u00f3 falar comigo \ud83d\ude09",
+              "text": "Alright, when you want, just talk to me \ud83d\ude09",
               "type": "send_msg",
               "uuid": "46756da6-e077-4141-91e0-ada7cc02881e"
             }
@@ -3489,7 +3489,7 @@
         {
           "actions": [
             {
-              "name": "@results.nome.value",
+              "name": "@results.name.value",
               "type": "set_contact_name",
               "uuid": "c51c18a1-14c6-4ce6-9680-996f9a65d8da"
             },
@@ -3497,7 +3497,7 @@
               "groups": [
                 {
                   "count": 0,
-                  "name": "Informou Nome",
+                  "name": "Provided Name",
                   "query": null,
                   "status": "ready",
                   "uuid": "30bcaa89-ebfb-482c-a696-c71ab13a679b"
@@ -3519,7 +3519,7 @@
           "actions": [
             {
               "flow": {
-                "name": "Apagar dados do Lead",
+                "name": "Delete Lead Data",
                 "uuid": "e611ac07-ea8b-4554-abbd-4c183f96a9cb"
               },
               "type": "enter_flow",
@@ -3687,7 +3687,7 @@
         },
         "stickies": {
           "0d0083b2-6cf7-4907-bcaa-9ebcf0df5258": {
-            "body": "Esse card serve para verificarmos se o usu\u00e1rio est\u00e1 no grupo Conversa Encerrada, se sim, o fluxo n\u00e3o continua. Agora se o usu\u00e1rio n\u00e3o estiver nesse grupo, ir\u00e1 passar pela categoria Other e continuar\u00e1 no fluxo.\n\n\u00c9 importante lembrar que o usu\u00e1rio s\u00f3 \u00e9 colocado no grupo Conversa encerrada se quiser encerrar ou ficar inativo.",
+            "body": "This card is used to check if the user is in the Conversation Ended group, if so, the flow does not continue. Now if the user is not in that group, it will pass through the Other category and continue in the flow.\n\nIt is important to remember that the user is only placed in the Conversation Ended group if they want to end or stay inactive.",
             "color": "purple",
             "position": {
               "bottom": 860,
@@ -3695,10 +3695,10 @@
               "right": 160,
               "top": 1220
             },
-            "title": "Dividir por Filia\u00e7\u00e3o de Grupo"
+            "title": "Divide by Group Section"
           },
           "4add01c1-1ae5-41b9-8cdf-aa84f8e29076": {
-            "body": "Esse \u00e9 o fluxo de mensagens principal de captura de dados. Sendo assim, ele que dever\u00e1 ser iniciado quando voc\u00ea precisar coletar nome, telefone e email de algum usu\u00e1rio.\n\nNeste fluxo usamos card \"Entrar em um fluxo\" para organizar as etapas e tipos de perguntas como nome, telefone e email. Mas o fluxo que voc\u00ea deve usar \u00e9 o \"Captura de Leads - Omie\n\".",
+            "body": "This is the main messaging flow for capturing data. Therefore, it should be started when you need to collect the name, phone number and email of a user.\n\nIn this flow we use the card \"Enter a flow\" to organize the steps and types of questions such as name, phone number and email. But the flow you should use is \"Captura de Leads - Omie\".",
             "color": "purple",
             "position": {
               "bottom": 0,
@@ -3706,10 +3706,10 @@
               "right": 0,
               "top": 40
             },
-            "title": "Informa\u00e7\u00f5es iniciais"
+            "title": "Initial Information"
           },
           "693fdf1e-9eb4-4c3c-80db-8a1a68dd6fd3": {
-            "body": "Neste fluxo incluimos a oportunidade api da Omie",
+            "body": "In this flow we include the opportunity in the Omie api.",
             "color": "purple",
             "position": {
               "bottom": 20,
@@ -3717,10 +3717,10 @@
               "right": -140,
               "top": 2840
             },
-            "title": "Incluir oportunidade"
+            "title": "Include Opportunity"
           },
           "753bcb91-f5c6-4836-81db-f6c49ef1bb1e": {
-            "body": "Neste fluxo incluimos o contato na api da omie.",
+            "body": "In this flow we include the contact in the Omie api.",
             "color": "purple",
             "position": {
               "bottom": -120,
@@ -3728,10 +3728,10 @@
               "right": 0,
               "top": 2500
             },
-            "title": "Incluir contato"
+            "title": "Include Contact"
           },
           "8c6966cf-0a04-4478-bd31-c2d39e23c4db": {
-            "body": "Neste fluxo de mensagens usamos o card \"Entrar em um fluxo\" para organizar a estrutura das nossas perguntas. \n\nO card \"Entrar em um fluxo\" simplesmente direciona o usu\u00e1rio para outro fluxo de mensagens  em mil\u00e9simos de segundos e j\u00e1 executa a a\u00e7\u00e3o desse outro fluxo de mensagens .\n\nSendo assim, a t\u00edtulo de organiza\u00e7\u00e3o perguntamos o nome, telefone e email, cada um em seu devido fluxo.de mensagem.",
+            "body": "In this messaging flow we use the card \"Enter a flow\" to organize the structure of our questions. \n\nThe card \"Enter a flow\" simply directs the user to another messaging flow in milliseconds and immediately executes the action of that other messaging flow.\n\nTherefore, for organizational purposes, we ask for name, phone number and email, each in its respective messaging flow.",
             "color": "purple",
             "position": {
               "bottom": -140,
@@ -3739,10 +3739,10 @@
               "right": 180,
               "top": 40
             },
-            "title": "Entrar em um fluxo"
+            "title": "Enter a Flow"
           },
           "a0889d78-48bf-4946-b208-8840ff6b6541": {
-            "body": "Adicione seu email para receber uma notifica\u00e7\u00e3o sempre que um lead for criado",
+            "body": "Add your email to receive a notification every time a lead is created",
             "color": "purple",
             "position": {
               "bottom": null,
@@ -3750,10 +3750,10 @@
               "right": null,
               "top": 3280
             },
-            "title": "Enviar Email"
+            "title": "Send Email"
           },
           "a507503c-2b76-443f-bdc9-11774aa9d149": {
-            "body": "Mensagem de feedback ao usu\u00e1rio.\n\nPode ser removida ou alterada, se preferir.",
+            "body": "Feedback message to the user.\n\nIt can be removed or changed if you prefer.",
             "color": "purple",
             "position": {
               "bottom": 20,
@@ -3761,10 +3761,10 @@
               "right": 460,
               "top": 3060
             },
-            "title": "Enviar mensagem"
+            "title": "Send Message"
           },
           "ac6454c0-fe74-4b63-9058-fc552f57cee7": {
-            "body": "Esse card serve para verificarmos se o usu\u00e1rio est\u00e1 no grupo Conversa Encerrada, se sim, o fluxo de mensagem n\u00e3o continua. Agora se o usu\u00e1rio n\u00e3o estiver nesse grupo, ir\u00e1 passar pela categoria Other e continuar\u00e1 no fluxo de mensagem.\n\n\u00c9 importante lembrar que o usu\u00e1rio s\u00f3 \u00e9 colocado no grupo Conversa encerrada se quiser encerrar ou ficar inativo.",
+            "body": "This card is used to check if the user is in the Conversation Ended group, if so, the messaging flow does not continue. Now if the user is not in that group, it will pass through the Other category and continue in the messaging flow.\n\nIt is important to remember that the user is only placed in the Conversation Ended group if they want to end or stay inactive.",
             "color": "purple",
             "position": {
               "bottom": -660,
@@ -3772,10 +3772,10 @@
               "right": 140,
               "top": 440
             },
-            "title": "Dividir por Filia\u00e7\u00e3o de Grupo"
+            "title": "Divide by Group Section"
           },
           "d5e6d883-3c5c-41b8-875c-30f5edc1fad0": {
-            "body": "Esse card serve para adicionar o usu\u00e1rio que completou o envio de informa\u00e7\u00f5es em um grupo chamado \"Lead Completo\".\n\nVoc\u00ea pode visualizar todas as pessoas que est\u00e3o nesse grupo acessando o m\u00f3dulo Est\u00fadio > Contatos > Filtrar pelo Grupo Lead Completo no canto inferior esquerdo da Tela.\n\nVoc\u00ea tamb\u00e9m pode disparar mensagens ativamente para todas as pessoas que estejam dentro desse grupo.",
+            "body": "This card is used to add the user who completed sending information to a group called \"Complete Lead\".\n\nYou can view all the people who are in that group by accessing the Module Dashboard > Contacts > Filter by Group Lead Complete in the bottom left corner of the Screen.\n\nYou can also actively send messages to all the people who are inside that group.",
             "color": "purple",
             "position": {
               "bottom": -200,
@@ -3783,7 +3783,7 @@
               "right": 40,
               "top": 2120
             },
-            "title": "Adicione a um Grupo"
+            "title": "Add to a Group"
           }
         }
       },
@@ -3794,13 +3794,13 @@
         "expires": 10080,
         "revision": 11
       },
-      "name": "Captura de Leads - Omie",
+      "name": "Leads Capture - Omie",
       "nodes": [
         {
           "actions": [
             {
               "flow": {
-                "name": "Coleta do Nome",
+                "name": "Name Capture",
                 "uuid": "9bbd69de-da2c-44a5-a592-b318ec794e56"
               },
               "type": "enter_flow",
@@ -3870,7 +3870,7 @@
               {
                 "arguments": [
                   "d01833de-92d9-4bb1-96eb-dde0c96665aa",
-                  "Conversa Encerrada"
+                  "Conversation Ended"
                 ],
                 "category_uuid": "cd5b2da3-8ea3-408d-b908-1f3ead91cd75",
                 "type": "has_group",
@@ -3880,7 +3880,7 @@
             "categories": [
               {
                 "exit_uuid": "bd93ac62-27d6-4079-b64b-7c68b2f3efa4",
-                "name": "Conversa Encerrada",
+                "name": "Conversation Ended",
                 "uuid": "cd5b2da3-8ea3-408d-b908-1f3ead91cd75"
               },
               {
@@ -3900,7 +3900,7 @@
           "actions": [
             {
               "flow": {
-                "name": "Coleta de Telefone",
+                "name": "Phone Capture",
                 "uuid": "2b5aa5a3-b716-4ad4-acaf-7e6b8a202fbf"
               },
               "type": "enter_flow",
@@ -3970,7 +3970,7 @@
               {
                 "arguments": [
                   "d01833de-92d9-4bb1-96eb-dde0c96665aa",
-                  "Conversa Encerrada"
+                  "Conversation Ended"
                 ],
                 "category_uuid": "c32dbd48-8d3b-4bfc-a525-91e7929b7fef",
                 "type": "has_group",
@@ -3980,7 +3980,7 @@
             "categories": [
               {
                 "exit_uuid": "13755e18-f50c-4fb9-a877-162c2ce52599",
-                "name": "Conversa Encerrada",
+                "name": "Conversation Ended",
                 "uuid": "c32dbd48-8d3b-4bfc-a525-91e7929b7fef"
               },
               {
@@ -4000,7 +4000,7 @@
           "actions": [
             {
               "flow": {
-                "name": "Coleta de E-mail",
+                "name": "Email Collection",
                 "uuid": "539c95e5-e872-4a5d-b455-d76e3dcc8b61"
               },
               "type": "enter_flow",
@@ -4070,7 +4070,7 @@
               {
                 "arguments": [
                   "d01833de-92d9-4bb1-96eb-dde0c96665aa",
-                  "Conversa Encerrada"
+                  "Conversation Ended"
                 ],
                 "category_uuid": "f0c6b4d9-e355-4c38-9691-84332ab101b4",
                 "type": "has_group",
@@ -4080,7 +4080,7 @@
             "categories": [
               {
                 "exit_uuid": "3055b159-a036-4450-837f-fc3dd0f08f43",
-                "name": "Conversa Encerrada",
+                "name": "Conversation Ended",
                 "uuid": "f0c6b4d9-e355-4c38-9691-84332ab101b4"
               },
               {
@@ -4102,7 +4102,7 @@
               "groups": [
                 {
                   "count": 0,
-                  "name": "Lead Completo",
+                  "name": "Complete Lead",
                   "query": null,
                   "status": "ready",
                   "uuid": "23f7a5ff-a631-4d73-8780-9d357f9b50dd"
@@ -4124,7 +4124,7 @@
           "actions": [
             {
               "flow": {
-                "name": "Cadastro de Lead - Incluir Contato",
+                "name": "Lead Registration - Add Contact",
                 "uuid": "3e8a2013-5155-4a48-99af-e7be710ac79a"
               },
               "type": "enter_flow",
@@ -4195,7 +4195,7 @@
               {
                 "arguments": [
                   "9634ff85-f5f8-4b1f-a34e-d8eef6e2c108",
-                  "Lead Cadastrado"
+                  "Lead Registered"
                 ],
                 "category_uuid": "731d5e58-9478-4f0b-a3ff-d5a7b05fee35",
                 "type": "has_group",
@@ -4205,7 +4205,7 @@
             "categories": [
               {
                 "exit_uuid": "f3b812dd-5cb7-4b59-8d3f-7f27a50b0384",
-                "name": "Lead Cadastrado",
+                "name": "Lead Registered",
                 "uuid": "731d5e58-9478-4f0b-a3ff-d5a7b05fee35"
               },
               {
@@ -4225,7 +4225,7 @@
           "actions": [
             {
               "flow": {
-                "name": "Cadastro de Lead - Incluir Oportunidade",
+                "name": "Lead Registration - Add Opportunity",
                 "uuid": "ecbfbea1-d0ad-4031-b538-764fa465e46f"
               },
               "type": "enter_flow",
@@ -4285,7 +4285,7 @@
               "all_urns": false,
               "attachments": [],
               "quick_replies": [],
-              "text": "Informei sobre seu interesse aos nossos respons\u00e1veis \ud83e\udd1d Aguarde, um de nossos consultores ir\u00e1 entrar em contato",
+              "text": "I informed about your interest to our responsible \ud83e\udd1d Wait, one of our consultants will contact you",
               "type": "send_msg",
               "uuid": "a0a7635b-5021-4c81-ac49-ddeadb6ce988"
             }
@@ -4304,8 +4304,8 @@
               "addresses": [
                 "seuemail@weni.ai"
               ],
-              "body": "O contato @contact.name acabou de ser cadastrado como lead na API da Omie.\n\nTelefone: @fields.telefone\n\nEmail: @fields.email",
-              "subject": "Novo Lead captado via Chatbot - API OMIE @globals.nome_da_empresa",
+              "body": "The contact @contact.name has just been registered as a lead via the Omie API.\n\nPhone: @fields.phone\n\nEmail: @fields.email",
+              "subject": "New Lead Captured via Chatbot - OMIE API @globals.nome_da_empresa",
               "type": "send_email",
               "uuid": "01494ca8-1957-4d89-9301-b87e690ac474"
             }
@@ -4361,23 +4361,23 @@
       "type": "text"
     },
     {
-      "key": "codigo_conta",
-      "name": "Codigo Conta",
+      "key": "account_code",
+      "name": "Account Code",
       "type": "text"
     },
     {
-      "key": "codigo_origem",
-      "name": "Codigo Origem",
+      "key": "source_code",
+      "name": "Source Code",
       "type": "text"
     },
     {
-      "key": "codigo_solucao",
-      "name": "Codigo Solucao",
+      "key": "solution_code",
+      "name": "Solution Code",
       "type": "text"
     },
     {
-      "key": "codigo_vendedor",
-      "name": "Codigo Vendedor",
+      "key": "seller_code",
+      "name": "Seller Code",
       "type": "text"
     },
     {
@@ -4391,50 +4391,50 @@
       "type": "text"
     },
     {
-      "key": "telefone",
-      "name": "Telefone",
+      "key": "phone",
+      "name": "Phone",
       "type": "text"
     }
   ],
   "groups": [
     {
       "uuid": "d01833de-92d9-4bb1-96eb-dde0c96665aa",
-      "name": "Conversa Encerrada",
+      "name": "Conversation Ended",
       "query": null
     },
     {
       "uuid": "30bcaa89-ebfb-482c-a696-c71ab13a679b",
-      "name": "Informou Nome",
+      "name": "Provided Name",
       "query": null
     },
     {
       "uuid": "9634ff85-f5f8-4b1f-a34e-d8eef6e2c108",
-      "name": "Lead Cadastrado",
+      "name": "Lead Registered",
       "query": null
     },
     {
       "uuid": "23f7a5ff-a631-4d73-8780-9d357f9b50dd",
-      "name": "Lead Completo",
+      "name": "Complete Lead",
       "query": null
     },
     {
       "uuid": "66e35bc2-c943-418d-9e49-769702167623",
-      "name": "Lead N\u00e3o cadastrado",
+      "name": "Lead Not Registered",
       "query": null
     },
     {
       "uuid": "f739f49d-431c-4715-aa7d-0dceaa2599dd",
-      "name": "Oportunidade Enviada",
+      "name": "Opportunity Sent",
       "query": null
     },
     {
       "uuid": "e62d7cfb-293c-4ef2-94bc-4e822047ba79",
-      "name": "Oportunidade n\u00e3o enviada",
+      "name": "Opportunity Not Sent",
       "query": null
     },
     {
       "uuid": "2071332e-da02-4146-a2ac-b035ec02e9e3",
-      "name": "Satisfeito",
+      "name": "Satisfied",
       "query": null
     }
   ]

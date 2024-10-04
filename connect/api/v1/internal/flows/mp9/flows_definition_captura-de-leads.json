@@ -59,8 +59,8 @@
               "right": null,
               "bottom": null
             },
-            "title": "Categoria No response",
-            "body": "A categoria No Response serve para quando o fluxo continua sem que o usu\u00e1rio tenha respondido \u00e0 pergunta. Normalmente \u00e9 utilizado para n\u00e3o deixar o usu\u00e1rio preso em uma pergunta.\n\nAl\u00e9m disso, adicionamos o usu\u00e1rio no grupo \"Conversa encerrada\" pois antes de enviar outra mensagem ou entrar em outro fluxo podemos verificar se o usu\u00e1rio est\u00e1 nesse grupo e evitar o envio de mensagens",
+            "title": "No Response Category",
+            "body": "The No Response category is used when the flow continues without the user answering the question. It is usually used to avoid the user being stuck in a question.\n\nIn addition, we add the user to the \"Conversation Ended\" group so that before sending another message or entering another flow, we can check if the user is in that group and avoid sending messages",
             "color": "green"
           },
           "bbec3f01-d705-47cb-bd31-d2f2a542e9e5": {
@@ -70,8 +70,8 @@
               "right": null,
               "bottom": null
             },
-            "title": "Enviar mensagem",
-            "body": "Aqui perguntamos o email do usu\u00e1rio. Voc\u00ea pode personalizar essa mensagem para a que preferir",
+            "title": "Send Message",
+            "body": "Here we ask the user for their email. You can customize this message to your liking",
             "color": "green"
           },
           "f1863e3c-063d-487f-aac8-5154989c438e": {
@@ -81,8 +81,8 @@
               "right": null,
               "bottom": null
             },
-            "title": "Aguarde por resposta",
-            "body": "Aqui aguardamos pela resposta do usu\u00e1rio e usamos a regra \"tem um email\".\n\nTamb\u00e9m usamos a regra de Sim e N\u00e3o para verificar se o usu\u00e1rio quer ou n\u00e3o informar o email.",
+            "title": "Wait for Response",
+            "body": "Here we wait for the user's response and use the \"has an email\" rule.\n\nWe also use the \"Yes\" and \"No\" rules to check if the user wants to or not inform the email.",
             "color": "green"
           },
           "9cb3a7e2-bb60-4fad-9177-a9f3694c7eab": {
@@ -92,8 +92,8 @@
               "right": null,
               "bottom": null
             },
-            "title": "Adicione URN",
-            "body": "Adicionamos o email do usu\u00e1rio na URN e-mail. Essa URN \u00e9 o canal em que o usu\u00e1rio pode ser contatado.\n\nOBS: Voc\u00ea disparar emails ativamente se o usu\u00e1rio tiver a URN email",
+            "title": "Add URN",
+            "body": "We add the user's email to the email URN. This URN is the channel in which the user can be contacted.\n\nOBS: You actively send emails if the user has the email URN",
             "color": "green"
           },
           "efed2930-4558-4f7f-b889-a275c4521fcf": {
@@ -103,8 +103,8 @@
               "right": 200,
               "bottom": -120
             },
-            "title": "Atualizar o contato",
-            "body": "Tamb\u00e9m salvamos no campo de contato Email. Esse dado poder\u00e1 ser visto em detalhes no hist\u00f3rico de cada contato e pode ser usado em qualquer fluxo de mensagem pois a informa\u00e7\u00e3o est\u00e1 sendo salva no contato e n\u00e3o em um fluxo de mensagem espec\u00edfico.",
+            "title": "Update Contact",
+            "body": "We also save the email in the contact field. This data can be seen in the details of each contact and can be used in any message flow since the information is being saved in the contact and not in a specific message flow.",
             "color": "green"
           },
           "0743246a-ba2f-4119-b47b-8d9e0957dad9": {
@@ -114,8 +114,8 @@
               "right": 0,
               "bottom": 20
             },
-            "title": "Enviar mensagem",
-            "body": "Aqui enviamos uma mensagem para o caso do usu\u00e1rio digitar \"N\u00e3o\"",
+            "title": "Send Message",
+            "body": "Here we send a message for the case where the user types \"No\"",
             "color": "green"
           },
           "4ebafb7f-b897-4dd5-b04b-6d468dd33c3c": {
@@ -125,8 +125,8 @@
               "right": 0,
               "bottom": 40
             },
-            "title": "Enviar mensagem",
-            "body": "Aqui verificamos que o usu\u00e1rio n\u00e3o digitou um email e perguntamos se ele pode informar e damos a op\u00e7\u00e3o de Sim e N\u00e3o. \n\nImportante lembrar que nessa etapa, se o usu\u00e1rio j\u00e1 responder com seu email, conseguiremos detectar, pois todas as regras est\u00e3o no mesmo card \"Aguarde por resposta\".",
+            "title": "Send Message",
+            "body": "Here we check that the user did not enter an email and ask if they can inform it and give the option of \"Yes\" or \"No\".\n\nIt is important to remember that in this step, if the user has already responded with their email, we will be able to detect it, since all the rules are in the same card \"Wait for Response\".",
             "color": "green"
           }
         }
@@ -138,14 +138,14 @@
         "expires": 10080,
         "revision": 11
       },
-      "name": "Coleta de E-mail - Fluxo secund\u00e1rio",
+      "name": "Email Collection - Secondary Flow",
       "nodes": [
         {
           "actions": [
             {
               "attachments": [],
               "quick_replies": [],
-              "text": "@(title(contact.first_name)), qual o seu e-mail?",
+              "text": "@(title(contact.first_name)), what is your email?",
               "type": "send_msg",
               "uuid": "91847ae2-48ac-419e-a228-5e4f3298e8cc"
             }
@@ -176,7 +176,7 @@
             },
             {
               "attachments": [],
-              "text": "Por falta de resposta, encerrei esse atendimento. Mas quando quiser \u00e9 s\u00f3 falar comigo \ud83d\ude09",
+              "text": "Due to lack of response, I ended this conversation. But if you want, just talk to me \ud83d\ude09",
               "type": "send_msg",
               "quick_replies": [],
               "uuid": "76b3ed5a-088c-4f24-825b-c9feae41e570"
@@ -204,7 +204,7 @@
               },
               {
                 "arguments": [
-                  "Sim si s"
+                  "Yes ye y"
                 ],
                 "type": "has_any_word",
                 "uuid": "8862e278-8ecb-4238-8839-a11598f09721",
@@ -212,7 +212,7 @@
               },
               {
                 "arguments": [
-                  "N\u00e3o nao n nau"
+                  "No nao n"
                 ],
                 "type": "has_any_word",
                 "uuid": "d8e94378-5d05-4974-b47e-f9f444439ecb",
@@ -222,17 +222,17 @@
             "categories": [
               {
                 "exit_uuid": "1cd4da3d-e84a-4409-b29f-3e14e3d713e4",
-                "name": "Tem email",
+                "name": "Has Email",
                 "uuid": "7de4d8ed-5ab4-49fe-98aa-28fa30e6f206"
               },
               {
                 "uuid": "3abe9086-e4e5-4a67-9f06-327271f0d676",
-                "name": "Sim",
+                "name": "Yes",
                 "exit_uuid": "3bdda235-731c-4e87-bef6-70a1b8d54ab6"
               },
               {
                 "uuid": "c70f8c1e-8df0-4084-8551-8968e8d4f285",
-                "name": "N\u00e3o",
+                "name": "No",
                 "exit_uuid": "a2e92a47-0244-40ce-b3fb-c498e9ef2ad1"
               },
               {
@@ -310,7 +310,7 @@
           "actions": [
             {
               "attachments": [],
-              "text": "Entendi, mas nesse caso precisamos dessa informa\u00e7\u00e3o para entrar em contato com voc\u00ea.",
+              "text": "Understood, but in this case we need this information to contact you.",
               "type": "send_msg",
               "quick_replies": [],
               "uuid": "265caae7-5b0f-41bb-9e2d-b60ed82e9e05"
@@ -327,11 +327,11 @@
           "actions": [
             {
               "attachments": [],
-              "text": "Essa \u00e9 uma informa\u00e7\u00e3o muito importante pra gente! Voc\u00ea pode nos informar?",
+              "text": "This is very important information for us! Can you tell us?",
               "type": "send_msg",
               "quick_replies": [
-                "Sim",
-                "N\u00e3o"
+                "Yes",
+                "No"
               ],
               "uuid": "2c68ccf2-3927-41c7-9fb0-24126a7315e8"
             }
@@ -386,8 +386,8 @@
             },
             "config": {
               "operand": {
-                "name": "contador de erros",
-                "id": "contador_de_erros",
+                "name": "error counter",
+                "id": "error_counter",
                 "type": "result"
               },
               "cases": {}
@@ -440,8 +440,8 @@
               "right": null,
               "bottom": null
             },
-            "title": "Categoria No response",
-            "body": "A categoria No Response serve para quando o fluxo continua sem que o usu\u00e1rio tenha respondido \u00e0 pergunta. Normalmente \u00e9 utilizado para n\u00e3o deixar o usu\u00e1rio preso em uma pergunta.\n\nAl\u00e9m disso, adicionamos o usu\u00e1rio no grupo \"Conversa encerrada\" pois antes de enviar outra mensagem ou entrar em outro fluxo podemos verificar se o usu\u00e1rio est\u00e1 nesse grupo e evitar o envio de mensagens.",
+            "title": "No Response Category",
+            "body": "The No Response category is used when the flow continues without the user answering the question. It is usually used to avoid the user being stuck in a question.\n\nIn addition, we add the user to the \"Conversation Ended\" group so that before sending another message or entering another flow, we can check if the user is in that group and avoid sending messages.",
             "color": "green"
           },
           "f9ab91ea-e511-4355-bf74-c320987ea552": {
@@ -451,8 +451,8 @@
               "right": null,
               "bottom": null
             },
-            "title": "Atualizar contato",
-            "body": "Aqui salvamos o telefone informado no campo de contato Telefone para que o dado seja salvo no contato e n\u00e3o somente no fluxo de mensagem.",
+            "title": "Update Contact",
+            "body": "Here we save the phone number entered in the Contact field so that the data is saved in the contact and not just in the message flow.",
             "color": "green"
           },
           "ef7dd972-20d6-4573-bf88-a41be521c93e": {
@@ -462,8 +462,8 @@
               "right": 0,
               "bottom": 0
             },
-            "title": "Salvar Resultado do Fluxo",
-            "body": "Aqui salvamos um resultado chamado contador de erros. Ele sempre ser\u00e1 salvo como 0 no in\u00edcio do fluxo de mensagem e usaremos ele posteriormente para verificar se o usu\u00e1rio digitou um formato de n\u00famero diferente do esperado",
+            "title": "Save Flow Result",
+            "body": "Here we save a result called error counter. It will always be saved as 0 at the beginning of the message flow and we will use it later to verify if the user entered a number format different from the expected one",
             "color": "green"
           },
           "cd43ba58-75a2-427b-bf9d-57a3895f4523": {
@@ -473,8 +473,8 @@
               "right": null,
               "bottom": null
             },
-            "title": "Enviar mensagem",
-            "body": "Aqui perguntamos qual o telefone do usu\u00e1rio mostrando o formato aceito pelo REGEX",
+            "title": "Send Message",
+            "body": "Here we ask the user what their phone number is, showing the format accepted by REGEX",
             "color": "green"
           },
           "0e691d1d-de70-42bd-bf9d-1837dc794279": {
@@ -484,8 +484,8 @@
               "right": null,
               "bottom": null
             },
-            "title": "Aguarde por resposta",
-            "body": "Aguardamos a resposta do usu\u00e1rio.\n\nLembre que voc\u00ea pode clicar na op\u00e7\u00e3o \"Continue quando n\u00e3o houver resposta...\" e escolher o tempo que deseja esperar.\n\nDentro do card \"Aguarde por resposta\" usamos criar regra usando REGEX para saber se o usu\u00e1rio digitou o n\u00famero na formata\u00e7\u00e3o correta. Se for preciso, voc\u00ea pdoe adicionar outras regras de \"corresponde a regex\".",
+            "title": "Wait for Response",
+            "body": "We wait for the user's response.\n\nRemember that you can click on the option \"Continue when there is no response...\" and choose the time you want to wait.\n\nInside the \"Wait for Response\" card we use REGEX to create a rule to know if the user entered the number in the correct format. If necessary, you can add other regex rules.",
             "color": "green"
           },
           "ab6c3a9f-4489-47d7-a1ff-e617745ba1fd": {
@@ -495,8 +495,8 @@
               "right": null,
               "bottom": null
             },
-            "title": "Dividir por Resultado de Fluxo",
-            "body": "Aqui verificamos o contador de erros. Se ainda for 0, categorizamos como \"Primeiro erro\" e tratamos de acordo, se for o segundo erro, o usu\u00e1rio passa pela categoria Other.",
+            "title": "Split by Flow Result",
+            "body": "Here we check the error counter. If it's still 0, we categorize as \"First Error\" and treat accordingly, if it's the second error, the user passes through the Other category.",
             "color": "green"
           },
           "979e8ed1-08f8-4c56-9a20-3d90e73617a3": {
@@ -504,8 +504,8 @@
               "left": 840,
               "top": 1060
             },
-            "title": "Dividir por express\u00e3o",
-            "body": "Se for o primeiro erro do usu\u00e1rio mas a mensagem dele tiver um n\u00famero, informamos que precisamos de certa formata\u00e7\u00e3o. Por\u00e9m se n\u00e3o tiver um n\u00famero, mandamos uma mensagem diferente",
+            "title": "Split by Expression",
+            "body": "If it's the first error of the user but their message has a number, we inform that we need a certain format. However, if it doesn't have a number, we send a different message",
             "color": "green"
           },
           "6e43344d-44aa-4811-aa15-b0f506ae5d78": {
@@ -513,8 +513,8 @@
               "left": 140,
               "top": 1240
             },
-            "title": "Salvar Resultado do Fluxo",
-            "body": "Aqui salvamos +1 no contador de erros. Isso vai servir para verificarmos se \u00e9 ou n\u00e3o a primeira vez que o usu\u00e1rio errou o formato de n\u00famero desejado.\n\nSe o usu\u00e1rio errar por uma segunda vez, enviamos um email para o respons\u00e1vel do setor e o deixamos prosseguir.",
+            "title": "Save Flow Result",
+            "body": "Here we save +1 in the error counter. This will serve to verify if it's the first time the user has entered the number format incorrectly.\n\nIf the user makes another mistake, we send an email to the responsible sector and let them proceed.",
             "color": "green"
           },
           "f3baf8e5-cfbf-4284-b724-aaf2ed6a7c6e": {
@@ -522,8 +522,8 @@
               "left": 1320,
               "top": 840
             },
-            "title": "Enviar Email",
-            "body": "Se o usu\u00e1rio errar o n\u00famero por uma segunda vez, enviamos um email para o respons\u00e1vel do setor e o deixamos prosseguir, visto que pode ser um n\u00famero de outro pa\u00eds etc.\n\nVoc\u00ea pode editar o email para receber uma sinaliza\u00e7\u00e3o quando algum usu\u00e1rio passar por esse cen\u00e1rio.\n\nDepois de enviar o email, salvamos o telefone e deixamos o usu\u00e1rio prosseguir para o pr\u00f3ximo fluxo.",
+            "title": "Send Email",
+            "body": "If the user makes another mistake, we send an email to the responsible sector and let them proceed, as it may be a number from another country, etc.\n\nYou can edit the email to receive a signal when any user passes through this scenario.\n\nAfter sending the email, we save the phone and let the user proceed to the next flow.",
             "color": "green"
           }
         }
@@ -535,13 +535,13 @@
         "expires": 10080,
         "revision": 75
       },
-      "name": "Coleta de Telefone - Fluxo secund\u00e1rio",
+      "name": "Phone Capture - Secondary Flow",
       "nodes": [
         {
           "actions": [
             {
               "category": "",
-              "name": "contador de erros",
+              "name": "error counter",
               "type": "set_run_result",
               "uuid": "e8b08846-5fd8-44bf-8d62-db946c23c7c8",
               "value": "0"
@@ -549,7 +549,7 @@
             {
               "attachments": [],
               "quick_replies": [],
-              "text": "Legal. Agora voc\u00ea poderia me informar tamb\u00e9m o seu telefone com DDD? (DD) 9xxxx-xxxx",
+              "text": "Great. Now could you also tell me your phone number with the DDD? (DD) 9xxxx-xxxx",
               "type": "send_msg",
               "uuid": "52759790-2e67-4e89-8cf8-cb2ff1bd6cf8"
             }
@@ -570,7 +570,7 @@
               "groups": [
                 {
                   "uuid": "86ea4b13-b03c-4530-8e9b-83624ed95542",
-                  "name": "Conversa Encerrada",
+                  "name": "Conversation Ended",
                   "query": null,
                   "status": "ready",
                   "count": 0
@@ -580,7 +580,7 @@
             },
             {
               "attachments": [],
-              "text": "Por falta de resposta, encerrei esse atendimento. Mas quando quiser \u00e9 s\u00f3 falar comigo \ud83d\ude09",
+              "text": "Due to lack of response, I ended this conversation. But if you want, just talk to me \ud83d\ude09",
               "type": "send_msg",
               "quick_replies": [],
               "uuid": "78ff46b3-43ec-4ec3-869e-4b56220e178d"
@@ -618,7 +618,7 @@
             "categories": [
               {
                 "exit_uuid": "efe984ea-1b91-4ab9-a2ac-556e377f7a94",
-                "name": "Telefone",
+                "name": "Phone",
                 "uuid": "4f063643-dbe3-4be1-85e9-6ae96798613a"
               },
               {
@@ -640,7 +640,7 @@
                 "category_uuid": "04b1ab3e-eda2-4445-ace2-1a58139e3f12"
               }
             },
-            "result_name": "Telefone"
+            "result_name": "Phone"
           },
           "exits": [
             {
@@ -666,7 +666,7 @@
             "categories": [
               {
                 "exit_uuid": "3d8d1f10-538f-430f-a442-828f9b63a0d1",
-                "name": "Primeiro erro",
+                "name": "First Error",
                 "uuid": "b16db79a-2f66-4ae1-bab7-cfcc20cca5a5"
               },
               {
@@ -685,7 +685,7 @@
                 "category_uuid": "b16db79a-2f66-4ae1-bab7-cfcc20cca5a5"
               }
             ],
-            "operand": "@results.contador_de_erros"
+            "operand": "@results.error_counter"
           },
           "exits": [
             {
@@ -702,12 +702,12 @@
           "actions": [
             {
               "field": {
-                "key": "telefone",
-                "name": "Telefone"
+                "key": "phone",
+                "name": "Phone"
               },
               "type": "set_contact_field",
               "uuid": "0ec492d4-2cb7-4137-a704-fe0472b2e3e3",
-              "value": "@results.telefone"
+              "value": "@results.phone"
             }
           ],
           "exits": [
@@ -724,8 +724,8 @@
               "addresses": [
                 "weni@weni.ai"
               ],
-              "subject": "Usu\u00e1rio com n\u00famero diferente da formata\u00e7\u00e3o - Chatbot",
-              "body": "Cliente com n\u00famero diferente da formata\u00e7\u00e3o - Chatbot\n\nNumero informado no Chatbot: @results.telefone.value\n\nNome: @contact.name\n\nUUID: @contact.uuid ",
+              "subject": "User with a different number from the format - Chatbot",
+              "body": "Client with a different number from the format - Chatbot\n\nNumber informed in the Chatbot: @results.phone.value\n\nName: @contact.name\n\nUUID: @contact.uuid ",
               "type": "send_email",
               "uuid": "d7893a6c-60e3-4441-9020-cba111043d31"
             }
@@ -782,16 +782,16 @@
             {
               "attachments": [],
               "quick_replies": [],
-              "text": "Ent\u00e3o @(title(contact.first_name)), eu preciso de um n\u00famero v\u00e1lido! Por favor, digita seu n\u00famero abaixo. (DD) 9xxxx-xxxx",
+              "text": "Then @(title(contact.first_name)), I need a valid number! Please, type your number below. (DD) 9xxxx-xxxx",
               "type": "send_msg",
               "uuid": "e30ebd27-191c-4b53-ae76-a326be5b1753"
             },
             {
               "category": "",
-              "name": "contador de erros",
+              "name": "error_counter",
               "type": "set_run_result",
               "uuid": "6793a126-e95b-494c-b6b9-85d16ee2774a",
-              "value": "@(contador_de_erros +1)"
+              "value": "@(error_counter +1)"
             }
           ],
           "exits": [
@@ -806,7 +806,7 @@
           "actions": [
             {
               "attachments": [],
-              "text": "Preciso desta informa\u00e7\u00e3o caso eu precise te contatar \ud83d\ude14",
+              "text": "I need this information in case I need to contact you \ud83d\ude14",
               "type": "send_msg",
               "quick_replies": [],
               "uuid": "1c0b9000-b5a5-461d-a71f-bb1048ccd7f7"
@@ -901,8 +901,8 @@
               "right": 100,
               "bottom": 20
             },
-            "title": "Dividir por filia\u00e7\u00e3o de grupo",
-            "body": "Aqui verificamos se o usu\u00e1rio est\u00e1 no grupo \"Informou nome\", pois se tiver \u00e9 porque j\u00e1 informou seu nome anteriormente visto que o usu\u00e1rio s\u00f3 \u00e9 adicionado neste grupo ap\u00f3s informar o nome.\n\nSe voc\u00ea n\u00e3o quiser perguntar o nome novamente, \u00e9 s\u00f3 retirar a liga\u00e7\u00e3o da categoria Informou Nome ou abaixar o card at\u00e9 que o fluxo de mensagem se inicie no primeiro card \"Enviar mensagem\"",
+            "title": "Divide by group",
+            "body": "Here we check if the user is in the \"Provided Name\" group, because if they are, it's because they have already provided their name previously, as the user is only added to this group after providing their name.\n\nIf you don't want to ask for the name again, just remove the link from the \"Provided Name\" category or lower the card until the message flow starts at the first \"Send Message\" card",
             "color": "green"
           },
           "bc46ae0d-ba55-48a8-9fc2-5bb5cba5d939": {
@@ -913,7 +913,7 @@
               "bottom": 20
             },
             "title": "Other",
-            "body": "Aqui tratamos a excess\u00e3o para caso o usu\u00e1rio n\u00e3o digite um texto, podendo ter enviado a foto de seu documento etc.",
+            "body": "Here we handle the excess for when the user does not type anything, possibly having sent a photo of their document, etc.",
             "color": "green"
           },
           "8a7b28da-2802-46ff-87fa-89e340f99782": {
@@ -923,8 +923,8 @@
               "right": 80,
               "bottom": 40
             },
-            "title": "Enviar mensagem",
-            "body": "O card \"Enviar mensagem\" serve para enviarmos mensagens ao usu\u00e1rio atrav\u00e9s de um canal.\n\nEssa mensagem pode ser personalizada, por exemplo, perguntando qual o nome social dessa pessoa.",
+            "title": "Send Message",
+            "body": "The \"Send Message\" card serves to send messages to the user through a channel.\n\nThis message can be customized, for example, asking what the social name of that person is.",
             "color": "green"
           },
           "a920df8c-e0af-455a-a6c8-dd522415b6e7": {
@@ -934,8 +934,8 @@
               "right": null,
               "bottom": null
             },
-            "title": "Categoria No Response",
-            "body": "A categoria No Response serve para quando o fluxo continua sem que o usu\u00e1rio tenha respondido \u00e0 pergunta. Normalmente \u00e9 utilizado para n\u00e3o deixar o usu\u00e1rio preso em uma pergunta.\n\nAl\u00e9m disso, adicionamos o usu\u00e1rio no grupo \"Conversa encerrada\" pois antes de enviar outra mensagem ou entrar em outro fluxo podemos verificar se o usu\u00e1rio est\u00e1 nesse grupo e evitar o envio de mensagens.",
+            "title": "No Response Category",
+            "body": "The \"No Response\" category serves for when the flow continues without the user answering the question. It is usually used to not leave the user stuck in a question.\n\nIn addition, we add the user to the \"Conversation Ended\" group because before sending another message or entering another message flow we can check if the user is in that group and avoid sending messages.",
             "color": "green"
           },
           "f0115ba1-2bd4-467e-b93b-050308749b2e": {
@@ -945,8 +945,8 @@
               "right": 0,
               "bottom": 40
             },
-            "title": "Categoria Encerrar",
-            "body": "A categoria Encerrar serve para quando o fluxo de mensagem continua sem que o usu\u00e1rio tenha respondido \u00e0 pergunta. Normalmente \u00e9 utilizado para n\u00e3o deixar o usu\u00e1rio preso em uma pergunta.\n\nAl\u00e9m disso, adicionamos o usu\u00e1rio no grupo \"Conversa encerrada\" pois antes de enviar outra mensagem ou entrar em outro fluxo de mensagem podemos verificar se o usu\u00e1rio est\u00e1 nesse grupo e evitar o envio de mensagens.",
+            "title": "End Category",
+            "body": "The \"End\" category serves for when the message flow continues without the user answering the question. It is usually used to not leave the user stuck in a question.\n\nIn addition, we add the user to the \"Conversation Ended\" group because before sending another message or entering another message flow we can check if the user is in that group and avoid sending messages.",
             "color": "green"
           },
           "65e53682-bb4c-4e56-a112-ff9b76cd8b2b": {
@@ -956,8 +956,8 @@
               "right": -80,
               "bottom": 20
             },
-            "title": "Aguarde por resposta",
-            "body": "Esse card serve para parar a fluidez do fluxo de mensagem e aguardar um momento para que haja uma resposta do usu\u00e1rio.\n\n\u00c9 muito importante ser usado para deixar a conversa mais humana.\n\nLembre que voc\u00ea pode clicar na op\u00e7\u00e3o \"Continue quando n\u00e3o houver resposta...\" e escolher o tempo que deseja esperar.\n\nDentro do card \"Aguarde por resposta\" tamb\u00e9m podemos criar regras para caso, quando o usu\u00e1rio responder, j\u00e1 verificar se h\u00e1 alguma palavra ou se \u00e9 um texto.",
+            "title": "Wait for response",
+            "body": "This card serves to stop the message flow and wait for a moment for the user to respond.\n\nIt is very important to be used to make the conversation more human.\n\nRemember that you can click on the option \"Continue when there is no response...\" and choose the time you want to wait.\n\nWithin the \"Wait for response\" card we can also create rules for when, when the user responds, already check if there is any word or if it is a text.",
             "color": "green"
           },
           "1795c335-d680-4f5d-966d-df21759d91c2": {
@@ -967,8 +967,8 @@
               "right": null,
               "bottom": null
             },
-            "title": "Atualizar o contato",
-            "body": "Salvamos o nome do usu\u00e1rio no campo de contato name. Poder\u00e1 ser visualizado no m\u00f3dulo Est\u00fadio",
+            "title": "Update contact",
+            "body": "We save the user's name in the contact name field. It can be viewed in the \"Estadio\" module",
             "color": "green"
           }
         }
@@ -980,7 +980,7 @@
         "expires": 10080,
         "revision": 1
       },
-      "name": "Coleta do Nome - Fluxo secund\u00e1rio",
+      "name": "Name Collection - Secondary Flow",
       "nodes": [
         {
           "actions": [],
@@ -999,7 +999,7 @@
               {
                 "arguments": [
                   "dd072370-fc15-4a75-a839-c97372dde86b",
-                  "Informou Nome"
+                  "Informed Name"
                 ],
                 "category_uuid": "5dd42105-db68-449d-be78-2f7cc641d192",
                 "type": "has_group",
@@ -1009,7 +1009,7 @@
             "categories": [
               {
                 "exit_uuid": "0ca4ad5f-8673-4102-904f-70aa0526f920",
-                "name": "Informou Nome",
+                "name": "Informed Name",
                 "uuid": "5dd42105-db68-449d-be78-2f7cc641d192"
               },
               {
@@ -1030,7 +1030,7 @@
           "actions": [
             {
               "attachments": [],
-              "text": "Gostaria de te conhecer melhor \ud83d\ude0a",
+              "text": "Would you like to know me better \ud83d\ude0a",
               "type": "send_msg",
               "quick_replies": [],
               "uuid": "2b62316d-66b2-4887-ba6f-85b0562a9505"
@@ -1048,7 +1048,7 @@
           "actions": [
             {
               "attachments": [],
-              "text": "Preciso que me envie em formato de texto...",
+              "text": "I need you to send me in text format...",
               "type": "send_msg",
               "quick_replies": [],
               "uuid": "47a356b5-99da-475a-82ed-e5ac48364f30"
@@ -1066,7 +1066,7 @@
             {
               "attachments": [],
               "quick_replies": [],
-              "text": "Por favor, qual o seu nome completo?",
+              "text": "Please, what is your full name?",
               "type": "send_msg",
               "uuid": "2c285430-f179-45a2-9291-d6682254e5f2"
             }
@@ -1088,7 +1088,7 @@
             "cases": [
               {
                 "arguments": [
-                  "desistir sair encerrar"
+                  "quit exit end"
                 ],
                 "type": "has_any_word",
                 "uuid": "6a4f30d5-8653-439b-8670-894fcbd27b9e",
@@ -1104,12 +1104,12 @@
             "categories": [
               {
                 "exit_uuid": "4e407947-e5c0-48d9-a761-0ce5190d0ae4",
-                "name": "Encerrar",
+                "name": "End",
                 "uuid": "976d212e-04e7-44ff-969c-8c75ba6e337e"
               },
               {
                 "exit_uuid": "5eb58bbc-d351-43b6-8d14-bfcbe3d5aabd",
-                "name": "Nome",
+                "name": "Name",
                 "uuid": "c9e426e9-9ddd-4900-afea-7528ea6f3167"
               },
               {
@@ -1131,7 +1131,7 @@
                 "category_uuid": "94159fe7-ecc5-4418-b709-da6254e0c9e1"
               }
             },
-            "result_name": "nome"
+            "result_name": "name"
           },
           "exits": [
             {
@@ -1158,7 +1158,7 @@
               "groups": [
                 {
                   "count": 2,
-                  "name": "Conversa Encerrada",
+                  "name": "Conversation Ended",
                   "query": null,
                   "status": "ready",
                   "uuid": "86ea4b13-b03c-4530-8e9b-83624ed95542"
@@ -1169,7 +1169,7 @@
             },
             {
               "attachments": [],
-              "text": "Certo, quando quiser \u00e9 s\u00f3 falar comigo \ud83d\ude09",
+              "text": "Alright, when you want \u00e9 just talk to me \ud83d\ude09",
               "type": "send_msg",
               "quick_replies": [],
               "uuid": "1edb6438-c68d-4a81-b400-b830b9328fb2"
@@ -1191,7 +1191,7 @@
               "groups": [
                 {
                   "uuid": "86ea4b13-b03c-4530-8e9b-83624ed95542",
-                  "name": "Conversa Encerrada",
+                  "name": "Conversation Ended",
                   "query": null,
                   "status": "ready",
                   "count": 0
@@ -1201,7 +1201,7 @@
             },
             {
               "attachments": [],
-              "text": "Por falta de resposta, encerrei esse atendimento. Mas quando quiser \u00e9 s\u00f3 falar comigo \ud83d\ude09",
+              "text": "Due to lack of response, I ended this conversation. But when you want \u00e9 just talk to me \ud83d\ude09",
               "type": "send_msg",
               "quick_replies": [],
               "uuid": "668b7521-457c-4fcc-9d7c-e17b86ed7dec"
@@ -1339,8 +1339,8 @@
               "right": -380,
               "bottom": 260
             },
-            "title": "Entrar em um fluxo",
-            "body": "Neste fluxo de mensagens usamos o card \"Entrar em um fluxo\" para organizar a estrutura das nossas perguntas. \n\nO card \"Entrar em um fluxo\" simplesmente direciona o usu\u00e1rio para outro fluxo de mensagens  em mil\u00e9simos de segundos e j\u00e1 executa a a\u00e7\u00e3o desse outro fluxo de mensagens .\n\nSendo assim, a t\u00edtulo de organiza\u00e7\u00e3o perguntamos o nome, telefone e email, cada um em seu devido fluxo.de mensagem.",
+            "title": "Enter a flow",
+            "body": "In this messaging flow we use the card \"Enter a flow\" to organize the structure of our questions. \n\nThe card \"Enter a flow\" simply directs the user to another messaging flow in milliseconds and already executes the action of that other messaging flow. \n\nTherefore, for organizational purposes, we ask for name, phone and email, each in their respective messaging flow.",
             "color": "green"
           },
           "7cf60043-ccfa-4adc-bc54-64a86c4211e6": {
@@ -1350,8 +1350,8 @@
               "right": 160,
               "bottom": 600
             },
-            "title": "Nome",
-            "body": "No fluxo de mensagens  \"Nome\" captaremos o nome do usu\u00e1rio usando a intelig\u00eancia artificial criada pela Weni",
+            "title": "Name",
+            "body": "In the messaging flow \"Name\" we will capture the user's name using the artificial intelligence created by Weni",
             "color": "green"
           },
           "1e9daa2e-d566-4d0b-959c-c0dccc5a0d02": {
@@ -1361,8 +1361,8 @@
               "right": 160,
               "bottom": 600
             },
-            "title": "Dividir por Filia\u00e7\u00e3o de Grupo",
-            "body": "Esse card serve para verificarmos se o usu\u00e1rio est\u00e1 no grupo Conversa Encerrada, se sim, o fluxo n\u00e3o continua. Agora se o usu\u00e1rio n\u00e3o estiver nesse grupo, ir\u00e1 passar pela categoria Other e continuar\u00e1 no fluxo.\n\n\u00c9 importante lembrar que o usu\u00e1rio s\u00f3 \u00e9 colocado no grupo Conversa encerrada se quiser encerrar ou ficar inativo.",
+            "title": "Divide by Group Subflow",
+            "body": "This card is used to check if the user is in the group Conversation Ended, if so, the flow does not continue. Now if the user is not in that group, it will pass through the Other category and continue in the flow.\n\nIt is important to remember that the user is only placed in the Conversation Ended group if he wants to end or stay inactive.",
             "color": "green"
           },
           "5fabcaee-fb04-43c9-bef9-0d0e42cff0a9": {
@@ -1372,8 +1372,8 @@
               "right": 180,
               "bottom": 720
             },
-            "title": "Dividir por Filia\u00e7\u00e3o de Grupo",
-            "body": "Esse card serve para verificarmos se o usu\u00e1rio est\u00e1 no grupo Conversa Encerrada, se sim, o fluxo de mensagem n\u00e3o continua. Agora se o usu\u00e1rio n\u00e3o estiver nesse grupo, ir\u00e1 passar pela categoria Other e continuar\u00e1 no fluxo de mensagem.\n\n\u00c9 importante lembrar que o usu\u00e1rio s\u00f3 \u00e9 colocado no grupo Conversa encerrada se quiser encerrar ou ficar inativo.",
+            "title": "Divide by Group Subflow",
+            "body": "This card is used to check if the user is in the group Conversation Ended, if so, the messaging flow does not continue. Now if the user is not in that group, it will pass through the Other category and continue in the messaging flow.\n\nIt is important to remember that the user is only placed in the Conversation Ended group if he wants to end or stay inactive.",
             "color": "green"
           },
           "caadc110-1e96-4110-ac23-1826838ecb3a": {
@@ -1383,8 +1383,8 @@
               "right": 160,
               "bottom": 580
             },
-            "title": "Telefone",
-            "body": "No fluxo de mensagem \"Telefone\" captaremos o telefone de contato do usu\u00e1rio usando regras REGEX no card \"Aguarde Por Resposta\".\n\nRegex \u00e9 uma express\u00e3o regular, ou Regex, s\u00e3o padr\u00f5es utilizados para identificar determinadas combina\u00e7\u00f5es ou cadeias de caracteres em uma string.",
+            "title": "Phone",
+            "body": "In the messaging flow \"Phone\" we will capture the user's phone number using rules REGEX in the card \"Wait for Response\".\n\nRegex is a regular expression, or Regex, are patterns used to identify certain combinations or chains of characters in a string.",
             "color": "green"
           },
           "94ffa25a-d3a8-4151-9ffa-91cce5383b7f": {
@@ -1395,7 +1395,7 @@
               "bottom": 640
             },
             "title": "E-mail",
-            "body": "No fluxo de mensagem \"E-mail\" captaremos o E-mail de contato do usu\u00e1rio usando a regra \"Tem um email\" no card \"Aguarde Por Resposta\".\n\nEssa \u00e9 uma regra padr\u00e3o da plataforma Weni, que verifica se o formato de texto \u00e9 compat\u00edvel com o de um email. \u00c9 importante ressaltar que n\u00e3o \u00e9 feita uma verifica\u00e7\u00e3o de exist\u00eancia do email e sim verifica\u00e7\u00e3o do formato que foi enviado pelo usu\u00e1rio.",
+            "body": "In the messaging flow \"E-mail\" we will capture the user's email using the \"Has an email\" rule in the card \"Wait for Response\".\n\nThis is a standard rule from the Weni platform, which checks if the text format is compatible with an email. It is important to note that there is no verification of the email's existence, but rather verification of the format sent by the user.",
             "color": "green"
           },
           "38fb0fd6-f24f-43d7-8da7-806e42046af8": {
@@ -1405,8 +1405,8 @@
               "right": 20,
               "bottom": 440
             },
-            "title": "Adicione a um Grupo",
-            "body": "Esse card serve para adicionar o usu\u00e1rio que completou o envio de informa\u00e7\u00f5es em um grupo chamado \"Lead Completo\".\n\nVoc\u00ea pode visualizar todas as pessoas que est\u00e3o nesse grupo acessando o m\u00f3dulo Est\u00fadio > Contatos > Filtrar pelo Grupo Lead Completo no canto inferior esquerdo da Tela.\n\nVoc\u00ea tamb\u00e9m pode disparar mensagens ativamente para todas as pessoas que estejam dentro desse grupo.",
+            "title": "Add to Group",
+            "body": "This card is used to add the user who completed the sending of information to a group called \"Complete Lead\".\n\nYou can view all the people who are in that group by accessing the \"Stadium\" module > \"Contacts\" > \"Filter by Group Lead Complete\" in the lower left corner of the screen.\n\nYou can also actively send messages to all the people who are inside that group.",
             "color": "green"
           },
           "cd035481-2169-4a07-b136-845a72efca08": {
@@ -1416,8 +1416,8 @@
               "right": 40,
               "bottom": 200
             },
-            "title": "Enviar mensagem",
-            "body": "Aqui colocamos uma mensagem de boas vindas se seu chatbot s\u00f3 for captar esses dados do usu\u00e1rio.\n\nSe preferir, pode remover essa mensagem e usar o restante do fluxo de mensagens em uma etapa de seu chatbot que j\u00e1 foi constru\u00eddo. Ao remover essa mensagem inicial, seu fluxo de mensagem j\u00e1 iniciar\u00e1 na pergunta do nome do usu\u00e1rio.",
+            "title": "Send Message",
+            "body": "Here we put a welcome message if your chatbot is only capturing these data from the user.\n\nIf you prefer, you can remove this message and use the rest of the messaging flow in a step of your chatbot that has already been built. By removing this initial message, your messaging flow will already start at the user's name question.",
             "color": "green"
           },
           "fa0c18a6-a1e9-4851-9a4c-cd1543ce5c6c": {
@@ -1427,8 +1427,8 @@
               "right": null,
               "bottom": null
             },
-            "title": "Enviar mensagem",
-            "body": "Mensagem de feedback ao usu\u00e1rio.\n\nPode ser removida ou alterada, se preferir.",
+            "title": "Send Message",
+            "body": "Feedback message to the user.\n\nIt can be removed or changed, if you prefer.",
             "color": "green"
           },
           "5d5755d7-62e9-497b-9e00-1f197606b78a": {
@@ -1438,8 +1438,8 @@
               "right": -60,
               "bottom": -20
             },
-            "title": "Informa\u00e7\u00f5es iniciais",
-            "body": "Esse \u00e9 o fluxo de mensagens principal de captura de dados. Sendo assim, ele que dever\u00e1 ser iniciado quando voc\u00ea precisar coletar nome, telefone e email de algum usu\u00e1rio.\n\nNeste fluxo usamos card \"Entrar em um fluxo\" para organizar as etapas e tipos de perguntas como nome, telefone e email. Mas o fluxo que voc\u00ea deve usar \u00e9 o \"Coleta de dados\".",
+            "title": "Initial Information",
+            "body": "This is the main messaging flow for data capture. Therefore, it should be started when you need to collect the name, phone and email of some user.\n\nIn this flow we use the card \"Enter a flow\" to organize the steps and types of questions like name, phone and email. But the flow you should use is \"Data Collection\".",
             "color": "purple"
           },
           "c559c7fe-02f6-477d-a685-d326a3478c3f": {
@@ -1449,8 +1449,8 @@
               "right": null,
               "bottom": null
             },
-            "title": "Dividir por inten\u00e7\u00e3o",
-            "body": "Aqui enviamos a \u00faltima mensagem do usu\u00e1rio para o classificador. Toda intelig\u00eancia \u00e9 utilizada atrav\u00e9s desse card e pode pode categorizar de acordo com uma inten\u00e7\u00e3o da intelig\u00eancia.\n\nNesse caso, se a inten\u00e7\u00e3o for \"greeting\" iremos saudar o usu\u00e1rio de acordo.",
+            "title": "Divide by Intent",
+            "body": "Here we send the last message from the user to the classifier. All intelligence is used through this card and can categorize according to an intelligence intention.\n\nIn this case, if the intention is \"greeting\" we will greet the user accordingly.",
             "color": "green"
           },
           "19bbe3d2-b45b-4e8c-b774-2b5676ababa6": {
@@ -1460,8 +1460,8 @@
               "right": 0,
               "bottom": 360
             },
-            "title": "Aten\u00e7\u00e3o",
-            "body": "Se voc\u00ea quer que seu fluxo inicie ativamente, como n\u00e3o haver\u00e1 mensagem do usu\u00e1rio para enviar \u00e0 intelig\u00eancia, remova o card \"Dividir por Inten\u00e7\u00e3o\"",
+            "title": "Attention",
+            "body": "If you want your flow to start actively, as there will be no message from the user to send to the intelligence, remove the card \"Divide by Intent\"",
             "color": "green"
           }
         }
@@ -1473,7 +1473,7 @@
         "expires": 10080,
         "revision": 11
       },
-      "name": "Coleta de Dados - Fluxo Principal",
+      "name": "Data Collection - Main Flow",
       "nodes": [
         {
           "uuid": "7b82a674-41b5-4fd8-8131-cbf7fc59366c",
@@ -1481,7 +1481,7 @@
             {
               "uuid": "2c1662f5-11a0-45f9-8b3c-0988f510be5b",
               "type": "call_classifier",
-              "result_name": "_cumprimento Classification",
+              "result_name": "_greeting Classification",
               "input": "@input.text",
               "classifier": {
                 "uuid": "f7d7b077-023b-47a3-8781-53db140727df",
@@ -1510,7 +1510,7 @@
                 "category_uuid": "8723aff4-e43f-4ece-ba95-2c21fc83680f"
               }
             ],
-            "operand": "@results._cumprimento_classification",
+            "operand": "@results._greeting_classification",
             "categories": [
               {
                 "uuid": "9ad43b1e-1cc1-45cf-af79-83f5bdd2e392",
@@ -1530,7 +1530,7 @@
             ],
             "type": "switch",
             "default_category_uuid": "5774ef8c-cc75-44a9-9eb2-081855668a29",
-            "result_name": "cumprimento"
+            "result_name": "greeting"
           },
           "exits": [
             {
@@ -1552,7 +1552,7 @@
           "actions": [
             {
               "attachments": [],
-              "text": "Ol\u00e1, \u00e9 um prazer falar com voc\u00ea",
+              "text": "Hello, it's a pleasure to talk to you",
               "type": "send_msg",
               "quick_replies": [],
               "uuid": "d850f74a-b42d-4a1b-ac1f-df406f91ef89"
@@ -1570,7 +1570,7 @@
           "actions": [
             {
               "attachments": [],
-              "text": "Seja bem-vindo a nossa central de atendimento! Vamos iniciar a captura de dados para cadastro",
+              "text": "Welcome to our customer service center! We will start capturing data for registration",
               "type": "send_msg",
               "quick_replies": [],
               "uuid": "5b6efce9-bf4e-4c15-b485-b124ed2267f0"
@@ -1591,7 +1591,7 @@
               "type": "enter_flow",
               "flow": {
                 "uuid": "7b7dfb48-5426-4429-ba27-3220c3340e32",
-                "name": "Coleta do Nome - Fluxo secund\u00e1rio"
+                "name": "Name Collection - Secondary Flow"
               }
             }
           ],
@@ -1657,7 +1657,7 @@
               {
                 "arguments": [
                   "86ea4b13-b03c-4530-8e9b-83624ed95542",
-                  "Conversa Encerrada"
+                  "Conversation Closed"
                 ],
                 "category_uuid": "a059115c-a30e-49d2-a616-48ad73b164a4",
                 "type": "has_group",
@@ -1667,7 +1667,7 @@
             "categories": [
               {
                 "exit_uuid": "5ea11194-2ca6-4308-91e1-3c15e9a1f611",
-                "name": "Conversa Encerrada",
+                "name": "Conversation Closed",
                 "uuid": "a059115c-a30e-49d2-a616-48ad73b164a4"
               },
               {
@@ -1691,7 +1691,7 @@
               "type": "enter_flow",
               "flow": {
                 "uuid": "c5712eab-d2ee-4b1f-ab3f-4ce06645e62b",
-                "name": "Coleta de Telefone - Fluxo secund\u00e1rio"
+                "name": "Phone Collection - Secondary Flow"
               }
             }
           ],
@@ -1757,7 +1757,7 @@
               {
                 "arguments": [
                   "86ea4b13-b03c-4530-8e9b-83624ed95542",
-                  "Conversa Encerrada"
+                  "Conversation Closed"
                 ],
                 "category_uuid": "a036bc92-f68b-4a85-b93d-c79e8f703fad",
                 "type": "has_group",
@@ -1767,7 +1767,7 @@
             "categories": [
               {
                 "exit_uuid": "c0763a7f-b978-4586-8867-3f1e3cadf351",
-                "name": "Conversa Encerrada",
+                "name": "Conversation Closed",
                 "uuid": "a036bc92-f68b-4a85-b93d-c79e8f703fad"
               },
               {
@@ -1791,7 +1791,7 @@
               "type": "enter_flow",
               "flow": {
                 "uuid": "afdc34e4-f1d6-4355-9418-c8951d0b747c",
-                "name": "Coleta de E-mail - Fluxo secund\u00e1rio"
+                "name": "Email Collection - Secondary Flow"
               }
             }
           ],
@@ -1852,7 +1852,7 @@
                 "type": "has_group",
                 "arguments": [
                   "86ea4b13-b03c-4530-8e9b-83624ed95542",
-                  "Conversa Encerrada"
+                  "Conversation Closed"
                 ],
                 "category_uuid": "a6d9ddce-abfe-4619-bbeb-29856e21d078"
               }
@@ -1860,7 +1860,7 @@
             "categories": [
               {
                 "uuid": "a6d9ddce-abfe-4619-bbeb-29856e21d078",
-                "name": "Conversa Encerrada",
+                "name": "Conversation Closed",
                 "exit_uuid": "56d66ec5-b617-44de-9e73-e54aa1261851"
               },
               {
@@ -1890,7 +1890,7 @@
               "groups": [
                 {
                   "uuid": "121d2607-504b-466f-864d-3120cc3c3745",
-                  "name": "Lead Completo",
+                  "name": "Complete Lead",
                   "query": null,
                   "status": "ready",
                   "count": 0
@@ -1912,7 +1912,7 @@
           "actions": [
             {
               "attachments": [],
-              "text": "Consegui salvar seus dados aqui na nossa base \ud83e\udd1d",
+              "text": "I managed to save your data here in our base \ud83e\udd1d",
               "type": "send_msg",
               "all_urns": false,
               "quick_replies": [],
@@ -1940,7 +1940,7 @@
       "trigger_type": "C",
       "flow": {
         "uuid": "c00b3a17-d57c-4830-9128-dd9641d157e0",
-        "name": "Coleta de Dados - Fluxo Principal"
+        "name": "Data Collection - Main Flow"
       },
       "groups": [],
       "exclude_groups": [],
@@ -1954,25 +1954,25 @@
       "type": "text"
     },
     {
-      "key": "telefone",
-      "name": "Telefone",
+      "key": "phone",
+      "name": "Phone",
       "type": "text"
     }
   ],
   "groups": [
     {
       "uuid": "86ea4b13-b03c-4530-8e9b-83624ed95542",
-      "name": "Conversa Encerrada",
+      "name": "Conversation Closed",
       "query": null
     },
     {
       "uuid": "dd072370-fc15-4a75-a839-c97372dde86b",
-      "name": "Informou Nome",
+      "name": "Provided Name",
       "query": null
     },
     {
       "uuid": "121d2607-504b-466f-864d-3120cc3c3745",
-      "name": "Lead Completo",
+      "name": "Complete Lead",
       "query": null
     }
   ]
