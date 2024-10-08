@@ -2445,6 +2445,32 @@ class RecentActivity(models.Model):
         (NEXUS, "Artificial Intelligence Entity"),
     ]
 
+    ACTIONS = dict(
+        ADD=dict(USER="joined-project"),
+        CREATE=dict(
+            TRIGGER="created-trigger",
+            CAMPAIGN="created-campaign",
+            FLOW="created-flow",
+            CHANNEL="created-channel",
+            AI="created-ai",
+            NEXUS="created-ai",
+        ),
+        UPDATE=dict(
+            TRIGGER="edited-trigger",
+            CAMPAIGN="edited-campaign",
+            FLOW="edited-flow",
+            CHANNEL="edited-channel",
+            NEXUS="edited-ai",
+        ),
+        INTEGRATE=dict(AI="integrated-ai"),
+        TRAIN=dict(AI="trained-ai"),
+        DELETE=dict(
+            FLOW="deleted-flow",
+            AI="deleted-ai",
+            NEXUS="deleted-ai",
+        ),
+    )
+
     project = models.ForeignKey(
         Project, on_delete=models.CASCADE, related_name="project_recent_activity"
     )
@@ -2458,31 +2484,7 @@ class RecentActivity(models.Model):
 
     @property
     def action_description_key(self) -> str:
-        actions = dict(
-            ADD=dict(USER="joined-project"),
-            CREATE=dict(
-                TRIGGER="created-trigger",
-                CAMPAIGN="created-campaign",
-                FLOW="created-flow",
-                CHANNEL="created-channel",
-                AI="created-ai",
-                NEXUS="created-ai",
-            ),
-            UPDATE=dict(
-                TRIGGER="edited-trigger",
-                CAMPAIGN="edited-campaign",
-                FLOW="edited-flow",
-                CHANNEL="edited-channel",
-            ),
-            INTEGRATE=dict(AI="integrated-ai"),
-            TRAIN=dict(AI="trained-ai"),
-            DELETE=dict(
-                FLOW="deleted-flow",
-                AI="deleted-ai",
-                NEXUS="deleted-ai",
-            ),
-        )
-        return actions[self.action][self.entity]
+        return self.ACTIONS[self.action][self.entity]
 
     @property
     def user_name(self):
