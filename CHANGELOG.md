@@ -1,3 +1,8 @@
+# 3.28.1
+## *Add*
+  - Reject recent activity case the entity or action is not valid.
+  - Add action `UPDATE` to `NEXUS` entity on recent activity mapper.
+
 # 3.28.0
 ## *Add*
   - Add to the `TemplateType` and `TemplateFeature` models to enable content translation.
