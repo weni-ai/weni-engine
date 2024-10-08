@@ -1,0 +1,2 @@
+class InvalidActionEntityCombination(Exception):
+    pass
