@@ -935,7 +935,7 @@ class Project(models.Model):
             "omie_financial": "Cristal - Assistente Financeiro",
             "omie_lead_capture": "Cristal - Assistente Financeiro",
             "omie_financial+chatgpt": "Cristal - Assistente Financeiro",
-            "sac+chatgpt": "Cristal - Assistente Financeiro",
+            "sac+chatgpt": "Cristal - Financial Assistant",
         }
 
         try:

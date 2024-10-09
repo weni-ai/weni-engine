@@ -46,7 +46,7 @@
         },
         "stickies": {
           "0536aa49-c0a6-489a-81ef-2504e6f6ffd6": {
-            "body": "Caso a numera\u00e7\u00e3o corresponda a um CPF o chatbot poder\u00e1 enviar uma mensagem espec\u00edfica, basta editar o texto no cart\u00e3o \u00e0 direita.",
+            "body": "If the numbering corresponds to a CPF, the chatbot can send a specific message. Just edit the text in the card on the right.",
             "color": "green",
             "position": {
               "bottom": -20,
@@ -57,7 +57,7 @@
             "title": "CPF"
           },
           "34b13b2f-f038-4137-b867-59c13d57f0ef": {
-            "body": "Caso o dado que o usu\u00e1rio informar n\u00e3o seja nem um CPF nem um CNPJ, poderemos sinalizar e pedir novamente uma numera\u00e7\u00e3o correta.\n\nO texto poder\u00e1 ser editado no cart\u00e3o \u00e0 esquerda.",
+            "body": "If the data provided by the user is neither a CPF nor a CNPJ, we can flag it and ask again for the correct numbering.\n\nThe text can be edited in the card on the left.",
             "color": "blue",
             "position": {
               "bottom": null,
@@ -65,10 +65,10 @@
               "right": null,
               "top": 600
             },
-            "title": "Tratamento"
+            "title": "Processing"
           },
           "79f675fd-e850-4e38-96a5-94db8abe8d6b": {
-            "body": "Caso a numera\u00e7\u00e3o corresponda a um CNPJ o chatbot poder\u00e1 enviar uma mensagem espec\u00edfica, basta editar o texto no cart\u00e3o \u00e0 esquerda.",
+            "body": "If the numbering corresponds to a CNPJ, the chatbot can send a specific message. Just edit the text in the card on the left.",
             "color": "yellow",
             "position": {
               "bottom": null,
@@ -79,7 +79,7 @@
             "title": "CNPJ"
           },
           "8957d498-a3e2-4b91-8a39-722df5eb3e20": {
-            "body": "Mensagem que \u00e9 enviada para que o usu\u00e1rio informe o seu CPF ou CNPJ.\n\nEssa mensagem poder\u00e1 ser editada a partir do cart\u00e3o \u00e0 esquerda.",
+            "body": "Message that is sent for the user to provide their CPF or CNPJ.\n\nThis message can be edited from the card on the left.",
             "color": "green",
             "position": {
               "bottom": null,
@@ -87,10 +87,10 @@
               "right": null,
               "top": 120
             },
-            "title": "In\u00edcio"
+            "title": "Start"
           },
           "eccf9212-0117-4b67-a3a3-feafa538a4ac": {
-            "body": "Nesta etapa existe um mecanismo para identificar se a numera\u00e7\u00e3o que o usu\u00e1rio informou corresponde a um CPF ou CNPJ.",
+            "body": "At this stage, there is a mechanism to identify whether the numbering provided by the user corresponds to a CPF or CNPJ.",
             "color": "purple",
             "position": {
               "bottom": 40,
@@ -98,7 +98,7 @@
               "right": 0,
               "top": 440
             },
-            "title": "Valida\u00e7\u00e3o de CPF/CNPJ"
+            "title": "CPF/CNPJ Validation"
           }
         }
       },
@@ -108,14 +108,14 @@
       "metadata": {
         "expires": 10080
       },
-      "name": "3- Coleta de dados - CNPJ/CPF",
+      "name": "3- Data Capture - CNPJ/CPF",
       "nodes": [
         {
           "actions": [
             {
               "attachments": [],
               "quick_replies": [],
-              "text": "@(title(fields.nomeusuario)), por favor, agora me informe o seu *CPF* ou *CNPJ*:\n\n*Ex:* \nCPF: 000.000.000-00\nCNPJ: 00. 000. 000/0000-00",
+              "text": "@(title(fields.username)), please now provide me with your *CPF* or *CNPJ*:\n\n*Example:* \nCPF: 000.000.000-00\nCNPJ: 00. 000. 000/0000-00",
               "type": "send_msg",
               "uuid": "c6d95d47-a2ff-4195-b810-3d59e3f14fe4"
             }
@@ -182,7 +182,7 @@
             ],
             "default_category_uuid": "61e7733f-d39e-4276-badd-c66f4e02fe61",
             "operand": "@input.text",
-            "result_name": "CpfOuCnpj",
+            "result_name": "cpf_or_cnpj",
             "type": "switch",
             "wait": {
               "type": "msg"
@@ -195,14 +195,14 @@
             {
               "attachments": [],
               "quick_replies": [],
-              "text": "\ud83d\udd0e Infelizmente n\u00e3o consegui identificar um CPF ou CNPJ.",
+              "text": "\ud83d\udd0e Unfortunately I couldn't identify a CPF or CNPJ.",
               "type": "send_msg",
               "uuid": "f27061e8-d707-48a9-9ddd-60e1f1a6c3b8"
             },
             {
               "attachments": [],
               "quick_replies": [],
-              "text": "Por favor, informe a numera\u00e7\u00e3o do seu CPF ou CNPJ da seguinte forma:\n\nCPF: 000.000.000-00\nCNPJ: 00. 000. 000/0000-00",
+              "text": "Please, inform the numbering of your CPF or CNPJ in the following format:\n\nCPF: 000.000.000-00\nCNPJ: 00. 000. 000/0000-00",
               "type": "send_msg",
               "uuid": "ca127261-c105-4543-86b7-8f8a7ba06925"
             }
@@ -220,7 +220,7 @@
             {
               "attachments": [],
               "quick_replies": [],
-              "text": "\ud83d\ude0a Obrigado por me informar seu CPF.",
+              "text": "\ud83d\ude0a Thank you for informing me your CPF.",
               "type": "send_msg",
               "uuid": "57af4e53-2373-40ae-bc08-4ae7208479fc"
             },
@@ -231,7 +231,7 @@
               },
               "type": "set_contact_field",
               "uuid": "6bb17870-f8a1-400c-8c6a-ad0f0a16f7a8",
-              "value": "@results.cpfoucnpj.category"
+              "value": "@results.cpf_or_cnpj.category"
             }
           ],
           "exits": [
@@ -247,7 +247,7 @@
             {
               "attachments": [],
               "quick_replies": [],
-              "text": "\ud83d\ude0a Obrigado por me informar seu CNPJ.",
+              "text": "\ud83d\ude0a Thank you for informing me your CNPJ.",
               "type": "send_msg",
               "uuid": "280cb9ba-791d-44c4-8c58-0c02e259badd"
             },
@@ -258,7 +258,7 @@
               },
               "type": "set_contact_field",
               "uuid": "9ad4429a-3f15-49fa-b9f4-3500fcaf9869",
-              "value": "@results.cpfoucnpj.category"
+              "value": "@results.cpf_or_cnpj.category"
             }
           ],
           "exits": [
@@ -328,8 +328,8 @@
             "config": {
               "cases": {},
               "operand": {
-                "id": "setor",
-                "name": "Setor",
+                "id": "sector",
+                "name": "Sector",
                 "type": "field"
               }
             },
@@ -350,7 +350,7 @@
         },
         "stickies": {
           "195d81c0-63e9-48ec-983f-5f6ac7cf10e9": {
-            "body": "Etapa onde \u00e9 aguardada e armazenada a resposta do usu\u00e1rio.",
+            "body": "Stage where the user's response is awaited and stored.",
             "color": "purple",
             "position": {
               "bottom": null,
@@ -358,10 +358,10 @@
               "right": null,
               "top": 240
             },
-            "title": "Armazenamento"
+            "title": "Storage"
           },
           "28e3218b-e024-40a3-bf7e-11522c7768b0": {
-            "body": "Aqui \u00e9 feito o direcionamento dos setores existentes. Esse direcionamento \u00e9 realizado com base na escolha do usu\u00e1rio na etapa de categoriza\u00e7\u00e3o.",
+            "body": "Here we direct the existing sectors. This direction is based on the user's choice in the categorization stage.",
             "color": "yellow",
             "position": {
               "bottom": null,
@@ -369,10 +369,10 @@
               "right": null,
               "top": 1000
             },
-            "title": "Setores"
+            "title": "Sectors"
           },
           "65ab615f-aacf-4821-b394-a82f3ce7b66a": {
-            "body": "Nesta etapa usamos uma intelig\u00eancia artificial para classificar a resposta do usu\u00e1rio, sendo ela positiva ou negativa.",
+            "body": "Here we use artificial intelligence to classify the user's response, being it positive or negative.",
             "color": "yellow",
             "position": {
               "bottom": null,
@@ -380,10 +380,10 @@
               "right": null,
               "top": 440
             },
-            "title": "Intelig\u00eancia artificial"
+            "title": "Artificial Intelligence"
           },
           "744b488f-3dd7-4ffc-bf42-1dc090c67e30": {
-            "body": "Caso o usu\u00e1rio tenha escolhido a categoria \"comercial\" ele falar\u00e1 com atendentes do setor comercial.",
+            "body": "If the user has chosen the \"commercial\" category, they will speak with the commercial sector.",
             "color": "green",
             "position": {
               "bottom": null,
@@ -391,10 +391,10 @@
               "right": null,
               "top": 1360
             },
-            "title": "Setor comercial"
+            "title": "Commercial Sector"
           },
           "b14d4fec-b60f-4902-b832-83eeddd2a26e": {
-            "body": "Caso o usu\u00e1rio tenha escolhido a categoria \"financeiro\" ele falar\u00e1 com atendentes do setor financeiro.",
+            "body": "If the user has chosen the \"financial\" category, they will speak with the financial sector.",
             "color": "purple",
             "position": {
               "bottom": null,
@@ -402,10 +402,10 @@
               "right": null,
               "top": 1360
             },
-            "title": "Setor financeiro"
+            "title": "Financial Sector"
           },
           "b3a12a6c-af5e-4b48-814f-fc689e5ce062": {
-            "body": "Caso o usu\u00e1rio n\u00e3o pretenda mais seguir para o atendimento humano ele receber\u00e1 essa mensagem.",
+            "body": "If the user does not want to proceed to human assistance, they will receive this message.",
             "color": "green",
             "position": {
               "bottom": null,
@@ -413,10 +413,10 @@
               "right": null,
               "top": 660
             },
-            "title": "Nega\u00e7\u00e3o"
+            "title": "Negation"
           },
           "ce0bce31-3b7e-4370-92d1-ff66ff5e6bf3": {
-            "body": "Os setores que foram citados tanto na etapa de escolha de usu\u00e1rio quanto nessa s\u00e3o totalmente personaliz\u00e1veis, voc\u00ea poder\u00e1 criar os setores de sua prefer\u00eancia.",
+            "body": "The sectors mentioned both in the user choice step and here are fully customizable. You can create the sectors of your preference.",
             "color": "blue",
             "position": {
               "bottom": null,
@@ -424,10 +424,10 @@
               "right": null,
               "top": 1000
             },
-            "title": "\ud83d\udcccTome nota"
+            "title": "\ud83d\udcccTake note"
           },
           "d7ba9de3-c4b6-487d-aba2-c5c3daa886a2": {
-            "body": "Caso o usu\u00e1rio tenha escolhido a categoria \"administrativo\" ele falar\u00e1 com atendentes do setor administrativo.",
+            "body": "If the user has chosen the \"administrative\" category, they will speak with attendants from the administrative sector.",
             "color": "blue",
             "position": {
               "bottom": null,
@@ -435,10 +435,10 @@
               "right": null,
               "top": 1360
             },
-            "title": "Setor administrativo"
+            "title": "Administrative Sector"
           },
           "eb62b052-1d2c-4dce-af0e-0cd1823d0d03": {
-            "body": "Mensagem que \u00e9 enviada para o usu\u00e1rio caso haja algum problema no sistema da intelig\u00eancia artificial.",
+            "body": "Message that is sent to the user if there is any problem in the artificial intelligence system.",
             "color": "blue",
             "position": {
               "bottom": null,
@@ -446,16 +446,16 @@
               "right": null,
               "top": 460
             },
-            "title": "Tratamento de erro"
+            "title": "Error handling"
           },
           "feeb46d5-13e0-4e2e-b4aa-0a37ff708b97": {
-            "body": "Mensagem de confirma\u00e7\u00e3o para que o chatbot possa encaminhar o usu\u00e1rio para um atendente dispon\u00edvel no momento.",
+            "body": "Confirmation message so that the chatbot can forward the user to an attendant available at the moment.",
             "color": "green",
             "position": {
               "left": 580,
               "top": 20
             },
-            "title": "In\u00edcio"
+            "title": "Start"
           }
         }
       },
@@ -465,7 +465,7 @@
       "metadata": {
         "expires": 10080
       },
-      "name": "5- Abrir Atendimento",
+      "name": "5- Open Support",
       "nodes": [
         {
           "actions": [
@@ -473,10 +473,10 @@
               "all_urns": false,
               "attachments": [],
               "quick_replies": [
-                "Sim",
-                "N\u00e3o"
+                "Yes",
+                "No"
               ],
-              "text": "Tudo pronto! Posso abrir uma sala com um atendente?",
+              "text": "Everything is ready! Can I open a room with an attendant?",
               "type": "send_msg",
               "uuid": "93a1ae3a-13bc-4304-8cec-c9f630027c00"
             }
@@ -508,7 +508,7 @@
             ],
             "default_category_uuid": "ee52ba55-d1cd-4717-880b-40ae50dcac7d",
             "operand": "@input.text",
-            "result_name": "respostaUsuario",
+            "result_name": "userResponse",
             "type": "switch",
             "wait": {
               "type": "msg"
@@ -522,7 +522,7 @@
             {
               "uuid": "a625249b-7360-4108-b694-a53b0b24be0e",
               "type": "call_classifier",
-              "result_name": "_classificacaoBinaria Classification",
+              "result_name": "_binaryClassification",
               "input": "@input.text",
               "classifier": {
                 "uuid": "287367f4-dff4-4fa2-8185-f0f323814cd2",
@@ -560,16 +560,16 @@
                 "uuid": "a727baa5-b182-4dcf-8080-1b9f366fade2"
               }
             ],
-            "operand": "@results._classificacaobinaria_classification",
+            "operand": "@results._binaryclassification",
             "categories": [
               {
                 "exit_uuid": "a9868cbf-0ffa-4d1d-98d3-8f5bc5a5e7a9",
-                "name": "Afirma\u00e7\u00e3o",
+                "name": "Affirmative",
                 "uuid": "2cb4a457-95be-4355-b8b4-4a5b898794fe"
               },
               {
                 "exit_uuid": "1f2638e7-4e56-4f29-9bde-2c5cc03e4738",
-                "name": "Nega\u00e7\u00e3o",
+                "name": "Negation",
                 "uuid": "9b699c50-4059-468d-ab38-0172db289eeb"
               },
               {
@@ -585,7 +585,7 @@
             ],
             "type": "switch",
             "default_category_uuid": "9dc96118-5dcd-4ee0-b0f8-6a1aa2cde881",
-            "result_name": "classificacaoBinaria"
+            "result_name": "binaryclassification"
           },
           "exits": [
             {
@@ -611,7 +611,7 @@
             {
               "attachments": [],
               "quick_replies": [],
-              "text": "\ud83d\ude15 Infelizmente meus sistemas est\u00e3o indispon\u00edveis no momento. Por favor, tente novamente em instantes!",
+              "text": "\ud83d\ude15 Unfortunately, my systems are currently unavailable. Please try again in a moment!",
               "type": "send_msg",
               "uuid": "cf189773-16be-4db0-8461-49d1874888b1"
             }
@@ -629,17 +629,17 @@
             {
               "attachments": [],
               "quick_replies": [],
-              "text": "\ud83d\ude15N\u00e3o consegui entender o que voc\u00ea quis me dizer.",
+              "text": "\ud83d\ude15 I couldn't understand what you meant.",
               "type": "send_msg",
               "uuid": "94e93c9a-ad59-41fa-a275-386ac12a8806"
             },
             {
               "attachments": [],
               "quick_replies": [
-                "Sim",
-                "N\u00e3o"
+                "Yes",
+                "No"
               ],
-              "text": "Posso abrir uma sala com um atendente?",
+              "text": "Can I open a room with an attendant?",
               "type": "send_msg",
               "uuid": "ee01c1d5-3971-4a5e-9db5-9e7913df9ad7"
             }
@@ -657,7 +657,7 @@
             {
               "attachments": [],
               "quick_replies": [],
-              "text": "Sem problemas! Voc\u00ea poder\u00e1 voltar aqui sempre que quiser\ud83d\udc4b",
+              "text": "No problem! You can always come back here \ud83d\udc4b",
               "type": "send_msg",
               "uuid": "68733c92-ae67-4449-ad0b-d3fb63fa2371"
             }
@@ -694,7 +694,7 @@
             "cases": [
               {
                 "arguments": [
-                  "Financeiro"
+                  "Financial"
                 ],
                 "category_uuid": "28544315-8edc-46c5-9835-e416e43f9103",
                 "type": "has_any_word",
@@ -702,7 +702,7 @@
               },
               {
                 "arguments": [
-                  "Comercial"
+                  "Commercial"
                 ],
                 "category_uuid": "668e4a3d-191e-452e-8fe7-481f7416648d",
                 "type": "has_any_word",
@@ -710,7 +710,7 @@
               },
               {
                 "arguments": [
-                  "Administrativo"
+                  "Administrative"
                 ],
                 "category_uuid": "b42ade3d-6a75-45ba-9c20-4f8b47090262",
                 "type": "has_any_word",
@@ -720,17 +720,17 @@
             "categories": [
               {
                 "exit_uuid": "02b29240-eba0-4842-905c-0e6c8a544b96",
-                "name": "Financeiro",
+                "name": "Financial",
                 "uuid": "28544315-8edc-46c5-9835-e416e43f9103"
               },
               {
                 "exit_uuid": "6843fd79-8a18-4432-9165-aef508add714",
-                "name": "Comercial",
+                "name": "Commercial",
                 "uuid": "668e4a3d-191e-452e-8fe7-481f7416648d"
               },
               {
                 "exit_uuid": "8eb891ef-3bc5-49dc-a8e8-ecf778be39cc",
-                "name": "Admnistrativo",
+                "name": "Administrative",
                 "uuid": "b42ade3d-6a75-45ba-9c20-4f8b47090262"
               },
               {
@@ -740,7 +740,7 @@
               }
             ],
             "default_category_uuid": "26e64f7f-2517-457b-8a54-7775c44ab6ff",
-            "operand": "@fields.setor",
+            "operand": "@fields.sector",
             "type": "switch"
           },
           "uuid": "ce192279-a7c9-4cfd-b318-f0a1df0c4ab9"
@@ -749,7 +749,7 @@
           "actions": [
             {
               "flow": {
-                "name": "Setor Financeiro",
+                "name": "Financial Sector",
                 "uuid": "c690b39c-7fba-4410-933f-ce00005d9966"
               },
               "type": "enter_flow",
@@ -844,7 +844,7 @@
         },
         "stickies": {
           "016ab3c0-d7e8-4b8f-affa-447324dc6c14": {
-            "body": "Cart\u00e3o respons\u00e1vel por abrir uma sala com um agente do setor especificado nas configura\u00e7\u00f5es do cart\u00e3o.\n\nPara acessar as configura\u00e7\u00f5es do cart\u00e3o basta clicar no mesmo.",
+            "body": "Card responsible for opening a room with an agent from the specified sector in the card settings.\n\nTo access the card settings, just click on it.",
             "color": "blue",
             "position": {
               "bottom": null,
@@ -852,10 +852,10 @@
               "right": null,
               "top": 160
             },
-            "title": "Abertura atendimento"
+            "title": "Opening Attendance"
           },
           "3715c9ce-416f-4f39-bf77-e0028e4a9f5e": {
-            "body": "Mensagem que \u00e9 enviada para o usu\u00e1rio caso haja algum problema na abertura de uma sala.",
+            "body": "Message sent to the user if there is a problem opening a room.",
             "color": "purple",
             "position": {
               "bottom": 120,
@@ -863,10 +863,10 @@
               "right": 0,
               "top": 440
             },
-            "title": "Tratamento de erro"
+            "title": "Error Treatment"
           },
           "45837582-5a3e-411e-9c07-e41a30bbabbc": {
-            "body": "Configura\u00e7\u00f5es aplicadas para que a conversa entre o atendente e o usu\u00e1rio n\u00e3o seja interrompida pelo chatbot. Dessa forma, quando o usu\u00e1rio estiver conversando com um atendente, ele n\u00e3o receber\u00e1 as mensagens do chatbot e sim do pr\u00f3prio agente.",
+            "body": "Configurations applied so that the conversation between the attendant and the user is not interrupted by the chatbot. Thus, when the user is talking to an attendant, they will not receive messages from the chatbot, but from the attendant themselves.",
             "color": "green",
             "position": {
               "bottom": 120,
@@ -874,10 +874,10 @@
               "right": 0,
               "top": 680
             },
-            "title": "Configura\u00e7\u00f5es"
+            "title": "Configurations"
           },
           "4dfcc40c-c0e7-4178-9572-d9843fa0e0c0": {
-            "body": "Mensagem que \u00e9 enviada para o usu\u00e1rio quando uma sala com um agente \u00e9 aberta.",
+            "body": "Message sent to the user when a room with an attendant is opened.",
             "color": "yellow",
             "position": {
               "bottom": 140,
@@ -885,7 +885,7 @@
               "right": 0,
               "top": 440
             },
-            "title": "Mensagem de abertura"
+            "title": "Opening Message"
           }
         }
       },
@@ -895,7 +895,7 @@
       "metadata": {
         "expires": 10080
       },
-      "name": "6.3- Setor Comercial",
+      "name": "6.3- Commercial Sector",
       "nodes": [
         {
           "actions": [
@@ -908,14 +908,14 @@
                 "role": "administrator"
               },
               "body": "@results",
-              "result_name": "AbrirAtendimento",
+              "result_name": "openattendance",
               "ticketer": {
-                "name": "Setor de Exemplo",
+                "name": "Example Sector",
                 "uuid": "e514a770-accc-4512-b84f-225bbc2db810"
               },
               "topic": {
                 "created_on": "2022-11-30T16:47:03.940629-03:00",
-                "name": "Financeiro",
+                "name": "Financial",
                 "uuid": "f66a0ad0-0822-4c4f-99e6-35e56aac41a6"
               },
               "type": "open_ticket",
@@ -956,7 +956,7 @@
               }
             ],
             "default_category_uuid": "2eaab309-24e9-4654-83c7-66bbcd209ac2",
-            "operand": "@results.abriratendimento",
+            "operand": "@results.openattendance",
             "type": "switch"
           },
           "uuid": "c6d27fc6-6c73-44c9-92c0-af0778fa8cc9"
@@ -966,7 +966,7 @@
             {
               "attachments": [],
               "quick_replies": [],
-              "text": "Vou chamar algu\u00e9m para te atender\ud83c\udfc3\u200d\u2642\ufe0f\nPor favor, aguarde.",
+              "text": "I will call someone to attend you \ud83c\udfc3\u200d\u2642\ufe0f\nPlease wait.",
               "type": "send_msg",
               "uuid": "8bcc1c62-1ca3-45aa-ab32-456b8a9db0f7"
             }
@@ -984,7 +984,7 @@
             {
               "attachments": [],
               "quick_replies": [],
-              "text": "\ud83d\ude15Tive um problema ao procurar um agente para te atender. Por favor, tente novamente mais tarde.",
+              "text": "\ud83d\ude15 I had a problem finding an agent to attend you. Please try again later.",
               "type": "send_msg",
               "uuid": "a909e035-50af-4a98-8344-c2bf54842313"
             }
@@ -1014,7 +1014,7 @@
               "groups": [
                 {
                   "count": 0,
-                  "name": "atendimentoHumano",
+                  "name": "humanAttendance",
                   "query": null,
                   "status": "ready",
                   "uuid": "695f960c-555f-433b-86e7-51e1b4a7bdaa"
@@ -1073,7 +1073,7 @@
         },
         "stickies": {
           "2bfaa50b-ec67-4070-b9e5-a789acb8daca": {
-            "body": "Cart\u00e3o respons\u00e1vel por abrir uma sala com um agente do setor especificado nas configura\u00e7\u00f5es do cart\u00e3o.\n\nPara acessar as configura\u00e7\u00f5es do cart\u00e3o basta clicar no mesmo.",
+            "body": "Card responsible for opening a room with an agent from the sector specified in the card settings.\n\nTo access the card settings, simply click on it.",
             "color": "blue",
             "position": {
               "bottom": null,
@@ -1081,10 +1081,10 @@
               "right": null,
               "top": 160
             },
-            "title": "Abertura atendimento"
+            "title": "Open Service"
           },
           "2fed4c95-2afd-4bae-800f-034bdc65f4cd": {
-            "body": "Mensagem que \u00e9 enviada para o usu\u00e1rio caso haja algum problema na abertura de uma sala.",
+            "body": "Message that is sent to the user if there is any problem opening a room.",
             "color": "purple",
             "position": {
               "bottom": 120,
@@ -1092,10 +1092,10 @@
               "right": 0,
               "top": 440
             },
-            "title": "Tratamento de erro"
+            "title": "Error Treatment"
           },
           "7463554a-b223-4c17-9f84-ab5a9eace7c7": {
-            "body": "Mensagem que \u00e9 enviada para o usu\u00e1rio quando uma sala com um agente \u00e9 aberta.",
+            "body": "Message that is sent to the user when a room with an agent is opened.",
             "color": "yellow",
             "position": {
               "bottom": 140,
@@ -1103,10 +1103,10 @@
               "right": 0,
               "top": 440
             },
-            "title": "Mensagem de abertura"
+            "title": "Opening Message"
           },
           "e16d1341-da07-420a-8dd9-15dff6007846": {
-            "body": "Configura\u00e7\u00f5es aplicadas para que a conversa entre o atendente e o usu\u00e1rio n\u00e3o seja interrompida pelo chatbot. Dessa forma, quando o usu\u00e1rio estiver conversando com um atendente, ele n\u00e3o receber\u00e1 as mensagens do chatbot e sim do pr\u00f3prio agente.",
+            "body": "Settings applied so that the conversation between the agent and the user is not interrupted by the chatbot. This way, when the user is talking to an agent, they will not receive messages from the chatbot but from the agent themselves.",
             "color": "green",
             "position": {
               "bottom": 120,
@@ -1114,7 +1114,7 @@
               "right": 0,
               "top": 680
             },
-            "title": "Configura\u00e7\u00f5es"
+            "title": "Configurations"
           }
         }
       },
@@ -1124,7 +1124,7 @@
       "metadata": {
         "expires": 10080
       },
-      "name": "6.2- Setor Administrativo",
+      "name": "6.2- Administrative Sector",
       "nodes": [
         {
           "actions": [
@@ -1137,14 +1137,14 @@
                 "role": "administrator"
               },
               "body": "@results",
-              "result_name": "AbrirAtendimento",
+              "result_name": "openattendance",
               "ticketer": {
-                "name": "Setor de Exemplo",
+                "name": "Example Sector",
                 "uuid": "e514a770-accc-4512-b84f-225bbc2db810"
               },
               "topic": {
                 "created_on": "2022-11-30T16:47:03.940629-03:00",
-                "name": "Financeiro",
+                "name": "Financial",
                 "uuid": "f66a0ad0-0822-4c4f-99e6-35e56aac41a6"
               },
               "type": "open_ticket",
@@ -1185,7 +1185,7 @@
               }
             ],
             "default_category_uuid": "e9698246-9fef-4191-befe-b54cb639c34c",
-            "operand": "@results.abriratendimento",
+            "operand": "@results.openattendance",
             "type": "switch"
           },
           "uuid": "d2009e98-bcca-424b-88e5-122718b28641"
@@ -1195,7 +1195,7 @@
             {
               "attachments": [],
               "quick_replies": [],
-              "text": "Vou chamar algu\u00e9m para te atender\ud83c\udfc3\u200d\u2642\ufe0f\nPor favor, aguarde.",
+              "text": "I will call someone to attend you \ud83c\udfc3\u200d\u2642\ufe0f\nPlease wait.",
               "type": "send_msg",
               "uuid": "b2deae56-4c12-4131-a3c5-0f2ab55cfaa5"
             }
@@ -1213,7 +1213,7 @@
             {
               "attachments": [],
               "quick_replies": [],
-              "text": "\ud83d\ude15Tive um problema ao procurar um agente para te atender. Por favor, tente novamente mais tarde.",
+              "text": "\ud83d\ude15 I had a problem finding an agent to attend you. Please try again later.",
               "type": "send_msg",
               "uuid": "c4b286c5-0ad5-464a-9e1b-ca91ffa93b02"
             }
@@ -1243,7 +1243,7 @@
               "groups": [
                 {
                   "count": 0,
-                  "name": "atendimentoHumano",
+                  "name": "humanAttendance",
                   "query": null,
                   "status": "ready",
                   "uuid": "695f960c-555f-433b-86e7-51e1b4a7bdaa"
@@ -1322,7 +1322,7 @@
         },
         "stickies": {
           "568b37b9-0abb-45eb-88c6-604f37821589": {
-            "body": "Configura\u00e7\u00f5es aplicadas para que a conversa entre o atendente e o usu\u00e1rio n\u00e3o seja interrompida pelo chatbot. Dessa forma, quando o usu\u00e1rio estiver conversando com um atendente, ele n\u00e3o receber\u00e1 as mensagens do chatbot e sim do pr\u00f3prio agente.",
+            "body": "Configurations applied so that the conversation between the agent and the user is not interrupted by the chatbot. This way, when the user is talking to an agent, they will not receive messages from the chatbot but from the agent themselves.",
             "color": "yellow",
             "position": {
               "bottom": null,
@@ -1330,10 +1330,10 @@
               "right": null,
               "top": 40
             },
-            "title": "Configura\u00e7\u00f5es"
+            "title": "Configurations"
           },
           "810acc43-834a-462b-ac88-3c4430c984b9": {
-            "body": "Nessa etapa \u00e9 capturado o CPF ou CNPJ do usu\u00e1rio por meio de uma express\u00e3o regular (Regex) j\u00e1 configurado.",
+            "body": "At this stage, the user's CPF or CNPJ is captured using a pre-configured regular expression (Regex).",
             "color": "blue",
             "position": {
               "bottom": null,
@@ -1341,10 +1341,10 @@
               "right": null,
               "top": 620
             },
-            "title": "Coleta de CPF|CNPJ"
+            "title": "CPF|CNPJ Collection"
           },
           "879ed169-ca74-4df3-a47b-1308244b42b4": {
-            "body": "Aqui \u00e9 onde o usu\u00e1rio informa a categoria que mais se encaixa na sua solicita\u00e7\u00e3o, para que dessa forma o atendimento com um agente possa ser melhor direcionado.",
+            "body": "This is where the user informs the category that best fits their request, so that the service with an agent can be better directed.",
             "color": "purple",
             "position": {
               "bottom": null,
@@ -1352,10 +1352,10 @@
               "right": null,
               "top": 800
             },
-            "title": "Categorias de atendimento"
+            "title": "Service Categories"
           },
           "87d4efd3-b244-4ec0-a5a5-1a3a75eab0d6": {
-            "body": "Por \u00faltimo, esse \u00e9 o fluxo respons\u00e1vel por abrir um novo atendimento com um agente.",
+            "body": "Finally, this is the flow responsible for opening a new service with an agent.",
             "color": "yellow",
             "position": {
               "bottom": null,
@@ -1363,10 +1363,10 @@
               "right": null,
               "top": 1020
             },
-            "title": "Abertura de atendimento"
+            "title": "Service Opening"
           },
           "f506c8c8-113b-444e-b092-0aca6dc64614": {
-            "body": "Aqui \u00e9 iniciado o fluxo para que o usu\u00e1rio informe seu nome e a intelig\u00eancia artificial trate e salve o mesmo em um campo de contato.",
+            "body": "Here, the flow is initiated for the user to provide their name, and artificial intelligence processes and saves it in a contact field.",
             "color": "green",
             "position": {
               "bottom": null,
@@ -1374,7 +1374,7 @@
               "right": null,
               "top": 400
             },
-            "title": "Coleta de Nome"
+            "title": "Name Collection"
           }
         }
       },
@@ -1384,7 +1384,7 @@
       "metadata": {
         "expires": 10080
       },
-      "name": "1- Atendimento Humano",
+      "name": "1- Human Attendance",
       "nodes": [
         {
           "actions": [
@@ -1427,7 +1427,7 @@
               {
                 "arguments": [
                   "695f960c-555f-433b-86e7-51e1b4a7bdaa",
-                  "atendimentoHumano"
+                  "humanAttendance"
                 ],
                 "category_uuid": "efb60463-e23b-4f6c-a698-9b620af09d1d",
                 "type": "has_group",
@@ -1437,7 +1437,7 @@
             "categories": [
               {
                 "exit_uuid": "a15f16d8-f5dc-4dc3-9e1c-e3566b116f63",
-                "name": "atendimentoHumano",
+                "name": "humanAttendance",
                 "uuid": "efb60463-e23b-4f6c-a698-9b620af09d1d"
               },
               {
@@ -1457,7 +1457,7 @@
           "actions": [
             {
               "flow": {
-                "name": "Coleta de dados - Nome",
+                "name": "Data Capture - Name",
                 "uuid": "65743c09-5ccd-4517-9952-21b9eb841f6c"
               },
               "type": "enter_flow",
@@ -1515,7 +1515,7 @@
           "actions": [
             {
               "flow": {
-                "name": "Coleta de dados - CNPJ/CPF",
+                "name": "Data Capture - CPF/CNPJ",
                 "uuid": "9bf9faf7-ca0c-4f42-91cf-a44b321cbe69"
               },
               "type": "enter_flow",
@@ -1573,7 +1573,7 @@
           "actions": [
             {
               "flow": {
-                "name": "Categoriza\u00e7\u00e3o de atendimento",
+                "name": "Service Categories",
                 "uuid": "781c453f-16da-47bc-b5e7-d5a13b3c6e04"
               },
               "type": "enter_flow",
@@ -1631,7 +1631,7 @@
           "actions": [
             {
               "flow": {
-                "name": "Abrir Atendimento",
+                "name": "Open Service",
                 "uuid": "27ef355e-f44d-4a72-8e13-bf80b92930d5"
               },
               "type": "enter_flow",
@@ -1711,7 +1711,7 @@
         },
         "stickies": {
           "0c122d92-9c01-4563-ac1d-099a864df6c3": {
-            "body": "Mensagem que \u00e9 enviada para o usu\u00e1rio quando a comunica\u00e7\u00e3o com o atendente \u00e9 encerrada.",
+            "body": "Message sent to the user when the communication with the agent is closed.",
             "color": "green",
             "position": {
               "bottom": null,
@@ -1719,10 +1719,10 @@
               "right": null,
               "top": 60
             },
-            "title": "Mensagem de Encerramento"
+            "title": "Closing Message"
           },
           "8dcee1bc-7779-4227-bd9a-45108b36740b": {
-            "body": "Configura\u00e7\u00f5es para que a comunica\u00e7\u00e3o entre o usu\u00e1rio e o chatbot flua normalmente ap\u00f3s o atendimento com um agente.",
+            "body": "Configurations to ensure normal communication between the user and the chatbot after the attendance with an agent.",
             "color": "yellow",
             "position": {
               "bottom": null,
@@ -1730,7 +1730,7 @@
               "right": null,
               "top": 220
             },
-            "title": "Configura\u00e7\u00f5es"
+            "title": "Configurations"
           }
         }
       },
@@ -1740,14 +1740,14 @@
       "metadata": {
         "expires": 10080
       },
-      "name": "7- Encerrar atendimento",
+      "name": "7- Ending Attendance",
       "nodes": [
         {
           "actions": [
             {
               "attachments": [],
               "quick_replies": [],
-              "text": "O seu atendimento humano foi encerrado, voc\u00ea poder\u00e1 abrir um novo ticket sempre que precisar!",
+              "text": "Your human attendance has been closed, you can open a new ticket whenever you need!",
               "type": "send_msg",
               "uuid": "eb2f307c-35f9-49f4-8618-55a303bc63cc"
             }
@@ -1766,7 +1766,7 @@
               "all_groups": false,
               "groups": [
                 {
-                  "name": "atendimentoHumano",
+                  "name": "humanAttendance",
                   "uuid": "695f960c-555f-433b-86e7-51e1b4a7bdaa"
                 }
               ],
@@ -1838,7 +1838,7 @@
         },
         "stickies": {
           "041986fc-1936-47cb-b21e-23e0eca56f10": {
-            "body": "Aqui o usu\u00e1rio poder\u00e1 escolher a categoria que mais se encaixa com a sua solicita\u00e7\u00e3o.\n\nEssas categorias s\u00e3o totalmente customiz\u00e1veis e podem ser alteradas no cart\u00e3o de texto \u00e0 esquerda.",
+            "body": "Here, the user can choose the category that best fits their request.\n\nThese categories are fully customizable and can be changed in the text card to the left.",
             "color": "green",
             "position": {
               "bottom": 0,
@@ -1846,10 +1846,10 @@
               "right": 0,
               "top": 0
             },
-            "title": "In\u00edcio"
+            "title": "Start"
           },
           "17220195-0d58-4945-81ec-6f7425631701": {
-            "body": "Aqui \u00e9 classificado a categoria que foi escolhida pelo usu\u00e1rio, neste exemplo: \"Financeiro\", \"Comercial\" e \"Administrativo\".",
+            "body": "Here, the category chosen by the user is classified, in this example: \"Financial\", \"Commercial\" and \"Administrative\".",
             "color": "blue",
             "position": {
               "bottom": null,
@@ -1857,19 +1857,19 @@
               "right": null,
               "top": 300
             },
-            "title": "Classifica\u00e7\u00e3o"
+            "title": "Classification"
           },
           "89ba0843-9779-4d82-9fb0-2039076fc3e7": {
-            "body": "Caso o usu\u00e1rio digite algo que n\u00e3o corresponde a nenhuma das op\u00e7\u00f5es, ele ser\u00e1 informado e poder\u00e1 tentar novamente.\n\nEssa mensagem pode ser modificada no cart\u00e3o \u00e0 esquerda.",
+            "body": "If the user enters something that does not correspond to any of the options, they will be informed and can try again.\n\nThis message can be modified in the text card to the left.",
             "color": "purple",
             "position": {
               "left": 1140,
               "top": 500
             },
-            "title": "Tratamento"
+            "title": "Treatment"
           },
           "f26cd4fc-e45b-416a-be56-e2b76864f1f2": {
-            "body": "Aqui \u00e9 onde \u00e9 armazenada a categoria escolhida pelo usu\u00e1rio caso ela se encaixe em uma das apresentadas no texto inicial.",
+            "body": "Here, the category chosen by the user is stored if it fits into one of the categories presented in the initial text.",
             "color": "yellow",
             "position": {
               "bottom": 20,
@@ -1877,7 +1877,7 @@
               "right": 0,
               "top": 600
             },
-            "title": "Armazenamento"
+            "title": "Storage"
           }
         }
       },
@@ -1887,18 +1887,18 @@
       "metadata": {
         "expires": 10080
       },
-      "name": "4- Categoriza\u00e7\u00e3o de atendimento",
+      "name": "4- Service Classification",
       "nodes": [
         {
           "actions": [
             {
               "attachments": [],
               "quick_replies": [
-                "Financeiro",
-                "Comercial",
-                "Administrativo"
+                "Financial",
+                "Commercial",
+                "Administrative"
               ],
-              "text": "Por favor, escolha uma categoria para prosseguir com o seu atendimento:\n\n1. Financeiro\n2. Comercial\n3. Administrativo",
+              "text": "Please choose a category to continue with your service:\n\n1. Financial\n2. Commercial\n3. Administrative",
               "type": "send_msg",
               "uuid": "12310055-dbf2-4343-a373-12c3b2645c52"
             }
@@ -1935,7 +1935,7 @@
             "cases": [
               {
                 "arguments": [
-                  "1 Financeiro"
+                  "1 Financial"
                 ],
                 "category_uuid": "3070524d-4be6-4bae-8551-3659f32ff0f1",
                 "type": "has_any_word",
@@ -1943,7 +1943,7 @@
               },
               {
                 "arguments": [
-                  "2 Comercial"
+                  "2 Commercial"
                 ],
                 "category_uuid": "c793dc76-a99f-4612-93f2-660ec0238dff",
                 "type": "has_any_word",
@@ -1951,7 +1951,7 @@
               },
               {
                 "arguments": [
-                  "3 Administrativo"
+                  "3 Administrative"
                 ],
                 "category_uuid": "f7489766-919b-41b2-a600-2781e0431cfa",
                 "type": "has_any_word",
@@ -1961,17 +1961,17 @@
             "categories": [
               {
                 "exit_uuid": "5015fe8d-54b1-4640-a5a7-010e23c94eca",
-                "name": "Financeiro",
+                "name": "Financial",
                 "uuid": "3070524d-4be6-4bae-8551-3659f32ff0f1"
               },
               {
                 "exit_uuid": "c53faae4-67bf-4272-911e-d5baf7997019",
-                "name": "Comercial",
+                "name": "Commercial",
                 "uuid": "c793dc76-a99f-4612-93f2-660ec0238dff"
               },
               {
                 "exit_uuid": "f3e383c8-4218-4c38-9d21-1fd35f02b0e0",
-                "name": "Administrativo",
+                "name": "Administrative",
                 "uuid": "f7489766-919b-41b2-a600-2781e0431cfa"
               },
               {
@@ -1982,7 +1982,7 @@
             ],
             "default_category_uuid": "1fb7f791-b286-446d-8f09-2f6a13e40fa6",
             "operand": "@input.text",
-            "result_name": "escolhaCategoria",
+            "result_name": "choiceCategory",
             "type": "switch",
             "wait": {
               "type": "msg"
@@ -1995,18 +1995,18 @@
             {
               "attachments": [],
               "quick_replies": [],
-              "text": "\u2757\ufe0fN\u00e3o consegui entender a categoria informada",
+              "text": "\u2757\ufe0fI couldn't understand the category you mentioned",
               "type": "send_msg",
               "uuid": "a3e81fe5-359c-47d4-8b4f-cd2e8d88ebf0"
             },
             {
               "attachments": [],
               "quick_replies": [
-                "Financeiro",
-                "Comercial",
-                "Administrativo"
+                "Financial",
+                "Commercial",
+                "Administrative"
               ],
-              "text": "Por favor, selecione uma das categorias para dar continuidade com o seu atendimento:\n\n1. Financeiro\n2. Comercial\n3. Administrativo",
+              "text": "Please choose one of the categories to continue with your service:\n\n1. Financial\n2. Commercial\n3. Administrative",
               "type": "send_msg",
               "uuid": "d94af033-0b94-4474-a049-bbe5c6d1336d"
             }
@@ -2023,12 +2023,12 @@
           "actions": [
             {
               "field": {
-                "key": "setor",
-                "name": "Setor"
+                "key": "sector",
+                "name": "Sector"
               },
               "type": "set_contact_field",
               "uuid": "81dc38cd-06b7-4ea7-853d-48cd1f0e6907",
-              "value": "@results.escolhacategoria.category"
+              "value": "@results.choicecategory.category"
             }
           ],
           "exits": [
@@ -2080,7 +2080,7 @@
         },
         "stickies": {
           "4b278141-88a8-4615-bb0d-867cfa53be5a": {
-            "body": "Configura\u00e7\u00f5es aplicadas para que a conversa entre o atendente e o usu\u00e1rio n\u00e3o seja interrompida pelo chatbot. Dessa forma, quando o usu\u00e1rio estiver conversando com um atendente, ele n\u00e3o receber\u00e1 as mensagens do chatbot e sim do pr\u00f3prio agente.",
+            "body": "Configurations applied so that the conversation between the attendant and the user is not interrupted by the chatbot. Thus, when the user is talking to an attendant, they will not receive messages from the chatbot, but from the attendant themselves.",
             "color": "green",
             "position": {
               "bottom": 120,
@@ -2088,10 +2088,10 @@
               "right": 0,
               "top": 680
             },
-            "title": "Configura\u00e7\u00f5es"
+            "title": "Configurations"
           },
           "c2752d32-40e1-424c-b7d4-24b3a7b32729": {
-            "body": "Mensagem que \u00e9 enviada para o usu\u00e1rio quando uma sala com um agente \u00e9 aberta.",
+            "body": "Message sent to the user when a room with an agent is opened.",
             "color": "yellow",
             "position": {
               "bottom": 140,
@@ -2099,10 +2099,10 @@
               "right": 0,
               "top": 440
             },
-            "title": "Mensagem de abertura"
+            "title": "Opening Message"
           },
           "cda9a24d-68e3-4687-a35f-0f993e1f98da": {
-            "body": "Mensagem que \u00e9 enviada para o usu\u00e1rio caso haja algum problema na abertura de uma sala.",
+            "body": "Message sent to the user if there is a problem opening a room.",
             "color": "purple",
             "position": {
               "bottom": 120,
@@ -2110,10 +2110,10 @@
               "right": 0,
               "top": 440
             },
-            "title": "Tratamento de erro"
+            "title": "Error Treatment"
           },
           "d2b411c2-be8a-4fdc-985a-8ca8ceea4544": {
-            "body": "Cart\u00e3o respons\u00e1vel por abrir uma sala com um agente do setor especificado nas configura\u00e7\u00f5es do cart\u00e3o.\n\nPara acessar as configura\u00e7\u00f5es do cart\u00e3o basta clicar no mesmo.",
+            "body": "Text card responsible for opening a room with an agent from the specified sector in the card settings.\n\nTo access the card settings, just click on it.",
             "color": "blue",
             "position": {
               "bottom": null,
@@ -2121,7 +2121,7 @@
               "right": null,
               "top": 120
             },
-            "title": "Abertura atendimento"
+            "title": "Opening Attendance"
           }
         }
       },
@@ -2131,21 +2131,21 @@
       "metadata": {
         "expires": 10080
       },
-      "name": "6.1- Setor Financeiro",
+      "name": "6.1- Financial Sector",
       "nodes": [
         {
           "actions": [
             {
               "assignee": null,
               "body": "@results",
-              "result_name": "AbrirAtendimento",
+              "result_name": "openattendance",
               "ticketer": {
-                "name": "Setor de Exemplo",
+                "name": "Example Sector",
                 "uuid": "e514a770-accc-4512-b84f-225bbc2db810"
               },
               "topic": {
                 "created_on": "2022-11-30T16:47:03.940629-03:00",
-                "name": "Financeiro",
+                "name": "Financial",
                 "uuid": "f66a0ad0-0822-4c4f-99e6-35e56aac41a6"
               },
               "type": "open_ticket",
@@ -2186,7 +2186,7 @@
               }
             ],
             "default_category_uuid": "9e235917-72d9-4fc0-99b3-c831b61541f8",
-            "operand": "@results.abriratendimento",
+            "operand": "@results.openattendance",
             "type": "switch"
           },
           "uuid": "5149f84e-10ce-4b83-8f73-b19578ef7ebf"
@@ -2196,7 +2196,7 @@
             {
               "attachments": [],
               "quick_replies": [],
-              "text": "Vou chamar algu\u00e9m para te atender\ud83c\udfc3\u200d\u2642\ufe0f\nPor favor, aguarde.",
+              "text": "I'm going to call someone to assist you\ud83c\udfc3\u200d\u2642\ufe0f\nPlease wait.",
               "type": "send_msg",
               "uuid": "d62e5208-0ab4-431c-be89-8aed0a23b74e"
             }
@@ -2214,7 +2214,7 @@
             {
               "attachments": [],
               "quick_replies": [],
-              "text": "\ud83d\ude15Tive um problema ao procurar um agente para te atender. Por favor, tente novamente mais tarde.",
+              "text": "\ud83d\ude15I had a problem searching for an agent to attend you. Please try again later.",
               "type": "send_msg",
               "uuid": "6f154105-4caa-461a-b47d-1f29327ba6ac"
             }
@@ -2244,7 +2244,7 @@
               "groups": [
                 {
                   "count": 0,
-                  "name": "atendimentoHumano",
+                  "name": "humanAttendance",
                   "query": null,
                   "status": "ready",
                   "uuid": "695f960c-555f-433b-86e7-51e1b4a7bdaa"
@@ -2327,7 +2327,7 @@
         },
         "stickies": {
           "1686845f-2f40-4c40-87db-1790da17c7ca": {
-            "body": "Mensagem que \u00e9 enviada para o usu\u00e1rio caso haja algum problema no sistema da intelig\u00eancia artificial.",
+            "body": "Message sent to the user if there is a problem in the artificial intelligence system.",
             "color": "green",
             "position": {
               "bottom": -100,
@@ -2335,10 +2335,10 @@
               "right": 60,
               "top": 1100
             },
-            "title": "Tratamento de erro"
+            "title": "Error Treatment"
           },
           "360bbfc5-4b53-4956-86fb-d896c3569d6a": {
-            "body": "Caso o usu\u00e1rio n\u00e3o digite um texto, o chatbot enviar\u00e1 uma mensagem de aten\u00e7\u00e3o e ele poder\u00e1 informar seu nome novamente.",
+            "body": "If the user does not type text, the chatbot will send a message of attention and they can inform their name again.",
             "color": "purple",
             "position": {
               "bottom": -140,
@@ -2346,10 +2346,10 @@
               "right": 40,
               "top": 380
             },
-            "title": "Tratamento"
+            "title": "Treatment"
           },
           "539b2a46-6cdc-4143-8153-e35cf5da2570": {
-            "body": "\u00c9 feito uma verifica\u00e7\u00e3o para saber se a entrada do usu\u00e1rio corresponde a um texto.",
+            "body": "A verification is made to see if the user's entry corresponds to a text.",
             "color": "green",
             "position": {
               "bottom": -60,
@@ -2357,19 +2357,19 @@
               "right": -20,
               "top": 360
             },
-            "title": "Verifica\u00e7\u00e3o"
+            "title": "Verification"
           },
           "54368e8a-7caa-47cf-84a7-89eafe46b043": {
-            "body": "Nessa etapa \u00e9 utilizado uma I.A para classificar e tratar o nome do usu\u00e1rio.\n\nCaso o usu\u00e1rio fale \"Meu nome \u00e9 Carlos\" a IA s\u00f3 ira capturar \"Carlos\".",
+            "body": "In this step, an I.A. is used to classify and treat the user's name.\n\nIf the user says \"My name is Carlos\" the IA will only capture \"Carlos\".",
             "color": "yellow",
             "position": {
               "left": 760,
               "top": 840
             },
-            "title": "Intelig\u00eancia artificial"
+            "title": "Artificial Intelligence"
           },
           "ac982d76-cb2f-4ae9-9b5a-9004a2eb7d62": {
-            "body": "Mensagem que \u00e9 enviada para obter o nome do usu\u00e1rio.",
+            "body": "Message sent to obtain the user's name.",
             "color": "yellow",
             "position": {
               "bottom": 20,
@@ -2377,10 +2377,10 @@
               "right": 0,
               "top": 20
             },
-            "title": "In\u00edcio"
+            "title": "Beginning"
           },
           "b90aae45-093c-4f76-aad2-4627c194c0f7": {
-            "body": "Aqui \u00e9 salvo em um campo de contato a mensagem do usu\u00e1rio.",
+            "body": "Here the user's message is saved in a contact field.",
             "color": "blue",
             "position": {
               "bottom": null,
@@ -2388,10 +2388,10 @@
               "right": null,
               "top": 640
             },
-            "title": "Armazenamento"
+            "title": "Storage"
           },
           "cf1c59f5-75ce-41ce-97f8-1748487086dd": {
-            "body": "Aqui \u00e9 a etapa onde \u00e9 de fato salvo o nome do usu\u00e1rio que foi tratado pela intelig\u00eancia artificial.",
+            "body": "Here is the step where the user's name, which was treated by artificial intelligence, is actually saved.",
             "color": "purple",
             "position": {
               "bottom": -20,
@@ -2399,7 +2399,7 @@
               "right": 40,
               "top": 1100
             },
-            "title": "Retorno "
+            "title": "Return"
           }
         }
       },
@@ -2409,21 +2409,21 @@
       "metadata": {
         "expires": 10080
       },
-      "name": "2- Coleta de dados - Nome",
+      "name": "2- Data Collection - Name",
       "nodes": [
         {
           "actions": [
             {
               "attachments": [],
               "quick_replies": [],
-              "text": "Vamos l\u00e1 \ud83d\ude0a",
+              "text": "Let's go \ud83d\ude0a",
               "type": "send_msg",
               "uuid": "c54bd614-8a52-496f-a8e1-fda689a48c55"
             },
             {
               "attachments": [],
               "quick_replies": [],
-              "text": "Para come\u00e7ar, por favor, me informe o seu nome:",
+              "text": "To start, please tell me your name:",
               "type": "send_msg",
               "uuid": "605d39a9-c719-44ee-8b2e-52d848b9689b"
             }
@@ -2471,7 +2471,7 @@
             ],
             "default_category_uuid": "04011c14-859e-410c-9c04-60789a70c7d4",
             "operand": "@input.text",
-            "result_name": "nomeUsuario",
+            "result_name": "username",
             "type": "switch",
             "wait": {
               "type": "msg"
@@ -2484,14 +2484,14 @@
             {
               "attachments": [],
               "quick_replies": [],
-              "text": "\ud83d\udd0e Infelizmente n\u00e3o consegui identificar um nome.",
+              "text": "\ud83d\udd0e Unfortunately I couldn't identify a name.",
               "type": "send_msg",
               "uuid": "ae1b8a97-cc25-435a-89df-5f486c94709a"
             },
             {
               "attachments": [],
               "quick_replies": [],
-              "text": "Por favor, me informe o seu nome para darmos continuidade na sua solicita\u00e7\u00e3o:",
+              "text": "Please tell me your name so we can continue with your request:",
               "type": "send_msg",
               "uuid": "be128450-f4ad-4832-a7da-f3f0ebe2833a"
             }
@@ -2508,12 +2508,12 @@
           "actions": [
             {
               "field": {
-                "key": "mensagem",
-                "name": "Mensagem"
+                "key": "message",
+                "name": "Message"
               },
               "type": "set_contact_field",
               "uuid": "30d62d1e-401e-4b76-87b5-8952c6349638",
-              "value": "@results.nomeusuario"
+              "value": "@results.username"
             }
           ],
           "exits": [
@@ -2527,14 +2527,14 @@
         {
           "actions": [
             {
-              "body": "@(json(object(\"language\", \"pt_br\", \"text\", fields.mensagem)))",
+              "body": "@(json(object(\"language\", \"pt_br\", \"text\", fields.message)))",
               "headers": {
                 "Accept": "application/json",
                 "Authorization": "Bearer 0af73991-8176-40bc-98e8-b3364ffb31f8",
                 "Content-type": "application/json"
               },
               "method": "POST",
-              "result_name": "classificacaoNomes",
+              "result_name": "nameClassification",
               "type": "call_webhook",
               "url": "https://nlp.bothub.it/v2/parse/",
               "uuid": "c4658083-f587-42f5-9f9d-6e18905766ce"
@@ -2574,7 +2574,7 @@
               }
             ],
             "default_category_uuid": "6545937d-e7d1-478a-a574-8702d88e3b61",
-            "operand": "@results.classificacaonomes.category",
+            "operand": "@results.nameclassification.category",
             "type": "switch"
           },
           "uuid": "d93a72b9-44c3-4b37-bfa3-429ed8e22ef4"
@@ -2583,12 +2583,12 @@
           "actions": [
             {
               "field": {
-                "key": "nomeusuario",
-                "name": "nomeUsuario"
+                "key": "username",
+                "name": "username"
               },
               "type": "set_contact_field",
               "uuid": "cc6ed4a0-d047-4274-a956-0d42b5430b52",
-              "value": "@results.classificacaonomes.extra.entities.other.0.value"
+              "value": "@results.nameclassification.extra.entities.other.0.value"
             }
           ],
           "exits": [
@@ -2604,7 +2604,7 @@
             {
               "attachments": [],
               "quick_replies": [],
-              "text": "\ud83d\ude15 Infelizmente meus sistemas est\u00e3o indispon\u00edveis no momento. Por favor, tente novamente em instantes!",
+              "text": "\ud83d\ude15 Unfortunately my systems are unavailable at the moment. Please try again in a moment!",
               "type": "send_msg",
               "uuid": "746c8b82-6dd1-4140-8d22-af7ed0dd6273"
             }
@@ -2630,7 +2630,7 @@
       "trigger_type": "C",
       "flow": {
         "uuid": "5ca998fa-6e29-4c5c-9f2b-3d6a597c7e41",
-        "name": "1- Atendimento Humano"
+        "name": "1- Human Attendance"
       },
       "groups": [],
       "exclude_groups": [],
@@ -2640,7 +2640,7 @@
       "trigger_type": "T",
       "flow": {
         "uuid": "5a9d0877-92ac-4fcb-a5c0-58e614d8dfd2",
-        "name": "7- Encerrar atendimento"
+        "name": "7- Ending Attendance"
       },
       "groups": [],
       "exclude_groups": [],
@@ -2659,18 +2659,18 @@
       "type": "text"
     },
     {
-      "key": "mensagem",
-      "name": "Mensagem",
+      "key": "message",
+      "name": "Message",
       "type": "text"
     },
     {
-      "key": "nomeusuario",
-      "name": "nomeUsuario",
+      "key": "username",
+      "name": "Username",
       "type": "text"
     },
     {
-      "key": "setor",
-      "name": "Setor",
+      "key": "sector",
+      "name": "Sector",
       "type": "text"
     }
   ],
@@ -2682,7 +2682,7 @@
     },
     {
       "uuid": "695f960c-555f-433b-86e7-51e1b4a7bdaa",
-      "name": "atendimentoHumano",
+      "name": "humanAttendance",
       "query": null
     }
   ]

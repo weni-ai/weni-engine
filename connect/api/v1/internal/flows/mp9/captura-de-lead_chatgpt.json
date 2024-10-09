@@ -61,7 +61,7 @@
         },
         "stickies": {
           "0d6c3a14-1605-483a-b9ab-bd1e54cd2559": {
-            "body": "Here we check that the user did not enter an email and ask if they can provide it, giving the options of Yes and No.\n\nIt is important to remember that at this stage, if the user already responds with their email, we will be able to detect it, as all the rules are in the same card \"Wait for response\".",
+            "body": "Here we check that the user has not entered an email and ask if they can provide one, giving the options Yes and No.\n\nIt's important to remember that at this stage, if the user already responds with their email, we'll be able to detect it, as all the rules are in the same \"Wait for response\" card.",
             "color": "green",
             "position": {
               "left": 1160,
@@ -72,7 +72,7 @@
             "title": "Send message"
           },
           "28c49c10-7bbd-4ae0-9260-a3f9493e1842": {
-            "body": "Here we send a message in case the user types \"No\".",
+            "body": "Here we send a message for the case where the user types \"No\"",
             "color": "green",
             "position": {
               "bottom": 20,
@@ -83,7 +83,7 @@
             "title": "Send message"
           },
           "9f2588fc-91ee-46d2-b1a3-316e808998fb": {
-            "body": "Here we wait for the user's response and use the rule \"has an email\".\n\nWe also use the Yes and No rule to check if the user wants to provide their email or not.",
+            "body": "Here we wait for the user's response and use the \"has an email\" rule.\n\nWe also use the Yes and No rule to check if the user wants to provide an email or not.",
             "color": "green",
             "position": {
               "bottom": null,
@@ -94,7 +94,7 @@
             "title": "Wait for response"
           },
           "b3a443f3-cfdd-4eab-9098-5d5dfc263054": {
-            "body": "Here we ask for the user's email. You can customize this message to whatever you prefer.",
+            "body": "Here we ask for the user's email. You can customize this message to your preference",
             "color": "green",
             "position": {
               "bottom": null,
@@ -105,7 +105,7 @@
             "title": "Send message"
           },
           "b44c848b-3113-4652-bf5d-6779b432e520": {
-            "body": "We also save in the contact field Email. This data can be viewed in detail in the history of each contact and can be used in any message flow as the information is being saved in the contact and not in a specific message flow.",
+            "body": "We also save the email in the contact's Email field. This data can be seen in detail in the history of each contact and can be used in any message flow because the information is being saved to the contact and not in a specific message flow.",
             "color": "green",
             "position": {
               "bottom": -120,
@@ -113,10 +113,10 @@
               "right": 200,
               "top": 840
             },
-            "title": "Update contact"
+            "title": "Update the contact"
           },
           "bece5d9d-c8e7-4e9b-a42c-5ed641c0edec": {
-            "body": "The No Response category serves for when the flow continues without the user responding to the question. It is usually used to avoid leaving the user stuck on a question.\n\nIn addition, we add the user to the \"Conversation ended\" group because before sending another message or entering another flow, we can check if the user is in this group and avoid sending messages.",
+            "body": "The No Response category is for when the flow continues without the user having responded to the question. It's typically used to prevent the user from being stuck on a question.\n\nAdditionally, we add the user to the \"Conversation ended\" group because before sending another message or entering another flow, we can check if the user is in this group and avoid sending messages",
             "color": "green",
             "position": {
               "bottom": null,
@@ -127,7 +127,7 @@
             "title": "No response category"
           },
           "ef592bdf-a34e-44df-9ae4-4514d74d2c50": {
-            "body": "We add the user's email to the URN email. This URN is the channel through which the user can be contacted.\n\nNOTE: You can actively send emails if the user has the URN email.",
+            "body": "We add the user's email to the email URN. This URN is the channel through which the user can be contacted.\n\nNOTE: You can actively send emails if the user has the email URN",
             "color": "green",
             "position": {
               "bottom": null,
@@ -153,7 +153,7 @@
             {
               "attachments": [],
               "quick_replies": [],
-              "text": "@(title(contact.first_name)), what is your email?",
+              "text": "@(title(contact.first_name)), what's your email?",
               "type": "send_msg",
               "uuid": "aae67347-2c88-413f-8cb7-0b98847989d2"
             }
@@ -184,7 +184,7 @@
             {
               "attachments": [],
               "quick_replies": [],
-              "text": "Due to no response, I ended this conversation. But feel free to talk to me anytime \ud83d\ude09",
+              "text": "Due to lack of response, I've ended this service. But feel free to talk to me anytime \ud83d\ude09",
               "type": "send_msg",
               "uuid": "66cab7bd-443e-4c65-8538-6d7068bec00c"
             }
@@ -231,7 +231,7 @@
               },
               {
                 "arguments": [
-                  "Yes yes y"
+                  "Yes yeah y"
                 ],
                 "category_uuid": "d63b1aff-23da-49fd-aae2-652cb526b49b",
                 "type": "has_any_word",
@@ -239,7 +239,7 @@
               },
               {
                 "arguments": [
-                  "No no n"
+                  "No nope n nah"
                 ],
                 "category_uuid": "979c9de5-4016-44fa-9e52-32b697b3baf9",
                 "type": "has_any_word",
@@ -342,7 +342,7 @@
               },
               "type": "call_webhook",
               "url": "https://api.openai.com/v1/completions",
-              "body": "{\"model\": \"text-davinci-003\", \"prompt\": \"This is a data collector for name, email, and age. Question: @input.text. For any question that is not considered an email, generate a response saying you don't know about the subject. If it is one of them, generate a thank you response.\", \"temperature\": 0, \"max_tokens\": 200} ",
+              "body": "{\"model\": \"text-davinci-003\", \"prompt\": \"This is a data collector for information like name, email, and age. Question: @input.text. For any question that is not considered an email, generate a response stating that you don't know about the subject. If it is one of them, generate a response thanking them.\", \"temperature\": 0, \"max_tokens\": 200} ",
               "method": "POST",
               "result_name": "ChatGPT"
             }
@@ -441,7 +441,7 @@
             "config": {
               "cases": {},
               "operand": {
-                "id": "contador_de_erros",
+                "id": "error_counter",
                 "name": "error counter",
                 "type": "result"
               }
@@ -508,7 +508,7 @@
         },
         "stickies": {
           "31a2d425-2b21-43bd-847f-f5864b742e1c": {
-            "body": "If it's the user's first error but their message has a number, we inform that we need a certain format. However, if it doesn't have a number, we send a different message",
+            "body": "If it's the user's first error but their message contains a number, we inform them that we need a certain format. However, if it doesn't contain a number, we send a different message",
             "color": "green",
             "position": {
               "left": 840,
@@ -517,7 +517,7 @@
             "title": "Split by expression"
           },
           "4b75124b-d1fb-4e41-b2c0-877de7faa0c5": {
-            "body": "Here we check the error counter. If it's still 0, we categorize it as \"First error\" and handle it accordingly, if it's the second error, the user goes through the Other category.",
+            "body": "Here we check the error counter. If it's still 0, we categorize it as \"First error\" and handle it accordingly. If it's the second error, the user goes through the Other category.",
             "color": "green",
             "position": {
               "bottom": null,
@@ -528,7 +528,7 @@
             "title": "Split by Flow Result"
           },
           "900b639d-8b44-45c5-b701-73539cf16569": {
-            "body": "Here we save a result called error counter. It's always saved as 0 at the beginning of the message flow and we'll use it later to check if the user entered a different number format",
+            "body": "Here we save a result called error counter. It will always be saved as 0 at the beginning of the message flow and we'll use it later to check if the user entered a number format different from what we expected",
             "color": "green",
             "position": {
               "bottom": 0,
@@ -539,7 +539,7 @@
             "title": "Save Flow Result"
           },
           "ac2fbb92-efc5-4e86-9cda-1c1b95fb0432": {
-            "body": "Here we ask the user for their phone number showing the accepted REGEX format",
+            "body": "Here we ask for the user's phone number showing the format accepted by the REGEX",
             "color": "green",
             "position": {
               "bottom": null,
@@ -550,7 +550,7 @@
             "title": "Send message"
           },
           "c86653e9-7662-420d-9585-41c01e8a7c90": {
-            "body": "We wait for the user's response.\n\nYou can click the \"Continue when there's no response...\" option and choose the time you want to wait.\n\nInside the \"Wait for response\" card we use create rule using REGEX to know if the user entered the number in the correct format. If needed, you can add other \"matches regex\" rules.",
+            "body": "We wait for the user's response.\n\nRemember that you can click on the \"Continue when there's no response...\" option and choose the time you want to wait.\n\nInside the \"Wait for response\" card, we use create rule using REGEX to know if the user typed the number in the correct format. If necessary, you can add other \"matches regex\" rules.",
             "color": "green",
             "position": {
               "bottom": null,
@@ -561,7 +561,7 @@
             "title": "Wait for response"
           },
           "d2fd3cf4-c6b6-4df1-98be-5392370c9e08": {
-            "body": "Here we save the informed phone number in the Contact Phone field so that the data is saved in the contact and not just in the message flow.",
+            "body": "Here we save the provided phone number in the Phone contact field so that the data is saved to the contact and not just in the message flow.",
             "color": "green",
             "position": {
               "bottom": null,
@@ -572,7 +572,7 @@
             "title": "Update contact"
           },
           "f88eb18a-c5fe-4472-a46e-832c71aea5db": {
-            "body": "If the user makes a mistake for a second time, we send an email to the department responsible and let them proceed, as it could be a number from another country etc.\n\nYou can edit the email to receive a notification when some user goes through this scenario.\n\nAfter sending the email, we save the phone number and let the user proceed to the next flow.",
+            "body": "If the user enters the wrong number for a second time, we send an email to the department head and let them proceed, as it could be a number from another country, etc.\n\nYou can edit the email to receive a notification when a user goes through this scenario.\n\nAfter sending the email, we save the phone number and let the user proceed to the next flow.",
             "color": "green",
             "position": {
               "left": 1320,
@@ -581,7 +581,7 @@
             "title": "Send Email"
           },
           "f9fa6580-02e7-40b0-8f14-b0ae827706e9": {
-            "body": "Here we save +1 in the error counter. This will serve to check whether it's the user's first time they've made a mistake in the desired number format.\n\nIf the user makes a mistake for a second time, we send an email to the department responsible and let them proceed.",
+            "body": "Here we save +1 in the error counter. This will be used to check whether or not it's the first time the user has entered the wrong number format.\n\nIf the user makes a mistake for a second time, we send an email to the department head and let them proceed.",
             "color": "green",
             "position": {
               "left": 140,
@@ -590,7 +590,7 @@
             "title": "Save Flow Result"
           },
           "fe104c2f-df51-4a3b-86cf-f463f934b3ee": {
-            "body": "The No Response category is used when the flow continues without the user having answered the question. Normally it's used to not leave the user stuck on a question.\n\nIn addition, we add the user to the \"Conversation ended\" group so that before sending another message or entering another flow we can check if the user is in that group and avoid sending messages.",
+            "body": "The No Response category is for when the flow continues without the user having responded to the question. It's typically used to prevent the user from being stuck on a question.\n\nAdditionally, we add the user to the \"Conversation ended\" group because before sending another message or entering another flow, we can check if the user is in this group and avoid sending messages.",
             "color": "green",
             "position": {
               "bottom": null,
@@ -623,7 +623,7 @@
             {
               "attachments": [],
               "quick_replies": [],
-              "text": "Cool. Now you could also tell me your phone number with DDD? (DD) 9xxxx-xxxx",
+              "text": "Great. Now could you also provide me with your phone number including the area code? (DD) 9xxxx-xxxx",
               "type": "send_msg",
               "uuid": "a125566f-6136-4ab3-8da1-3d0fc5e85156"
             }
@@ -654,7 +654,7 @@
             {
               "attachments": [],
               "quick_replies": [],
-              "text": "Due to no response, I ended this conversation. But feel free to talk to me anytime \ud83d\ude09",
+              "text": "Due to lack of response, I've ended this service. But feel free to talk to me anytime \ud83d\ude09",
               "type": "send_msg",
               "uuid": "08d0e846-ad0e-4e59-800b-d2c974924ec1"
             }
@@ -798,8 +798,8 @@
               "addresses": [
                 "weni@weni.ai"
               ],
-              "body": "Client with different format number - Chatbot\n\nNumber informed in Chatbot: @results.phone.value\n\nName: @contact.name\n\nUUID: @contact.uuid ",
-              "subject": "User with different format number - Chatbot",
+              "body": "Customer with number different from formatting - Chatbot\n\nNumber provided in Chatbot: @results.phone.value\n\nName: @contact.name\n\nUUID: @contact.uuid ",
+              "subject": "User with number different from formatting - Chatbot",
               "type": "send_email",
               "uuid": "e4d609f5-5771-4956-89b1-6ac0808d4584"
             }
@@ -856,7 +856,7 @@
             {
               "attachments": [],
               "quick_replies": [],
-              "text": "So @(title(contact.first_name)), I need a valid number! Please type your number below. (DD) 9xxxx-xxxx",
+              "text": "So @(title(contact.first_name)), I need a valid number! Please enter your number below. (DD) 9xxxx-xxxx",
               "type": "send_msg",
               "uuid": "ddbf8cae-0fd8-4189-825a-bc48daffa562"
             }
@@ -880,7 +880,7 @@
               },
               "type": "call_webhook",
               "url": "https://api.openai.com/v1/completions",
-              "body": "{\"model\": \"text-davinci-003\", \"prompt\": \"This is a data collector for name, email, age, and phone number. Question: @input.text. For any question that is not considered a phone number, generate a response saying you don't know about the subject. If it is one of them, ask for the number in the format (DD) 9xxxx-xxxx\", \"temperature\": 0, \"max_tokens\": 200} ",
+              "body": "{\"model\": \"text-davinci-003\", \"prompt\": \"This is a data collector for name, email, age, and phone number. Question: @input.text. For any question that is not considered a phone number, generate a response stating that you don't know about the subject. If it is one of them, ask for it to be in the format (DD) 9xxxx-xxxx\", \"temperature\": 0, \"max_tokens\": 200} ",
               "method": "POST",
               "result_name": "ChatGPT"
             }
@@ -1042,7 +1042,7 @@
         },
         "stickies": {
           "0617a23f-efdb-49e5-ba20-5ac2a615ea9d": {
-            "body": "We save the user's name in the contact name field. It can be viewed in the Stage module",
+            "body": "We save the user's name in the contact field 'name'. It can be viewed in the Studio module",
             "color": "green",
             "position": {
               "bottom": null,
@@ -1050,10 +1050,10 @@
               "right": null,
               "top": 820
             },
-            "title": "Update contact"
+            "title": "Update the contact"
           },
           "33cbfb49-faf0-4ab2-9e7e-3f408ca9f174": {
-            "body": "The \"Send message\" card is used to send messages to the user through a channel.\n\nThis message can be personalized, for example, asking what their social name is.",
+            "body": "The \"Send message\" card is used to send messages to the user through a channel.\n\nThis message can be personalized, for example, asking for this person's preferred name.",
             "color": "green",
             "position": {
               "bottom": 40,
@@ -1064,7 +1064,7 @@
             "title": "Send message"
           },
           "373a0539-4474-4e13-801e-771ca9715104": {
-            "body": "This card is used to stop the message flow and wait a moment for the user to respond.\n\nIt's very important to use it to make the conversation more human.\n\nYou can click the \"Continue when there's no response...\" option and choose the time you want to wait.\n\nInside the \"Wait for response\" card we can also create rules for if the user responds, we can check if there's any word or if it's a text.",
+            "body": "This card is used to pause the flow of messages and wait for a moment for the user to respond.\n\nIt's very important to use this to make the conversation more human-like.\n\nRemember that you can click on the \"Continue when there's no response...\" option and choose the time you want to wait.\n\nWithin the \"Wait for response\" card, we can also create rules to check if there's a specific word or if it's a text when the user responds.",
             "color": "green",
             "position": {
               "bottom": 20,
@@ -1075,7 +1075,7 @@
             "title": "Wait for response"
           },
           "6498f488-e153-4538-8b0c-6fa47df44d8e": {
-            "body": "Here we check if the user is in the \"Informed Name\" group, because if they are, it means they've already informed their name previously since the user is only added to this group after informing their name.\n\nIf you don't want to ask for the name again, you can remove the link from the Informed Name category or lower the first card \"Send message\" until the message flow starts.",
+            "body": "Here we check if the user is in the \"Provided name\" group, because if they are, it means they have already provided their name since the user is only added to this group after providing their name.\n\nIf you don't want to ask for the name again, just remove the connection from the Provided Name category or move the card down until the message flow starts at the first \"Send message\" card",
             "color": "green",
             "position": {
               "bottom": 20,
@@ -1083,10 +1083,10 @@
               "right": 100,
               "top": 160
             },
-            "title": "Split by group affiliation"
+            "title": "Split by group membership"
           },
           "8080bcb1-b037-4aad-8b63-288a5b3c0960": {
-            "body": "The End category is used when the message flow continues without the user having responded to the question. Normally it's used to not leave the user stuck on a question.\n\nIn addition, we add the user to the \"Conversation ended\" group so that before sending another message or entering another flow we can check if the user is in that group and avoid sending messages.",
+            "body": "The End category is used when the message flow continues without the user having responded to the question. It's typically used to prevent the user from being stuck on a question.\n\nAdditionally, we add the user to the \"Conversation ended\" group because before sending another message or entering another message flow, we can check if the user is in this group and avoid sending messages.",
             "color": "green",
             "position": {
               "bottom": 40,
@@ -1094,10 +1094,10 @@
               "right": 0,
               "top": 760
             },
-            "title": "End category"
+            "title": "End Category"
           },
           "e8a26bed-1667-4c90-9d62-b842eed9d5c4": {
-            "body": "The No Response category is used when the flow continues without the user having responded to the question. Normally it's used to not leave the user stuck on a question.\n\nIn addition, we add the user to the \"Conversation ended\" group so that before sending another message or entering another flow we can check if the user is in that group and avoid sending messages.",
+            "body": "The No Response category is used when the flow continues without the user having responded to the question. It's typically used to prevent the user from being stuck on a question.\n\nAdditionally, we add the user to the \"Conversation ended\" group because before sending another message or entering another flow, we can check if the user is in this group and avoid sending messages.",
             "color": "green",
             "position": {
               "bottom": null,
@@ -1105,10 +1105,10 @@
               "right": null,
               "top": 520
             },
-            "title": "No Response category"
+            "title": "No Response Category"
           },
           "fde32c92-9fa1-4bf2-8807-50e42dce9923": {
-            "body": "Here we handle the exception for if the user doesn't type a text, possibly having sent a photo of their document etc.",
+            "body": "Here we handle the exception for cases where the user doesn't type a text, possibly having sent a photo of their document, etc.",
             "color": "green",
             "position": {
               "bottom": 20,
@@ -1146,7 +1146,7 @@
               {
                 "arguments": [
                   "52f6267f-4c43-4dda-b8ca-1c704eaa0fa4",
-                  "Informed Name"
+                  "Name Informed"
                 ],
                 "category_uuid": "569b73cd-87db-421b-a2bc-aca97d0096ba",
                 "type": "has_group",
@@ -1156,7 +1156,7 @@
             "categories": [
               {
                 "exit_uuid": "66d52b48-19b0-42dc-abb4-554e78eebcc4",
-                "name": "Informed Name",
+                "name": "Name Informed",
                 "uuid": "569b73cd-87db-421b-a2bc-aca97d0096ba"
               },
               {
@@ -1177,7 +1177,7 @@
             {
               "attachments": [],
               "quick_replies": [],
-              "text": "I'd love to get to know you better \ud83d\ude0a",
+              "text": "Would you like to know me better \ud83d\ude0a",
               "type": "send_msg",
               "uuid": "cc888877-1f58-4465-b69d-f1b7eeb239dd"
             }
@@ -1201,7 +1201,7 @@
               },
               "type": "call_webhook",
               "url": "https://api.openai.com/v1/completions",
-              "body": "{\"model\": \"text-davinci-003\", \"prompt\": \"This is a data collector for name, email, and age. Question: @input.text. For any question that is not considered a name, generate a response saying you don't know about the subject. If it is one of them, generate a thank you response.\", \"temperature\": 0, \"max_tokens\": 200} ",
+              "body": "{\"model\": \"text-davinci-003\", \"prompt\": \"This is a data collector for name, email, and age. Question: @input.text. For any question that is not considered a proper name, generate a response indicating that it is not known, if it is one of them, generate a response thanking.\", \"temperature\": 0, \"max_tokens\": 200} ",
               "method": "POST",
               "result_name": "ChatGPT"
             }
@@ -1249,7 +1249,7 @@
             {
               "attachments": [],
               "quick_replies": [],
-              "text": "Could you please tell me your full name?",
+              "text": "Please, what is your full name?",
               "type": "send_msg",
               "uuid": "10b96426-786f-4f70-85c6-973eca35a8d7"
             }
@@ -1304,7 +1304,7 @@
             "cases": [
               {
                 "arguments": [
-                  "quit leave end"
+                  "quit exit leave end"
                 ],
                 "category_uuid": "86037c2c-cb50-4906-8a9d-18aea86fa77b",
                 "type": "has_any_word",
@@ -1371,7 +1371,7 @@
             {
               "attachments": [],
               "quick_replies": [],
-              "text": "Alright, whenever you want you can talk to me again \ud83d\ude09",
+              "text": "Alright, when you want \u00e9 just talk to me \ud83d\ude09",
               "type": "send_msg",
               "uuid": "30c3ae50-b331-4f21-a4a8-c896d4f56da2"
             }
@@ -1402,7 +1402,7 @@
             {
               "attachments": [],
               "quick_replies": [],
-              "text": "Due to no response, I ended this conversation. But feel free to talk to me anytime \ud83d\ude09",
+              "text": "Due to lack of response, I ended this conversation. But when you want \u00e9 just talk to me \ud83d\ude09",
               "type": "send_msg",
               "uuid": "799351af-815d-40bf-85a4-d82c026eefe1"
             }
@@ -1534,7 +1534,7 @@
         },
         "stickies": {
           "2593103f-f5b8-427c-823d-a10c26f53ab5": {
-            "body": "If you want your flow to start actively, as there won't be a user message to send to the AI, remove the \"Split by Intent\" card",
+            "body": "If you want your flow to start actively, as there will be no user message to send to the intelligence, remove the \"Split by Intent\" card",
             "color": "green",
             "position": {
               "bottom": 360,
@@ -1545,7 +1545,7 @@
             "title": "Attention"
           },
           "40b9d992-255e-4610-8d10-628f2a690cdb": {
-            "body": "This card is used to check if the user is in the \"Conversation Ended\" group, if so, the flow doesn't continue. Now if the user isn't in that group, they'll go through the Other category and continue in the flow.\n\nIt's important to remember that the user is only added to the \"Conversation ended\" group if they want to end or go inactive.",
+            "body": "This card is used to check if the user is in the Conversation Ended group. If so, the flow doesn't continue. Now if the user is not in this group, it will pass through the Other category and continue in the flow.\n\nIt's important to remember that the user is only placed in the Conversation Ended group if they want to end or become inactive.",
             "color": "green",
             "position": {
               "bottom": 600,
@@ -1556,7 +1556,7 @@
             "title": "Split by Group Affiliation"
           },
           "4c951ae0-3825-4259-8095-55faba7b8330": {
-            "body": "In this message flow we use the \"Enter a flow\" card to organize the structure of our questions. \n\nThe \"Enter a flow\" card simply directs the user to another message flow in milliseconds and immediately executes the action of that other message flow .\n\nSo, for organizational purposes we ask for the name, phone number, and email, each in their own message flow.",
+            "body": "In this message flow, we use the \"Enter a flow\" card to organize the structure of our questions.\n\nThe \"Enter a flow\" card simply directs the user to another message flow in milliseconds and immediately executes the action of that other message flow.\n\nThus, for organizational purposes, we ask for the name, phone, and email, each in its respective message flow.",
             "color": "green",
             "position": {
               "bottom": 260,
@@ -1567,7 +1567,7 @@
             "title": "Enter a flow"
           },
           "7d438dfe-84e6-4d32-9082-3fd3b5b6ff48": {
-            "body": "In the \"Name\" message flow we'll capture the user's name using the AI created by Weni",
+            "body": "In the \"Name\" message flow, we will capture the user's name using the artificial intelligence created by Weni",
             "color": "green",
             "position": {
               "bottom": 600,
@@ -1578,7 +1578,7 @@
             "title": "Name"
           },
           "9706b839-c9f0-408d-9131-d03efb225c69": {
-            "body": "Here we send the user's last message to the classifier. All AI is used through this card and can categorize according to an intent of the AI.\n\nIn this case, if the intent is \"greeting\" we'll greet the user accordingly.",
+            "body": "Here we send the user's last message to the classifier. All intelligence is used through this card and can categorize according to an intelligence intention.\n\nIn this case, if the intention is \"greeting\", we will greet the user accordingly.",
             "color": "green",
             "position": {
               "bottom": null,
@@ -1586,10 +1586,10 @@
               "right": null,
               "top": 20
             },
-            "title": "Split by intent"
+            "title": "Split by intention"
           },
           "a1885b39-5ae2-4f07-94cc-3ee92803eacb": {
-            "body": "In the \"Phone\" message flow we'll capture the user's contact phone number using REGEX rules in the \"Wait for Response\" card.\n\nRegex is a regular expression, or regex, are patterns used to identify certain combinations or character strings in a string.",
+            "body": "In the \"Phone\" message flow, we will capture the user's contact phone using REGEX rules in the \"Wait for Response\" card.\n\nRegex is a regular expression, or Regex, which are patterns used to identify certain combinations or strings of characters in a string.",
             "color": "green",
             "position": {
               "bottom": 580,
@@ -1600,7 +1600,7 @@
             "title": "Phone"
           },
           "a678ac34-58e5-42af-a765-6e815e42bc14": {
-            "body": "Feedback message to the user.\n\nCan be removed or changed, if you prefer.",
+            "body": "Feedback message to the user.\n\nCan be removed or changed, if preferred.",
             "color": "green",
             "position": {
               "bottom": null,
@@ -1611,7 +1611,7 @@
             "title": "Send message"
           },
           "af489e76-4330-4611-bbdc-b8937bc0c8ad": {
-            "body": "Here we put a welcome message if your chatbot is going to collect this user data.\n\nIf you prefer, you can remove this message and use the rest of the message flow in a chatbot step that's already been built. By removing this initial message, your message flow will start with the name question.",
+            "body": "Here we put a welcome message if your chatbot is only going to capture this user data.\n\nIf you prefer, you can remove this message and use the rest of the message flow in a stage of your chatbot that has already been built. By removing this initial message, your message flow will start with the question about the user's name.",
             "color": "green",
             "position": {
               "bottom": 200,
@@ -1622,7 +1622,7 @@
             "title": "Send message"
           },
           "cd728368-0909-452d-a350-67e6abf1c172": {
-            "body": "In the \"Email\" message flow we'll capture the user's contact email using the \"Has an email\" rule in the \"Wait for Response\" card.\n\nThis is a standard Weni rule that checks if the text format is compatible with an email. It's important to note that no verification of the existence of the email is done, only the format that was sent by the user is checked.",
+            "body": "In the \"Email\" message flow, we will capture the user's contact email using the \"Has an email\" rule in the \"Wait for Response\" card.\n\nThis is a standard rule of the Weni platform, which checks if the text format is compatible with that of an email. It's important to note that no verification of the email's existence is made, but rather a verification of the format sent by the user.",
             "color": "green",
             "position": {
               "bottom": 640,
@@ -1633,7 +1633,7 @@
             "title": "Email"
           },
           "d3e1c246-3824-486e-9794-8a43eb65309c": {
-            "body": "This card is used to check if the user is in the \"Conversation Ended\" group, if so, the message flow doesn't continue. Now if the user isn't in that group, they'll go through the Other category and continue in the message flow.\n\nIt's important to remember that the user is only added to the \"Conversation ended\" group if they want to end or go inactive.",
+            "body": "This card is used to check if the user is in the Conversation Ended group. If so, the message flow doesn't continue. Now if the user is not in this group, it will pass through the Other category and continue in the message flow.\n\nIt's important to remember that the user is only placed in the Conversation Ended group if they want to end or become inactive.",
             "color": "green",
             "position": {
               "bottom": 720,
@@ -1644,7 +1644,7 @@
             "title": "Split by Group Affiliation"
           },
           "e3f9e26c-fdb7-448b-bc9f-570fa19c1440": {
-            "body": "This card is used to add the user who completed the information sending process to a group called \"Lead Complete\".\n\nYou can view all people who are in this group by accessing the Stage > Contacts > Filter by Lead Complete group in the bottom left corner of the Screen.\n\nYou can also dispatch active messages to all people who are in this group.",
+            "body": "This card is used to add the user who completed sending information to a group called \"Complete Lead\".\n\nYou can view all the people in this group by accessing the Studio module > Contacts > Filter by Complete Lead Group in the bottom left corner of the screen.\n\nYou can also actively send messages to all people within this group.",
             "color": "green",
             "position": {
               "bottom": 440,
@@ -1655,7 +1655,7 @@
             "title": "Add to a Group"
           },
           "fcfeb8a7-a7bf-4892-90f3-2a2fd17bd2e2": {
-            "body": "This is the main data capture message flow. So it's the one you should start when you need to collect name, phone number, and email from some user.\n\nIn this flow we use the \"Enter a flow\" card to organize the steps and types of questions like name, phone number, and email. But the flow you should use is \"Data Capture\".",
+            "body": "This is the main message flow for data capture. Therefore, it should be initiated when you need to collect a user's name, phone, and email.\n\nIn this flow, we use the \"Enter a flow\" card to organize the stages and types of questions such as name, phone, and email. But the flow you should use is \"Data Capture\".",
             "color": "purple",
             "position": {
               "bottom": -20,
@@ -1753,7 +1753,7 @@
             {
               "attachments": [],
               "quick_replies": [],
-              "text": "Hello, it's a pleasure to talk to you",
+              "text": "Hi, it's a pleasure to talk to you",
               "type": "send_msg",
               "uuid": "cf8eef8f-a9f8-4680-bf01-0c35a6102fa9"
             }
@@ -1771,7 +1771,7 @@
             {
               "attachments": [],
               "quick_replies": [],
-              "text": "Welcome to our service center! Let's start data capture for registration",
+              "text": "Welcome to our customer service center! We will start capturing data for registration",
               "type": "send_msg",
               "uuid": "2346f53d-ec51-4246-bb89-809fc82099a0"
             }
@@ -1788,7 +1788,7 @@
           "actions": [
             {
               "flow": {
-                "name": "Data Capture - Name Flow",
+                "name": "Name Capture - Secondary Flow",
                 "uuid": "f9f124d1-d587-4ca2-897b-f533a2833d67"
               },
               "type": "enter_flow",
@@ -1858,7 +1858,7 @@
               {
                 "arguments": [
                   "b7abd3ed-e078-4127-9ced-de6b14ca81bd",
-                  "Conversa Encerrada"
+                  "Conversation Ended"
                 ],
                 "category_uuid": "0ed889cd-37e4-42ad-bbcf-9a378f1df3c8",
                 "type": "has_group",
@@ -1888,7 +1888,7 @@
           "actions": [
             {
               "flow": {
-                "name": "Data Capture - Phone Flow",
+                "name": "Phone Capture - Secondary Flow",
                 "uuid": "06615c36-2386-4869-af37-37cc70a4759a"
               },
               "type": "enter_flow",
@@ -1988,7 +1988,7 @@
           "actions": [
             {
               "flow": {
-                "name": "Data Capture - Email Flow",
+                "name": "Email Capture - Secondary Flow",
                 "uuid": "35e5b573-dd0e-4d40-8c37-a8071810bd74"
               },
               "type": "enter_flow",
@@ -2090,7 +2090,7 @@
               "groups": [
                 {
                   "count": 0,
-                  "name": "Lead Complete",
+                  "name": "Complete Lead",
                   "query": null,
                   "status": "ready",
                   "uuid": "7ce49ac0-56b6-4b1c-952e-b3352bdba76b"
@@ -2155,7 +2155,7 @@
       "type": "text"
     },
     {
-      "key": "telefone",
+      "key": "phone",
       "name": "Phone",
       "type": "text"
     }
@@ -2168,12 +2168,12 @@
     },
     {
       "uuid": "52f6267f-4c43-4dda-b8ca-1c704eaa0fa4",
-      "name": "Provided Name",
+      "name": "Name Informed",
       "query": null
     },
     {
       "uuid": "7ce49ac0-56b6-4b1c-952e-b3352bdba76b",
-      "name": "Lead Complete",
+      "name": "Complete Lead",
       "query": null
     }
   ]
