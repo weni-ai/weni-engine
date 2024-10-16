@@ -24,7 +24,6 @@ app.conf.task_routes = {
     "create_contacts": {"queue": "billing"},
     "end_trial_plan": {"queue": "billing"},
     "daily_contact_count": {"queue": "billing"},
-    "sync_project_statistics": {"queue": "sync"},
     "sync_total_contact_count": {"queue": "sync"},
 }
 
@@ -36,10 +35,6 @@ app.conf.beat_schedule = {
     },
     "check-organization-free-plan": {
         "task": "connect.common.tasks.check_organization_free_plan",
-        "schedule": schedules.crontab(minute="*/6"),
-    },
-    "sync_project_statistics": {
-        "task": "sync_project_statistics",
         "schedule": schedules.crontab(minute="*/6"),
     },
     "sync_total_contact_count": {

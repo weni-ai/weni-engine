@@ -315,33 +315,6 @@ def sync_total_contact_count():
     return True
 
 
-@app.task(name="sync_project_statistics")
-def sync_project_statistics():
-    if settings.USE_FLOW_REST:
-        flow_instance = FlowsRESTClient()
-    else:
-        flow_instance = utils.get_grpc_types().get("flow")
-
-        for project in Project.objects.order_by("-created_at"):
-            try:
-                statistic_project_result = flow_instance.get_project_statistic(
-                    project_uuid=str(project.uuid),
-                )
-                if len(statistic_project_result) > 0:
-                    project.flow_count = int(
-                        statistic_project_result.get("active_flows")
-                    )
-                    project.save(update_fields=["flow_count"])
-            except ConnectionError as c:
-                logger.error(
-                    f"Remote end closed connection without: {c} - Project: {project}"
-                )
-                continue
-            except Exception as e:
-                logger.error(f"Sync Project Statistics Exception {e}")
-                continue
-
-
 @app.task()
 def sync_repositories_statistics():
     if settings.USE_FLOW_REST:
