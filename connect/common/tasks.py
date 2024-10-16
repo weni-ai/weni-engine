@@ -362,31 +362,6 @@ def capture_invoice():
             # add send email
 
 
-@app.task()
-def delete_status_logs():
-    BATCH_SIZE = 5000
-    logs = LogService.objects.filter(
-        created_at__lt=timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
-        - timezone.timedelta(days=10)
-    )
-
-    num_updated = 0
-    max_id = -1
-    while True:
-        batch = list(logs.filter(id__gt=max_id).order_by("id")[:BATCH_SIZE])
-
-        if not batch:
-            break
-
-        max_id = batch[-1].id
-        with transaction.atomic():
-            for log in batch:
-                log.delete()
-
-        num_updated += len(batch)
-        print(f" > deleted {num_updated} status logs")
-
-
 @app.task(
     name="update_suspend_project",
     autoretry_for=(_InactiveRpcError, Exception),

@@ -29,10 +29,6 @@ app.conf.task_routes = {
 
 
 app.conf.beat_schedule = {
-    "delete-status-logs": {
-        "task": "connect.common.tasks.delete_status_logs",
-        "schedule": schedules.crontab(hour="22", minute=0),
-    },
     "check-organization-free-plan": {
         "task": "connect.common.tasks.check_organization_free_plan",
         "schedule": schedules.crontab(minute="*/6"),
