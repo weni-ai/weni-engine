@@ -17,13 +17,17 @@ from connect.common.models import (
     BillingPlan,
     Invoice,
     GenericBillingData,
-    RecentActivity
+    RecentActivity,
 )
 
 from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
 from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
-from connect.api.v1.internal.integrations.integrations_rest_client import IntegrationsRESTClient
-from connect.api.v1.internal.intelligence.intelligence_rest_client import IntelligenceRESTClient
+from connect.api.v1.internal.integrations.integrations_rest_client import (
+    IntegrationsRESTClient,
+)
+from connect.api.v1.internal.intelligence.intelligence_rest_client import (
+    IntelligenceRESTClient,
+)
 from connect.common.keycloak import KeycloakCleanup
 
 import logging
@@ -43,19 +47,19 @@ def delete_organization(inteligence_organization: int, user_email):
 
 
 @app.task(name="update_organization")
-def update_organization(inteligence_organization: int, organization_name: str, user_email: str):
+def update_organization(
+    inteligence_organization: int, organization_name: str, user_email: str
+):
     ai_client = IntelligenceRESTClient()
     ai_client.update_organization(
         organization_id=inteligence_organization,
         organization_name=organization_name,
-        user_email=user_email
+        user_email=user_email,
     )
     return True
 
 
-@app.task(
-    name="update_user_permission_organization"
-)
+@app.task(name="update_user_permission_organization")
 def update_user_permission_organization(
     inteligence_organization: int, user_email: str, permission: int
 ):
@@ -120,14 +124,10 @@ def update_user_permission_project(
         permission=permission,
     )
     integrations_client.update_user_permission_project(
-        project_uuid=project_uuid,
-        user_email=user_email,
-        role=permission
+        project_uuid=project_uuid, user_email=user_email, role=permission
     )
     chats_client.update_user_permission(
-        permission=permission,
-        user_email=user_email,
-        project_uuid=project_uuid
+        permission=permission, user_email=user_email, project_uuid=project_uuid
     )
     return True
 
@@ -146,8 +146,7 @@ def migrate_organization(user_email: str):
         )
 
         role = ai_client.get_user_organization_permission_role(
-            user_email=user_email,
-            organization_id=organization.get("id")
+            user_email=user_email, organization_id=organization.get("id")
         )
 
         org.authorizations.create(user=user, role=role)
@@ -250,15 +249,11 @@ def search_project(organization_id: int, project_uuid: str, text: str):
     else:
         flows_client = FlowsRESTClient()
     flow_result = flows_client.get_project_flows(
-        project_uuid=project_uuid,
-        flow_name=text
+        project_uuid=project_uuid, flow_name=text
     )
 
-    inteligence_result = (
-        IntelligenceRESTClient().get_organization_intelligences(
-            intelligence_name=text,
-            organization_id=organization_id
-        )
+    inteligence_result = IntelligenceRESTClient().get_organization_intelligences(
+        intelligence_name=text, organization_id=organization_id
     )
     return {
         "flow": flow_result,
@@ -282,7 +277,7 @@ def check_organization_free_plan():
             now = pendulum.now(project_timezone)
             before = now.strftime("%Y-%m-%d %H:%M")
             # first day of month
-            after = now.start_of('month').strftime("%Y-%m-%d %H:%M")
+            after = now.start_of("month").strftime("%Y-%m-%d %H:%M")
 
             contact_count = flow_instance.get_billing_total_statistics(
                 project_uuid=str(project.flow_organization), before=before, after=after
@@ -302,27 +297,6 @@ def check_organization_free_plan():
                 organization.name,
                 organization.authorizations.values_list("user__email", flat=True),
             )
-    return True
-
-
-@app.task(name="sync_active_contacts")
-def sync_active_contacts():
-    for project in Project.objects.all()[:10]:
-        try:
-            if project.organization.organization_billing.plan in [BillingPlan.PLAN_CUSTOM, BillingPlan.PLAN_ENTERPRISE]:
-                before = pendulum.now().end_of("month")
-                after = pendulum.now().start_of("month")
-            else:
-                last_invoice_date = project.organization.organization_billing.last_invoice_date
-                next_due_date = project.organization.organization_billing.next_due_date
-                created_at = project.organization.created_at
-                before = timezone.now() if next_due_date is None else next_due_date
-                after = created_at if last_invoice_date is None else last_invoice_date
-        except BillingPlan.DoesNotExist:
-            logger.error("Org: {project.organization} does not have a billing plan object")
-        contact_count = utils.count_contacts(project=project, after=str(after), before=str(before))
-        project.contact_count = int(contact_count)
-        project.save(update_fields=["contact_count"])
     return True
 
 
@@ -354,10 +328,14 @@ def sync_project_statistics():
                     project_uuid=str(project.uuid),
                 )
                 if len(statistic_project_result) > 0:
-                    project.flow_count = int(statistic_project_result.get("active_flows"))
+                    project.flow_count = int(
+                        statistic_project_result.get("active_flows")
+                    )
                     project.save(update_fields=["flow_count"])
             except ConnectionError as c:
-                logger.error(f"Remote end closed connection without: {c} - Project: {project}")
+                logger.error(
+                    f"Remote end closed connection without: {c} - Project: {project}"
+                )
                 continue
             except Exception as e:
                 logger.error(f"Sync Project Statistics Exception {e}")
@@ -402,9 +380,7 @@ def sync_channels_statistics():
         flow_instance = utils.get_grpc_types().get("flow")
     for project in Project.objects.all():
         project.extra_active_integration = len(
-            list(
-                flow_instance.list_channel(project_uuid=str(project.uuid))
-            )
+            list(flow_instance.list_channel(project_uuid=str(project.uuid)))
         )
         project.save(update_fields=["extra_active_integration"])
 
@@ -415,14 +391,23 @@ def generate_project_invoice():
         sync_channels_statistics()
 
     for org in Organization.objects.filter(
-        organization_billing__next_due_date__lte=pendulum.now().date(), is_suspended=False).exclude(
-            organization_billing__plan__in=[BillingPlan.PLAN_TRIAL, BillingPlan.PLAN_CUSTOM, BillingPlan.PLAN_ENTERPRISE]):
+        organization_billing__next_due_date__lte=pendulum.now().date(),
+        is_suspended=False,
+    ).exclude(
+        organization_billing__plan__in=[
+            BillingPlan.PLAN_TRIAL,
+            BillingPlan.PLAN_CUSTOM,
+            BillingPlan.PLAN_ENTERPRISE,
+        ]
+    ):
 
         invoice = org.organization_billing_invoice.create(
             due_date=pendulum.now(),
-            invoice_random_id=1
-            if org.organization_billing_invoice.last() is None
-            else org.organization_billing_invoice.last().invoice_random_id + 1,
+            invoice_random_id=(
+                1
+                if org.organization_billing_invoice.last() is None
+                else org.organization_billing_invoice.last().invoice_random_id + 1
+            ),
             discount=org.organization_billing.fixed_discount,
             extra_integration=org.extra_active_integrations,
             cost_per_whatsapp=settings.BILLING_COST_PER_WHATSAPP,
@@ -430,19 +415,17 @@ def generate_project_invoice():
         after = (
             org.created_at.strftime("%Y-%m-%d %H:%M")
             if org.organization_billing.last_invoice_date is None
-            else org.organization_billing.last_invoice_date.strftime(
-                "%Y-%m-%d %H:%M"
-            )
+            else org.organization_billing.last_invoice_date.strftime("%Y-%m-%d %H:%M")
         )
         before = (
             timezone.now().strftime("%Y-%m-%d %H:%M")
             if org.organization_billing.next_due_date is None
-            else org.organization_billing.next_due_date.strftime(
-                "%Y-%m-%d %H:%M"
-            )
+            else org.organization_billing.next_due_date.strftime("%Y-%m-%d %H:%M")
         )
         for project in org.project.all():
-            contact_count = utils.count_contacts(project=project, after=str(after), before=str(before))
+            contact_count = utils.count_contacts(
+                project=project, after=str(after), before=str(before)
+            )
 
             invoice.organization_billing_invoice_project.create(
                 project=project,
@@ -532,10 +515,7 @@ def update_user_photo(user_email: str, photo_url: str):
             user_email=user_email,
             photo_url=photo_url,
         )
-        chats_client.update_user(
-            user_email=user_email,
-            photo_url=photo_url
-        )
+        chats_client.update_user(user_email=user_email, photo_url=photo_url)
     return True
 
 
@@ -550,14 +530,10 @@ def update_user_name(user_email: str, first_name: str, last_name: str):
     if user.exists():
         user = user.first()
         integrations_client.update_user(
-            user_email=user_email,
-            first_name=first_name,
-            last_name=last_name
+            user_email=user_email, first_name=first_name, last_name=last_name
         )
         chats_client.update_user(
-            user_email=user_email,
-            first_name=first_name,
-            last_name=last_name
+            user_email=user_email, first_name=first_name, last_name=last_name
         )
     return True
 
@@ -584,20 +560,18 @@ def get_billing_total_statistics(project_uuid: str, before: str, after: str):
     retry_kwargs={"max_retries": 5},
     retry_backoff=True,
 )
-def delete_user_permission_project(flow_organization: str, project_uuid: str, user_email: str, permission: int):
+def delete_user_permission_project(
+    flow_organization: str, project_uuid: str, user_email: str, permission: int
+):
     flow_instance = FlowsRESTClient()
     chats_instance = ChatsRESTClient()
 
     flow_instance.delete_user_permission_project(
-        project_uuid=flow_organization,
-        user_email=user_email,
-        permission=permission
+        project_uuid=flow_organization, user_email=user_email, permission=permission
     )
 
     chats_instance.delete_user_permission_project(
-        project_uuid=project_uuid,
-        user_email=user_email,
-        permission=permission
+        project_uuid=project_uuid, user_email=user_email, permission=permission
     )
 
 
@@ -622,7 +596,7 @@ def list_channels(channel_type):
                     config=channel.get("config"),
                     address=channel.get("address"),
                     project_uuid=str(project.uuid),
-                    is_active=channel.get("is_active")
+                    is_active=channel.get("is_active"),
                 )
             else:
                 channel_data = dict(
@@ -637,7 +611,7 @@ def list_channels(channel_type):
     return channels
 
 
-@app.task(name='release_channel')
+@app.task(name="release_channel")
 def realease_channel(channel_uuid, user):
     if settings.USE_FLOW_REST:
         flow_instance = FlowsRESTClient()
@@ -650,7 +624,7 @@ def realease_channel(channel_uuid, user):
     return True
 
 
-@app.task(name='create_channel')
+@app.task(name="create_channel")
 def create_channel(user, project_uuid, data, channeltype_code):
     if settings.USE_FLOW_REST:
         flow_instance = FlowsRESTClient()
@@ -658,7 +632,7 @@ def create_channel(user, project_uuid, data, channeltype_code):
             user=user,
             project_uuid=project_uuid,
             data=data,
-            channeltype_code=channeltype_code
+            channeltype_code=channeltype_code,
         )
     else:
         flow_instance = utils.get_grpc_types().get("flow")
@@ -668,13 +642,13 @@ def create_channel(user, project_uuid, data, channeltype_code):
             user=user,
             project_uuid=project_uuid,
             data=data,
-            channeltype_code=channeltype_code
+            channeltype_code=channeltype_code,
         )
         return dict(
             uuid=response.uuid,
             name=response.name,
             config=response.config,
-            address=response.address
+            address=response.address,
         )
     except grpc.RpcError as error:
         raise error
@@ -703,7 +677,7 @@ def create_wac_channel(user, flow_organization, config, phone_number_id):
             uuid=response.uuid,
             name=response.name,
             config=response.config,
-            address=response.address
+            address=response.address,
         )
     except grpc.RpcError as error:
         raise error
@@ -741,7 +715,9 @@ def destroy_classifier(classifier_uuid: str, user_email: str):
 
 
 @app.task(name="create_classifier")
-def create_classifier(project_uuid: str, user_email: str, classifier_name: str, access_token):
+def create_classifier(
+    project_uuid: str, user_email: str, classifier_name: str, access_token
+):
     if settings.USE_FLOW_REST:
         flow_instance = FlowsRESTClient()
     else:
@@ -756,7 +732,7 @@ def create_classifier(project_uuid: str, user_email: str, classifier_name: str, 
     return response.get("data", {})
 
 
-@app.task(name='list_classifier')
+@app.task(name="list_classifier")
 def list_classifier(project_uuid: str):
     classifiers = {"data": []}
     if settings.USE_FLOW_REST:
@@ -769,14 +745,20 @@ def list_classifier(project_uuid: str):
         is_active=True,
     )
     for i in response:
-        authorization = i.get("access_token") if settings.USE_FLOW_REST else i.get("authorization_uuid")
-        classifiers["data"].append({
-            "authorization_uuid": authorization,
-            "classifier_type": i.get("classifier_type"),
-            "name": i.get("name"),
-            "is_active": i.get("is_active"),
-            "uuid": i.get("uuid"),
-        })
+        authorization = (
+            i.get("access_token")
+            if settings.USE_FLOW_REST
+            else i.get("authorization_uuid")
+        )
+        classifiers["data"].append(
+            {
+                "authorization_uuid": authorization,
+                "classifier_type": i.get("classifier_type"),
+                "name": i.get("name"),
+                "is_active": i.get("is_active"),
+                "uuid": i.get("uuid"),
+            }
+        )
     return classifiers
 
 
