@@ -1,3 +1,7 @@
+# 3.28.2
+## *Remove*
+  - Removing obsolete tasks
+
 # 3.28.1
 ## *Add*
   - Reject recent activity case the entity or action is not valid.
