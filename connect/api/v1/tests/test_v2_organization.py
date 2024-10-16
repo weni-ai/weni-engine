@@ -24,7 +24,6 @@ import pendulum
 from freezegun import freeze_time
 from connect.billing.tasks import (
     end_trial_plan,
-    check_organization_plans,
     daily_contact_count,
 )
 from rest_framework import status
