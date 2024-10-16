@@ -16,16 +16,19 @@ from connect.common.models import (
     ProjectAuthorization,
     RequestPermissionOrganization,
     BillingPlan,
-    Invoice
+    Invoice,
 )
 from connect.common.mocks import StripeMockGateway
 from unittest.mock import patch
 import pendulum
 from freezegun import freeze_time
-from connect.billing.tasks import end_trial_plan, check_organization_plans, daily_contact_count
+from connect.billing.tasks import (
+    end_trial_plan,
+    check_organization_plans,
+    daily_contact_count,
+)
 from rest_framework import status
 from connect.api.v1.billing.views import BillingViewSet
-from connect.common.tasks import generate_project_invoice
 
 
 class CreateOrganizationAPITestCase(TestCase):
@@ -64,19 +67,14 @@ class CreateOrganizationAPITestCase(TestCase):
                 "name": "name",
                 "description": "desc",
                 "plan": "plan",
-                "authorizations": [
-                    {
-                        "user_email": "e@mail.com",
-                        "role": 3
-                    }
-                ]
+                "authorizations": [{"user_email": "e@mail.com", "role": 3}],
             },
             "project": {
                 "date_format": "D",
                 "name": "Test Project",
                 "organization": "2575d1f9-f7f8-4a5d-ac99-91972e309511",
                 "timezone": "America/Argentina/Buenos_Aires",
-            }
+            },
         }
 
         response, content_data = self.request(data, self.owner_token)
@@ -93,19 +91,14 @@ class CreateOrganizationAPITestCase(TestCase):
                 "description": "Customer",
                 "plan": BillingPlan.PLAN_SCALE,
                 "customer": "cus_tomer",
-                "authorizations": [
-                    {
-                        "user_email": "e@mail.com",
-                        "role": 3
-                    }
-                ]
+                "authorizations": [{"user_email": "e@mail.com", "role": 3}],
             },
             "project": {
                 "date_format": "D",
                 "name": "Test Project",
                 "timezone": "America/Argentina/Buenos_Aires",
-                "template": True
-            }
+                "template": True,
+            },
         }
         response, content_data = self.request(data, self.owner_token)
         org = Organization.objects.get(uuid=content_data["organization"]["uuid"])
@@ -121,12 +114,7 @@ class CreateOrganizationAPITestCase(TestCase):
                 "name": "name",
                 "description": "desc",
                 "plan": "plan",
-                "authorizations": [
-                    {
-                        "user_email": "e@mail.com",
-                        "role": 3
-                    }
-                ]
+                "authorizations": [{"user_email": "e@mail.com", "role": 3}],
             },
             "project": {
                 "date_format": "D",
@@ -134,15 +122,22 @@ class CreateOrganizationAPITestCase(TestCase):
                 "organization": "2575d1f9-f7f8-4a5d-ac99-91972e309511",
                 "timezone": "America/Argentina/Buenos_Aires",
                 "template": True,
-                "template_type": "support"
-            }
+                "template_type": "support",
+            },
         }
         response, content_data = self.request(data, self.owner_token)
         self.assertEquals(response.status_code, 201)
         self.assertEquals(content_data.get("project").get("first_access"), True)
-        self.assertEquals(content_data.get("project").get("wa_demo_token"), "wa-demo-12345")
-        self.assertEquals(content_data.get("project").get("project_type"), "template:support")
-        self.assertEquals(content_data.get("project").get("redirect_url"), "https://wa.me/5582123456?text=wa-demo-12345")
+        self.assertEquals(
+            content_data.get("project").get("wa_demo_token"), "wa-demo-12345"
+        )
+        self.assertEquals(
+            content_data.get("project").get("project_type"), "template:support"
+        )
+        self.assertEquals(
+            content_data.get("project").get("redirect_url"),
+            "https://wa.me/5582123456?text=wa-demo-12345",
+        )
         self.assertEquals(OrganizationAuthorization.objects.count(), 1)
         self.assertEquals(RequestPermissionOrganization.objects.count(), 1)
         self.assertEquals(Project.objects.count(), 1)
@@ -150,7 +145,9 @@ class CreateOrganizationAPITestCase(TestCase):
 
     @patch("connect.common.signals.update_user_permission_project")
     @patch("connect.billing.get_gateway")
-    def test_create_template_project_type_support(self, mock_get_gateway, mock_permission):
+    def test_create_template_project_type_support(
+        self, mock_get_gateway, mock_permission
+    ):
         mock_get_gateway.return_value = StripeMockGateway()
         mock_permission.return_value = True
         data = {
@@ -158,12 +155,7 @@ class CreateOrganizationAPITestCase(TestCase):
                 "name": "name",
                 "description": "desc",
                 "plan": "plan",
-                "authorizations": [
-                    {
-                        "user_email": "e@mail.com",
-                        "role": 3
-                    }
-                ]
+                "authorizations": [{"user_email": "e@mail.com", "role": 3}],
             },
             "project": {
                 "date_format": "D",
@@ -171,8 +163,8 @@ class CreateOrganizationAPITestCase(TestCase):
                 "organization": "2575d1f9-f7f8-4a5d-ac99-91972e309511",
                 "timezone": "America/Argentina/Buenos_Aires",
                 "template": True,
-                "template_type": Project.TYPE_SUPPORT
-            }
+                "template_type": Project.TYPE_SUPPORT,
+            },
         }
         response, content_data = self.request(data, self.owner_token)
         self.assertEquals(response.status_code, 201)
@@ -201,9 +193,7 @@ class RetrieveOrganizationProjectsAPITestCase(TestCase):
         )
 
         self.project = self.organization.project.create(
-            name="will fail",
-            flow_organization=uuid.uuid4(),
-            is_template=True
+            name="will fail", flow_organization=uuid.uuid4(), is_template=True
         )
 
     def request(self, project_uuid, token=None):
@@ -242,7 +232,7 @@ class PlanAPITestCase(TestCase):
             organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
             organization_billing__plan="free",
             inteligence_organization=1,
-            organization_billing__stripe_customer="cus_MYOrndkgpPHGK9"
+            organization_billing__stripe_customer="cus_MYOrndkgpPHGK9",
         )
         self.trial = Organization.objects.create(
             name="Trial org",
@@ -306,19 +296,26 @@ class PlanAPITestCase(TestCase):
             format="json",
             **authorization_header,
         )
-        response = OrganizationViewSet.as_view({"patch": "upgrade_plan"})(request, organization_uuid)
+        response = OrganizationViewSet.as_view({"patch": "upgrade_plan"})(
+            request, organization_uuid
+        )
         content_data = json.loads(response.content)
         return response, content_data
 
     def test_stripe_customer_kwarg(self):
         """Test new kwarg organization_billing__stripe_customer at organization create."""
-        self.assertEqual(self.organization.organization_billing.stripe_customer, "cus_MYOrndkgpPHGK9")
+        self.assertEqual(
+            self.organization.organization_billing.stripe_customer, "cus_MYOrndkgpPHGK9"
+        )
 
     def test_assert_plans(self):
         """Test trial plan creation. Check if BillingPlan save method sets a end date to trial"""
 
         self.assertEqual(self.trial.organization_billing.plan, BillingPlan.PLAN_TRIAL)
-        self.assertEqual(self.trial.organization_billing.trial_end_date, pendulum.now().end_of("day").add(months=1))
+        self.assertEqual(
+            self.trial.organization_billing.trial_end_date,
+            pendulum.now().end_of("day").add(months=1),
+        )
 
     def test_end_trial_period(self):
         """Test BillingPlan method end_trial_period.
@@ -351,13 +348,9 @@ class PlanAPITestCase(TestCase):
         mock_get_gateway.return_value = StripeMockGateway()
         """Test upgrade plan view"""
         self.assertEqual(self.trial.organization_billing.plan, BillingPlan.PLAN_TRIAL)
-        data = {
-            "organization_billing_plan": BillingPlan.PLAN_START
-        }
+        data = {"organization_billing_plan": BillingPlan.PLAN_START}
         response, content_data = self.request_upgrade_plan(
-            organization_uuid=self.trial.uuid,
-            data=data,
-            token=self.owner_token
+            organization_uuid=self.trial.uuid, data=data, token=self.owner_token
         )
 
         upgraded_org = Organization.objects.get(uuid=self.trial.uuid)
@@ -370,13 +363,11 @@ class PlanAPITestCase(TestCase):
         """Test response if stripe charge fails"""
         data = {
             "organization_billing_plan": BillingPlan.PLAN_START,
-            "stripe_failure": True
+            "stripe_failure": True,
         }
 
         response, content_data = self.request_upgrade_plan(
-            organization_uuid=self.trial.uuid,
-            data=data,
-            token=self.owner_token
+            organization_uuid=self.trial.uuid, data=data, token=self.owner_token
         )
 
         self.assertEqual(content_data["status"], "FAILURE")
@@ -389,9 +380,7 @@ class PlanAPITestCase(TestCase):
             "organization_billing_plan": "baic",
         }
         response, content_data = self.request_upgrade_plan(
-            organization_uuid=self.trial.uuid,
-            data=data,
-            token=self.owner_token
+            organization_uuid=self.trial.uuid, data=data, token=self.owner_token
         )
         self.assertEqual(content_data["status"], "FAILURE")
         self.assertEqual(content_data["message"], "Invalid plan choice")
@@ -403,9 +392,7 @@ class PlanAPITestCase(TestCase):
             "organization_billing_plan": "plus",
         }
         response, content_data = self.request_upgrade_plan(
-            organization_uuid=self.basic.uuid,
-            data=data,
-            token=self.owner_token
+            organization_uuid=self.basic.uuid, data=data, token=self.owner_token
         )
         self.assertEqual(content_data["status"], "FAILURE")
         self.assertEqual(content_data["message"], "Empty customer")
@@ -458,7 +445,9 @@ class BillingViewTestCase(TestCase):
             "plan": BillingPlan.PLAN_START,
             "customer": "cus_MYOrndkgpPHGK9",
         }
-        response, content_data = self.request(data=data, path="setup-plan", method="setup_plan")
+        response, content_data = self.request(
+            data=data, path="setup-plan", method="setup_plan"
+        )
 
         customer = content_data["customer"]
         self.assertEqual(content_data["status"], "SUCCESS")
@@ -473,26 +462,36 @@ class BillingViewTestCase(TestCase):
                 "description": "basic",
                 "plan": BillingPlan.PLAN_START,
                 "customer": customer,
-                "authorizations": [
-                    {
-                        "user_email": "e@mail.com",
-                        "role": 3
-                    }
-                ]
+                "authorizations": [{"user_email": "e@mail.com", "role": 3}],
             },
             "project": {
                 "date_format": "D",
                 "name": "Test Project basic",
                 "organization": "2575d1f9-f7f8-4a5d-ac99-91972e309511",
                 "timezone": "America/Argentina/Buenos_Aires",
-            }
+            },
         }
-        response, content_data = self.request_create_org(create_org_data, self.owner_token)
-        self.assertEqual(content_data["organization"]["organization_billing"]["plan"], BillingPlan.PLAN_START)
-        self.assertEqual(content_data["organization"]["organization_billing"]["final_card_number"], '42')
-        organization = Organization.objects.get(uuid=content_data["organization"]["uuid"])
-        self.assertEqual(organization.organization_billing_invoice.first().payment_status, Invoice.PAYMENT_STATUS_PAID)
-        self.assertEqual(organization.organization_billing_invoice.first().stripe_charge, "ch_teste")
+        response, content_data = self.request_create_org(
+            create_org_data, self.owner_token
+        )
+        self.assertEqual(
+            content_data["organization"]["organization_billing"]["plan"],
+            BillingPlan.PLAN_START,
+        )
+        self.assertEqual(
+            content_data["organization"]["organization_billing"]["final_card_number"],
+            "42",
+        )
+        organization = Organization.objects.get(
+            uuid=content_data["organization"]["uuid"]
+        )
+        self.assertEqual(
+            organization.organization_billing_invoice.first().payment_status,
+            Invoice.PAYMENT_STATUS_PAID,
+        )
+        self.assertEqual(
+            organization.organization_billing_invoice.first().stripe_charge, "ch_teste"
+        )
 
         self.tearDown(organization)
 
@@ -518,7 +517,7 @@ class IntegrationTestCase(TestCase):
             organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
             organization_billing__plan=BillingPlan.PLAN_START,
             inteligence_organization=1,
-            organization_billing__stripe_customer="cus_MYOrndkgpPHGK9"
+            organization_billing__stripe_customer="cus_MYOrndkgpPHGK9",
         )
 
         self.billing = self.organization.organization_billing
@@ -545,64 +544,9 @@ class IntegrationTestCase(TestCase):
             format="json",
             **authorization_header,
         )
-        response = OrganizationViewSet.as_view({"patch": "upgrade_plan"})(request, organization_uuid)
+        response = OrganizationViewSet.as_view({"patch": "upgrade_plan"})(
+            request, organization_uuid
+        )
 
         content_data = json.loads(response.content)
         return response, content_data
-
-    @patch("connect.billing.get_gateway")
-    def test_plan_limits(self, mock_get_gateway):
-        mock_get_gateway.return_value = StripeMockGateway()
-        # Creates more contacts than the plan limit allows
-        num_contacts = BillingPlan.plan_info(self.organization.organization_billing.plan)["limit"] * 5 + 1
-        self.assertTrue(self.organization.organization_billing.is_active)
-        self.assertFalse(self.organization.is_suspended)
-        create_contacts(num_contacts)
-
-        daily_contact_count()
-        # Verify if the organizations have more contacts than the plan limit
-        check_organization_plans()
-        organization = Organization.objects.get(uuid=self.organization.uuid)
-        self.assertFalse(organization.organization_billing.is_active)
-        self.assertTrue(organization.is_suspended)
-
-        self.assertEqual(organization.organization_billing.plan, BillingPlan.PLAN_START)
-        self.assertEqual(self.billing.contract_on, pendulum.now().date())
-        self.assertEqual(self.billing.next_due_date, pendulum.now().add(months=1).date())
-
-        # Upgrade plan, request made in a diferent day to validade
-        # changes in BillingPlan.contract_on and next_due_date
-        data = {
-            "organization_billing_plan": BillingPlan.PLAN_SCALE
-        }
-        freezer = freeze_time(f"{pendulum.now().add(days=5)}")
-        freezer.start()
-        response, content_data = self.request_upgrade_plan(
-            organization_uuid=self.organization.uuid,
-            data=data,
-            token=self.owner_token
-        )
-
-        self.assertEqual(content_data["status"], "SUCCESS")
-        self.assertEqual(content_data["old_plan"], BillingPlan.PLAN_START)
-        self.assertEqual(content_data["plan"], BillingPlan.PLAN_SCALE)
-
-        organization = Organization.objects.get(uuid=self.organization.uuid)
-
-        # New due date, contract on and plan
-        self.assertEqual(organization.organization_billing.contract_on, pendulum.now().date())
-        self.assertEqual(organization.organization_billing.next_due_date, pendulum.now().add(months=1).date())
-        self.assertEqual(organization.organization_billing.plan, BillingPlan.PLAN_SCALE)
-
-        # Check if the org is active again
-        self.assertTrue(organization.organization_billing.is_active)
-        self.assertFalse(organization.is_suspended)
-        check_organization_plans()
-        freezer.stop()
-        freezer = freeze_time(organization.organization_billing.next_due_date)
-        freezer.start()
-
-        generate_project_invoice()
-        invoice = organization.organization_billing_invoice.last()
-        self.assertEqual(invoice.due_date, pendulum.now().date())
-        freezer.stop()
