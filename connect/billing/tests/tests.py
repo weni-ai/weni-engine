@@ -21,8 +21,7 @@ from connect.billing.models import Contact, ContactCount, Message, SyncManagerTa
 from connect.common.models import Organization, Project, BillingPlan, OrganizationRole
 
 from freezegun import freeze_time
-from connect.billing.tasks import sync_contacts, check_organization_plans
-from connect.api.v1.tests.utils import create_contacts, create_user_and_token
+from connect.billing.tasks import sync_contacts
 
 
 @skipIf(not settings.BILLING_SETTINGS.get("stripe", None), "gateway not configured")
@@ -43,29 +42,29 @@ class StripeGatewayTestCase(TestCase):
 
     def test_last_2(self):
         resp = self.merchant.get_card_data(self.customer)
-        self.assertEquals(resp['response'][0]['last2'], '42')
+        self.assertEquals(resp["response"][0]["last2"], "42")
 
     def test_brand(self):
         resp = self.merchant.get_card_data(self.customer)
-        self.assertEquals(resp['response'][0]['brand'], 'visa')
+        self.assertEquals(resp["response"][0]["brand"], "visa")
 
     def test_get_card_data(self):
         resp = self.merchant.get_card_data(self.customer)
-        self.assertEquals(resp['status'], 'SUCCESS')
+        self.assertEquals(resp["status"], "SUCCESS")
 
     def test_get_user_detail_data(self):
         resp = self.merchant.get_user_detail_data(self.customer)
-        self.assertEquals(resp['status'], 'SUCCESS')
+        self.assertEquals(resp["status"], "SUCCESS")
 
     def test_get_payment_method_details(self):
         resp = self.merchant.get_payment_method_details("ch_3K9wZYGB60zUb40p1C0iiskn")
-        self.assertEquals(resp['status'], 'SUCCESS')
-        self.assertEquals(resp['response']['final_card_number'], '4242')
-        self.assertEquals(resp['response']['brand'], 'visa')
+        self.assertEquals(resp["status"], "SUCCESS")
+        self.assertEquals(resp["response"]["final_card_number"], "4242")
+        self.assertEquals(resp["response"]["brand"], "visa")
 
     def test_get_payment_method_details_fail(self):
         resp = self.merchant.get_payment_method_details("ch_3K9wZYGB60zUb40p1C0iisk")
-        self.assertEquals(resp['status'], 'FAIL')
+        self.assertEquals(resp["status"], "FAIL")
 
 
 class SyncManagerTest(TestCase):
@@ -104,7 +103,7 @@ class SyncContactsTestCase(TestCase):
             before=pendulum.datetime(2022, 4, 8, 9, 0, 0),
             after=pendulum.datetime(2022, 4, 8, 4, 0, 0),
             status=True,
-            finished_at=pendulum.datetime(2022, 4, 8, 9, 0, 0)
+            finished_at=pendulum.datetime(2022, 4, 8, 9, 0, 0),
         )
 
         self.first_count_sync = SyncManagerTask.objects.create(
@@ -113,7 +112,7 @@ class SyncContactsTestCase(TestCase):
             before=pendulum.datetime(2022, 4, 8, 9, 0, 0),
             after=pendulum.datetime(2022, 4, 8, 4, 0, 0),
             status=True,
-            finished_at=pendulum.datetime(2022, 4, 8, 9, 0, 0)
+            finished_at=pendulum.datetime(2022, 4, 8, 9, 0, 0),
         )
 
         self.organization = Organization.objects.create(
@@ -128,7 +127,7 @@ class SyncContactsTestCase(TestCase):
             name="project test",
             timezone="America/Sao_Paulo",
             flow_organization=uuid.uuid4(),
-            flow_id=11
+            flow_id=11,
         )
 
     @freeze_time("2022-04-08 14")
@@ -162,33 +161,37 @@ class ContactTestCase(TestCase):
     def setUp(self, mock_get_gateway):
         mock_get_gateway.return_value = StripeMockGateway()
         self.organization = Organization.objects.create(
-            name='org test',
-            description='desc',
+            name="org test",
+            description="desc",
             inteligence_organization=1,
             organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
             organization_billing__payment_method=BillingPlan.PAYMENT_METHOD_CREDIT_CARD,
-            organization_billing__plan=BillingPlan.PLAN_ENTERPRISE
+            organization_billing__plan=BillingPlan.PLAN_ENTERPRISE,
         )
 
         self.project = Project.objects.create(
             name="project test",
             timezone="America/Sao_Paulo",
             flow_organization=uuid4.uuid4(),
-            organization=self.organization
+            organization=self.organization,
         )
 
         self.contact = Contact.objects.create(
             contact_flow_uuid=uuid4.uuid4(),
-            name='contact test 1',
-            last_seen_on=datetime(2022, 4, 8, 10, 20, 0, 0, pytz.UTC)
+            name="contact test 1",
+            last_seen_on=datetime(2022, 4, 8, 10, 20, 0, 0, pytz.UTC),
         )
 
     def test_create_contact(self):
         self.assertEquals(self.contact.name, "contact test 1")
-        self.assertEquals(self.contact.last_seen_on, datetime(2022, 4, 8, 10, 20, 0, 0, pytz.UTC))
+        self.assertEquals(
+            self.contact.last_seen_on, datetime(2022, 4, 8, 10, 20, 0, 0, pytz.UTC)
+        )
 
     def test_create_existing_contact(self):
-        existing_contact = Contact.objects.create(contact_flow_uuid=self.contact.contact_flow_uuid)
+        existing_contact = Contact.objects.create(
+            contact_flow_uuid=self.contact.contact_flow_uuid
+        )
         self.assertEquals(existing_contact, self.contact)
 
 
@@ -197,141 +200,36 @@ class MessageTestCase(TestCase):
 
     def setUp(self):
         self.organization = Organization.objects.create(
-            name='org test',
-            description='desc',
+            name="org test",
+            description="desc",
             inteligence_organization=1,
             organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
             organization_billing__payment_method=BillingPlan.PAYMENT_METHOD_CREDIT_CARD,
-            organization_billing__plan=BillingPlan.PLAN_ENTERPRISE
+            organization_billing__plan=BillingPlan.PLAN_ENTERPRISE,
         )
 
         self.project = Project.objects.create(
             name="project test",
             timezone="America/Sao_Paulo",
             flow_organization=uuid4.uuid4(),
-            organization=self.organization
+            organization=self.organization,
         )
 
         self.contact = Contact.objects.create(
             contact_flow_uuid=uuid4.uuid4(),
-            name='contact test 1',
+            name="contact test 1",
         )
 
         self.message = Message.objects.create(
             contact=self.contact,
-            text='test message',
+            text="test message",
             sent_on=timezone.now(),
             message_flow_uuid=uuid4.uuid4(),
-            direction='test'
+            direction="test",
         )
 
     def test_create_message(self):
         self.assertTrue("test message", self.message.text)
-
-
-class CheckPlansTestCase(TestCase):
-    @patch("connect.common.signals.update_user_permission_project")
-    @patch("connect.billing.get_gateway")
-    def setUp(self, mock_get_gateway, mock_permission):
-        mock_get_gateway.return_value = StripeMockGateway()
-        mock_permission.return_value = True
-        # Orgs
-        self.start = Organization.objects.create(
-            name="Start org",
-            description="Basic org",
-            inteligence_organization=1,
-            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
-            organization_billing__plan=BillingPlan.PLAN_START,
-        )
-        self.scale = Organization.objects.create(
-            name="Scale org",
-            description="plus org",
-            inteligence_organization=1,
-            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
-            organization_billing__plan=BillingPlan.PLAN_SCALE,
-        )
-        self.advanced = Organization.objects.create(
-            name="Advanced org",
-            description="advanced org",
-            inteligence_organization=1,
-            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
-            organization_billing__plan=BillingPlan.PLAN_ADVANCED,
-        )
-        self.enterprise = Organization.objects.create(
-            name="enterprise org",
-            description="enterprise org",
-            inteligence_organization=1,
-            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
-            organization_billing__plan=BillingPlan.PLAN_ENTERPRISE,
-        )
-        # Projects
-        self.start_project = self.start.project.create(
-            name="start",
-            flow_organization=uuid.uuid4(),
-        )
-        self.scale_project = self.scale.project.create(
-            name="scale",
-            flow_organization=uuid.uuid4(),
-        )
-        self.advanced_project = self.advanced.project.create(
-            name="advanced",
-            flow_organization=uuid.uuid4(),
-        )
-        self.enterprise_project = self.enterprise.project.create(
-            name="enterprise",
-            flow_organization=uuid.uuid4(),
-        )
-
-        # Users
-        self.admin, self.admin_token = create_user_and_token("admin")
-        self.admin2, self.owner_token = create_user_and_token("admin2")
-        self.financial, self.admin_token = create_user_and_token("financial")
-        self.support, self.admin_token = create_user_and_token("support")
-        self.contributor, self.admin_token = create_user_and_token("contributor")
-        self.viewer, self.admin_token = create_user_and_token("viewer")
-
-        # Authorizations
-        self.start.authorizations.create(
-            user=self.admin, role=OrganizationRole.ADMIN.value
-        )
-
-        self.start.authorizations.create(
-            user=self.admin2, role=OrganizationRole.ADMIN.value
-        )
-
-        self.start.authorizations.create(
-            user=self.financial, role=OrganizationRole.FINANCIAL.value
-        )
-
-        self.start.authorizations.create(
-            user=self.support, role=OrganizationRole.SUPPORT.value
-        )
-
-        self.start.authorizations.create(
-            user=self.contributor, role=OrganizationRole.CONTRIBUTOR.value
-        )
-
-        self.start.authorizations.create(
-            user=self.viewer, role=OrganizationRole.VIEWER.value
-        )
-
-    @skipIf(True, "This test takes a while to run")
-    def test_task_end_trial_plan(self):
-        """
-        Test if 'check_organization_plans' suspends org that should after the trial periods end
-        """
-        for organization in Organization.objects.all():
-            num_contacts = BillingPlan.plan_info(organization.organization_billing.plan)["limit"] * 5 + 1
-            create_contacts(num_contacts)
-
-        check_organization_plans()
-
-        for org in Organization.objects.all():
-            self.assertGreater(org.active_contacts, org.organization_billing.plan_limit)
-            self.assertTrue(org.is_suspended)
-
-    def test_billing_emails(self):
-        self.start.organization_billing.send_email_trial_plan_expired_due_time_limit()
 
 
 class ContactCountTestCase(TestCase):
@@ -375,7 +273,7 @@ class BillingTasksTestCase(TestCase):
             inteligence_organization=1,
             organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
             organization_billing__plan=BillingPlan.PLAN_START,
-            is_suspended=False
+            is_suspended=False,
         )
         now = pendulum.now()
         self.manager_task = SyncManagerTask.objects.create(
@@ -391,9 +289,13 @@ class BillingTasksTestCase(TestCase):
             flow_organization=uuid.uuid4(),
         )
 
-    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.suspend_or_unsuspend_project")
+    @patch(
+        "connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.suspend_or_unsuspend_project"
+    )
     @patch("connect.common.models.BillingPlan.problem_capture_invoice")
-    def test_problem_capture_invoice(self, mock_problem_capture_invoice, mock_update_suspend_project):
+    def test_problem_capture_invoice(
+        self, mock_problem_capture_invoice, mock_update_suspend_project
+    ):
         mock_problem_capture_invoice.side_effect = [True]
 
         celery_app.send_task(name="problem_capture_invoice")
@@ -404,12 +306,10 @@ class BillingTasksTestCase(TestCase):
     def test_contact_count_task(self):
 
         now = pendulum.now()
-        response = celery_app.send_task(name="count_contacts", args=[
-            now,
-            now.subtract(days=1),
-            self.project.uuid,
-            self.manager_task.uuid
-        ])
+        response = celery_app.send_task(
+            name="count_contacts",
+            args=[now, now.subtract(days=1), self.project.uuid, self.manager_task.uuid],
+        )
 
         self.assertTrue(response.result)
         self.manager_task.refresh_from_db()
@@ -418,11 +318,14 @@ class BillingTasksTestCase(TestCase):
 
     def test_contact_count_without_task_uuid(self):
         now = pendulum.now()
-        response = celery_app.send_task(name="count_contacts", args=[
-            now,
-            now.subtract(days=1),
-            self.project.uuid,
-        ])
+        response = celery_app.send_task(
+            name="count_contacts",
+            args=[
+                now,
+                now.subtract(days=1),
+                self.project.uuid,
+            ],
+        )
 
         self.assertTrue(response.result)
 
@@ -436,7 +339,9 @@ class BillingTasksTestCase(TestCase):
 
     @patch("connect.elastic.flow.ElasticFlow.clear_scroll")
     @patch("connect.elastic.flow.ElasticFlow.get_paginated_contacts")
-    def test_sync_contacts_task_no_projects(self, mock_clear_scroll, mock_get_paginated_contacts):
+    def test_sync_contacts_task_no_projects(
+        self, mock_clear_scroll, mock_get_paginated_contacts
+    ):
         mock_clear_scroll.return_value = True
         mock_get_paginated_contacts.return_value = True
 
@@ -445,20 +350,20 @@ class BillingTasksTestCase(TestCase):
             args=[
                 str(self.manager_task.before),
                 str(self.manager_task.after),
-                str(self.manager_task.uuid)
-            ]
+                str(self.manager_task.uuid),
+            ],
         )
         self.assertTrue(response.result)
 
     @patch("connect.elastic.flow.ElasticFlow.clear_scroll")
     @patch("connect.elastic.flow.ElasticFlow.get_paginated_contacts")
-    def test_sync_contacts_else_task(self, mock_clear_scroll, mock_get_paginated_contacts):
+    def test_sync_contacts_else_task(
+        self, mock_clear_scroll, mock_get_paginated_contacts
+    ):
         mock_clear_scroll.return_value = True
         mock_get_paginated_contacts.return_value = True
 
-        response = celery_app.send_task(
-            name="sync_contacts"
-        )
+        response = celery_app.send_task(name="sync_contacts")
         self.assertTrue(response.result)
 
     @patch("connect.elastic.flow.ElasticFlow.get_paginated_contacts")
@@ -466,10 +371,7 @@ class BillingTasksTestCase(TestCase):
     def test_sync_contacts_task(self, mock_clear_scroll, mock_get_paginated_contacts):
         mock_clear_scroll.return_value = True
 
-        mock_scroll = {
-            "scroll_id": "123",
-            "scroll_size": 100
-        }
+        mock_scroll = {"scroll_id": "123", "scroll_size": 100}
         mock_hits = "test"
 
         mock_get_paginated_contacts.return_value = mock_scroll, mock_hits
@@ -482,14 +384,16 @@ class BillingTasksTestCase(TestCase):
             args=[
                 str(self.manager_task.before),
                 str(self.manager_task.after),
-                str(self.manager_task.uuid)
-            ]
+                str(self.manager_task.uuid),
+            ],
         )
         self.assertTrue(response.result)
 
     @patch("connect.elastic.flow.ElasticFlow.get_paginated_contacts")
     @patch("connect.elastic.flow.ElasticFlow.clear_scroll")
-    def test_exception_sync_contacts_task(self, mock_clear_scroll, mock_get_paginated_contacts):
+    def test_exception_sync_contacts_task(
+        self, mock_clear_scroll, mock_get_paginated_contacts
+    ):
         mock_clear_scroll.return_value = True
         mock_get_paginated_contacts.side_effect = Exception("test")
 
@@ -501,7 +405,7 @@ class BillingTasksTestCase(TestCase):
             args=[
                 str(self.manager_task.before),
                 str(self.manager_task.after),
-                str(self.manager_task.uuid)
-            ]
+                str(self.manager_task.uuid),
+            ],
         )
         self.assertFalse(response.result)

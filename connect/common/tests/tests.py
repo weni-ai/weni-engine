@@ -337,10 +337,12 @@ class InvoiceTestCase(TestCase):
         )
         self.invoice = self.organization.organization_billing_invoice.create(
             due_date=pendulum.now().add(months=1),
-            invoice_random_id=1
-            if self.organization.organization_billing_invoice.last() is None
-            else self.organization.organization_billing_invoice.last().invoice_random_id
-            + 1,
+            invoice_random_id=(
+                1
+                if self.organization.organization_billing_invoice.last() is None
+                else self.organization.organization_billing_invoice.last().invoice_random_id
+                + 1
+            ),
             discount=self.organization.organization_billing.fixed_discount,
             extra_integration=self.organization.extra_integration,
             cost_per_whatsapp=settings.BILLING_COST_PER_WHATSAPP,
@@ -431,18 +433,20 @@ class OrganizationTestCase(TestCase):
         email1 = (
             self.test_user1.email,
             self.test_user1.username,
-            self.test_user1.language
+            self.test_user1.language,
         )
         email2 = (
             self.test_user2.email,
             self.test_user2.username,
-            self.test_user2.language
+            self.test_user2.language,
         )
         email_list = [email1, email2]
         self.organization.send_email_organization_create(email_list)
         self.assertEqual(len(mail.outbox), 2)
         outbox = mail.outbox[0]
-        self.assertEqual(outbox.subject, f"You just gave life to {self.organization.name}")
+        self.assertEqual(
+            outbox.subject, f"You just gave life to {self.organization.name}"
+        )
         self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
         self.assertEqual(outbox.to[0], self.test_user1.email)
 
@@ -469,8 +473,13 @@ class OrganizationTestCase(TestCase):
         self.organization.send_email_delete_organization()
 
         self.assertEqual(len(mail.outbox), 2)
-        self.assertEqual(mail.outbox[0].subject, "The organization Test Organization no longer exists")
-        self.assertEqual(mail.outbox[1].subject, "A organização Test Organization deixou de existir")
+        self.assertEqual(
+            mail.outbox[0].subject,
+            "The organization Test Organization no longer exists",
+        )
+        self.assertEqual(
+            mail.outbox[1].subject, "A organização Test Organization deixou de existir"
+        )
         self.assertIn(f"{self.test_user1.username}", mail.outbox[0].body)
         self.assertIn(f"{self.test_user2.username}", mail.outbox[1].body)
 
@@ -481,7 +490,9 @@ class OrganizationTestCase(TestCase):
             (self.test_user1.email, self.test_user1.username, self.test_user1.language),
             (self.test_user2.email, self.test_user2.username, self.test_user2.language),
         ]
-        self.organization.send_email_change_organization_name(prev_name, new_name, emails)
+        self.organization.send_email_change_organization_name(
+            prev_name, new_name, emails
+        )
         self.assertEqual(len(mail.outbox), 2)
 
         for email in mail.outbox:
@@ -498,7 +509,9 @@ class OrganizationTestCase(TestCase):
         self.assertTrue(result)
         self.assertEqual(len(mail.outbox), 1)
         sent_email = mail.outbox[0]
-        self.assertEqual(sent_email.subject, "You receive an access code to Weni Platform")
+        self.assertEqual(
+            sent_email.subject, "You receive an access code to Weni Platform"
+        )
 
     def test_send_email_permission_change(self):
         sended_email = self.organization.send_email_permission_change(
@@ -506,7 +519,10 @@ class OrganizationTestCase(TestCase):
         )
         self.assertEqual(len(sended_email.outbox), 1)
         outbox = sended_email.outbox[0]
-        self.assertEqual(outbox.subject, f"An administrator of {self.organization.name} has updated your permission")
+        self.assertEqual(
+            outbox.subject,
+            f"An administrator of {self.organization.name} has updated your permission",
+        )
         self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
         self.assertEqual(outbox.to[0], self.test_email)
 
@@ -581,9 +597,7 @@ class BillingPlanTestCase(TestCase):
 
     def test_send_email_finished_plan(self):
         email_list = [self.test_user1.email, self.test_user2.email]
-        self.billing.send_email_finished_plan(
-            self.test_user1.username, email_list
-        )
+        self.billing.send_email_finished_plan(self.test_user1.username, email_list)
         self.assertEqual(len(mail.outbox), 2)
         outbox = mail.outbox[0]
         if self.test_user1.language == "en-us":
@@ -595,9 +609,7 @@ class BillingPlanTestCase(TestCase):
         self.assertEqual(outbox.to[0], self.test_email[0])
 
     def test_send_email_reactivated_plan(self):
-        self.billing.send_email_reactivated_plan(
-            self.test_user_name, self.test_email
-        )
+        self.billing.send_email_reactivated_plan(self.test_user_name, self.test_email)
         self.assertEqual(len(mail.outbox), 1)
         outbox = mail.outbox[0]
         self.assertEqual(
@@ -663,12 +675,18 @@ class BillingPlanTestCase(TestCase):
 
     def test_send_email_plan_is_about_to_expire(self):
         self.billing.plan = BillingPlan.PLAN_TRIAL
-        user1 = (self.test_user1.email, self.test_user1.username, self.test_user1.language)
-        user2 = (self.test_user2.email, self.test_user2.username, self.test_user2.language)
-        email_list = [user1, user2]
-        self.billing.send_email_plan_is_about_to_expire(
-            email_list
+        user1 = (
+            self.test_user1.email,
+            self.test_user1.username,
+            self.test_user1.language,
         )
+        user2 = (
+            self.test_user2.email,
+            self.test_user2.username,
+            self.test_user2.language,
+        )
+        email_list = [user1, user2]
+        self.billing.send_email_plan_is_about_to_expire(email_list)
         self.assertEqual(len(mail.outbox), 2)
         outbox = mail.outbox[0]
         self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
@@ -676,9 +694,7 @@ class BillingPlanTestCase(TestCase):
 
     def test_send_email_end_trial(self):
         email_list = [self.test_user1.email]
-        self.billing.send_email_end_trial(
-            email_list
-        )
+        self.billing.send_email_end_trial(email_list)
         self.assertEqual(len(mail.outbox), 1)
         outbox = mail.outbox[0]
         self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
@@ -845,27 +861,6 @@ class RequestPermissionProjectTestCase(TestCase):
         self.assertEqual(auth.role, OrganizationRole.VIEWER.value)
 
 
-@skipIf(True, "can't run that without port-forward")
-class SyncUpdateTasksTestCase(TestCase):
-
-    def setUp(self):
-        self.organization = Organization.objects.create(
-            name="Test", inteligence_organization=0,
-            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
-            organization_billing__plan="free",
-        )
-        self.billing = self.organization.organization_billing
-        self.project = self.organization.project.create(
-            name="project test",
-            timezone="America/Sao_Paulo",
-            flow_organization=uuid4.uuid4(),
-        )
-
-    def test_okay(self):
-        from connect.common.tasks import sync_active_contacts
-        self.assertTrue(sync_active_contacts())
-
-
 @skipIf(not settings.ROCKET_TEST_MODE, "Skip if rocket isnt in test mode")
 class TestRocket(TestCase):
     def setUp(self):
@@ -884,7 +879,9 @@ class TestRocket(TestCase):
 
     def test_fail_to_get_keycloak_authorization_token(self):
         self.rocket = Rocket()
-        self.rocket.username = ''
+        self.rocket.username = ""
         response = self.rocket.get_keycloak_authorization_token()
-        self.assertEquals(response['status'], 'FAILED')
-        self.assertEquals(response['message']['error_description'], 'Invalid user credentials')
+        self.assertEquals(response["status"], "FAILED")
+        self.assertEquals(
+            response["message"]["error_description"], "Invalid user credentials"
+        )

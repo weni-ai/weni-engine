@@ -6,7 +6,7 @@ from connect.common.models import (
     Project,
     BillingPlan,
     NewsletterOrganization,
-    Newsletter
+    Newsletter,
 )
 from connect.billing.models import (
     Contact,
@@ -197,52 +197,6 @@ def end_trial_plan():
     ):
         organization.organization_billing.end_trial_period()
         organization.organization_billing.send_email_trial_plan_expired_due_time_limit()
-
-
-@app.task(name="check_organization_plans")
-def check_organization_plans():
-    # utc-3 or project_timezone
-
-    for organization in Organization.objects.filter(is_suspended=False).exclude(
-        organization_billing__plan__in=[
-            BillingPlan.PLAN_TRIAL,
-            BillingPlan.PLAN_CUSTOM,
-            BillingPlan.PLAN_ENTERPRISE,
-        ]
-    ):
-
-        next_due_date = pendulum.parse(
-            str(organization.organization_billing.next_due_date)
-        )
-        after = next_due_date.subtract(months=1).strftime("%Y-%m-%d %H:%M")
-        before = next_due_date.strftime("%Y-%m-%d %H:%M")
-        for project in organization.project.all():
-            contact_count = utils.count_contacts(
-                project=project, before=before, after=after
-            )
-            project.contact_count = int(contact_count)
-            project.save(update_fields=["contact_count"])
-
-        current_active_contacts = organization.active_contacts
-
-        if current_active_contacts > organization.organization_billing.plan_limit:
-            organization.organization_billing.end_trial_period()
-
-            organization.organization_billing.send_email_plan_expired_due_attendance_limit()
-
-        elif (
-            current_active_contacts > organization.organization_billing.plan_limit - 50
-        ):
-            organization.organization_billing.send_email_plan_is_about_to_expire()
-
-            NewsletterOrganization.objects.create(
-                newsletter=Newsletter.objects.create(),
-                title="trial-about-to-end",
-                description=f"Your trial period of the organization {organization.name}, is about to expire.",
-                organization=organization
-            )
-
-    return True
 
 
 @app.task(name="daily_contact_count")
