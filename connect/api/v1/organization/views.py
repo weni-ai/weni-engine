@@ -25,7 +25,7 @@ from connect.api.v1.organization.permissions import (
     OrganizationHasPermission,
     OrganizationAdminManagerAuthorization,
     IsCRMUser,
-    _is_orm_user,
+    _is_orm_user
 )
 from connect.api.v1.organization.serializers import (
     OrganizationSeralizer,
@@ -51,9 +51,7 @@ from connect.common.models import (
 from connect import billing
 from connect.billing.gateways.stripe_gateway import StripeGateway
 from connect.utils import count_contacts
-from connect.api.v1.internal.intelligence.intelligence_rest_client import (
-    IntelligenceRESTClient,
-)
+from connect.api.v1.internal.intelligence.intelligence_rest_client import IntelligenceRESTClient
 import pendulum
 from connect.common import tasks
 import logging
@@ -61,10 +59,7 @@ import stripe
 
 from connect.internals.event_driven.producer.rabbitmq_publisher import RabbitmqPublisher
 from connect.usecases.authorizations.update import UpdateAuthorizationUseCase
-from connect.usecases.authorizations.dto import (
-    DeleteAuthorizationDTO,
-    UpdateAuthorizationDTO,
-)
+from connect.usecases.authorizations.dto import DeleteAuthorizationDTO, UpdateAuthorizationDTO
 from connect.usecases.authorizations.delete import DeleteAuthorizationUseCase
 
 
@@ -81,11 +76,7 @@ class OrganizationViewSet(
 ):
     queryset = Organization.objects.all()
     serializer_class = OrganizationSeralizer
-    permission_classes = [
-        IsAuthenticated,
-        OrganizationHasPermission | IsCRMUser,
-        Has2FA,
-    ]
+    permission_classes = [IsAuthenticated, OrganizationHasPermission | IsCRMUser, Has2FA]
     lookup_field = "uuid"
     metadata_class = Metadata
 
@@ -110,9 +101,7 @@ class OrganizationViewSet(
         page = self.paginate_queryset(
             self.filter_queryset(self.get_queryset().order_by("name")),
         )
-        organization_serializer = OrganizationSeralizer(
-            page, many=True, context=self.get_serializer_context()
-        )
+        organization_serializer = OrganizationSeralizer(page, many=True, context=self.get_serializer_context())
         return self.get_paginated_response(organization_serializer.data)
 
     def create(self, request, *args, **kwargs):
@@ -127,23 +116,32 @@ class OrganizationViewSet(
                 try:
                     ai_client = IntelligenceRESTClient()
                     ai_org = ai_client.create_organization(
-                        user_email=user.email, organization_name=org_info.get("name")
+                        user_email=user.email,
+                        organization_name=org_info.get("name")
                     )
-                    org_info.update(dict(intelligence_organization=ai_org.get("id")))
+                    org_info.update(
+                        dict(
+                            intelligence_organization=ai_org.get("id")
+                        )
+                    )
                 except Exception as error:
-                    data.update(
-                        {
-                            "message": "Could not create organization in AI module",
-                            "status": "FAILED",
-                        }
-                    )
+                    data.update({
+                        "message": "Could not create organization in AI module",
+                        "status": "FAILED"
+                    })
                     logger.error(error)
                     return Response(data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             else:
                 # for testing purposes
-                org_info.update(dict(intelligence_organization=randint(1, 99)))
+                org_info.update(
+                    dict(
+                        intelligence_organization=randint(1, 99)
+                    )
+                )
 
-            cycle = BillingPlan._meta.get_field("cycle").default
+            cycle = BillingPlan._meta.get_field(
+                "cycle"
+            ).default
 
             new_organization = Organization.objects.create(
                 name=org_info.get("name"),
@@ -160,23 +158,27 @@ class OrganizationViewSet(
                         flows_info = tasks.create_template_project(
                             project_info.get("name"),
                             user.email,
-                            project_info.get("timezone"),
+                            project_info.get("timezone")
                         )
                     else:
                         flows_info = tasks.create_project(
                             project_name=project_info.get("name"),
                             user_email=user.email,
-                            project_timezone=project_info.get("timezone"),
+                            project_timezone=project_info.get("timezone")
                         )
                 except Exception as error:
-                    data.update(
-                        {"message": "Could not create project", "status": "FAILED"}
-                    )
+                    data.update({
+                        "message": "Could not create project",
+                        "status": "FAILED"
+                    })
                     logger.error(error)
                     new_organization.delete()
                     return Response(data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             else:
-                flows_info = {"id": randint(1, 100), "uuid": uuid.uuid4()}
+                flows_info = {
+                    "id": randint(1, 100),
+                    "uuid": uuid.uuid4()
+                }
 
             project = Project.objects.create(
                 name=project_info.get("name"),
@@ -186,14 +188,14 @@ class OrganizationViewSet(
                 organization=new_organization,
                 is_template=True if project_info.get("template") else False,
                 created_by=user,
-                template_type=project_info.get("template_type"),
+                template_type=project_info.get("template_type")
             )
 
             if len(Project.objects.filter(created_by=user)) == 1:
                 data = dict(
                     send_request_flow=settings.SEND_REQUEST_FLOW_PRODUCT,
                     flow_uuid=settings.FLOW_PRODUCT_UUID,
-                    token_authorization=settings.TOKEN_AUTHORIZATION_FLOW_PRODUCT,
+                    token_authorization=settings.TOKEN_AUTHORIZATION_FLOW_PRODUCT
                 )
                 user.send_request_flow_user_info(data)
 
@@ -202,7 +204,7 @@ class OrganizationViewSet(
                 email=user.email,
                 organization=new_organization,
                 role=OrganizationRole.ADMIN.value,
-                created_by=user,
+                created_by=user
             )
 
             # Create user's organizations authorizations
@@ -211,30 +213,27 @@ class OrganizationViewSet(
                     email=auth.get("user_email"),
                     organization=new_organization,
                     role=auth.get("role"),
-                    created_by=user,
+                    created_by=user
                 )
 
             if project_info.get("template"):
-                data = {"project": project, "organization": new_organization}
+                data = {
+                    "project": project,
+                    "organization": new_organization
+                }
                 project_data = TemplateProjectSerializer().create(data, request)
                 if project_data.get("status") == "FAILED":
                     new_organization.delete()
                     project.delete()
-                    return Response(
-                        project_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                    )
+                    return Response(project_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-            serializer = OrganizationSeralizer(
-                new_organization, context={"request": request}
-            )
-            project_serializer = ProjectSerializer(
-                project, context={"request": request}
-            )
+            serializer = OrganizationSeralizer(new_organization, context={"request": request})
+            project_serializer = ProjectSerializer(project, context={"request": request})
             response_data = dict(
                 project=project_serializer.data,
                 status="SUCCESS",
                 message="",
-                organization=serializer.data,
+                organization=serializer.data
             )
 
         except Exception as exception:
@@ -248,20 +247,15 @@ class OrganizationViewSet(
         instance.send_email_delete_organization()
         instance.delete()
         ai_client = IntelligenceRESTClient()
-        ai_client.delete_organization(
-            organization_id=intelligence_organization,
-            user_email=self.request.user.email,
-        )
+        ai_client.delete_organization(organization_id=intelligence_organization, user_email=self.request.user.email)
 
     def update(self, request, *args, **kwargs):
         data = request.data
-        partial = kwargs.pop("partial", False)
+        partial = kwargs.pop('partial', False)
         instance = self.get_object()
 
         if data.get("name"):
-            instance.send_email_change_organization_name(
-                instance.name, data.get("name")
-            )
+            instance.send_email_change_organization_name(instance.name, data.get("name"))
 
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
@@ -369,9 +363,7 @@ class OrganizationViewSet(
                     "uuid": project.uuid,
                     "name": project.name,
                     "flow_organization": project.flow_organization,
-                    "active_contacts": count_contacts(
-                        project=project, before=str(before), after=str(after)
-                    ),
+                    "active_contacts": count_contacts(project=project, before=str(before), after=str(after)),
                 }
             )
 
@@ -673,7 +665,12 @@ class OrganizationViewSet(
         data = {"2fa_required": organization.enforce_2fa}
         return JsonResponse(data=data, status=status.HTTP_200_OK)
 
-    @action(detail=True, methods=["POST"], url_path="billing/validate-customer-card")
+    @action(
+        detail=True,
+        methods=['POST'],
+        url_path="billing/validate-customer-card"
+
+    )
     def validate_customer_card(self, request):
         customer = request.data.get("customer")
         if customer:
@@ -685,21 +682,17 @@ class OrganizationViewSet(
                 response["charge"] = gateway.card_verification_charge(customer)
 
             return JsonResponse(data=response, status=status.HTTP_200_OK)
-        return JsonResponse(
-            data={"response": "no customer"}, status=status.HTTP_400_BAD_REQUEST
-        )
+        return JsonResponse(data={"response": "no customer"}, status=status.HTTP_400_BAD_REQUEST)
 
     @action(
         detail=True,
         methods=["POST"],
         url_name="organization-retrieve",
-        url_path="internal/retrieve",
+        url_path="internal/retrieve"
     )
     def retrieve_organization(self, request):
         flow_organization_uuid = request.uuid
-        organization = Organization.objects.get(
-            project__flow_organization=flow_organization_uuid
-        )
+        organization = Organization.objects.get(project__flow_organization=flow_organization_uuid)
         return {
             "status": status.HTTP_200_OK,
             "response": {
@@ -709,7 +702,7 @@ class OrganizationViewSet(
                 "inteligence_organization": organization.inteligence_organization,
                 "extra_integration": organization.extra_integration,
                 "is_suspended": organization.is_suspended,
-            },
+            }
         }
 
     @action(
@@ -725,10 +718,7 @@ class OrganizationViewSet(
 
         self.check_object_permissions(self.request, organization)
         if not organization.organization_billing.stripe_customer:
-            return JsonResponse(
-                data={"status": "FAILURE", "message": "Empty customer"},
-                status=status.HTTP_304_NOT_MODIFIED,
-            )
+            return JsonResponse(data={"status": "FAILURE", "message": "Empty customer"}, status=status.HTTP_304_NOT_MODIFIED)
 
         org_billing = organization.organization_billing
         old_plan = organization.organization_billing.plan
@@ -737,19 +727,13 @@ class OrganizationViewSet(
 
         if not plan_info["valid"]:
             return JsonResponse(
-                data={"status": "FAILURE", "message": "Invalid plan choice"},
-                status=status.HTTP_400_BAD_REQUEST,
+                data={"status": "FAILURE", "message": "Invalid plan choice"}, status=status.HTTP_400_BAD_REQUEST
             )
 
         price = BillingPlan.plan_info(plan)["price"]
 
         if settings.TESTING:
-            p_intent = stripe.PaymentIntent(
-                amount_received=price,
-                id="pi_test_id",
-                amount=price,
-                charges={"amount": price, "amount_captured": price},
-            )
+            p_intent = stripe.PaymentIntent(amount_received=price, id="pi_test_id", amount=price, charges={"amount": price, "amount_captured": price})
             purchase_result = {"status": "SUCCESS", "response": p_intent}
             if request.data.get("stripe_failure"):
                 data["status"] = "FAILURE"
@@ -778,21 +762,17 @@ class OrganizationViewSet(
                     old_plan,
                 )
                 return JsonResponse(
-                    data={
-                        "status": "SUCCESS",
-                        "old_plan": old_plan,
-                        "plan": org_billing.plan,
-                    },
-                    status=status.HTTP_200_OK,
+                    data={"status": "SUCCESS", "old_plan": old_plan, "plan": org_billing.plan},
+                    status=status.HTTP_200_OK
                 )
             return JsonResponse(
                 data={"status": "FAILURE", "message": "Invalid plan choice"},
-                status=status.HTTP_400_BAD_REQUEST,
+                status=status.HTTP_400_BAD_REQUEST
             )
 
         return JsonResponse(
             data={"status": "FAILURE", "message": "Stripe error"},
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
 
 
@@ -863,15 +843,13 @@ class OrganizationAuthorizationViewSet(
             id=self.kwargs.get("user__id"),
             org_uuid=self.kwargs.get("organization__uuid"),
             role=int(data.get("role")),
-            request_user=self.request.user,
+            request_user=self.request.user
         )
 
         usecase = UpdateAuthorizationUseCase(message_publisher=RabbitmqPublisher())
         authorization = usecase.update_authorization(auth_dto)
 
-        instance.organization.send_email_permission_change(
-            instance.user, old_permission, new_permission
-        )
+        instance.organization.send_email_permission_change(instance.user, old_permission, new_permission)
 
         return Response(data={"role": authorization.role})
 
