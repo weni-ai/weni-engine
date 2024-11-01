@@ -1,4 +1,5 @@
 from django.db.models import QuerySet
+from rest_framework.exceptions import PermissionDenied
 from connect.common.models import (
     Organization,
     User,
@@ -53,6 +54,8 @@ class DeleteAuthorizationUseCase(AuthorizationUseCase):
             )
 
     def delete_authorization(self, auth_dto: DeleteAuthorizationDTO):
+        if auth_dto.request_user:
+            request_user : User = RetrieveUserUseCase().get_user_by_email(email=auth_dto.request_user)
 
         if auth_dto.user_email:
             user: User = RetrieveUserUseCase().get_user_by_email(email=auth_dto.user_email)
@@ -60,6 +63,9 @@ class DeleteAuthorizationUseCase(AuthorizationUseCase):
             user: User = RetrieveUserUseCase().get_user_by_id(id=auth_dto.id)
 
         org: Organization = RetrieveOrganizationUseCase().get_organization_by_uuid(org_uuid=auth_dto.org_uuid)
+
+        if not org.authorizations.filter(user=request_user).exists():
+            raise PermissionDenied("User does not have permission to perform this action")
 
         org_auth = org.authorizations.get(user=user)
 

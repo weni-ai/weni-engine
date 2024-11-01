@@ -824,7 +824,7 @@ class OrganizationAuthorizationViewSet(
     ]
     ordering = ["-user__first_name"]
 
-    permission_classes = [IsAuthenticated, OrganizationHasPermission]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self, *args, **kwargs):
         if getattr(self, "swagger_fake_view", False):
