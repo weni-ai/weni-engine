@@ -1,3 +1,7 @@
+# 3.28.3
+## *Add*
+  - Adding validation that only allows removing permissions if the request user is present in the organization
+
 # 3.28.2
 ## *Remove*
   - Removing obsolete tasks
