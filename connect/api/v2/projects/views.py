@@ -7,19 +7,19 @@ from rest_framework.permissions import IsAuthenticated
 from connect.api.v1.organization.permissions import Has2FA
 from connect.api.v1.project.permissions import ProjectHasPermission
 
-from connect.common.models import (
-    Project,
-    OpenedProject,
-)
+from connect.common.models import Project, OpenedProject, TypeProject
 from connect.api.v2.projects.serializers import (
     ProjectSerializer,
     ProjectUpdateSerializer,
     ProjectListAuthorizationSerializer,
-    OpenedProjectSerializer
+    OpenedProjectSerializer,
 )
 
 from django.utils import timezone
-from connect.api.v2.paginations import CustomCursorPagination, OpenedProjectCustomCursorPagination
+from connect.api.v2.paginations import (
+    CustomCursorPagination,
+    OpenedProjectCustomCursorPagination,
+)
 
 
 class ProjectViewSet(
@@ -28,7 +28,7 @@ class ProjectViewSet(
     mixins.CreateModelMixin,
     mixins.UpdateModelMixin,
     mixins.DestroyModelMixin,
-    GenericViewSet
+    GenericViewSet,
 ):
     queryset = Project.objects
     serializer_class = ProjectSerializer
@@ -40,15 +40,19 @@ class ProjectViewSet(
         if getattr(self, "swagger_fake_view", False):
             return Project.objects.none()  # pragma: no cover
 
-        return super().get_queryset().filter(organization__uuid=self.kwargs["organization_uuid"])
+        if self.kwargs.get("organization_uuid"):
+            return (
+                super()
+                .get_queryset()
+                .filter(organization__uuid=self.kwargs["organization_uuid"])
+            )
+        return super().get_queryset()
 
     def get_ordering(self):
-        valid_fields = (
-            org_fields.name for org_fields in Project._meta.get_fields()
-        )
+        valid_fields = (org_fields.name for org_fields in Project._meta.get_fields())
         ordering = []
-        for param in self.request.query_params.getlist('ordering'):
-            if param.startswith('-'):
+        for param in self.request.query_params.getlist("ordering"):
+            if param.startswith("-"):
                 field = param[1:]
             else:
                 field = param
@@ -74,7 +78,7 @@ class ProjectViewSet(
     @action(
         detail=True,
         methods=["POST"],  # change to patch
-        url_name="update-last-opened-on"
+        url_name="update-last-opened-on",
     )
     def update_last_opened_on(self, request, **kwargs):
         instance = self.get_object()
@@ -87,8 +91,12 @@ class ProjectViewSet(
             last_opened_on.day = timezone.now()  # TODO change to pendulum
             last_opened_on.save()
         else:
-            OpenedProject.objects.create(project=instance, user=user, day=timezone.now())
-        return Response(data={"day": str(last_opened_on.day)}, status=status.HTTP_200_OK)
+            OpenedProject.objects.create(
+                project=instance, user=user, day=timezone.now()
+            )
+        return Response(
+            data={"day": str(last_opened_on.day)}, status=status.HTTP_200_OK
+        )
 
     def update(self, request, *args, **kwargs):
         self.serializer_class = ProjectUpdateSerializer
@@ -96,10 +104,7 @@ class ProjectViewSet(
 
     def create(self, request, *args, **kwargs):
         request.data.update(
-            {
-                "organization": kwargs.get("organization_uuid"),
-                "project_view": True
-            }
+            {"organization": kwargs.get("organization_uuid"), "project_view": True}
         )
         return super(ProjectViewSet, self).create(request, *args, **kwargs)
 
@@ -109,23 +114,38 @@ class ProjectViewSet(
 
         instance.delete()
 
+    @action(detail=True, methods=["POST"], url_name="set-type")
+    def set_type(self, request, **kwargs):
+        instance = self.get_object()
+        try:
+            project_type = request.data.get("type")
 
-class ProjectAuthorizationViewSet(
-    mixins.RetrieveModelMixin,
-    GenericViewSet
-):
+            if project_type not in [choice[0] for choice in TypeProject.choices]:
+                choices_text = []
+                for value, label in TypeProject.choices:
+                    choices_text.append(f"{value} ({label.title()})")
+                return Response(
+                    {"detail": f"Invalid type. Choices are: {', '.join(choices_text)}"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
+            instance.type = project_type
+            instance.save(update_fields=["type"])
+
+            return Response({"type": instance.type}, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ProjectAuthorizationViewSet(mixins.RetrieveModelMixin, GenericViewSet):
     queryset = Project.objects
     serializer_class = ProjectListAuthorizationSerializer
     permission_classes = [IsAuthenticated, ProjectHasPermission, Has2FA]
     lookup_field = "uuid"
 
 
-class OpenedProjectViewSet(
-    mixins.ListModelMixin,
-    GenericViewSet
-):
-
+class OpenedProjectViewSet(mixins.ListModelMixin, GenericViewSet):
     queryset = OpenedProject.objects.select_related("project", "user")
     serializer_class = OpenedProjectSerializer
     permission_classes = [IsAuthenticated, ProjectHasPermission, Has2FA]
@@ -146,8 +166,8 @@ class OpenedProjectViewSet(
             opened_project.name for opened_project in OpenedProject._meta.get_fields()
         )
         ordering = ["project"]
-        for param in self.request.query_params.getlist('ordering'):
-            if param.startswith('-'):
+        for param in self.request.query_params.getlist("ordering"):
+            if param.startswith("-"):
                 field = param[1:]
             else:
                 field = param
