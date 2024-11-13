@@ -120,7 +120,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             template_type=template_name,
             project_template_type=project_template_type,
             description=validated_data.get("description", None),
-            type=validated_data.get("type", TypeProject.GENERAL),
+            type=validated_data.get("type", TypeProject.GENERAL.value),
         )
 
         self.send_request_flow_product(user)
@@ -178,7 +178,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             "description": instance.description,
             "organization_uuid": str(instance.organization.uuid),
             "brain_on": brain_on,
-            "type": instance.type,
+            "type": instance.type.value,
         }
         rabbitmq_publisher = RabbitmqPublisher()
         rabbitmq_publisher.send_message(
