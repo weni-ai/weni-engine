@@ -23,6 +23,7 @@ from connect.common.models import (
     OpenedProject,
     ProjectRole,
     TemplateProject,
+    TypeProject,
 )
 from connect.internals.event_driven.producer.rabbitmq_publisher import RabbitmqPublisher
 from connect.template_projects.models import TemplateType
@@ -50,9 +51,10 @@ class ProjectSerializer(serializers.ModelSerializer):
             "total_contact_count",
             "created_at",
             "authorization",
-            "project_type",
+            "project_template_type",
             "description",
-            "brain_on"
+            "brain_on",
+            "project_type",
         ]
         ref_name = None
 
@@ -78,8 +80,11 @@ class ProjectSerializer(serializers.ModelSerializer):
     authorization = serializers.SerializerMethodField(style={"show": False})
     project_type = serializers.SerializerMethodField()
     brain_on = serializers.BooleanField(default=False)
+    project_type = serializers.ChoiceField(
+        choices=TypeProject.choices, default=TypeProject.GENERAL
+    )
 
-    def get_project_type(self, obj):
+    def get_project_template_type(self, obj):
         if obj.is_template:
             return f"template:{obj.template_type}"
         else:
@@ -91,16 +96,18 @@ class ProjectSerializer(serializers.ModelSerializer):
 
         template_uuid = self.context["request"].data.get("uuid")
         is_template = self.context["request"].data.get("template", False)
-        brain_on = self.context["request"].data.get('brain_on', False)
+        brain_on = self.context["request"].data.get("brain_on", False)
 
         if extra_data:
             template_uuid = extra_data.get("uuid", template_uuid)
             is_template = extra_data.get("template", is_template)
-            brain_on = extra_data.get('brain_on', False)
+            brain_on = extra_data.get("brain_on", False)
         project_template_type = None
         template_name = "blank"
         if is_template:
-            project_template_type_queryset = TemplateType.objects.filter(uuid=template_uuid)
+            project_template_type_queryset = TemplateType.objects.filter(
+                uuid=template_uuid
+            )
             if project_template_type_queryset.exists():
                 project_template_type = project_template_type_queryset.first()
                 template_name = project_template_type.name
@@ -112,7 +119,8 @@ class ProjectSerializer(serializers.ModelSerializer):
             created_by=user,
             template_type=template_name,
             project_template_type=project_template_type,
-            description=validated_data.get("description", None)
+            description=validated_data.get("description", None),
+            project_type=validated_data.get("project_type", TypeProject.GENERAL.value),
         )
 
         self.send_request_flow_product(user)
@@ -122,33 +130,35 @@ class ProjectSerializer(serializers.ModelSerializer):
             extra_data.update(
                 {
                     "project": instance.uuid,
-                    "authorization": instance.get_user_authorization(user).uuid
+                    "authorization": instance.get_user_authorization(user).uuid,
                 }
             )
 
-            template_serializer = TemplateProjectSerializer(data=extra_data, context=self.context["request"])
+            template_serializer = TemplateProjectSerializer(
+                data=extra_data, context=self.context["request"]
+            )
             template_serializer.is_valid()
             template_project = template_serializer.save()
 
-            if type(template_project) == dict:
+            if isinstance(template_project, dict):
                 return template_project
 
         return instance
 
-    def publish_create_project_message(
-        self,
-        instance,
-        brain_on: bool = False
-    ):
+    def publish_create_project_message(self, instance, brain_on: bool = False):
 
         authorizations = []
         for authorization in instance.organization.authorizations.all():
             if authorization.can_contribute:
-                authorizations.append({"user_email": authorization.user.email, "role": authorization.role})
+                authorizations.append(
+                    {"user_email": authorization.user.email, "role": authorization.role}
+                )
 
         extra_fields = self.context["request"].data.get("globals")
         if extra_fields is None:
-            extra_fields = self.context["request"].data.get("project", {}).get("globals", {})
+            extra_fields = (
+                self.context["request"].data.get("project", {}).get("globals", {})
+            )
 
         message_body = {
             "uuid": str(instance.uuid),
@@ -156,7 +166,11 @@ class ProjectSerializer(serializers.ModelSerializer):
             "is_template": instance.is_template,
             "user_email": instance.created_by.email if instance.created_by else None,
             "date_format": instance.date_format,
-            "template_type_uuid": str(instance.project_template_type.uuid) if instance.project_template_type else None,
+            "template_type_uuid": (
+                str(instance.project_template_type.uuid)
+                if instance.project_template_type
+                else None
+            ),
             "timezone": str(instance.timezone),
             "organization_id": instance.organization.inteligence_organization,
             "extra_fields": extra_fields if instance.is_template else {},
@@ -164,9 +178,12 @@ class ProjectSerializer(serializers.ModelSerializer):
             "description": instance.description,
             "organization_uuid": str(instance.organization.uuid),
             "brain_on": brain_on,
+            "project_type": instance.project_type.value,
         }
         rabbitmq_publisher = RabbitmqPublisher()
-        rabbitmq_publisher.send_message(message_body, exchange="projects.topic", routing_key="")
+        rabbitmq_publisher.send_message(
+            message_body, exchange="projects.topic", routing_key=""
+        )
 
     def send_request_flow_product(self, user):
 
@@ -174,19 +191,18 @@ class ProjectSerializer(serializers.ModelSerializer):
             data = dict(
                 send_request_flow=settings.SEND_REQUEST_FLOW_PRODUCT,
                 flow_uuid=settings.FLOW_PRODUCT_UUID,
-                token_authorization=settings.TOKEN_AUTHORIZATION_FLOW_PRODUCT
+                token_authorization=settings.TOKEN_AUTHORIZATION_FLOW_PRODUCT,
             )
             celery_app.send_task("send_user_flow_info", args=[data, user.email])
 
     def update(self, instance, validated_data):
         name = validated_data.get("name", instance.name)
         description = validated_data.get("description", instance.description)
-        message_body = {
-            "project_uuid": str(instance.uuid),
-            "description": description
-        }
+        message_body = {"project_uuid": str(instance.uuid), "description": description}
         rabbitmq_publisher = RabbitmqPublisher()
-        rabbitmq_publisher.send_message(message_body, exchange="update-projects.topic", routing_key="")
+        rabbitmq_publisher.send_message(
+            message_body, exchange="update-projects.topic", routing_key=""
+        )
         celery_app.send_task(
             "update_project",
             args=[instance.uuid, name],
@@ -206,7 +222,9 @@ class ProjectSerializer(serializers.ModelSerializer):
         ).data
         return data
 
-    def create_flows_project(self, data: dict, user: User, is_template: bool, project_uuid: str):
+    def create_flows_project(
+        self, data: dict, user: User, is_template: bool, project_uuid: str
+    ):
         flow_instance = FlowsRESTClient()
         created = False
         try:
@@ -229,7 +247,7 @@ class ProjectSerializer(serializers.ModelSerializer):
         except Exception as error:
             flows_info = {
                 "data": {"message": "Could not create project"},
-                "status": status.HTTP_500_INTERNAL_SERVER_ERROR
+                "status": status.HTTP_500_INTERNAL_SERVER_ERROR,
             }
             logger.error(f"Could not create project {error}")
 
@@ -272,11 +290,13 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
         if authorization.role == 0:
             return False, {
                 "message": "Project authorization not setted",
-                "status": status.HTTP_500_INTERNAL_SERVER_ERROR
+                "status": status.HTTP_500_INTERNAL_SERVER_ERROR,
             }
         return True, {}
 
-    def create_globals_omie(self, project: Project, user_email: str):  # pragma: no cover
+    def create_globals_omie(
+        self, project: Project, user_email: str
+    ):  # pragma: no cover
         from connect.api.v1.internal.flows.mp9.client_omie import Omie
 
         response_data = {}
@@ -291,12 +311,15 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
         else:
             globals_dict = data.get("project").get("globals")
 
-        if project.template_type in [Project.TYPE_OMIE_PAYMENT_FINANCIAL, Project.TYPE_OMIE_PAYMENT_FINANCIAL_CHAT_GPT]:
+        if project.template_type in [
+            Project.TYPE_OMIE_PAYMENT_FINANCIAL,
+            Project.TYPE_OMIE_PAYMENT_FINANCIAL_CHAT_GPT,
+        ]:
             default_globals = {
                 "nome_da_empresa": f"{project.name}",
                 "nome_do_bot": f"{project.name}",
                 "status_boleto_para_desconsiderar": "Recebido, Cancelado",
-                "tipo_credenciamento": "email"
+                "tipo_credenciamento": "email",
             }
         elif project.template_type in [Project.TYPE_OMIE_LEAD_CAPTURE]:
             default_globals = {
@@ -308,17 +331,13 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
 
         flow_organization = str(project.flow_organization)
         try:
-            omie.create_globals(
-                flow_organization,
-                user_email,
-                globals_dict
-            )
+            omie.create_globals(flow_organization, user_email, globals_dict)
             created = True
         except Exception as error:
             logger.error(f"Create globals: {error}")
             response_data = {
                 "data": {"message": "Could not create global"},
-                "status": status.HTTP_500_INTERNAL_SERVER_ERROR
+                "status": status.HTTP_500_INTERNAL_SERVER_ERROR,
             }
         return created, response_data
 
@@ -330,7 +349,7 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
             wa_demo_token="wa-demo-12345",
             redirect_url="https://wa.me/5582123456?text=wa-demo-12345",
             flow_uuid=None,
-            classifier_uuid=None
+            classifier_uuid=None,
         )
 
         return template
@@ -342,17 +361,18 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
         data = {}
         if project.template_type in Project.HAS_GLOBALS:
 
-            common_templates = [Project.TYPE_SAC_CHAT_GPT, Project.TYPE_LEAD_CAPTURE_CHAT_GPT]
+            common_templates = [
+                Project.TYPE_SAC_CHAT_GPT,
+                Project.TYPE_LEAD_CAPTURE_CHAT_GPT,
+            ]
 
             if project.template_type in common_templates:
                 created, data = self.create_globals(
-                    str(project.flow_organization),
-                    str(authorization.user.email)
+                    str(project.flow_organization), str(authorization.user.email)
                 )
             else:
                 created, data = self.create_globals_omie(
-                    project,
-                    str(authorization.user.email)
+                    project, str(authorization.user.email)
                 )
 
             if not created:
@@ -364,15 +384,15 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
             # Project delete
             return message
 
-        ok, access_token = project.organization.get_ai_access_token(authorization.user.email, project)
+        ok, access_token = project.organization.get_ai_access_token(
+            authorization.user.email, project
+        )
         if not ok:
             # Project delete
             return access_token
 
         created, classifier_uuid = project.create_classifier(
-            authorization,
-            project.template_type,
-            access_token
+            authorization, project.template_type, access_token
         )
         if not created:
             # Project delete
@@ -391,7 +411,7 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
             wa_demo_token="wa-demo-12345",
             redirect_url="https://wa.me/5582123456?text=wa-demo-12345",
             flow_uuid=flow_uuid,
-            classifier_uuid=classifier_uuid
+            classifier_uuid=classifier_uuid,
         )
 
         return template
@@ -413,10 +433,7 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
         globals_list = []
 
         for key, value in globals_dict.items():
-            payload = {
-                "name": key,
-                "value": value
-            }
+            payload = {"name": key, "value": value}
             payload.update(body)
             globals_list.append(payload)
 
@@ -431,7 +448,7 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
             logger.error(f"Create globals: {error}")
             response_data = {
                 "data": {"message": "Could not create global"},
-                "status": status.HTTP_500_INTERNAL_SERVER_ERROR
+                "status": status.HTTP_500_INTERNAL_SERVER_ERROR,
             }
             created = False
             return created, response_data
@@ -441,13 +458,7 @@ class ProjectUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Project
-        fields = [
-            "name",
-            "timezone",
-            "date_format",
-            "uuid",
-            "description"
-        ]
+        fields = ["name", "timezone", "date_format", "uuid", "description"]
         ref_name = None
 
     name = serializers.CharField(max_length=500, required=False)
@@ -493,7 +504,9 @@ class ProjectListAuthorizationSerializer(serializers.ModelSerializer):
 
     def get_existing_authorizations(self, obj):
         exclude_roles = [ProjectRole.SUPPORT.value]
-        queryset = obj.project_authorizations.exclude(role__in=exclude_roles).select_related('user')
+        queryset = obj.project_authorizations.exclude(
+            role__in=exclude_roles
+        ).select_related("user")
 
         return [
             {
@@ -533,7 +546,9 @@ class ProjectListAuthorizationSerializer(serializers.ModelSerializer):
         ]
 
     def get_pending_rocketchat_role(self, email):
-        rocket_authorization = RequestRocketPermission.objects.filter(email=email).first()
+        rocket_authorization = RequestRocketPermission.objects.filter(
+            email=email
+        ).first()
 
         if rocket_authorization:
             return rocket_authorization.role
@@ -559,9 +574,6 @@ class OpenedProjectSerializer(serializers.ModelSerializer):
     project = serializers.SerializerMethodField()
 
     def get_project(self, obj):
-        data = ProjectSerializer(
-            obj.project,
-            context=self.context
-        ).data
+        data = ProjectSerializer(obj.project, context=self.context).data
 
         return data

@@ -671,6 +671,11 @@ class OrganizationAuthorization(models.Model):
         )
 
 
+class TypeProject(models.IntegerChoices):
+    GENERAL = 1, "general"
+    COMMERCE = 2, "commerce"
+
+
 class Project(models.Model):
     class Meta:
         verbose_name = _("project")
@@ -772,6 +777,9 @@ class Project(models.Model):
     )
     description = models.CharField(
         "Project description with the context", null=True, blank=True, max_length=1000
+    )
+    project_type = models.IntegerField(
+        _("Project type"), choices=TypeProject.choices, default=TypeProject.GENERAL
     )
 
     def __str__(self):
