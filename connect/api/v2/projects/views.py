@@ -118,7 +118,7 @@ class ProjectViewSet(
     def set_type(self, request, **kwargs):
         instance = self.get_object()
         try:
-            project_type = request.data.get("type")
+            project_type = request.data.get("project_type")
 
             if project_type not in [choice[0] for choice in TypeProject.choices]:
                 choices_text = []
@@ -129,10 +129,12 @@ class ProjectViewSet(
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
-            instance.type = project_type
-            instance.save(update_fields=["type"])
+            instance.project_type = project_type
+            instance.save(update_fields=["project_type"])
 
-            return Response({"type": instance.type}, status=status.HTTP_200_OK)
+            return Response(
+                {"project_type": instance.project_type}, status=status.HTTP_200_OK
+            )
 
         except Exception as e:
             return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)

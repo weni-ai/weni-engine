@@ -778,10 +778,8 @@ class Project(models.Model):
     description = models.CharField(
         "Project description with the context", null=True, blank=True, max_length=1000
     )
-    type = models.IntegerField(
-        _("Project type"),
-        choices=TypeProject.choices,
-        default=TypeProject.GENERAL
+    project_type = models.IntegerField(
+        _("Project type"), choices=TypeProject.choices, default=TypeProject.GENERAL
     )
 
     def __str__(self):

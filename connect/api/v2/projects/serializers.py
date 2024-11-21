@@ -51,10 +51,10 @@ class ProjectSerializer(serializers.ModelSerializer):
             "total_contact_count",
             "created_at",
             "authorization",
-            "project_type",
+            "project_template_type",
             "description",
             "brain_on",
-            "type",
+            "project_type",
         ]
         ref_name = None
 
@@ -80,11 +80,11 @@ class ProjectSerializer(serializers.ModelSerializer):
     authorization = serializers.SerializerMethodField(style={"show": False})
     project_type = serializers.SerializerMethodField()
     brain_on = serializers.BooleanField(default=False)
-    type = serializers.ChoiceField(
+    project_type = serializers.ChoiceField(
         choices=TypeProject.choices, default=TypeProject.GENERAL
     )
 
-    def get_project_type(self, obj):
+    def get_project_template_type(self, obj):
         if obj.is_template:
             return f"template:{obj.template_type}"
         else:
@@ -120,7 +120,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             template_type=template_name,
             project_template_type=project_template_type,
             description=validated_data.get("description", None),
-            type=validated_data.get("type", TypeProject.GENERAL.value),
+            project_type=validated_data.get("project_type", TypeProject.GENERAL.value),
         )
 
         self.send_request_flow_product(user)
@@ -178,7 +178,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             "description": instance.description,
             "organization_uuid": str(instance.organization.uuid),
             "brain_on": brain_on,
-            "type": instance.type.value,
+            "project_type": instance.project_type.value,
         }
         rabbitmq_publisher = RabbitmqPublisher()
         rabbitmq_publisher.send_message(

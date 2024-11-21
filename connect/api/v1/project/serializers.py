@@ -65,7 +65,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             "wa_demo_token",
             "redirect_url",
             "description",
-            "type",
+            "project_type",
         ]
         ref_name = None
 

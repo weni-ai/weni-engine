@@ -230,7 +230,7 @@ class ProjectViewSetTestCase(TestCase):
 
         path = f"/v2/projects/{project_uuid}/set-type"
         method = {"post": "set_type"}
-        data = {"type": TypeProject.COMMERCE}
+        data = {"project_type": TypeProject.COMMERCE}
         user = self.user
 
         response, content_data = self.request(
@@ -242,10 +242,10 @@ class ProjectViewSetTestCase(TestCase):
         )
 
         self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(content_data.get("type"), TypeProject.COMMERCE)
+        self.assertEquals(content_data.get("project_type"), TypeProject.COMMERCE)
 
         self.project1.refresh_from_db()
-        self.assertEquals(self.project1.type, TypeProject.COMMERCE)
+        self.assertEquals(self.project1.project_type, TypeProject.COMMERCE)
 
     def test_set_type_invalid_type(self):
         """Test setting an invalid project type returns error"""
@@ -253,7 +253,7 @@ class ProjectViewSetTestCase(TestCase):
 
         path = f"/v2/projects/{project_uuid}/set-type"
         method = {"post": "set_type"}
-        data = {"type": 999}  # Invalid type
+        data = {"project_type": 999}  # Invalid type
         user = self.user
 
         response, content_data = self.request(
@@ -268,7 +268,9 @@ class ProjectViewSetTestCase(TestCase):
         self.assertIn("Invalid type. Choices are:", content_data.get("detail"))
 
         self.project1.refresh_from_db()
-        self.assertEquals(self.project1.type, TypeProject.GENERAL)  # Default value
+        self.assertEquals(
+            self.project1.project_type, TypeProject.GENERAL
+        )  # Default value
 
     def test_set_type_missing_type(self):
         """Test setting type without providing type parameter"""
@@ -291,13 +293,13 @@ class ProjectViewSetTestCase(TestCase):
         self.assertIn("Invalid type. Choices are:", content_data.get("detail"))
 
         self.project1.refresh_from_db()
-        self.assertEquals(self.project1.type, TypeProject.GENERAL)
+        self.assertEquals(self.project1.project_type, TypeProject.GENERAL)
 
     def test_set_type_user_unauthorized(self):
         project_uuid = str(self.project1.uuid)
         path = f"/v2/projects/{project_uuid}/set-type"
         method = {"post": "set_type"}
-        data = {"type": TypeProject.COMMERCE}
+        data = {"project_type": TypeProject.COMMERCE}
         user, user_token = create_user_and_token("user_unauthorized")
 
         response, content_data = self.request(
