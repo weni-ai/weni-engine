@@ -25,10 +25,9 @@ class CommerceSerializer(serializers.Serializer):
     organization_name = serializers.CharField(required=True)
     project_name = serializers.CharField(required=True)
     vtex_account = serializers.CharField(required=True)
-    timezone = TimezoneField(required=True, initial="America/Sao_Paulo")
+    timezone = TimezoneField(required=False, initial="America/Sao_Paulo")
 
     def publish_create_org_message(self, instance: Organization, user: User):
-
         authorizations = []
         for authorization in instance.authorizations.all():
             if authorization.can_contribute:
@@ -57,7 +56,6 @@ class CommerceSerializer(serializers.Serializer):
             celery_app.send_task("send_user_flow_info", args=[data, user.email])
 
     def publish_create_project_message(self, instance: Project, user: User):
-
         authorizations = []
         for authorization in instance.organization.authorizations.all():
             if authorization.can_contribute:
@@ -92,45 +90,55 @@ class CommerceSerializer(serializers.Serializer):
         )
 
     def create(self, validated_data):
-        user_email = validated_data.pop("user_email")
+        user_email = validated_data.get("user_email")
 
-        # Create Keycloak user
-        user_dto = KeycloakUserDTO(email=user_email)
-        create_keycloak_user_use_case = CreateKeycloakUserUseCase(user_dto)
-        user_info = create_keycloak_user_use_case.execute()
+        try:
+            # Create Keycloak user
+            try:
+                user_dto = KeycloakUserDTO(email=user_email)
+                create_keycloak_user_use_case = CreateKeycloakUserUseCase(user_dto)
+                user_info = create_keycloak_user_use_case.execute()
+            except Exception as e:
+                raise serializers.ValidationError(
+                    {"user_email": "User already exists in Keycloak"}
+                )
 
-        # Create organization
-        organization = Organization.objects.create(
-            name=validated_data.get("organization_name"),
-            organization_billing__plan="enterprise",
-            description=f"Organization {validated_data.get('organization_name')}",
-            organization_billing__cycle=BillingPlan._meta.get_field("cycle").default,
-        )
-        organization.authorizations.create(
-            user=user_info.get("user"), role=OrganizationRole.ADMIN.value
-        )
-        self.publish_create_org_message(organization, user_info.get("user"))
+            # Create organization
+            organization = Organization.objects.create(
+                name=validated_data.get("organization_name"),
+                organization_billing__plan="enterprise",
+                description=f"Organization {validated_data.get('organization_name')}",
+                organization_billing__cycle=BillingPlan._meta.get_field(
+                    "cycle"
+                ).default,
+            )
+            organization.authorizations.create(
+                user=user_info.get("user"), role=OrganizationRole.ADMIN.value
+            )
+            self.publish_create_org_message(organization, user_info.get("user"))
 
-        # Create project
-        project = Project.objects.create(
-            name=validated_data.get("project_name"),
-            vtex_account=validated_data.get("vtex_account"),
-            timezone=validated_data.get("timezone"),
-            organization=organization,
-            created_by=user_info.get("user"),
-            is_template=False,
-            project_type=TypeProject.COMMERCE,
-        )
-        self.send_request_flow_product(user_info.get("user"))
-        self.publish_create_project_message(project, user_info.get("user"))
+            # Create project
+            project = Project.objects.create(
+                name=validated_data.get("project_name"),
+                vtex_account=validated_data.get("vtex_account"),
+                timezone=validated_data.get("timezone"),
+                organization=organization,
+                created_by=user_info.get("user"),
+                is_template=False,
+                project_type=TypeProject.COMMERCE,
+            )
+            self.send_request_flow_product(user_info.get("user"))
+            self.publish_create_project_message(project, user_info.get("user"))
 
-        # Send email to user
-        user = user_info.get("user")
-        user.send_email_access_password(user_info.get("password"))
+            # Send email to user
+            user = user_info.get("user")
+            user.send_email_access_password(user_info.get("password"))
 
-        data = {
-            "organization": organization,
-            "project": project,
-            "user": user_info.get("user"),
-        }
+            data = {
+                "organization": organization,
+                "project": project,
+                "user": user_info.get("user"),
+            }
+        except Exception as e:
+            raise serializers.ValidationError({"error": str(e)})
         return data
