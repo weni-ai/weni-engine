@@ -205,6 +205,23 @@ class User(AbstractBaseUser, PermissionsMixin):
             ),
         )
 
+    def send_email_access_password(self, password: str):
+        if not settings.SEND_EMAILS:
+            return False
+        context = {
+            "email": self.email,
+            "password": password,
+        }
+        send_mail(
+            _("Access password"),
+            render_to_string("authentication/emails/first_password.txt"),
+            None,
+            [self.email],
+            html_message=render_to_string(
+                "authentication/emails/first_password.html", context
+            ),
+        )
+
     def send_request_flow_user_info(self, flow_data):  # pragma: no cover
         if not flow_data.get("send_request_flow"):
             return False
@@ -231,9 +248,11 @@ class User(AbstractBaseUser, PermissionsMixin):
                     "phone": self.phone,
                     "utm": self.utm,
                     "email_marketing": self.email_marketing,
-                    "company_colaborators": company_size_mapping[self.number_people]
-                    if self.number_people
-                    else None,
+                    "company_colaborators": (
+                        company_size_mapping[self.number_people]
+                        if self.number_people
+                        else None
+                    ),
                     "company_name": self.company_name,
                     "company_sector": self.company_sector,
                     "company_segment": self.company_segment,
