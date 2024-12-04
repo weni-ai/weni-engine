@@ -95,10 +95,13 @@ class CommerceSerializer(serializers.Serializer):
         try:
             # Create Keycloak user
             try:
-                user_dto = KeycloakUserDTO(email=user_email)
+                user_dto = KeycloakUserDTO(
+                    email=user_email,
+                    company_name=validated_data.get("organization_name"),
+                )
                 create_keycloak_user_use_case = CreateKeycloakUserUseCase(user_dto)
                 user_info = create_keycloak_user_use_case.execute()
-            except Exception as e:
+            except Exception:
                 raise serializers.ValidationError(
                     {"user_email": "User already exists in Keycloak"}
                 )

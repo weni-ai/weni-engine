@@ -1,16 +1,11 @@
-from django.db import transaction
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.viewsets import GenericViewSet
 
 from connect.api.v2.commerce.permissions import CanCommunicateInternally
 from connect.api.v2.commerce.serializers import CommerceSerializer
-from connect.api.v2.organizations.serializers import OrganizationSeralizer
 from connect.api.v2.paginations import CustomCursorPagination
-from connect.api.v2.projects.serializers import ProjectSerializer
 from connect.common.models import Organization
-from connect.usecases.users.create import CreateKeycloakUserUseCase
-from connect.usecases.users.user_dto import KeycloakUserDTO
 
 
 class CommerceOrganizationViewSet(GenericViewSet):

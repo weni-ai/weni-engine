@@ -49,6 +49,7 @@ class CreateKeycloakUserUseCase:
             user = User.objects.create_user(
                 username=self.user_dto.username,
                 email=self.user_dto.username,
+                company_name=self.user_dto.company_name,
             )
 
             return {
