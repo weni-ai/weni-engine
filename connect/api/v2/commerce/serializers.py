@@ -78,7 +78,7 @@ class CommerceSerializer(serializers.Serializer):
             "organization_id": instance.organization.inteligence_organization,
             "extra_fields": {},
             "authorizations": authorizations,
-            "description": instance.description,
+            "description": "Commerce project",
             "organization_uuid": str(instance.organization.uuid),
             "brain_on": True,
             "project_type": instance.project_type.value,
