@@ -4,7 +4,6 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from connect.celery import app as celery_app
 
-from connect.api.v1.fields import TimezoneField
 from connect.internals.event_driven.producer.rabbitmq_publisher import RabbitmqPublisher
 from connect.usecases.users.create import CreateKeycloakUserUseCase
 from connect.usecases.users.user_dto import KeycloakUserDTO
@@ -25,7 +24,6 @@ class CommerceSerializer(serializers.Serializer):
     organization_name = serializers.CharField(required=True)
     project_name = serializers.CharField(required=True)
     vtex_account = serializers.CharField(required=True)
-    timezone = TimezoneField(required=False, initial="America/Sao_Paulo")
 
     def publish_create_org_message(self, instance: Organization, user: User):
         authorizations = []
@@ -74,7 +72,7 @@ class CommerceSerializer(serializers.Serializer):
                 if instance.project_template_type
                 else None
             ),
-            "timezone": str(instance.timezone),
+            "timezone": "America/Sao_Paulo",
             "organization_id": instance.organization.inteligence_organization,
             "extra_fields": {},
             "authorizations": authorizations,
@@ -124,7 +122,7 @@ class CommerceSerializer(serializers.Serializer):
             project = Project.objects.create(
                 name=validated_data.get("project_name"),
                 vtex_account=validated_data.get("vtex_account"),
-                timezone=validated_data.get("timezone"),
+                timezone="America/Sao_Paulo",
                 organization=organization,
                 created_by=user_info.get("user"),
                 is_template=False,
