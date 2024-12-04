@@ -1,14 +1,14 @@
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.viewsets import GenericViewSet
-
+from rest_framework.mixins import CreateModelMixin
 from connect.api.v2.commerce.permissions import CanCommunicateInternally
 from connect.api.v2.commerce.serializers import CommerceSerializer
 from connect.api.v2.paginations import CustomCursorPagination
 from connect.common.models import Organization
 
 
-class CommerceOrganizationViewSet(GenericViewSet):
+class CommerceOrganizationViewSet(CreateModelMixin, GenericViewSet):
     queryset = Organization.objects.all()
     serializer_class = CommerceSerializer
     permission_classes = [CanCommunicateInternally]
