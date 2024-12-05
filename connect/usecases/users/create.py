@@ -19,7 +19,24 @@ class CreateKeycloakUserUseCase:
     user_dto: KeycloakUserDTO
 
     def generate_password(self) -> str:
-        return "".join(random.choices(string.ascii_letters + string.digits, k=10))
+        uppercase = string.ascii_uppercase
+        lowercase = string.ascii_lowercase
+        digits = string.digits
+        special = "!@#$%^&*()_+-=[]{}|;:,.<>?"
+
+        password = [
+            random.choice(uppercase),  # 1 uppercase
+            random.choice(lowercase),  # 1 lowercase
+            random.choice(digits),  # 1 digit
+            random.choice(special),  # 1 special
+        ]
+
+        all_chars = uppercase + lowercase + digits + special
+        password.extend(random.choices(all_chars, k=4))
+
+        random.shuffle(password)
+
+        return "".join(password)
 
     def execute(self) -> dict:
         try:
