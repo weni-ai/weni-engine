@@ -17,7 +17,7 @@ from connect.api.v1.account.serializers import (
     ChangePasswordSerializer,
     ChangeLanguageSerializer,
     SearchUserSerializer,
-    UserEmailSetupSerializer
+    UserEmailSetupSerializer,
 )
 from connect.api.v1.keycloak import KeycloakControl
 from connect.authentication.models import User
@@ -83,7 +83,9 @@ class MyUserProfileViewSet(
             user.save(update_fields=["photo"])
 
             # Update avatar on integrations
-            celery_app.send_task("update_user_photo", args=[user.email, self._get_photo_url(user)])
+            celery_app.send_task(
+                "update_user_photo", args=[user.email, self._get_photo_url(user)]
+            )
 
             # Update avatar in all rocket chat registered
             for authorization in user.authorizations_user.all():
@@ -180,7 +182,9 @@ class MyUserProfileViewSet(
                 OrganizationAuthorization.set_2fa(user)
                 return Response(status=status.HTTP_200_OK, data={"email": user.email})
             else:
-                return Response(status=status.HTTP_404_NOT_FOUND, data={"response": response})
+                return Response(
+                    status=status.HTTP_404_NOT_FOUND, data={"response": response}
+                )
 
     @action(
         detail=True,
@@ -214,20 +218,18 @@ class MyUserProfileViewSet(
                 "last_update_profile",
                 "position",
                 "company_segment",
-                "company_phone_number"
+                "company_phone_number",
             ]
 
             if "utm" in user_info:
                 user.utm = user_info.get("utm")
                 updated_fields.append("utm")
 
-            user.save(
-                update_fields=updated_fields
-            )
+            user.save(update_fields=updated_fields)
             data = dict(
                 send_request_flow=settings.SEND_REQUEST_FLOW,
                 flow_uuid=settings.FLOW_MARKETING_UUID,
-                token_authorization=settings.TOKEN_AUTHORIZATION_FLOW_MARKETING
+                token_authorization=settings.TOKEN_AUTHORIZATION_FLOW_MARKETING,
             )
             user.send_request_flow_user_info(data)
             response = dict(
@@ -237,14 +239,18 @@ class MyUserProfileViewSet(
                     segment=user.company_segment,
                     number_people=user.number_people,
                     weni_helps=user.weni_helps,
-                    company_phone_number=user.company_phone_number
+                    company_phone_number=user.company_phone_number,
                 ),
                 user=dict(
                     phone=user.phone,
                     last_update_profile=user.last_update_profile,
-                    position=user.position.split(":")[1] if user.position and "other:" in user.position else user.position,
-                    utm=user.utm
-                )
+                    position=(
+                        user.position.split(":")[1]
+                        if user.position and "other:" in user.position
+                        else user.position
+                    ),
+                    utm=user.utm,
+                ),
             )
             return Response(status=200, data=response)
         except Exception as e:
@@ -262,7 +268,9 @@ class MyUserProfileViewSet(
         try:
             setup = user.email_setup
             if "receive_organization_emails" in data.keys():
-                setup.receive_organization_emails = data.get("receive_organization_emails")
+                setup.receive_organization_emails = data.get(
+                    "receive_organization_emails"
+                )
                 setup.save(update_fields=["receive_organization_emails"])
             if "receive_project_emails" in data.keys():
                 setup.receive_project_emails = data.get("receive_project_emails")
@@ -276,7 +284,9 @@ class MyUserProfileViewSet(
             response = UserEmailSetupSerializer(setup).data
             return Response(status=200, data=response)
         except Exception as e:
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR, data={"message": e})
+            return Response(
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR, data={"message": e}
+            )
 
     @action(
         detail=True,
@@ -294,18 +304,16 @@ class MyUserProfileViewSet(
             organization = authorization.organization
             first_user = organization.authorizations.order_by("created_at").first().user
 
-            if first_user.id != user.id:
-                organization_data = dict(
-                    uuid=str(organization.uuid),
-                    name=organization.name,
-                    authorization=authorization.role
+            organization_data = dict(
+                uuid=str(organization.uuid),
+                name=organization.name,
+                authorization=authorization.role,
+            )
+            response.append(
+                dict(
+                    organization=organization_data, company=first_user.get_company_data
                 )
-                response.append(
-                    dict(
-                        organization=organization_data,
-                        company=first_user.get_company_data
-                    )
-                )
+            )
 
         return Response(status=status.HTTP_200_OK, data=response)
 
@@ -334,9 +342,7 @@ class SearchUserViewSet(mixins.ListModelMixin, GenericViewSet):  # pragma: no co
 
     def list(self, request, *args, **kwargs):
         if len(request.query_params.get("search", "")) == 0:
-            raise ValidationError(
-                _("The search field needed the text to search.")
-            )
+            raise ValidationError(_("The search field needed the text to search."))
         queryset = self.filter_queryset(self.get_queryset())[: self.limit]
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)

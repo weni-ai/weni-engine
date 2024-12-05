@@ -55,6 +55,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             "description",
             "brain_on",
             "project_type",
+            "vtex_account",
         ]
         ref_name = None
 
@@ -179,6 +180,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             "organization_uuid": str(instance.organization.uuid),
             "brain_on": brain_on,
             "project_type": instance.project_type.value,
+            "vtex_account": instance.vtex_account,
         }
         rabbitmq_publisher = RabbitmqPublisher()
         rabbitmq_publisher.send_message(

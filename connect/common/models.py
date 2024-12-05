@@ -781,6 +781,9 @@ class Project(models.Model):
     project_type = models.IntegerField(
         _("Project type"), choices=TypeProject.choices, default=TypeProject.GENERAL
     )
+    vtex_account = models.CharField(
+        _("VTEX account"), null=True, blank=True, max_length=100
+    )
 
     def __str__(self):
         return f"{self.uuid} - Project: {self.name} - Org: {self.organization.name}"

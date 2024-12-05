@@ -23,10 +23,12 @@ from connect.common.models import (
     RequestRocketPermission,
     RequestChatsPermission,
     OpenedProject,
-    RecentActivity
+    RecentActivity,
 )
 from connect.celery import app as celery_app
-from connect.api.v1.internal.intelligence.intelligence_rest_client import IntelligenceRESTClient
+from connect.api.v1.internal.intelligence.intelligence_rest_client import (
+    IntelligenceRESTClient,
+)
 from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
 from connect.common.tasks import update_user_permission_project
 from connect.common import tasks
@@ -41,7 +43,9 @@ logger = logging.getLogger("connect.common.signals")
 
 @receiver(post_save, sender=Project)
 def create_service_status(sender, instance, created, **kwargs):
-    update_fields = list(kwargs.get("update_fields")) if kwargs.get("update_fields") else None
+    update_fields = (
+        list(kwargs.get("update_fields")) if kwargs.get("update_fields") else None
+    )
     if created:
         for service in Service.objects.filter(default=True):
             instance.service_status.create(service=service)
@@ -51,7 +55,7 @@ def create_service_status(sender, instance, created, **kwargs):
                 data = dict(
                     send_request_flow=settings.SEND_REQUEST_FLOW_PRODUCT,
                     flow_uuid=settings.FLOW_PRODUCT_UUID,
-                    token_authorization=settings.TOKEN_AUTHORIZATION_FLOW_PRODUCT
+                    token_authorization=settings.TOKEN_AUTHORIZATION_FLOW_PRODUCT,
                 )
                 instance.created_by.send_request_flow_user_info(data)
 
@@ -61,7 +65,7 @@ def create_service_status(sender, instance, created, **kwargs):
                     project_uuid=str(instance.uuid),
                     flow_organization=str(instance.flow_organization),
                     user_email=permission.user.email,
-                    permission=permission.role
+                    permission=permission.role,
                 )
 
         for authorization in instance.organization.authorizations.all():
@@ -76,7 +80,7 @@ def create_service_status(sender, instance, created, **kwargs):
                 project_uuid=str(instance.uuid),
                 flow_organization=str(instance.flow_organization),
                 user_email=permission.user.email,
-                permission=permission.role
+                permission=permission.role,
             )
 
 
@@ -131,7 +135,7 @@ def project_authorization(sender, instance, created, **kwargs):
         OpenedProject.objects.create(
             user=instance.user,
             project=instance.project,
-            day=instance.project.created_at
+            day=instance.project.created_at,
         )
         opened = opened.first()
         opened.day = timezone.now()
@@ -169,13 +173,17 @@ def request_chats_permission(sender, instance, created, **kwargs):
             chats_instance = ChatsRESTClient()
             if project_auth.exists():
                 project_auth = project_auth.first()
-                chats_role = ChatsRole.ADMIN.value if project_auth.is_moderator else ChatsRole.AGENT.value
+                chats_role = (
+                    ChatsRole.ADMIN.value
+                    if project_auth.is_moderator
+                    else ChatsRole.AGENT.value
+                )
                 if not project_auth.chats_authorization:
                     if not settings.TESTING:
                         chats_instance.update_user_permission(
                             project_uuid=str(instance.project.uuid),
                             user_email=user.email,
-                            permission=chats_role
+                            permission=chats_role,
                         )
                 else:
                     # project_auth.chats_authorization.role = chats_role
@@ -184,7 +192,7 @@ def request_chats_permission(sender, instance, created, **kwargs):
                         chats_instance.update_user_permission(
                             permission=chats_role,
                             user_email=user.email,
-                            project_uuid=str(instance.project.uuid)
+                            project_uuid=str(instance.project.uuid),
                         )
                 # project_auth.save(update_fields=["chats_authorization"])
                 instance.delete()
@@ -192,5 +200,5 @@ def request_chats_permission(sender, instance, created, **kwargs):
 
 @receiver(post_save, sender=Project)
 def send_email_create_project(sender, instance, created, **kwargs):
-    if created:
+    if created and not instance.vtex_account:
         instance.send_email_create_project()
