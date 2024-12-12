@@ -1,4 +1,20 @@
-# 3.28.3
+# 3.29.2
+## *Add*
+  - Adding validation before deleting organization permissions if the user is the last admin of the organization.
+
+# 3.29.1
+## *Fix*
+  - Fixing generate password algorithm for commerce user
+
+# 3.29.0
+## *Add*
+  - Adding endpoint to create commerce organization/project and user
+
+# 3.28.5
+## *Add*
+  - Adding Project Type (General or Commerce) to Project Model
+
+# 3.28.4
 ## *Add*
   - Adding validation that only allows removing permissions if the request user is present in the organization
 
