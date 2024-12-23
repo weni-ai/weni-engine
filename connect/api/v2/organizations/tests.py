@@ -223,7 +223,7 @@ class OrganizationViewSetTestCase(TestCase):
         response, content_data = self.request(path, method, user=user, data=data)
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data["name"][0].code, "max_length")
+        self.assertEqual(response.data["organization"]["name"][0].code, "max_length")
 
     @patch("connect.internals.event_driven.producer.rabbitmq_publisher.RabbitmqPublisher.send_message")
     @patch("connect.authentication.models.User.send_request_flow_user_info")
