@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.test import APIRequestFactory, force_authenticate
 
 from django.test import TestCase
-from django.utils import get_random_string
+from django.utils.crypto import get_random_string
 
 from unittest.mock import patch
 
