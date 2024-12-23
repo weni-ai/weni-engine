@@ -83,7 +83,7 @@ class OrganizationViewSet(
 
         # Organization
         serializer = self.get_serializer(data=org_data)
-        serializer.is_valid()
+        serializer.is_valid(raise_exception=True)
         instance = serializer.save()
 
         if type(instance) == dict:
@@ -94,7 +94,7 @@ class OrganizationViewSet(
             {"organization": instance.uuid}
         )
         project_serializer = ProjectSerializer(data=project_data, context={"request": request})
-        project_serializer.is_valid()
+        project_serializer.is_valid(raise_exception=True)
         project_instance = project_serializer.save()
 
         if type(project_instance) == dict:
