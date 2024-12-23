@@ -9,7 +9,7 @@ from django.utils.crypto import get_random_string
 from unittest.mock import patch
 
 from connect.api.v1.tests.utils import create_user_and_token
-from connect.common.models import Organization, BillingPlan, OrganizationRole
+from connect.common.models import Project, Organization, BillingPlan, OrganizationRole
 from connect.authentication.models import UserEmailSetup
 from connect.api.v2.organizations.views import OrganizationViewSet
 from connect.common.mocks import StripeMockGateway
@@ -189,7 +189,7 @@ class OrganizationViewSetTestCase(TestCase):
     @patch(
         "connect.internals.event_driven.producer.rabbitmq_publisher.RabbitmqPublisher"
     )
-    def test_cannot_create_organization_project_with_invalid_name_length(
+    def test_cannot_create_organization_with_invalid_name_length(
         self, mock_publisher, send_request_flow_user_info, mock_get_gateway
     ):
         mock_get_gateway.return_value = StripeMockGateway()
@@ -224,6 +224,47 @@ class OrganizationViewSetTestCase(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data["organization"]["name"][0].code, "max_length")
+
+    @patch("connect.billing.get_gateway")
+    @patch("connect.authentication.models.User.send_request_flow_user_info")
+    @patch(
+        "connect.internals.event_driven.producer.rabbitmq_publisher.RabbitmqPublisher"
+    )
+    def test_cannot_create_organization_project_with_invalid_name_length(
+        self, mock_publisher, send_request_flow_user_info, mock_get_gateway
+    ):
+        mock_get_gateway.return_value = StripeMockGateway()
+        send_request_flow_user_info.side_effect = [True]
+        mock_publisher.side_effect = [True]
+
+        org_data = {
+            "name": "Test",
+            "description": "V2 desc",
+            "organization_billing_plan": BillingPlan.PLAN_TRIAL,
+            "authorizations": [
+                {"user_email": "e@mail.com", "role": 3},
+                {"user_email": "user_1@user.com", "role": 3},
+            ],
+        }
+
+        invalid_name_length = Project.name.field.max_length + 1
+
+        project_data = {
+            "date_format": "D",
+            "name": get_random_string(invalid_name_length),
+            "timezone": "America/Argentina/Buenos_Aires",
+        }
+
+        data = {"organization": org_data, "project": project_data}
+
+        path = "/v2/organizations/"
+        method = {"post": "create"}
+        user = self.user
+
+        response, content_data = self.request(path, method, user=user, data=data)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data["project"]["name"][0].code, "max_length")
 
     @patch("connect.internals.event_driven.producer.rabbitmq_publisher.RabbitmqPublisher.send_message")
     @patch("connect.authentication.models.User.send_request_flow_user_info")
