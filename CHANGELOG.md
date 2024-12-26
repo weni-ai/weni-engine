@@ -1,3 +1,7 @@
+# 3.29.3
+## *Fix*
+  - Organization's and project's name maximum length validation when creating them
+
 # 3.29.2
 ## *Add*
   - Adding validation before deleting organization permissions if the user is the last admin of the organization.
