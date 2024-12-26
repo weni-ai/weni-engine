@@ -1,5 +1,5 @@
 import pendulum
-from rest_framework import mixins, status
+from rest_framework import mixins, status, exceptions
 from rest_framework.decorators import action
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.response import Response
@@ -83,7 +83,12 @@ class OrganizationViewSet(
 
         # Organization
         serializer = self.get_serializer(data=org_data)
-        serializer.is_valid()
+
+        try:
+            serializer.is_valid(raise_exception=True)
+        except exceptions.ValidationError as e:
+            raise exceptions.ValidationError({"organization": e.detail}, code=e.get_codes())
+
         instance = serializer.save()
 
         if type(instance) == dict:
@@ -94,7 +99,12 @@ class OrganizationViewSet(
             {"organization": instance.uuid}
         )
         project_serializer = ProjectSerializer(data=project_data, context={"request": request})
-        project_serializer.is_valid()
+
+        try:
+            project_serializer.is_valid(raise_exception=True)
+        except exceptions.ValidationError as e:
+            raise exceptions.ValidationError({"project": e.detail}, code=e.get_codes())
+
         project_instance = project_serializer.save()
 
         if type(project_instance) == dict:

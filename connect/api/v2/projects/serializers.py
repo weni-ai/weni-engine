@@ -60,7 +60,7 @@ class ProjectSerializer(serializers.ModelSerializer):
         ref_name = None
 
     uuid = serializers.UUIDField(style={"show": False}, read_only=True)
-    name = serializers.CharField(max_length=500, required=True)
+    name = serializers.CharField(max_length=150, required=True)
     description = serializers.CharField(max_length=1000, required=False)
     organization = serializers.PrimaryKeyRelatedField(
         queryset=Organization.objects,
