@@ -92,17 +92,10 @@ class ProjectSerializer(serializers.ModelSerializer):
     pending_authorizations = serializers.SerializerMethodField(style={"show": False})
     authorization = serializers.SerializerMethodField(style={"show": False})
     last_opened_on = serializers.SerializerMethodField()
-    project_type = serializers.SerializerMethodField()
     flow_uuid = serializers.SerializerMethodField()
     first_access = serializers.SerializerMethodField()
     wa_demo_token = serializers.SerializerMethodField()
     redirect_url = serializers.SerializerMethodField()
-
-    def get_project_type(self, obj):
-        if obj.is_template and obj.template_project.exists():
-            return f"template:{obj.template_type}"
-        else:
-            return "blank"
 
     def get_flow_uuid(self, obj):
         if obj.is_template and obj.template_project.exists():
