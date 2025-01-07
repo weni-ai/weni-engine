@@ -96,6 +96,13 @@ class ProjectSerializer(serializers.ModelSerializer):
     first_access = serializers.SerializerMethodField()
     wa_demo_token = serializers.SerializerMethodField()
     redirect_url = serializers.SerializerMethodField()
+    template_type = serializers.SerializerMethodField()
+
+    def get_template_type(self, obj):
+        if obj.is_template and obj.template_project.exists():
+            return f"template:{obj.template_type}"
+        else:
+            return "blank"
 
     def get_flow_uuid(self, obj):
         if obj.is_template and obj.template_project.exists():
