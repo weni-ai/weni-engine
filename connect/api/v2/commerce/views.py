@@ -74,7 +74,7 @@ class CommerceProjectCheckExists(views.APIView):
             )
         return Response(
             {
-                "message": f"Project {project.name} exists and user {permission.user.email} has permission",
+                "message": f"Project {project.name} exists and user {user_email} has permission",
                 "data": {
                     "project_uuid": project.uuid,
                     "has_project": True
