@@ -40,7 +40,7 @@ class CommerceProjectCheckExists(views.APIView):
     def get(self, request):
         data = request.data
         project = Project.objects.filter(vtex_account=data.get("vtex_account"))
-
+        print(f"request data: {data}")
         if project.count() > 0:
             project = project.first()
         else:
@@ -53,6 +53,7 @@ class CommerceProjectCheckExists(views.APIView):
                 }, status=status.HTTP_200_OK)
 
         organization = project.organization
+        print(f"project: {project.__dict__}")
         permission = ProjectAuthorization.objects.filter(project=project, user__email=data.get("user_email"))
 
         if permission.count() > 0:
