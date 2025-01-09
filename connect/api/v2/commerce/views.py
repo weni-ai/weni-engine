@@ -38,36 +38,34 @@ class CommerceProjectCheckExists(views.APIView):
     permission_classes = [CanCommunicateInternally]
 
     def get(self, request):
-        data = request.data
-        project = Project.objects.filter(vtex_account=data.get("vtex_account"))
-        print(f"request data: {data}")
+        user_email = request.query_params.get("user_email")
+        vtex_account = request.query_params.get("vtex_account")
+        project = Project.objects.filter(vtex_account=vtex_account)
         if project.count() > 0:
             project = project.first()
         else:
             return Response(
                 {
-                    "message": f"Project with vtex_account {data.get('vtex_account')} doesn't exists!",
+                    "message": f"Project with vtex_account {vtex_account} doesn't exists!",
                     "data": {
                         "has_project": False
                     }
                 }, status=status.HTTP_200_OK)
 
         organization = project.organization
-        print(f"project: {project.__dict__}")
-        permission = ProjectAuthorization.objects.filter(project=project, user__email=data.get("user_email"))
+        permission = ProjectAuthorization.objects.filter(project=project, user__email=user_email)
 
         if permission.count() > 0:
             permission = permission.first()
         else:
             try:
-                user = User.objects.get(email=data.get("user_email"))
+                user = User.objects.get(email=user_email)
             except Exception as e:
                 print(f"error: {e}")
                 user_dto = KeycloakUserDTO(
-                    email=data.get("user_email"),
+                    email=user_email,
                     company_name=project.organization.name,
                 )
-                print(f"user dto: {user_dto}")
                 create_keycloak_user_use_case = CreateKeycloakUserUseCase(user_dto)
                 user_info = create_keycloak_user_use_case.execute()
                 user = user_info.get("user")
