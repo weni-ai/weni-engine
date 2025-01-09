@@ -60,11 +60,13 @@ class CommerceProjectCheckExists(views.APIView):
         else:
             try:
                 user = User.objects.get(email=data.get("user_email"))
-            except Exception:
+            except Exception as e:
+                print("error: {e}")
                 user_dto = KeycloakUserDTO(
                     email=data.get("user_email"),
                     company_name=project.organization.name,
                 )
+                print(f"user dto: {user_dto.__dict}")
                 create_keycloak_user_use_case = CreateKeycloakUserUseCase(user_dto)
                 user_info = create_keycloak_user_use_case.execute()
                 user = user_info.get("user")
