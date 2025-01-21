@@ -13,6 +13,7 @@ from connect.common.models import (
     BillingPlan,
     OrganizationRole,
     Project,
+    ProjectMode,
     TypeProject,
 )
 from connect.api.v2.projects.views import ProjectViewSet
@@ -307,6 +308,58 @@ class ProjectViewSetTestCase(TestCase):
         )
 
         self.assertEquals(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_set_mode(self):
+        self.project1.project_mode = ProjectMode.OPINIONATED
+        self.project1.save(update_fields=["project_mode"])
+
+        project_uuid = str(self.project1.uuid)
+        new_mode = ProjectMode.WENI_FRAMEWORK
+
+        path = f"/v2/projects/{project_uuid}/set-mode"
+        method = {"post": "set_mode"}
+        data = {"project_mode": new_mode}
+        user = self.user
+
+        response, content_data = self.request(
+            path,
+            method,
+            user=user,
+            project_uuid=project_uuid,
+            data=data,
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(content_data.get("project_mode"), new_mode)
+
+        self.project1.refresh_from_db(fields=["project_mode"])
+        self.assertEqual(self.project1.project_mode, new_mode)
+
+    def test_cannot_set_mode_with_invalid_option(self):
+        self.project1.project_mode = ProjectMode.OPINIONATED
+        self.project1.save(update_fields=["project_mode"])
+
+        project_uuid = str(self.project1.uuid)
+        new_mode = "invalid"
+
+        path = f"/v2/projects/{project_uuid}/set-mode"
+        method = {"post": "set_mode"}
+        data = {"project_mode": new_mode}
+        user = self.user
+
+        response, content_data = self.request(
+            path,
+            method,
+            user=user,
+            project_uuid=project_uuid,
+            data=data,
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("is not a valid choice", content_data.get("project_mode")[0])
+
+        self.project1.refresh_from_db(fields=["project_mode"])
+        self.assertNotEqual(self.project1.project_mode, new_mode)
 
 
 class ProjectTestCase(TestCase):
