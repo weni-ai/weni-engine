@@ -23,7 +23,7 @@ class ElasticSearchTestCase(TestCase):
             name="project test",
             timezone="America/Sao_Paulo",
             flow_organization=uuid4.uuid4(),
-            flow_id=11
+            flow_id=11,
         )
 
         self.client = ElasticFlow()
@@ -32,7 +32,9 @@ class ElasticSearchTestCase(TestCase):
         after = datetime(2022, 4, 8, 10, 20, 0, 0, pytz.UTC)
         before = datetime(2022, 4, 8, 15, 20, 0, 0, pytz.UTC)
 
-        response = self.client.get_contact_detailed(self.project.flow_id, str(before), str(after))
+        response = self.client.get_contact_detailed(
+            self.project.flow_id, str(before), str(after)
+        )
         hit = list(response)[0]
         last_seen_on = pendulum.parse(hit.last_seen_on)
 

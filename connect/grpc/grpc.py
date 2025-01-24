@@ -44,9 +44,7 @@ class GRPCType(metaclass=ABCMeta):
     ):
         raise NotImplementedError()
 
-    def update_project(
-        self, organization_uuid: int, organization_name: str
-    ):
+    def update_project(self, organization_uuid: int, organization_name: str):
         raise NotImplementedError()
 
     def delete_project(self, project_uuid: int, user_email: str):

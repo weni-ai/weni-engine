@@ -8,38 +8,90 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='TemplateType',
+            name="TemplateType",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('category', models.CharField(max_length=255)),
-                ('description', models.TextField(blank=True, null=True)),
-                ('name', models.CharField(blank=True, max_length=255, null=True)),
-                ('level', models.CharField(choices=[('low', 1), ('medium', 2), ('high', 3)], max_length=255)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("category", models.CharField(max_length=255)),
+                ("description", models.TextField(blank=True, null=True)),
+                ("name", models.CharField(blank=True, max_length=255, null=True)),
+                (
+                    "level",
+                    models.CharField(
+                        choices=[("low", 1), ("medium", 2), ("high", 3)], max_length=255
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='TemplateFeature',
+            name="TemplateFeature",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('description', models.TextField()),
-                ('name', models.CharField(max_length=255)),
-                ('type', models.CharField(choices=[('Flows', 'Flows'), ('Integrations', 'Integrations'), ('Intelligences', 'Intelligences')], max_length=255)),
-                ('feature_identifier', models.CharField(max_length=255)),
-                ('template_type', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='template_features', to='template_projects.templatetype')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("description", models.TextField()),
+                ("name", models.CharField(max_length=255)),
+                (
+                    "type",
+                    models.CharField(
+                        choices=[
+                            ("Flows", "Flows"),
+                            ("Integrations", "Integrations"),
+                            ("Intelligences", "Intelligences"),
+                        ],
+                        max_length=255,
+                    ),
+                ),
+                ("feature_identifier", models.CharField(max_length=255)),
+                (
+                    "template_type",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="template_features",
+                        to="template_projects.templatetype",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='TemplateAI',
+            name="TemplateAI",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255)),
-                ('description', models.TextField(blank=True, null=True)),
-                ('template_type', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='template_ais', to='template_projects.templatetype')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255)),
+                ("description", models.TextField(blank=True, null=True)),
+                (
+                    "template_type",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="template_ais",
+                        to="template_projects.templatetype",
+                    ),
+                ),
             ],
         ),
     ]

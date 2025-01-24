@@ -12,17 +12,13 @@ from ..exceptions import (
 
 
 class GetAlertByUuidTestCase(TestCase):
-
     def setUp(self):
         self.alert = AlertFactory()
         self.token = settings.VERIFICATION_MARKETING_TOKEN
 
     def test_get_alert_by_uuid(self):
 
-        alert_from_usecase = get_alert_by_uuid(
-            uuid=self.alert.uuid,
-            token=self.token
-        )
+        alert_from_usecase = get_alert_by_uuid(uuid=self.alert.uuid, token=self.token)
 
         self.assertEqual(alert_from_usecase, self.alert)
 

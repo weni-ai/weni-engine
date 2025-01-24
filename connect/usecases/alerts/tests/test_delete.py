@@ -13,9 +13,6 @@ class TestDeleteAlert(TestCase):
         self.token = settings.VERIFICATION_MARKETING_TOKEN
 
     def test_delete_alert(self):
-        self.usecase.delete_alert(
-            alert_uuid=self.alert.uuid,
-            token=self.token
-        )
+        self.usecase.delete_alert(alert_uuid=self.alert.uuid, token=self.token)
 
         self.assertEqual(Alert.objects.count(), 0)

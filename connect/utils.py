@@ -4,7 +4,9 @@ import pendulum
 from connect.common.models import Project
 
 
-def upload_photo_rocket(server_rocket: str, jwt_token: str, avatar_url: str) -> bool:  # pragma: no cover
+def upload_photo_rocket(
+    server_rocket: str, jwt_token: str, avatar_url: str
+) -> bool:  # pragma: no cover
     login = requests.post(
         url="{}/api/v1/login/".format(server_rocket),
         json={"serviceName": "keycloak", "accessToken": jwt_token, "expiresIn": 200},
@@ -49,6 +51,7 @@ def check_module_permission(claims, user):
     from django.contrib.auth.models import Permission
     from django.contrib.contenttypes.models import ContentType
     from django.contrib.auth import get_user_model
+
     User = get_user_model()
 
     if claims.get("can_communicate_internally", False):

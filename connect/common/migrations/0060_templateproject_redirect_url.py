@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('common', '0059_project_is_template'),
+        ("common", "0059_project_is_template"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='templateproject',
-            name='redirect_url',
+            model_name="templateproject",
+            name="redirect_url",
             field=models.URLField(null=True),
         ),
     ]

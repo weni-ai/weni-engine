@@ -40,7 +40,7 @@ class UserUpdateTestCase(TestCase):
             "/v1/account/my-profile/",
             self.factory._encode_data(data, MULTIPART_CONTENT),
             MULTIPART_CONTENT,
-            **authorization_header
+            **authorization_header,
         )
         response = MyUserProfileViewSet.as_view({"patch": "update"})(
             request, pk=user.pk, partial=True
@@ -119,17 +119,14 @@ class AdditionalUserInfoTestCase(TestCase):
             "utm": {"utm_source": "instagram"},
         }
 
-        body = dict(
-            company=company_info,
-            user=user_info
-        )
+        body = dict(company=company_info, user=user_info)
 
         response, content_data = self.request(body, self.user_token)
-        company_response = content_data.get('company')
-        user_response = content_data.get('user')
+        company_response = content_data.get("company")
+        user_response = content_data.get("user")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(company_info, company_response)
-        self.assertEqual(user_info.get('phone'), user_response.get('phone'))
+        self.assertEqual(user_info.get("phone"), user_response.get("phone"))
         self.assertEqual(user_response.get("utm"), {"utm_source": "instagram"})
 
 
@@ -164,13 +161,17 @@ class CompanyInfoTestCase(TestCase):
 
     def request(self, token):
         authorization_header = {"HTTP_AUTHORIZATION": "Token {}".format(token.key)}
-        request = self.factory.get("/v1/account/user-company-info/", **authorization_header)
-        response = MyUserProfileViewSet.as_view({"get": "get_user_company_info"})(request)
+        request = self.factory.get(
+            "/v1/account/user-company-info/", **authorization_header
+        )
+        response = MyUserProfileViewSet.as_view({"get": "get_user_company_info"})(
+            request
+        )
         response.render()
         content_data = json.loads(response.content)
         return (response, content_data)
 
     def test_okay(self):
         response, content_data = self.request(self.user_token)
-        self.assertEquals(list(content_data[0].keys()), ['organization', 'company'])
+        self.assertEquals(list(content_data[0].keys()), ["organization", "company"])
         self.assertEqual(response.status_code, status.HTTP_200_OK)

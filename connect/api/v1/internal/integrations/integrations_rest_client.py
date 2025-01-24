@@ -6,21 +6,16 @@ from connect.api.v1.internal.internal_authentication import InternalAuthenticati
 
 
 class IntegrationsRESTClient:
-
     def __init__(self):
         self.base_url = settings.INTEGRATIONS_REST_ENDPOINT
         self.authentication_instance = InternalAuthentication()
 
     def update_user_permission_project(self, project_uuid, user_email, role):
-        body = {
-            "project_uuid": project_uuid,
-            "user": user_email,
-            "role": role
-        }
+        body = {"project_uuid": project_uuid, "user": user_email, "role": role}
         response = requests.patch(
             url=f"{self.base_url}/api/v1/internal/user-permission/{project_uuid}/",
             headers=self.authentication_instance.headers,
-            json=body
+            json=body,
         )
         return dict(status=response.status_code)
 
@@ -41,7 +36,7 @@ class IntegrationsRESTClient:
         response = requests.post(
             url=f"{self.base_url}/api/v1/internal/user/",
             headers=self.authentication_instance.headers,
-            json=body
+            json=body,
         )
         response.raise_for_status()
         return dict(status=response.status_code)
@@ -52,11 +47,9 @@ class IntegrationsRESTClient:
 
         headers = self.authentication_instance.headers
         headers["Authorization"] = f"Bearer {token}"
-        headers['Project-Uuid'] = project_uuid
+        headers["Project-Uuid"] = project_uuid
 
-        data = {
-            "project_uuid": project_uuid
-        }
+        data = {"project_uuid": project_uuid}
         response = requests.post(url, data=json.dumps(data), headers=headers)
 
         if response.status_code != 201:
@@ -66,5 +59,5 @@ class IntegrationsRESTClient:
 
         return {
             "redirect_url": response.get("config").get("redirect_url"),
-            "router_token": response.get("config").get("routerToken")
+            "router_token": response.get("config").get("routerToken"),
         }

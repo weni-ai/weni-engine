@@ -6,18 +6,32 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('common', '0075_merge_0073_auto_20230330_1542_0074_auto_20230327_2002'),
+        ("common", "0075_merge_0073_auto_20230330_1542_0074_auto_20230327_2002"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='project',
-            name='flow_organization',
-            field=models.UUIDField(blank=True, null=True, unique=True, verbose_name='flow identification UUID'),
+            model_name="project",
+            name="flow_organization",
+            field=models.UUIDField(
+                blank=True,
+                null=True,
+                unique=True,
+                verbose_name="flow identification UUID",
+            ),
         ),
         migrations.AlterField(
-            model_name='recentactivity',
-            name='action',
-            field=models.CharField(choices=[('CREATE', 'Entity Created'), ('ADD', 'Add'), ('TRAIN', 'Entity Trained'), ('UPDATE', 'Entity updated'), ('INTEGRATE', 'Entity integrated')], max_length=15),
+            model_name="recentactivity",
+            name="action",
+            field=models.CharField(
+                choices=[
+                    ("CREATE", "Entity Created"),
+                    ("ADD", "Add"),
+                    ("TRAIN", "Entity Trained"),
+                    ("UPDATE", "Entity updated"),
+                    ("INTEGRATE", "Entity integrated"),
+                ],
+                max_length=15,
+            ),
         ),
     ]

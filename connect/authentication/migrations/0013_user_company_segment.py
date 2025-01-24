@@ -6,13 +6,19 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('authentication', '0012_auto_20220909_1317'),
+        ("authentication", "0012_auto_20220909_1317"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='user',
-            name='company_segment',
-            field=models.CharField(blank=True, help_text='the segment of your company', max_length=100, null=True, verbose_name='company segment'),
+            model_name="user",
+            name="company_segment",
+            field=models.CharField(
+                blank=True,
+                help_text="the segment of your company",
+                max_length=100,
+                null=True,
+                verbose_name="company segment",
+            ),
         ),
     ]

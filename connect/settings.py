@@ -233,11 +233,7 @@ LANGUAGE_CODE = env.str("LANGUAGE_CODE")
 # -----------------------------------------------------------------------------------
 # Available languages for translation
 # -----------------------------------------------------------------------------------
-LANGUAGES = (
-    ("en-us", _("English")),
-    ("pt-br", _("Portuguese")),
-    ("es", _("Spanish"))
-)
+LANGUAGES = (("en-us", _("English")), ("pt-br", _("Portuguese")), ("es", _("Spanish")))
 
 MODELTRANSLATION_DEFAULT_LANGUAGE = "en-us"
 
@@ -373,8 +369,12 @@ OIDC_DRF_AUTH_BACKEND = env.str(
 )
 OIDC_RP_SCOPES = env.str("OIDC_RP_SCOPES", default="openid email")
 
-OIDC_CACHE_TOKEN = env.bool("OIDC_CACHE_TOKEN", default=False)  # Enable/disable user token caching (default: False).
-OIDC_CACHE_TTL = env.int("OIDC_CACHE_TTL", default=600)  # Time-to-live for cached user tokens (default: 600 seconds).
+OIDC_CACHE_TOKEN = env.bool(
+    "OIDC_CACHE_TOKEN", default=False
+)  # Enable/disable user token caching (default: False).
+OIDC_CACHE_TTL = env.int(
+    "OIDC_CACHE_TTL", default=600
+)  # Time-to-live for cached user tokens (default: 600 seconds).
 
 # Swagger
 
@@ -543,7 +543,9 @@ OMIE_APP_SECRET = env.str("OMIE_APP_SECRET", default="sk_test")
 USE_EDA = env.bool("USE_EDA", default=False)
 
 if USE_EDA:
-    EDA_CONNECTION_BACKEND = "connect.internals.event_driven.connection.pymqp.PyAMQPConnectionBackend"
+    EDA_CONNECTION_BACKEND = (
+        "connect.internals.event_driven.connection.pymqp.PyAMQPConnectionBackend"
+    )
     EDA_CONSUMERS_HANDLE = "connect.internals.event_driven.handle.handle_consumers"
 
     EDA_BROKER_HOST = env.str("EDA_BROKER_HOST", default="localhost")
@@ -559,7 +561,7 @@ NEW_ATTENDANCE_DATE = env.str("NEW_ATTENDANCE_DATE", default="2023-09-30")
 ALLOW_CRM_ACCESS = env.bool("ALLOW_CRM_ACCESS", default=True)
 
 if ALLOW_CRM_ACCESS:
-    CRM_EMAILS_LIST = env.list("CRM_EMAILS_LIST")
+    CRM_EMAILS_LIST = env.list("CRM_EMAILS_LIST", default=[])
 
 USE_EDA_PERMISSIONS = env.bool("USE_EDA_PERMISSIONS", default=True)
 

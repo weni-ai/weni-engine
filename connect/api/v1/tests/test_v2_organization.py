@@ -7,7 +7,7 @@ from connect.api.v1.project.views import ProjectViewSet
 from ..organization.serializers import User
 
 from connect.api.v1.organization.views import OrganizationViewSet
-from connect.api.v1.tests.utils import create_user_and_token, create_contacts
+from connect.api.v1.tests.utils import create_user_and_token
 from connect.common.models import (
     Organization,
     OrganizationAuthorization,
@@ -24,7 +24,6 @@ import pendulum
 from freezegun import freeze_time
 from connect.billing.tasks import (
     end_trial_plan,
-    daily_contact_count,
 )
 from rest_framework import status
 from connect.api.v1.billing.views import BillingViewSet
@@ -171,7 +170,6 @@ class CreateOrganizationAPITestCase(TestCase):
 
 
 class RetrieveOrganizationProjectsAPITestCase(TestCase):
-
     @patch("connect.common.signals.update_user_permission_project")
     @patch("connect.billing.get_gateway")
     def setUp(self, mock_get_gateway, mock_permission) -> None:
@@ -216,7 +214,6 @@ class RetrieveOrganizationProjectsAPITestCase(TestCase):
 
 
 class PlanAPITestCase(TestCase):
-
     @patch("connect.common.signals.update_user_permission_project")
     @patch("connect.billing.get_gateway")
     def setUp(self, mock_get_gateway, mock_permission) -> None:
@@ -501,7 +498,6 @@ class BillingViewTestCase(TestCase):
 
 @freeze_time("2022-11-14")
 class IntegrationTestCase(TestCase):
-
     @patch("connect.common.signals.update_user_permission_project")
     @patch("connect.billing.get_gateway")
     def setUp(self, mock_get_gateway, mock_permission):

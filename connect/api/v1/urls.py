@@ -10,7 +10,11 @@ urlpatterns = [
     path("", include(router.urls)),
     path("channel-types", ChannelTypesAPIView.as_view(), name="channel-types"),
     path("recent-activity", RecentActivityAPIView.as_view(), name="recent-activity"),
-    path("recent-activities", RecentActivityListAPIView.as_view(), name='recent-activity-list'),
+    path(
+        "recent-activities",
+        RecentActivityListAPIView.as_view(),
+        name="recent-activity-list",
+    ),
 ]
 
 urlpatterns += externals_urls

@@ -19,7 +19,7 @@ class RabbitMQPymqpConnection:
             virtual_host=settings.EDA_VIRTUAL_HOST,
             userid=settings.EDA_BROKER_USER,
             password=settings.EDA_BROKER_PASSWORD,
-            port=settings.EDA_BROKER_PORT
+            port=settings.EDA_BROKER_PORT,
         )
         self.channel = self.connection.channel()
 
@@ -60,7 +60,11 @@ class PyAMQPConnectionBackend:
 
                 self._drain_events(self.rabbitmq_instance.connection)
 
-            except (amqp.exceptions.AMQPError, ConnectionRefusedError, OSError) as error:
+            except (
+                amqp.exceptions.AMQPError,
+                ConnectionRefusedError,
+                OSError,
+            ) as error:
                 print(f"[-] Connection error: {error}")
                 print("    [+] Reconnecting in 5 seconds...")
                 time.sleep(5)

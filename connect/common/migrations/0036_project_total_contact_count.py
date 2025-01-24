@@ -6,13 +6,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('common', '0035_alter_newsletterlanguage_language'),
+        ("common", "0035_alter_newsletterlanguage_language"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='project',
-            name='total_contact_count',
-            field=models.IntegerField(default=0, verbose_name='Contacts count of all time'),
+            model_name="project",
+            name="total_contact_count",
+            field=models.IntegerField(
+                default=0, verbose_name="Contacts count of all time"
+            ),
         ),
     ]

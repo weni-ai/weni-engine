@@ -6,21 +6,26 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('common', '0032_alter_billingplan_plan'),
+        ("common", "0032_alter_billingplan_plan"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='billingplan',
-            name='cnpj',
+            model_name="billingplan",
+            name="cnpj",
         ),
         migrations.RemoveField(
-            model_name='billingplan',
-            name='cpf',
+            model_name="billingplan",
+            name="cpf",
         ),
         migrations.AddField(
-            model_name='billingplan',
-            name='personal_identification_number',
-            field=models.CharField(blank=True, max_length=50, null=True, verbose_name='Personal Identification Number'),
+            model_name="billingplan",
+            name="personal_identification_number",
+            field=models.CharField(
+                blank=True,
+                max_length=50,
+                null=True,
+                verbose_name="Personal Identification Number",
+            ),
         ),
     ]

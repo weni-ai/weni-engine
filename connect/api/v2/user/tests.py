@@ -10,7 +10,6 @@ from connect.common.models import Project, Organization, OrganizationRole, Billi
 
 
 class UserAPITokenTestCase(TestCase):
-
     @patch("connect.common.signals.update_user_permission_project")
     @patch("connect.billing.get_gateway")
     def setUp(self, mock_get_gateway, mock_permission):
@@ -37,22 +36,20 @@ class UserAPITokenTestCase(TestCase):
         )
         self.view = UserAPIToken.as_view()
 
-    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.get_user_api_token")
+    @patch(
+        "connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.get_user_api_token"
+    )
     def test_get_user_api_token(self, mock_get_user_api_token):
 
         response_data = {"api_token": "mocked_token"}
         mock_response = Mock(
-            status_code=status.HTTP_200_OK,
-            json=Mock(return_value=response_data)
+            status_code=status.HTTP_200_OK, json=Mock(return_value=response_data)
         )
         mock_get_user_api_token.return_value = mock_response
 
         request = self.factory.get(
             f"/projects/{self.project1.uuid}/user-api-token/",
-            data={
-                "project_uuid": self.project1.uuid,
-                "user": self.owner.email
-            }
+            data={"project_uuid": self.project1.uuid, "user": self.owner.email},
         )
         response = self.view(request, project_uuid=self.project1.uuid)
 
@@ -60,7 +57,6 @@ class UserAPITokenTestCase(TestCase):
 
 
 class UserIsPayingTestCase(TestCase):
-
     @patch("connect.common.signals.update_user_permission_project")
     @patch("connect.billing.get_gateway")
     def setUp(self, mock_get_gateway, mock_permission):

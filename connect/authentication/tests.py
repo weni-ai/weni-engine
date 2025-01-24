@@ -31,7 +31,6 @@ class AuthenticationTestCase(TestCase):
 
 
 class UserTestCase(TestCase):
-
     def setUp(self):
 
         self.user = User.objects.create_user(
@@ -39,13 +38,21 @@ class UserTestCase(TestCase):
             email="fake@fake.com",
             first_name="Fake",
             last_name="User",
-            language="en"
+            language="en",
         )
 
-    @patch("connect.api.v1.internal.chats.chats_rest_client.ChatsRESTClient.update_user_language")
-    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.update_language")
-    @patch("connect.api.v1.internal.intelligence.intelligence_rest_client.IntelligenceRESTClient.update_language")
-    def test_update_language(self, chats_update_user_language, flows_update_language, intel_update_language):
+    @patch(
+        "connect.api.v1.internal.chats.chats_rest_client.ChatsRESTClient.update_user_language"
+    )
+    @patch(
+        "connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.update_language"
+    )
+    @patch(
+        "connect.api.v1.internal.intelligence.intelligence_rest_client.IntelligenceRESTClient.update_language"
+    )
+    def test_update_language(
+        self, chats_update_user_language, flows_update_language, intel_update_language
+    ):
         chats_update_user_language.return_value = True
         flows_update_language.return_value = True
         intel_update_language.return_value = True

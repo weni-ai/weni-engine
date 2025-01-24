@@ -5,8 +5,6 @@ from connect.common.models import (
     Organization,
     Project,
     BillingPlan,
-    NewsletterOrganization,
-    Newsletter,
 )
 from connect.billing.models import (
     Contact,
@@ -15,7 +13,6 @@ from connect.billing.models import (
 )
 from connect.elastic.flow import ElasticFlow
 from django.utils import timezone
-from connect import utils
 from celery import current_app
 from django.conf import settings
 

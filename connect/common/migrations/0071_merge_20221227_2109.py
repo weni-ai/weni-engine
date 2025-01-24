@@ -6,9 +6,8 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('common', '0069_project_template_type'),
-        ('common', '0070_auto_20221226_1753'),
+        ("common", "0069_project_template_type"),
+        ("common", "0070_auto_20221226_1753"),
     ]
 
-    operations = [
-    ]
+    operations = []

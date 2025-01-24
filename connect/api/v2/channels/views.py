@@ -4,7 +4,11 @@ from rest_framework.exceptions import ValidationError
 
 from connect.api.v1.internal.permissions import ModuleHasPermission
 from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
-from connect.api.v2.channels.serializers import ReleaseChannelSerializer, CreateChannelSerializer, CreateWACChannelSerializer
+from connect.api.v2.channels.serializers import (
+    ReleaseChannelSerializer,
+    CreateChannelSerializer,
+    CreateWACChannelSerializer,
+)
 from connect.common.models import Project
 
 
@@ -43,7 +47,9 @@ class ChannelsAPIView(views.APIView):  # pragma: no cover
             channeltype_code=serializer.validated_data.get("channeltype_code"),
         )
         if response.status_code != status.HTTP_200_OK:
-            return JsonResponse(status=response.status_code, data={"message": response.text})
+            return JsonResponse(
+                status=response.status_code, data={"message": response.text}
+            )
         return JsonResponse(status=response.status_code, data=response.json())
 
 
@@ -68,7 +74,7 @@ class ListChannelsAPIView(views.APIView):  # pragma: no cover
                     config=channel.get("config"),
                     address=channel.get("address"),
                     project_uuid=str(project.uuid),
-                    is_active=channel.get("is_active")
+                    is_active=channel.get("is_active"),
                 )
                 channels.append(channel_data)
         return JsonResponse(data={"channels": channels}, status=status.HTTP_200_OK)
@@ -89,7 +95,7 @@ class CreateWACChannelAPIView(views.APIView):  # pragma: no cover
             user=serializer.validated_data.get("user"),
             flow_organization=str(project.uuid),
             config=serializer.validated_data.get("config"),
-            phone_number_id=serializer.validated_data.get("phone_number_id")
+            phone_number_id=serializer.validated_data.get("phone_number_id"),
         )
 
         return JsonResponse(status=status.HTTP_200_OK, data=project_data)
