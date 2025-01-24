@@ -625,4 +625,3 @@ class UserAPITokenSerializer(serializers.Serializer):
         except Project.DoesNotExist:
             raise serializers.ValidationError("This project does not exist")
         return value
-        
