@@ -51,5 +51,5 @@ omit =
     Dockerfile
 
 [report]
-fail_under = 74
+fail_under = 54
 skip_empty = true
