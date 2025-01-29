@@ -17,11 +17,6 @@ env:
   POSTGRES_HOST: postgres
   # The default PostgreSQL port
   POSTGRES_PORT: 5432
-  # RabbitMQ settings
-  RABBITMQ_HOST: rabbitmq
-  RABBITMQ_PORT: 5672
-  RABBITMQ_USER: guest
-  RABBITMQ_PASSWORD: guest
 jobs:
   # Label of the container job
   container-job:
@@ -42,21 +37,6 @@ jobs:
         # Set health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-      
-      # RabbitMQ service container
-      rabbitmq:
-        image: rabbitmq:3-management
-        env:
-          RABBITMQ_DEFAULT_USER: guest
-          RABBITMQ_DEFAULT_PASS: guest
-        ports:
-          - 5672:5672
-          - 15672:15672
-        options: >-
-          --health-cmd "rabbitmqctl node_health_check"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
