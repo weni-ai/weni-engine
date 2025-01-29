@@ -146,7 +146,6 @@ class AuthorizationsTestCase(TestCase, TestCaseSetUp):
         self.assertEqual(self.org.authorizations.count(), 0)
         self.assertEqual(self.project.project_authorizations.count(), 0)
 
-
     def test_create_authorization_for_a_single_project(self):
         role = 3
 

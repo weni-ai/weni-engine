@@ -714,6 +714,7 @@ class DestroyAuthorizationRoleTestCase(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
+
 @unittest.skip("Test broken, need to be fixed")
 class ActiveContactsLimitTestCase(TestCase):
     @patch("connect.common.signals.update_user_permission_project")

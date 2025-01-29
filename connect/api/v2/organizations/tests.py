@@ -259,7 +259,9 @@ class OrganizationViewSetTestCase(TestCase):
     @patch(
         "connect.internals.event_driven.producer.rabbitmq_publisher.RabbitmqPublisher.send_message"
     )
-    @patch("connect.internals.event_driven.producer.rabbitmq_publisher.RabbitmqPublisher.send_message")
+    @patch(
+        "connect.internals.event_driven.producer.rabbitmq_publisher.RabbitmqPublisher.send_message"
+    )
     @patch("connect.authentication.models.User.send_request_flow_user_info")
     def test_user_email_setup(self, mock_publisher, send_request_flow_user_info):
         UserEmailSetup.objects.create(
