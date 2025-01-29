@@ -7,14 +7,18 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('common', '0055_merge_20220606_1437'),
-        ('billing', '0003_auto_20220607_2206'),
+        ("common", "0055_merge_20220606_1437"),
+        ("billing", "0003_auto_20220607_2206"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='channel',
-            name='project',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='channel', to='common.project'),
+            model_name="channel",
+            name="project",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="channel",
+                to="common.project",
+            ),
         ),
     ]

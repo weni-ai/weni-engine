@@ -10,10 +10,20 @@ from unittest.mock import patch
 
 from connect.authentication.models import User
 from connect.api.v1.tests.utils import create_user_and_token
-from connect.common.models import Organization, BillingPlan, Project, OrganizationRole, OrganizationLevelRole, RequestPermissionOrganization
+from connect.common.models import (
+    Organization,
+    BillingPlan,
+    Project,
+    OrganizationRole,
+    OrganizationLevelRole,
+    RequestPermissionOrganization,
+)
 from connect.common.mocks import StripeMockGateway
 from connect.api.v2.internals.views import AIGetOrganizationView
-from connect.api.v2.internals.serializers import OrganizationAuthorizationRoleSerializer, RequestPermissionOrganizationSerializer
+from connect.api.v2.internals.serializers import (
+    OrganizationAuthorizationRoleSerializer,
+    RequestPermissionOrganizationSerializer,
+)
 
 
 @unittest.skip("Test broken, need to configure rabbitmq")
@@ -95,21 +105,30 @@ class AIGetOrganizationViewTestCase(TestCase):
 
         data = {"intelligence_organization": 1}
 
-        request = self.factory.patch(path, data=json.dumps(data), format="json",)
+        request = self.factory.patch(
+            path,
+            data=json.dumps(data),
+            format="json",
+        )
 
-        response = AIGetOrganizationView.as_view()(request, query_params=query_params, data=data)
+        response = AIGetOrganizationView.as_view()(
+            request, query_params=query_params, data=data
+        )
         response.render()
         content_data = json.loads(response.content)
 
-        organization = Organization.objects.get(uuid=content_data.get("organization").get("uuid"))
+        organization = Organization.objects.get(
+            uuid=content_data.get("organization").get("uuid")
+        )
 
         self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(organization.inteligence_organization, data.get("intelligence_organization"))
+        self.assertEquals(
+            organization.inteligence_organization, data.get("intelligence_organization")
+        )
 
 
 @unittest.skip("Test broken, need to configure rabbitmq")
 class RequestPermissionOrganizationSerializerTestCase(TestCase):
-
     @patch("connect.billing.get_gateway")
     def setUp(self, mock_get_gateway):
         mock_get_gateway.return_value = StripeMockGateway()
@@ -165,7 +184,9 @@ class RequestPermissionOrganizationSerializerTestCase(TestCase):
         )
 
         data = self.test_serializer.get_user_data(request_permission)
-        self.assertEqual(f"{self.test_user.first_name} {self.test_user.last_name}", data["name"])
+        self.assertEqual(
+            f"{self.test_user.first_name} {self.test_user.last_name}", data["name"]
+        )
 
     @unittest.skip("Test broken, need to be fixed")
     def test_get_non_existing_user_data(self):
@@ -185,7 +206,6 @@ class RequestPermissionOrganizationSerializerTestCase(TestCase):
 
 @unittest.skip("Test broken, need to configure rabbitmq")
 class OrganizationAuthorizationRoleSerializerTestCase(TestCase):
-
     @patch("connect.billing.get_gateway")
     def setUp(self, mock_get_gateway):
         mock_get_gateway.return_value = StripeMockGateway()

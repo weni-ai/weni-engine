@@ -19,7 +19,7 @@ from connect.billing import get_gateway
 from connect.celery import app as celery_app
 
 from connect.billing.models import Contact, ContactCount, Message, SyncManagerTask
-from connect.common.models import Organization, Project, BillingPlan, OrganizationRole
+from connect.common.models import Organization, Project, BillingPlan
 
 from freezegun import freeze_time
 from connect.billing.tasks import sync_contacts
@@ -199,7 +199,6 @@ class ContactTestCase(TestCase):
 
 @skipIf(True, "message not saved yet.")
 class MessageTestCase(TestCase):
-
     def setUp(self):
         self.organization = Organization.objects.create(
             name="org test",
@@ -235,7 +234,6 @@ class MessageTestCase(TestCase):
 
 
 class ContactCountTestCase(TestCase):
-
     @patch("connect.billing.get_gateway")
     def setUp(self, mock_get_gateway):
         mock_get_gateway.return_value = StripeMockGateway()
@@ -265,7 +263,6 @@ class ContactCountTestCase(TestCase):
 
 
 class BillingTasksTestCase(TestCase):
-
     @patch("connect.billing.get_gateway")
     def setUp(self, mock_get_gateway):
         mock_get_gateway.return_value = StripeMockGateway()

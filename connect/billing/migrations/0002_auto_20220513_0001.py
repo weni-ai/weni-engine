@@ -6,22 +6,24 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('billing', '0001_initial'),
+        ("billing", "0001_initial"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='contact',
-            name='channel',
+            model_name="contact",
+            name="channel",
         ),
         migrations.AddField(
-            model_name='contact',
-            name='channel_type',
-            field=models.CharField(default='whatsapp', max_length=150, verbose_name='channel_type'),
+            model_name="contact",
+            name="channel_type",
+            field=models.CharField(
+                default="whatsapp", max_length=150, verbose_name="channel_type"
+            ),
         ),
         migrations.AddField(
-            model_name='contact',
-            name='last_seen_on',
+            model_name="contact",
+            name="last_seen_on",
             field=models.DateTimeField(blank=True, null=True),
         ),
     ]

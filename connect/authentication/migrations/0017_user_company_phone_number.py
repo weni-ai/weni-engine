@@ -6,13 +6,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('authentication', '0016_useremailsetup'),
+        ("authentication", "0016_useremailsetup"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='user',
-            name='company_phone_number',
-            field=models.BigIntegerField(help_text='company phone number', null=True, verbose_name='company phone number'),
+            model_name="user",
+            name="company_phone_number",
+            field=models.BigIntegerField(
+                help_text="company phone number",
+                null=True,
+                verbose_name="company phone number",
+            ),
         ),
     ]

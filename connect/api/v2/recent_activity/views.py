@@ -11,7 +11,9 @@ from connect.common.models import Project, RecentActivity
 User = get_user_model()
 
 
-class RecentActivityViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, GenericViewSet):
+class RecentActivityViewSet(
+    mixins.ListModelMixin, mixins.CreateModelMixin, GenericViewSet
+):
     queryset = RecentActivity.objects.all()
     pagination_class = CustomCursorPagination
 
@@ -37,12 +39,22 @@ class RecentActivityViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, Gene
         try:
             project = Project.objects.get(uuid=project_uuid)
         except Project.DoesNotExist:
-            return Response({"message": "Project does not exist."}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"message": "Project does not exist."}, status=status.HTTP_404_NOT_FOUND
+            )
 
-        if not project.project_authorizations.filter(user__email=request.user.email).exists():
-            return Response({"message": "Permission denied."}, status=status.HTTP_403_FORBIDDEN)
+        if not project.project_authorizations.filter(
+            user__email=request.user.email
+        ).exists():
+            return Response(
+                {"message": "Permission denied."}, status=status.HTTP_403_FORBIDDEN
+            )
 
-        queryset = RecentActivity.objects.select_related("user").filter(project__uuid=project_uuid).order_by("-created_on")
+        queryset = (
+            RecentActivity.objects.select_related("user")
+            .filter(project__uuid=project_uuid)
+            .order_by("-created_on")
+        )
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)
 

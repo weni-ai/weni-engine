@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('billing', '0004_alter_channel_project'),
+        ("billing", "0004_alter_channel_project"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='syncmanagertask',
-            name='fail_message',
+            model_name="syncmanagertask",
+            name="fail_message",
             field=models.TextField(null=True),
         ),
     ]

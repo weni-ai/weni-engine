@@ -29,7 +29,7 @@ def get_attendances(project: Project, start: str, end: str) -> int:
 
     total_per_project = 0
 
-    for day in period.range('days'):
+    for day in period.range("days"):
         start_of_the_day, end_of_the_day = day_period(day)
         day_attendances = daily_attendances(project, start_of_the_day, end_of_the_day)
         total_per_project += day_attendances
@@ -42,7 +42,9 @@ def count_attendances(contact_group: list):
     base_contact = contact_group[0]
 
     for contact in contact_group:
-        date_period = pendulum.instance(base_contact.last_seen_on) - pendulum.instance(contact.last_seen_on)
+        date_period = pendulum.instance(base_contact.last_seen_on) - pendulum.instance(
+            contact.last_seen_on
+        )
         if abs(date_period.days) >= 1:
             attendances += 1
             base_contact = contact
@@ -55,7 +57,9 @@ def custom_get_attendances(project: Project, start: str, end: str):
     end = pendulum.parse(end)
     total_attendances = 0
 
-    contacts = Contact.objects.filter(last_seen_on__range=(start, end), project=project).order_by("contact_flow_uuid", "-last_seen_on")
+    contacts = Contact.objects.filter(
+        last_seen_on__range=(start, end), project=project
+    ).order_by("contact_flow_uuid", "-last_seen_on")
     grouped_contacts = groupby(contacts, lambda contact: contact.contact_flow_uuid)
 
     for _, group in grouped_contacts:

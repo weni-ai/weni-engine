@@ -9,7 +9,6 @@ from rest_framework.response import Response
 
 
 class UserAPIToken(views.APIView):  # pragma: no cover
-
     def get(self, request, *args, **kwargs):
         project_uuid = kwargs.get("project_uuid")
         user = request.query_params.get("user")
@@ -29,18 +28,29 @@ class UserIsPaying(views.APIView):
     def get(self, request, *args, **kwargs):
         user_email = request.query_params.get("user_email")
         if user_email is None:
-            return Response(status=status.HTTP_400_BAD_REQUEST, data={"message": "You must provide a user_email"})
+            return Response(
+                status=status.HTTP_400_BAD_REQUEST,
+                data={"message": "You must provide a user_email"},
+            )
 
         org_auth = OrganizationAuthorization.objects.filter(user__email=user_email)
         response_data = []
         if len(org_auth) == 0:
-            return Response(status=status.HTTP_404_NOT_FOUND, data={"message": "This user doesn't have permission on any organization"})
+            return Response(
+                status=status.HTTP_404_NOT_FOUND,
+                data={
+                    "message": "This user doesn't have permission on any organization"
+                },
+            )
 
         for auth in org_auth:
             current_body = {
                 "org_uuid": auth.organization.uuid,
-                "is_paying": auth.organization.organization_billing.plan != BillingPlan.PLAN_TRIAL,
-                "project": [project.uuid for project in auth.organization.project.all()],
+                "is_paying": auth.organization.organization_billing.plan
+                != BillingPlan.PLAN_TRIAL,
+                "project": [
+                    project.uuid for project in auth.organization.project.all()
+                ],
             }
             response_data.append({auth.organization.name: current_body})
         return Response(status=status.HTTP_200_OK, data=dict(orgs=response_data))

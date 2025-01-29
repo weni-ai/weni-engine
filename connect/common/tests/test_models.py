@@ -21,7 +21,7 @@ class BillingPlanTestCase(TestCase):
             inteligence_organization=1,
             organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
             organization_billing__plan=BillingPlan.PLAN_TRIAL,
-            organization_billing__stripe_customer="cus_MYOrndkgpPHGK9"
+            organization_billing__stripe_customer="cus_MYOrndkgpPHGK9",
         )
         self.organization_authorization = self.organization.authorizations.create(
             user=self.owner, role=OrganizationRole.ADMIN.value
@@ -33,7 +33,7 @@ class BillingPlanTestCase(TestCase):
             inteligence_organization=1,
             organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
             organization_billing__plan=BillingPlan.PLAN_START,
-            organization_billing__stripe_customer="cus_MYOrndkgpPHGK9"
+            organization_billing__stripe_customer="cus_MYOrndkgpPHGK9",
         )
         self.basic_authorization = self.basic.authorizations.create(
             user=self.owner, role=OrganizationRole.ADMIN.value
@@ -55,7 +55,11 @@ class BillingPlanTestCase(TestCase):
     def test_trial(self):
         billing = self.organization.organization_billing
         print(self.organization)
-        fields = [x for x in self.organization.organization_billing.__dict__.keys() if not x.startswith('_')]
+        fields = [
+            x
+            for x in self.organization.organization_billing.__dict__.keys()
+            if not x.startswith("_")
+        ]
         print("[+]ATTRIBUTES[+]")
         for field in fields:
             print(f"{field} = {billing.__dict__[field]}")
@@ -83,7 +87,11 @@ class BillingPlanTestCase(TestCase):
     def test_basic(self):
         print(self.basic)
         billing = self.basic.organization_billing
-        fields = [x for x in self.basic.organization_billing.__dict__.keys() if not x.startswith('_')]
+        fields = [
+            x
+            for x in self.basic.organization_billing.__dict__.keys()
+            if not x.startswith("_")
+        ]
         print("[+]ATTRIBUTES[+]")
         for field in fields:
             print(f"{field} = {billing.__dict__[field]}")
@@ -111,7 +119,6 @@ class BillingPlanTestCase(TestCase):
 
 @unittest.skip("Test broken, need to configure rabbitmq")
 class ProjectEmailTestCase(TestCase):
-
     @patch("connect.billing.get_gateway")
     def setUp(self, mock_get_gateway):
 
@@ -125,8 +132,7 @@ class ProjectEmailTestCase(TestCase):
             organization_billing__plan=BillingPlan.PLAN_START,
         )
         self.test_project = Project.objects.create(
-            name="Test Project",
-            organization=self_test_org
+            name="Test Project", organization=self_test_org
         )
         self.test_email = "test@example.com"
         self.test_first_name = "Test User"

@@ -6,13 +6,16 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('common', '0050_project_flow_id'),
+        ("common", "0050_project_flow_id"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='organization',
-            name='enforce_2fa',
-            field=models.BooleanField(default=False, verbose_name='Only users with 2fa can access the organization'),
+            model_name="organization",
+            name="enforce_2fa",
+            field=models.BooleanField(
+                default=False,
+                verbose_name="Only users with 2fa can access the organization",
+            ),
         ),
     ]

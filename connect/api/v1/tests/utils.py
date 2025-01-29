@@ -23,7 +23,7 @@ def create_contacts(num_contacts: int, day=None):
 
     for project in Project.objects.all():
         for j in range(0, num_contacts):
-            if (j == 0 or j % 5 == 0):
+            if j == 0 or j % 5 == 0:
                 contact_flow_uuid = uuid.uuid4()
                 last_seen_on = day.add(hours=random.randint(0, 23))
                 last_seen_on2 = day.add(days=1).add(hours=random.randint(0, 23))

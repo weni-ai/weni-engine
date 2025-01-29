@@ -822,6 +822,7 @@ class RocketAuthorizationTestCase(TestCase):
     def test_level_nothing_permission(self):
         self.assertTrue(self.not_set_auth.level == RocketRoleLevel.NOTHING.value)
 
+
 @unittest.skip("Test broken, need to be fixed")
 class RequestPermissionProjectTestCase(TestCase):
     @patch("connect.common.signals.update_user_permission_project")

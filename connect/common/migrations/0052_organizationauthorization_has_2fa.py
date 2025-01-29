@@ -6,13 +6,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('common', '0051_organization_enforce_2fa'),
+        ("common", "0051_organization_enforce_2fa"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='organizationauthorization',
-            name='has_2fa',
-            field=models.BooleanField(default=False, verbose_name='2 factor authentication active'),
+            model_name="organizationauthorization",
+            name="has_2fa",
+            field=models.BooleanField(
+                default=False, verbose_name="2 factor authentication active"
+            ),
         ),
     ]

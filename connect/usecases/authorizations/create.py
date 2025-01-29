@@ -1,5 +1,4 @@
 from typing import Union
-from connect.internals.event_driven.producer.rabbitmq_publisher import RabbitmqPublisher
 from django.db.models import QuerySet
 from connect.common.models import (
     Organization,
@@ -11,15 +10,21 @@ from connect.common.models import (
 )
 from connect.usecases.authorizations.usecase import AuthorizationUseCase
 from connect.usecases.organizations.retrieve import RetrieveOrganizationUseCase
-from connect.usecases.authorizations.dto import CreateAuthorizationDTO, CreateProjectAuthorizationDTO
+from connect.usecases.authorizations.dto import (
+    CreateAuthorizationDTO,
+    CreateProjectAuthorizationDTO,
+)
 from connect.usecases.users.retrieve import RetrieveUserUseCase
 from connect.usecases.users.exceptions import UserDoesNotExist
 
 
 class CreateAuthorizationUseCase(AuthorizationUseCase):
-
-    def create_organization_authorization(self, auth_dto: CreateAuthorizationDTO, user: User, org: Organization) -> OrganizationAuthorization:
-        authorization: OrganizationAuthorization = org.authorizations.create(user=user, role=auth_dto.role, has_2fa=user.has_2fa)
+    def create_organization_authorization(
+        self, auth_dto: CreateAuthorizationDTO, user: User, org: Organization
+    ) -> OrganizationAuthorization:
+        authorization: OrganizationAuthorization = org.authorizations.create(
+            user=user, role=auth_dto.role, has_2fa=user.has_2fa
+        )
 
         if self.publish_message:
             self.publish_organization_authorization_message(
@@ -27,13 +32,21 @@ class CreateAuthorizationUseCase(AuthorizationUseCase):
                 org_uuid=str(org.uuid),
                 user_email=user.email,
                 role=authorization.role,
-                org_intelligence=org.inteligence_organization
+                org_intelligence=org.inteligence_organization,
             )
         return authorization
 
-    def create_project_authorization(self, project: Project, user: User, role: int, org_auth: OrganizationAuthorization) -> ProjectAuthorization:
+    def create_project_authorization(
+        self,
+        project: Project,
+        user: User,
+        role: int,
+        org_auth: OrganizationAuthorization,
+    ) -> ProjectAuthorization:
         try:
-            project_auth: ProjectAuthorization = project.project_authorizations.get(user=user)
+            project_auth: ProjectAuthorization = project.project_authorizations.get(
+                user=user
+            )
             project_auth.role = role
             project_auth.save()
             action = "update"
@@ -41,9 +54,7 @@ class CreateAuthorizationUseCase(AuthorizationUseCase):
         except ProjectAuthorization.DoesNotExist:
             action = "create"
             project_auth: ProjectAuthorization = project.project_authorizations.create(
-                user=user,
-                organization_authorization=org_auth,
-                role=role
+                user=user, organization_authorization=org_auth, role=role
             )
 
         if self.publish_message:
@@ -57,10 +68,14 @@ class CreateAuthorizationUseCase(AuthorizationUseCase):
 
         return project_auth
 
-    def create_authorization(self, auth_dto: CreateAuthorizationDTO) -> OrganizationAuthorization:
+    def create_authorization(
+        self, auth_dto: CreateAuthorizationDTO
+    ) -> OrganizationAuthorization:
 
         user: User = RetrieveUserUseCase().get_user_by_email(email=auth_dto.user_email)
-        org: Organization = RetrieveOrganizationUseCase().get_organization_by_uuid(org_uuid=auth_dto.org_uuid)
+        org: Organization = RetrieveOrganizationUseCase().get_organization_by_uuid(
+            org_uuid=auth_dto.org_uuid
+        )
 
         org_auth = self.create_organization_authorization(
             auth_dto,
@@ -80,16 +95,23 @@ class CreateAuthorizationUseCase(AuthorizationUseCase):
                 )
         return org_auth
 
-    def create_authorization_for_a_single_project(self, auth_dto: CreateProjectAuthorizationDTO) -> Union[ProjectAuthorization, RequestPermissionProject]:
-        org: Organization = RetrieveOrganizationUseCase().get_organization_by_project_uuid(project_uuid=auth_dto.project_uuid)
+    def create_authorization_for_a_single_project(
+        self, auth_dto: CreateProjectAuthorizationDTO
+    ) -> Union[ProjectAuthorization, RequestPermissionProject]:
+        org: Organization = (
+            RetrieveOrganizationUseCase().get_organization_by_project_uuid(
+                project_uuid=auth_dto.project_uuid
+            )
+        )
         project: Project = org.project.get(uuid=auth_dto.project_uuid)
 
         try:
-            user: User = RetrieveUserUseCase().get_user_by_email(email=auth_dto.user_email)
+            user: User = RetrieveUserUseCase().get_user_by_email(
+                email=auth_dto.user_email
+            )
         except UserDoesNotExist:
             return self.create_request_permission_for_user_that_dosent_exist(
-                project=project,
-                auth_dto=auth_dto
+                project=project, auth_dto=auth_dto
             )
 
         try:
@@ -105,11 +127,11 @@ class CreateAuthorizationUseCase(AuthorizationUseCase):
 
         except OrganizationAuthorization.DoesNotExist:
             create_auth_dto = CreateAuthorizationDTO(
-                user_email=auth_dto.user_email,
-                org_uuid=str(org.uuid),
-                role=1
+                user_email=auth_dto.user_email, org_uuid=str(org.uuid), role=1
             )
-            org_auth = self.create_organization_authorization(create_auth_dto, user, org)
+            org_auth = self.create_organization_authorization(
+                create_auth_dto, user, org
+            )
 
             project_auth = self.create_project_authorization(
                 project=project,
@@ -120,10 +142,16 @@ class CreateAuthorizationUseCase(AuthorizationUseCase):
             project.send_email_invite_project(user.email)
             return project_auth
 
-    def create_request_permission_for_user_that_dosent_exist(self, project: Project, auth_dto: CreateProjectAuthorizationDTO):
-        created_by_user: User = RetrieveUserUseCase().get_user_by_email(email=auth_dto.created_by_email)
+    def create_request_permission_for_user_that_dosent_exist(
+        self, project: Project, auth_dto: CreateProjectAuthorizationDTO
+    ):
+        created_by_user: User = RetrieveUserUseCase().get_user_by_email(
+            email=auth_dto.created_by_email
+        )
         try:
-            request_permission = RequestPermissionProject.objects.get(email=auth_dto.user_email, project=project)
+            request_permission = RequestPermissionProject.objects.get(
+                email=auth_dto.user_email, project=project
+            )
             request_permission.role = auth_dto.role
             request_permission.created_by = created_by_user
             request_permission.save()
@@ -135,7 +163,7 @@ class CreateAuthorizationUseCase(AuthorizationUseCase):
                 email=auth_dto.user_email,
                 project=project,
                 role=auth_dto.role,
-                created_by=created_by_user
+                created_by=created_by_user,
             )
             project.send_email_invite_project(request_permission.email)
             return request_permission

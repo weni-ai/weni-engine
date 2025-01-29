@@ -6,11 +6,11 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('template_projects', '0005_templatetype_base_project_uuid'),
+        ("template_projects", "0005_templatetype_base_project_uuid"),
     ]
 
     operations = [
         migrations.DeleteModel(
-            name='TemplateAI',
+            name="TemplateAI",
         ),
     ]

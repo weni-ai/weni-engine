@@ -6,13 +6,22 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('common', '0033_auto_20211222_1819'),
+        ("common", "0033_auto_20211222_1819"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='billingplan',
-            name='plan',
-            field=models.CharField(choices=[('free', 'free'), ('enterprise', 'enterprise'), ('custom', 'custom')], default='custom', max_length=10, verbose_name='plan'),
+            model_name="billingplan",
+            name="plan",
+            field=models.CharField(
+                choices=[
+                    ("free", "free"),
+                    ("enterprise", "enterprise"),
+                    ("custom", "custom"),
+                ],
+                default="custom",
+                max_length=10,
+                verbose_name="plan",
+            ),
         ),
     ]

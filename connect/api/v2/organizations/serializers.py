@@ -154,7 +154,10 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
         if obj.config.get("show_chat_help"):
             return True
         user = obj.authorizations.order_by("created_at").first().user
-        return user.number_people == 4 or user.company_segment in ['E-commerce', 'Comercio electrónico']
+        return user.number_people == 4 or user.company_segment in [
+            "E-commerce",
+            "Comercio electrónico",
+        ]
 
 
 class PendingAuthorizationOrganizationSerializer(serializers.ModelSerializer):

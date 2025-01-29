@@ -52,7 +52,9 @@ class CreateProjectAPITestCase(TestCase):
         content_data = json.loads(response.content)
         return (response, content_data)
 
-    @patch("connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_project")
+    @patch(
+        "connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.create_project"
+    )
     def test_create_project(self, mock_create_project):
         project_uuid = str(uuid4.uuid4())
         mock_create_project.return_value = {"uuid": project_uuid}
@@ -98,24 +100,30 @@ class ListProjectAPITestCase(TestCase):
             email=self.owner.email,
             organization=self.organization,
             role=OrganizationRole.ADMIN.value,
-            created_by=self.owner
+            created_by=self.owner,
         )
         RequestPermissionOrganization.objects.create(
             email=self.user.email,
             organization=self.organization,
             role=OrganizationRole.CONTRIBUTOR.value,
-            created_by=self.owner
+            created_by=self.owner,
         )
         RequestPermissionOrganization.objects.create(
             email=self.financial.email,
             organization=self.organization,
             role=OrganizationRole.FINANCIAL.value,
-            created_by=self.owner
+            created_by=self.owner,
         )
 
-        self.owner_organization_authorization = self.organization.authorizations.get(user=self.owner)
-        self.user_organization_authorization = self.organization.authorizations.get(user=self.user)
-        self.financial_organization_authorization = self.organization.authorizations.get(user=self.financial)
+        self.owner_organization_authorization = self.organization.authorizations.get(
+            user=self.owner
+        )
+        self.user_organization_authorization = self.organization.authorizations.get(
+            user=self.user
+        )
+        self.financial_organization_authorization = (
+            self.organization.authorizations.get(user=self.financial)
+        )
 
         self.project = self.organization.project.create(
             name="project test",
@@ -199,9 +207,11 @@ class UpdateProjectTestCase(TestCase):
             email=self.owner.email,
             organization=self.organization,
             role=OrganizationRole.ADMIN.value,
-            created_by=self.owner
+            created_by=self.owner,
         )
-        self.organization_authorization = self.organization.authorizations.get(user=self.owner)
+        self.organization_authorization = self.organization.authorizations.get(
+            user=self.owner
+        )
         self.project = self.organization.project.create(
             name="project test",
             timezone="America/Sao_Paulo",
@@ -228,12 +238,11 @@ class UpdateProjectTestCase(TestCase):
         content_data = json.loads(response.content)
         return (response, content_data)
 
-    @patch("connect.internals.event_driven.producer.rabbitmq_publisher.RabbitmqPublisher.send_message")
+    @patch(
+        "connect.internals.event_driven.producer.rabbitmq_publisher.RabbitmqPublisher.send_message"
+    )
     @skipIf(True, "Depreceted")
-    def test_okay_update_name(
-        self,
-        mock_send_updated_project
-    ):
+    def test_okay_update_name(self, mock_send_updated_project):
         mock_send_updated_project.side_effect = [True]
         response, content_data = self.request(
             self.project,
@@ -294,7 +303,9 @@ class DeleteProjectAuthTestCase(TestCase):
             flow_organization=uuid4.uuid4(),
         )
 
-        self.owner_project_authorization = self.project.get_user_authorization(self.owner)
+        self.owner_project_authorization = self.project.get_user_authorization(
+            self.owner
+        )
         self.owner_project_authorization.role = 3
         self.owner_project_authorization.save()
 
@@ -303,10 +314,8 @@ class DeleteProjectAuthTestCase(TestCase):
         self.project_auth.save()
 
         self.request_auth = RequestPermissionProject.objects.create(
-            project=self.project,
-            email="delete@auth.com",
-            role=2,
-            created_by=self.owner)
+            project=self.project, email="delete@auth.com", role=2, created_by=self.owner
+        )
 
     def request(self, project, data={}, token=None):
         authorization_header = (
@@ -322,7 +331,8 @@ class DeleteProjectAuthTestCase(TestCase):
         )
 
         response = ProjectViewSet.as_view({"delete": "destroy_user_permission"})(
-            request, project_uuid=project)
+            request, project_uuid=project
+        )
         return response
 
     @unittest.skip("Test broken, need to be fixed")
@@ -382,8 +392,7 @@ class TemplateProjectTestCase(TestCase):
             **authorization_header,
         )
 
-        response = TemplateProjectViewSet.as_view({"get": "list"})(
-            request)
+        response = TemplateProjectViewSet.as_view({"get": "list"})(request)
 
         response.render()
         content_data = json.loads(response.content)
@@ -402,8 +411,7 @@ class TemplateProjectTestCase(TestCase):
             **authorization_header,
         )
 
-        response = TemplateProjectViewSet.as_view({"post": "create"})(
-            request, data)
+        response = TemplateProjectViewSet.as_view({"post": "create"})(request, data)
         response.render()
         content_data = json.loads(response.content)
 
@@ -433,9 +441,7 @@ class TemplateProjectTestCase(TestCase):
             "template": True,
             "template_type": "support",
         }
-        response, content_data = self.request_create(
-            data, token=self.user_token
-        )
+        response, content_data = self.request_create(data, token=self.user_token)
 
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
         self.assertIsNotNone(content_data.get("flow_uuid"))

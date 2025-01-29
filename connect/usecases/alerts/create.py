@@ -13,8 +13,4 @@ class AlertCreateUseCase:
 
         AlertAuthsUseCase().has_permission(token=token)
 
-        return Alert.objects.create(
-            can_be_closed=can_be_closed,
-            text=text,
-            type=type
-        )
+        return Alert.objects.create(can_be_closed=can_be_closed, text=text, type=type)

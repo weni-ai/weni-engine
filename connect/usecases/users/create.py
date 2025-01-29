@@ -2,9 +2,6 @@ from dataclasses import dataclass
 import random
 import string
 
-from django.core.mail import send_mail
-from django.template.loader import render_to_string
-
 from django.contrib.auth import get_user_model
 
 from connect.api.v1.keycloak import KeycloakControl

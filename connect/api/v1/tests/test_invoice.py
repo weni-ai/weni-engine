@@ -12,11 +12,7 @@ from rest_framework import status
 
 from connect.api.v1.invoice.views import InvoiceViewSet
 from connect.api.v1.tests.utils import create_user_and_token
-from connect.common.models import (
-    Organization,
-    BillingPlan,
-    OrganizationRole
-)
+from connect.common.models import Organization, BillingPlan, OrganizationRole
 from connect.common.mocks import StripeMockGateway
 
 
@@ -95,6 +91,7 @@ class ListInvoiceAPITestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(content_data.get("count"), 2)
 
+
 @unittest.skip("Test broken, need to be fixed")
 class InvoiceDataTestCase(TestCase):
     @patch("connect.common.signals.update_user_permission_project")
@@ -123,15 +120,19 @@ class InvoiceDataTestCase(TestCase):
             timezone="America/Sao_Paulo",
             flow_organization=uuid4.uuid4(),
         )
-        self.invoice = self.invoice = self.organization.organization_billing_invoice.create(
+        self.invoice = (
+            self.invoice
+        ) = self.organization.organization_billing_invoice.create(
             due_date=pendulum.now().add(months=1),
             invoice_random_id=1
-            if self.organization.organization_billing_invoice.last() is None else self.organization.organization_billing_invoice.last().invoice_random_id + 1,
+            if self.organization.organization_billing_invoice.last() is None
+            else self.organization.organization_billing_invoice.last().invoice_random_id
+            + 1,
             discount=self.organization.organization_billing.fixed_discount,
             extra_integration=self.organization.extra_integration,
             cost_per_whatsapp=settings.BILLING_COST_PER_WHATSAPP,
-            stripe_charge='ch_3K9wZYGB60zUb40p1C0iiskn',
-            payment_method=BillingPlan.PAYMENT_METHOD_CREDIT_CARD
+            stripe_charge="ch_3K9wZYGB60zUb40p1C0iiskn",
+            payment_method=BillingPlan.PAYMENT_METHOD_CREDIT_CARD,
         )
 
     def request(self, value, invoice_id, token=None):
@@ -139,7 +140,8 @@ class InvoiceDataTestCase(TestCase):
             {"HTTP_AUTHORIZATION": "Token {}".format(token.key)} if token else {}
         )
         request = self.factory.get(
-            f"/v1/organization/invoice/invoice-data/{value}/?invoice_id={invoice_id}", **authorization_header
+            f"/v1/organization/invoice/invoice-data/{value}/?invoice_id={invoice_id}",
+            **authorization_header,
         )
         response = InvoiceViewSet.as_view({"get": "invoice_data"})(
             request, organization_uuid=self.organization.uuid
@@ -162,4 +164,4 @@ class InvoiceDataTestCase(TestCase):
             self.owner_token,
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(content_data['payment_data']['payment_method'], 'credit_card')
+        self.assertEqual(content_data["payment_data"]["payment_method"], "credit_card")

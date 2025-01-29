@@ -310,7 +310,6 @@ class ProjectViewSetTestCase(TestCase):
 
 @unittest.skip("Test broken, need to configure rabbitmq")
 class ProjectTestCase(TestCase):
-
     @patch("connect.common.signals.update_user_permission_project")
     @patch("connect.billing.get_gateway")
     @patch(
@@ -412,7 +411,6 @@ class ProjectTestCase(TestCase):
 
 @unittest.skip("Test broken, need to be fixed")
 class ProjectAuthorizationTestCase(TestCase):
-
     @patch("connect.billing.get_gateway")
     def setUp(self, mock_get_gateway):
         mock_get_gateway.return_value = StripeMockGateway()
