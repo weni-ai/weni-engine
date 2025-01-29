@@ -359,7 +359,7 @@ class EDAProjectAuthorizationsViewsTestCase(TestCase, TestCaseSetUp):
             ProjectAuthorization.objects.get(uuid=project_auth.uuid)
 
 
-# @skipIf(True, "Tests views and rabbitmq connection")
+@unittest.skip("Test broken, need to configure rabbitmq")
 class OrganizationViewSetTestCase(TestCase, TestCaseSetUp):
     def setUp(self):
         self.factory = RequestFactory()
