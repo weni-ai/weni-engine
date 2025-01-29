@@ -108,7 +108,6 @@ class AdditionalUserInfoTestCase(TestCase):
         content_data = json.loads(response.content)
         return (response, content_data)
 
-
     def test_okay(self):
         company_info = {
             "name": "test",

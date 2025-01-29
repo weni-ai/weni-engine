@@ -256,7 +256,9 @@ class OrganizationViewSetTestCase(TestCase):
         self.assertEqual(response.data["project"]["name"][0].code, "max_length")
 
     @unittest.skip("Test broken, need to be fixed")
-    @patch("connect.internals.event_driven.producer.rabbitmq_publisher.RabbitmqPublisher.send_message")
+    @patch(
+        "connect.internals.event_driven.producer.rabbitmq_publisher.RabbitmqPublisher.send_message"
+    )
     @patch("connect.authentication.models.User.send_request_flow_user_info")
     def test_user_email_setup(self, mock_publisher, send_request_flow_user_info):
         UserEmailSetup.objects.create(
