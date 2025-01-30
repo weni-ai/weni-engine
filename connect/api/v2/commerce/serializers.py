@@ -92,16 +92,22 @@ class CommerceSerializer(serializers.Serializer):
 
         try:
             # Create Keycloak user
-            try:
-                user_dto = KeycloakUserDTO(
-                    email=user_email,
-                    company_name=validated_data.get("organization_name"),
-                )
-                create_keycloak_user_use_case = CreateKeycloakUserUseCase(user_dto)
-                user_info = create_keycloak_user_use_case.execute()
-            except Exception as e:
-                raise serializers.ValidationError({"keycloak_error": str(e)})
-
+            users = User.objects.filter(email=user_email)
+            if users.count() == 0:
+                try:
+                    user_dto = KeycloakUserDTO(
+                        email=user_email,
+                        company_name=validated_data.get("organization_name"),
+                    )
+                    create_keycloak_user_use_case = CreateKeycloakUserUseCase(user_dto)
+                    user_info = create_keycloak_user_use_case.execute()
+                            # Send email to user
+                    user = user_info.get("user")
+                    user.send_email_access_password(user_info.get("password"))
+                except Exception as e:
+                    raise serializers.ValidationError({"keycloak_error": str(e)})
+            else:
+                user = users.first()
             # Create organization
             organization = Organization.objects.create(
                 name=validated_data.get("organization_name"),
@@ -112,9 +118,9 @@ class CommerceSerializer(serializers.Serializer):
                 ).default,
             )
             organization.authorizations.create(
-                user=user_info.get("user"), role=OrganizationRole.ADMIN.value
+                user=user, role=OrganizationRole.ADMIN.value
             )
-            self.publish_create_org_message(organization, user_info.get("user"))
+            self.publish_create_org_message(organization, user)
 
             # Create project
             project = Project.objects.create(
@@ -122,21 +128,17 @@ class CommerceSerializer(serializers.Serializer):
                 vtex_account=validated_data.get("vtex_account"),
                 timezone="America/Sao_Paulo",
                 organization=organization,
-                created_by=user_info.get("user"),
+                created_by=user,
                 is_template=False,
                 project_type=TypeProject.COMMERCE,
             )
-            self.send_request_flow_product(user_info.get("user"))
-            self.publish_create_project_message(project, user_info.get("user"))
-
-            # Send email to user
-            user = user_info.get("user")
-            user.send_email_access_password(user_info.get("password"))
+            self.send_request_flow_product(user)
+            self.publish_create_project_message(project, user)
 
             data = {
                 "organization": organization,
                 "project": project,
-                "user": user_info.get("user"),
+                "user": user,
             }
         except Exception as e:
             raise serializers.ValidationError({"error": str(e)})
