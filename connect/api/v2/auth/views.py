@@ -7,10 +7,7 @@ from connect.usecases.keycloak.authenticate import KeycloakAuthenticateUseCase
 class KeycloakAuthView(views.APIView):
     def post(self, request):
         serializer = KeycloakAuthSerializer(data=request.data)
-        if not serializer.is_valid(raise_exception=True):
-            return Response(
-                {"error": "Invalid input data"}, status=status.HTTP_400_BAD_REQUEST
-            )
+        serializer.is_valid(raise_exception=True)
 
         try:
             use_case = KeycloakAuthenticateUseCase()
