@@ -69,6 +69,7 @@ class CommerceProjectCheckExists(views.APIView):
                 create_keycloak_user_use_case = CreateKeycloakUserUseCase(user_dto)
                 user_info = create_keycloak_user_use_case.execute()
                 user = user_info.get("user")
+                user.send_email_access_password(user_info.get("password"))
             organization.authorizations.create(
                 user=user, role=OrganizationRole.ADMIN.value
             )
