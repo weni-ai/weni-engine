@@ -7,21 +7,26 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('template_projects', '0008_templatefeaturetranslation_templatetypetranslation'),
+        (
+            "template_projects",
+            "0008_templatefeaturetranslation_templatetypetranslation",
+        ),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='templatetypetranslation',
-            name='category',
-            field=django.contrib.postgres.fields.ArrayField(base_field=models.CharField(max_length=255), default=list, size=None),
+            model_name="templatetypetranslation",
+            name="category",
+            field=django.contrib.postgres.fields.ArrayField(
+                base_field=models.CharField(max_length=255), default=list, size=None
+            ),
         ),
         migrations.AlterUniqueTogether(
-            name='templatefeaturetranslation',
-            unique_together={('language', 'template_feature')},
+            name="templatefeaturetranslation",
+            unique_together={("language", "template_feature")},
         ),
         migrations.AlterUniqueTogether(
-            name='templatetypetranslation',
-            unique_together={('language', 'template_type')},
+            name="templatetypetranslation",
+            unique_together={("language", "template_type")},
         ),
     ]

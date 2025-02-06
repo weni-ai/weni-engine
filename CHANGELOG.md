@@ -1,3 +1,7 @@
+# 3.29.4
+## *Add*
+  - Adding an endpoint to return an access token based on the username and password
+
 # 3.29.3
 ## *Fix*
   - Organization's and project's name maximum length validation when creating them

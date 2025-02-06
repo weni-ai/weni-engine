@@ -7,18 +7,18 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('template_projects', '0003_templatetype_photo'),
+        ("template_projects", "0003_templatetype_photo"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='templatetype',
-            name='photo_description',
+            model_name="templatetype",
+            name="photo_description",
             field=models.TextField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='templatetype',
-            name='uuid',
-            field=models.UUIDField(default=uuid.uuid4, verbose_name='UUID'),
+            model_name="templatetype",
+            name="uuid",
+            field=models.UUIDField(default=uuid.uuid4, verbose_name="UUID"),
         ),
     ]

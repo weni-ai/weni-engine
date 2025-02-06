@@ -29,15 +29,17 @@ class RabbitMQConnection:
             self._establish_connection()
 
     def _establish_connection(self):
-        self.connection = BlockingConnection(ConnectionParameters(
-            host=settings.EDA_BROKER_HOST,
-            port=settings.EDA_BROKER_PORT,
-            credentials=PlainCredentials(
-                username=settings.EDA_BROKER_USER,
-                password=settings.EDA_BROKER_PASSWORD
-            ),
-            virtual_host=settings.EDA_VIRTUAL_HOST
-        ))
+        self.connection = BlockingConnection(
+            ConnectionParameters(
+                host=settings.EDA_BROKER_HOST,
+                port=settings.EDA_BROKER_PORT,
+                credentials=PlainCredentials(
+                    username=settings.EDA_BROKER_USER,
+                    password=settings.EDA_BROKER_PASSWORD,
+                ),
+                virtual_host=settings.EDA_VIRTUAL_HOST,
+            )
+        )
         self.channel = self.connection.channel()
 
     def close(self):

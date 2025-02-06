@@ -11,27 +11,16 @@ from connect.common.models import (
     Project,
     Service,
     Organization,
-    OrganizationAuthorization,
     RequestPermissionOrganization,
-    OrganizationLevelRole,
-    OrganizationRole,
-    RequestPermissionProject,
     ProjectAuthorization,
-    ProjectRole,
-    ProjectRoleLevel,
     RocketAuthorization,
     RequestRocketPermission,
     RequestChatsPermission,
     OpenedProject,
-    RecentActivity,
 )
 from connect.celery import app as celery_app
-from connect.api.v1.internal.intelligence.intelligence_rest_client import (
-    IntelligenceRESTClient,
-)
 from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
 from connect.common.tasks import update_user_permission_project
-from connect.common import tasks
 
 from connect.usecases.authorizations.create import CreateAuthorizationUseCase
 from connect.usecases.authorizations.dto import CreateAuthorizationDTO

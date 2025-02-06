@@ -6,19 +6,19 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('billing', '0009_contactcount_day'),
+        ("billing", "0009_contactcount_day"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='contact',
-            name='channel',
+            model_name="contact",
+            name="channel",
         ),
         migrations.RemoveField(
-            model_name='contactcount',
-            name='channel',
+            model_name="contactcount",
+            name="channel",
         ),
         migrations.DeleteModel(
-            name='Channel',
+            name="Channel",
         ),
     ]

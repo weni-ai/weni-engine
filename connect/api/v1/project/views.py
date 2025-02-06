@@ -41,17 +41,13 @@ from connect.api.v1.project.serializers import (
 from connect.celery import app as celery_app
 from connect.common.models import (
     Organization,
-    ChatsAuthorization,
     OrganizationAuthorization,
     Project,
-    RequestChatsPermission,
     RequestPermissionProject,
     RequestRocketPermission,
     ProjectAuthorization,
-    RocketAuthorization,
     OpenedProject,
     TemplateProject,
-    Service,
 )
 from connect.authentication.models import User
 from connect.common import tasks
@@ -59,7 +55,10 @@ from connect.utils import count_contacts
 from django.conf import settings
 import logging
 
-from connect.usecases.authorizations.dto import CreateProjectAuthorizationDTO, DeleteProjectAuthorizationDTO
+from connect.usecases.authorizations.dto import (
+    CreateProjectAuthorizationDTO,
+    DeleteProjectAuthorizationDTO,
+)
 from connect.usecases.authorizations.create import CreateAuthorizationUseCase
 from connect.usecases.authorizations.delete import DeleteAuthorizationUseCase
 from connect.internals.event_driven.producer.rabbitmq_publisher import RabbitmqPublisher
@@ -93,14 +92,16 @@ class ProjectViewSet(
             .values("organization")
         )
 
-        filter = Q(
-            project_authorizations__user=self.request.user
-        ) & ~Q(
-            project_authorizations__role=0
-        ) & Q(
-            opened_project__user=self.request.user
+        filter = (
+            Q(project_authorizations__user=self.request.user)
+            & ~Q(project_authorizations__role=0)
+            & Q(opened_project__user=self.request.user)
         )
-        return self.queryset.filter(organization__pk__in=auth).filter(filter).order_by("-opened_project__day")
+        return (
+            self.queryset.filter(organization__pk__in=auth)
+            .filter(filter)
+            .order_by("-opened_project__day")
+        )
 
     def perform_destroy(self, instance):
         flow_organization = instance.flow_organization
@@ -117,7 +118,12 @@ class ProjectViewSet(
         if not is_request_permission:
             celery_app.send_task(
                 "delete_user_permission_project",
-                args=[str(flow_organization), str(project_uuid), instance.user.email, instance.role],
+                args=[
+                    str(flow_organization),
+                    str(project_uuid),
+                    instance.user.email,
+                    instance.role,
+                ],
             )
         instance.delete()
 
@@ -144,7 +150,7 @@ class ProjectViewSet(
         task = tasks.search_project(
             organization_id=project.organization.inteligence_organization,
             project_uuid=str(project.uuid),
-            text=serializer.data.get("text")
+            text=serializer.data.get("text"),
         )
 
         return Response(task)
@@ -170,11 +176,17 @@ class ProjectViewSet(
         project = Project.objects.get(uuid=project_uuid)
 
         contact_count = count_contacts(project, str(before), str(after))
-        contacts = Contact.objects.filter(project=project).filter(last_seen_on__range=(after, before)).distinct("contact_flow_uuid")
+        contacts = (
+            Contact.objects.filter(project=project)
+            .filter(last_seen_on__range=(after, before))
+            .distinct("contact_flow_uuid")
+        )
 
         active_contacts_info = []
         for contact in contacts:
-            active_contacts_info.append({"name": contact.name, "uuid": contact.contact_flow_uuid})
+            active_contacts_info.append(
+                {"name": contact.name, "uuid": contact.contact_flow_uuid}
+            )
 
         project_info = {
             "project_name": project.name,
@@ -192,16 +204,14 @@ class ProjectViewSet(
         url_path="grpc/destroy-user-permission/(?P<project_uuid>[^/.]+)",
     )
     def destroy_user_permission(self, request, project_uuid):
-        user_email = request.data.get('email')
+        user_email = request.data.get("email")
         auth_dto = DeleteProjectAuthorizationDTO(
-            user_email=user_email,
-            project_uuid=project_uuid
+            user_email=user_email, project_uuid=project_uuid
         )
 
         usecase = DeleteAuthorizationUseCase(RabbitmqPublisher())
         usecase.delete_single_project_permission(auth_dto)
         return Response(status=status.HTTP_204_NO_CONTENT)
-
 
     @action(
         detail=True,
@@ -214,13 +224,15 @@ class ProjectViewSet(
         project = get_object_or_404(Project, uuid=project_uuid)
         user = User.objects.get(email=user_email)
         last_opened_on = OpenedProject.objects.filter(user=user, project=project)
-        if(last_opened_on.exists()):
+        if last_opened_on.exists():
             last_opened_on = last_opened_on.first()
             last_opened_on.day = timezone.now()
             last_opened_on.save()
         else:
             OpenedProject.objects.create(project=project, user=user, day=timezone.now())
-        return JsonResponse(status=status.HTTP_200_OK, data={"day": str(last_opened_on.day)})
+        return JsonResponse(
+            status=status.HTTP_200_OK, data={"day": str(last_opened_on.day)}
+        )
 
     @action(
         detail=True,
@@ -229,14 +241,12 @@ class ProjectViewSet(
         permission_classes=[ModuleHasPermission],
     )
     def list_channels(self, request):
-        channel_type = request.query_params.get('channel_type', None)
+        channel_type = request.query_params.get("channel_type", None)
         if not channel_type:
             raise ValidationError("Need pass the channel_type")
 
         task = tasks.list_channels(channel_type)
-        response = dict(
-            channels=task
-        )
+        response = dict(channels=task)
         return JsonResponse(status=status.HTTP_200_OK, data=response)
 
     @action(
@@ -258,7 +268,7 @@ class ProjectViewSet(
     @action(
         detail=True,
         methods=["POST"],
-        url_name='create-channel',
+        url_name="create-channel",
         serializer_class=CreateChannelSerializer,
         permission_classes=[ModuleHasPermission],
     )
@@ -279,7 +289,7 @@ class ProjectViewSet(
     @action(
         detail=True,
         methods=["POST"],
-        url_name='create-wac-channel',
+        url_name="create-wac-channel",
         serializer_class=CreateWACChannelSerializer,
         permission_classes=[ModuleHasPermission],
     )
@@ -300,7 +310,7 @@ class ProjectViewSet(
     @action(
         detail=True,
         methods=["DELETE"],
-        url_name='destroy-classifier',
+        url_name="destroy-classifier",
         serializer_class=DestroyClassifierSerializer,
         permission_classes=[ModuleHasPermission],
     )
@@ -316,7 +326,7 @@ class ProjectViewSet(
     @action(
         detail=True,
         methods=["GET"],
-        url_name='retrieve-classifier',
+        url_name="retrieve-classifier",
         serializer_class=RetrieveClassifierSerializer,
         permission_classes=[ModuleHasPermission],
     )
@@ -332,7 +342,7 @@ class ProjectViewSet(
     @action(
         detail=True,
         methods=["POST"],
-        url_name='create-classifier',
+        url_name="create-classifier",
         serializer_class=CreateClassifierSerializer,
         permission_classes=[ModuleHasPermission],
     )
@@ -353,7 +363,7 @@ class ProjectViewSet(
     @action(
         detail=True,
         methods=["GET"],
-        url_name='list-classifier',
+        url_name="list-classifier",
         serializer_class=ClassifierSerializer,
         permission_classes=[ModuleHasPermission],
     )
@@ -368,7 +378,7 @@ class ProjectViewSet(
     @action(
         detail=True,
         methods=["GET"],
-        url_name='user-api-token',
+        url_name="user-api-token",
     )
     def user_api_token(self, request):
         serializer = UserAPITokenSerializer(data=request.query_params)
@@ -386,14 +396,14 @@ class ProjectViewSet(
     @action(
         detail=True,
         methods=["POST"],
-        url_name='create-ticketer',
+        url_name="create-ticketer",
         permission_classes=[ModuleHasPermission],
     )
     def create_ticketer(self, request):
-        project_uuid = request.data.get('project_uuid')
-        ticketer_type = request.data.get('ticketer_type')
-        name = request.data.get('name')
-        config = request.data.get('config')
+        project_uuid = request.data.get("project_uuid")
+        ticketer_type = request.data.get("ticketer_type")
+        name = request.data.get("name")
+        config = request.data.get("config")
         project = Project.objects.get(uuid=project_uuid)
         if not settings.TESTING:
             flows_client = FlowsRESTClient()
@@ -408,11 +418,11 @@ class ProjectViewSet(
     @action(
         detail=True,
         methods=["GET"],
-        url_name='list-flows',
+        url_name="list-flows",
         permission_classes=[ModuleHasPermission],
     )
     def list_flows(self, request, **kwargs):
-        project_uuid = request.query_params.get('project_uuid')
+        project_uuid = request.query_params.get("project_uuid")
         project = get_object_or_404(Project, uuid=project_uuid)
         task = tasks.list_project_flows(str(project.flow_organization))
         return Response(task)
@@ -431,9 +441,9 @@ class RequestPermissionProjectViewSet(
 
     def create(self, request, *args, **kwargs):
         created_by: User = self.request.user
-        role: int = int(self.request.data.get('role'))
-        email: str = self.request.data.get('email')
-        project_uuid: str = self.request.data.get('project')
+        role: int = int(self.request.data.get("role"))
+        email: str = self.request.data.get("email")
+        project_uuid: str = self.request.data.get("project")
 
         user = User.objects.filter(email=email)
 
@@ -441,7 +451,7 @@ class RequestPermissionProjectViewSet(
             user_email=email,
             project_uuid=project_uuid,
             role=role,
-            created_by_email=created_by.email
+            created_by_email=created_by.email,
         )
 
         data = {
@@ -453,34 +463,34 @@ class RequestPermissionProjectViewSet(
 
         usecase = CreateAuthorizationUseCase(RabbitmqPublisher())
         if user.exists():
-            auth: ProjectAuthorization = usecase.create_authorization_for_a_single_project(auth_dto=auth_dto)
+            auth: ProjectAuthorization = (
+                usecase.create_authorization_for_a_single_project(auth_dto=auth_dto)
+            )
 
-            data.update({
-                "username": auth.user.username,
-                "first_name": auth.user.first_name,
-                "last_name": auth.user.last_name,
-                "photo_user": auth.user.photo_url,
-                "is_pendent": False
-            })
+            data.update(
+                {
+                    "username": auth.user.username,
+                    "first_name": auth.user.first_name,
+                    "last_name": auth.user.last_name,
+                    "photo_user": auth.user.photo_url,
+                    "is_pendent": False,
+                }
+            )
 
-            return Response({
-                "status": 200,
-                "data": data
-            })
+            return Response({"status": 200, "data": data})
 
-        request_auth: RequestPermissionProject = usecase.create_authorization_for_a_single_project(auth_dto=auth_dto)
-        data.update({
-            "username": '',
-            "first_name": '',
-            "last_name": '',
-            "photo_user": '',
-            "is_pendent": True
-        })
+        usecase.create_authorization_for_a_single_project(auth_dto=auth_dto)
+        data.update(
+            {
+                "username": "",
+                "first_name": "",
+                "last_name": "",
+                "photo_user": "",
+                "is_pendent": True,
+            }
+        )
 
-        return Response({
-            "status": 200,
-            "data": data
-        })
+        return Response({"status": 200, "data": data})
 
 
 class RequestPermissionRocketViewSet(
@@ -514,16 +524,17 @@ class TemplateProjectViewSet(
         if getattr(self, "swagger_fake_view", False):
             # queryset just for schema generation metadata
             return TemplateProject.objects.none()  # pragma: no cover
-        auth = (
-            ProjectAuthorization.objects.exclude(role=0)
-            .filter(user=self.request.user)
+        auth = ProjectAuthorization.objects.exclude(role=0).filter(
+            user=self.request.user
         )
         return self.queryset.filter(authorization__in=auth)
 
     def get_object(self):
         lookup_url_kwarg = self.lookup_field
 
-        obj = self.get_queryset().get(authorization__project__uuid=self.kwargs.get(lookup_url_kwarg))
+        obj = self.get_queryset().get(
+            authorization__project__uuid=self.kwargs.get(lookup_url_kwarg)
+        )
 
         return obj
 
@@ -537,15 +548,14 @@ class TemplateProjectViewSet(
                 flow_organization = tasks.create_template_project(
                     request.data.get("name"),
                     request.user.email,
-                    request.data.get("timezone")
+                    request.data.get("timezone"),
                 ).get("uuid")
             except Exception as error:
-                logger.error(f"Could not create template project: {error}", )
+                logger.error(
+                    f"Could not create template project: {error}",
+                )
                 data.update(
-                    {
-                        "message": "Could not create template project",
-                        "status": "FAILED"
-                    }
+                    {"message": "Could not create template project", "status": "FAILED"}
                 )
                 return Response(data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
@@ -554,7 +564,9 @@ class TemplateProjectViewSet(
             }
             flow_organization = flows.get("uuid")
 
-        organization = get_object_or_404(Organization, uuid=request.data.get("organization"))
+        organization = get_object_or_404(
+            Organization, uuid=request.data.get("organization")
+        )
 
         # Create project
         project = Project.objects.create(
@@ -565,14 +577,14 @@ class TemplateProjectViewSet(
             flow_organization=flow_organization,
             is_template=True,
             created_by=request.user,
-            template_type=request.data.get("template_type")
+            template_type=request.data.get("template_type"),
         )
 
         if len(Project.objects.filter(created_by=project.created_by)) == 1:
             data = dict(
                 send_request_flow=settings.SEND_REQUEST_FLOW_PRODUCT,
                 flow_uuid=settings.FLOW_PRODUCT_UUID,
-                token_authorization=settings.TOKEN_AUTHORIZATION_FLOW_PRODUCT
+                token_authorization=settings.TOKEN_AUTHORIZATION_FLOW_PRODUCT,
             )
             project.created_by.send_request_flow_user_info(data)
 
@@ -583,11 +595,6 @@ class TemplateProjectViewSet(
         TemplateProjectSerializer().create(project_data, request)
 
         serializer = ProjectSerializer(project, context={"request": request})
-        data.update(
-            {
-                "message": "",
-                "status": "SUCCESS"
-            }
-        )
+        data.update({"message": "", "status": "SUCCESS"})
         data.update(serializer.data)
         return Response(data, status=status.HTTP_201_CREATED)

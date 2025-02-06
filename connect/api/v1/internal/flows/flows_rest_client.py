@@ -8,7 +8,6 @@ from connect.api.v1.internal.flows.helpers import add_classifier_to_flow
 
 
 class FlowsRESTClient:
-
     def __init__(self):
         self.base_url = settings.FLOWS_REST_ENDPOINT
         self.authentication_instance = InternalAuthentication()
@@ -18,7 +17,13 @@ class FlowsRESTClient:
         assert endpoint.startswith("/"), "the endpoint needs to start with: /"
         return self.base_url + endpoint
 
-    def create_template_project(self, project_name: str, user_email: str, project_timezone: str, project_uuid: str):
+    def create_template_project(
+        self,
+        project_name: str,
+        user_email: str,
+        project_timezone: str,
+        project_uuid: str,
+    ):
         body = dict(
             name=project_name,
             timezone=project_timezone,
@@ -28,28 +33,43 @@ class FlowsRESTClient:
         response = requests.post(
             url=f"{self.base_url}/api/v2/internals/template-orgs/",
             headers=self.authentication_instance.headers,
-            json=body
+            json=body,
         )
         return dict(status=response.status_code, data=response.text)
 
-    def create_flows(self, project_uuid: str, classifier_uuid: str, template_type: str, ticketer: dict = None, queue: dict = None):
+    def create_flows(
+        self,
+        project_uuid: str,
+        classifier_uuid: str,
+        template_type: str,
+        ticketer: dict = None,
+        queue: dict = None,
+    ):
 
         flow = self.template_flow(template_type)
-        sample_flow = add_classifier_to_flow(flow, classifier_uuid, template_type, ticketer, queue)
+        sample_flow = add_classifier_to_flow(
+            flow, classifier_uuid, template_type, ticketer, queue
+        )
 
         body = dict(
             project=project_uuid,
             sample_flow=sample_flow,
-            classifier_uuid=classifier_uuid
+            classifier_uuid=classifier_uuid,
         )
         response = requests.post(
             url=f"{self.base_url}/api/v2/internals/flows/",
             headers=self.authentication_instance.headers,
-            json=body
+            json=body,
         )
         return dict(status=response.status_code, data=response.text)
 
-    def create_project(self, project_name: str, user_email: str, project_timezone: str, project_uuid: str):
+    def create_project(
+        self,
+        project_name: str,
+        user_email: str,
+        project_timezone: str,
+        project_uuid: str,
+    ):
         body = dict(
             name=project_name,
             timezone=project_timezone,
@@ -60,36 +80,42 @@ class FlowsRESTClient:
         response = requests.post(
             url=f"{self.base_url}/api/v2/internals/orgs/",
             headers=self.authentication_instance.headers,
-            json=body
+            json=body,
         )
 
         return response.json()
 
     def delete_project(self, project_uuid: int, user_email: str):
-        body = dict(
-            user_email=user_email
-        )
+        body = dict(user_email=user_email)
 
         response = requests.delete(
             url=f"{self.base_url}/api/v2/internals/orgs/{project_uuid}/",
             headers=self.authentication_instance.headers,
-            params=body
+            params=body,
         )
 
         return dict(status=response.status_code)
 
-    def update_user_permission_project(self, organization_uuid: str, user_email: str, permission: int):
-        permissions = {1: "viewer", 2: "editor", 3: "administrator", 4: "administrator", 5: "agent"}
+    def update_user_permission_project(
+        self, organization_uuid: str, user_email: str, permission: int
+    ):
+        permissions = {
+            1: "viewer",
+            2: "editor",
+            3: "administrator",
+            4: "administrator",
+            5: "agent",
+        }
 
         body = dict(
             org_uuid=organization_uuid,
             user_email=user_email,
-            permission=permissions.get(permission)
+            permission=permissions.get(permission),
         )
         response = requests.patch(
             url=f"{self.base_url}/api/v2/internals/user-permission/",
             headers=self.authentication_instance.headers,
-            json=body
+            json=body,
         )
 
         return dict(status=response.status_code, data=response.json())
@@ -105,12 +131,19 @@ class FlowsRESTClient:
         response = requests.get(
             url=f"{self.base_url}/api/v2/internals/classifier/",
             headers=self.authentication_instance.headers,
-            params=params
+            params=params,
         )
 
         return response.json()
 
-    def create_classifier(self, project_uuid: str, user_email: str, classifier_type: str, classifier_name: str, access_token: str):
+    def create_classifier(
+        self,
+        project_uuid: str,
+        user_email: str,
+        classifier_type: str,
+        classifier_name: str,
+        access_token: str,
+    ):
         body = dict(
             org=project_uuid,
             user=user_email,
@@ -121,7 +154,7 @@ class FlowsRESTClient:
         response = requests.post(
             url=f"{self.base_url}/api/v2/internals/classifier/",
             headers=self.authentication_instance.headers,
-            json=body
+            json=body,
         )
         # TODO: check the response data its equals to gRPC endpoint return
         return dict(status=response.status_code, data=response.json())
@@ -142,56 +175,46 @@ class FlowsRESTClient:
         response = requests.get(
             url=f"{self.base_url}/api/v2/internals/users/api-token",
             params=params,
-            headers=self.authentication_instance.headers
+            headers=self.authentication_instance.headers,
         )
         return response
 
     def create_ticketer(self, project_uuid, ticketer_type, name, config):
         body = dict(
-            org=project_uuid,
-            ticketer_type=ticketer_type,
-            name=name,
-            config=config
+            org=project_uuid, ticketer_type=ticketer_type, name=name, config=config
         )
 
         response = requests.post(
             url=f"{self.base_url}/api/v2/internals/ticketers/",
             headers=self.authentication_instance.headers,
-            json=body
+            json=body,
         )
 
         return response.json()
 
     def update_language(self, user_email: str, language: str):
-        body = dict(
-            language=language
-        )
-        params = dict(
-            email=user_email
-        )
+        body = dict(language=language)
+        params = dict(email=user_email)
         response = requests.patch(
-            url=f'{self.base_url}/api/v2/internals/flows-users/',
+            url=f"{self.base_url}/api/v2/internals/flows-users/",
             headers=self.authentication_instance.headers,
             params=params,
-            json=body
+            json=body,
         )
         return response.status_code
 
     def get_project_flows(self, project_uuid, flow_name):
-        params = dict(
-            flow_name=flow_name,
-            project=project_uuid
-        )
+        params = dict(flow_name=flow_name, project=project_uuid)
         response = requests.get(
             url=f"{self.base_url}/api/v2/internals/project-flows/",
             headers=self.authentication_instance.headers,
-            params=params
+            params=params,
         )
         return response.json()
 
     def get_project_info(self, project_uuid: str):
         response = requests.get(
-            url=f'{self.base_url}/api/v2/internals/orgs/{project_uuid}/',
+            url=f"{self.base_url}/api/v2/internals/orgs/{project_uuid}/",
             headers=self.authentication_instance.headers,
         )
         return response.json()
@@ -199,54 +222,48 @@ class FlowsRESTClient:
     def get_project_statistic(self, project_uuid: str):
         try:
             response = requests.get(
-                url=f'{self.base_url}/api/v2/internals/statistic/{project_uuid}/',
+                url=f"{self.base_url}/api/v2/internals/statistic/{project_uuid}/",
                 headers=self.authentication_instance.headers,
-                timeout=180
+                timeout=180,
             )
             return response.json()
         except Exception as request_error:
             return dict(error=str(request_error))
 
     def get_billing_total_statistics(self, project_uuid: str, before: str, after: str):
-        body = dict(
-            org=project_uuid,
-            before=before,
-            after=after
-        )
+        body = dict(org=project_uuid, before=before, after=after)
         response = requests.get(
-            url=f'{self.base_url}/',
+            url=f"{self.base_url}/",
             headers=self.authentication_instance.headers,
-            json=body
+            json=body,
         )
         return response.json()
 
     def suspend_or_unsuspend_project(self, project_uuid: str, is_suspended: bool):
-        body = dict(
-            uuid=project_uuid,
-            is_suspended=is_suspended
-        )
+        body = dict(uuid=project_uuid, is_suspended=is_suspended)
         response = requests.patch(
-            url=f'{self.base_url}/api/v2/internals/orgs/{project_uuid}/',
+            url=f"{self.base_url}/api/v2/internals/orgs/{project_uuid}/",
             headers=self.authentication_instance.headers,
-            json=body
+            json=body,
         )
         return response.json()
 
-    def create_channel(self, user: str, project_uuid: str, data: dict, channeltype_code: str):
+    def create_channel(
+        self, user: str, project_uuid: str, data: dict, channeltype_code: str
+    ):
         body = dict(
-            user=user,
-            org=project_uuid,
-            data=data,
-            channeltype_code=channeltype_code
+            user=user, org=project_uuid, data=data, channeltype_code=channeltype_code
         )
         response = requests.post(
-            url=f'{self.base_url}/api/v2/internals/channel/',
+            url=f"{self.base_url}/api/v2/internals/channel/",
             headers=self.authentication_instance.headers,
-            json=body
+            json=body,
         )
         return response
 
-    def create_wac_channel(self, user: str, flow_organization: str, config: str, phone_number_id: str):
+    def create_wac_channel(
+        self, user: str, flow_organization: str, config: str, phone_number_id: str
+    ):
         body = dict(
             user=user,
             org=flow_organization,
@@ -254,84 +271,85 @@ class FlowsRESTClient:
             phone_number_id=phone_number_id,
         )
         response = requests.post(
-            url=f'{self.base_url}/api/v2/internals/channel/create_wac/',
+            url=f"{self.base_url}/api/v2/internals/channel/create_wac/",
             headers=self.authentication_instance.headers,
-            json=body
+            json=body,
         )
         return response.json()
 
     def release_channel(self, user: str, channel_uuid: str):
         requests.delete(
-            url=f'{self.base_url}/api/v2/internals/channel/{channel_uuid}/',
+            url=f"{self.base_url}/api/v2/internals/channel/{channel_uuid}/",
             headers=self.authentication_instance.headers,
-            json={"user": user}
+            json={"user": user},
         )
 
-    def list_channel(self, is_active: str = "True", channel_type: str = "WA", project_uuid: str = None):
+    def list_channel(
+        self,
+        is_active: str = "True",
+        channel_type: str = "WA",
+        project_uuid: str = None,
+    ):
         params = {}
         if project_uuid:
             params = dict(
-                is_active=is_active,
-                channel_type=channel_type,
-                org=project_uuid
+                is_active=is_active, channel_type=channel_type, org=project_uuid
             )
         else:
-            params = dict(
-                is_active=is_active,
-                channel_type=channel_type
-            )
+            params = dict(is_active=is_active, channel_type=channel_type)
         response = requests.get(
-            url=f'{self.base_url}/api/v2/internals/channel/',
+            url=f"{self.base_url}/api/v2/internals/channel/",
             headers=self.authentication_instance.headers,
-            params=params
+            params=params,
         )
         return response.json()
 
     def delete_channel(self, channel_uuid: str):
         response = requests.delete(
-            url=f'{self.base_url}/api/v2/internals/channel/{channel_uuid}/',
-            headers=self.authentication_instance.headers
+            url=f"{self.base_url}/api/v2/internals/channel/{channel_uuid}/",
+            headers=self.authentication_instance.headers,
         )
         return response.json()
 
     def get_active_contacts(self, project_uuid, before, after):
-        body = dict(
-            org=project_uuid,
-            before=before,
-            after=after
-        )
+        body = dict(org=project_uuid, before=before, after=after)
         response = requests.get(
-            url=f'{self.base_url}/api/v2/internals/',
+            url=f"{self.base_url}/api/v2/internals/",
             headers=self.authentication_instance.headers,
-            json=body
+            json=body,
         )
         return response.get("data", [])
 
-    def delete_user_permission_project(self, project_uuid: str, user_email: str, permission: int):
-        permissions = {1: "viewer", 2: "editor", 3: "administrator", 4: "administrator", 5: "agent"}
+    def delete_user_permission_project(
+        self, project_uuid: str, user_email: str, permission: int
+    ):
+        permissions = {
+            1: "viewer",
+            2: "editor",
+            3: "administrator",
+            4: "administrator",
+            5: "agent",
+        }
         body = dict(
             org_uuid=project_uuid,
             user_email=user_email,
             permission=permissions.get(permission),
         )
         response = requests.delete(
-            url=f'{self.base_url}/api/v2/internals/user-permission/',
+            url=f"{self.base_url}/api/v2/internals/user-permission/",
             headers=self.authentication_instance.headers,
-            json=body
+            json=body,
         )
         return response.json()
 
     def get_message(self, org_uuid: str, contact_uuid: str, before: str, after: str):
         body = dict(
-            org_uuid=org_uuid,
-            contact_uuid=contact_uuid,
-            before=before,
-            after=after
+            org_uuid=org_uuid, contact_uuid=contact_uuid, before=before, after=after
         )
         response = requests.get(
-            url=f'{self.base_url}/',
+            url=f"{self.base_url}/",
             headers=self.authentication_instance.headers,
-            json=body
+            json=body,
         )
         return response.json()
 
@@ -351,19 +369,26 @@ class FlowsRESTClient:
     def list_channel_types(self, channel_code):
 
         if channel_code:
-            request_url = f"{self.base_url}/api/v2/internals/channels/{str(channel_code)}"
+            request_url = (
+                f"{self.base_url}/api/v2/internals/channels/{str(channel_code)}"
+            )
         else:
             request_url = f"{self.base_url}/api/v2/internals/channels"
 
         response = requests.get(
-            url=request_url,
-            headers=self.authentication_instance.headers,
-            timeout=60
+            url=request_url, headers=self.authentication_instance.headers, timeout=60
         )
         return response
 
-    def create_external_service(self, user: str, flow_organization: str, type_fields: dict, type_code: str):
-        body = dict(user=user, org=flow_organization, type_fields=type_fields, type_code=type_code)
+    def create_external_service(
+        self, user: str, flow_organization: str, type_fields: dict, type_code: str
+    ):
+        body = dict(
+            user=user,
+            org=flow_organization,
+            type_fields=type_fields,
+            type_code=type_code,
+        )
 
         return requests.post(
             self._get_url("/api/v2/internals/externals"),
@@ -374,22 +399,23 @@ class FlowsRESTClient:
     def create_globals(self, omie_body: list):
 
         response = requests.post(
-            url=f'{self.base_url}/api/v2/internals/globals/',
+            url=f"{self.base_url}/api/v2/internals/globals/",
             headers=self.authentication_instance.headers,
-            json=omie_body
+            json=omie_body,
         )
 
         return response
 
     def update_project(self, project_uuid: str, **kwargs: dict):
         from connect.common.models import Project
+
         project = Project.objects.get(uuid=project_uuid)
         kwargs.update({"timezone": str(project.timezone)})
         try:
             response = requests.patch(
-                url=f'{self.base_url}/api/v2/internals/orgs/{project_uuid}/',
+                url=f"{self.base_url}/api/v2/internals/orgs/{project_uuid}/",
                 headers=self.authentication_instance.headers,
-                json=kwargs
+                json=kwargs,
             )
             return response.json()
         except Exception as request_error:

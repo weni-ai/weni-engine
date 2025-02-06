@@ -15,8 +15,9 @@ from rest_framework.exceptions import PermissionDenied
 
 
 class UpdateAuthorizationUseCase(AuthorizationUseCase):
-
-    def update_organization_authorization(self, auth_dto: UpdateAuthorizationDTO, user: User, org: Organization):
+    def update_organization_authorization(
+        self, auth_dto: UpdateAuthorizationDTO, user: User, org: Organization
+    ):
         authorization: OrganizationAuthorization = org.authorizations.get(user=user)
 
         authorization.role = auth_dto.role
@@ -29,12 +30,14 @@ class UpdateAuthorizationUseCase(AuthorizationUseCase):
                 org_uuid=str(org.uuid),
                 user_email=user.email,
                 role=authorization.role,
-                org_intelligence=org.inteligence_organization
+                org_intelligence=org.inteligence_organization,
             )
 
         return authorization
 
-    def update_project_authorization(self, project: Project, user: User, role: int) -> ProjectAuthorization:
+    def update_project_authorization(
+        self, project: Project, user: User, role: int
+    ) -> ProjectAuthorization:
         auth = project.project_authorizations.get(user=user)
         auth.role = role
         auth.save(update_fields=["role"])
@@ -48,19 +51,27 @@ class UpdateAuthorizationUseCase(AuthorizationUseCase):
             )
         return auth
 
-    def update_authorization(self, auth_dto: UpdateAuthorizationDTO) -> OrganizationAuthorization:
+    def update_authorization(
+        self, auth_dto: UpdateAuthorizationDTO
+    ) -> OrganizationAuthorization:
 
         if auth_dto.user_email == auth_dto.request_user:
             raise PermissionDenied("Can't change own permission")
 
         if auth_dto.user_email:
-            user: User = RetrieveUserUseCase().get_user_by_email(email=auth_dto.user_email)
+            user: User = RetrieveUserUseCase().get_user_by_email(
+                email=auth_dto.user_email
+            )
         elif auth_dto.id:
             user: User = RetrieveUserUseCase().get_user_by_id(id=auth_dto.id)
 
-        org: Organization = RetrieveOrganizationUseCase().get_organization_by_uuid(org_uuid=auth_dto.org_uuid)
+        org: Organization = RetrieveOrganizationUseCase().get_organization_by_uuid(
+            org_uuid=auth_dto.org_uuid
+        )
 
-        org_auth: OrganizationAuthorization = self.update_organization_authorization(auth_dto, user=user, org=org)
+        org_auth: OrganizationAuthorization = self.update_organization_authorization(
+            auth_dto, user=user, org=org
+        )
 
         projects: QuerySet[Project] = org_auth.organization.project.all()
 

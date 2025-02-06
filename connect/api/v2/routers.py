@@ -31,7 +31,7 @@ from connect.api.v2.commerce.views import CommerceOrganizationViewSet, CommerceP
 from connect.api.v2.organizations import views as organization_views
 from connect.api.v2.projects import views as project_views
 from connect.api.v2.internals import views as connect_internal_views
-
+from connect.api.v2.auth.views import KeycloakAuthView
 
 router = routers.SimpleRouter()
 router.register(
@@ -133,6 +133,7 @@ urlpatterns = [
         CommerceProjectCheckExists.as_view(),
         name="check-exists-project"
     ),
+    path("auth/", KeycloakAuthView.as_view(), name="keycloak-auth"),
 ]
 urlpatterns += [
     path("", include(projects_router.urls)),

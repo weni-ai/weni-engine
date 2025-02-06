@@ -6,18 +6,38 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('common', '0034_alter_billingplan_plan'),
+        ("common", "0034_alter_billingplan_plan"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='organizationauthorization',
-            name='role',
-            field=models.PositiveIntegerField(choices=[(0, 'not set'), (1, 'viewer'), (2, 'contributor'), (3, 'admin'), (4, 'financial')], default=0, verbose_name='role'),
+            model_name="organizationauthorization",
+            name="role",
+            field=models.PositiveIntegerField(
+                choices=[
+                    (0, "not set"),
+                    (1, "viewer"),
+                    (2, "contributor"),
+                    (3, "admin"),
+                    (4, "financial"),
+                ],
+                default=0,
+                verbose_name="role",
+            ),
         ),
         migrations.AlterField(
-            model_name='requestpermissionorganization',
-            name='role',
-            field=models.PositiveIntegerField(choices=[(0, 'not set'), (1, 'viewer'), (2, 'contributor'), (3, 'admin'), (4, 'financial')], default=0, verbose_name='role'),
+            model_name="requestpermissionorganization",
+            name="role",
+            field=models.PositiveIntegerField(
+                choices=[
+                    (0, "not set"),
+                    (1, "viewer"),
+                    (2, "contributor"),
+                    (3, "admin"),
+                    (4, "financial"),
+                ],
+                default=0,
+                verbose_name="role",
+            ),
         ),
     ]

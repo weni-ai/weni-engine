@@ -86,7 +86,7 @@ class CountContactsTestCase(TestCase):
 
         for project in Project.objects.all():
             for j in range(0, 100):
-                if (j == 0 or j % 5 == 0):
+                if j == 0 or j % 5 == 0:
                     contact_flow_uuid = uuid.uuid4()
                     last_seen_on = day.add(hours=random.randint(0, 23))
                     last_seen_on2 = day.add(days=1).add(hours=random.randint(0, 23))
@@ -114,7 +114,11 @@ class CountContactsTestCase(TestCase):
 
     def test_count(self):
         daily_contact_count()
-        for project in Project.objects.exclude(organization__organization_billing__plan=BillingPlan.PLAN_CUSTOM):
-            contacts_day_count = ContactCount.objects.filter(project=project, day=pendulum.now().start_of("day"))
+        for project in Project.objects.exclude(
+            organization__organization_billing__plan=BillingPlan.PLAN_CUSTOM
+        ):
+            contacts_day_count = ContactCount.objects.filter(
+                project=project, day=pendulum.now().start_of("day")
+            )
             total = sum([day_count.count for day_count in contacts_day_count])
             self.assertEquals(total, 20)

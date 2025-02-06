@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('template_projects', '0004_auto_20230822_1258'),
+        ("template_projects", "0004_auto_20230822_1258"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='templatetype',
-            name='base_project_uuid',
-            field=models.UUIDField(blank=True, null=True, verbose_name='base project'),
+            model_name="templatetype",
+            name="base_project_uuid",
+            field=models.UUIDField(blank=True, null=True, verbose_name="base project"),
         ),
     ]

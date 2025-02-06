@@ -6,13 +6,22 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('common', '0034_alter_billingplan_plan'),
+        ("common", "0034_alter_billingplan_plan"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='newsletterlanguage',
-            name='language',
-            field=models.CharField(choices=[('es', 'Spanish'), ('en-us', 'English'), ('pt-br', 'Portuguese')], default='en-us', max_length=10, verbose_name='language'),
+            model_name="newsletterlanguage",
+            name="language",
+            field=models.CharField(
+                choices=[
+                    ("es", "Spanish"),
+                    ("en-us", "English"),
+                    ("pt-br", "Portuguese"),
+                ],
+                default="en-us",
+                max_length=10,
+                verbose_name="language",
+            ),
         ),
     ]

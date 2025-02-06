@@ -8,17 +8,32 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('authentication', '0015_auto_20230510_1910'),
+        ("authentication", "0015_auto_20230510_1910"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='UserEmailSetup',
+            name="UserEmailSetup",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('receive_project_emails', models.BooleanField(default=True)),
-                ('receive_organization_emails', models.BooleanField(default=True)),
-                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='email_setup', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("receive_project_emails", models.BooleanField(default=True)),
+                ("receive_organization_emails", models.BooleanField(default=True)),
+                (
+                    "user",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="email_setup",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
     ]

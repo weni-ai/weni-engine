@@ -13,7 +13,11 @@ from connect.api.grpc.project.serializers import (
     CreateWACChannelRequestSerializer,
 )
 from connect.common.models import Project
-from weni.protobuf.connect.project_pb2 import ClassifierResponse, ChannelListResponse, ChannelCreateResponse
+from weni.protobuf.connect.project_pb2 import (
+    ClassifierResponse,
+    ChannelListResponse,
+    ChannelCreateResponse,
+)
 
 
 class ProjectService(
