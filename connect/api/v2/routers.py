@@ -27,7 +27,7 @@ from connect.api.v2.template_projects.views import (
     TemplateFeatureViewSet,
     TemplateSuggestionViewSet,
 )
-from connect.api.v2.commerce.views import CommerceOrganizationViewSet
+from connect.api.v2.commerce.views import CommerceOrganizationViewSet, CommerceProjectCheckExists
 from connect.api.v2.organizations import views as organization_views
 from connect.api.v2.projects import views as project_views
 from connect.api.v2.internals import views as connect_internal_views
@@ -127,6 +127,11 @@ urlpatterns = [
         "recent-activities",
         RecentActivityViewSet.as_view({"post": "create", "get": "list"}),
         name="recent-activities",
+    ),
+    path(
+        "commerce/check-project",
+        CommerceProjectCheckExists.as_view(),
+        name="check-exists-project"
     ),
     path("auth/", KeycloakAuthView.as_view(), name="keycloak-auth"),
 ]
