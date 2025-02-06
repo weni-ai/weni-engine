@@ -101,7 +101,7 @@ class CommerceSerializer(serializers.Serializer):
                     )
                     create_keycloak_user_use_case = CreateKeycloakUserUseCase(user_dto)
                     user_info = create_keycloak_user_use_case.execute()
-                            # Send email to user
+                    # Send email to user
                     user = user_info.get("user")
                     user.send_email_access_password(user_info.get("password"))
                 except Exception as e:
