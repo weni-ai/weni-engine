@@ -6,7 +6,7 @@ from rest_framework.mixins import CreateModelMixin
 from connect.api.v2.commerce.permissions import CanCommunicateInternally
 from connect.api.v2.commerce.serializers import CommerceSerializer
 from connect.api.v2.paginations import CustomCursorPagination
-from connect.common.models import Organization, Project, ProjectAuthorization, OrganizationRole
+from connect.common.models import Organization, Project, ProjectAuthorization, OrganizationRole, RequestPermissionOrganization
 from connect.authentication.models import User
 from connect.usecases.users.create import CreateKeycloakUserUseCase
 from connect.usecases.users.user_dto import KeycloakUserDTO
@@ -70,8 +70,11 @@ class CommerceProjectCheckExists(views.APIView):
                 user_info = create_keycloak_user_use_case.execute()
                 user = user_info.get("user")
                 user.send_email_access_password(user_info.get("password"))
-            organization.authorizations.create(
-                user=user, role=OrganizationRole.ADMIN.value
+            RequestPermissionOrganization.objects.create(
+                email=user.email,
+                organization=organization,
+                role=OrganizationRole.ADMIN.value,
+                created_by=user,
             )
         return Response(
             {
