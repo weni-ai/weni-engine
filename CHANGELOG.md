@@ -1,3 +1,7 @@
+# 3.29.5
+## *Add*
+  - Adding endpoint to check if exists project and user, if project exists and no user create user and set your permission in project and organization
+
 # 3.29.4
 ## *Add*
   - Adding an endpoint to return an access token based on the username and password
