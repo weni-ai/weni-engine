@@ -229,6 +229,31 @@ class ProjectViewSetTestCase(TestCase):
 
         path = f"/v2/projects/{project_uuid}/set-type"
         method = {"post": "set_type"}
+        data = {"project_type": TypeProject.GENERAL}
+        user = self.user
+
+        response, content_data = self.request(
+            path,
+            method,
+            user=user,
+            project_uuid=project_uuid,
+            data=data,
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(content_data.get("project_type"), TypeProject.GENERAL)
+
+        self.project1.refresh_from_db()
+        self.assertEqual(self.project1.project_type, TypeProject.GENERAL)
+
+    def test_cannot_set_type_to_commerce_once_is_general(self):
+        """Test successfully setting a valid project type"""
+        self.project1.project_type = TypeProject.GENERAL
+        self.project1.save()
+        project_uuid = str(self.project1.uuid)
+
+        path = f"/v2/projects/{project_uuid}/set-type"
+        method = {"post": "set_type"}
         data = {"project_type": TypeProject.COMMERCE}
         user = self.user
 
@@ -240,11 +265,14 @@ class ProjectViewSetTestCase(TestCase):
             data=data,
         )
 
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(content_data.get("project_type"), TypeProject.COMMERCE)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn(
+            f"It is not possible to change the type from {TypeProject.GENERAL} to {TypeProject.COMMERCE}",
+            content_data.get("detail"),
+        )
 
         self.project1.refresh_from_db()
-        self.assertEquals(self.project1.project_type, TypeProject.COMMERCE)
+        self.assertNotEqual(self.project1.project_type, TypeProject.COMMERCE)
 
     def test_set_type_invalid_type(self):
         """Test setting an invalid project type returns error"""
