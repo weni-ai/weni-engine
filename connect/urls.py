@@ -52,7 +52,7 @@ urlpatterns = [
     path("v1/", include(rookly_api_v1_urls)),
     path("v2/", include(api_v2_urls)),
     url(r"^handlers/stripe/$", StripeHandler.as_view(), name="handlers.stripe_handler"),
-    ppath("api/prometheus/metrics", metrics_view, name="metrics_view"),
+    path("api/prometheus/metrics", metrics_view, name="metrics_view"),
 ]
 
 urlpatterns += staticfiles_urlpatterns()
