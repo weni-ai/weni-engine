@@ -153,9 +153,11 @@ INSTALLED_APPS = [
     "corsheaders",
     "django_grpc_framework",
     "stripe",
+    "django_prometheus",
 ]
 
 MIDDLEWARE = [
+    "django_prometheus.middleware.PrometheusBeforeMiddleware",
     "elasticapm.contrib.django.middleware.TracingMiddleware",
     "elasticapm.contrib.django.middleware.Catch404Middleware",
     "django.middleware.security.SecurityMiddleware",

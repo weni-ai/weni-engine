@@ -30,6 +30,7 @@ from connect.api.grpc.organization.handlers import (
 )
 from connect.billing.views import StripeHandler
 from connect.api.v2 import routers as api_v2_urls
+from connect.api.prometheus.view import metrics_view
 
 
 api_v2_urls = [path("", include(api_v2_urls))]
@@ -51,6 +52,7 @@ urlpatterns = [
     path("v1/", include(rookly_api_v1_urls)),
     path("v2/", include(api_v2_urls)),
     url(r"^handlers/stripe/$", StripeHandler.as_view(), name="handlers.stripe_handler"),
+    ppath("api/prometheus/metrics", metrics_view, name="metrics_view"),
 ]
 
 urlpatterns += staticfiles_urlpatterns()
