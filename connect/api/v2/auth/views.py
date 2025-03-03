@@ -37,13 +37,18 @@ class ProjectAuthView(views.APIView):
 
     def get(self, request, project_uuid: str = None):
         try:
-            project_authorization = request.user.project_authorizations_user.get(project__uuid=project_uuid)
+            project_authorization = request.user.project_authorizations_user.get(
+                project__uuid=project_uuid
+            )
         except ProjectAuthorization.DoesNotExist:
-            return Response({"error": "Project authorization not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"error": "Project authorization not found"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
 
         response = {
             "user": request.user.email,
             "project_authorization": project_authorization.role,
-            "available_roles": self.get_available_roles()
+            "available_roles": self.get_available_roles(),
         }
         return Response(response)
