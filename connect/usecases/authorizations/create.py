@@ -106,6 +106,13 @@ class CreateAuthorizationUseCase(AuthorizationUseCase):
         )
         project: Project = org.project.get(uuid=auth_dto.project_uuid)
 
+        user_created_by: User = RetrieveUserUseCase().get_user_by_email(
+            email=auth_dto.created_by_email
+        )
+
+        if not ProjectAuthorization.objects.filter(user=user_created_by, project=project, role__in=[2, 3]).exists():
+            raise UserHasNoPermissionToManageProject
+
         try:
             user: User = RetrieveUserUseCase().get_user_by_email(
                 email=auth_dto.user_email
@@ -115,12 +122,6 @@ class CreateAuthorizationUseCase(AuthorizationUseCase):
                 project=project, auth_dto=auth_dto
             )
 
-        user_created_by: User = RetrieveUserUseCase().get_user_by_email(
-            email=auth_dto.created_by_email
-        )
-
-        if not ProjectAuthorization.objects.filter(user=user_created_by, project=project, role=2).exists():
-            raise UserHasNoPermissionToManageProject
 
         try:
             org_auth = org.authorizations.get(user=user)
