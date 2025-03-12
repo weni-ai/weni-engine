@@ -16,7 +16,9 @@ from connect.usecases.authorizations.dto import (
 )
 from connect.usecases.users.retrieve import RetrieveUserUseCase
 from connect.usecases.users.exceptions import UserDoesNotExist
-from connect.usecases.authorizations.exceptions import UserHasNoPermissionToManageProject
+from connect.usecases.authorizations.exceptions import (
+    UserHasNoPermissionToManageProject,
+)
 
 
 class CreateAuthorizationUseCase(AuthorizationUseCase):
@@ -110,7 +112,9 @@ class CreateAuthorizationUseCase(AuthorizationUseCase):
             email=auth_dto.created_by_email
         )
 
-        if not ProjectAuthorization.objects.filter(user=user_created_by, project=project, role__in=[2, 3]).exists():
+        if not ProjectAuthorization.objects.filter(
+            user=user_created_by, project=project, role__in=[2, 3]
+        ).exists():
             raise UserHasNoPermissionToManageProject
 
         try:
@@ -121,7 +125,6 @@ class CreateAuthorizationUseCase(AuthorizationUseCase):
             return self.create_request_permission_for_user_that_dosent_exist(
                 project=project, auth_dto=auth_dto
             )
-
 
         try:
             org_auth = org.authorizations.get(user=user)
