@@ -51,6 +51,7 @@ from connect.common.models import (
 )
 from connect.authentication.models import User
 from connect.common import tasks
+from connect.usecases.authorizations.exceptions import UserHasNoPermissionToManageProject
 from connect.utils import count_contacts
 from django.conf import settings
 import logging
@@ -463,9 +464,12 @@ class RequestPermissionProjectViewSet(
 
         usecase = CreateAuthorizationUseCase(RabbitmqPublisher())
         if user.exists():
-            auth: ProjectAuthorization = (
-                usecase.create_authorization_for_a_single_project(auth_dto=auth_dto)
-            )
+            try:
+                auth: ProjectAuthorization = (
+                    usecase.create_authorization_for_a_single_project(auth_dto=auth_dto)
+                )
+            except UserHasNoPermissionToManageProject:
+                return Response({"status": 403, "detail": "You don't have permission to manage this project"}, status=status.HTTP_403_FORBIDDEN)
 
             data.update(
                 {
@@ -479,7 +483,11 @@ class RequestPermissionProjectViewSet(
 
             return Response({"status": 200, "data": data})
 
-        usecase.create_authorization_for_a_single_project(auth_dto=auth_dto)
+        try:
+            usecase.create_authorization_for_a_single_project(auth_dto=auth_dto)
+        except UserHasNoPermissionToManageProject:
+            return Response({"status": 403, "detail": "You don't have permission to manage this project"}, status=status.HTTP_403_FORBIDDEN)
+
         data.update(
             {
                 "username": "",
