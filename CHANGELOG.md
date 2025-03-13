@@ -1,3 +1,7 @@
+# 3.29.7
+## *Add*
+  - Adds check when adding new permissions to the project if the request user is present on project
+
 # 3.29.6
 ## *Add*
   - Add project authorization endpoint for retrieving user roles
