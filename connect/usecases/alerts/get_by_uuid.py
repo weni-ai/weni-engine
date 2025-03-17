@@ -5,10 +5,7 @@ from .exceptions import AlertNotFound
 from .auths import AlertAuthsUseCase
 
 
-def get_alert_by_uuid(
-    uuid: str,
-    token: str
-) -> Alert:
+def get_alert_by_uuid(uuid: str, token: str) -> Alert:
 
     auth = AlertAuthsUseCase()
     auth.has_permission(token=token)

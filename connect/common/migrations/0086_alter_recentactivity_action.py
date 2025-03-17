@@ -6,13 +6,23 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('common', '0085_auto_20240828_1910'),
+        ("common", "0085_auto_20240828_1910"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='recentactivity',
-            name='action',
-            field=models.CharField(choices=[('ADD', 'Add'), ('CREATE', 'Entity Created'), ('UPDATE', 'Entity updated'), ('INTEGRATE', 'Entity integrated'), ('TRAIN', 'Entity Trained'), ('DELETE', 'Entity Deleted')], max_length=15),
+            model_name="recentactivity",
+            name="action",
+            field=models.CharField(
+                choices=[
+                    ("ADD", "Add"),
+                    ("CREATE", "Entity Created"),
+                    ("UPDATE", "Entity updated"),
+                    ("INTEGRATE", "Entity integrated"),
+                    ("TRAIN", "Entity Trained"),
+                    ("DELETE", "Entity Deleted"),
+                ],
+                max_length=15,
+            ),
         ),
     ]

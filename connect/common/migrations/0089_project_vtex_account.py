@@ -6,13 +6,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('common', '0088_rename_type_project_project_type'),
+        ("common", "0088_rename_type_project_project_type"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='project',
-            name='vtex_account',
-            field=models.CharField(blank=True, max_length=100, null=True, verbose_name='VTEX account'),
+            model_name="project",
+            name="vtex_account",
+            field=models.CharField(
+                blank=True, max_length=100, null=True, verbose_name="VTEX account"
+            ),
         ),
     ]

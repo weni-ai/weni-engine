@@ -23,39 +23,45 @@ class AuthorizationUseCase:
         OrganizationRole.SUPPORT.value: ProjectRole.SUPPORT.value,
     }
 
-    def __init__(self, message_publisher = MockRabbitMQPublisher(), publish_message: bool = True) -> None:
+    def __init__(
+        self, message_publisher=MockRabbitMQPublisher(), publish_message: bool = True
+    ) -> None:
         self.message_publisher = message_publisher
         self.publish_message = publish_message
 
     def publish_organization_authorization_message(
-            self,
-            action: str,
-            org_uuid: str,
-            user_email: str,
-            role: int,
-            org_intelligence: int,
-        ) -> None:
+        self,
+        action: str,
+        org_uuid: str,
+        user_email: str,
+        role: int,
+        org_intelligence: int,
+    ) -> None:
 
         message_body = {
             "action": action,
             "organization_uuid": org_uuid,
             "user_email": user_email,
             "role": role,
-            "org_intelligence": org_intelligence
+            "org_intelligence": org_intelligence,
         }
-        self.message_publisher.send_message(message_body, exchange="orgs-auths.topic", routing_key="")
+        self.message_publisher.send_message(
+            message_body, exchange="orgs-auths.topic", routing_key=""
+        )
 
     def publish_project_authorization_message(
-            self,
-            action: str,
-            project_uuid: str,
-            user_email: str,
-            role: int,
+        self,
+        action: str,
+        project_uuid: str,
+        user_email: str,
+        role: int,
     ) -> None:
         message_body = {
             "action": action,
             "project": project_uuid,
             "user": user_email,
-            "role": role
+            "role": role,
         }
-        self.message_publisher.send_message(message_body, exchange="project-auths.topic", routing_key="")
+        self.message_publisher.send_message(
+            message_body, exchange="project-auths.topic", routing_key=""
+        )

@@ -6,13 +6,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('authentication', '0010_alter_user_language'),
+        ("authentication", "0010_alter_user_language"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='user',
-            name='has_2fa',
-            field=models.BooleanField(default=False, verbose_name='Two factor authentication'),
+            model_name="user",
+            name="has_2fa",
+            field=models.BooleanField(
+                default=False, verbose_name="Two factor authentication"
+            ),
         ),
     ]

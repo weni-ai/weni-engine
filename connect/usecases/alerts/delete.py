@@ -12,10 +12,7 @@ class AlertDeleteUseCase:
 
         AlertAuthsUseCase().has_permission(token=token)
 
-        alert = get_alert_by_uuid(
-            uuid=alert_uuid,
-            token=token
-        )
+        alert = get_alert_by_uuid(uuid=alert_uuid, token=token)
         alert.delete()
 
         return alert

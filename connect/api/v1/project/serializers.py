@@ -39,7 +39,6 @@ logger = logging.getLogger(__name__)
 
 
 class ProjectSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Project
         fields = [

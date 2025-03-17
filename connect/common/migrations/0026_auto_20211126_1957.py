@@ -6,23 +6,32 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('common', '0025_billingplan_is_active'),
+        ("common", "0025_billingplan_is_active"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='billingplan',
-            name='additional_billing_information',
-            field=models.CharField(blank=True, max_length=250, null=True, verbose_name='Additional billing information'),
+            model_name="billingplan",
+            name="additional_billing_information",
+            field=models.CharField(
+                blank=True,
+                max_length=250,
+                null=True,
+                verbose_name="Additional billing information",
+            ),
         ),
         migrations.AddField(
-            model_name='billingplan',
-            name='cnpj',
-            field=models.CharField(blank=True, max_length=20, null=True, verbose_name='CNPJ'),
+            model_name="billingplan",
+            name="cnpj",
+            field=models.CharField(
+                blank=True, max_length=20, null=True, verbose_name="CNPJ"
+            ),
         ),
         migrations.AddField(
-            model_name='billingplan',
-            name='cpf',
-            field=models.CharField(blank=True, max_length=14, null=True, verbose_name='CPF'),
+            model_name="billingplan",
+            name="cpf",
+            field=models.CharField(
+                blank=True, max_length=14, null=True, verbose_name="CPF"
+            ),
         ),
     ]

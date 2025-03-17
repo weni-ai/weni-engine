@@ -4,7 +4,6 @@ from .models import Alert
 
 
 class AlertsTestCase(TestCase):
-
     def setUp(self):
         self.alert = Alert.objects.create(
             can_be_closed=True,

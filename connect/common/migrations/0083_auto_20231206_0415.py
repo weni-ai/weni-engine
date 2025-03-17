@@ -6,13 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('common', '0082_auto_20231005_1945'),
+        ("common", "0082_auto_20231005_1945"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='project',
-            name='description',
-            field=models.CharField(blank=True, max_length=1000, null=True, verbose_name='Project description with the context'),
+            model_name="project",
+            name="description",
+            field=models.CharField(
+                blank=True,
+                max_length=1000,
+                null=True,
+                verbose_name="Project description with the context",
+            ),
         ),
     ]

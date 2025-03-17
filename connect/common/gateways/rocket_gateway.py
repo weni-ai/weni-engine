@@ -10,9 +10,15 @@ class Rocket:
         self.username = getattr(settings, "ROCKET_USERNAME")
         self.password = getattr(settings, "ROCKET_PASSWORD")
         self.keycloak_oidc_url = getattr(settings, "OIDC_OP_TOKEN_ENDPOINT")
-        self.rocket_base_url = f'{rocket.url}/api/v1'
+        self.rocket_base_url = f"{rocket.url}/api/v1"
         self.is_authenticated = self.authenticate()
-        self.valid_roles = ['not-set', 'user', 'admin', 'livechat-agent', 'livechat-manager']
+        self.valid_roles = [
+            "not-set",
+            "user",
+            "admin",
+            "livechat-agent",
+            "livechat-manager",
+        ]
 
     def get_keycloak_authorization_token(self):
         data = dict(
@@ -81,7 +87,7 @@ class Rocket:
                 )
                 data = json.loads(r.text)
                 return data
-            return 'Invalid role choice'
+            return "Invalid role choice"
         return message
 
     def remove_user_role(self, role_name, username):
@@ -113,7 +119,12 @@ class Rocket:
                 "X-Auth-Token": self.rocket_credentials["X-Auth-Token"],
                 "X-User-Id": self.rocket_credentials["X-User-Id"],
             }
-            data = {"name": name, "email": email, "password": password, "username": username}
+            data = {
+                "name": name,
+                "email": email,
+                "password": password,
+                "username": username,
+            }
             r = requests.post(
                 self.rocket_base_url + path, headers=headers, data=json.dumps(data)
             )
@@ -130,9 +141,7 @@ class Rocket:
                 "X-Auth-Token": self.rocket_credentials["X-Auth-Token"],
                 "X-User-Id": self.rocket_credentials["X-User-Id"],
             }
-            r = requests.get(
-                self.rocket_base_url + path, headers=headers
-            )
+            r = requests.get(self.rocket_base_url + path, headers=headers)
             data = json.loads(r.text)
             return data
         return message

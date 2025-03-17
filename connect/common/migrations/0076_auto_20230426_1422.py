@@ -6,18 +6,41 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('common', '0075_merge_0073_auto_20230330_1542_0074_auto_20230327_2002'),
+        ("common", "0075_merge_0073_auto_20230330_1542_0074_auto_20230327_2002"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='project',
-            name='template_type',
-            field=models.CharField(blank=True, choices=[('support', 'support'), ('lead_capture', 'lead capture'), ('lead_capture_chatgpt', 'lead_capture+chatgpt'), ('omie_lead_capture', 'omie_lead_capture'), ('omie_financial', 'omie_financial'), ('omie_financial+chatgpt', 'omie_financial+chatgpt')], help_text='Project template type', max_length=30, null=True, verbose_name='Template type'),
+            model_name="project",
+            name="template_type",
+            field=models.CharField(
+                blank=True,
+                choices=[
+                    ("support", "support"),
+                    ("lead_capture", "lead capture"),
+                    ("lead_capture_chatgpt", "lead_capture+chatgpt"),
+                    ("omie_lead_capture", "omie_lead_capture"),
+                    ("omie_financial", "omie_financial"),
+                    ("omie_financial+chatgpt", "omie_financial+chatgpt"),
+                ],
+                help_text="Project template type",
+                max_length=30,
+                null=True,
+                verbose_name="Template type",
+            ),
         ),
         migrations.AlterField(
-            model_name='recentactivity',
-            name='action',
-            field=models.CharField(choices=[('ADD', 'Add'), ('TRAIN', 'Entity Trained'), ('UPDATE', 'Entity updated'), ('CREATE', 'Entity Created'), ('INTEGRATE', 'Entity integrated')], max_length=15),
+            model_name="recentactivity",
+            name="action",
+            field=models.CharField(
+                choices=[
+                    ("ADD", "Add"),
+                    ("TRAIN", "Entity Trained"),
+                    ("UPDATE", "Entity updated"),
+                    ("CREATE", "Entity Created"),
+                    ("INTEGRATE", "Entity integrated"),
+                ],
+                max_length=15,
+            ),
         ),
     ]

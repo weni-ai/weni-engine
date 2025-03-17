@@ -8,31 +8,93 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('template_projects', '0007_auto_20230926_1231'),
+        ("template_projects", "0007_auto_20230926_1231"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='TemplateTypeTranslation',
+            name="TemplateTypeTranslation",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('language', models.CharField(choices=[('en-us', 'English'), ('pt-br', 'Portuguese'), ('es', 'Spanish')], default='en-us', max_length=10, verbose_name='language')),
-                ('description', models.TextField(blank=True, null=True)),
-                ('name', models.CharField(blank=True, max_length=255, null=True)),
-                ('setup', models.JSONField(blank=True, null=True)),
-                ('photo', models.ImageField(blank=True, null=True, storage=connect.template_projects.storage.TemplateTypeImageStorage(), upload_to='')),
-                ('photo_description', models.TextField(blank=True, null=True)),
-                ('template_type', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='translations', to='template_projects.templatetype')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "language",
+                    models.CharField(
+                        choices=[
+                            ("en-us", "English"),
+                            ("pt-br", "Portuguese"),
+                            ("es", "Spanish"),
+                        ],
+                        default="en-us",
+                        max_length=10,
+                        verbose_name="language",
+                    ),
+                ),
+                ("description", models.TextField(blank=True, null=True)),
+                ("name", models.CharField(blank=True, max_length=255, null=True)),
+                ("setup", models.JSONField(blank=True, null=True)),
+                (
+                    "photo",
+                    models.ImageField(
+                        blank=True,
+                        null=True,
+                        storage=connect.template_projects.storage.TemplateTypeImageStorage(),
+                        upload_to="",
+                    ),
+                ),
+                ("photo_description", models.TextField(blank=True, null=True)),
+                (
+                    "template_type",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="translations",
+                        to="template_projects.templatetype",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='TemplateFeatureTranslation',
+            name="TemplateFeatureTranslation",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('language', models.CharField(choices=[('en-us', 'English'), ('pt-br', 'Portuguese'), ('es', 'Spanish')], default='en-us', max_length=10, verbose_name='language')),
-                ('description', models.TextField()),
-                ('name', models.CharField(max_length=255)),
-                ('template_feature', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='translations', to='template_projects.templatefeature')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "language",
+                    models.CharField(
+                        choices=[
+                            ("en-us", "English"),
+                            ("pt-br", "Portuguese"),
+                            ("es", "Spanish"),
+                        ],
+                        default="en-us",
+                        max_length=10,
+                        verbose_name="language",
+                    ),
+                ),
+                ("description", models.TextField()),
+                ("name", models.CharField(max_length=255)),
+                (
+                    "template_feature",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="translations",
+                        to="template_projects.templatefeature",
+                    ),
+                ),
             ],
         ),
     ]

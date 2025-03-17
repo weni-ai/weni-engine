@@ -6,7 +6,6 @@ from ..exceptions import AlertsPermissionDenied
 
 
 class CreateAlertTestCase(TestCase):
-
     def setUp(self):
         self.usecase = AlertCreateUseCase()
 

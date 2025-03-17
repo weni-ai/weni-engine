@@ -25,8 +25,7 @@ class ExternalServiceAPIView(views.APIView):
 
         rest_client = FlowsRESTClient()
         response = rest_client.create_external_service(
-            flow_organization=str(project.flow_organization),
-            **request.data
+            flow_organization=str(project.flow_organization), **request.data
         )
         response.raise_for_status()
 

@@ -8,9 +8,13 @@ from connect.api.v1.dashboard.filters import StatusServiceFilter
 from connect.api.v1.dashboard.serializers import (
     NewsletterSerializer,
     StatusServiceSerializer,
-    NewsletterOrganizationSerializer
+    NewsletterOrganizationSerializer,
 )
-from connect.common.models import ServiceStatus, NewsletterLanguage, NewsletterOrganization
+from connect.common.models import (
+    ServiceStatus,
+    NewsletterLanguage,
+    NewsletterOrganization,
+)
 from itertools import chain
 
 
@@ -52,7 +56,9 @@ class NewsletterViewSet(
         )
 
         serializer = self.get_serializer(queryset, many=True)
-        nl_org_serializer = NewsletterOrganizationSerializer(organization_newsletters, many=True)
+        nl_org_serializer = NewsletterOrganizationSerializer(
+            organization_newsletters, many=True
+        )
 
         language_newsletters = serializer.data
         organization_newsletters = nl_org_serializer.data

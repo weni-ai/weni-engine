@@ -6,25 +6,35 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('billing', '0006_alter_contact_name'),
+        ("billing", "0006_alter_contact_name"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='FailMessageLog',
+            name="FailMessageLog",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('message', models.TextField()),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("message", models.TextField()),
             ],
         ),
         migrations.RemoveField(
-            model_name='syncmanagertask',
-            name='fail_message',
+            model_name="syncmanagertask",
+            name="fail_message",
         ),
         migrations.AddField(
-            model_name='syncmanagertask',
-            name='fail_message',
-            field=models.ManyToManyField(to='billing.FailMessageLog', verbose_name='Manager fail messages'),
+            model_name="syncmanagertask",
+            name="fail_message",
+            field=models.ManyToManyField(
+                to="billing.FailMessageLog", verbose_name="Manager fail messages"
+            ),
         ),
     ]

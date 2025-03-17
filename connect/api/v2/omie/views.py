@@ -5,10 +5,9 @@ from connect.api.clients.omie import OmieClient
 
 
 class OmieAccountAPIView(views.APIView):
-
     def get(self, request):
 
-        """ Returns omie account listing and detail """
+        """Returns omie account listing and detail"""
 
         app_key = request.query_params.get("app_key")
         app_secret = request.query_params.get("app_secret")
@@ -24,20 +23,25 @@ class OmieAccountAPIView(views.APIView):
             data = response.json()
             return_data = {"accounts": []}
             for cadastro in data.get("cadastros"):
-                return_data["accounts"].append({
-                    "cCodInt": cadastro.get("identificacao").get("cCodInt"),
-                    "cNome": cadastro.get("identificacao").get("cNome"),
-                })
+                return_data["accounts"].append(
+                    {
+                        "cCodInt": cadastro.get("identificacao").get("cCodInt"),
+                        "cNome": cadastro.get("identificacao").get("cNome"),
+                    }
+                )
 
             return Response(status=status.HTTP_200_OK, data=return_data)
 
-        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR, data={"message": response.text})
+        return Response(
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            data={"message": response.text},
+        )
 
 
 class OmieOriginAPIView(views.APIView):
     def get(self, request):
 
-        """ Returns omie origin listing and detail """
+        """Returns omie origin listing and detail"""
 
         app_key = request.query_params.get("app_key")
         app_secret = request.query_params.get("app_secret")
@@ -59,13 +63,16 @@ class OmieOriginAPIView(views.APIView):
 
             return Response(status=status.HTTP_200_OK, data=return_data)
 
-        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR, data={"message": response.text})
+        return Response(
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            data={"message": response.text},
+        )
 
 
 class OmieSolutionsAPIView(views.APIView):
     def get(self, request):
 
-        """ Returns omie solutions listing and detail """
+        """Returns omie solutions listing and detail"""
 
         app_key = request.query_params.get("app_key")
         app_secret = request.query_params.get("app_secret")
@@ -87,13 +94,16 @@ class OmieSolutionsAPIView(views.APIView):
 
             return Response(status=status.HTTP_200_OK, data=return_data)
 
-        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR, data={"message": response.text})
+        return Response(
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            data={"message": response.text},
+        )
 
 
 class OmieUsersAPIView(views.APIView):
     def get(self, request):
 
-        """ Returns omie users listing and detail """
+        """Returns omie users listing and detail"""
 
         app_key = request.query_params.get("app_key")
         app_secret = request.query_params.get("app_secret")
@@ -121,4 +131,7 @@ class OmieUsersAPIView(views.APIView):
 
             return Response(status=status.HTTP_200_OK, data=return_data)
 
-        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR, data={"message": response.text})
+        return Response(
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            data={"message": response.text},
+        )

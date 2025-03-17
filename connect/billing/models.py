@@ -23,7 +23,9 @@ class SyncManagerTask(models.Model):
     retried = models.BooleanField(
         default=False, help_text=_("Whether this task retry or not.")
     )
-    fail_message = models.ManyToManyField(FailMessageLog, verbose_name=_("Manager fail messages"))
+    fail_message = models.ManyToManyField(
+        FailMessageLog, verbose_name=_("Manager fail messages")
+    )
     task_type = models.CharField(_("task type"), max_length=150)
     started_at = models.DateTimeField(_("started at"))
     finished_at = models.DateTimeField(_("finished at"), null=True)
@@ -56,7 +58,9 @@ class Contact(models.Model):
     last_seen_on = models.DateTimeField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(blank=True, null=True)
-    project = models.ForeignKey("common.Project", models.CASCADE, related_name="contacts", null=True)
+    project = models.ForeignKey(
+        "common.Project", models.CASCADE, related_name="contacts", null=True
+    )
 
     objects = ContactManager()
 
@@ -76,7 +80,12 @@ class ContactCount(models.Model):
     count = models.PositiveIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
     day = models.DateTimeField(null=True)
-    project = models.ForeignKey("common.Project", models.CASCADE, related_name="contact_count_project", null=True)
+    project = models.ForeignKey(
+        "common.Project",
+        models.CASCADE,
+        related_name="contact_count_project",
+        null=True,
+    )
 
     def increase_contact_count(self, contact_count):
         self.count += contact_count

@@ -17,7 +17,10 @@ class RecentActivityAPIView(views.APIView):
         try:
             user = User.objects.get(email=request.data.get("user"))
         except User.DoesNotExist:
-            return Response(status=status.HTTP_200_OK, data={"message": "The User does not exist. Action ignored"})
+            return Response(
+                status=status.HTTP_200_OK,
+                data={"message": "The User does not exist. Action ignored"},
+            )
 
         action = request.data.get("action")
         entity = request.data.get("entity")
@@ -27,8 +30,10 @@ class RecentActivityAPIView(views.APIView):
         project_uuid = request.data.get("project_uuid", None)
         new_recent_activities = []
 
-        if(intelligence_id):
-            organization = Organization.objects.get(inteligence_organization=intelligence_id)
+        if intelligence_id:
+            organization = Organization.objects.get(
+                inteligence_organization=intelligence_id
+            )
             for project in organization.project.all():
                 new_recent_activities.append(
                     RecentActivity(
@@ -36,7 +41,7 @@ class RecentActivityAPIView(views.APIView):
                         entity=entity,
                         user=user,
                         project=project,
-                        entity_name=entity_name
+                        entity_name=entity_name,
                     )
                 )
         else:
@@ -48,7 +53,10 @@ class RecentActivityAPIView(views.APIView):
             if len(project) > 0:
                 project = project.first()
             else:
-                return Response(status=status.HTTP_404_NOT_FOUND, data=dict(message="error: Project not found"))
+                return Response(
+                    status=status.HTTP_404_NOT_FOUND,
+                    data=dict(message="error: Project not found"),
+                )
 
             new_recent_activities.append(
                 RecentActivity(
@@ -56,7 +64,7 @@ class RecentActivityAPIView(views.APIView):
                     entity=entity,
                     user=user,
                     project=project,
-                    entity_name=entity_name
+                    entity_name=entity_name,
                 )
             )
 
@@ -65,15 +73,18 @@ class RecentActivityAPIView(views.APIView):
 
 
 class RecentActivityListAPIView(views.APIView):
-
     def get(self, request):
 
         project_uuid = request.query_params.get("project")
         project = Project.objects.get(uuid=project_uuid)
 
-        if not project.project_authorizations.filter(user__email=request.user.email).exists():
+        if not project.project_authorizations.filter(
+            user__email=request.user.email
+        ).exists():
             raise PermissionDenied()
 
-        recent_activities = RecentActivity.objects.filter(project__uuid=project_uuid).order_by("-created_on")
+        recent_activities = RecentActivity.objects.filter(
+            project__uuid=project_uuid
+        ).order_by("-created_on")
         data = [recent_activity.to_json for recent_activity in recent_activities]
         return Response(status=status.HTTP_200_OK, data=data)

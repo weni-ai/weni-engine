@@ -6,28 +6,43 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('authentication', '0011_user_has_2fa'),
+        ("authentication", "0011_user_has_2fa"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='user',
-            name='company_name',
-            field=models.CharField(blank=True, max_length=100, null=True, verbose_name='company name'),
+            model_name="user",
+            name="company_name",
+            field=models.CharField(
+                blank=True, max_length=100, null=True, verbose_name="company name"
+            ),
         ),
         migrations.AddField(
-            model_name='user',
-            name='company_sector',
-            field=models.CharField(blank=True, max_length=100, null=True, verbose_name='company sector'),
+            model_name="user",
+            name="company_sector",
+            field=models.CharField(
+                blank=True, max_length=100, null=True, verbose_name="company sector"
+            ),
         ),
         migrations.AddField(
-            model_name='user',
-            name='number_people',
-            field=models.IntegerField(blank=True, help_text='number of people working in this company', null=True, verbose_name='number of people'),
+            model_name="user",
+            name="number_people",
+            field=models.IntegerField(
+                blank=True,
+                help_text="number of people working in this company",
+                null=True,
+                verbose_name="number of people",
+            ),
         ),
         migrations.AddField(
-            model_name='user',
-            name='weni_helps',
-            field=models.CharField(blank=True, help_text='how the weni platform will help your team', max_length=100, null=True, verbose_name='weni helps'),
+            model_name="user",
+            name="weni_helps",
+            field=models.CharField(
+                blank=True,
+                help_text="how the weni platform will help your team",
+                max_length=100,
+                null=True,
+                verbose_name="weni helps",
+            ),
         ),
     ]

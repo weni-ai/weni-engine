@@ -2,8 +2,11 @@ import json
 
 
 def add_classifier_to_flow(
-    sample_flow: str, classifier_uuid: str, template_type: str,
-    ticketer: dict = None, queue: dict = None,
+    sample_flow: str,
+    classifier_uuid: str,
+    template_type: str,
+    ticketer: dict = None,
+    queue: dict = None,
 ):  # pragma: no cover
     from connect.common.models import Project
 

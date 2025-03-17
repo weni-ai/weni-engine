@@ -7,13 +7,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('template_projects', '0002_templatetype_setup'),
+        ("template_projects", "0002_templatetype_setup"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='templatetype',
-            name='photo',
-            field=models.ImageField(blank=True, null=True, storage=connect.template_projects.storage.TemplateTypeImageStorage(), upload_to=''),
+            model_name="templatetype",
+            name="photo",
+            field=models.ImageField(
+                blank=True,
+                null=True,
+                storage=connect.template_projects.storage.TemplateTypeImageStorage(),
+                upload_to="",
+            ),
         ),
     ]

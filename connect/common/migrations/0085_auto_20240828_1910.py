@@ -6,18 +6,28 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('common', '0084_auto_20240710_1828'),
+        ("common", "0084_auto_20240710_1828"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='organization',
-            name='config',
+            model_name="organization",
+            name="config",
             field=models.JSONField(default=dict),
         ),
         migrations.AlterField(
-            model_name='recentactivity',
-            name='action',
-            field=models.CharField(choices=[('ADD', 'Add'), ('TRAIN', 'Entity Trained'), ('DELETE', 'Entity Deleted'), ('CREATE', 'Entity Created'), ('INTEGRATE', 'Entity integrated'), ('UPDATE', 'Entity updated')], max_length=15),
+            model_name="recentactivity",
+            name="action",
+            field=models.CharField(
+                choices=[
+                    ("ADD", "Add"),
+                    ("TRAIN", "Entity Trained"),
+                    ("DELETE", "Entity Deleted"),
+                    ("CREATE", "Entity Created"),
+                    ("INTEGRATE", "Entity integrated"),
+                    ("UPDATE", "Entity updated"),
+                ],
+                max_length=15,
+            ),
         ),
     ]

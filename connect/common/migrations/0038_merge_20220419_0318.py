@@ -6,9 +6,8 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('common', '0037_alter_newsletterlanguage_language'),
-        ('common', '0037_auto_20220418_2220'),
+        ("common", "0037_alter_newsletterlanguage_language"),
+        ("common", "0037_auto_20220418_2220"),
     ]
 
-    operations = [
-    ]
+    operations = []
