@@ -676,6 +676,11 @@ class TypeProject(models.IntegerChoices):
     COMMERCE = 2, "commerce"
 
 
+class ProjectMode(models.IntegerChoices):
+    WENI_FRAMEWORK = 1, "weni framework"
+    OPINIONATED = 2, "opinionated"
+
+
 class Project(models.Model):
     class Meta:
         verbose_name = _("project")
@@ -781,12 +786,23 @@ class Project(models.Model):
     project_type = models.IntegerField(
         _("Project type"), choices=TypeProject.choices, default=TypeProject.GENERAL
     )
+    project_mode = models.IntegerField(
+        _("Project mode"),
+        choices=ProjectMode.choices,
+        default=ProjectMode.WENI_FRAMEWORK,
+    )
     vtex_account = models.CharField(
         _("VTEX account"), null=True, blank=True, max_length=100
     )
 
     def __str__(self):
         return f"{self.uuid} - Project: {self.name} - Org: {self.organization.name}"
+
+    def save(self, *args, **kwargs):
+        if self._state.adding and self.project_type == TypeProject.COMMERCE:
+            self.project_mode = ProjectMode.OPINIONATED
+
+        super().save(*args, **kwargs)
 
     def get_user_authorization(self, user, **kwargs):
         if user.is_anonymous:

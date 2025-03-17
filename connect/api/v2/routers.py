@@ -117,6 +117,11 @@ urlpatterns = [
         name="set-type",
     ),
     path(
+        "projects/<uuid>/set-mode",
+        project_views.ProjectViewSet.as_view({"post": "set_mode"}),
+        name="set-mode",
+    ),
+    path(
         "projects/<project_uuid>/user-api-token",
         UserAPIToken.as_view(),
         name="user-api-token",

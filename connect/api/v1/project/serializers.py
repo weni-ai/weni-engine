@@ -65,6 +65,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             "redirect_url",
             "description",
             "project_type",
+            "project_mode",
         ]
         ref_name = None
 
@@ -96,6 +97,7 @@ class ProjectSerializer(serializers.ModelSerializer):
     first_access = serializers.SerializerMethodField()
     wa_demo_token = serializers.SerializerMethodField()
     redirect_url = serializers.SerializerMethodField()
+    project_mode = serializers.IntegerField(read_only=True)
 
     def get_project_type(self, obj):
         if obj.is_template and obj.template_project.exists():
