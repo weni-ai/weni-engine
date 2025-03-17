@@ -118,7 +118,11 @@ class FlowType(GRPCType):
 
     def delete_classifier(self, classifier_uuid: str, user_email: str):
         stub = classifier_pb2_grpc.ClassifierControllerStub(self.channel)
-        stub.Destroy(classifier_pb2.ClassifierDestroyRequest(uuid=classifier_uuid, user_email=user_email))
+        stub.Destroy(
+            classifier_pb2.ClassifierDestroyRequest(
+                uuid=classifier_uuid, user_email=user_email
+            )
+        )
 
     def get_classifier(self, classifier_uuid: str):
         stub = classifier_pb2_grpc.ClassifierControllerStub(self.channel)
@@ -195,9 +199,7 @@ class FlowType(GRPCType):
     def get_billing_total_statistics(self, project_uuid: str, before: str, after: str):
         stub = billing_pb2_grpc.BillingControllerStub(self.channel)
         response = stub.Total(
-            billing_pb2.BillingRequest(
-                org=project_uuid, before=before, after=after
-            )
+            billing_pb2.BillingRequest(org=project_uuid, before=before, after=after)
         )
         return {"active_contacts": response.active_contacts}
 
@@ -226,7 +228,9 @@ class FlowType(GRPCType):
         )
         return response
 
-    def create_wac_channel(self, user: str, flow_organization: str, config: str, phone_number_id: str):
+    def create_wac_channel(
+        self, user: str, flow_organization: str, config: str, phone_number_id: str
+    ):
         stub = channel_pb2_grpc.ChannelControllerStub(self.channel)
         response = stub.CreateWAC(
             channel_pb2.ChannelWACCreateRequest(
@@ -248,19 +252,21 @@ class FlowType(GRPCType):
         )
         return response
 
-    def list_channel(self, is_active: str = "True", channel_type: str = "WA", project_uuid: str = None):
+    def list_channel(
+        self,
+        is_active: str = "True",
+        channel_type: str = "WA",
+        project_uuid: str = None,
+    ):
         stub = channel_pb2_grpc.ChannelControllerStub(self.channel)
         grpc_response = None
         if project_uuid:
             grpc_response = channel_pb2.ChannelListRequest(
-                is_active=is_active,
-                channel_type=channel_type,
-                org=project_uuid
+                is_active=is_active, channel_type=channel_type, org=project_uuid
             )
         else:
             grpc_response = channel_pb2.ChannelListRequest(
-                is_active=is_active,
-                channel_type=channel_type
+                is_active=is_active, channel_type=channel_type
             )
 
         return stub.List(grpc_response)
@@ -268,13 +274,13 @@ class FlowType(GRPCType):
     def get_active_contacts(self, project_uuid, before, after):
         stub = billing_pb2_grpc.BillingControllerStub(self.channel)
         response = stub.Detailed(
-            billing_pb2.BillingRequest(
-                org=project_uuid, before=before, after=after
-            )
+            billing_pb2.BillingRequest(org=project_uuid, before=before, after=after)
         )
         return response
 
-    def delete_user_permission_project(self, project_uuid: str, user_email: str, permission: int):
+    def delete_user_permission_project(
+        self, project_uuid: str, user_email: str, permission: int
+    ):
         stub = user_pb2_grpc.UserPermissionControllerStub(self.channel)
         request = user_pb2.UserPermissionUpdateRequest(
             org_uuid=project_uuid,
@@ -288,10 +294,7 @@ class FlowType(GRPCType):
     def get_message(self, org_uuid: str, contact_uuid: str, before: str, after: str):
         stub = billing_pb2_grpc.BillingControllerStub(self.channel)
         request = billing_pb2.MessageDetailRequest(
-            org_uuid=org_uuid,
-            contact_uuid=contact_uuid,
-            before=before,
-            after=after
+            org_uuid=org_uuid, contact_uuid=contact_uuid, before=before, after=after
         )
         response = stub.MessageDetail(request)
 
@@ -302,22 +305,28 @@ class FlowType(GRPCType):
         flows = []
 
         try:
-            flows_response = stub.List(flow_pb2.FlowListRequest(org_uuid=flow_organization, *args))
+            flows_response = stub.List(
+                flow_pb2.FlowListRequest(org_uuid=flow_organization, *args)
+            )
             for flow in flows_response:
                 triggers = []
 
                 for trigger in flow.triggers:
-                    triggers.append({
-                        "id": trigger.id,
-                        "keyword": trigger.keyword,
-                        "trigger_type": trigger.trigger_type,
-                    })
+                    triggers.append(
+                        {
+                            "id": trigger.id,
+                            "keyword": trigger.keyword,
+                            "trigger_type": trigger.trigger_type,
+                        }
+                    )
 
-                flows.append({
-                    "uuid": flow.uuid,
-                    "name": flow.name,
-                    "triggers": triggers,
-                })
+                flows.append(
+                    {
+                        "uuid": flow.uuid,
+                        "name": flow.name,
+                        "triggers": triggers,
+                    }
+                )
         except grpc.RpcError as e:
             if e.code() is not grpc.StatusCode.NOT_FOUND:
                 raise e

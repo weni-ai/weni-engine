@@ -7,13 +7,18 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('common', '0042_alter_newsletterlanguage_language'),
+        ("common", "0042_alter_newsletterlanguage_language"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='projectauthorization',
-            name='rocket_authorization',
-            field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.CASCADE, to='common.rocketauthorization'),
+            model_name="projectauthorization",
+            name="rocket_authorization",
+            field=models.ForeignKey(
+                default=None,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="common.rocketauthorization",
+            ),
         ),
     ]

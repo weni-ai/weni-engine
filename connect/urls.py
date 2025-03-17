@@ -221,7 +221,7 @@ if settings.DEBUG:
                             webapp_base_url=settings.WEBAPP_BASE_URL,
                             organization_name="Teste",
                             project_name="TestProject",
-                        )
+                        ),
                     ),
                 ]
             ),

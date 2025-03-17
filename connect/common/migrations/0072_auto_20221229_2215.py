@@ -6,18 +6,37 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('common', '0071_merge_20221227_2109'),
+        ("common", "0071_merge_20221227_2109"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='recentactivity',
-            name='action',
-            field=models.CharField(choices=[('CREATE', 'Entity Created'), ('TRAIN', 'Entity Trained'), ('ADD', 'Add'), ('UPDATE', 'Entity updated'), ('INTEGRATE', 'Entity integrated')], max_length=15),
+            model_name="recentactivity",
+            name="action",
+            field=models.CharField(
+                choices=[
+                    ("CREATE", "Entity Created"),
+                    ("TRAIN", "Entity Trained"),
+                    ("ADD", "Add"),
+                    ("UPDATE", "Entity updated"),
+                    ("INTEGRATE", "Entity integrated"),
+                ],
+                max_length=15,
+            ),
         ),
         migrations.AlterField(
-            model_name='recentactivity',
-            name='entity',
-            field=models.CharField(choices=[('USER', 'User Entity'), ('FLOW', 'Flow Entity'), ('CHANNEL', 'Channel Entity'), ('TRIGGER', 'Trigger Entity'), ('CAMPAIGN', 'Campaign Entity'), ('AI', 'Artificial Intelligence Entity')], max_length=20),
+            model_name="recentactivity",
+            name="entity",
+            field=models.CharField(
+                choices=[
+                    ("USER", "User Entity"),
+                    ("FLOW", "Flow Entity"),
+                    ("CHANNEL", "Channel Entity"),
+                    ("TRIGGER", "Trigger Entity"),
+                    ("CAMPAIGN", "Campaign Entity"),
+                    ("AI", "Artificial Intelligence Entity"),
+                ],
+                max_length=20,
+            ),
         ),
     ]

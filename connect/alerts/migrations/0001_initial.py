@@ -8,19 +8,37 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Alert',
+            name="Alert",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('can_be_closed', models.BooleanField()),
-                ('text', models.TextField()),
-                ('type', models.IntegerField(choices=[(1, 'very_high'), (2, 'high'), (3, 'medium'), (4, 'low'), (5, 'very_low')])),
-                ('uuid', models.UUIDField(default=uuid.uuid4)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("can_be_closed", models.BooleanField()),
+                ("text", models.TextField()),
+                (
+                    "type",
+                    models.IntegerField(
+                        choices=[
+                            (1, "very_high"),
+                            (2, "high"),
+                            (3, "medium"),
+                            (4, "low"),
+                            (5, "very_low"),
+                        ]
+                    ),
+                ),
+                ("uuid", models.UUIDField(default=uuid.uuid4)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
             ],
         ),
     ]

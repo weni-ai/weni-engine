@@ -9,6 +9,6 @@ class AlertFactory(factory.django.DjangoModelFactory):
         model = Alert
 
     can_be_closed = True
-    text = factory.Sequence(lambda n: 'test%d' % n)
+    text = factory.Sequence(lambda n: "test%d" % n)
     type = 1
     uuid = uuid4.uuid4()

@@ -82,7 +82,7 @@ class StripeGateway(Gateway):
                         "last2": card["card"]["last4"][2:],
                         "brand": card["card"]["brand"],
                         "cardholder_name": card["billing_details"]["name"],
-                        "card_expiration_date": f"{card['card']['exp_month']}/{str(card['card']['exp_year'])[2:]}"
+                        "card_expiration_date": f"{card['card']['exp_month']}/{str(card['card']['exp_year'])[2:]}",
                     }
                 )
         except self.stripe.error.CardError as error:
@@ -127,21 +127,21 @@ class StripeGateway(Gateway):
 
     def verify_payment_method(self, customer):
         payment_method = self.stripe.Customer.list_payment_methods(
-            customer,
-            type="card"
+            customer, type="card"
         )
         data = payment_method["data"][0]
-        response = {
-            "cvc_check": '',
-            "address_postal_code_check": ''
-        }
+        response = {"cvc_check": "", "address_postal_code_check": ""}
         if data["card"]["checks"].get("cvc_check") == "pass":
             response["cvc_check"] = data["card"]["checks"].get("cvc_check")
-            response["address_postal_code_check"] = data["card"]["checks"].get("address_postal_code_check")
+            response["address_postal_code_check"] = data["card"]["checks"].get(
+                "address_postal_code_check"
+            )
             return response
 
         response["cvc_check"] = data["card"]["checks"].get("cvc_check")
-        response["address_postal_code_check"] = data["card"]["checks"].get("address_postal_code_check")
+        response["address_postal_code_check"] = data["card"]["checks"].get(
+            "address_postal_code_check"
+        )
         return response
 
     def card_verification_charge(self, customer):  # pragma: no cover
@@ -152,7 +152,7 @@ class StripeGateway(Gateway):
             )
             response = stripe.PaymentIntent.create(
                 amount=100 * int(self.verification_amount),
-                currency='usd',
+                currency="usd",
                 customer=customer,
                 description="Card Verification Charge",
                 payment_method=payment.get("data", {})[0].get("id"),
@@ -161,7 +161,7 @@ class StripeGateway(Gateway):
             )
             return {
                 "status": "SUCCESS",
-                "response": response["charges"]["data"][0]["paid"]
+                "response": response["charges"]["data"][0]["paid"],
             }
         except IndexError:
             return {

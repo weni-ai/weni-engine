@@ -6,18 +6,31 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('common', '0067_auto_20221130_0118'),
+        ("common", "0067_auto_20221130_0118"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='billingplan',
-            name='plan',
-            field=models.CharField(choices=[('free', 'free'), ('trial', 'trial'), ('start', 'start'), ('scale', 'scale'), ('advanced', 'advanced'), ('enterprise', 'enterprise')], max_length=10, verbose_name='plan'),
+            model_name="billingplan",
+            name="plan",
+            field=models.CharField(
+                choices=[
+                    ("free", "free"),
+                    ("trial", "trial"),
+                    ("start", "start"),
+                    ("scale", "scale"),
+                    ("advanced", "advanced"),
+                    ("enterprise", "enterprise"),
+                ],
+                max_length=10,
+                verbose_name="plan",
+            ),
         ),
         migrations.AlterField(
-            model_name='billingplan',
-            name='trial_end_date',
-            field=models.DateTimeField(blank=True, null=True, verbose_name='Trial end date'),
+            model_name="billingplan",
+            name="trial_end_date",
+            field=models.DateTimeField(
+                blank=True, null=True, verbose_name="Trial end date"
+            ),
         ),
     ]

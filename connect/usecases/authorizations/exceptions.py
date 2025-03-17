@@ -1,0 +1,2 @@
+class UserHasNoPermissionToManageProject(Exception):
+    pass

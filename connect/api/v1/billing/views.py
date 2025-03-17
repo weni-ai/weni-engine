@@ -34,15 +34,12 @@ class BillingViewSet(viewsets.ViewSet):
             customer = Customer(id="cus_MYOrndkgpPHGK9")
             # Fake setup intent object
             setup_intent = stripe.SetupIntent(
-                customer=customer.id,
-                id="seti_test_string"
+                customer=customer.id, id="seti_test_string"
             )
 
         else:
             customer = stripe.Customer.create()
-            setup_intent = stripe.SetupIntent.create(
-                customer=customer.id
-            )
+            setup_intent = stripe.SetupIntent.create(customer=customer.id)
 
         data = {
             "setup_intent": setup_intent,
@@ -67,7 +64,8 @@ class BillingViewSet(viewsets.ViewSet):
 
         if not plan_info["valid"]:
             return JsonResponse(
-                data={"status": "FAILURE", "message": "Invalid plan choice"}, status=status.HTTP_400_BAD_REQUEST
+                data={"status": "FAILURE", "message": "Invalid plan choice"},
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         price = BillingPlan.plan_info(plan)["price"]
@@ -75,11 +73,16 @@ class BillingViewSet(viewsets.ViewSet):
         data = {
             "customer": customer,
             "plan": plan,
-            "price": price ,
+            "price": price,
         }
 
         if settings.TESTING:
-            p_intent = stripe.PaymentIntent(amount_received=price, id="pi_test_id", amount=price, charges={"amount": price, "amount_captured": price})
+            p_intent = stripe.PaymentIntent(
+                amount_received=price,
+                id="pi_test_id",
+                amount=price,
+                charges={"amount": price, "amount_captured": price},
+            )
             purchase_result = {"status": "SUCCESS", "response": p_intent}
             data["status"] = "SUCCESS"
         else:
@@ -88,7 +91,9 @@ class BillingViewSet(viewsets.ViewSet):
                 import decimal
 
                 price -= price * (4.18 / 100)
-                final_price = Decimal(price).quantize(Decimal(".01"), decimal.ROUND_HALF_UP)
+                final_price = Decimal(price).quantize(
+                    Decimal(".01"), decimal.ROUND_HALF_UP
+                )
                 gateway = billing.get_gateway("stripe")
                 purchase_result = gateway.purchase(
                     money=int(final_price),

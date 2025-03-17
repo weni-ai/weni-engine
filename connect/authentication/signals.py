@@ -8,7 +8,10 @@ from connect.api.v1.keycloak import KeycloakControl
 from connect.authentication.models import User
 
 from connect.usecases.authorizations.create import CreateAuthorizationUseCase
-from connect.usecases.authorizations.dto import CreateAuthorizationDTO, CreateProjectAuthorizationDTO
+from connect.usecases.authorizations.dto import (
+    CreateAuthorizationDTO,
+    CreateProjectAuthorizationDTO,
+)
 from connect.internals.event_driven.producer.rabbitmq_publisher import RabbitmqPublisher
 
 
@@ -21,9 +24,10 @@ def signal_user(instance, created, **kwargs):
         RequestPermissionOrganization,
         RequestPermissionProject,
     )
+
     if settings.USE_EDA_PERMISSIONS and created:
-        requests_permission_organizations = RequestPermissionOrganization.objects.filter(
-            email=instance.email
+        requests_permission_organizations = (
+            RequestPermissionOrganization.objects.filter(email=instance.email)
         )
         requests_permission_projects = RequestPermissionProject.objects.filter(
             email=instance.email
@@ -45,7 +49,7 @@ def signal_user(instance, created, **kwargs):
                 user_email=requests_permission_project.email,
                 project_uuid=str(requests_permission_project.project.uuid),
                 role=requests_permission_project.role,
-                created_by_email=requests_permission_project.created_by.email
+                created_by_email=requests_permission_project.created_by.email,
             )
             usecase.create_authorization_for_a_single_project(auth_dto=auth_dto)
             requests_permission_project.delete()

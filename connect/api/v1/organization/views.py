@@ -19,7 +19,6 @@ from connect.api.v1.organization.filters import (
     OrganizationAuthorizationFilter,
     RequestPermissionOrganizationFilter,
 )
-from rest_framework.exceptions import PermissionDenied
 from connect.api.v1.organization.permissions import (
     Has2FA,
     OrganizationHasPermission,

@@ -10,62 +10,173 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('common', '0050_project_flow_id'),
+        ("common", "0050_project_flow_id"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Channel',
+            name="Channel",
             fields=[
-                ('uuid', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, verbose_name='UUID')),
-                ('name', models.CharField(max_length=150, verbose_name='name')),
-                ('channel_type', models.CharField(choices=[('WA', 'WhatsApp'), ('TG', 'Telegram')], max_length=150, verbose_name='channel_type')),
-                ('channel_flow_uuid', models.UUIDField(unique=True, verbose_name='flow identification UUID')),
-                ('project', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='project', to='common.project')),
+                (
+                    "uuid",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="UUID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=150, verbose_name="name")),
+                (
+                    "channel_type",
+                    models.CharField(
+                        choices=[("WA", "WhatsApp"), ("TG", "Telegram")],
+                        max_length=150,
+                        verbose_name="channel_type",
+                    ),
+                ),
+                (
+                    "channel_flow_uuid",
+                    models.UUIDField(
+                        unique=True, verbose_name="flow identification UUID"
+                    ),
+                ),
+                (
+                    "project",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="project",
+                        to="common.project",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Contact',
+            name="Contact",
             fields=[
-                ('uuid', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, verbose_name='UUID')),
-                ('contact_flow_uuid', models.UUIDField(verbose_name='flow identification UUID')),
-                ('name', models.CharField(max_length=150, verbose_name='contact name')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('modified_at', models.DateTimeField(blank=True, null=True)),
-                ('channel', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='channel', to='billing.channel')),
+                (
+                    "uuid",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="UUID",
+                    ),
+                ),
+                (
+                    "contact_flow_uuid",
+                    models.UUIDField(verbose_name="flow identification UUID"),
+                ),
+                ("name", models.CharField(max_length=150, verbose_name="contact name")),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("modified_at", models.DateTimeField(blank=True, null=True)),
+                (
+                    "channel",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="channel",
+                        to="billing.channel",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='SyncManagerTask',
+            name="SyncManagerTask",
             fields=[
-                ('uuid', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, verbose_name='UUID')),
-                ('status', models.BooleanField(default=False, help_text='Whether this task succeded or not.')),
-                ('retried', models.BooleanField(default=False, help_text='Whether this task retry or not.')),
-                ('task_type', models.CharField(max_length=150, verbose_name='task type')),
-                ('started_at', models.DateTimeField(verbose_name='started at')),
-                ('finished_at', models.DateTimeField(null=True, verbose_name='finished at')),
-                ('before', models.DateTimeField(verbose_name='before')),
-                ('after', models.DateTimeField(verbose_name='after')),
+                (
+                    "uuid",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="UUID",
+                    ),
+                ),
+                (
+                    "status",
+                    models.BooleanField(
+                        default=False, help_text="Whether this task succeded or not."
+                    ),
+                ),
+                (
+                    "retried",
+                    models.BooleanField(
+                        default=False, help_text="Whether this task retry or not."
+                    ),
+                ),
+                (
+                    "task_type",
+                    models.CharField(max_length=150, verbose_name="task type"),
+                ),
+                ("started_at", models.DateTimeField(verbose_name="started at")),
+                (
+                    "finished_at",
+                    models.DateTimeField(null=True, verbose_name="finished at"),
+                ),
+                ("before", models.DateTimeField(verbose_name="before")),
+                ("after", models.DateTimeField(verbose_name="after")),
             ],
         ),
         migrations.CreateModel(
-            name='Message',
+            name="Message",
             fields=[
-                ('uuid', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, verbose_name='UUID')),
-                ('text', models.TextField()),
-                ('sent_on', models.DateTimeField()),
-                ('direction', models.CharField(max_length=150, verbose_name='contact name')),
-                ('message_flow_uuid', models.UUIDField(unique=True, verbose_name='flow identification UUID')),
-                ('contact', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='message', to='billing.contact')),
+                (
+                    "uuid",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="UUID",
+                    ),
+                ),
+                ("text", models.TextField()),
+                ("sent_on", models.DateTimeField()),
+                (
+                    "direction",
+                    models.CharField(max_length=150, verbose_name="contact name"),
+                ),
+                (
+                    "message_flow_uuid",
+                    models.UUIDField(
+                        unique=True, verbose_name="flow identification UUID"
+                    ),
+                ),
+                (
+                    "contact",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="message",
+                        to="billing.contact",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='ContactCount',
+            name="ContactCount",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('count', models.PositiveIntegerField()),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('channel', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='contact_count_channel', to='billing.channel')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("count", models.PositiveIntegerField()),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "channel",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="contact_count_channel",
+                        to="billing.channel",
+                    ),
+                ),
             ],
         ),
     ]

@@ -13,18 +13,18 @@ from connect.common.models import (
     Organization,
     OrganizationAuthorization,
     OrganizationRole,
-    BillingPlan
+    BillingPlan,
 )
 from connect.api.v1.organization.permissions import (
     Has2FA,
     OrganizationHasPermission,
     IsCRMUser,
-    _is_orm_user
+    _is_orm_user,
 )
 from connect.api.v2.paginations import CustomCursorPagination
 from connect.api.v2.organizations.serializers import (
     OrganizationSeralizer,
-    NestedAuthorizationOrganizationSerializer
+    NestedAuthorizationOrganizationSerializer,
 )
 from connect.api.v2.projects.serializers import ProjectSerializer
 from connect.api.v2.organizations.api_schemas import (
@@ -37,13 +37,17 @@ class OrganizationViewSet(
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
     mixins.DestroyModelMixin,
-    GenericViewSet
+    GenericViewSet,
 ):
 
     queryset = Organization.objects.all()
     serializer_class = OrganizationSeralizer
     lookup_field = "uuid"
-    permission_classes = [IsAuthenticated, OrganizationHasPermission | IsCRMUser, Has2FA]
+    permission_classes = [
+        IsAuthenticated,
+        OrganizationHasPermission | IsCRMUser,
+        Has2FA,
+    ]
     pagination_class = CustomCursorPagination
 
     def get_queryset(self, *args, **kwargs):
@@ -65,10 +69,12 @@ class OrganizationViewSet(
         return super().get_object()
 
     def get_ordering(self):
-        valid_fields = (org_fields.name for org_fields in Organization._meta.get_fields())
+        valid_fields = (
+            org_fields.name for org_fields in Organization._meta.get_fields()
+        )
         ordering = []
-        for param in self.request.query_params.getlist('ordering'):
-            if param.startswith('-'):
+        for param in self.request.query_params.getlist("ordering"):
+            if param.startswith("-"):
                 field = param[1:]
             else:
                 field = param
@@ -87,7 +93,9 @@ class OrganizationViewSet(
         try:
             serializer.is_valid(raise_exception=True)
         except exceptions.ValidationError as e:
-            raise exceptions.ValidationError({"organization": e.detail}, code=e.get_codes())
+            raise exceptions.ValidationError(
+                {"organization": e.detail}, code=e.get_codes()
+            )
 
         instance = serializer.save()
 
@@ -95,10 +103,10 @@ class OrganizationViewSet(
             return Response(**instance)
 
         # Project
-        project_data.update(
-            {"organization": instance.uuid}
+        project_data.update({"organization": instance.uuid})
+        project_serializer = ProjectSerializer(
+            data=project_data, context={"request": request}
         )
-        project_serializer = ProjectSerializer(data=project_data, context={"request": request})
 
         try:
             project_serializer.is_valid(raise_exception=True)
@@ -111,10 +119,7 @@ class OrganizationViewSet(
             instance.delete()
             return Response(**project_instance)
 
-        data = {
-            "organization": serializer.data,
-            "project": project_serializer.data
-        }
+        data = {"organization": serializer.data, "project": project_serializer.data}
 
         return Response(data, status.HTTP_201_CREATED)
 
@@ -129,9 +134,7 @@ class OrganizationViewSet(
         methods=["GET"],
         url_name="get-contact-active",
     )
-    def get_contact_active(
-        self, request, **kwargs
-    ):  # pragma: no cover
+    def get_contact_active(self, request, **kwargs):  # pragma: no cover
         organization = self.get_object()
 
         before = request.query_params.get("before")
@@ -155,8 +158,16 @@ class OrganizationViewSet(
                     "plan": project.organization.organization_billing.plan,
                     "plan_method": project.organization.organization_billing.plan_method,
                     "flow_organization": project.flow_organization,
-                    "active_contacts": project.get_contacts(before=str(before), after=str(after), counting_method=BillingPlan.ACTIVE_CONTACTS),
-                    "attendances": project.get_contacts(before=str(before), after=str(after), counting_method=BillingPlan.ATTENDANCES),
+                    "active_contacts": project.get_contacts(
+                        before=str(before),
+                        after=str(after),
+                        counting_method=BillingPlan.ACTIVE_CONTACTS,
+                    ),
+                    "attendances": project.get_contacts(
+                        before=str(before),
+                        after=str(after),
+                        counting_method=BillingPlan.ATTENDANCES,
+                    ),
                 }
             )
 

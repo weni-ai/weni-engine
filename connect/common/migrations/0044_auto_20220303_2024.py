@@ -8,32 +8,70 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('common', '0043_alter_projectauthorization_rocket_authorization'),
+        ("common", "0043_alter_projectauthorization_rocket_authorization"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='organizationauthorization',
-            name='role',
-            field=models.PositiveIntegerField(choices=[(0, 'not set'), (2, 'contributor'), (3, 'admin'), (1, 'viewer'), (4, 'financial')], default=0, verbose_name='role'),
+            model_name="organizationauthorization",
+            name="role",
+            field=models.PositiveIntegerField(
+                choices=[
+                    (0, "not set"),
+                    (2, "contributor"),
+                    (3, "admin"),
+                    (1, "viewer"),
+                    (4, "financial"),
+                ],
+                default=0,
+                verbose_name="role",
+            ),
         ),
         migrations.AlterField(
-            model_name='projectauthorization',
-            name='role',
-            field=models.PositiveIntegerField(choices=[(0, 'not set'), (1, 'viewer'), (2, 'contributor'), (3, 'moderator')], default=0, verbose_name='role'),
+            model_name="projectauthorization",
+            name="role",
+            field=models.PositiveIntegerField(
+                choices=[
+                    (0, "not set"),
+                    (1, "viewer"),
+                    (2, "contributor"),
+                    (3, "moderator"),
+                ],
+                default=0,
+                verbose_name="role",
+            ),
         ),
         migrations.AlterField(
-            model_name='requestpermissionorganization',
-            name='role',
-            field=models.PositiveIntegerField(choices=[(0, 'not set'), (2, 'contributor'), (3, 'admin'), (1, 'viewer'), (4, 'financial')], default=0, verbose_name='role'),
+            model_name="requestpermissionorganization",
+            name="role",
+            field=models.PositiveIntegerField(
+                choices=[
+                    (0, "not set"),
+                    (2, "contributor"),
+                    (3, "admin"),
+                    (1, "viewer"),
+                    (4, "financial"),
+                ],
+                default=0,
+                verbose_name="role",
+            ),
         ),
         migrations.AlterField(
-            model_name='requestpermissionproject',
-            name='role',
-            field=models.PositiveIntegerField(choices=[(0, 'not set'), (1, 'viewer'), (2, 'contributor'), (3, 'moderator')], default=0, verbose_name='role'),
+            model_name="requestpermissionproject",
+            name="role",
+            field=models.PositiveIntegerField(
+                choices=[
+                    (0, "not set"),
+                    (1, "viewer"),
+                    (2, "contributor"),
+                    (3, "moderator"),
+                ],
+                default=0,
+                verbose_name="role",
+            ),
         ),
         migrations.AlterUniqueTogether(
-            name='projectauthorization',
-            unique_together={('user', 'project')},
+            name="projectauthorization",
+            unique_together={("user", "project")},
         ),
     ]

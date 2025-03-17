@@ -3,9 +3,7 @@ import pendulum
 import grpc
 from grpc._channel import _InactiveRpcError
 
-from django.utils import timezone
 from django.conf import settings
-from django.db import transaction
 
 from connect import utils, billing
 from connect.authentication.models import User
@@ -13,8 +11,6 @@ from connect.celery import app
 from connect.common.models import (
     Organization,
     Project,
-    LogService,
-    BillingPlan,
     Invoice,
     GenericBillingData,
     RecentActivity,

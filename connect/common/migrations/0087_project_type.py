@@ -6,13 +6,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('common', '0086_alter_recentactivity_action'),
+        ("common", "0086_alter_recentactivity_action"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='project',
-            name='type',
-            field=models.IntegerField(choices=[(1, 'general'), (2, 'commerce')], default=1, verbose_name='Project type'),
+            model_name="project",
+            name="type",
+            field=models.IntegerField(
+                choices=[(1, "general"), (2, "commerce")],
+                default=1,
+                verbose_name="Project type",
+            ),
         ),
     ]

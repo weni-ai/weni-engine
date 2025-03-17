@@ -39,7 +39,6 @@ logger = logging.getLogger(__name__)
 
 
 class ProjectSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Project
         fields = [
@@ -106,7 +105,11 @@ class ProjectSerializer(serializers.ModelSerializer):
 
     def get_flow_uuid(self, obj):
         if obj.is_template and obj.template_project.exists():
-            template = obj.template_project.filter(flow_uuid__isnull=False, wa_demo_token__isnull=False, redirect_url__isnull=False).first()
+            template = obj.template_project.filter(
+                flow_uuid__isnull=False,
+                wa_demo_token__isnull=False,
+                redirect_url__isnull=False,
+            ).first()
             if template:
                 return template.flow_uuid
             ...
@@ -122,17 +125,23 @@ class ProjectSerializer(serializers.ModelSerializer):
                 template = obj.template_project.get(authorization__user__email=email)
                 return template.first_access
             except TemplateProject.DoesNotExist:
-                template_project = obj.template_project.filter(wa_demo_token__isnull=False, redirect_url__isnull=False).first()
+                template_project = obj.template_project.filter(
+                    wa_demo_token__isnull=False, redirect_url__isnull=False
+                ).first()
                 template = obj.template_project.create(
                     wa_demo_token=template_project.wa_demo_token,
                     redirect_url=template_project.redirect_url,
-                    authorization=authorization
+                    authorization=authorization,
                 )
         ...
 
     def get_wa_demo_token(self, obj):
         if obj.is_template and obj.template_project.exists():
-            template = obj.template_project.filter(flow_uuid__isnull=False, wa_demo_token__isnull=False, redirect_url__isnull=False).first()
+            template = obj.template_project.filter(
+                flow_uuid__isnull=False,
+                wa_demo_token__isnull=False,
+                redirect_url__isnull=False,
+            ).first()
             if template:
                 return template.wa_demo_token
             ...
@@ -140,7 +149,11 @@ class ProjectSerializer(serializers.ModelSerializer):
 
     def get_redirect_url(self, obj):
         if obj.is_template and obj.template_project.exists():
-            template = obj.template_project.filter(flow_uuid__isnull=False, wa_demo_token__isnull=False, redirect_url__isnull=False).first()
+            template = obj.template_project.filter(
+                flow_uuid__isnull=False,
+                wa_demo_token__isnull=False,
+                redirect_url__isnull=False,
+            ).first()
             if template:
                 return template.redirect_url
             ...
@@ -172,10 +185,7 @@ class ProjectSerializer(serializers.ModelSerializer):
         )
 
         validated_data.update(
-            {
-                "flow_organization": project.get("uuid"),
-                "created_by": user
-            }
+            {"flow_organization": project.get("uuid"), "created_by": user}
         )
         instance = super().create(validated_data)
 
@@ -190,17 +200,14 @@ class ProjectSerializer(serializers.ModelSerializer):
     def get_authorizations(self, obj):
         exclude_roles = [ProjectRole.SUPPORT.value]
         queryset = obj.project_authorizations.exclude(role__in=exclude_roles)
-        response = dict(
-            count=queryset.count(),
-            users=[]
-        )
+        response = dict(count=queryset.count(), users=[])
         for i in queryset:
             chats_role = None
             if i.rocket_authorization:
                 chats_role = i.rocket_authorization.role
             elif i.chats_authorization:
                 chats_role = i.chats_authorization.role
-            response['users'].append(
+            response["users"].append(
                 dict(
                     username=i.user.username,
                     email=i.user.email,
@@ -222,7 +229,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             rocket_authorization = RequestRocketPermission.objects.filter(email=i.email)
             chats_authorization = RequestChatsPermission.objects.filter(email=i.email)
             chats_role = None
-            if(len(rocket_authorization) > 0):
+            if len(rocket_authorization) > 0:
                 rocket_authorization = rocket_authorization.first()
                 chats_role = rocket_authorization.role
 
@@ -235,7 +242,7 @@ class ProjectSerializer(serializers.ModelSerializer):
                     email=i.email,
                     project_role=i.role,
                     created_by=i.created_by.email,
-                    chats_role=chats_role
+                    chats_role=chats_role,
                 )
             )
         return response
@@ -254,7 +261,9 @@ class ProjectSerializer(serializers.ModelSerializer):
         request = self.context.get("request")
         if not request or not request.user.is_authenticated:
             return None
-        opened = OpenedProject.objects.filter(user__email=request.user, project=obj.uuid)
+        opened = OpenedProject.objects.filter(
+            user__email=request.user, project=obj.uuid
+        )
         response = None
         if opened.exists():
             opened = opened.first()
@@ -305,15 +314,11 @@ class RequestPermissionProjectSerializer(serializers.ModelSerializer):
 
         email = attrs.get("email")
 
-        if ' ' in email:
-            raise ValidationError(
-                _("Email field cannot have spaces")
-            )
+        if " " in email:
+            raise ValidationError(_("Email field cannot have spaces"))
 
-        if bool(re.match('[A-Z]', email)):
-            raise ValidationError(
-                _("Email field cannot have uppercase characters")
-            )
+        if bool(re.match("[A-Z]", email)):
+            raise ValidationError(_("Email field cannot have uppercase characters"))
 
         return attrs
 
@@ -504,7 +509,7 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
             data.update(
                 {
                     "data": {"message": "Project authorization not setted"},
-                    "status": "FAILED"
+                    "status": "FAILED",
                 }
             )
             return data
@@ -517,14 +522,16 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
             intelligence_client = IntelligenceRESTClient()
             try:
                 repository_uuid = settings.REPOSITORY_IDS.get(project.template_type)
-                access_token = intelligence_client.get_access_token(request.user.email, repository_uuid)
+                access_token = intelligence_client.get_access_token(
+                    request.user.email, repository_uuid
+                )
             except Exception as error:
                 logger.error(f" REPOSITORY IDS {error}")
                 template.delete()
                 data.update(
                     {
                         "data": {"message": "Could not get access token"},
-                        "status": "FAILED"
+                        "status": "FAILED",
                     }
                 )
                 return data
@@ -537,23 +544,22 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
                 classifier_uuid = tasks.create_classifier(
                     project_uuid=str(project.flow_organization),
                     user_email=request.user.email,
-                    classifier_name="Farewell & Greetings" if project.template_type == Project.TYPE_LEAD_CAPTURE else "Binary Answers",
+                    classifier_name="Farewell & Greetings"
+                    if project.template_type == Project.TYPE_LEAD_CAPTURE
+                    else "Binary Answers",
                     access_token=access_token,
                 ).get("uuid")
             except Exception as error:
                 logger.error(f"CREATE CLASSIFIER {error}")
                 template.delete()
                 data.update(
-                    {
-                        "message": "Could not create classifier",
-                        "status": "FAILED"
-                    }
+                    {"message": "Could not create classifier", "status": "FAILED"}
                 )
                 return data
         else:
             classifier_uuid = uuid.uuid4()
 
-    # Create Flow and Ticketer
+        # Create Flow and Ticketer
         if not settings.TESTING and not settings.USE_EDA:
             rest_client = FlowsRESTClient()
             try:
@@ -566,7 +572,7 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
                         date_format=project.date_format,
                         timezone=str(project.timezone),
                         is_template=True,
-                        user_email=project.created_by.email
+                        user_email=project.created_by.email,
                     )
                     chats_response = json.loads(chats_response.text)
                 flows = rest_client.create_flows(
@@ -581,12 +587,7 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
             except Exception as error:
                 logger.error(error)
                 template.delete()
-                data.update(
-                    {
-                        "message": "Could not create flow",
-                        "status": "FAILED"
-                    }
-                )
+                data.update({"message": "Could not create flow", "status": "FAILED"})
                 return data
         else:
             flows = {"uuid": uuid.uuid4()}
@@ -600,7 +601,14 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
         redirect_url = "https://wa.me/5582123456?text=wa-demo-12345"
         template.wa_demo_token = wa_demo_token
         template.redirect_url = redirect_url
-        template.save(update_fields=["classifier_uuid", "flow_uuid", "wa_demo_token", "redirect_url"])
+        template.save(
+            update_fields=[
+                "classifier_uuid",
+                "flow_uuid",
+                "wa_demo_token",
+                "redirect_url",
+            ]
+        )
 
         data = {
             "first_access": template.first_access,

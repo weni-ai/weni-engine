@@ -4,16 +4,12 @@ from .exceptions import AlertsPermissionDenied
 
 
 class AlertAuthsUseCase:
-
     def __init__(self) -> None:
         self.valid_tokens = [
             settings.VERIFICATION_MARKETING_TOKEN,
         ]
 
-    def is_valid(
-            self,
-            token: str
-    ) -> bool:
+    def is_valid(self, token: str) -> bool:
         return token in self.valid_tokens
 
     def has_permission(

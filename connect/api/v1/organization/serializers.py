@@ -18,9 +18,11 @@ from connect.common.models import (
     RequestPermissionOrganization,
     BillingPlan,
     OrganizationLevelRole,
-    OrganizationRole
+    OrganizationRole,
 )
-from connect.api.v1.internal.intelligence.intelligence_rest_client import IntelligenceRESTClient
+from connect.api.v1.internal.intelligence.intelligence_rest_client import (
+    IntelligenceRESTClient,
+)
 
 User = get_user_model()
 logger = logging.getLogger(__name__)
@@ -49,7 +51,7 @@ class BillingPlanSerializer(serializers.ModelSerializer):
             "currenty_invoice",
             "contract_on",
             "trial_end_date",
-            "days_till_trial_end"
+            "days_till_trial_end",
         ]
         ref_name = None
 
@@ -143,7 +145,9 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
     enforce_2fa = serializers.BooleanField(
         label=_("enforce 2fa"),
         required=False,
-        help_text=_("if this field is true, only users with 2fa activated can access the org")
+        help_text=_(
+            "if this field is true, only users with 2fa activated can access the org"
+        ),
     )
 
     show_chat_help = serializers.SerializerMethodField()
@@ -154,7 +158,7 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
             ai_client = IntelligenceRESTClient()
             organization = ai_client.create_organization(
                 user_email=self.context["request"].user.email,
-                organization_name=validated_data.get("name")
+                organization_name=validated_data.get("name"),
             )
 
         validated_data.update({"inteligence_organization": organization.get("id")})
@@ -214,7 +218,11 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
         return instance
 
     def get_authorizations(self, obj):
-        exclude_roles = [OrganizationRole.NOT_SETTED.value, OrganizationRole.VIEWER.value, OrganizationRole.SUPPORT.value]
+        exclude_roles = [
+            OrganizationRole.NOT_SETTED.value,
+            OrganizationRole.VIEWER.value,
+            OrganizationRole.SUPPORT.value,
+        ]
         return {
             "count": obj.authorizations.count(),
             "users": [
@@ -243,7 +251,10 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
         if obj.config.get("show_chat_help"):
             return True
         user = obj.authorizations.order_by("created_at").first().user
-        return user.number_people == 4 or user.company_segment in ['E-commerce', 'Comercio electrónico']
+        return user.number_people == 4 or user.company_segment in [
+            "E-commerce",
+            "Comercio electrónico",
+        ]
 
 
 class OrganizationAuthorizationSerializer(serializers.ModelSerializer):
@@ -317,29 +328,21 @@ class RequestPermissionOrganizationSerializer(serializers.ModelSerializer):
 
         email = attrs.get("email")
 
-        if ' ' in email:
-            raise ValidationError(
-                _("Email field cannot have spaces")
-            )
+        if " " in email:
+            raise ValidationError(_("Email field cannot have spaces"))
 
-        if bool(re.match('[A-Z]', email)):
-            raise ValidationError(
-                _("Email field cannot have uppercase characters")
-            )
+        if bool(re.match("[A-Z]", email)):
+            raise ValidationError(_("Email field cannot have uppercase characters"))
 
         return attrs
 
     def get_user_data(self, obj):
         user = User.objects.filter(email=obj.email)
-        user_data = dict(
-            name=f"{obj.email}",
-            photo=None
-        )
+        user_data = dict(name=f"{obj.email}", photo=None)
         if user.exists():
             user = user.first()
             user_data = dict(
-                name=f"{user.first_name} {user.last_name}",
-                photo=user.photo_url
+                name=f"{user.first_name} {user.last_name}", photo=user.photo_url
             )
 
         return user_data

@@ -10,19 +10,63 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('common', '0034_alter_billingplan_plan'),
+        ("common", "0034_alter_billingplan_plan"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='ProjectAuthorization',
+            name="ProjectAuthorization",
             fields=[
-                ('uuid', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, verbose_name='UUID')),
-                ('role', models.PositiveIntegerField(choices=[(0, 'not set'), (3, 'viewer'), (2, 'contributor'), (1, 'admin')], default=0, verbose_name='role')),
-                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='created at')),
-                ('organization_authorization', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='common.organization')),
-                ('project', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='project_authorizations', to='common.project')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='project_authorizations_user', to=settings.AUTH_USER_MODEL)),
+                (
+                    "uuid",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="UUID",
+                    ),
+                ),
+                (
+                    "role",
+                    models.PositiveIntegerField(
+                        choices=[
+                            (0, "not set"),
+                            (3, "viewer"),
+                            (2, "contributor"),
+                            (1, "admin"),
+                        ],
+                        default=0,
+                        verbose_name="role",
+                    ),
+                ),
+                (
+                    "created_at",
+                    models.DateTimeField(auto_now_add=True, verbose_name="created at"),
+                ),
+                (
+                    "organization_authorization",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="common.organization",
+                    ),
+                ),
+                (
+                    "project",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="project_authorizations",
+                        to="common.project",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="project_authorizations_user",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
     ]

@@ -4,7 +4,6 @@ from connect.alerts.models import Alert
 
 
 class AlertUpdateUseCase:
-
     def update_alert(
         self,
         alert_uuid: str,
@@ -16,10 +15,7 @@ class AlertUpdateUseCase:
 
         AlertAuthsUseCase().has_permission(token=token)
 
-        alert = get_alert_by_uuid(
-            uuid=alert_uuid,
-            token=token
-        )
+        alert = get_alert_by_uuid(uuid=alert_uuid, token=token)
 
         if can_be_closed is not None:
             alert.can_be_closed = can_be_closed

@@ -56,7 +56,9 @@ class ListClassifierAPIView(views.APIView):  # pragma: no cover
         flow_instance = FlowsRESTClient()
 
         response = flow_instance.get_classifiers(
-            project_uuid=str(project.flow_organization), classifier_type="bothub", is_active=True
+            project_uuid=str(project.flow_organization),
+            classifier_type="bothub",
+            is_active=True,
         )
 
         for i in response:

@@ -59,7 +59,7 @@ class AIGetOrganizationView(views.APIView):
         response = {
             "organization": {
                 "intellgence_organization": organization.inteligence_organization,
-                "uuid": organization.uuid
+                "uuid": organization.uuid,
             }
         }
 
