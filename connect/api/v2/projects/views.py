@@ -1,5 +1,4 @@
 from rest_framework import mixins, status
-from rest_framework.exceptions import ValidationError
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.response import Response
 from rest_framework.decorators import action
