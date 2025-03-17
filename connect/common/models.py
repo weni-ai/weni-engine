@@ -798,6 +798,12 @@ class Project(models.Model):
     def __str__(self):
         return f"{self.uuid} - Project: {self.name} - Org: {self.organization.name}"
 
+    def save(self, *args, **kwargs):
+        if self._state.adding and self.project_type == TypeProject.COMMERCE:
+            self.project_mode = ProjectMode.OPINIONATED
+
+        super().save(*args, **kwargs)
+
     def get_user_authorization(self, user, **kwargs):
         if user.is_anonymous:
             return ProjectAuthorization(project=self)  # pragma: no cover
