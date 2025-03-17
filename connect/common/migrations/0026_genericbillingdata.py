@@ -6,15 +6,28 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('common', '0025_billingplan_is_active'),
+        ("common", "0025_billingplan_is_active"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='GenericBillingData',
+            name="GenericBillingData",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('_free_active_contacts_limit', models.PositiveIntegerField(default=200, verbose_name='Free active contacts limit')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "_free_active_contacts_limit",
+                    models.PositiveIntegerField(
+                        default=200, verbose_name="Free active contacts limit"
+                    ),
+                ),
             ],
         ),
     ]

@@ -13,7 +13,4 @@ class ListClassifierSerializerTest(TestCase):
         with self.assertRaises(ValidationError) as context:
             serializer.validate_project_uuid(invalid_uuid)
         error_detail = str(context.exception.detail[0])
-        self.assertEqual(
-            error_detail,
-            'This project does not exist'
-        )
+        self.assertEqual(error_detail, "This project does not exist")

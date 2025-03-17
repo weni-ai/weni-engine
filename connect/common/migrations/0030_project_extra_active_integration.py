@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('common', '0029_auto_20211202_1729'),
+        ("common", "0029_auto_20211202_1729"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='project',
-            name='extra_active_integration',
-            field=models.IntegerField(default=0, verbose_name='Whatsapp Integrations'),
+            model_name="project",
+            name="extra_active_integration",
+            field=models.IntegerField(default=0, verbose_name="Whatsapp Integrations"),
         ),
     ]

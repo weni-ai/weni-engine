@@ -8,14 +8,18 @@ from django.utils.timezone import utc
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('common', '0030_project_extra_active_integration'),
+        ("common", "0030_project_extra_active_integration"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='billingplan',
-            name='contract_on',
-            field=models.DateField(auto_now_add=True, default=datetime.datetime(2021, 12, 9, 12, 42, 40, 540676, tzinfo=utc), verbose_name='date of contract plan'),
+            model_name="billingplan",
+            name="contract_on",
+            field=models.DateField(
+                auto_now_add=True,
+                default=datetime.datetime(2021, 12, 9, 12, 42, 40, 540676, tzinfo=utc),
+                verbose_name="date of contract plan",
+            ),
             preserve_default=False,
         ),
     ]

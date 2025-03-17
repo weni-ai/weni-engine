@@ -80,7 +80,9 @@ class InvoiceViewSet(
         }
         contact_count = 0
         for project in organization.project.all():
-            current_contact_count = count_contacts(project=project, before=before, after=after)
+            current_contact_count = count_contacts(
+                project=project, before=before, after=after
+            )
             contact_count += current_contact_count
             payment_data["projects"].append(
                 {

@@ -58,14 +58,11 @@ class IntelligenceRESTClient:
         return response.json()
 
     def delete_user_permission(self, organization_id, user_email):
-        params = dict(
-            user_email=user_email,
-            org_id=organization_id
-        )
+        params = dict(user_email=user_email, org_id=organization_id)
         requests.delete(
             url=f"{self.base_url}v2/internal/user/permissions",
             headers=self.authentication_instance.headers,
-            params=params
+            params=params,
         )
 
     def update_user_permission_organization(
@@ -112,9 +109,7 @@ class IntelligenceRESTClient:
             response = requests.get(
                 url=f"{self.base_url}v2/internal/repository/retrieve_authorization/",
                 headers=self.authentication_instance.headers,
-                params={
-                    "repository_authorization": classifier.get("access_token")
-                },
+                params={"repository_authorization": classifier.get("access_token")},
             )
             if response.status_code == 200:
                 auth_list.add(response.json().get("uuid"))
@@ -123,20 +118,18 @@ class IntelligenceRESTClient:
         return {"repositories_count": len(auth_list)}
 
     def get_access_token(self, user_email: str, repository_uuid: str):
-        body = {
-            "user_email": user_email,
-            "repository_uuid": repository_uuid
-        }
+        body = {"user_email": user_email, "repository_uuid": repository_uuid}
         response = requests.get(
             url=f"{self.base_url}v2/repository/authorization-by-user",
             headers=self.authentication_instance.headers,
-            params=body
+            params=body,
         )
 
         return json.loads(response.text).get("access_token")
 
     def create_project(self, project_uuid):
         from connect.common.models import Project
+
         project = Project.objects.get(uuid=project_uuid)
         body = {
             "project_uuid": str(project.uuid),
@@ -145,12 +138,14 @@ class IntelligenceRESTClient:
             "is_template": project.is_template,
             "intelligence_organization": project.organization.inteligence_organization,
             "date_format": project.date_format,
-            "created_by": str(project.created_by) if project.created_by else "crm@weni.ai"
+            "created_by": str(project.created_by)
+            if project.created_by
+            else "crm@weni.ai",
         }
         response = requests.post(
             url=f"{self.base_url}v2/project",
             headers=self.authentication_instance.headers,
-            json=body
+            json=body,
         )
         response.raise_for_status()
         return response.json()
@@ -159,7 +154,7 @@ class IntelligenceRESTClient:
         response = requests.patch(
             url=f"{self.base_url}v2/project",
             headers=self.authentication_instance.headers,
-            json=project_data
+            json=project_data,
         )
         return response.json()
 
@@ -167,6 +162,6 @@ class IntelligenceRESTClient:
         response = requests.delete(
             url=f"{self.base_url}v2/project",
             headers=self.authentication_instance.headers,
-            json={"project_uuid": project_uuid}
+            json={"project_uuid": project_uuid},
         )
         return response.json()

@@ -1,5 +1,10 @@
 import json
-from connect.api.v2.omie.views import OmieAccountAPIView, OmieOriginAPIView, OmieSolutionsAPIView, OmieUsersAPIView
+from connect.api.v2.omie.views import (
+    OmieAccountAPIView,
+    OmieOriginAPIView,
+    OmieSolutionsAPIView,
+    OmieUsersAPIView,
+)
 from rest_framework import status
 from rest_framework.test import APIRequestFactory
 
@@ -19,27 +24,39 @@ class OmieAccResponse:
                 {
                     "caracteristicas": [],
                     "endereco": {},
-                    "identificacao": {"cCodInt": "001", "cDoc": "", "cNome": "Account 1"},
+                    "identificacao": {
+                        "cCodInt": "001",
+                        "cDoc": "",
+                        "cNome": "Account 1",
+                    },
                     "informacoesAdicionais": {},
                     "tags": [],
-                    "telefone_email": {}
+                    "telefone_email": {},
                 },
                 {
                     "caracteristicas": [],
                     "endereco": {},
-                    "identificacao": {"cCodInt": "002", "cDoc": "", "cNome": "Account 2"},
+                    "identificacao": {
+                        "cCodInt": "002",
+                        "cDoc": "",
+                        "cNome": "Account 2",
+                    },
                     "informacoesAdicionais": {},
                     "tags": [],
-                    "telefone_email": {}
+                    "telefone_email": {},
                 },
                 {
                     "caracteristicas": [],
                     "endereco": {},
-                    "identificacao": {"cCodInt": "003", "cDoc": "", "cNome": "Account 3"},
+                    "identificacao": {
+                        "cCodInt": "003",
+                        "cDoc": "",
+                        "cNome": "Account 3",
+                    },
                     "informacoesAdicionais": {},
                     "tags": [],
-                    "telefone_email": {}
-                }
+                    "telefone_email": {},
+                },
             ]
         }
         return account_response
@@ -55,13 +72,13 @@ class OmieOriginResponse:
                 {
                     "cDescricao": "Origin 1",
                     "cObservacao": "Origin (1)",
-                    "nCodigo": 1234567890
+                    "nCodigo": 1234567890,
                 },
                 {
                     "cDescricao": "Origin 2",
                     "cObservacao": "Origin (2)",
-                    "nCodigo": 9876543210
-                }
+                    "nCodigo": 9876543210,
+                },
             ]
         }
         return origin_response
@@ -78,14 +95,14 @@ class OmieSolutionResponse:
                     "cDescricao": "Solução 01",
                     "cInativo": "N",
                     "cObservacao": "",
-                    "nCodigo": 1234567890
+                    "nCodigo": 1234567890,
                 },
                 {
                     "cDescricao": "Solução 02",
                     "cInativo": "N",
                     "cObservacao": "",
-                    "nCodigo": 9876543210
-                }
+                    "nCodigo": 9876543210,
+                },
             ]
         }
 
@@ -101,21 +118,20 @@ class OmieUserResponse:
                     "cEmail": "1.vendedor@email.ai",
                     "cNome": "1 vendedor",
                     "cTelefone": "(00) 00000-0000",
-                    "nCodigo": 1231231234
+                    "nCodigo": 1231231234,
                 },
                 {
                     "cCelular": "+55 (11) 3775-7888",
                     "cEmail": "contato@omie.com.br",
                     "cNome": "Omiexperience",
                     "cTelefone": "+55 (11) 3775-7888",
-                    "nCodigo": 2342342345
-                }
+                    "nCodigo": 2342342345,
+                },
             ]
         }
 
 
 class OmieAccountViewSetTestCase(TestCase):
-
     def setUp(self):
         self.app_key = settings.OMIE_APP_KEY
         self.app_secret = settings.OMIE_APP_SECRET
@@ -161,7 +177,6 @@ class OmieAccountViewSetTestCase(TestCase):
 
 
 class OmieOriginViewSetTestCase(TestCase):
-
     def setUp(self):
         self.app_key = settings.OMIE_APP_KEY
         self.app_secret = settings.OMIE_APP_SECRET
@@ -207,7 +222,6 @@ class OmieOriginViewSetTestCase(TestCase):
 
 
 class OmieSolutionViewSetTestCase(TestCase):
-
     def setUp(self):
         self.app_key = settings.OMIE_APP_KEY
         self.app_secret = settings.OMIE_APP_SECRET
@@ -253,7 +267,6 @@ class OmieSolutionViewSetTestCase(TestCase):
 
 
 class OmieUserViewSetTestCase(TestCase):
-
     def setUp(self):
         self.app_key = settings.OMIE_APP_KEY
         self.app_secret = settings.OMIE_APP_SECRET

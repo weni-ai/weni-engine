@@ -3,7 +3,12 @@ from django.utils.timezone import timedelta
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from connect.common.models import ServiceStatus, Service, NewsletterLanguage, NewsletterOrganization
+from connect.common.models import (
+    ServiceStatus,
+    Service,
+    NewsletterLanguage,
+    NewsletterOrganization,
+)
 
 
 class NewsletterSerializer(serializers.ModelSerializer):
@@ -16,7 +21,15 @@ class NewsletterSerializer(serializers.ModelSerializer):
 class NewsletterOrganizationSerializer(serializers.ModelSerializer):
     class Meta:
         model = NewsletterOrganization
-        fields = ["id", "title", "description", "organization", "organization_name", "created_at", "trial_end_date"]
+        fields = [
+            "id",
+            "title",
+            "description",
+            "organization",
+            "organization_name",
+            "created_at",
+            "trial_end_date",
+        ]
         ref_name = None
 
 

@@ -8,36 +8,43 @@ import django.utils.timezone
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('billing', '0002_auto_20220513_0001'),
+        ("billing", "0002_auto_20220513_0001"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='message',
-            old_name='sent_on',
-            new_name='created_on',
+            model_name="message",
+            old_name="sent_on",
+            new_name="created_on",
         ),
         migrations.RemoveField(
-            model_name='channel',
-            name='channel_flow_uuid',
+            model_name="channel",
+            name="channel_flow_uuid",
         ),
         migrations.RemoveField(
-            model_name='channel',
-            name='name',
+            model_name="channel",
+            name="name",
         ),
         migrations.RemoveField(
-            model_name='contact',
-            name='channel_type',
+            model_name="contact",
+            name="channel_type",
         ),
         migrations.AddField(
-            model_name='channel',
-            name='channel_flow_id',
-            field=models.PositiveIntegerField(default=1, unique=True, verbose_name='channel id'),
+            model_name="channel",
+            name="channel_flow_id",
+            field=models.PositiveIntegerField(
+                default=1, unique=True, verbose_name="channel id"
+            ),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='contact',
-            name='channel',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='channel', to='billing.channel'),
+            model_name="contact",
+            name="channel",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="channel",
+                to="billing.channel",
+            ),
         ),
     ]

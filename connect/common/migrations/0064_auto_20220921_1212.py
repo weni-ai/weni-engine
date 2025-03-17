@@ -6,18 +6,40 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('common', '0063_auto_20220919_1232'),
+        ("common", "0063_auto_20220919_1232"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='projectauthorization',
-            name='role',
-            field=models.PositiveIntegerField(choices=[(0, 'not set'), (1, 'viewer'), (2, 'contributor'), (3, 'moderator'), (4, 'support'), (5, 'Chat user')], default=0, verbose_name='role'),
+            model_name="projectauthorization",
+            name="role",
+            field=models.PositiveIntegerField(
+                choices=[
+                    (0, "not set"),
+                    (1, "viewer"),
+                    (2, "contributor"),
+                    (3, "moderator"),
+                    (4, "support"),
+                    (5, "Chat user"),
+                ],
+                default=0,
+                verbose_name="role",
+            ),
         ),
         migrations.AlterField(
-            model_name='requestpermissionproject',
-            name='role',
-            field=models.PositiveIntegerField(choices=[(0, 'not set'), (1, 'viewer'), (2, 'contributor'), (3, 'moderator'), (4, 'support'), (5, 'Chat user')], default=0, verbose_name='role'),
+            model_name="requestpermissionproject",
+            name="role",
+            field=models.PositiveIntegerField(
+                choices=[
+                    (0, "not set"),
+                    (1, "viewer"),
+                    (2, "contributor"),
+                    (3, "moderator"),
+                    (4, "support"),
+                    (5, "Chat user"),
+                ],
+                default=0,
+                verbose_name="role",
+            ),
         ),
     ]

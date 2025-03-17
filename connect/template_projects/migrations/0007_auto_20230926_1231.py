@@ -7,23 +7,46 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('template_projects', '0006_delete_templateai'),
+        ("template_projects", "0006_delete_templateai"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='TemplateSuggestion',
+            name="TemplateSuggestion",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('suggestion', models.TextField()),
-                ('type', models.CharField(choices=[('feature', 'feature'), ('template', 'template'), ('flow', 'flow'), ('integration', 'integration'), ('intelligence', 'intelligence')], default='template', max_length=255)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('status', models.CharField(default='pending', max_length=255)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("suggestion", models.TextField()),
+                (
+                    "type",
+                    models.CharField(
+                        choices=[
+                            ("feature", "feature"),
+                            ("template", "template"),
+                            ("flow", "flow"),
+                            ("integration", "integration"),
+                            ("intelligence", "intelligence"),
+                        ],
+                        default="template",
+                        max_length=255,
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("status", models.CharField(default="pending", max_length=255)),
             ],
         ),
         migrations.AlterField(
-            model_name='templatetype',
-            name='category',
-            field=django.contrib.postgres.fields.ArrayField(base_field=models.CharField(max_length=255), default=list, size=None),
+            model_name="templatetype",
+            name="category",
+            field=django.contrib.postgres.fields.ArrayField(
+                base_field=models.CharField(max_length=255), default=list, size=None
+            ),
         ),
     ]

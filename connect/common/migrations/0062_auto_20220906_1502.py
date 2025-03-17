@@ -6,18 +6,36 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('common', '0061_auto_20220901_1459'),
+        ("common", "0061_auto_20220901_1459"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='chatsauthorization',
-            name='role',
-            field=models.PositiveIntegerField(choices=[(0, 'not set'), (2, 'agent'), (1, 'admin'), (3, 'service_manager')], default=0, verbose_name='role'),
+            model_name="chatsauthorization",
+            name="role",
+            field=models.PositiveIntegerField(
+                choices=[
+                    (0, "not set"),
+                    (2, "agent"),
+                    (1, "admin"),
+                    (3, "service_manager"),
+                ],
+                default=0,
+                verbose_name="role",
+            ),
         ),
         migrations.AlterField(
-            model_name='requestchatspermission',
-            name='role',
-            field=models.PositiveIntegerField(choices=[(0, 'not set'), (2, 'agent'), (1, 'admin'), (3, 'service_manager')], default=0, verbose_name='role'),
+            model_name="requestchatspermission",
+            name="role",
+            field=models.PositiveIntegerField(
+                choices=[
+                    (0, "not set"),
+                    (2, "agent"),
+                    (1, "admin"),
+                    (3, "service_manager"),
+                ],
+                default=0,
+                verbose_name="role",
+            ),
         ),
     ]

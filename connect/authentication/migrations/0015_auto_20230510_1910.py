@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('authentication', '0014_user_position'),
+        ("authentication", "0014_user_position"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='user',
-            name='first_login',
+            model_name="user",
+            name="first_login",
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='user',
-            name='first_login_token',
+            model_name="user",
+            name="first_login_token",
             field=models.TextField(null=True),
         ),
     ]

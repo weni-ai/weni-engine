@@ -1,3 +1,19 @@
+# 3.29.7
+## *Add*
+  - Adds check when adding new permissions to the project if the request user is present on project
+
+# 3.29.6
+## *Add*
+  - Add project authorization endpoint for retrieving user roles
+
+# 3.29.5
+## *Add*
+  - Adding endpoint to check if exists project and user, if project exists and no user create user and set your permission in project and organization
+
+# 3.29.4
+## *Add*
+  - Adding an endpoint to return an access token based on the username and password
+
 # 3.29.3
 ## *Fix*
   - Organization's and project's name maximum length validation when creating them

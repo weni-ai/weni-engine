@@ -23,9 +23,7 @@ class RabbitmqPublisher:  # pragma: no cover
                     exchange=exchange,
                     routing_key=routing_key,
                     body=json.dumps(body),
-                    properties=BasicProperties(
-                        delivery_mode=2
-                    )
+                    properties=BasicProperties(delivery_mode=2),
                 )
                 print(f"Message sent {body}")
                 sended = True

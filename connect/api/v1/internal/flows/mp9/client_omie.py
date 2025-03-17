@@ -2,7 +2,7 @@ from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
 
 
 class Omie:
-    """ Client para fazer requests para criar template omie """
+    """Client para fazer requests para criar template omie"""
 
     def __init__(self):
         self.flows_rest = FlowsRESTClient()
@@ -17,10 +17,7 @@ class Omie:
 
         for key, value in global_body.items():
 
-            payload = {
-                "name": key,
-                "value": value
-            }
+            payload = {"name": key, "value": value}
 
             payload.update(body)
 

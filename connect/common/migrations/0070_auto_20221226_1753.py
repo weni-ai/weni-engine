@@ -9,23 +9,38 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('common', '0069_recentactivity'),
+        ("common", "0069_recentactivity"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='recentactivity',
-            name='action',
-            field=models.CharField(choices=[('CREATE', 'Entity Created'), ('UPDATE', 'Entity updated'), ('ADD', 'Add')], max_length=15),
+            model_name="recentactivity",
+            name="action",
+            field=models.CharField(
+                choices=[
+                    ("CREATE", "Entity Created"),
+                    ("UPDATE", "Entity updated"),
+                    ("ADD", "Add"),
+                ],
+                max_length=15,
+            ),
         ),
         migrations.AlterField(
-            model_name='recentactivity',
-            name='project',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='project_recent_activity', to='common.project'),
+            model_name="recentactivity",
+            name="project",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="project_recent_activity",
+                to="common.project",
+            ),
         ),
         migrations.AlterField(
-            model_name='recentactivity',
-            name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='user_recent_activy', to=settings.AUTH_USER_MODEL),
+            model_name="recentactivity",
+            name="user",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="user_recent_activy",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
     ]

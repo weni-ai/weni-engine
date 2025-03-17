@@ -36,7 +36,6 @@ User = get_user_model()
 
 
 class ProjectSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Project
         fields = [
@@ -466,7 +465,6 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
 
 
 class ProjectUpdateSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Project
         fields = ["name", "timezone", "date_format", "uuid", "description"]
@@ -495,7 +493,6 @@ class ProjectUpdateSerializer(serializers.ModelSerializer):
 
 
 class ProjectListAuthorizationSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Project
         fields = [
@@ -567,7 +564,6 @@ class ProjectListAuthorizationSerializer(serializers.ModelSerializer):
 
 
 class OpenedProjectSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = OpenedProject
         fields = [

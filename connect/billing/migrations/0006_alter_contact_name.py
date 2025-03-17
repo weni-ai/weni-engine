@@ -6,13 +6,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('billing', '0005_syncmanagertask_fail_message'),
+        ("billing", "0005_syncmanagertask_fail_message"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='contact',
-            name='name',
-            field=models.CharField(blank=True, max_length=150, null=True, verbose_name='contact name'),
+            model_name="contact",
+            name="name",
+            field=models.CharField(
+                blank=True, max_length=150, null=True, verbose_name="contact name"
+            ),
         ),
     ]

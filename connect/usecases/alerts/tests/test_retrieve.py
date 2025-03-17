@@ -13,8 +13,7 @@ class TestRetrieveAlert(TestCase):
 
     def test_retrieve_alert(self):
         alert = self.usecase.retrieve_alert(
-            alert_uuid=self.alert.uuid,
-            token=self.token
+            alert_uuid=self.alert.uuid, token=self.token
         )
 
         self.assertEqual(alert.uuid, self.alert.uuid)
