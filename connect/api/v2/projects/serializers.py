@@ -19,6 +19,7 @@ from connect.common.models import (
     ProjectAuthorization,
     Project,
     Organization,
+    ProjectMode,
     RequestRocketPermission,
     OpenedProject,
     ProjectRole,
@@ -54,6 +55,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             "description",
             "brain_on",
             "project_type",
+            "project_mode",
             "vtex_account",
         ]
         ref_name = None
@@ -82,6 +84,10 @@ class ProjectSerializer(serializers.ModelSerializer):
     brain_on = serializers.BooleanField(default=False)
     project_type = serializers.ChoiceField(
         choices=TypeProject.choices, default=TypeProject.GENERAL
+    )
+    project_mode = serializers.ChoiceField(
+        choices=ProjectMode.choices,
+        default=ProjectMode.WENI_FRAMEWORK,
     )
 
     def get_project_template_type(self, obj):
@@ -121,6 +127,9 @@ class ProjectSerializer(serializers.ModelSerializer):
             project_template_type=project_template_type,
             description=validated_data.get("description", None),
             project_type=validated_data.get("project_type", TypeProject.GENERAL.value),
+            project_mode=validated_data.get(
+                "project_mode", ProjectMode.WENI_FRAMEWORK.value
+            ),
         )
 
         self.send_request_flow_product(user)
@@ -575,3 +584,13 @@ class OpenedProjectSerializer(serializers.ModelSerializer):
         data = ProjectSerializer(obj.project, context=self.context).data
 
         return data
+
+
+class ChangeProjectModeSerializer(serializers.ModelSerializer):
+    project_mode = serializers.ChoiceField(
+        choices=ProjectMode.choices,
+    )
+
+    class Meta:
+        model = Project
+        fields = ["uuid", "project_mode"]
