@@ -68,6 +68,7 @@ env = environ.Env(
     CHATS_REST_ENDPOINT=(str, "https://chats-engine.dev.cloud.weni.ai"),
     INTEGRATIONS_REST_ENDPOINT=(str, "https://integrations-engine.dev.cloud.weni.ai"),
     INTELLIGENCE_REST_ENDPOINT=(str, "https://engine-ai.dev.cloud.weni.ai/"),
+    INSIGHTS_REST_ENDPOINT=(str, "https://insights-engine.dev.cloud.weni.ai"),
     SEND_REQUEST_FLOW=(bool, False),
     FLOW_MARKETING_UUID=(str, None),
     TOKEN_AUTHORIZATION_FLOW_MARKETING=(str, None),
@@ -455,6 +456,7 @@ CHATS_URL = env.str("CHATS_URL")
 INTEGRATIONS_REST_ENDPOINT = env.str("INTEGRATIONS_REST_ENDPOINT")
 INTELLIGENCE_REST_ENDPOINT = env.str("INTELLIGENCE_REST_ENDPOINT")
 CHATS_REST_ENDPOINT = env.str("CHATS_REST_ENDPOINT")
+INSIGHTS_REST_ENDPOINT = env.str("INSIGHTS_REST_ENDPOINT")
 
 FLOW_GRPC_ENDPOINT = env.str("FLOW_GRPC_ENDPOINT")
 INTELIGENCE_GRPC_ENDPOINT = env.str("INTELIGENCE_GRPC_ENDPOINT")

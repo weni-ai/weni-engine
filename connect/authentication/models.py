@@ -275,16 +275,21 @@ class User(AbstractBaseUser, PermissionsMixin):
         from connect.api.v1.internal.intelligence.intelligence_rest_client import (
             IntelligenceRESTClient,
         )
+        from connect.api.v1.internal.insights.insights_rest_client import (
+            InsightsRESTClient,
+        )
 
         chats_rest = ChatsRESTClient()
         flows_rest = FlowsRESTClient()
         intelligence_rest = IntelligenceRESTClient()
+        insights_rest = InsightsRESTClient()
         self.language = language
         self.save(update_fields=["language"])
 
         chats_rest.update_user_language(self.email, self.language)
         flows_rest.update_language(self.email, self.language)
         intelligence_rest.update_language(self.email, self.language)
+        insights_rest.update_user_language(self.email, self.language)
 
     def save_first_login_token(self, token: str):
         self.first_login_token = token
