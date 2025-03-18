@@ -68,6 +68,7 @@ env = environ.Env(
     CHATS_REST_ENDPOINT=(str, "https://chats-engine.dev.cloud.weni.ai"),
     INTEGRATIONS_REST_ENDPOINT=(str, "https://integrations-engine.dev.cloud.weni.ai"),
     INTELLIGENCE_REST_ENDPOINT=(str, "https://engine-ai.dev.cloud.weni.ai/"),
+    INSIGHTS_REST_ENDPOINT=(str, "https://insights-engine.dev.cloud.weni.ai"),
     SEND_REQUEST_FLOW=(bool, False),
     FLOW_MARKETING_UUID=(str, None),
     TOKEN_AUTHORIZATION_FLOW_MARKETING=(str, None),
