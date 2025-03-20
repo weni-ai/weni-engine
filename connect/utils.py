@@ -1,5 +1,9 @@
-import requests
+import functools
+
 import pendulum
+import requests
+from django.http import JsonResponse
+from django_redis import get_redis_connection
 
 from connect.common.models import Project
 
@@ -48,9 +52,9 @@ def count_contacts(project: Project, before: str, after: str):
 
 
 def check_module_permission(claims, user):
+    from django.contrib.auth import get_user_model
     from django.contrib.auth.models import Permission
     from django.contrib.contenttypes.models import ContentType
-    from django.contrib.auth import get_user_model
 
     User = get_user_model()
 
@@ -65,3 +69,65 @@ def check_module_permission(claims, user):
             user.user_permissions.add(permission)
         return True
     return False
+
+
+def rate_limit(requests=5, window=60, block_time=300):
+    def decorator(view_func):
+        @functools.wraps(view_func)
+        def wrapper(*args, **kwargs):
+            if len(args) > 1:
+                request = args[1]
+            else:
+                request = args[0]
+
+            if request.user.is_authenticated:
+                client_id = f"user:{request.user.id}"
+            else:
+                client_id = f"ip:{_get_client_ip(request)}"
+
+            path = request.path_info
+            redis_key = f"ratelimit:{path}:{client_id}"
+            block_key = f"ratelimit:blocked:{path}:{client_id}"
+
+            redis_conn = get_redis_connection()
+
+            if redis_conn.exists(block_key):
+                block_ttl = redis_conn.ttl(block_key)
+                return JsonResponse(
+                    {
+                        "error": "Too many requests. Please try again later.",
+                        "retry_after": block_ttl,
+                    },
+                    status=429,
+                )
+
+            pipe = redis_conn.pipeline()
+            pipe.incr(redis_key)
+            pipe.expire(redis_key, window)
+            results = pipe.execute()
+            request_count = results[0]
+
+            if request_count > requests:
+                redis_conn.setex(block_key, block_time, 1)
+                return JsonResponse(
+                    {
+                        "error": "Too many requests. Please try again later.",
+                        "retry_after": block_time,
+                    },
+                    status=429,
+                )
+
+            return view_func(*args, **kwargs)
+
+        return wrapper
+
+    return decorator
+
+
+def _get_client_ip(request):
+    x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(",")[0].strip()
+    else:
+        ip = request.META.get("REMOTE_ADDR")
+    return ip
