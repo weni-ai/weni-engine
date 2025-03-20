@@ -1,68 +1,53 @@
+import logging
 import uuid
+
+import pendulum
+from django.conf import settings
+from django.db.models import Q
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django_filters.rest_framework import DjangoFilterBackend
-from django.http import JsonResponse
-from django.db.models import Q
-from django.utils import timezone
-import pendulum
-from connect.billing.models import Contact
 from rest_framework import mixins, status
 from rest_framework.decorators import action
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
-from rest_framework.exceptions import ValidationError
 
+from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
+from connect.api.v1.internal.permissions import ModuleHasPermission
 from connect.api.v1.metadata import Metadata
+from connect.api.v1.organization.permissions import Has2FA
 from connect.api.v1.project.filters import ProjectOrgFilter
 from connect.api.v1.project.permissions import ProjectHasPermission
-from connect.api.v1.internal.permissions import ModuleHasPermission
-from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
-from connect.api.v1.organization.permissions import Has2FA
 from connect.api.v1.project.serializers import (
-    ProjectSerializer,
-    ProjectSearchSerializer,
-    RequestRocketPermissionSerializer,
-    RequestPermissionProjectSerializer,
-    ReleaseChannelSerializer,
-    CreateChannelSerializer,
-    CreateWACChannelSerializer,
-    DestroyClassifierSerializer,
-    RetrieveClassifierSerializer,
-    CreateClassifierSerializer,
-    ClassifierSerializer,
-    TemplateProjectSerializer,
-    UserAPITokenSerializer,
-)
-
-from connect.celery import app as celery_app
-from connect.common.models import (
-    Organization,
-    OrganizationAuthorization,
-    Project,
-    RequestPermissionProject,
-    RequestRocketPermission,
-    ProjectAuthorization,
-    OpenedProject,
-    TemplateProject,
-)
+    ClassifierSerializer, CreateChannelSerializer, CreateClassifierSerializer,
+    CreateWACChannelSerializer, DestroyClassifierSerializer,
+    ProjectSearchSerializer, ProjectSerializer, ReleaseChannelSerializer,
+    RequestPermissionProjectSerializer, RequestRocketPermissionSerializer,
+    RetrieveClassifierSerializer, TemplateProjectSerializer,
+    UserAPITokenSerializer)
 from connect.authentication.models import User
+from connect.billing.models import Contact
+from connect.celery import app as celery_app
 from connect.common import tasks
-from connect.usecases.authorizations.exceptions import UserHasNoPermissionToManageProject
-from connect.utils import count_contacts
-from django.conf import settings
-import logging
-
-from connect.usecases.authorizations.dto import (
-    CreateProjectAuthorizationDTO,
-    DeleteProjectAuthorizationDTO,
-)
+from connect.common.models import (OpenedProject, Organization,
+                                   OrganizationAuthorization, Project,
+                                   ProjectAuthorization,
+                                   RequestPermissionProject,
+                                   RequestRocketPermission, TemplateProject)
+from connect.internals.event_driven.producer.rabbitmq_publisher import \
+    RabbitmqPublisher
 from connect.usecases.authorizations.create import CreateAuthorizationUseCase
 from connect.usecases.authorizations.delete import DeleteAuthorizationUseCase
-from connect.internals.event_driven.producer.rabbitmq_publisher import RabbitmqPublisher
+from connect.usecases.authorizations.dto import (CreateProjectAuthorizationDTO,
+                                                 DeleteProjectAuthorizationDTO)
+from connect.usecases.authorizations.exceptions import \
+    UserHasNoPermissionToManageProject
+from connect.utils import count_contacts, rate_limit
 
 logger = logging.getLogger(__name__)
 
@@ -440,6 +425,7 @@ class RequestPermissionProjectViewSet(
     permission_classes = [IsAuthenticated]
     metadata_class = Metadata
 
+    @rate_limit(requests=5, window=60, block_time=300)
     def create(self, request, *args, **kwargs):
         created_by: User = self.request.user
         role: int = int(self.request.data.get("role"))
@@ -469,7 +455,13 @@ class RequestPermissionProjectViewSet(
                     usecase.create_authorization_for_a_single_project(auth_dto=auth_dto)
                 )
             except UserHasNoPermissionToManageProject:
-                return Response({"status": 403, "detail": "You don't have permission to manage this project"}, status=status.HTTP_403_FORBIDDEN)
+                return Response(
+                    {
+                        "status": 403,
+                        "detail": "You don't have permission to manage this project",
+                    },
+                    status=status.HTTP_403_FORBIDDEN,
+                )
 
             data.update(
                 {
@@ -486,7 +478,13 @@ class RequestPermissionProjectViewSet(
         try:
             usecase.create_authorization_for_a_single_project(auth_dto=auth_dto)
         except UserHasNoPermissionToManageProject:
-            return Response({"status": 403, "detail": "You don't have permission to manage this project"}, status=status.HTTP_403_FORBIDDEN)
+            return Response(
+                {
+                    "status": 403,
+                    "detail": "You don't have permission to manage this project",
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
 
         data.update(
             {
