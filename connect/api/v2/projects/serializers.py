@@ -3,9 +3,12 @@ import json
 
 from django.contrib.auth import get_user_model
 from django.conf import settings
+from django.utils.html import strip_tags
+from django.utils.translation import gettext_lazy as _
 
 from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
 from rest_framework import status
 
@@ -89,6 +92,20 @@ class ProjectSerializer(serializers.ModelSerializer):
         choices=ProjectMode.choices,
         default=ProjectMode.WENI_FRAMEWORK,
     )
+
+    def validate_name(self, value):
+        stripped_value = strip_tags(value)
+        if not stripped_value.strip():
+            raise ValidationError(_("Name cannot be empty or contain only HTML tags"))
+        return stripped_value
+
+    def validate_description(self, value):
+        if value:
+            stripped_value = strip_tags(value)
+            if not stripped_value.strip():
+                raise ValidationError(_("Description cannot contain only HTML tags"))
+            return stripped_value
+        return value
 
     def get_project_template_type(self, obj):
         if obj.is_template:
