@@ -4,6 +4,7 @@ import re
 from django.contrib.auth import get_user_model
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
+from django.utils.html import strip_tags
 
 from rest_framework import serializers
 from rest_framework.exceptions import PermissionDenied, ValidationError
@@ -49,6 +50,7 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
 
     uuid = serializers.UUIDField(style={"show": False}, read_only=True)
     name = serializers.CharField(max_length=40, required=True)
+    description = serializers.CharField(max_length=1000, required=False)
     inteligence_organization = serializers.IntegerField(read_only=True)
     authorization = serializers.SerializerMethodField(style={"show": False})
     organization_billing = BillingPlanSerializer(read_only=True)
@@ -75,6 +77,20 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
     )
 
     show_chat_help = serializers.SerializerMethodField()
+
+    def validate_name(self, value):
+        stripped_value = strip_tags(value)
+        if not stripped_value.strip():
+            raise ValidationError(_("Name cannot be empty or contain only HTML tags"))
+        return stripped_value
+
+    def validate_description(self, value):
+        if value:
+            stripped_value = strip_tags(value)
+            if not stripped_value.strip():
+                raise ValidationError(_("Description cannot contain only HTML tags"))
+            return stripped_value
+        return value
 
     def create(self, validated_data):
         # Billing Cycle
