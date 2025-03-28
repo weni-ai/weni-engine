@@ -162,7 +162,7 @@ class Organization(models.Model):
             )
         except OrganizationAuthorization.DoesNotExist:
             raise OrganizationAuthorizationException(
-                "User not authorized to access organization"
+                f"User {user.email} not authorized to access organization {self.name}"
             )
 
     def perform_destroy_ai_organization(self, user_email):
@@ -805,7 +805,9 @@ class Project(models.Model):
                 **kwargs,
             )
         except ProjectAuthorization.DoesNotExist:
-            raise ProjectAuthorizationException("User not authorized to access project")
+            raise ProjectAuthorizationException(
+                f"User {user.email} not authorized to access project {self.name}"
+            )
 
     def project_search(self, text: str):
         """Searches for project in flows and intelligence"""
