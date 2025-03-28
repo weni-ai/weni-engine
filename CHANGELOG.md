@@ -1,3 +1,11 @@
+# 3.29.10
+## *Add*
+  - Add sanitize function on Project and Organization name on creation
+
+# 3.29.9
+## *Add*
+  - Adds request to the Insights module to update users' language preference.
+
 # 3.29.8
 ## *Add*
   - Added a rate limiting decorator to prevent excessive requests.
