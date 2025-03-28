@@ -7,7 +7,13 @@ from rest_framework.permissions import IsAuthenticated
 from connect.api.v1.organization.permissions import Has2FA
 from connect.api.v1.project.permissions import ProjectHasPermission
 
-from connect.common.models import Project, OpenedProject, TypeProject
+from connect.common.models import (
+    Project,
+    OpenedProject,
+    ProjectAuthorization,
+    ProjectRole,
+    TypeProject,
+)
 from connect.api.v2.projects.serializers import (
     ProjectSerializer,
     ProjectUpdateSerializer,
@@ -40,11 +46,20 @@ class ProjectViewSet(
         if getattr(self, "swagger_fake_view", False):
             return Project.objects.none()  # pragma: no cover
 
+        exclude_roles = [ProjectRole.NOT_SETTED.value]
+
+        exclude_projects = (
+            ProjectAuthorization.objects.exclude(role__in=exclude_roles)
+            .filter(user=self.request.user)
+            .values("project")
+        )
+
         if self.kwargs.get("organization_uuid"):
             return (
                 super()
                 .get_queryset()
                 .filter(organization__uuid=self.kwargs["organization_uuid"])
+                .exclude(uuid__in=exclude_projects)
             )
         return super().get_queryset()
 
