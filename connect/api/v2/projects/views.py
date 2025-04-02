@@ -116,7 +116,7 @@ class ProjectViewSet(
 
     @action(detail=True, methods=["POST"], url_name="set-type")
     def set_type(self, request, **kwargs):
-        instance = self.get_object()
+        instance: Project = self.get_object()
         try:
             project_type = request.data.get("project_type")
 
@@ -126,6 +126,17 @@ class ProjectViewSet(
                     choices_text.append(f"{value} ({label.title()})")
                 return Response(
                     {"detail": f"Invalid type. Choices are: {', '.join(choices_text)}"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            if (
+                instance.project_type == TypeProject.GENERAL
+                and project_type == TypeProject.COMMERCE
+            ):
+                return Response(
+                    {
+                        "detail": f"It is not possible to change the type from {TypeProject.GENERAL} to {TypeProject.COMMERCE}"
+                    },
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
