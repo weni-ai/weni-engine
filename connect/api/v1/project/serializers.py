@@ -64,8 +64,8 @@ class ProjectSerializer(serializers.ModelSerializer):
             "wa_demo_token",
             "redirect_url",
             "description",
-            "project_type",
             "project_mode",
+            "template_type",
         ]
         ref_name = None
 
@@ -92,14 +92,14 @@ class ProjectSerializer(serializers.ModelSerializer):
     pending_authorizations = serializers.SerializerMethodField(style={"show": False})
     authorization = serializers.SerializerMethodField(style={"show": False})
     last_opened_on = serializers.SerializerMethodField()
-    project_type = serializers.SerializerMethodField()
     flow_uuid = serializers.SerializerMethodField()
     first_access = serializers.SerializerMethodField()
     wa_demo_token = serializers.SerializerMethodField()
     redirect_url = serializers.SerializerMethodField()
     project_mode = serializers.IntegerField(read_only=True)
+    template_type = serializers.SerializerMethodField()
 
-    def get_project_type(self, obj):
+    def get_template_type(self, obj):
         if obj.is_template and obj.template_project.exists():
             return f"template:{obj.template_type}"
         else:
@@ -546,9 +546,11 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
                 classifier_uuid = tasks.create_classifier(
                     project_uuid=str(project.flow_organization),
                     user_email=request.user.email,
-                    classifier_name="Farewell & Greetings"
-                    if project.template_type == Project.TYPE_LEAD_CAPTURE
-                    else "Binary Answers",
+                    classifier_name=(
+                        "Farewell & Greetings"
+                        if project.template_type == Project.TYPE_LEAD_CAPTURE
+                        else "Binary Answers"
+                    ),
                     access_token=access_token,
                 ).get("uuid")
             except Exception as error:

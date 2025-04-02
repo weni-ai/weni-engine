@@ -53,12 +53,20 @@ class UserTestCase(TestCase):
     @patch(
         "connect.api.v1.internal.intelligence.intelligence_rest_client.IntelligenceRESTClient.update_language"
     )
+    @patch(
+        "connect.api.v1.internal.insights.insights_rest_client.InsightsRESTClient.update_user_language"
+    )
     def test_update_language(
-        self, chats_update_user_language, flows_update_language, intel_update_language
+        self,
+        insights_update_user_language,
+        intel_update_language,
+        flows_update_language,
+        chats_update_user_language,
     ):
         chats_update_user_language.return_value = True
         flows_update_language.return_value = True
         intel_update_language.return_value = True
+        insights_update_user_language.return_value = True
         self.user.update_language("pt_br")
         self.assertEqual(self.user.language, "pt_br")
 
