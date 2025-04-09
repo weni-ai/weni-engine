@@ -1,3 +1,7 @@
+# 3.29.12
+## *Add*
+  - Metrics endpoint for django-prometheus
+
 # 3.29.11
 ## *Add*
   - Flag to indicate the mode (extended or opinionated) for a project
