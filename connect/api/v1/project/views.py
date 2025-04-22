@@ -28,7 +28,7 @@ from connect.api.v1.project.serializers import (
     CreateWACChannelSerializer, DestroyClassifierSerializer,
     ProjectSearchSerializer, ProjectSerializer, ReleaseChannelSerializer,
     RequestPermissionProjectSerializer, RequestRocketPermissionSerializer,
-    RetrieveClassifierSerializer, TemplateProjectSerializer,
+    RetrieveClassifierSerializer, TemplateProjectSerializer, UpdateProjectStatusSerializer,
     UserAPITokenSerializer)
 from connect.authentication.models import User
 from connect.billing.models import Contact
@@ -412,6 +412,22 @@ class ProjectViewSet(
         project = get_object_or_404(Project, uuid=project_uuid)
         task = tasks.list_project_flows(str(project.flow_organization))
         return Response(task)
+
+    @action(
+        detail=True,
+        methods=["PATCH"],
+        url_name="update-status",
+        permission_classes=[IsAuthenticated, ProjectHasPermission],
+        serializer_class=UpdateProjectStatusSerializer,
+    )
+    def update_status(self, request, *args, **kwargs) -> Response:
+        project = self.get_object()
+
+        serializer = self.get_serializer(project, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(status=status.HTTP_200_OK)
 
 
 class RequestPermissionProjectViewSet(

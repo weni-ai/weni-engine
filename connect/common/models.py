@@ -687,7 +687,6 @@ class ProjectStatus(models.TextChoices):
     IN_TEST = "IN_TEST", _("in test")
 
 
-
 class Project(models.Model):
     class Meta:
         verbose_name = _("project")

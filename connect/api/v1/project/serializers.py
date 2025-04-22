@@ -19,6 +19,7 @@ from connect.common import tasks
 from connect.common.models import (
     ChatsRole,
     ProjectAuthorization,
+    ProjectStatus,
     RocketAuthorization,
     Service,
     Project,
@@ -636,3 +637,12 @@ class UserAPITokenSerializer(serializers.Serializer):
         except Project.DoesNotExist:
             raise serializers.ValidationError("This project does not exist")
         return value
+
+
+class UpdateProjectStatusSerializer(serializers.ModelSerializer):
+    status = serializers.ChoiceField(choices=ProjectStatus.choices, required=True)
+
+    class Meta:
+        model = Project
+        fields = ["status"]
+
