@@ -510,7 +510,7 @@ class TestUpdateProjectStatusAuthenticatedUser(BaseUpdateProjectStatusTestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 
-    @with_organization_auth(role=OrganizationRole.ADMIN.value)
+    @with_organization_auth(role=OrganizationRole.CONTRIBUTOR.value)
     @with_project_auth(role=ProjectRole.CONTRIBUTOR.value)
     def test_cannot_update_project_status_as_contributor(self):
         response = self.update_project_status(self.project, {"status": ProjectStatus.INACTIVE.value})
