@@ -3,9 +3,11 @@ import unittest
 import uuid as uuid4
 from unittest.mock import patch
 from unittest import skipIf
+
 from django.test import RequestFactory
 from django.test import TestCase
 from django.test.client import MULTIPART_CONTENT
+from django.test import override_settings
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -490,6 +492,7 @@ class TestUpdateProjectStatusAnonymousUser(BaseUpdateProjectStatusTestCase):
 
 
 class TestUpdateProjectStatusAuthenticatedUser(BaseUpdateProjectStatusTestCase):
+    @override_settings(USE_EDA_PERMISSIONS=False)
     def setUp(self):
         super().setUp()
         self.user = User.objects.create(
