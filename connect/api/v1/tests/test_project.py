@@ -475,7 +475,7 @@ class BaseUpdateProjectStatusTestCase(APITestCase):
 
     def update_project_status(self, project, data: dict):
         url = f"/v1/organization/project/{project.uuid}/update_status/"
-        
+
         return self.client.patch(
             url,
             data,
@@ -509,7 +509,6 @@ class TestUpdateProjectStatusAuthenticatedUser(BaseUpdateProjectStatusTestCase):
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-
     @with_organization_auth(role=OrganizationRole.CONTRIBUTOR.value)
     @with_project_auth(role=ProjectRole.CONTRIBUTOR.value)
     def test_cannot_update_project_status_as_contributor(self):
@@ -527,7 +526,6 @@ class TestUpdateProjectStatusAuthenticatedUser(BaseUpdateProjectStatusTestCase):
         self.project.refresh_from_db(fields=["status"])
         self.assertEqual(self.project.status, ProjectStatus.INACTIVE.value)
 
-
     @with_organization_auth(role=OrganizationRole.ADMIN.value)
     @with_project_auth(role=ProjectRole.MODERATOR.value)
     def test_update_project_status_as_moderator(self):
@@ -538,3 +536,11 @@ class TestUpdateProjectStatusAuthenticatedUser(BaseUpdateProjectStatusTestCase):
 
         self.project.refresh_from_db(fields=["status"])
         self.assertEqual(self.project.status, new_status)
+
+    @with_organization_auth(role=OrganizationRole.ADMIN.value)
+    @with_project_auth(role=ProjectRole.MODERATOR.value)
+    def test_cannot_update_project_status_with_invalid_status(self):
+        new_status = "INVALID_STATUS"
+        response = self.update_project_status(self.project, {"status": new_status})
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

@@ -645,4 +645,3 @@ class UpdateProjectStatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
         fields = ["status"]
-
