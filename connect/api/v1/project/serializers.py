@@ -66,6 +66,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             "description",
             "project_mode",
             "template_type",
+            "status",
         ]
         ref_name = None
 
