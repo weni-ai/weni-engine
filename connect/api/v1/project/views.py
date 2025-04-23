@@ -9,6 +9,7 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django_filters.rest_framework import DjangoFilterBackend
+from drf_yasg2.utils import swagger_auto_schema
 from rest_framework import mixins, status
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied, ValidationError
@@ -413,6 +414,10 @@ class ProjectViewSet(
         task = tasks.list_project_flows(str(project.flow_organization))
         return Response(task)
 
+    @swagger_auto_schema(
+        request=UpdateProjectStatusSerializer,
+        responses={200: UpdateProjectStatusSerializer},
+    )
     @action(
         detail=True,
         methods=["PATCH"],
@@ -427,7 +432,7 @@ class ProjectViewSet(
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
-        return Response(status=status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class RequestPermissionProjectViewSet(
