@@ -685,6 +685,12 @@ class ProjectMode(models.IntegerChoices):
     OPINIONATED = 2, "opinionated"
 
 
+class ProjectStatus(models.TextChoices):
+    ACTIVE = "ACTIVE", _("active")
+    INACTIVE = "INACTIVE", _("inactive")
+    IN_TEST = "IN_TEST", _("in test")
+
+
 class Project(models.Model):
     class Meta:
         verbose_name = _("project")
@@ -797,6 +803,12 @@ class Project(models.Model):
     )
     vtex_account = models.CharField(
         _("VTEX account"), null=True, blank=True, max_length=100
+    )
+    status = models.CharField(
+        _("Project status"),
+        choices=ProjectStatus.choices,
+        default=ProjectStatus.ACTIVE,
+        max_length=8
     )
 
     def __str__(self):
