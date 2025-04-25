@@ -23,7 +23,7 @@ from connect.api.v1.internal.permissions import ModuleHasPermission
 from connect.api.v1.metadata import Metadata
 from connect.api.v1.organization.permissions import Has2FA
 from connect.api.v1.project.filters import ProjectOrgFilter
-from connect.api.v1.project.permissions import ProjectHasPermission
+from connect.api.v1.project.permissions import CanChangeProjectStatus, ProjectHasPermission
 from connect.api.v1.project.serializers import (
     ClassifierSerializer, CreateChannelSerializer, CreateClassifierSerializer,
     CreateWACChannelSerializer, DestroyClassifierSerializer,
@@ -422,7 +422,7 @@ class ProjectViewSet(
         detail=True,
         methods=["PATCH"],
         url_name="update-status",
-        permission_classes=[IsAuthenticated, ProjectHasPermission],
+        permission_classes=[IsAuthenticated, CanChangeProjectStatus],
         serializer_class=UpdateProjectStatusSerializer,
     )
     def update_status(self, request, *args, **kwargs) -> Response:
