@@ -24,7 +24,7 @@ class CanChangeProjectStatus(permissions.BasePermission):
         if not request.user.is_authenticated:
             return False
         
-        authorization = obj.organization.get_user_authorization(request.user)
+        authorization = obj.get_user_authorization(request.user)
         role = authorization.role
 
         if request.method in WRITE_METHODS:
