@@ -1,3 +1,6 @@
+## 3.29.14
+  - Add project status to v2 serializer
+
 ## 3.29.13
   - Add project status field, to indicate if it is in test, active or inactive
 

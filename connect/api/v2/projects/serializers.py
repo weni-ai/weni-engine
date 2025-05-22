@@ -60,6 +60,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             "project_type",
             "project_mode",
             "vtex_account",
+            "status",
         ]
         ref_name = None
 
