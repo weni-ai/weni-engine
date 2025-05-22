@@ -3,18 +3,25 @@ import unittest
 import uuid as uuid4
 from unittest.mock import patch
 from unittest import skipIf
+
 from django.test import RequestFactory
 from django.test import TestCase
 from django.test.client import MULTIPART_CONTENT
+from django.test import override_settings
 from rest_framework import status
+from rest_framework.test import APITestCase
 
+from connect.api.tests.decorators import with_organization_auth, with_project_auth
 from connect.api.v1.project.views import ProjectViewSet, TemplateProjectViewSet
 from connect.api.v1.tests.utils import create_user_and_token
+from connect.authentication.models import User
 from connect.common.models import (
     Project,
     Organization,
     BillingPlan,
     OrganizationRole,
+    ProjectRole,
+    ProjectStatus,
     RequestPermissionProject,
     RequestPermissionOrganization,
 )
@@ -448,3 +455,95 @@ class TemplateProjectTestCase(TestCase):
         self.assertEquals(content_data.get("first_access"), True)
         self.assertEquals(content_data.get("wa_demo_token"), "wa-demo-12345")
         self.assertEquals(content_data.get("project_type"), "template:support")
+
+
+class BaseUpdateProjectStatusTestCase(APITestCase):
+    @patch("connect.common.models.BillingPlan.objects.create")
+    def setUp(self, mock_create):
+        mock_create.return_value = None
+
+        self.organization = Organization.objects.create(
+            name="test organization",
+            description="",
+            inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan=BillingPlan.PLAN_TRIAL,
+        )
+        self.project = self.organization.project.create(
+            name="test project",
+            status=ProjectStatus.ACTIVE,
+            organization=self.organization,
+        )
+
+    def update_project_status(self, project, data: dict):
+        url = f"/v1/organization/project/{project.uuid}/update_status/"
+
+        return self.client.patch(
+            url,
+            data,
+            format="json",
+        )
+
+
+class TestUpdateProjectStatusAnonymousUser(BaseUpdateProjectStatusTestCase):
+    def test_cannot_update_project_status(self):
+        response = self.update_project_status(self.project, {"status": ProjectStatus.INACTIVE.value})
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+
+class TestUpdateProjectStatusAuthenticatedUser(BaseUpdateProjectStatusTestCase):
+    @override_settings(USE_EDA_PERMISSIONS=False)
+    def setUp(self):
+        super().setUp()
+        self.user = User.objects.create(
+            email="test@test.com",
+        )
+        self.client.force_authenticate(user=self.user)
+
+    def test_cannot_update_project_status_without_permission(self):
+        response = self.update_project_status(self.project, {"status": ProjectStatus.INACTIVE.value})
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    @with_organization_auth(role=OrganizationRole.VIEWER.value)
+    @with_project_auth(role=ProjectRole.VIEWER.value)
+    def test_cannot_update_project_status_as_viewer(self):
+        response = self.update_project_status(self.project, {"status": ProjectStatus.INACTIVE.value})
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    @with_organization_auth(role=OrganizationRole.CONTRIBUTOR.value)
+    @with_project_auth(role=ProjectRole.CONTRIBUTOR.value)
+    def test_update_project_status_as_contributor(self):
+        response = self.update_project_status(self.project, {"status": ProjectStatus.INACTIVE.value})
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.project.refresh_from_db(fields=["status"])
+        self.assertEqual(self.project.status, ProjectStatus.INACTIVE.value)
+
+    @with_organization_auth(role=OrganizationRole.SUPPORT.value)
+    @with_project_auth(role=ProjectRole.SUPPORT.value)
+    def test_cannot_update_project_status_as_support(self):
+        response = self.update_project_status(self.project, {"status": ProjectStatus.INACTIVE.value})
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    @with_organization_auth(role=OrganizationRole.ADMIN.value)
+    @with_project_auth(role=ProjectRole.MODERATOR.value)
+    def test_update_project_status_as_moderator(self):
+        new_status = ProjectStatus.INACTIVE.value
+        response = self.update_project_status(self.project, {"status": new_status})
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.project.refresh_from_db(fields=["status"])
+        self.assertEqual(self.project.status, new_status)
+
+    @with_organization_auth(role=OrganizationRole.ADMIN.value)
+    @with_project_auth(role=ProjectRole.MODERATOR.value)
+    def test_cannot_update_project_status_with_invalid_status(self):
+        new_status = "INVALID_STATUS"
+        response = self.update_project_status(self.project, {"status": new_status})
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

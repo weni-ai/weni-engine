@@ -9,6 +9,7 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django_filters.rest_framework import DjangoFilterBackend
+from drf_yasg2.utils import swagger_auto_schema
 from rest_framework import mixins, status
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied, ValidationError
@@ -22,13 +23,13 @@ from connect.api.v1.internal.permissions import ModuleHasPermission
 from connect.api.v1.metadata import Metadata
 from connect.api.v1.organization.permissions import Has2FA
 from connect.api.v1.project.filters import ProjectOrgFilter
-from connect.api.v1.project.permissions import ProjectHasPermission
+from connect.api.v1.project.permissions import CanChangeProjectStatus, ProjectHasPermission
 from connect.api.v1.project.serializers import (
     ClassifierSerializer, CreateChannelSerializer, CreateClassifierSerializer,
     CreateWACChannelSerializer, DestroyClassifierSerializer,
     ProjectSearchSerializer, ProjectSerializer, ReleaseChannelSerializer,
     RequestPermissionProjectSerializer, RequestRocketPermissionSerializer,
-    RetrieveClassifierSerializer, TemplateProjectSerializer,
+    RetrieveClassifierSerializer, TemplateProjectSerializer, UpdateProjectStatusSerializer,
     UserAPITokenSerializer)
 from connect.authentication.models import User
 from connect.billing.models import Contact
@@ -412,6 +413,26 @@ class ProjectViewSet(
         project = get_object_or_404(Project, uuid=project_uuid)
         task = tasks.list_project_flows(str(project.flow_organization))
         return Response(task)
+
+    @swagger_auto_schema(
+        request=UpdateProjectStatusSerializer,
+        responses={200: UpdateProjectStatusSerializer},
+    )
+    @action(
+        detail=True,
+        methods=["PATCH"],
+        url_name="update-status",
+        permission_classes=[IsAuthenticated, CanChangeProjectStatus],
+        serializer_class=UpdateProjectStatusSerializer,
+    )
+    def update_status(self, request, *args, **kwargs) -> Response:
+        project = self.get_object()
+
+        serializer = self.get_serializer(project, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class RequestPermissionProjectViewSet(
