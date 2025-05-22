@@ -1,3 +1,6 @@
+## 3.29.13
+  - Add project status field, to indicate if it is in test, active or inactive
+
 # 3.29.12
 ## *Add*
   - Metrics endpoint for django-prometheus
