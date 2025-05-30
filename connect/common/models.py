@@ -10,7 +10,7 @@ from django.core import mail
 from django.db import models
 from django.db.models import Sum
 from django.template.loader import render_to_string
-from django.utils import timezone
+from django.utils import timezone, translation
 
 from django.utils.translation import activate, ugettext_lazy as _
 
@@ -2051,12 +2051,13 @@ class BillingPlan(models.Model):
             language_code = email[2]
             username = email[1]
             context["user_name"] = username
-            message = render_to_string(
-                "billing/emails/trial_plan_expired_due_time_limit_en.txt", context
-            )
-            html_message = render_to_string(
-                "billing/emails/trial_plan_expired_due_time_limit_en.html", context
-            )
+            with translation.override(language_code):
+                message = render_to_string(
+                    "billing/emails/trial_plan_expired_due_time_limit_en.txt", context
+                )
+                html_message = render_to_string(
+                    "billing/emails/trial_plan_expired_due_time_limit_en.html", context
+                )
             if language_code == "en-us":
                 subject = _("Your trial plan has expired")
             else:

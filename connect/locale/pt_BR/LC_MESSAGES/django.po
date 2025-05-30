@@ -420,21 +420,35 @@ msgstr "Digite o código de acesso do Plano Personalizado"
 msgid " and apply the access code in text field"
 msgstr " e aplique o código de acesso no campo de texto"
 
-#: connect/authentication/templates/authentication/emails/base.html:44
-msgid "Visit our website"
-msgstr "Visite o nosso site"
+#: connect/authentication/templates/authentication/emails/base.html:31
+msgid "Our site"
+msgstr "Nosso site"
 
-#: connect/authentication/templates/authentication/emails/base.html:87
-msgid "Weni © Brazil 2020 - All rights reserved"
-msgstr "Weni © Brasil 2020 - Todos os direitos reservados"
+#: connect/authentication/templates/authentication/emails/base.html:45
+msgid "2025 © Weni by VTEX. All rights reserved."
+msgstr "2025 © Weni by VTEX - Todos os direitos reservados."
+
+#: connect/authentication/templates/authentication/emails/base.html:53
+msgid "Privacy Policy"
+msgstr "Política de Privacidade"
+
+#: connect/authentication/templates/authentication/emails/base.html:57
+msgid "Terms of use"
+msgstr "Termos de uso"
+
+#: connect/authentication/templates/authentication/emails/base.html:61
+msgid "Help Center"
+msgstr "Central de Ajuda"
+
+#: connect/authentication/templates/authentication/emails/base.html:65
+msgid "Unsubscribe"
+msgstr "Descadastrar"
 
 #: connect/authentication/templates/authentication/emails/base.html:89
 msgid ""
-"If you have not performed this action, ignore this message and change your "
-"email password for security. Talk to support if necessary!"
+"You are receiving this mail because you registered in Weni platform. This also shows that you agree to our Terms of use and Privacy Policies. If you no longer want to receive mails from use, click the unsubscribe link below to unsubscribe."
 msgstr ""
-"Se você não executou esta ação, ignore esta mensagem e altere sua senha de e-"
-"mail para segurança. Fale com o suporte se necessário!"
+"Você está recebendo este e-mail porque se registrou na plataforma Weni. Isso também indica que você concorda com nossos Termos de Uso e Políticas de Privacidade. Se não quiser mais receber e-mails nossos, clique no link de descadastramento abaixo."
 
 #: connect/authentication/templates/authentication/emails/change_password.html:8
 #: connect/authentication/templates/authentication/emails/change_password.txt:3
@@ -564,24 +578,6 @@ msgstr ""
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.html:84
 msgid "Avoid blocking your chatbot by accessing "
 msgstr "Evite o bloqueio de seu chatbot acessando"
-
-#: connect/billing/templates/billing/emails/advanced_plan_is_about_to_expire.html:70
-#: connect/billing/templates/billing/emails/advanced_plan_is_about_to_expire.txt:5
-#: connect/billing/templates/billing/emails/plan_expired_due_attendence_limit_en.html:70
-#: connect/billing/templates/billing/emails/plan_expired_due_attendence_limit_en.txt:5
-#: connect/billing/templates/billing/emails/plan_expired_due_attendence_limit_pt_BR.html:61
-#: connect/billing/templates/billing/emails/plan_expired_due_attendence_limit_pt_BR.txt:5
-#: connect/billing/templates/billing/emails/plan_is_about_to_expire_en.html:70
-#: connect/billing/templates/billing/emails/plan_is_about_to_expire_en.txt:5
-#: connect/billing/templates/billing/emails/plan_is_about_to_expire_pt_BR.html:62
-#: connect/billing/templates/billing/emails/plan_is_about_to_expire_pt_BR.txt:5
-#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.html:85
-#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:6
-#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:73
-#, fuzzy
-#| msgid "billing cycle"
-msgid "Billing"
-msgstr "ciclo de pagamento"
 
 #: connect/billing/templates/billing/emails/advanced_plan_is_about_to_expire.html:71
 #: connect/billing/templates/billing/emails/plan_is_about_to_expire_en.html:71
@@ -921,7 +917,7 @@ msgstr ""
 
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.html:42
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:3
-msgid "has reached the time limit of the Trial plan."
+msgid "has reached the time limit of Trial plan."
 msgstr "atingiu o tempo limite do plano Trial"
 
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.html:56
@@ -953,6 +949,96 @@ msgstr "e escolha um plano que se adapte às suas necessidades comerciais."
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:14
 msgid "Olá"
 msgstr ""
+
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:16
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:2
+msgid "Hey"
+msgstr "Poxa,"
+
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:30
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:2
+msgid "your Trial Plan has come to an end!"
+msgstr "seu plano Trial chegou ao fim! ⏳"
+
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:44
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:3
+msgid "While "
+msgstr "A"
+
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:44
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:3
+msgid "has enjoyed the 30-day free trial,"
+msgstr "aproveitou os 30 dias gratuitos da Weni,"
+
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:44
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:3
+msgid "it's time to move forward to the next stage."
+msgstr "mas agora é hora de seguir para o próximo nível."
+
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:58
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:4
+msgid "Please note that "
+msgstr " "
+
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:58
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:4
+msgid "your agents are currently unable to send messages"
+msgstr "Seus agentes não poderão mais enviar mensagens"
+
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:58
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:4
+msgid " until you select a plan that best suits your business needs."
+msgstr "até você escolher o plano que melhor se encaixa no seu negócio."
+
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:72
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:5
+msgid "Rest assured, "
+msgstr "Mas, não se preocupe: "
+
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:73
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:5
+msgid "you still have access to the platform."
+msgstr "você ainda tem acesso à plataforma!"
+
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:74
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:5
+msgid "To reactivate your agents and continue enjoying all the benefits, simply "
+msgstr "Para reativar seus agentes e continuar aproveitando todos os benefícios, basta "
+
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:75
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:5
+msgid "choose the most suitable plan"
+msgstr "escolher o plano ideal"
+
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:76
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:5
+msgid "in the"
+msgstr "na seção de"
+
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:77
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:5
+msgid "Billing"
+msgstr "Cobrança."
+
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:78
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:5
+msgid " section."
+msgstr " "
+
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:92
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:6
+msgid "We're here to support you every step of the way!"
+msgstr "Vamos manter seus agentes a todo vapor!"
+
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:107
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:7
+msgid "Best regards,"
+msgstr "Atenciosamente,"
+
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:109
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:8
+msgid "Weni by VTEX Team"
+msgstr "Time Weni by VTEX"
 
 #: connect/common/models.py:41
 msgid "newsletter"
