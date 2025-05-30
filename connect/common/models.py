@@ -1888,15 +1888,15 @@ class BillingPlan(models.Model):
         msg_list = []
         for user_email in email:
             language_code = User.objects.get(email=user_email).language
-            activate(language_code)
-            message = render_to_string("billing/emails/finished-plan.txt", context)
-            html_message = render_to_string(
-                "billing/emails/finished-plan.html", context
-            )
+            with translation.override(language_code):
+                message = render_to_string("billing/emails/finished-plan.txt", context)
+                html_message = render_to_string(
+                    "billing/emails/finished-plan.html", context
+                )
             if language_code == "en-us":
-                subject = _("Your organization's plan has ended")
+                subject = _("Plan ended on Weni Platform")
             else:
-                subject = _("O plano da sua organização foi encerrado.")
+                subject = _("Plano encerrado na Weni Plataforma")
 
             recipient_list = [user_email]
             msg = (subject, message, html_message, from_email, recipient_list)

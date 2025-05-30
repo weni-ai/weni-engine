@@ -358,8 +358,6 @@ msgstr "Nome de usuário alterado"
 #: connect/billing/templates/billing/emails/changed-plan.txt:2
 #: connect/billing/templates/billing/emails/changed_card.html:7
 #: connect/billing/templates/billing/emails/changed_card.txt:2
-#: connect/billing/templates/billing/emails/finished-plan.html:15
-#: connect/billing/templates/billing/emails/finished-plan.txt:2
 #: connect/billing/templates/billing/emails/free-plan-expired.html:16
 #: connect/billing/templates/billing/emails/free-plan-expired.txt:2
 #: connect/billing/templates/billing/emails/free_plan.html:16
@@ -597,12 +595,6 @@ msgstr " e escolha um plano que se adapte às suas necessidades comerciais."
 
 #: connect/billing/templates/billing/emails/changed-plan.html:40
 #, fuzzy
-#| msgid "The plan for your organization"
-msgid "The plan of the organization"
-msgstr "O plano para sua organização"
-
-#: connect/billing/templates/billing/emails/changed-plan.html:40
-#, fuzzy
 #| msgid "plan has been changed"
 msgid "has been changed"
 msgstr "plano foi alterado com sucesso"
@@ -661,42 +653,45 @@ msgstr ""
 "Um administrador mudou as informações do cartão de crédito para o pagamento "
 "do plano da organização"
 
-#: connect/billing/templates/billing/emails/finished-plan.html:34
+#: connect/billing/templates/billing/emails/finished-plan.html:17
+#: connect/billing/templates/billing/emails/finished-plan.txt:2
+msgid "Oh no,"
+msgstr "Que pena,"
+
+#: connect/billing/templates/billing/emails/finished-plan.html:43
 #: connect/billing/templates/billing/emails/finished-plan.txt:3
-#: connect/billing/templates/billing/emails/reactived-plan.html:40
-#: connect/billing/templates/billing/emails/reactived-plan.txt:3
 msgid "The plan for your organization"
-msgstr "O plano para sua organização"
+msgstr "O plano da sua organização,"
 
-#: connect/billing/templates/billing/emails/finished-plan.html:34
+#: connect/billing/templates/billing/emails/finished-plan.html:45
 #: connect/billing/templates/billing/emails/finished-plan.txt:3
-msgid "has been finalized"
-msgstr " foi finalizado"
+msgid "has ended. As a result,"
+msgstr "foi finalizado. Por isso,"
 
-#: connect/billing/templates/billing/emails/finished-plan.html:47
+#: connect/billing/templates/billing/emails/finished-plan.html:46
+#: connect/billing/templates/billing/emails/finished-plan.txt:3
+msgid "your intelligent agents are currently offline."
+msgstr "seus agentes inteligentes estão fora de operação agora."
+
+#: connect/billing/templates/billing/emails/finished-plan.html:60
+#: connect/billing/templates/billing/emails/finished-plan.txt:4
+msgid "To keep using the Weni Platform, simply ask your organization's administrator"
+msgstr "Para retomar o uso da Weni Plataforma, basta solicitar ao administrador da organização"
+
+#: connect/billing/templates/billing/emails/finished-plan.html:61
+#: connect/billing/templates/billing/emails/finished-plan.txt:4
+msgid "to reactivate the plan"
+msgstr "para reativar o plano"
+
+#: connect/billing/templates/billing/emails/finished-plan.html:62
+#: connect/billing/templates/billing/emails/finished-plan.txt:4
+msgid "or select a new one that meets your business needs."
+msgstr "ou escolher outro que atenda às necessidades de seu negócio."
+
+#: connect/billing/templates/billing/emails/finished-plan.html:76
 #: connect/billing/templates/billing/emails/finished-plan.txt:5
-msgid "An administrator has terminated the organization plan"
-msgstr "Um dos administradores encerrou o plano da organização"
-
-#: connect/billing/templates/billing/emails/finished-plan.html:51
-#: connect/billing/templates/billing/emails/finished-plan.txt:9
-msgid ""
-"At the moment, the functioning of your Intelligences, Flows and the Chat "
-"module are interrupted"
-msgstr ""
-"Nesse momento, o funcionamento de suas inteligências, Fluxos criados e o "
-"Módulo de Chat estão paralisados"
-
-#: connect/billing/templates/billing/emails/finished-plan.html:65
-#: connect/billing/templates/billing/emails/finished-plan.txt:12
-msgid ""
-"To continue using the Weni Platform ask your organization's administrator to "
-"reactivate the plan or choose a new one, that makes sense for your projects. "
-"We want you to stay with us"
-msgstr ""
-"Para continuar utilizando a plataforma Weni, peça a um administrador da "
-"organização para reativar o plano ou ativar um novo plano, que faça sentido "
-"para seus projetos.Queremos que fiquem conosco"
+msgid "Our goal is to continue growing alongside you!"
+msgstr "Nosso objetivo é continuar caminhando junto com você!"
 
 #: connect/billing/templates/billing/emails/free-plan-expired.html:40
 #: connect/billing/templates/billing/emails/free-plan-expired.txt:3
@@ -1032,11 +1027,15 @@ msgstr "Vamos manter seus agentes a todo vapor!"
 
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:107
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:7
+#: connect/billing/templates/billing/emails/finished-plan.html:91
+#: connect/billing/templates/billing/emails/finished-plan.txt:6
 msgid "Best regards,"
 msgstr "Atenciosamente,"
 
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:109
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:8
+#: connect/billing/templates/billing/emails/finished-plan.html:93
+#: connect/billing/templates/billing/emails/finished-plan.txt:7
 msgid "Weni by VTEX Team"
 msgstr "Time Weni by VTEX"
 
@@ -1541,10 +1540,6 @@ msgstr "Um cartão de crédito foi atualizado na organização"
 msgid "Your organization's plan has ended"
 msgstr "O plano da sua organização expirou"
 
-#: connect/common/models.py:1768
-msgid "O plano da sua organização foi encerrado."
-msgstr ""
-
 #: connect/common/models.py:1800
 msgid "Your organization's plan has been reactivated."
 msgstr "O plano da sua organização foi reativado com sucesso."
@@ -1564,6 +1559,14 @@ msgstr ""
 #: connect/common/models.py:1883
 msgid "has the plan"
 msgstr "tem o seguinte plano"
+
+#: connect/common/models.py:1897
+msgid "Plan ended on Weni Platform"
+msgstr "Plano encerrado na Weni Plataforma"
+
+#: connect/common/models.py:1899
+msgid "Plano encerrado na Weni Plataforma"
+msgstr "Plano encerrado na Weni Plataforma"
 
 #: connect/common/models.py:1904
 msgid "Your organization's plan has been updated"
