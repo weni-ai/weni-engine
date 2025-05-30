@@ -1971,18 +1971,31 @@ class BillingPlan(models.Model):
             "organization_name": self.organization.name,
             "user_name": user_name,
         }
-        mail.send_mail(
-            _("Your organization")
-            + f" {self.organization.name} "
-            + _("has already surpassed 200 active contacts"),
-            render_to_string("billing/emails/free-plan-expired.txt", context),
-            None,
-            email,
-            html_message=render_to_string(
-                "billing/emails/free-plan-expired.html", context
-            ),
-        )
-        return mail
+        from_email = None
+        msg_list = []
+        for user_email in email:
+            user = User.objects.get(email=user_email)
+            language_code = user.language
+            user_name = user.first_name + " " + user.last_name
+            context["user_name"] = user_name
+
+            with translation.override(language_code):
+                html_message = render_to_string(
+                    "billing/emails/free-plan-expired.html", context
+                )
+                message = render_to_string("billing/emails/free-plan-expired.txt", context)
+
+            if language_code == "en-us":
+                subject = _("Your Free Plan on Weni has expired")
+            else:
+                subject = _("Seu plano gratuito na Weni expirou")
+
+            recipient_list = [user_email]
+            msg = (subject, message, html_message, from_email, recipient_list)
+            msg_list.append(msg)
+
+        html_mail = send_mass_html_mail(msg_list, fail_silently=False)
+        return html_mail
 
     def send_email_chosen_plan(self, user_name: str, email: str, plan: str):
         if not settings.SEND_EMAILS:

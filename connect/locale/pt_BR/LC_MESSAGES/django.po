@@ -358,8 +358,6 @@ msgstr "Nome de usuário alterado"
 #: connect/billing/templates/billing/emails/changed-plan.txt:2
 #: connect/billing/templates/billing/emails/changed_card.html:7
 #: connect/billing/templates/billing/emails/changed_card.txt:2
-#: connect/billing/templates/billing/emails/free-plan-expired.html:16
-#: connect/billing/templates/billing/emails/free-plan-expired.txt:2
 #: connect/billing/templates/billing/emails/free_plan.html:16
 #: connect/billing/templates/billing/emails/free_plan.txt:2
 #: connect/billing/templates/billing/emails/plan_expired_due_attendence_limit_en.html:16
@@ -693,51 +691,65 @@ msgstr "ou escolher outro que atenda às necessidades de seu negócio."
 msgid "Our goal is to continue growing alongside you!"
 msgstr "Nosso objetivo é continuar caminhando junto com você!"
 
-#: connect/billing/templates/billing/emails/free-plan-expired.html:40
-#: connect/billing/templates/billing/emails/free-plan-expired.txt:3
 #: connect/common/templates/common/emails/organization/delete_organization.html:39
 #: connect/common/templates/common/emails/organization/delete_organization.txt:3
 msgid "The organization"
 msgstr "A organização"
 
-#: connect/billing/templates/billing/emails/free-plan-expired.html:40
-#: connect/billing/templates/billing/emails/free-plan-expired.txt:3
 #: connect/common/models.py:1861
 msgid "has already surpassed 200 active contacts"
 msgstr "já ultrapassou 200 contatos ativos"
 
-#: connect/billing/templates/billing/emails/free-plan-expired.html:55
+#: connect/billing/templates/billing/emails/free-plan-expired.html:16
+#: connect/billing/templates/billing/emails/free-plan-expired.txt:2
+msgid "Your projects are growing,"
+msgstr "Seus projetos estão crescendo,"
+
+#: connect/billing/templates/billing/emails/free-plan-expired.html:18
+#: connect/billing/templates/billing/emails/free-plan-expired.txt:2
+msgid "Congratulations!"
+msgstr " "
+
+#: connect/billing/templates/billing/emails/free-plan-expired.html:32
+#: connect/billing/templates/billing/emails/free-plan-expired.txt:3
+msgid "Your organization has"
+msgstr "Sua organização"
+
+#: connect/billing/templates/billing/emails/free-plan-expired.html:33
+#: connect/billing/templates/billing/emails/free-plan-expired.txt:3
+msgid "surpassed 200 active contacts."
+msgstr "ultrapassou 200 contatos ativos. Parabéns!"
+
+#: connect/billing/templates/billing/emails/free-plan-expired.html:47
 #: connect/billing/templates/billing/emails/free-plan-expired.txt:4
-msgid ""
-"This means that many people are interacting with your projects and our free "
-"plan no longer meets your organization's needs"
-msgstr ""
-"Isso quer dizer que muitas pessoas estão interagindo com seus projetos e "
-"nosso plano grátis não atende mais as necessidades da sua organização"
+msgid "This means that our free plan is no longer enough to keep up with the growth of"
+msgstr "Isso quer dizer que o nosso plano gratuito já não é suficiente para acompanhar o crescimento da"
 
-#: connect/billing/templates/billing/emails/free-plan-expired.html:78
-msgid ""
-"At the moment the functioning of your intelligences, created Flows and the "
-"Chat module is paralyzed. To continue using Weni Platform, ask the "
-"organization's administrador to choose a new plan that makes sense for your "
-"projects, we want you to continue with us"
-msgstr ""
-"No momento o funcionamento das suas inteligências, Fluxos criados e o módulo "
-"de Chat estão paralisados. Para continuar usando a plataforma da Weni, "
-"pergunte ao administrador da organização para escolher um novo plano que "
-"faça sentido para seus projetos, nós queremos que você continue conosco"
+#: connect/billing/templates/billing/emails/free-plan-expired.html:62
+#: connect/billing/templates/billing/emails/free-plan-expired.txt:6
+msgid "To continue using your intelligent agents,"
+msgstr "Para continuar utilizando seus agentes inteligentes,"
 
-#: connect/billing/templates/billing/emails/free-plan-expired.txt:5
-msgid ""
-"At the moment the functioning of your intelligences, created Flows and the "
-"Chat module is paralyzed. To continue using Weni Platform, ask the "
-"organization's Administrador to choose a new plan that makes sense for your "
-"projects, we want you to continue with us"
-msgstr ""
-"No momento o funcionamento das suas inteligências, Fluxos criados e o módulo "
-"de Chat estão paralisados. Para continuar usando a plataforma da Weni, "
-"pergunte ao administrador da organização para escolher um novo plano que "
-"faça sentido para seus projetos, nós queremos que você continue conosco"
+#: connect/billing/templates/billing/emails/free-plan-expired.html:63
+#: connect/billing/templates/billing/emails/free-plan-expired.txt:7
+msgid "artificial intelligence, and all the other features of the Weni Platform,"
+msgstr "inteligência artificial, e aproveitar todos os outros recursos da Weni Plataforma,"
+
+#: connect/billing/templates/billing/emails/free-plan-expired.html:64
+#: connect/billing/templates/billing/emails/free-plan-expired.txt:8
+msgid "choose a plan"
+msgstr "escolha um plano"
+
+#: connect/billing/templates/billing/emails/free-plan-expired.html:65
+#: connect/billing/templates/billing/emails/free-plan-expired.txt:9
+msgid "that aligns with your goals."
+msgstr "que atenda aos seus objetivos."
+
+#: connect/billing/templates/billing/emails/free-plan-expired.html:79
+#: connect/billing/templates/billing/emails/free-plan-expired.txt:11
+msgctxt "free-plan-expired"
+msgid "We're here to support you every step of the way!"
+msgstr "Estamos aqui para te apoiar em cada passo!"
 
 #: connect/billing/templates/billing/emails/free_plan.html:40
 #: connect/billing/templates/billing/emails/free_plan.txt:3
@@ -1022,6 +1034,7 @@ msgstr " "
 
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:92
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:6
+msgctxt "trial-plan-expired"
 msgid "We're here to support you every step of the way!"
 msgstr "Vamos manter seus agentes a todo vapor!"
 
@@ -1029,6 +1042,8 @@ msgstr "Vamos manter seus agentes a todo vapor!"
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:7
 #: connect/billing/templates/billing/emails/finished-plan.html:91
 #: connect/billing/templates/billing/emails/finished-plan.txt:6
+#: connect/billing/templates/billing/emails/free-plan-expired.html:94
+#: connect/billing/templates/billing/emails/free-plan-expired.txt:12
 msgid "Best regards,"
 msgstr "Atenciosamente,"
 
@@ -1036,6 +1051,8 @@ msgstr "Atenciosamente,"
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:8
 #: connect/billing/templates/billing/emails/finished-plan.html:93
 #: connect/billing/templates/billing/emails/finished-plan.txt:7
+#: connect/billing/templates/billing/emails/free-plan-expired.html:96
+#: connect/billing/templates/billing/emails/free-plan-expired.txt:13
 msgid "Weni by VTEX Team"
 msgstr "Time Weni by VTEX"
 
