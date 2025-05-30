@@ -1945,15 +1945,20 @@ class BillingPlan(models.Model):
         from_email = None
         msg_list = []
         for user_email in email:
-            language_code = User.objects.get(email=user_email).language
-            activate(language_code)
-            message = render_to_string("billing/emails/removed_card.txt", context)
-            html_message = render_to_string("billing/emails/removed_card.html", context)
+            user = User.objects.get(email=user_email)
+            language_code = user.language
+            user_name = user.first_name + " " + user.last_name
+
+            context["user_name"] = user_name
+
+            with translation.override(language_code):
+                message = render_to_string("billing/emails/removed_card.txt", context)
+                html_message = render_to_string("billing/emails/removed_card.html", context)
             if language_code == "en-us":
-                subject = _("Your organization's credit card was removed")
+                subject = _("Attention: credit card removed from Weni Platform")
             else:
                 subject = _(
-                    "O cartão de crédito vinculado a sua organização foi removido"
+                    "Cartão de crédito removido na Weni Plataforma"
                 )
 
             recipient_list = [user_email]

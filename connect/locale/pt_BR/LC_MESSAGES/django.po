@@ -366,6 +366,7 @@ msgstr "Nome de usuário alterado"
 #: connect/billing/templates/billing/emails/plan_is_about_to_expire_en.txt:2
 #: connect/billing/templates/billing/emails/reactived-plan.html:16
 #: connect/billing/templates/billing/emails/removed_card.html:16
+#: connect/billing/templates/billing/emails/removed_card.txt:2
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.html:16
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:2
 #: connect/common/templates/common/emails/organization/change_organization_name.html:7
@@ -879,48 +880,30 @@ msgstr "É maravilhoso ter seu time de volta"
 msgid "Hi,"
 msgstr "Oi,"
 
-#: connect/billing/templates/billing/emails/removed_card.html:40
+#: connect/billing/templates/billing/emails/removed_card.html:42
 #: connect/billing/templates/billing/emails/removed_card.txt:3
-msgid "The credit card linked to the organization"
-msgstr "O cartão de crédito ligado à organização"
+msgid "Your account needs urgent attention!"
+msgstr "Sua conta precisa de um ajuste urgente!"
 
-#: connect/billing/templates/billing/emails/removed_card.html:40
-#: connect/billing/templates/billing/emails/removed_card.txt:3
-msgid "has been removed"
-msgstr " foi removido"
-
-#: connect/billing/templates/billing/emails/removed_card.html:55
+#: connect/billing/templates/billing/emails/removed_card.html:56
 #: connect/billing/templates/billing/emails/removed_card.txt:5
-msgid ""
-"An administrator has removed the credit card associated with your "
-"organization"
-msgstr ""
-"Um administrador removeu o cartão de crédito associado à sua organização"
+msgid "The credit card for"
+msgstr "O cartão de crédito da"
 
-#: connect/billing/templates/billing/emails/removed_card.html:57
+#: connect/billing/templates/billing/emails/removed_card.html:58
 #: connect/billing/templates/billing/emails/removed_card.txt:7
-msgid "preventing the current plan's billing"
-msgstr "impedindo a cobrança do plano atual"
+msgid "has been removed. This change has paused your plan's billing and deactivated you agents."
+msgstr "foi removido. Essa alteração pausou a cobrança do seu plano e deixou os agentes inativos."
 
-#: connect/billing/templates/billing/emails/removed_card.html:60
-#: connect/billing/templates/billing/emails/removed_card.txt:10
-msgid ""
-"At the moment, the status of your Intelligences, created Flows and the Chat "
-"module is frozen"
-msgstr ""
-"Nesse momento, o funcionamento de suas inteligências, Fluxos criados e o "
-"Módulo de Chat estão paralisados"
+#: connect/billing/templates/billing/emails/removed_card.html:72
+#: connect/billing/templates/billing/emails/removed_card.txt:9
+msgid "To continue using the Weni Platform, simply ask the administrator to update the card in the"
+msgstr "Para continuar usando a Weni Plataforma, é só pedir para o administrador atualizar o cartão na seção de"
 
-#: connect/billing/templates/billing/emails/removed_card.html:75
-#: connect/billing/templates/billing/emails/removed_card.txt:13
-msgid ""
-"To continue using the weni platform, request the organization's "
-"administrator to add a valid credit card in the billing section. We want you "
-"to stay with us"
-msgstr ""
-"Para continuar utilizando a plataforma Weni, peça a um administrador da "
-"organização para adicionar um cartão de crédito válido na seção de pagamento."
-"Queremos que fiquem conosco"
+#: connect/billing/templates/billing/emails/removed_card.html:74
+#: connect/billing/templates/billing/emails/removed_card.txt:11
+msgid "section. Once updated, everything will be back to normal!"
+msgstr "Assim, tudo volta a funcionar normalmente!"
 
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.html:42
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:3
@@ -1024,6 +1007,8 @@ msgstr "na seção de"
 
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:77
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:5
+#: connect/billing/templates/billing/emails/removed_card.html:73
+#: connect/billing/templates/billing/emails/removed_card.txt:10
 msgid "Billing"
 msgstr "Cobrança."
 
