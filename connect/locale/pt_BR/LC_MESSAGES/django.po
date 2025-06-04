@@ -467,6 +467,40 @@ msgstr " para "
 msgid " we hope you like your new nickname"
 msgstr " nós esperamos que você goste do seu novo nome de usuário"
 
+#: connect/authentication/models.py:221
+msgid "Your Weni Platform account is ready! Log in now"
+msgstr "Seu cadastro na Weni Plataforma foi concluído! Acesse agora"
+
+#: connect/authentication/templates/authentication/emails/first_password.html:42
+#: connect/authentication/templates/authentication/emails/first_password.txt:3
+msgid "Welcome to"
+msgstr "Bem-vindo à"
+
+#: connect/authentication/templates/authentication/emails/first_password.html:57
+#: connect/authentication/templates/authentication/emails/first_password.txt:6
+msgid "Your registration was successful! To log in for the first time, please use the temporary password below:"
+msgstr "Seu cadastro foi concluído com sucesso! Para acessar a plataforma pela primeira vez, utilize a senha temporária abaixo:"
+
+#: connect/authentication/templates/authentication/emails/first_password.html:85
+#: connect/authentication/templates/authentication/emails/first_password.txt:8
+msgid "When logging in for the first time, you’ll be prompted to set a new password of your choice."
+msgstr "Ao fazer login pela primeira vez, você precisará definir uma nova senha de sua escolha."
+
+#: connect/authentication/templates/authentication/emails/first_password.html:99
+#: connect/authentication/templates/authentication/emails/first_password.txt:10
+msgid "🔒 Important: "
+msgstr "Importante: "
+
+#: connect/authentication/templates/authentication/emails/first_password.html:100
+#: connect/authentication/templates/authentication/emails/first_password.txt:11
+msgid "Your password is personal and confidential. We recommend keeping it secure to protect your account."
+msgstr "Sua senha é pessoal e confidencial. Recomendamos mantê-la segura para proteger sua conta."
+
+#: connect/authentication/templates/authentication/emails/first_password.html:114
+#: connect/authentication/templates/authentication/emails/first_password.txt:13
+msgid "We hope you have a fantastic experience with Weni by VTEX!"
+msgstr "Desejamos a você uma experiência incrível com a Weni by VTEX!"
+
 #: connect/billing/models.py:18 connect/billing/models.py:52
 #: connect/billing/models.py:66 connect/common/models.py:126
 #: connect/common/models.py:559 connect/common/models.py:684
@@ -869,6 +903,8 @@ msgstr "Oi,"
 
 #: connect/authentication/templates/authentication/emails/change_password.html:17
 #: connect/authentication/templates/authentication/emails/change_password.txt:2
+#: connect/authentication/templates/authentication/emails/first_password.html:16
+#: connect/authentication/templates/authentication/emails/first_password.txt:2
 msgctxt "formal-hi"
 msgid "Hi,"
 msgstr "Olá,"

@@ -213,17 +213,19 @@ class User(AbstractBaseUser, PermissionsMixin):
             return False
         context = {
             "email": self.email,
+            "name": self.first_name,
             "password": password,
         }
-        send_mail(
-            _("Access password"),
-            render_to_string("authentication/emails/first_password.txt"),
-            None,
-            [self.email],
-            html_message=render_to_string(
-                "authentication/emails/first_password.html", context
-            ),
-        )
+        with translation.override(self.language):
+            send_mail(
+                _("Your Weni Platform account is ready! Log in now"),
+                render_to_string("authentication/emails/first_password.txt"),
+                None,
+                [self.email],
+                html_message=render_to_string(
+                    "authentication/emails/first_password.html", context
+                ),
+            )
 
     def send_request_flow_user_info(self, flow_data):  # pragma: no cover
         if not flow_data.get("send_request_flow"):
