@@ -335,9 +335,9 @@ msgstr "setor da empresa"
 msgid "Your position in the company"
 msgstr "número de pessoas trabalhando nesta empresa"
 
-#: connect/authentication/models.py:168
-msgid "Password changed"
-msgstr "Senha alterada"
+#: connect/authentication/models.py:181
+msgid "Your password has been changed"
+msgstr "Sua senha foi alterada"
 
 #: connect/authentication/models.py:186
 msgid "Nickname changed"
@@ -867,6 +867,22 @@ msgctxt "common-hi"
 msgid "Hi,"
 msgstr "Oi,"
 
+#: connect/authentication/templates/authentication/emails/change_password.html:17
+#: connect/authentication/templates/authentication/emails/change_password.txt:2
+msgctxt "formal-hi"
+msgid "Hi,"
+msgstr "Olá,"
+
+#: connect/authentication/templates/authentication/emails/change_password.html:20
+#: connect/authentication/templates/authentication/emails/change_password.txt:3
+msgid "Your password has been successfully changed. For your security and privacy, remember not to share it with anyone."
+msgstr "Sua senha foi alterada com sucesso. Para garantir sua segurança e privacidade, lembre-se de não compartilhá-la com ninguém."
+
+#: connect/authentication/templates/authentication/emails/change_password.html:23
+#: connect/authentication/templates/authentication/emails/change_password.txt:4
+msgid "If you didn't request this change, please contact our support team immediately."
+msgstr "Caso você não tenha solicitado essa alteração, entre em contato com nossa equipe de suporte imediatamente."
+
 #: connect/billing/templates/billing/emails/removed_card.html:42
 #: connect/billing/templates/billing/emails/removed_card.txt:3
 msgid "Your account needs urgent attention!"
@@ -1018,6 +1034,8 @@ msgstr "Vamos manter seus agentes a todo vapor!"
 #: connect/billing/templates/billing/emails/free-plan-expired.txt:12
 #: connect/common/templates/common/emails/organization/invite_organization.html:63
 #: connect/common/templates/common/emails/organization/invite_organization.txt:5
+#: connect/authentication/templates/authentication/emails/change_password.html:70
+#: connect/authentication/templates/authentication/emails/change_password.txt:5
 msgid "Best regards,"
 msgstr "Atenciosamente,"
 
@@ -1029,6 +1047,8 @@ msgstr "Atenciosamente,"
 #: connect/billing/templates/billing/emails/free-plan-expired.txt:13
 #: connect/common/templates/common/emails/organization/invite_organization.html:65
 #: connect/common/templates/common/emails/organization/invite_organization.txt:6
+#: connect/authentication/templates/authentication/emails/change_password.html:72
+#: connect/authentication/templates/authentication/emails/change_password.txt:6
 msgid "Weni by VTEX Team"
 msgstr "Time Weni by VTEX"
 
