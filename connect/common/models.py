@@ -419,6 +419,7 @@ class Organization(models.Model):
             return False  # pragma: no cover
 
         user = User.objects.get(email=email)
+        language = user.language
 
         context = {
             "base_url": settings.BASE_URL,
@@ -426,17 +427,18 @@ class Organization(models.Model):
             "user_name": user_name,
         }
 
-        mail.send_mail(
-            _("You receive an access code to Weni Platform"),
-            render_to_string(
-                f"authentication/emails/access_code_{user.language}.txt", context
-            ),
-            None,
-            [email],
-            html_message=render_to_string(
-                f"authentication/emails/access_code_{user.language}.html", context
-            ),
-        )
+        with translation.override(language):
+            mail.send_mail(
+                _("You've received an access code for Weni Platform"),
+                render_to_string(
+                    "authentication/emails/access_code.txt", context
+                ),
+                None,
+                [email],
+                html_message=render_to_string(
+                    "authentication/emails/access_code.html", context
+                ),
+            )
         return mail
 
     def send_email_permission_change(

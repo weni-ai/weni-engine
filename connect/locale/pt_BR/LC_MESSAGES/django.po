@@ -343,9 +343,6 @@ msgstr "Senha alterada"
 msgid "Nickname changed"
 msgstr "Nome de usuário alterado"
 
-#: connect/authentication/templates/authentication/emails/access_code_en-us.html:16
-#: connect/authentication/templates/authentication/emails/access_code_en-us.txt:2
-#: connect/authentication/templates/authentication/emails/access_code_pt-br.txt:2
 #: connect/authentication/templates/authentication/emails/change_password.html:6
 #: connect/authentication/templates/authentication/emails/change_password.txt:2
 #: connect/authentication/templates/authentication/emails/nickname_changed.html:8
@@ -391,31 +388,20 @@ msgstr "Nome de usuário alterado"
 msgid "Hi"
 msgstr "Oi"
 
-#: connect/authentication/templates/authentication/emails/access_code_en-us.html:40
-msgid "Enter the access code below on the Weni platform"
-msgstr "Digite o código de acesso abaixo na plataforma Weni"
+#: connect/authentication/templates/authentication/emails/access_code.html:15
+#: connect/authentication/templates/authentication/emails/access_code.txt:2
+msgid "Welcome to Weni by VTEX, an AI powered customer experience solution for brands and retailers."
+msgstr "Bem-vindo à Weni by VTEX, uma solução de experiência do cliente impulsionada por IA para marcas e varejistas."
 
-#: connect/authentication/templates/authentication/emails/access_code_en-us.html:54
-#: connect/authentication/templates/authentication/emails/access_code_en-us.txt:4
-#: connect/authentication/templates/authentication/emails/access_code_pt-br.txt:4
-msgid ""
-"You receive an access code to Weni Platform. When adding a organization in "
-"system press on "
-msgstr ""
-"Você recebeu um código de acesso para a Plataforma Weni. Ao adicionar uma "
-"organização no sistema aperte em "
+#: connect/authentication/templates/authentication/emails/access_code.html:28
+#: connect/authentication/templates/authentication/emails/access_code.txt:3
+msgid "Your temporary password is:"
+msgstr "Sua senha temporária é:"
 
-#: connect/authentication/templates/authentication/emails/access_code_en-us.html:55
-#: connect/authentication/templates/authentication/emails/access_code_en-us.txt:5
-#: connect/authentication/templates/authentication/emails/access_code_pt-br.txt:5
-msgid "Enter access code on Custom Plan"
-msgstr "Digite o código de acesso do Plano Personalizado"
-
-#: connect/authentication/templates/authentication/emails/access_code_en-us.html:56
-#: connect/authentication/templates/authentication/emails/access_code_en-us.txt:5
-#: connect/authentication/templates/authentication/emails/access_code_pt-br.txt:5
-msgid " and apply the access code in text field"
-msgstr " e aplique o código de acesso no campo de texto"
+#: connect/authentication/templates/authentication/emails/access_code.html:54
+#: connect/authentication/templates/authentication/emails/access_code.txt:3
+msgid "We wish you a fantastic experience with Weni by VTEX!"
+msgstr "Esperamos que você tenha uma experiência fantástica com a Weni by VTEX!"
 
 #: connect/authentication/templates/authentication/emails/base.html:31
 msgid "Our site"
@@ -1144,9 +1130,9 @@ msgstr "Organização {} não existe"
 msgid "{prev_name} is now named {new_name}!"
 msgstr ""
 
-#: connect/common/models.py:420
-msgid "You receive an access code to Weni Platform"
-msgstr "Você recebeu um código de acesso para a plataforma Weni"
+#: connect/common/models.py:432
+msgid "You've received an access code for Weni Platform"
+msgstr "Código de acesso para a Weni Plataforma"
 
 #: connect/common/models.py:450
 #, fuzzy
