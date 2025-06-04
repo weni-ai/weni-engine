@@ -877,6 +877,7 @@ msgstr "É maravilhoso ter seu time de volta"
 
 #: connect/billing/templates/billing/emails/reactived-plan.txt:2
 #: connect/common/templates/common/emails/organization/organization_create.txt:2
+msgctxt "common-hi"
 msgid "Hi,"
 msgstr "Oi,"
 
@@ -1029,6 +1030,8 @@ msgstr "Vamos manter seus agentes a todo vapor!"
 #: connect/billing/templates/billing/emails/finished-plan.txt:6
 #: connect/billing/templates/billing/emails/free-plan-expired.html:94
 #: connect/billing/templates/billing/emails/free-plan-expired.txt:12
+#: connect/common/templates/common/emails/organization/invite_organization.html:63
+#: connect/common/templates/common/emails/organization/invite_organization.txt:5
 msgid "Best regards,"
 msgstr "Atenciosamente,"
 
@@ -1038,6 +1041,8 @@ msgstr "Atenciosamente,"
 #: connect/billing/templates/billing/emails/finished-plan.txt:7
 #: connect/billing/templates/billing/emails/free-plan-expired.html:96
 #: connect/billing/templates/billing/emails/free-plan-expired.txt:13
+#: connect/common/templates/common/emails/organization/invite_organization.html:65
+#: connect/common/templates/common/emails/organization/invite_organization.txt:6
 msgid "Weni by VTEX Team"
 msgstr "Time Weni by VTEX"
 
@@ -1782,25 +1787,15 @@ msgstr ""
 "Você ainda pode criar outras organizações e projetos se quiser continuar "
 "conosco"
 
-#: connect/common/templates/common/emails/organization/invite_organization.html:18
-#: connect/common/templates/common/emails/organization/invite_organization.txt:2
-msgid "You have been invited to join the organization"
-msgstr "Você foi convidado para participar da organização"
-
-#: connect/common/templates/common/emails/organization/invite_organization.html:39
 #: connect/common/templates/common/emails/project/invite_project.html:39
 msgid "Uhuuul, now you are one of us"
 msgstr "Uhuuul, agora você é um(a) de nós!"
 
-#: connect/common/templates/common/emails/organization/invite_organization.html:42
-#: connect/common/templates/common/emails/organization/invite_organization.txt:4
 #: connect/common/templates/common/emails/project/invite_project.html:42
 #: connect/common/templates/common/emails/project/invite_project.txt:4
 msgid "A member of the organization"
 msgstr "Um membro da organização"
 
-#: connect/common/templates/common/emails/organization/invite_organization.html:42
-#: connect/common/templates/common/emails/organization/invite_organization.txt:4
 #: connect/common/templates/common/emails/project/invite_project.html:42
 #: connect/common/templates/common/emails/project/invite_project.txt:4
 msgid ""
@@ -1813,17 +1808,46 @@ msgstr ""
 "basta clicar no botão abaixo e você será redirecionado para uma página de "
 "cadastro. Caso já tenha cadastro, basta fazer o login"
 
-#: connect/common/templates/common/emails/organization/invite_organization.html:79
-#: connect/common/templates/common/emails/organization/invite_organization.txt:5
 #: connect/common/templates/common/emails/project/invite_project.html:79
 #: connect/common/templates/common/emails/project/invite_project.txt:5
+#: connect/common/templates/common/emails/organization/invite_organization.html:82
+#: connect/common/templates/common/emails/organization/invite_organization.txt:7
 msgid "Join org"
 msgstr "Entrar na organização"
 
-#: connect/common/templates/common/emails/organization/invite_organization.txt:3
 #: connect/common/templates/common/emails/project/invite_project.txt:3
 msgid "Uhuuul, now you are one of us!"
 msgstr "Uhuuul, agora você é um(a) de nós!"
+
+#: connect/common/models.py:188
+msgid "You've been invited to join "
+msgstr "Você foi convidado para a organização "
+
+#: connect/common/templates/common/emails/organization/invite_organization.html:17
+#: connect/common/templates/common/emails/organization/invite_organization.txt:2
+msgctxt "invite-hi"
+msgid "Hi,"
+msgstr "Uhull! Seja bem-vindo,"
+
+#: connect/common/templates/common/emails/organization/invite_organization.html:32
+msgid "Welcome! We're excited to have you onboard."
+msgstr " "
+
+#: connect/common/templates/common/emails/organization/invite_organization.html:32
+#: connect/common/templates/common/emails/organization/invite_organization.txt:3
+msgid "A member of"
+msgstr "Um membro de"
+
+#: connect/common/templates/common/emails/organization/invite_organization.html:34
+#: connect/common/templates/common/emails/organization/invite_organization.txt:3
+msgid "has sent you an invitation to join their organization."
+msgstr "enviou um convite para você se juntar à organização na Weni Plataforma."
+
+#: connect/common/templates/common/emails/organization/invite_organization.html:48
+#: connect/common/templates/common/emails/organization/invite_organization.txt:4
+msgid "To accept, simply click the button below and complete your registration. If you're already registered, just log in you account."
+msgstr "Para aceitar, basta clicar no botão abaixo para completar o seu cadastro. Se você já fez isso, é só logar na sua conta."
+
 
 #: connect/common/templates/common/emails/organization/leaving_org.html:13
 #: connect/common/templates/common/emails/organization/leaving_org.txt:3

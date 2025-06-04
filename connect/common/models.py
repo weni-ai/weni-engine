@@ -172,22 +172,29 @@ class Organization(models.Model):
     def send_email_invite_organization(self, email):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
+        user = User.objects.get(email=email)
+        language = user.language
+        user_name = user.first_name + " " + user.last_name
+
         context = {
             "base_url": settings.BASE_URL,
             "webapp_base_url": settings.WEBAPP_BASE_URL,
             "organization_name": self.name,
+            "user_name": user_name,
         }
-        mail.send_mail(
-            _("Invitation to join organization"),
-            render_to_string(
-                "common/emails/organization/invite_organization.txt", context
-            ),
-            None,
-            [email],
-            html_message=render_to_string(
-                "common/emails/organization/invite_organization.html", context
-            ),
-        )
+
+        with translation.override(language):
+            mail.send_mail(
+                _("You've been invited to join ") + self.name,
+                render_to_string(
+                    "common/emails/organization/invite_organization.txt", context
+                ),
+                None,
+                [email],
+                html_message=render_to_string(
+                    "common/emails/organization/invite_organization.html", context
+                ),
+            )
         return mail
 
     def send_email_organization_going_out(self, user: User):
