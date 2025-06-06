@@ -1,4 +1,4 @@
 {% load i18n %}
-<p>{% trans 'Hi,' %} {{first_name}}</p>
+<p>{% trans 'Hi,' context 'common-hi' %} {{first_name}}</p>
 <p>{% trans 'You just gave life to' %} {{ organization_name }}</p>
 <p>{% trans 'Your organization was successfully created! You can now invite members to help you build projects and increase exponentially the way you automate your life with our Intelligences and Flows modules' %}.</p>

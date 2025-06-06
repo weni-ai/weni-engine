@@ -1,5 +1,13 @@
 {% load i18n %}
-<p>{% trans 'Hi' %}, {{ user_name }}!</p>
-<p>{% trans 'The organization' %} {{organization_name}} {% trans 'has already surpassed 200 active contacts' %}</p>
-<p>{% trans "This means that many people are interacting with your projects and our free plan no longer meets your organization's needs" %}</p>
-<p>{% trans "At the moment the functioning of your intelligences, created Flows and the Chat module is paralyzed. To continue using Weni Platform, ask the organization's Administrador to choose a new plan that makes sense for your projects, we want you to continue with us" %}</p>
+<p>{% trans "Your projects are growing," %} {{ user_name }}! {% trans "Congratulations!" %}</p>
+<p>{% trans "Your organization has" %} <strong>{% trans "surpassed 200 active contacts." %}</strong></p>
+<p>{% trans "This means that our free plan is no longer enough to keep up with the growth of" %} {{ organization_name }}.</p>
+<p>
+    <strong>{% trans "To continue using your intelligent agents," %}</strong>
+    {% trans "artificial intelligence, and all the other features of the Weni Platform," %}
+    <strong>{% trans "choose a plan"%}</strong>
+    {% trans "that aligns with your goals." %}
+</p>
+<p>{% trans "We're here to support you every step of the way!" context "free-plan-expired" %}</p>
+<p>{% trans "Best regards," %}</p>
+<p>{% trans "Weni by VTEX Team" %}</p>

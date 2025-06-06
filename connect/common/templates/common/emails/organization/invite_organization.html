@@ -3,80 +3,98 @@
 {% load i18n %}
 
 {% block main-content %}
-    <section style="width: 574px; margin: 50px auto">
+<section style="margin: 24px auto; padding: 0 32px">
+  <div
+    style="
+      font-family: 'Lato', sans-serif;
+      font-style: normal;
+      font-weight: 700;
+      font-size: 16px;
+      line-height: 24px;
+      color: #3b414d;
+    "
+  >
+    {% trans 'Hi,' context 'invite-hi' %}
+    {{ user_name }}!
+  </div>
 
-          <div
-            style="
-              font-family: 'Lato', sans-serif;
-              font-weight: bold;
-              font-size: 20px;
-              line-height: 28px;
-              color: #262626;
-              margin-top: 24px;
-            "
-          >
-            {% trans 'You have been invited to join the organization' %} <strong> {{ organization_name }} </strong>
-            <span style="margin-left: 1px">
-              <img
-                style="max-height: 20px"
-                src="{% static 'emojis/grinning-squinting.png' %}"
-                alt=""
-              />
-            </span>
-          </div>
+  <div
+    style="
+      font-family: 'Lato', sans-serif;
+      font-style: normal;
+      font-weight: 700;
+      font-size: 14px;
+      line-height: 22px;
+      color: #3b414d;
+      margin-top: 12px;
+    "
+  >
+    {% trans "Welcome! We're excited to have you onboard." %}
+  </div>
 
-          <div
-            style="
-              font-family: 'Lato', sans-serif;
-              font-style: normal;
-              font-weight: normal;
-              font-size: 16px;
-              line-height: 24px;
-              color: #808080;
-              margin-top: 24px;
-            "
-          >
-            {% trans 'Uhuuul, now you are one of us' %}!
+  <div
+    style="
+      font-family: 'Lato', sans-serif;
+      font-style: normal;
+      font-weight: normal;
+      font-size: 14px;
+      line-height: 22px;
+      color: #3b414d;
+      margin-top: 12px;
+    "
+  >
+    {% trans 'A member of' %}
+    <strong>{{ organization_name }}</strong>
+    {% trans 'has sent you an invitation to join their organization.' %}
+  </div>
 
-            <p style="margin-top: 24px; margin-bottom: 0">
-              {% trans 'A member of the organization' %} <strong> {{ organization_name }} </strong> {% trans "just sent you an invitation to join them in the organization. To do so, just click the button below and you will be redirected to the registration page. In case you are already registered, you don't have to do anything, just login and you'll be set " %}.
-              <span style="margin-left: 1px">
-                <img
-                  style="max-height: 16px"
-                  src="{% static 'emojis/winking-face.png' %}"
-                  alt=""
-                />
-              </span>
-            </p>
+  <div
+    style="
+      font-family: 'Lato', sans-serif;
+      font-style: normal;
+      font-weight: normal;
+      font-size: 14px;
+      line-height: 22px;
+      color: #3b414d;
+      margin-top: 12px;
+    "
+  >
+    {% trans "To accept, simply click the button below and complete your registration. If you're already registered, just log in you account." %}
+  </div>
 
-          </div>
+  <div
+    style="
+      font-family: 'Lato', sans-serif;
+      font-style: normal;
+      font-weight: normal;
+      font-size: 14px;
+      line-height: 22px;
+      color: #3B414D;
+      margin-top: 12px;
+      margin-bottom: 32px;
+    "
+  >
+    {% trans 'Best regards,' %}
+    <br>
+    {% trans 'Weni by VTEX Team' %}
+  </div>
 
-          <div
-            style="
-              position: relative;
-              cursor: pointer;
-              margin: auto;
-              width: 400px;
-              text-align: center;
-              background: #3b414d;
-              color: #ffffff;
-              font-size: 16px;
-              font-family: 'Lato', sans-serif;
-              margin-top: 48px;
-              border-radius: 4px;
-              padding: 12px 0;
-              margin-bottom: 0;
-            "
-          >
-            <a
-              style="
-                font-family: 'Lato', sans-serif;
-                line-height: 24px;
-                padding: 12px 64px;
-                text-decoration: none;
-                color: #FFF;
-              " href="{{ webapp_base_url }}"
-              >{% trans "Join org" %}</a>
-          </div>
-        </section>
+  <a href="{{ webapp_base_url }}" style="text-decoration: none">
+    <div
+      style="
+        padding: 12px 16px;
+        text-align: center;
+        background: #00a49f;
+        border-radius: 4px;
+        color: #fff;
+        font-family: 'Lato', sans-serif;
+        font-weight: 400;
+        font-size: 14px;
+        line-height: 22px;
+      "
+    >
+      {% trans 'Join org' %}
+    </div>
+  </a>
+</section>
 {% endblock %}

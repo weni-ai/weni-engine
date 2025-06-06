@@ -1,5 +1,8 @@
 {% load i18n %}
-<p>{% trans 'You have been invited to join the organization' %} {{ organization_name }} </p>
-<p>{% trans 'Uhuuul, now you are one of us!' %}</p>
-<p>{% trans 'A member of the organization' %} <strong> {{ organization_name }} </strong> {% trans "just sent you an invitation to join them in the organization. To do so, just click the button below and you will be redirected to the registration page. In case you are already registered, you don't have to do anything, just login and you'll be set " %}.</p>
+<p>{% trans 'Hi,' context 'invite-hi' %} {{ user_name }}! </p>
+<p>{% trans "Welcome! We're excited to have you onboard." %}</p>
+<p>{% trans "A member of" %} {{ organization_name }} {% trans "has sent you an invitation to join their organization." %}</p>
+<p>{% trans "To accept, simply click the button below and complete your registration. If you're already registered, just log in you account." %}</p>
+<p>{% trans "Best regards," %}</p>
+<p>{% trans "Weni by VTEX Team" %}</p>
 <p><a href="{{ webapp_base_url }}"> {% trans "Join org" %} </a></p>

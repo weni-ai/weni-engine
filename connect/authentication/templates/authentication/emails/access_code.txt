@@ -1,0 +1,5 @@
+{% load i18n %}
+<p>{% trans "Welcome to the Weni by VTEX, an AI powered customer experience solution for brands and retailers." %}</p>
+<p>{% trans "Your temporary password is:" %}</p>
+<p>{{access_code}}</p>
+<p>{% trans "We wish you a fantastic experience with Weni by VTEX!" %}</p>

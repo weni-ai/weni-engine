@@ -335,17 +335,14 @@ msgstr "setor da empresa"
 msgid "Your position in the company"
 msgstr "número de pessoas trabalhando nesta empresa"
 
-#: connect/authentication/models.py:168
-msgid "Password changed"
-msgstr "Senha alterada"
+#: connect/authentication/models.py:181
+msgid "Your password has been changed"
+msgstr "Sua senha foi alterada"
 
 #: connect/authentication/models.py:186
 msgid "Nickname changed"
 msgstr "Nome de usuário alterado"
 
-#: connect/authentication/templates/authentication/emails/access_code_en-us.html:16
-#: connect/authentication/templates/authentication/emails/access_code_en-us.txt:2
-#: connect/authentication/templates/authentication/emails/access_code_pt-br.txt:2
 #: connect/authentication/templates/authentication/emails/change_password.html:6
 #: connect/authentication/templates/authentication/emails/change_password.txt:2
 #: connect/authentication/templates/authentication/emails/nickname_changed.html:8
@@ -358,10 +355,6 @@ msgstr "Nome de usuário alterado"
 #: connect/billing/templates/billing/emails/changed-plan.txt:2
 #: connect/billing/templates/billing/emails/changed_card.html:7
 #: connect/billing/templates/billing/emails/changed_card.txt:2
-#: connect/billing/templates/billing/emails/finished-plan.html:15
-#: connect/billing/templates/billing/emails/finished-plan.txt:2
-#: connect/billing/templates/billing/emails/free-plan-expired.html:16
-#: connect/billing/templates/billing/emails/free-plan-expired.txt:2
 #: connect/billing/templates/billing/emails/free_plan.html:16
 #: connect/billing/templates/billing/emails/free_plan.txt:2
 #: connect/billing/templates/billing/emails/plan_expired_due_attendence_limit_en.html:16
@@ -370,6 +363,7 @@ msgstr "Nome de usuário alterado"
 #: connect/billing/templates/billing/emails/plan_is_about_to_expire_en.txt:2
 #: connect/billing/templates/billing/emails/reactived-plan.html:16
 #: connect/billing/templates/billing/emails/removed_card.html:16
+#: connect/billing/templates/billing/emails/removed_card.txt:2
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.html:16
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:2
 #: connect/common/templates/common/emails/organization/change_organization_name.html:7
@@ -394,47 +388,50 @@ msgstr "Nome de usuário alterado"
 msgid "Hi"
 msgstr "Oi"
 
-#: connect/authentication/templates/authentication/emails/access_code_en-us.html:40
-msgid "Enter the access code below on the Weni platform"
-msgstr "Digite o código de acesso abaixo na plataforma Weni"
+#: connect/authentication/templates/authentication/emails/access_code.html:15
+#: connect/authentication/templates/authentication/emails/access_code.txt:2
+msgid "Welcome to Weni by VTEX, an AI powered customer experience solution for brands and retailers."
+msgstr "Bem-vindo à Weni by VTEX, uma solução de experiência do cliente impulsionada por IA para marcas e varejistas."
 
-#: connect/authentication/templates/authentication/emails/access_code_en-us.html:54
-#: connect/authentication/templates/authentication/emails/access_code_en-us.txt:4
-#: connect/authentication/templates/authentication/emails/access_code_pt-br.txt:4
-msgid ""
-"You receive an access code to Weni Platform. When adding a organization in "
-"system press on "
-msgstr ""
-"Você recebeu um código de acesso para a Plataforma Weni. Ao adicionar uma "
-"organização no sistema aperte em "
+#: connect/authentication/templates/authentication/emails/access_code.html:28
+#: connect/authentication/templates/authentication/emails/access_code.txt:3
+msgid "Your temporary password is:"
+msgstr "Sua senha temporária é:"
 
-#: connect/authentication/templates/authentication/emails/access_code_en-us.html:55
-#: connect/authentication/templates/authentication/emails/access_code_en-us.txt:5
-#: connect/authentication/templates/authentication/emails/access_code_pt-br.txt:5
-msgid "Enter access code on Custom Plan"
-msgstr "Digite o código de acesso do Plano Personalizado"
+#: connect/authentication/templates/authentication/emails/access_code.html:54
+#: connect/authentication/templates/authentication/emails/access_code.txt:3
+msgid "We wish you a fantastic experience with Weni by VTEX!"
+msgstr "Esperamos que você tenha uma experiência fantástica com a Weni by VTEX!"
 
-#: connect/authentication/templates/authentication/emails/access_code_en-us.html:56
-#: connect/authentication/templates/authentication/emails/access_code_en-us.txt:5
-#: connect/authentication/templates/authentication/emails/access_code_pt-br.txt:5
-msgid " and apply the access code in text field"
-msgstr " e aplique o código de acesso no campo de texto"
+#: connect/authentication/templates/authentication/emails/base.html:31
+msgid "Our site"
+msgstr "Nosso site"
 
-#: connect/authentication/templates/authentication/emails/base.html:44
-msgid "Visit our website"
-msgstr "Visite o nosso site"
+#: connect/authentication/templates/authentication/emails/base.html:45
+msgid "2025 © Weni by VTEX. All rights reserved."
+msgstr "2025 © Weni by VTEX - Todos os direitos reservados."
 
-#: connect/authentication/templates/authentication/emails/base.html:87
-msgid "Weni © Brazil 2020 - All rights reserved"
-msgstr "Weni © Brasil 2020 - Todos os direitos reservados"
+#: connect/authentication/templates/authentication/emails/base.html:53
+msgid "Privacy Policy"
+msgstr "Política de Privacidade"
+
+#: connect/authentication/templates/authentication/emails/base.html:57
+msgid "Terms of use"
+msgstr "Termos de uso"
+
+#: connect/authentication/templates/authentication/emails/base.html:61
+msgid "Help Center"
+msgstr "Central de Ajuda"
+
+#: connect/authentication/templates/authentication/emails/base.html:65
+msgid "Unsubscribe"
+msgstr "Descadastrar"
 
 #: connect/authentication/templates/authentication/emails/base.html:89
 msgid ""
-"If you have not performed this action, ignore this message and change your "
-"email password for security. Talk to support if necessary!"
+"You are receiving this mail because you registered in Weni platform. This also shows that you agree to our Terms of use and Privacy Policies. If you no longer want to receive mails from use, click the unsubscribe link below to unsubscribe."
 msgstr ""
-"Se você não executou esta ação, ignore esta mensagem e altere sua senha de e-"
-"mail para segurança. Fale com o suporte se necessário!"
+"Você está recebendo este e-mail porque se registrou na plataforma Weni. Isso também indica que você concorda com nossos Termos de Uso e Políticas de Privacidade. Se não quiser mais receber e-mails nossos, clique no link de descadastramento abaixo."
 
 #: connect/authentication/templates/authentication/emails/change_password.html:8
 #: connect/authentication/templates/authentication/emails/change_password.txt:3
@@ -469,6 +466,40 @@ msgstr " para "
 #: connect/authentication/templates/authentication/emails/nickname_changed.txt:4
 msgid " we hope you like your new nickname"
 msgstr " nós esperamos que você goste do seu novo nome de usuário"
+
+#: connect/authentication/models.py:221
+msgid "Your Weni Platform account is ready! Log in now"
+msgstr "Seu cadastro na Weni Plataforma foi concluído! Acesse agora"
+
+#: connect/authentication/templates/authentication/emails/first_password.html:42
+#: connect/authentication/templates/authentication/emails/first_password.txt:3
+msgid "Welcome to"
+msgstr "Bem-vindo à"
+
+#: connect/authentication/templates/authentication/emails/first_password.html:57
+#: connect/authentication/templates/authentication/emails/first_password.txt:6
+msgid "Your registration was successful! To log in for the first time, please use the temporary password below:"
+msgstr "Seu cadastro foi concluído com sucesso! Para acessar a plataforma pela primeira vez, utilize a senha temporária abaixo:"
+
+#: connect/authentication/templates/authentication/emails/first_password.html:85
+#: connect/authentication/templates/authentication/emails/first_password.txt:8
+msgid "When logging in for the first time, you’ll be prompted to set a new password of your choice."
+msgstr "Ao fazer login pela primeira vez, você precisará definir uma nova senha de sua escolha."
+
+#: connect/authentication/templates/authentication/emails/first_password.html:99
+#: connect/authentication/templates/authentication/emails/first_password.txt:10
+msgid "🔒 Important: "
+msgstr "Importante: "
+
+#: connect/authentication/templates/authentication/emails/first_password.html:100
+#: connect/authentication/templates/authentication/emails/first_password.txt:11
+msgid "Your password is personal and confidential. We recommend keeping it secure to protect your account."
+msgstr "Sua senha é pessoal e confidencial. Recomendamos mantê-la segura para proteger sua conta."
+
+#: connect/authentication/templates/authentication/emails/first_password.html:114
+#: connect/authentication/templates/authentication/emails/first_password.txt:13
+msgid "We hope you have a fantastic experience with Weni by VTEX!"
+msgstr "Desejamos a você uma experiência incrível com a Weni by VTEX!"
 
 #: connect/billing/models.py:18 connect/billing/models.py:52
 #: connect/billing/models.py:66 connect/common/models.py:126
@@ -565,24 +596,6 @@ msgstr ""
 msgid "Avoid blocking your chatbot by accessing "
 msgstr "Evite o bloqueio de seu chatbot acessando"
 
-#: connect/billing/templates/billing/emails/advanced_plan_is_about_to_expire.html:70
-#: connect/billing/templates/billing/emails/advanced_plan_is_about_to_expire.txt:5
-#: connect/billing/templates/billing/emails/plan_expired_due_attendence_limit_en.html:70
-#: connect/billing/templates/billing/emails/plan_expired_due_attendence_limit_en.txt:5
-#: connect/billing/templates/billing/emails/plan_expired_due_attendence_limit_pt_BR.html:61
-#: connect/billing/templates/billing/emails/plan_expired_due_attendence_limit_pt_BR.txt:5
-#: connect/billing/templates/billing/emails/plan_is_about_to_expire_en.html:70
-#: connect/billing/templates/billing/emails/plan_is_about_to_expire_en.txt:5
-#: connect/billing/templates/billing/emails/plan_is_about_to_expire_pt_BR.html:62
-#: connect/billing/templates/billing/emails/plan_is_about_to_expire_pt_BR.txt:5
-#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.html:85
-#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:6
-#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:73
-#, fuzzy
-#| msgid "billing cycle"
-msgid "Billing"
-msgstr "ciclo de pagamento"
-
 #: connect/billing/templates/billing/emails/advanced_plan_is_about_to_expire.html:71
 #: connect/billing/templates/billing/emails/plan_is_about_to_expire_en.html:71
 msgid " and choose a plan that fits your business needs."
@@ -598,12 +611,6 @@ msgstr "Evite o bloqueio de seu chatbot acessando"
 #: connect/billing/templates/billing/emails/plan_is_about_to_expire_en.txt:5
 msgid "and choose a plan that fits your business needs."
 msgstr " e escolha um plano que se adapte às suas necessidades comerciais."
-
-#: connect/billing/templates/billing/emails/changed-plan.html:40
-#, fuzzy
-#| msgid "The plan for your organization"
-msgid "The plan of the organization"
-msgstr "O plano para sua organização"
 
 #: connect/billing/templates/billing/emails/changed-plan.html:40
 #, fuzzy
@@ -665,88 +672,105 @@ msgstr ""
 "Um administrador mudou as informações do cartão de crédito para o pagamento "
 "do plano da organização"
 
-#: connect/billing/templates/billing/emails/finished-plan.html:34
+#: connect/billing/templates/billing/emails/finished-plan.html:17
+#: connect/billing/templates/billing/emails/finished-plan.txt:2
+msgid "Oh no,"
+msgstr "Que pena,"
+
+#: connect/billing/templates/billing/emails/finished-plan.html:43
 #: connect/billing/templates/billing/emails/finished-plan.txt:3
-#: connect/billing/templates/billing/emails/reactived-plan.html:40
-#: connect/billing/templates/billing/emails/reactived-plan.txt:3
 msgid "The plan for your organization"
-msgstr "O plano para sua organização"
+msgstr "O plano da sua organização,"
 
-#: connect/billing/templates/billing/emails/finished-plan.html:34
+#: connect/billing/templates/billing/emails/finished-plan.html:45
 #: connect/billing/templates/billing/emails/finished-plan.txt:3
-msgid "has been finalized"
-msgstr " foi finalizado"
+msgid "has ended. As a result,"
+msgstr "foi finalizado. Por isso,"
 
-#: connect/billing/templates/billing/emails/finished-plan.html:47
+#: connect/billing/templates/billing/emails/finished-plan.html:46
+#: connect/billing/templates/billing/emails/finished-plan.txt:3
+msgid "your intelligent agents are currently offline."
+msgstr "seus agentes inteligentes estão fora de operação agora."
+
+#: connect/billing/templates/billing/emails/finished-plan.html:60
+#: connect/billing/templates/billing/emails/finished-plan.txt:4
+msgid "To keep using the Weni Platform, simply ask your organization's administrator"
+msgstr "Para retomar o uso da Weni Plataforma, basta solicitar ao administrador da organização"
+
+#: connect/billing/templates/billing/emails/finished-plan.html:61
+#: connect/billing/templates/billing/emails/finished-plan.txt:4
+msgid "to reactivate the plan"
+msgstr "para reativar o plano"
+
+#: connect/billing/templates/billing/emails/finished-plan.html:62
+#: connect/billing/templates/billing/emails/finished-plan.txt:4
+msgid "or select a new one that meets your business needs."
+msgstr "ou escolher outro que atenda às necessidades de seu negócio."
+
+#: connect/billing/templates/billing/emails/finished-plan.html:76
 #: connect/billing/templates/billing/emails/finished-plan.txt:5
-msgid "An administrator has terminated the organization plan"
-msgstr "Um dos administradores encerrou o plano da organização"
+msgid "Our goal is to continue growing alongside you!"
+msgstr "Nosso objetivo é continuar caminhando junto com você!"
 
-#: connect/billing/templates/billing/emails/finished-plan.html:51
-#: connect/billing/templates/billing/emails/finished-plan.txt:9
-msgid ""
-"At the moment, the functioning of your Intelligences, Flows and the Chat "
-"module are interrupted"
-msgstr ""
-"Nesse momento, o funcionamento de suas inteligências, Fluxos criados e o "
-"Módulo de Chat estão paralisados"
-
-#: connect/billing/templates/billing/emails/finished-plan.html:65
-#: connect/billing/templates/billing/emails/finished-plan.txt:12
-msgid ""
-"To continue using the Weni Platform ask your organization's administrator to "
-"reactivate the plan or choose a new one, that makes sense for your projects. "
-"We want you to stay with us"
-msgstr ""
-"Para continuar utilizando a plataforma Weni, peça a um administrador da "
-"organização para reativar o plano ou ativar um novo plano, que faça sentido "
-"para seus projetos.Queremos que fiquem conosco"
-
-#: connect/billing/templates/billing/emails/free-plan-expired.html:40
-#: connect/billing/templates/billing/emails/free-plan-expired.txt:3
 #: connect/common/templates/common/emails/organization/delete_organization.html:39
 #: connect/common/templates/common/emails/organization/delete_organization.txt:3
 msgid "The organization"
 msgstr "A organização"
 
-#: connect/billing/templates/billing/emails/free-plan-expired.html:40
-#: connect/billing/templates/billing/emails/free-plan-expired.txt:3
 #: connect/common/models.py:1861
 msgid "has already surpassed 200 active contacts"
 msgstr "já ultrapassou 200 contatos ativos"
 
-#: connect/billing/templates/billing/emails/free-plan-expired.html:55
+#: connect/billing/templates/billing/emails/free-plan-expired.html:16
+#: connect/billing/templates/billing/emails/free-plan-expired.txt:2
+msgid "Your projects are growing,"
+msgstr "Seus projetos estão crescendo,"
+
+#: connect/billing/templates/billing/emails/free-plan-expired.html:18
+#: connect/billing/templates/billing/emails/free-plan-expired.txt:2
+msgid "Congratulations!"
+msgstr " "
+
+#: connect/billing/templates/billing/emails/free-plan-expired.html:32
+#: connect/billing/templates/billing/emails/free-plan-expired.txt:3
+msgid "Your organization has"
+msgstr "Sua organização"
+
+#: connect/billing/templates/billing/emails/free-plan-expired.html:33
+#: connect/billing/templates/billing/emails/free-plan-expired.txt:3
+msgid "surpassed 200 active contacts."
+msgstr "ultrapassou 200 contatos ativos. Parabéns!"
+
+#: connect/billing/templates/billing/emails/free-plan-expired.html:47
 #: connect/billing/templates/billing/emails/free-plan-expired.txt:4
-msgid ""
-"This means that many people are interacting with your projects and our free "
-"plan no longer meets your organization's needs"
-msgstr ""
-"Isso quer dizer que muitas pessoas estão interagindo com seus projetos e "
-"nosso plano grátis não atende mais as necessidades da sua organização"
+msgid "This means that our free plan is no longer enough to keep up with the growth of"
+msgstr "Isso quer dizer que o nosso plano gratuito já não é suficiente para acompanhar o crescimento da"
 
-#: connect/billing/templates/billing/emails/free-plan-expired.html:78
-msgid ""
-"At the moment the functioning of your intelligences, created Flows and the "
-"Chat module is paralyzed. To continue using Weni Platform, ask the "
-"organization's administrador to choose a new plan that makes sense for your "
-"projects, we want you to continue with us"
-msgstr ""
-"No momento o funcionamento das suas inteligências, Fluxos criados e o módulo "
-"de Chat estão paralisados. Para continuar usando a plataforma da Weni, "
-"pergunte ao administrador da organização para escolher um novo plano que "
-"faça sentido para seus projetos, nós queremos que você continue conosco"
+#: connect/billing/templates/billing/emails/free-plan-expired.html:62
+#: connect/billing/templates/billing/emails/free-plan-expired.txt:6
+msgid "To continue using your intelligent agents,"
+msgstr "Para continuar utilizando seus agentes inteligentes,"
 
-#: connect/billing/templates/billing/emails/free-plan-expired.txt:5
-msgid ""
-"At the moment the functioning of your intelligences, created Flows and the "
-"Chat module is paralyzed. To continue using Weni Platform, ask the "
-"organization's Administrador to choose a new plan that makes sense for your "
-"projects, we want you to continue with us"
-msgstr ""
-"No momento o funcionamento das suas inteligências, Fluxos criados e o módulo "
-"de Chat estão paralisados. Para continuar usando a plataforma da Weni, "
-"pergunte ao administrador da organização para escolher um novo plano que "
-"faça sentido para seus projetos, nós queremos que você continue conosco"
+#: connect/billing/templates/billing/emails/free-plan-expired.html:63
+#: connect/billing/templates/billing/emails/free-plan-expired.txt:7
+msgid "artificial intelligence, and all the other features of the Weni Platform,"
+msgstr "inteligência artificial, e aproveitar todos os outros recursos da Weni Plataforma,"
+
+#: connect/billing/templates/billing/emails/free-plan-expired.html:64
+#: connect/billing/templates/billing/emails/free-plan-expired.txt:8
+msgid "choose a plan"
+msgstr "escolha um plano"
+
+#: connect/billing/templates/billing/emails/free-plan-expired.html:65
+#: connect/billing/templates/billing/emails/free-plan-expired.txt:9
+msgid "that aligns with your goals."
+msgstr "que atenda aos seus objetivos."
+
+#: connect/billing/templates/billing/emails/free-plan-expired.html:79
+#: connect/billing/templates/billing/emails/free-plan-expired.txt:11
+msgctxt "free-plan-expired"
+msgid "We're here to support you every step of the way!"
+msgstr "Estamos aqui para te apoiar em cada passo!"
 
 #: connect/billing/templates/billing/emails/free_plan.html:40
 #: connect/billing/templates/billing/emails/free_plan.txt:3
@@ -873,55 +897,56 @@ msgstr "É maravilhoso ter seu time de volta"
 
 #: connect/billing/templates/billing/emails/reactived-plan.txt:2
 #: connect/common/templates/common/emails/organization/organization_create.txt:2
+msgctxt "common-hi"
 msgid "Hi,"
 msgstr "Oi,"
 
-#: connect/billing/templates/billing/emails/removed_card.html:40
-#: connect/billing/templates/billing/emails/removed_card.txt:3
-msgid "The credit card linked to the organization"
-msgstr "O cartão de crédito ligado à organização"
+#: connect/authentication/templates/authentication/emails/change_password.html:17
+#: connect/authentication/templates/authentication/emails/change_password.txt:2
+#: connect/authentication/templates/authentication/emails/first_password.html:16
+#: connect/authentication/templates/authentication/emails/first_password.txt:2
+msgctxt "formal-hi"
+msgid "Hi,"
+msgstr "Olá,"
 
-#: connect/billing/templates/billing/emails/removed_card.html:40
-#: connect/billing/templates/billing/emails/removed_card.txt:3
-msgid "has been removed"
-msgstr " foi removido"
+#: connect/authentication/templates/authentication/emails/change_password.html:20
+#: connect/authentication/templates/authentication/emails/change_password.txt:3
+msgid "Your password has been successfully changed. For your security and privacy, remember not to share it with anyone."
+msgstr "Sua senha foi alterada com sucesso. Para garantir sua segurança e privacidade, lembre-se de não compartilhá-la com ninguém."
 
-#: connect/billing/templates/billing/emails/removed_card.html:55
+#: connect/authentication/templates/authentication/emails/change_password.html:23
+#: connect/authentication/templates/authentication/emails/change_password.txt:4
+msgid "If you didn't request this change, please contact our support team immediately."
+msgstr "Caso você não tenha solicitado essa alteração, entre em contato com nossa equipe de suporte imediatamente."
+
+#: connect/billing/templates/billing/emails/removed_card.html:42
+#: connect/billing/templates/billing/emails/removed_card.txt:3
+msgid "Your account needs urgent attention!"
+msgstr "Sua conta precisa de um ajuste urgente!"
+
+#: connect/billing/templates/billing/emails/removed_card.html:56
 #: connect/billing/templates/billing/emails/removed_card.txt:5
-msgid ""
-"An administrator has removed the credit card associated with your "
-"organization"
-msgstr ""
-"Um administrador removeu o cartão de crédito associado à sua organização"
+msgid "The credit card for"
+msgstr "O cartão de crédito da"
 
-#: connect/billing/templates/billing/emails/removed_card.html:57
+#: connect/billing/templates/billing/emails/removed_card.html:58
 #: connect/billing/templates/billing/emails/removed_card.txt:7
-msgid "preventing the current plan's billing"
-msgstr "impedindo a cobrança do plano atual"
+msgid "has been removed. This change has paused your plan's billing and deactivated you agents."
+msgstr "foi removido. Essa alteração pausou a cobrança do seu plano e deixou os agentes inativos."
 
-#: connect/billing/templates/billing/emails/removed_card.html:60
-#: connect/billing/templates/billing/emails/removed_card.txt:10
-msgid ""
-"At the moment, the status of your Intelligences, created Flows and the Chat "
-"module is frozen"
-msgstr ""
-"Nesse momento, o funcionamento de suas inteligências, Fluxos criados e o "
-"Módulo de Chat estão paralisados"
+#: connect/billing/templates/billing/emails/removed_card.html:72
+#: connect/billing/templates/billing/emails/removed_card.txt:9
+msgid "To continue using the Weni Platform, simply ask the administrator to update the card in the"
+msgstr "Para continuar usando a Weni Plataforma, é só pedir para o administrador atualizar o cartão na seção de"
 
-#: connect/billing/templates/billing/emails/removed_card.html:75
-#: connect/billing/templates/billing/emails/removed_card.txt:13
-msgid ""
-"To continue using the weni platform, request the organization's "
-"administrator to add a valid credit card in the billing section. We want you "
-"to stay with us"
-msgstr ""
-"Para continuar utilizando a plataforma Weni, peça a um administrador da "
-"organização para adicionar um cartão de crédito válido na seção de pagamento."
-"Queremos que fiquem conosco"
+#: connect/billing/templates/billing/emails/removed_card.html:74
+#: connect/billing/templates/billing/emails/removed_card.txt:11
+msgid "section. Once updated, everything will be back to normal!"
+msgstr "Assim, tudo volta a funcionar normalmente!"
 
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.html:42
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:3
-msgid "has reached the time limit of the Trial plan."
+msgid "has reached the time limit of Trial plan."
 msgstr "atingiu o tempo limite do plano Trial"
 
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.html:56
@@ -953,6 +978,115 @@ msgstr "e escolha um plano que se adapte às suas necessidades comerciais."
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:14
 msgid "Olá"
 msgstr ""
+
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:16
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:2
+msgid "Hey"
+msgstr "Poxa,"
+
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:30
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:2
+msgid "your Trial Plan has come to an end!"
+msgstr "seu plano Trial chegou ao fim! ⏳"
+
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:44
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:3
+msgid "While "
+msgstr "A"
+
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:44
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:3
+msgid "has enjoyed the 30-day free trial,"
+msgstr "aproveitou os 30 dias gratuitos da Weni,"
+
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:44
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:3
+msgid "it's time to move forward to the next stage."
+msgstr "mas agora é hora de seguir para o próximo nível."
+
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:58
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:4
+msgid "Please note that "
+msgstr " "
+
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:58
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:4
+msgid "your agents are currently unable to send messages"
+msgstr "Seus agentes não poderão mais enviar mensagens"
+
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:58
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:4
+msgid " until you select a plan that best suits your business needs."
+msgstr "até você escolher o plano que melhor se encaixa no seu negócio."
+
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:72
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:5
+msgid "Rest assured, "
+msgstr "Mas, não se preocupe: "
+
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:73
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:5
+msgid "you still have access to the platform."
+msgstr "você ainda tem acesso à plataforma!"
+
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:74
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:5
+msgid "To reactivate your agents and continue enjoying all the benefits, simply "
+msgstr "Para reativar seus agentes e continuar aproveitando todos os benefícios, basta "
+
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:75
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:5
+msgid "choose the most suitable plan"
+msgstr "escolher o plano ideal"
+
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:76
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:5
+msgid "in the"
+msgstr "na seção de"
+
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:77
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:5
+#: connect/billing/templates/billing/emails/removed_card.html:73
+#: connect/billing/templates/billing/emails/removed_card.txt:10
+msgid "Billing"
+msgstr "Cobrança."
+
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:78
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:5
+msgid " section."
+msgstr " "
+
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:92
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:6
+msgctxt "trial-plan-expired"
+msgid "We're here to support you every step of the way!"
+msgstr "Vamos manter seus agentes a todo vapor!"
+
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:107
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:7
+#: connect/billing/templates/billing/emails/finished-plan.html:91
+#: connect/billing/templates/billing/emails/finished-plan.txt:6
+#: connect/billing/templates/billing/emails/free-plan-expired.html:94
+#: connect/billing/templates/billing/emails/free-plan-expired.txt:12
+#: connect/common/templates/common/emails/organization/invite_organization.html:63
+#: connect/common/templates/common/emails/organization/invite_organization.txt:5
+#: connect/authentication/templates/authentication/emails/change_password.html:70
+#: connect/authentication/templates/authentication/emails/change_password.txt:5
+msgid "Best regards,"
+msgstr "Atenciosamente,"
+
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:109
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:8
+#: connect/billing/templates/billing/emails/finished-plan.html:93
+#: connect/billing/templates/billing/emails/finished-plan.txt:7
+#: connect/billing/templates/billing/emails/free-plan-expired.html:96
+#: connect/billing/templates/billing/emails/free-plan-expired.txt:13
+#: connect/common/templates/common/emails/organization/invite_organization.html:65
+#: connect/common/templates/common/emails/organization/invite_organization.txt:6
+#: connect/authentication/templates/authentication/emails/change_password.html:72
+#: connect/authentication/templates/authentication/emails/change_password.txt:6
+msgid "Weni by VTEX Team"
+msgstr "Time Weni by VTEX"
 
 #: connect/common/models.py:41
 msgid "newsletter"
@@ -1052,9 +1186,9 @@ msgstr "Organização {} não existe"
 msgid "{prev_name} is now named {new_name}!"
 msgstr ""
 
-#: connect/common/models.py:420
-msgid "You receive an access code to Weni Platform"
-msgstr "Você recebeu um código de acesso para a plataforma Weni"
+#: connect/common/models.py:432
+msgid "You've received an access code for Weni Platform"
+msgstr "Código de acesso para a Weni Plataforma"
 
 #: connect/common/models.py:450
 #, fuzzy
@@ -1455,10 +1589,6 @@ msgstr "Um cartão de crédito foi atualizado na organização"
 msgid "Your organization's plan has ended"
 msgstr "O plano da sua organização expirou"
 
-#: connect/common/models.py:1768
-msgid "O plano da sua organização foi encerrado."
-msgstr ""
-
 #: connect/common/models.py:1800
 msgid "Your organization's plan has been reactivated."
 msgstr "O plano da sua organização foi reativado com sucesso."
@@ -1478,6 +1608,14 @@ msgstr ""
 #: connect/common/models.py:1883
 msgid "has the plan"
 msgstr "tem o seguinte plano"
+
+#: connect/common/models.py:1897
+msgid "Plan ended on Weni Platform"
+msgstr "Plano encerrado na Weni Plataforma"
+
+#: connect/common/models.py:1899
+msgid "Plano encerrado na Weni Plataforma"
+msgstr "Plano encerrado na Weni Plataforma"
 
 #: connect/common/models.py:1904
 msgid "Your organization's plan has been updated"
@@ -1691,25 +1829,15 @@ msgstr ""
 "Você ainda pode criar outras organizações e projetos se quiser continuar "
 "conosco"
 
-#: connect/common/templates/common/emails/organization/invite_organization.html:18
-#: connect/common/templates/common/emails/organization/invite_organization.txt:2
-msgid "You have been invited to join the organization"
-msgstr "Você foi convidado para participar da organização"
-
-#: connect/common/templates/common/emails/organization/invite_organization.html:39
 #: connect/common/templates/common/emails/project/invite_project.html:39
 msgid "Uhuuul, now you are one of us"
 msgstr "Uhuuul, agora você é um(a) de nós!"
 
-#: connect/common/templates/common/emails/organization/invite_organization.html:42
-#: connect/common/templates/common/emails/organization/invite_organization.txt:4
 #: connect/common/templates/common/emails/project/invite_project.html:42
 #: connect/common/templates/common/emails/project/invite_project.txt:4
 msgid "A member of the organization"
 msgstr "Um membro da organização"
 
-#: connect/common/templates/common/emails/organization/invite_organization.html:42
-#: connect/common/templates/common/emails/organization/invite_organization.txt:4
 #: connect/common/templates/common/emails/project/invite_project.html:42
 #: connect/common/templates/common/emails/project/invite_project.txt:4
 msgid ""
@@ -1722,17 +1850,46 @@ msgstr ""
 "basta clicar no botão abaixo e você será redirecionado para uma página de "
 "cadastro. Caso já tenha cadastro, basta fazer o login"
 
-#: connect/common/templates/common/emails/organization/invite_organization.html:79
-#: connect/common/templates/common/emails/organization/invite_organization.txt:5
 #: connect/common/templates/common/emails/project/invite_project.html:79
 #: connect/common/templates/common/emails/project/invite_project.txt:5
+#: connect/common/templates/common/emails/organization/invite_organization.html:82
+#: connect/common/templates/common/emails/organization/invite_organization.txt:7
 msgid "Join org"
 msgstr "Entrar na organização"
 
-#: connect/common/templates/common/emails/organization/invite_organization.txt:3
 #: connect/common/templates/common/emails/project/invite_project.txt:3
 msgid "Uhuuul, now you are one of us!"
 msgstr "Uhuuul, agora você é um(a) de nós!"
+
+#: connect/common/models.py:188
+msgid "You've been invited to join "
+msgstr "Você foi convidado para a organização "
+
+#: connect/common/templates/common/emails/organization/invite_organization.html:17
+#: connect/common/templates/common/emails/organization/invite_organization.txt:2
+msgctxt "invite-hi"
+msgid "Hi,"
+msgstr "Uhull! Seja bem-vindo,"
+
+#: connect/common/templates/common/emails/organization/invite_organization.html:32
+msgid "Welcome! We're excited to have you onboard."
+msgstr " "
+
+#: connect/common/templates/common/emails/organization/invite_organization.html:32
+#: connect/common/templates/common/emails/organization/invite_organization.txt:3
+msgid "A member of"
+msgstr "Um membro de"
+
+#: connect/common/templates/common/emails/organization/invite_organization.html:34
+#: connect/common/templates/common/emails/organization/invite_organization.txt:3
+msgid "has sent you an invitation to join their organization."
+msgstr "enviou um convite para você se juntar à organização na Weni Plataforma."
+
+#: connect/common/templates/common/emails/organization/invite_organization.html:48
+#: connect/common/templates/common/emails/organization/invite_organization.txt:4
+msgid "To accept, simply click the button below and complete your registration. If you're already registered, just log in you account."
+msgstr "Para aceitar, basta clicar no botão abaixo para completar o seu cadastro. Se você já fez isso, é só logar na sua conta."
+
 
 #: connect/common/templates/common/emails/organization/leaving_org.html:13
 #: connect/common/templates/common/emails/organization/leaving_org.txt:3

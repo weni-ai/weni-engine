@@ -10,6 +10,7 @@ from django.core.mail import send_mail
 from django.db import models
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
+from django.utils import translation
 
 from connect.storages import AvatarUserMediaStorage
 
@@ -177,15 +178,17 @@ class User(AbstractBaseUser, PermissionsMixin):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
         context = {"name": self.first_name}
-        send_mail(
-            _("Password changed"),
-            render_to_string("authentication/emails/change_password.txt"),
-            None,
-            [self.email],
-            html_message=render_to_string(
-                "authentication/emails/change_password.html", context
-            ),
-        )
+
+        with translation.override(self.language):
+            send_mail(
+                _("Your password has been changed"),
+                render_to_string("authentication/emails/change_password.txt"),
+                None,
+                [self.email],
+                html_message=render_to_string(
+                    "authentication/emails/change_password.html", context
+                ),
+            )
 
     def send_email_nickname_changed(self, before_nickname: str, new_nickname: str):
         if not settings.SEND_EMAILS:
@@ -210,17 +213,19 @@ class User(AbstractBaseUser, PermissionsMixin):
             return False
         context = {
             "email": self.email,
+            "name": self.first_name,
             "password": password,
         }
-        send_mail(
-            _("Access password"),
-            render_to_string("authentication/emails/first_password.txt"),
-            None,
-            [self.email],
-            html_message=render_to_string(
-                "authentication/emails/first_password.html", context
-            ),
-        )
+        with translation.override(self.language):
+            send_mail(
+                _("Your Weni Platform account is ready! Log in now"),
+                render_to_string("authentication/emails/first_password.txt"),
+                None,
+                [self.email],
+                html_message=render_to_string(
+                    "authentication/emails/first_password.html", context
+                ),
+            )
 
     def send_request_flow_user_info(self, flow_data):  # pragma: no cover
         if not flow_data.get("send_request_flow"):

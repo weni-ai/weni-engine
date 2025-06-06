@@ -124,10 +124,6 @@ class StripeHandler(View):  # pragma: no cover
                 ]
             )
             org.allow_payments()
-            org.send_email_added_card(
-                org.organization.name,
-                org.organization.authorizations.values_list("user__email", flat=True),
-            )
 
         # empty response, 200 lets Stripe know we handled it
         return HttpResponse("Ignored, uninteresting event")
