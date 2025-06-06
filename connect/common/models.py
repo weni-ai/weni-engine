@@ -1975,28 +1975,6 @@ class BillingPlan(models.Model):
         html_mail = send_mass_html_mail(msg_list, fail_silently=False)
         return html_mail
 
-    def send_email_chosen_plan(self, user_name: str, email: str, plan: str):
-        if not settings.SEND_EMAILS:
-            return False  # pragma: no cover
-        context = {
-            "base_url": settings.BASE_URL,
-            "user_name": user_name,
-            "org_name": self.organization.name,
-            "plan": plan,
-        }
-        mail.send_mail(
-            _("Your organization")
-            + f" {self.organization.name} "
-            + _("has the plan")
-            + ": "
-            + f"{plan.title()}",
-            render_to_string("billing/emails/free_plan.txt", context),
-            None,
-            [email],
-            html_message=render_to_string("billing/emails/free_plan.html", context),
-        )
-        return mail
-
     def send_email_trial_plan_expired_due_time_limit(self, emails: list = None):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover

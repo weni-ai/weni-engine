@@ -624,20 +624,6 @@ class BillingPlanTestCase(TestCase):
         self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
         self.assertEqual(outbox.to[0], self.test_email[0])
 
-    def test_send_email_chosen_plan(self):
-        plan = BillingPlan.PLAN_ENTERPRISE
-        sended_email = self.billing.send_email_chosen_plan(
-            self.test_user_name, self.test_email[0], plan
-        )
-        self.assertEqual(len(sended_email.outbox), 1)
-        outbox = sended_email.outbox[0]
-        self.assertEqual(
-            outbox.subject,
-            f"Your organization {self.organization.name} has the plan: {plan.title()}",
-        )
-        self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
-        self.assertEqual(outbox.to[0], self.test_email[0])
-
     def test_send_email_plan_is_about_to_expire(self):
         self.billing.plan = BillingPlan.PLAN_TRIAL
         user1 = (
