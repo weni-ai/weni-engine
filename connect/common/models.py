@@ -1849,24 +1849,6 @@ class BillingPlan(models.Model):
         elif count == 0:
             return 1
 
-    def send_email_added_card(self, user_name: str, email: list):
-        if not settings.SEND_EMAILS:
-            return False  # pragma: no cover
-        context = {
-            "base_url": settings.BASE_URL,
-            "organization_name": self.organization.name,
-            "user_name": user_name,
-        }
-        mail.send_mail(
-            _("A credit card has been added to the organization")
-            + f" {self.organization.name}",
-            render_to_string("billing/emails/added_card.txt", context),
-            None,
-            email,
-            html_message=render_to_string("billing/emails/added_card.html", context),
-        )
-        return mail
-
     def send_email_changed_card(self, user_name: str, email: str):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover

@@ -574,19 +574,6 @@ class BillingPlanTestCase(TestCase):
             language="pt-br",
         )
 
-    def test_send_email_added_card(self):
-        sended_email = self.billing.send_email_added_card(
-            self.test_user_name, self.test_email
-        )
-        self.assertEqual(len(sended_email.outbox), 1)
-        outbox = sended_email.outbox[0]
-        self.assertEqual(
-            outbox.subject,
-            f"A credit card has been added to the organization {self.organization.name}",
-        )
-        self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
-        self.assertEqual(outbox.to[0], self.test_email[0])
-
     def test_send_email_changed_card(self):
         sended_email = self.billing.send_email_changed_card(
             self.test_user_name, self.test_email
