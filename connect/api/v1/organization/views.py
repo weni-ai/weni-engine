@@ -488,14 +488,7 @@ class OrganizationViewSet(
                 "update_suspend_project",
                 args=[str(project.uuid), False],
             )
-        user_name = (
-            org_billing.organization.name
-            if request.user is None
-            else request.user.first_name
-        )
-        org_billing.send_email_reactivated_plan(
-            user_name, organization.authorizations.values_list("user__email", flat=True)
-        )
+
         result = {
             "plan": org_billing.plan,
             "is_active": org_billing.is_active,
