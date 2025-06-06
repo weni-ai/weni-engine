@@ -2020,53 +2020,6 @@ class BillingPlan(models.Model):
         html_mail = send_mass_html_mail(msg_list, fail_silently=False)
         return html_mail
 
-    def send_email_plan_expired_due_attendance_limit(self, emails: list = None):
-        if not settings.SEND_EMAILS:
-            return False  # pragma: no cover
-
-        if not emails:
-            emails = (
-                self.organization.authorizations.exclude(
-                    role=OrganizationRole.VIEWER.value
-                )
-                .values_list("user__email", "user__username", "user__language")
-                .order_by("user__language")
-            )
-
-        from_email = None
-        msg_list = []
-
-        context = {
-            "webapp_billing_url": f"{settings.WEBAPP_BASE_URL}/orgs/{self.organization.uuid}/billing",
-            "plan": self.plan,
-            "plan_limit": self.plan_limit,
-            "org_name": self.organization.name,
-        }
-
-        for email in emails:
-            language_code = email[2]
-            activate(language_code)
-            username = email[1]
-            context["user_name"] = username
-            html_message = render_to_string(
-                "billing/emails/plan_expired_due_attendence_limit_en.html", context
-            )
-            message = render_to_string(
-                "billing/emails/plan_expired_due_attendence_limit_en.txt", context
-            )
-            if language_code == "en-us":
-                subject = _(f"You reached {self.plan_limit} attendances")
-            else:
-                subject = _(f"Você atingiu {self.plan_limit} atendimentos")
-
-            recipient_list = [email[0]]
-            msg = (subject, message, html_message, from_email, recipient_list)
-            msg_list.append(msg)
-
-        html_mail = send_mass_html_mail(msg_list, fail_silently=False)
-
-        return html_mail
-
     def send_email_plan_is_about_to_expire(self, emails: list = None):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
