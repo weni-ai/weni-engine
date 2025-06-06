@@ -2015,25 +2015,6 @@ class BillingPlan(models.Model):
         )
         return mail
 
-    def send_email_changed_plan(self, user_name: str, email: list, old_plan: str):
-        if not settings.SEND_EMAILS:
-            return False  # pragma: no cover
-        context = {
-            "base_url": settings.BASE_URL,
-            "organization_name": self.organization.name,
-            "user_name": user_name,
-            "old_plan": old_plan,
-            "actual_plan": self.plan,
-        }
-        mail.send_mail(
-            _("Your organization's plan has been updated"),
-            render_to_string("billing/emails/changed-plan.txt", context),
-            None,
-            email,
-            html_message=render_to_string("billing/emails/changed-plan.html", context),
-        )
-        return mail
-
     def send_email_trial_plan_expired_due_time_limit(self, emails: list = None):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover

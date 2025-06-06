@@ -651,20 +651,6 @@ class BillingPlanTestCase(TestCase):
         self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
         self.assertEqual(outbox.to[0], self.test_email[0])
 
-    def test_send_email_changed_plan(self):
-        plan = BillingPlan.PLAN_CHOICES[1][0]
-        sended_email = self.billing.send_email_changed_plan(
-            self.test_user_name, self.test_email, plan
-        )
-        self.assertEqual(len(sended_email.outbox), 1)
-        outbox = sended_email.outbox[0]
-        self.assertEqual(
-            outbox.subject,
-            "Your organization's plan has been updated",
-        )
-        self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
-        self.assertEqual(outbox.to[0], self.test_email[0])
-
     def test_send_email_plan_is_about_to_expire(self):
         self.billing.plan = BillingPlan.PLAN_TRIAL
         user1 = (
