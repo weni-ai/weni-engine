@@ -111,7 +111,7 @@ class CommerceSerializer(serializers.Serializer):
             # Create organization
             organization = Organization.objects.create(
                 name=validated_data.get("organization_name"),
-                organization_billing__plan="enterprise",
+                organization_billing__plan=BillingPlan.PLAN_TRIAL,
                 description=f"Organization {validated_data.get('organization_name')}",
                 organization_billing__cycle=BillingPlan._meta.get_field(
                     "cycle"
