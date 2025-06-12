@@ -1,3 +1,6 @@
+## 3.30.0
+  - Updated emails templates and removed no longer needed ones
+
 ## 3.29.14
   - Add project status to v2 serializer
 
