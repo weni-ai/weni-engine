@@ -1,95 +1,74 @@
 {% load static i18n %}
 <!doctype html>
 <html lang="en">
+
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="preconnect" href="https://fonts.gstatic.com">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
 </head>
 
-<body>
-    <div>
-        <div style="width: 670px; height: 500px">
-          <header style="width: 670px; height: 52px; border-bottom: 1px solid #E2E6ED;">
-          {% block logo %}
-            <a style="display: block; padding: 16px;" rel="nofollow" href="https://weni.ai/" target="_blank">
-                <img src="https://weni-media-sp.s3-sa-east-1.amazonaws.com/logo/Logo.png" alt="Weni-Logo" style="margin-left: 24px; margin-top: 10px;"/>
+<body style="display: flex;">
+  <div style="margin: 0 auto;">
+    <div style="width: 680px;">
+      <header
+        style="background: #F9F9F9; border-bottom: 1px solid #E2E6ED; display: flex; padding: 32px 0;">
+        {% block logo %}
+        <a style="display: block; padding: 10px; margin: auto; line-height: 0;" rel="nofollow" href="https://weni.ai/" target="_blank">
+          <img src="https://weni-media-sp.s3.sa-east-1.amazonaws.com/logo/ab76181e-e71c-4e4d-9e58-faee28e601e3.png" alt="Weni-Logo"/>
+        </a>
+        {% endblock %}
+      </header>
+      {% block main-content %}{% endblock %}
+
+
+      <footer style="padding: 0 32px; font-family: 'Lato', sans-serif; margin: auto; text-align: center;">
+        <div style="margin: 0 auto 32px auto;">
+          <div id="separator" style="width: 100%; height: 1px; background: #D0D3D9; margin-bottom: 24px;"></div>
+          <div style="margin: 0 auto 24px auto; font-family: 'Lato', sans-serif; font-weight: 700;">
+            <a style="cursor: pointer; margin-right: 32px; color: #00A49F; text-decoration: none;" target="_blank" href="https://weni.ai/">
+              {% trans 'Our site' %}
             </a>
-          {% endblock %}
-          </header>
-        {% block main-content %}{% endblock %}
-
-
-          <footer style="width: 670px;height: 150px; border-top: 1px solid #E2E6ED; border-bottom: 8px solid #262626;margin: auto; text-align: center;">
-
-          {% block footer %}
-            <a rel="nofollow" href="https://weni.ai/" target="_blank">
-                <img src="https://weni-media-sp.s3-sa-east-1.amazonaws.com/logo/Logo-small.png" style="margin: 15px 0;"/>
+            <a style="cursor: pointer; margin-right: 32px; color: #00A49F; text-decoration: none;" target="_blank" href="https://www.facebook.com/WeniAi">
+              Facebook
             </a>
-          {% endblock %}
-
-              <div style="width: 450px; font-size: 12px;line-height: 20px;margin: auto;">
-                <a
-                  style="
-                    cursor: pointer;
-                    margin-right: 26px;
-                    color: #9caccc;
-                    text-decoration: underline;
-                    font-family: 'Lato';
-                  " 
-                  target="_blank"
-                  href="https://weni.ai/"
-                >
-                  {% trans 'Visit our website' %}
-                </a>
-                <a
-                  style="
-                    cursor: pointer;
-                    margin-right: 26px;
-                    color: #9caccc;
-                    text-decoration: underline;
-                    font-family: 'Lato';
-                  "
-                  target="_blank"
-                  href="https://www.facebook.com/WeniAi"
-                >
-                  Facebook
-                </a>
-                <a
-                  style="
-                  cursor: pointer;
-                  margin-right: 26px;
-                  color: #9caccc;
-                  text-decoration: underline;
-                  font-family: 'Lato';
-                  "
-                  target="_blank" 
-                  href="https://www.instagram.com/weni.ai/"
-                >
-                  Instagram
-                </a>
-                <a
-                  style="
-                    cursor: pointer;
-                    margin-right: 0px;
-                    color: #9caccc;
-                    text-decoration: underline;
-                    font-family: 'Lato';
-                  " 
-                  target="_blank"
-                  href="https://www.linkedin.com/company/weniai/mycompany/"
-                >
-                  Linkedin
-                </a>
-              </div>
-
-            <div style="font-family: Lato;font-style: normal;font-weight: normal;font-size: 12px;line-height: 20px;color: #CCCCCC;text-align: center;margin-top:10px;">{% trans 'Weni © Brazil 2020 - All rights reserved' %}</div>
-
-            <div style="margin: 5px auto;font-family: Lato;font-style: normal;font-weight: normal;font-size: 12px;line-height: 16px;text-align: center;color: #4E5666;width: 385px;height: 32px;">{% trans 'If you have not performed this action, ignore this message and change your email password for security. Talk to support if necessary!' %}</div>
-          </footer>
-            </div>
+            <a style="cursor: pointer; margin-right: 32px; color: #00A49F; text-decoration: none;" target="_blank" href="https://www.instagram.com/weni.ai/">
+              Instagram
+            </a>
+            <a style="cursor: pointer; margin-right: 0px; color: #00A49F; text-decoration: none;" target="_blank" href="https://www.linkedin.com/company/weniai/mycompany/">
+              Linkedin
+            </a>
+          </div>
+          <div id="separator" style="width: 100%; height: 1px; background: #D0D3D9; margin-bottom: 24px;"></div>
+          <div style="font-family: 'Lato', sans-serif; font-style: normal; font-weight: normal; font-size: 12px; line-height: 20px; text-align: center; color: #3B414D">
+            {% trans '2025 © Weni by VTEX. All rights reserved.' %}
+          </div>
         </div>
+
+        <div style="display: grid; margin: auto; color: #3B414D; text-align: center; font-family: 'Lato', sans-serif; font-size: 12px; font-style: normal; font-weight: normal; line-height: 20px;">
+          {% trans 'You are receiving this mail because you registered in Weni platform. This also shows that you agree to our Terms of use and Privacy Policies. If you no longer want to receive mails from use, click the unsubscribe link below to unsubscribe.' %}
+          <div style="display: inline-flex; margin: auto; margin-top: 8px;">
+            <a href="https://weni.ai/en/privacy-policy/" target="_blank" style="color: #3B414D; text-decoration: none; font-size: 8px; line-height: 16px;">
+              {% trans 'Privacy Policy' %}
+            </a>
+            <div id="circle" style="width: 4px; height: 4px; background: #D0D3D9; border-radius: 100%; margin: auto 5px;"></div>
+            <a href="https://dash.weni.ai/terms-of-service-privacy-and-cookie-policy" target="_blank" style="color: #3B414D; text-decoration: none; font-size: 8px; line-height: 16px;">
+              {% trans 'Terms of use' %}
+            </a>
+            <div id="circle" style="width: 4px; height: 4px; background: #D0D3D9; border-radius: 100%; margin: auto 5px;"></div>
+            <a href="https://wenivtex.zendesk.com/hc/en-us" target="_blank" style="color: #3B414D; text-decoration: none; font-size: 8px; line-height: 16px;">
+              {% trans 'Help Center' %}
+            </a>
+            <div id="circle" style="width: 4px; height: 4px; background: #D0D3D9; border-radius: 100%; margin: auto 5px;"></div>
+            <a href="https://weni.ai/unsubscribe/" target="_blank" style="color: #3B414D; text-decoration: none; font-size: 8px; line-height: 16px;">
+              {% trans 'Unsubscribe' %}
+            </a>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </div>
 </body>
 
 </html>

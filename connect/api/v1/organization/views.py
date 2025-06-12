@@ -488,14 +488,7 @@ class OrganizationViewSet(
                 "update_suspend_project",
                 args=[str(project.uuid), False],
             )
-        user_name = (
-            org_billing.organization.name
-            if request.user is None
-            else request.user.first_name
-        )
-        org_billing.send_email_reactivated_plan(
-            user_name, organization.authorizations.values_list("user__email", flat=True)
-        )
+
         result = {
             "plan": org_billing.plan,
             "is_active": org_billing.is_active,
@@ -515,14 +508,8 @@ class OrganizationViewSet(
         organization = get_object_or_404(Organization, uuid=organization_uuid)
         self.check_object_permissions(self.request, organization)
         org_billing = organization.organization_billing
-        old_plan = organization.organization_billing.plan
         change_plan = org_billing.change_plan(plan)
         if change_plan:
-            organization.organization_billing.send_email_changed_plan(
-                organization.name,
-                organization.authorizations.values_list("user__email", flat=True),
-                old_plan,
-            )
             NewsletterOrganization.destroy_newsletter(organization)
             return JsonResponse(
                 data={"plan": org_billing.plan}, status=status.HTTP_200_OK
@@ -771,11 +758,6 @@ class OrganizationViewSet(
             change_plan = org_billing.change_plan(plan)
 
             if change_plan:
-                organization.organization_billing.send_email_changed_plan(
-                    organization.name,
-                    organization.authorizations.values_list("user__email", flat=True),
-                    old_plan,
-                )
                 return JsonResponse(
                     data={
                         "status": "SUCCESS",

@@ -3,70 +3,94 @@
 
 {% block main-content %}
 
-<section style="width: 574px; margin: 48px">
-  <div style="
-              font-family: 'Lato', sans-serif;
-              font-style: normal;
-              font-weight: normal;
-              font-size: 20px;
-              line-height: 28px;
-              color: #808080;
-            ">
-    {% trans 'Hi' %},
-    <span style="
-                font-family: 'Lato', sans-serif;
-                color: #262626;
-                font-size: 20px;
-                font-weight: bold;
-                line-height: 28px;
-                font-style: normal;
-              ">{{user_name}}!</span>
-  </div>
-
-  <div style="
-              font-family: 'Lato', sans-serif;
-              font-weight: bold;
-              font-size: 20px;
-              line-height: 28px;
-              color: #262626;
-              margin-top: 24px;
-            ">
-    {% trans "The plan for your organization" %} <strong>{{organization_name}}</strong> {% trans "has been finalized" %}
-  </div>
-
-  <div style="
-              font-family: 'Lato', sans-serif;
-              font-style: normal;
-              font-weight: normal;
-              font-size: 16px;
-              line-height: 24px;
-              color: #808080;
-              margin-top: 24px;
-            ">
-    <p>
-      {% trans "An administrator has terminated the organization plan" %}.
-      <strong>{{organization_name}}</strong>.
-    </p>
-    <p>
-      {% trans "At the moment, the functioning of your Intelligences, Flows and the Chat module are interrupted" %}.
-    </p>
-  </div>
-
-  <div style="
-              font-family: 'Lato', sans-serif;
-              font-style: normal;
-              font-weight: normal;
-              font-size: 16px;
-              line-height: 24px;
-              color: #808080;
-              margin-top: 24px;
-            ">
-    <p>
-      {% trans "To continue using the Weni Platform ask your organization's administrator to reactivate the plan or choose a new one, that makes sense for your projects. We want you to stay with us" %}
-    </p>
-    <span style="margin-left: 1px">
-      <img style="max-height: 16px" src="{% static 'emojis/winking-face.png' %}" alt="" />
+<section style="margin: 24px auto">
+  <div
+    style="
+      font-family: 'Lato', sans-serif;
+      font-style: normal;
+      font-weight: 700;
+      font-size: 16px;
+      line-height: 24px;
+      color: #3b414d;
+    "
+  >
+    {% trans 'Oh no,' %}
+    <span
+      style="
+        font-family: 'Lato', sans-serif;
+        color: #3b414d;
+        font-size: 16px;
+        font-weight: 700;
+        line-height: 24px;
+        font-style: normal;
+      "
+    >
+      {{user_name}}!
     </span>
+  </div>
+
+  <div
+    style="
+      font-family: 'Lato', sans-serif;
+      font-style: normal;
+      font-weight: normal;
+      font-size: 14px;
+      line-height: 22px;
+      color: #3b414d;
+      margin-top: 12px;
+    "
+  >
+    {% trans "The plan for your organization" %}
+    {{organization_name}},
+    {% trans "has ended. As a result," %}
+    <strong>{% trans "your intelligent agents are currently offline."%}</strong>
+  </div>
+
+  <div
+    style="
+      font-family: 'Lato', sans-serif;
+      font-style: normal;
+      font-weight: normal;
+      font-size: 14px;
+      line-height: 22px;
+      color: #3b414d;
+      margin-top: 12px;
+    "
+  >
+    {% trans "To keep using the Weni Platform, simply ask your organization's administrator" %}
+    <strong>{% trans "to reactivate the plan" %}</strong>
+    {% trans "or select a new one that meets your business needs." %}
+  </div>
+
+  <div
+    style="
+      font-family: 'Lato', sans-serif;
+      font-style: normal;
+      font-weight: normal;
+      font-size: 14px;
+      line-height: 22px;
+      color: #3b414d;
+      margin-top: 12px;
+    "
+  >
+    {% trans 'Our goal is to continue growing alongside you!' %}
+  </div>
+
+  <div
+    style="
+      font-family: 'Lato', sans-serif;
+      font-style: normal;
+      font-weight: normal;
+      font-size: 14px;
+      line-height: 22px;
+      color: #3b414d;
+      margin-top: 12px;
+      margin-bottom: 32px;
+    "
+  >
+    {% trans 'Best regards,' %}
+    <br />
+    {% trans 'Weni by VTEX Team' %}
   </div>
 </section>
 
