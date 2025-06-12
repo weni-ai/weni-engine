@@ -6,6 +6,7 @@ from django.dispatch import receiver
 from django.utils import timezone
 
 from connect.authentication.models import User
+from connect.common.exceptions import ProjectAuthorizationException
 from connect.common.models import (
     ChatsRole,
     Project,
@@ -59,9 +60,17 @@ def create_service_status(sender, instance, created, **kwargs):
 
         for authorization in instance.organization.authorizations.all():
             if authorization.can_contribute:
-                project_auth = instance.get_user_authorization(authorization.user)
-                project_auth.role = authorization.role
-                project_auth.save()
+                try:
+                    project_auth = instance.get_user_authorization(authorization.user)
+                    project_auth.role = authorization.role
+                    project_auth.save()
+                except ProjectAuthorizationException:
+                    project_auth = ProjectAuthorization.objects.create(
+                        user=authorization.user,
+                        project=instance,
+                        role=authorization.role,
+                        organization_authorization=authorization,
+                    )
 
     elif update_fields and "flow_organization" in update_fields:
         for permission in instance.project_authorizations.all():
