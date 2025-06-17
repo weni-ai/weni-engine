@@ -1,7 +1,7 @@
 import json
 
-from django.core import mail
 from django.conf import settings
+from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 
 
@@ -25,6 +25,8 @@ def send_email(subject, to, template_txt, template_html=None, context=None):
     if not isinstance(to, list):
         to = [to]
 
-    mail.send_mail(subject, text_content, None, to, html_message=html_content)
+    msg = EmailMultiAlternatives(subject, text_content, None, to, headers=headers)
+    if html_content:
+        msg.attach_alternative(html_content, "text/html")
 
-    return mail
+    return msg.send()
