@@ -1,6 +1,8 @@
 {% load i18n %}
-<p>{% trans 'Hi' %}, {{ user_name }}!</p>
-<p>{% trans 'Your organization' %} {{org_name}} {% trans 'has reached the time limit of the Trial plan.' %}</p>
-<p>{% trans 'You have reached the 30-day limit to use all features of the Weni platform for free.' %}</p>
-<p>{% trans 'Your access to the platform continues, but your chatbot will not be able to trigger messages to your users.' %}</p>
-<p>{% trans 'Avoid blocking your chatbot by accessing' %} <a href="{{ webapp_billing_url }}">{% trans 'Billing' %}</a> {% trans 'and choose a plan that fits according to your business needs.' %}</p>
+<p>{% trans 'Hey' %} {{ user_name }}, {% trans 'your Trial Plan has come to an end!' %}</p>
+<p>{% trans 'While '%} {{org_name}} {% trans 'has enjoyed the 30-day free trial,' %} {% trans "it's time to move forward to the next stage." %}</p>
+<p>{% trans 'Please note that ' %}{% trans 'your agents are currently unable to send messages' %}{% trans ' until you select a plan that best suits your business needs.' %}</p>
+<p>{% trans 'Rest assured, ' %}{% trans 'you still have access to the platform.'%}{% trans 'To reactivate your agents and continue enjoying all the benefits, simply ' %}{% trans 'choose the most suitable plan' %}{% trans 'in the' %} <a href="{{ webapp_billing_url }}">{% trans 'Billing' %}</a> {% trans ' section.' %}</p>
+<p>{% trans "We're here to support you every step of the way!" context "trial-plan-expired" %}</p>
+<p>{% trans 'Best regards,' %}</p>
+<p>{% trans 'Weni by VTEX Team' %}</p>

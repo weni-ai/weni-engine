@@ -6,11 +6,11 @@ from django.contrib.auth.models import PermissionsMixin
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.db.models import JSONField
-from django.core.mail import send_mail
 from django.db import models
-from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
+from django.utils import translation
 
+from connect.common.utils import send_email
 from connect.storages import AvatarUserMediaStorage
 
 from connect.api.v1.keycloak import KeycloakControl
@@ -177,15 +177,15 @@ class User(AbstractBaseUser, PermissionsMixin):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
         context = {"name": self.first_name}
-        send_mail(
-            _("Password changed"),
-            render_to_string("authentication/emails/change_password.txt"),
-            None,
-            [self.email],
-            html_message=render_to_string(
-                "authentication/emails/change_password.html", context
-            ),
-        )
+
+        with translation.override(self.language):
+            send_email(
+                _("Your password has been changed"),
+                self.email,
+                "authentication/emails/change_password.txt",
+                "authentication/emails/change_password.html",
+                context,
+            )
 
     def send_email_nickname_changed(self, before_nickname: str, new_nickname: str):
         if not settings.SEND_EMAILS:
@@ -195,14 +195,12 @@ class User(AbstractBaseUser, PermissionsMixin):
             "before_nickname": before_nickname,
             "new_nickname": new_nickname,
         }
-        send_mail(
+        send_email(
             _("Nickname changed"),
-            render_to_string("authentication/emails/nickname_changed.txt"),
-            None,
-            [self.email],
-            html_message=render_to_string(
-                "authentication/emails/nickname_changed.html", context
-            ),
+            self.email,
+            "authentication/emails/nickname_changed.txt",
+            "authentication/emails/nickname_changed.html",
+            context,
         )
 
     def send_email_access_password(self, password: str):
@@ -210,17 +208,17 @@ class User(AbstractBaseUser, PermissionsMixin):
             return False
         context = {
             "email": self.email,
+            "name": self.first_name,
             "password": password,
         }
-        send_mail(
-            _("Access password"),
-            render_to_string("authentication/emails/first_password.txt"),
-            None,
-            [self.email],
-            html_message=render_to_string(
-                "authentication/emails/first_password.html", context
-            ),
-        )
+        with translation.override(self.language):
+            send_email(
+                _("Your Weni Platform account is ready! Log in now"),
+                self.email,
+                "authentication/emails/first_password.txt",
+                "authentication/emails/first_password.html",
+                context,
+            )
 
     def send_request_flow_user_info(self, flow_data):  # pragma: no cover
         if not flow_data.get("send_request_flow"):

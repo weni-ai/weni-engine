@@ -1,3 +1,12 @@
+## 3.30.0
+  - Updated emails templates and removed no longer needed ones
+
+## 3.29.14
+  - Add project status to v2 serializer
+
+## 3.29.13
+  - Add project status field, to indicate if it is in test, active or inactive
+
 # 3.29.12
 ## *Add*
   - Metrics endpoint for django-prometheus

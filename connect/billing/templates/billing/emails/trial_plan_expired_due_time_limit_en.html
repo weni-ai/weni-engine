@@ -2,44 +2,32 @@
 {% load static i18n %}
 
 {% block main-content %}
-<section style="width: 574px; margin: 48px">
+<section style="margin: 24px auto; padding: 0 32px;">
   <div
     style="
       font-family: 'Lato', sans-serif;
       font-style: normal;
-      font-weight: normal;
-      font-size: 20px;
-      line-height: 28px;
-      color: #808080;
+      font-weight: 700;
+      font-size: 16px;
+      line-height: 24px;
+      color: #3B414D;
     "
   >
-    {% trans 'Hi' %},
+    {% trans 'Hey' %}
     <span
       style="
         font-family: 'Lato', sans-serif;
-        color: #262626;
-        font-size: 20px;
-        font-weight: bold;
-        line-height: 28px;
+        color: #3B414D;
+        font-size: 16px;
+        font-weight: 700;
+        line-height: 24px;
         font-style: normal;
       "
     >
       {{emails}}
-      {{ user_name }}!
+      {{ user_name }},
     </span>
-  </div>
-
-  <div
-    style="
-      font-family: 'Lato', sans-serif;
-      font-weight: bold;
-      font-size: 20px;
-      line-height: 28px;
-      color: #262626;
-      margin-top: 24px;
-    "
-  >
-    {% trans 'Your organization' %} {{org_name}} {% trans 'has reached the time limit of the Trial plan.' %}
+    {% trans 'your Trial Plan has come to an end!' %}
   </div>
 
   <div
@@ -47,13 +35,13 @@
       font-family: 'Lato', sans-serif;
       font-style: normal;
       font-weight: normal;
-      font-size: 16px;
-      line-height: 24px;
-      color: #808080;
-      margin-top: 24px;
+      font-size: 14px;
+      line-height: 22px;
+      color: #3B414D;
+      margin-top: 12px;
     "
   >
-    {% trans 'You have reached the 30-day limit to use all features of the Weni platform for free.' %}
+    {% trans 'While '%} {{org_name}} <span style="font-weight: 700;">{% trans 'has enjoyed the 30-day free trial,' %}</span> {% trans "it's time to move forward to the next stage." %}
   </div>
 
   <div
@@ -61,13 +49,13 @@
       font-family: 'Lato', sans-serif;
       font-style: normal;
       font-weight: normal;
-      font-size: 16px;
-      line-height: 24px;
-      color: #808080;
-      margin-top: 24px;
+      font-size: 14px;
+      line-height: 22px;
+      color: #3B414D;
+      margin-top: 12px;
     "
   >
-    {% trans 'Your access to the platform continues, but your chatbot will not be able to trigger messages to your users.' %}
+    {% trans 'Please note that ' %} <span style="font-weight: 700;">{% trans 'your agents are currently unable to send messages' %}</span> {% trans ' until you select a plan that best suits your business needs.' %}
   </div>
 
   <div
@@ -75,15 +63,50 @@
       font-family: 'Lato', sans-serif;
       font-style: normal;
       font-weight: normal;
-      font-size: 16px;
-      line-height: 24px;
-      color: #808080;
-      margin-top: 24px;
+      font-size: 14px;
+      line-height: 22px;
+      color: #3B414D;
+      margin-top: 12px;
     "
   >
-    {% trans 'Avoid blocking your chatbot by accessing ' %}
+    {% trans 'Rest assured, ' %}
+    <span style="font-weight: 700;">{% trans 'you still have access to the platform.'%}</span>
+    {% trans 'To reactivate your agents and continue enjoying all the benefits, simply ' %}
+    <span style="font-weight: 700;">{% trans 'choose the most suitable plan' %}</span>
+    {% trans 'in the' %}
     <a href="{{ webapp_billing_url }}" style="color: #009E96; text-decoration: underline; text-underline-offset: 4px;">{% trans 'Billing' %}</a>
-    {% trans ' and choose a plan that fits according to your business needs.' %}
+    {% trans ' section.' %}
+  </div>
+
+  <div
+    style="
+      font-family: 'Lato', sans-serif;
+      font-style: normal;
+      font-weight: normal;
+      font-size: 14px;
+      line-height: 22px;
+      color: #3B414D;
+      margin-top: 12px;
+    "
+  >
+    {% trans "We're here to support you every step of the way!" context "trial-plan-expired" %}
+  </div>
+
+  <div
+    style="
+      font-family: 'Lato', sans-serif;
+      font-style: normal;
+      font-weight: normal;
+      font-size: 14px;
+      line-height: 22px;
+      color: #3B414D;
+      margin-top: 12px;
+      margin-bottom: 32px;
+    "
+  >
+    {% trans 'Best regards,' %}
+    <br>
+    {% trans 'Weni by VTEX Team' %}
   </div>
 </section>
 {% endblock %}
