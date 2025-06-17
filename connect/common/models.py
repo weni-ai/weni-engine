@@ -6,7 +6,6 @@ from datetime import timedelta
 from decimal import Decimal
 import pendulum
 from django.conf import settings
-from django.core import mail
 from django.db import models
 from django.db.models import Sum
 from django.template.loader import render_to_string
@@ -31,6 +30,7 @@ from rest_framework import status
 from connect.common.helpers import send_mass_html_mail
 from django.db.models import Q
 from connect.template_projects.models import TemplateType
+from connect.common.utils import send_email
 
 from connect.internals.event_driven.producer.rabbitmq_publisher import RabbitmqPublisher
 
@@ -184,18 +184,14 @@ class Organization(models.Model):
         }
 
         with translation.override(language):
-            mail.send_mail(
+            email = send_email(
                 _("You've been invited to join ") + self.name,
-                render_to_string(
-                    "common/emails/organization/invite_organization.txt", context
-                ),
-                None,
-                [email],
-                html_message=render_to_string(
-                    "common/emails/organization/invite_organization.html", context
-                ),
+                email,
+                "common/emails/organization/invite_organization.txt",
+                "common/emails/organization/invite_organization.html",
+                context,
             )
-        return mail
+        return email
 
     def send_email_organization_going_out(self, user: User):
         if not settings.SEND_EMAILS:
@@ -212,16 +208,14 @@ class Organization(models.Model):
         else:
             subject = _(f"You are leaving {self.name}")
 
-        mail.send_mail(
+        email = send_email(
             subject,
-            render_to_string("common/emails/organization/leaving_org.txt", context),
-            None,
-            [user.email],
-            html_message=render_to_string(
-                "common/emails/organization/leaving_org.html", context
-            ),
+            user.email,
+            "common/emails/organization/leaving_org.txt",
+            "common/emails/organization/leaving_org.html",
+            context,
         )
-        return mail
+        return email
 
     def send_email_organization_removed(self, email: str, user_name: str):
         if not settings.SEND_EMAILS:
@@ -231,16 +225,14 @@ class Organization(models.Model):
             "user_name": user_name,
             "organization_name": self.name,
         }
-        mail.send_mail(
+        email = send_email(
             _("You have been removed from") + f" {self.name}",
-            render_to_string("common/emails/organization/org_removed.txt", context),
-            None,
-            [email],
-            html_message=render_to_string(
-                "common/emails/organization/org_removed.html", context
-            ),
+            email,
+            "common/emails/organization/org_removed.txt",
+            "common/emails/organization/org_removed.html",
+            context,
         )
-        return mail
+        return email
 
     def send_email_organization_create(self, emails: list = None):
         if not settings.SEND_EMAILS:
@@ -296,24 +288,21 @@ class Organization(models.Model):
     def send_email_remove_permission_organization(self, first_name: str, email: str):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
+
+        subject = _("You have been removed from") + f" {self.name}",
         context = {
             "base_url": settings.BASE_URL,
             "organization_name": self.name,
             "first_name": first_name,
         }
-        mail.send_mail(
-            _("You have been removed from") + f" {self.name}",
-            render_to_string(
-                "common/emails/organization/remove_permission_organization.txt", context
-            ),
-            None,
-            [email],
-            html_message=render_to_string(
-                "common/emails/organization/remove_permission_organization.html",
-                context,
-            ),
+        email = send_email(
+            subject,
+            email,
+            "common/emails/organization/remove_permission_organization.txt",
+            "common/emails/organization/remove_permission_organization.html",
+            context,
         )
-        return mail
+        return email
 
     def send_email_delete_organization(self, emails: list = None):
         if not settings.SEND_EMAILS:
@@ -428,18 +417,14 @@ class Organization(models.Model):
         }
 
         with translation.override(language):
-            mail.send_mail(
+            email = send_email(
                 _("You've received an access code for Weni Platform"),
-                render_to_string(
-                    "authentication/emails/access_code.txt", context
-                ),
-                None,
-                [email],
-                html_message=render_to_string(
-                    "authentication/emails/access_code.html", context
-                ),
+                email,
+                "authentication/emails/access_code.txt",
+                "authentication/emails/access_code.html",
+                context,
             )
-        return mail
+        return email
 
     def send_email_permission_change(
         self, user: User, old_permission: str, new_permission: str
@@ -464,18 +449,14 @@ class Organization(models.Model):
         else:
             subject = _(f"An administrator of {self.name } has updated your permission")
 
-        mail.send_mail(
+        email = send_email(
             subject,
-            render_to_string(
-                "common/emails/organization/permission_change.txt", context
-            ),
-            None,
-            [user.email],
-            html_message=render_to_string(
-                "common/emails/organization/permission_change.html", context
-            ),
+            user.email,
+            "common/emails/organization/permission_change.txt",
+            "common/emails/organization/permission_change.html",
+            context,
         )
-        return mail
+        return email
 
     @property
     def active_contacts(self):
@@ -940,36 +921,34 @@ class Project(models.Model):
             "secondary_lang_before": secondary_lang_before,
             "secondary_lang_now": secondary_lang_now,
         }
-        mail.send_mail(
+        email = send_email(
             _(f"The project {self.name} has changed"),
-            render_to_string("common/emails/project/project-changed.txt", context),
-            None,
-            [email],
-            html_message=render_to_string(
-                "common/emails/project/project-changed.html", context
-            ),
+            email,
+            "common/emails/project/project-changed.txt",
+            "common/emails/project/project-changed.html",
+            context,
         )
-        return mail
+        return email
 
     def send_email_deleted_project(self, first_name: str, email: str):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
+
         context = {
             "base_url": settings.BASE_URL,
             "organization_name": self.organization.name,
             "project_name": self.name,
             "first_name": first_name,
         }
-        mail.send_mail(
+
+        email = send_email(
             _("A project was deleted..."),
-            render_to_string("common/emails/project/project-delete.txt", context),
-            None,
-            [email],
-            html_message=render_to_string(
-                "common/emails/project/project-delete.html", context
-            ),
+            email,
+            "common/emails/project/project-delete.txt",
+            "common/emails/project/project-delete.html",
+            context,
         )
-        return mail
+        return email
 
     def create_classifier(self, authorization, template_type: str, access_token: str):
         flow_instance = FlowsRESTClient()
@@ -1075,22 +1054,25 @@ class Project(models.Model):
     def send_email_invite_project(self, email):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
+        user = User.objects.get(email=email)
+        language = user.language
+
         context = {
             "base_url": settings.BASE_URL,
             "webapp_base_url": settings.WEBAPP_BASE_URL,
             "organization_name": self.organization.name,
             "project_name": self.name,
         }
-        mail.send_mail(
-            _("Invitation to join organization"),
-            render_to_string("common/emails/project/invite_project.txt", context),
-            None,
-            [email],
-            html_message=render_to_string(
-                "common/emails/project/invite_project.html", context
-            ),
-        )
-        return mail
+
+        with translation.override(language):
+            email = send_email(
+                _("Invitation to join organization"),
+                email,
+                "common/emails/project/invite_project.txt",
+                "common/emails/project/invite_project.html",
+                context,
+            )
+        return email
 
     def get_contacts(self, before: str, after: str, counting_method: str = None):
         from connect.billing.models import Contact
@@ -2043,21 +2025,22 @@ class BillingPlan(models.Model):
     def send_email_end_trial(self, email: list):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
+
+        subject = _("Your trial period has ended")
         context = {
             "base_url": settings.BASE_URL,
             "webapp_base_url": settings.WEBAPP_BASE_URL,
             "organization_name": self.organization.name,
         }
-        mail.send_mail(
-            _("Your trial period has ended"),
-            render_to_string("common/emails/organization/end_trial.txt", context),
-            None,
+
+        email = send_email(
+            subject,
             email,
-            html_message=render_to_string(
-                "common/emails/organization/end_trial.html", context
-            ),
+            "common/emails/organization/end_trial.txt",
+            "common/emails/organization/end_trial.html",
+            context,
         )
-        return mail
+        return email
 
     def end_trial_period(self):
         newsletter = Newsletter.objects.create()

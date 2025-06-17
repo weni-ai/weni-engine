@@ -445,6 +445,7 @@ else:
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 SEND_EMAILS = env.bool("SEND_EMAILS")
+SENDGRID_UNSUBSCRIBE_GROUP_ID = env.str("SENDGRID_UNSUBSCRIBE_GROUP_ID", default=None)
 
 # Products URL
 
