@@ -197,28 +197,6 @@ class Organization(models.Model):
             )
         return mail
 
-    def send_email_remove_permission_organization(self, first_name: str, email: str):
-        if not settings.SEND_EMAILS:
-            return False  # pragma: no cover
-        context = {
-            "base_url": settings.BASE_URL,
-            "organization_name": self.name,
-            "first_name": first_name,
-        }
-        mail.send_mail(
-            _("You have been removed from") + f" {self.name}",
-            render_to_string(
-                "common/emails/organization/remove_permission_organization.txt", context
-            ),
-            None,
-            [email],
-            html_message=render_to_string(
-                "common/emails/organization/remove_permission_organization.html",
-                context,
-            ),
-        )
-        return mail
-
     def send_email_access_code(self, email: str, user_name: str, access_code: str):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover

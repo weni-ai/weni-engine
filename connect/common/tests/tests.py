@@ -433,18 +433,6 @@ class OrganizationTestCase(TestCase):
         self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
         self.assertEqual(outbox.to[0], self.test_email)
 
-    def test_send_email_remove_permission_organization(self):
-        sended_mail = self.organization.send_email_remove_permission_organization(
-            self.test_first_name, self.test_email
-        )
-        self.assertEqual(len(sended_mail.outbox), 1)
-        outbox = sended_mail.outbox[0]
-        self.assertEqual(
-            outbox.subject, f"You have been removed from {self.organization.name}"
-        )
-        self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
-        self.assertEqual(outbox.to[0], self.test_email)
-
     def test_send_email_access_code(self):
         organization = self.organization
         email = "test@example.com"

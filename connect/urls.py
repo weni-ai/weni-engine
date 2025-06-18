@@ -105,29 +105,11 @@ if settings.DEBUG:
                         ),
                     ),
                     path(
-                        "remove-permission-organization/",
-                        render_template(
-                            "authentication/emails/remove_permission_organization.html",
-                            base_url=settings.BASE_URL,
-                            first_name="Daniel Yohan",
-                            organization_name="Org Test",
-                        ),
-                    ),
-                    path(
                         "invite-organization",
                         render_template(
                             "common/emails/organization/invite_organization.html",
                             base_url=settings.BASE_URL,
                             webapp_base_url=settings.WEBAPP_BASE_URL,
-                            organization_name="Org Test",
-                        ),
-                    ),
-                    path(
-                        "remove-permission",
-                        render_template(
-                            "common/emails/organization/remove_permission_organization.html",
-                            base_url=settings.BASE_URL,
-                            first_name="João",
                             organization_name="Org Test",
                         ),
                     ),
