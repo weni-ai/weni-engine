@@ -358,8 +358,6 @@ msgstr "Nome de usuário alterado"
 #: connect/billing/templates/billing/emails/removed_card.txt:2
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.html:16
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:2
-#: connect/common/templates/common/emails/organization/org_removed.html:7
-#: connect/common/templates/common/emails/organization/org_removed.txt:2
 #: connect/common/templates/common/emails/organization/organization_create.html:16
 #: connect/common/templates/common/emails/organization/permission_change.html:16
 #: connect/common/templates/common/emails/organization/permission_change.txt:2
@@ -1661,8 +1659,6 @@ msgstr "De 100001 até 250000 contatos ativos"
 msgid "created on"
 msgstr "criado em"
 
-#: connect/common/templates/common/emails/organization/org_removed.html:33
-#: connect/common/templates/common/emails/organization/org_removed.txt:5
 #: connect/common/templates/common/emails/organization/remove_permission_organization.html:62
 #: connect/common/templates/common/emails/organization/remove_permission_organization.txt:4
 msgid ""
@@ -1732,27 +1728,6 @@ msgstr "enviou um convite para você se juntar à organização na Weni Platafor
 #: connect/common/templates/common/emails/organization/invite_organization.txt:4
 msgid "To accept, simply click the button below and complete your registration. If you're already registered, just log in you account."
 msgstr "Para aceitar, basta clicar no botão abaixo para completar o seu cadastro. Se você já fez isso, é só logar na sua conta."
-
-#: connect/common/templates/common/emails/organization/org_removed.html:13
-#: connect/common/templates/common/emails/organization/org_removed.txt:3
-msgid "You have been removed from the organization"
-msgstr "Você foi removido(a) da organização"
-
-#: connect/common/templates/common/emails/organization/org_removed.html:24
-#: connect/common/templates/common/emails/organization/org_removed.txt:4
-msgid "An administrator of the organization"
-msgstr "Um dos administradores da organização"
-
-#: connect/common/templates/common/emails/organization/org_removed.html:24
-#: connect/common/templates/common/emails/organization/org_removed.txt:4
-msgid ""
-"has removed you from the organization, so you won't be able to access their "
-"projects anymore. We were saddened by your departure, but understand that "
-"life goes on and things change"
-msgstr ""
-"removeu você da organização, então você não irá conseguir mais acessarmais "
-"seus projetos. Ficamos tristes com sua partida, mas entendemos que a vida "
-"segue e as coisas mudam"
 
 #: connect/common/templates/common/emails/organization/organization_create.html:39
 #: connect/common/templates/common/emails/organization/organization_create.txt:3

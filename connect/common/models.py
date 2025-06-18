@@ -197,25 +197,6 @@ class Organization(models.Model):
             )
         return mail
 
-    def send_email_organization_removed(self, email: str, user_name: str):
-        if not settings.SEND_EMAILS:
-            return False  # pragma: no cover
-        context = {
-            "base_url": settings.BASE_URL,
-            "user_name": user_name,
-            "organization_name": self.name,
-        }
-        mail.send_mail(
-            _("You have been removed from") + f" {self.name}",
-            render_to_string("common/emails/organization/org_removed.txt", context),
-            None,
-            [email],
-            html_message=render_to_string(
-                "common/emails/organization/org_removed.html", context
-            ),
-        )
-        return mail
-
     def send_email_organization_create(self, emails: list = None):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover

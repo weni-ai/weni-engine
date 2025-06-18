@@ -123,15 +123,6 @@ if settings.DEBUG:
                         ),
                     ),
                     path(
-                        "organization-removed",
-                        render_template(
-                            "common/emails/organization/org_removed.html",
-                            base_url=settings.BASE_URL,
-                            user_name="João",
-                            organization_name="Org Test",
-                        ),
-                    ),
-                    path(
                         "organization-created",
                         render_template(
                             "common/emails/organization/organization_create.html",
