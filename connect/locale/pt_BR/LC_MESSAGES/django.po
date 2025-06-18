@@ -358,8 +358,6 @@ msgstr "Nome de usuário alterado"
 #: connect/billing/templates/billing/emails/removed_card.txt:2
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.html:16
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:2
-#: connect/common/templates/common/emails/project/project_create.html:16
-#: connect/common/templates/common/emails/project/project_create.txt:2
 msgid "Hi"
 msgstr "Oi"
 
@@ -1169,8 +1167,6 @@ msgid "Project template type"
 msgstr "Nome do Projeto"
 
 #: connect/common/models.py:805
-#: connect/common/templates/common/emails/project/project_create.html:39
-#: connect/common/templates/common/emails/project/project_create.txt:3
 msgid "Your project has been successfully created!"
 msgstr "Seu projeto foi criado com sucesso!"
 
@@ -1704,30 +1700,6 @@ msgstr "Você foi convidado para participar da organização"
 #: connect/common/templates/common/emails/project/invite_project.txt:2
 msgid "from the organization"
 msgstr "da organização"
-
-#: connect/common/templates/common/emails/project/project_create.html:53
-#: connect/common/templates/common/emails/project/project_create.txt:4
-msgid "The project"
-msgstr "O projeto"
-
-#: connect/common/templates/common/emails/project/project_create.html:53
-#: connect/common/templates/common/emails/project/project_create.txt:4
-msgid ""
-"was created, and you can now start using our Intelligences and Flows modules "
-"to transform the way you work"
-msgstr ""
-"foi criado, e agora você pode iniciar a criação de Inteligências e Fluxos "
-"para transformar a maneira como você trabalha"
-
-#: connect/common/templates/common/emails/project/project_create.html:62
-#: connect/common/templates/common/emails/project/project_create.txt:5
-msgid "Remember that everyone in the organization"
-msgstr "Lembre-se de que todos na organização"
-
-#: connect/common/templates/common/emails/project/project_create.html:62
-#: connect/common/templates/common/emails/project/project_create.txt:5
-msgid "that you created the project in, can view it, ok"
-msgstr "em que você criou o projeto podem visualizar ele, ok ?!"
 
 #: connect/settings.py:228
 msgid "An error has occurred"

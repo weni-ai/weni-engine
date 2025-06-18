@@ -1,5 +1,0 @@
-{% load i18n %}
-<p>{% trans "Hi" %}, {{ first_name }}!</p>
-<p>{% trans "Your project has been successfully created!" %}</p>
-<p>{% trans "The project" %} <strong>{{ project_name }}</strong> {% trans "was created, and you can now start using our Intelligences and Flows modules to transform the way you work" %}!</p>
-<p>{% trans "Remember that everyone in the organization" %} <strong>{{ organization_name }}</strong> {% trans "that you created the project in, can view it, ok" %}?!</p>

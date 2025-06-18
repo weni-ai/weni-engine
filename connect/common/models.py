@@ -604,56 +604,6 @@ class Project(models.Model):
 
         current_app.send_task("delete_project", args=[project_uuid, user_email])
 
-    def send_email_create_project(self, emails: list = None):
-        if not settings.SEND_EMAILS:
-            return False  # pragma: no cover
-
-        if not emails:
-            filter = Q(role=OrganizationRole.VIEWER.value) | Q(
-                user__email_setup__receive_project_emails=False
-            )
-            emails = (
-                self.project_authorizations.exclude(filter)
-                .values_list("user__email", "user__username", "user__language")
-                .order_by("user__language")
-            )
-
-        from_email = None
-        msg_list = []
-
-        context = {
-            "base_url": settings.BASE_URL,
-            "organization_name": self.organization.name,
-            "project_name": self.name,
-        }
-
-        for email in emails:
-            username = email[1]
-            context["first_name"] = username
-
-            language = email[2]
-
-            if language == "pt-br":
-                subject = "Seu projeto foi criado com sucesso!"
-            else:
-                subject = _("Your project has been successfully created!")
-
-            message = render_to_string(
-                "common/emails/project/project_create.txt",
-                context,
-            )
-            html_message = render_to_string(
-                "common/emails/project/project_create.html",
-                context,
-            )
-
-            recipient_list = [email[0]]
-            msg = (subject, message, html_message, from_email, recipient_list)
-            msg_list.append(msg)
-
-        html_mail = send_mass_html_mail(msg_list, fail_silently=False)
-        return html_mail
-
     def create_classifier(self, authorization, template_type: str, access_token: str):
         flow_instance = FlowsRESTClient()
         created = False
