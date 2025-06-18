@@ -466,27 +466,6 @@ class OrganizationTestCase(TestCase):
         self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
         self.assertEqual(outbox.to[0], self.test_email)
 
-    def test_send_email_delete_organization(self):
-        self.organization.authorizations.create(
-            user=self.test_user1, role=OrganizationRole.ADMIN.value
-        )
-        self.organization.authorizations.create(
-            user=self.test_user2, role=OrganizationRole.ADMIN.value
-        )
-
-        self.organization.send_email_delete_organization()
-
-        self.assertEqual(len(mail.outbox), 2)
-        self.assertEqual(
-            mail.outbox[0].subject,
-            "The organization Test Organization no longer exists",
-        )
-        self.assertEqual(
-            mail.outbox[1].subject, "A organização Test Organization deixou de existir"
-        )
-        self.assertIn(f"{self.test_user1.username}", mail.outbox[0].body)
-        self.assertIn(f"{self.test_user2.username}", mail.outbox[1].body)
-
     def test_send_email_access_code(self):
         organization = self.organization
         email = "test@example.com"

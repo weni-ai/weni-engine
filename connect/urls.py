@@ -114,15 +114,6 @@ if settings.DEBUG:
                         ),
                     ),
                     path(
-                        "delete-organization/",
-                        render_template(
-                            "authentication/emails/delete_organization.html",
-                            base_url=settings.BASE_URL,
-                            first_name="Daniel Yohan",
-                            organization_name="Org Test",
-                        ),
-                    ),
-                    path(
                         "invite-organization",
                         render_template(
                             "common/emails/organization/invite_organization.html",
@@ -163,15 +154,6 @@ if settings.DEBUG:
                         "remove-permission",
                         render_template(
                             "common/emails/organization/remove_permission_organization.html",
-                            base_url=settings.BASE_URL,
-                            first_name="João",
-                            organization_name="Org Test",
-                        ),
-                    ),
-                    path(
-                        "delete-organization",
-                        render_template(
-                            "common/emails/organization/delete_organization.html",
                             base_url=settings.BASE_URL,
                             first_name="João",
                             organization_name="Org Test",

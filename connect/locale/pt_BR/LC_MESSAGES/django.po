@@ -358,8 +358,6 @@ msgstr "Nome de usuário alterado"
 #: connect/billing/templates/billing/emails/removed_card.txt:2
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.html:16
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:2
-#: connect/common/templates/common/emails/organization/delete_organization.html:16
-#: connect/common/templates/common/emails/organization/delete_organization.txt:2
 #: connect/common/templates/common/emails/organization/leaving_org.html:6
 #: connect/common/templates/common/emails/organization/leaving_org.txt:2
 #: connect/common/templates/common/emails/organization/org_removed.html:7
@@ -637,11 +635,6 @@ msgstr "ou escolher outro que atenda às necessidades de seu negócio."
 #: connect/billing/templates/billing/emails/finished-plan.txt:5
 msgid "Our goal is to continue growing alongside you!"
 msgstr "Nosso objetivo é continuar caminhando junto com você!"
-
-#: connect/common/templates/common/emails/organization/delete_organization.html:39
-#: connect/common/templates/common/emails/organization/delete_organization.txt:3
-msgid "The organization"
-msgstr "A organização"
 
 #: connect/common/models.py:1861
 msgid "has already surpassed 200 active contacts"
@@ -1670,28 +1663,6 @@ msgstr "De 100001 até 250000 contatos ativos"
 msgid "created on"
 msgstr "criado em"
 
-#: connect/common/templates/common/emails/organization/delete_organization.html:39
-#: connect/common/templates/common/emails/organization/delete_organization.txt:3
-msgid "no longer exists"
-msgstr "não existe mais"
-
-#: connect/common/templates/common/emails/organization/delete_organization.html:60
-#: connect/common/templates/common/emails/organization/delete_organization.txt:4
-msgid "One of their administrators deleted this organization"
-msgstr "Um dos administradores excluiu esta organização"
-
-#: connect/common/templates/common/emails/organization/delete_organization.html:61
-#: connect/common/templates/common/emails/organization/delete_organization.txt:5
-msgid ""
-"so you will no longer be able access it through your account. We were "
-"saddened by your departure, but understand that life goes on and things "
-"change"
-msgstr ""
-"então você não pode mais acessá-lo através de sua conta. Ficamos tristes com "
-"sua partida, mas entendemos que a vida segue e as coisas mudam"
-
-#: connect/common/templates/common/emails/organization/delete_organization.html:70
-#: connect/common/templates/common/emails/organization/delete_organization.txt:6
 #: connect/common/templates/common/emails/organization/leaving_org.html:27
 #: connect/common/templates/common/emails/organization/leaving_org.txt:6
 #: connect/common/templates/common/emails/organization/org_removed.html:33
