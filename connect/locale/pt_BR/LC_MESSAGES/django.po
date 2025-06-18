@@ -358,7 +358,6 @@ msgstr "Nome de usuário alterado"
 #: connect/billing/templates/billing/emails/removed_card.txt:2
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.html:16
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:2
-#: connect/common/templates/common/emails/organization/organization_create.html:16
 #: connect/common/templates/common/emails/organization/permission_change.html:16
 #: connect/common/templates/common/emails/organization/permission_change.txt:2
 #: connect/common/templates/common/emails/organization/remove_permission_organization.html:16
@@ -785,7 +784,6 @@ msgid "It's wonderful to have your team back"
 msgstr "É maravilhoso ter seu time de volta"
 
 #: connect/billing/templates/billing/emails/reactived-plan.txt:2
-#: connect/common/templates/common/emails/organization/organization_create.txt:2
 msgctxt "common-hi"
 msgid "Hi,"
 msgstr "Oi,"
@@ -1728,22 +1726,6 @@ msgstr "enviou um convite para você se juntar à organização na Weni Platafor
 #: connect/common/templates/common/emails/organization/invite_organization.txt:4
 msgid "To accept, simply click the button below and complete your registration. If you're already registered, just log in you account."
 msgstr "Para aceitar, basta clicar no botão abaixo para completar o seu cadastro. Se você já fez isso, é só logar na sua conta."
-
-#: connect/common/templates/common/emails/organization/organization_create.html:39
-#: connect/common/templates/common/emails/organization/organization_create.txt:3
-msgid "You just gave life to"
-msgstr "Você acaba de dar vida à"
-
-#: connect/common/templates/common/emails/organization/organization_create.html:60
-#: connect/common/templates/common/emails/organization/organization_create.txt:4
-msgid ""
-"Your organization was successfully created! You can now invite members to "
-"help you build projects and increase exponentially the way you automate your "
-"life with our Intelligences and Flows modules"
-msgstr ""
-"Sua organização foi criada com sucesso! Agora você já pode convidar membros "
-"para te ajudar na construção de projetos e aumentar cada vez mais a maneira "
-"como você automatiza sua vida com nossas Inteligências e Fluxos"
 
 #: connect/common/templates/common/emails/organization/permission_change.html:39
 #: connect/common/templates/common/emails/organization/permission_change.txt:3

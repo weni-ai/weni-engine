@@ -433,27 +433,6 @@ class OrganizationTestCase(TestCase):
         self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
         self.assertEqual(outbox.to[0], self.test_email)
 
-    def test_send_email_organization_create(self):
-        email1 = (
-            self.test_user1.email,
-            self.test_user1.username,
-            self.test_user1.language,
-        )
-        email2 = (
-            self.test_user2.email,
-            self.test_user2.username,
-            self.test_user2.language,
-        )
-        email_list = [email1, email2]
-        self.organization.send_email_organization_create(email_list)
-        self.assertEqual(len(mail.outbox), 2)
-        outbox = mail.outbox[0]
-        self.assertEqual(
-            outbox.subject, f"You just gave life to {self.organization.name}"
-        )
-        self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
-        self.assertEqual(outbox.to[0], self.test_user1.email)
-
     def test_send_email_remove_permission_organization(self):
         sended_mail = self.organization.send_email_remove_permission_organization(
             self.test_first_name, self.test_email

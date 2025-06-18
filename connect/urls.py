@@ -123,16 +123,6 @@ if settings.DEBUG:
                         ),
                     ),
                     path(
-                        "organization-created",
-                        render_template(
-                            "common/emails/organization/organization_create.html",
-                            base_url=settings.BASE_URL,
-                            first_name="João",
-                            webapp_base_url=settings.WEBAPP_BASE_URL,
-                            organization_name="Org Test",
-                        ),
-                    ),
-                    path(
                         "remove-permission",
                         render_template(
                             "common/emails/organization/remove_permission_organization.html",
