@@ -140,16 +140,6 @@ if settings.DEBUG:
                         ),
                     ),
                     path(
-                        "permission-change",
-                        render_template(
-                            "common/emails/organization/permission_change.html",
-                            base_url=settings.BASE_URL,
-                            user_name="João",
-                            old_permission="Viewer",
-                            new_permission="Administrator",
-                        ),
-                    ),
-                    path(
                         "trial-end",
                         render_template(
                             "billing/emails/trial_plan_expired_due_time_limit_pt_BR.html",

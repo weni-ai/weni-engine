@@ -460,19 +460,6 @@ class OrganizationTestCase(TestCase):
             sent_email.subject, "You receive an access code to Weni Platform"
         )
 
-    def test_send_email_permission_change(self):
-        sended_email = self.organization.send_email_permission_change(
-            self.test_user1, "Admin", "Viewer"
-        )
-        self.assertEqual(len(sended_email.outbox), 1)
-        outbox = sended_email.outbox[0]
-        self.assertEqual(
-            outbox.subject,
-            f"An administrator of {self.organization.name} has updated your permission",
-        )
-        self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
-        self.assertEqual(outbox.to[0], self.test_email)
-
     @patch("connect.billing.get_gateway")
     def test_days_till_trial_end(self, mock_get_gateway):
         mock_get_gateway.return_value = StripeMockGateway()

@@ -828,10 +828,6 @@ class OrganizationAuthorizationViewSet(
             OrganizationAdminManagerAuthorization,
         ]
         data = self.request.data
-        instance = self.get_object()
-
-        old_permission = OrganizationRole(instance.role).name
-        new_permission = OrganizationRole(int(data.get("role"))).name
 
         auth_dto = UpdateAuthorizationDTO(
             id=self.kwargs.get("user__id"),
@@ -842,10 +838,6 @@ class OrganizationAuthorizationViewSet(
 
         usecase = UpdateAuthorizationUseCase(message_publisher=RabbitmqPublisher())
         authorization = usecase.update_authorization(auth_dto)
-
-        instance.organization.send_email_permission_change(
-            instance.user, old_permission, new_permission
-        )
 
         return Response(data={"role": authorization.role})
 

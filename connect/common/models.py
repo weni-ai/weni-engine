@@ -246,42 +246,6 @@ class Organization(models.Model):
             )
         return mail
 
-    def send_email_permission_change(
-        self, user: User, old_permission: str, new_permission: str
-    ):
-        if not settings.SEND_EMAILS:
-            return False  # pragma: no cover
-
-        context = {
-            "base_url": settings.BASE_URL,
-            "user_name": user.username,
-            "old_permission": old_permission,
-            "new_permission": new_permission,
-            "org_name": self.name,
-        }
-
-        activate(user.language)
-
-        if user.language == "pt-br":
-            subject = (
-                f"Um administrador da organização { self.name } atualizou sua permissão"
-            )
-        else:
-            subject = _(f"An administrator of {self.name } has updated your permission")
-
-        mail.send_mail(
-            subject,
-            render_to_string(
-                "common/emails/organization/permission_change.txt", context
-            ),
-            None,
-            [user.email],
-            html_message=render_to_string(
-                "common/emails/organization/permission_change.html", context
-            ),
-        )
-        return mail
-
     @property
     def active_contacts(self):
         active_contact_counter = 0

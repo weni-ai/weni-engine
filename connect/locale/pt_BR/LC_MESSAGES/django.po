@@ -358,8 +358,6 @@ msgstr "Nome de usuário alterado"
 #: connect/billing/templates/billing/emails/removed_card.txt:2
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.html:16
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:2
-#: connect/common/templates/common/emails/organization/permission_change.html:16
-#: connect/common/templates/common/emails/organization/permission_change.txt:2
 #: connect/common/templates/common/emails/organization/remove_permission_organization.html:16
 #: connect/common/templates/common/emails/organization/remove_permission_organization.txt:2
 #: connect/common/templates/common/emails/project/project-changed.html:16
@@ -575,21 +573,6 @@ msgstr "Evite o bloqueio de seu chatbot acessando"
 #: connect/billing/templates/billing/emails/plan_is_about_to_expire_en.txt:5
 msgid "and choose a plan that fits your business needs."
 msgstr " e escolha um plano que se adapte às suas necessidades comerciais."
-
-#: connect/common/templates/common/emails/organization/permission_change.html:53
-#: connect/common/templates/common/emails/organization/permission_change.txt:5
-msgid "An administrator of"
-msgstr "Um administrador da"
-
-#: connect/common/templates/common/emails/organization/permission_change.html:54
-#: connect/common/templates/common/emails/organization/permission_change.txt:6
-msgid "to"
-msgstr "para"
-
-#: connect/common/templates/common/emails/organization/permission_change.html:54
-#: connect/common/templates/common/emails/organization/permission_change.txt:6
-msgid "from"
-msgstr "de"
 
 #: connect/billing/templates/billing/emails/finished-plan.html:17
 #: connect/billing/templates/billing/emails/finished-plan.txt:2
@@ -1726,21 +1709,6 @@ msgstr "enviou um convite para você se juntar à organização na Weni Platafor
 #: connect/common/templates/common/emails/organization/invite_organization.txt:4
 msgid "To accept, simply click the button below and complete your registration. If you're already registered, just log in you account."
 msgstr "Para aceitar, basta clicar no botão abaixo para completar o seu cadastro. Se você já fez isso, é só logar na sua conta."
-
-#: connect/common/templates/common/emails/organization/permission_change.html:39
-#: connect/common/templates/common/emails/organization/permission_change.txt:3
-msgid "A new permission has been assigned to you"
-msgstr "Uma nova permissão foi atribuida a você"
-
-#: connect/common/templates/common/emails/organization/permission_change.html:53
-#: connect/common/templates/common/emails/organization/permission_change.txt:5
-msgid "has updated your permission"
-msgstr "atualizou sua permissão"
-
-#: connect/common/templates/common/emails/organization/permission_change.html:56
-#: connect/common/templates/common/emails/organization/permission_change.txt:8
-msgid "Use your new permission responsibly"
-msgstr "Use sua nova permissão com responsabilidade"
 
 #: connect/common/templates/common/emails/organization/remove_permission_organization.html:39
 #: connect/common/templates/common/emails/organization/remove_permission_organization.txt:3
