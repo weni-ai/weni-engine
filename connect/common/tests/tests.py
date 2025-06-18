@@ -487,21 +487,6 @@ class OrganizationTestCase(TestCase):
         self.assertIn(f"{self.test_user1.username}", mail.outbox[0].body)
         self.assertIn(f"{self.test_user2.username}", mail.outbox[1].body)
 
-    def test_send_email_change_organization_name(self):
-        prev_name = self.organization.name
-        new_name = "new org name"
-        emails = [
-            (self.test_user1.email, self.test_user1.username, self.test_user1.language),
-            (self.test_user2.email, self.test_user2.username, self.test_user2.language),
-        ]
-        self.organization.send_email_change_organization_name(
-            prev_name, new_name, emails
-        )
-        self.assertEqual(len(mail.outbox), 2)
-
-        for email in mail.outbox:
-            self.assertIn(f"{new_name}", email.body)
-
     def test_send_email_access_code(self):
         organization = self.organization
         email = "test@example.com"

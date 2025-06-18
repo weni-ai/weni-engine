@@ -178,16 +178,6 @@ if settings.DEBUG:
                         ),
                     ),
                     path(
-                        "change-organization-name",
-                        render_template(
-                            "common/emails/organization/change_organization_name.html",
-                            base_url=settings.BASE_URL,
-                            user_name="João",
-                            organization_previous_name="Old Test",
-                            organization_new_name="New Org",
-                        ),
-                    ),
-                    path(
                         "access-code",
                         render_template(
                             "authentication/emails/access_code.html",

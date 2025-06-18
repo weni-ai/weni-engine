@@ -253,14 +253,8 @@ class OrganizationViewSet(
         )
 
     def update(self, request, *args, **kwargs):
-        data = request.data
         partial = kwargs.pop("partial", False)
         instance = self.get_object()
-
-        if data.get("name"):
-            instance.send_email_change_organization_name(
-                instance.name, data.get("name")
-            )
 
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)

@@ -358,8 +358,6 @@ msgstr "Nome de usuário alterado"
 #: connect/billing/templates/billing/emails/removed_card.txt:2
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.html:16
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:2
-#: connect/common/templates/common/emails/organization/change_organization_name.html:7
-#: connect/common/templates/common/emails/organization/change_organization_name.txt:2
 #: connect/common/templates/common/emails/organization/delete_organization.html:16
 #: connect/common/templates/common/emails/organization/delete_organization.txt:2
 #: connect/common/templates/common/emails/organization/leaving_org.html:6
@@ -585,8 +583,6 @@ msgstr "Evite o bloqueio de seu chatbot acessando"
 msgid "and choose a plan that fits your business needs."
 msgstr " e escolha um plano que se adapte às suas necessidades comerciais."
 
-#: connect/common/templates/common/emails/organization/change_organization_name.html:21
-#: connect/common/templates/common/emails/organization/change_organization_name.txt:4
 #: connect/common/templates/common/emails/organization/permission_change.html:53
 #: connect/common/templates/common/emails/organization/permission_change.txt:5
 msgid "An administrator of"
@@ -1673,30 +1669,6 @@ msgstr "De 100001 até 250000 contatos ativos"
 #| msgid "created at"
 msgid "created on"
 msgstr "criado em"
-
-#: connect/common/templates/common/emails/organization/change_organization_name.html:14
-#: connect/common/templates/common/emails/organization/change_organization_name.txt:3
-msgid "is now named"
-msgstr "agora se chama"
-
-#: connect/common/templates/common/emails/organization/change_organization_name.html:22
-#: connect/common/templates/common/emails/organization/change_organization_name.txt:4
-msgid "has updated the name of the organization to"
-msgstr "atualizou o nome da organização para"
-
-#: connect/common/templates/common/emails/organization/change_organization_name.html:23
-#: connect/common/templates/common/emails/organization/change_organization_name.txt:4
-msgid "stay tuned when you search for it"
-msgstr "fique atento(a) ao pesquisar por ela"
-
-#: connect/common/templates/common/emails/organization/change_organization_name.html:25
-#: connect/common/templates/common/emails/organization/change_organization_name.txt:5
-msgid ""
-"To learn more about the change, contact a person responsible for your "
-"organization"
-msgstr ""
-"Para saber mais sobre a mudança, entre em contato com um responsável pela "
-"organização"
 
 #: connect/common/templates/common/emails/organization/delete_organization.html:39
 #: connect/common/templates/common/emails/organization/delete_organization.txt:3
