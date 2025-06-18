@@ -345,8 +345,6 @@ msgstr "Nome de usuário alterado"
 
 #: connect/authentication/templates/authentication/emails/change_password.html:6
 #: connect/authentication/templates/authentication/emails/change_password.txt:2
-#: connect/authentication/templates/authentication/emails/nickname_changed.html:8
-#: connect/authentication/templates/authentication/emails/nickname_changed.txt:2
 #: connect/billing/templates/billing/emails/advanced_plan_is_about_to_expire.html:16
 #: connect/billing/templates/billing/emails/advanced_plan_is_about_to_expire.txt:2
 #: connect/billing/templates/billing/emails/plan_expired_due_attendence_limit_en.html:16
@@ -419,26 +417,6 @@ msgid ""
 msgstr ""
 "Sua senha foi alterada. Lembre-se de não compartilhar com ninguém para "
 "manter sua segurança e privacidade."
-
-#: connect/authentication/templates/authentication/emails/nickname_changed.html:15
-#: connect/authentication/templates/authentication/emails/nickname_changed.txt:3
-msgid "Nickname successfully changed"
-msgstr "Nome de usuário alterado com sucesso"
-
-#: connect/authentication/templates/authentication/emails/nickname_changed.html:22
-#: connect/authentication/templates/authentication/emails/nickname_changed.txt:4
-msgid "Your nickname changed of @"
-msgstr "Seu nome de usuário foi alterado de @"
-
-#: connect/authentication/templates/authentication/emails/nickname_changed.html:22
-#: connect/authentication/templates/authentication/emails/nickname_changed.txt:4
-msgid " to "
-msgstr " para "
-
-#: connect/authentication/templates/authentication/emails/nickname_changed.html:22
-#: connect/authentication/templates/authentication/emails/nickname_changed.txt:4
-msgid " we hope you like your new nickname"
-msgstr " nós esperamos que você goste do seu novo nome de usuário"
 
 #: connect/authentication/models.py:221
 msgid "Your Weni Platform account is ready! Log in now"

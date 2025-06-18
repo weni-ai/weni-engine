@@ -1,8 +1,6 @@
 import unittest
 import uuid
 from django.test import TestCase
-from django.core import mail
-from django.conf import settings
 from connect.authentication.models import User
 from connect.common.models import Organization, OrganizationRole, BillingPlan, Project
 from connect.api.v1.tests.utils import create_user_and_token
