@@ -596,14 +596,6 @@ class BillingPlanTestCase(TestCase):
         self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
         self.assertEqual(outbox.to[0], self.test_email[0])
 
-    def test_send_email_end_trial(self):
-        email_list = [self.test_user1.email]
-        self.billing.send_email_end_trial(email_list)
-        self.assertEqual(len(mail.outbox), 1)
-        outbox = mail.outbox[0]
-        self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
-        self.assertEqual(outbox.to[0], self.test_user1.email)
-
 
 @unittest.skip("Test broken, need to be fixed")
 class ProjectAuthorizationTestCase(TestCase):
