@@ -358,8 +358,6 @@ msgstr "Nome de usuário alterado"
 #: connect/billing/templates/billing/emails/removed_card.txt:2
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.html:16
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:2
-#: connect/common/templates/common/emails/project/project-delete.html:16
-#: connect/common/templates/common/emails/project/project-delete.txt:2
 #: connect/common/templates/common/emails/project/project_create.html:16
 #: connect/common/templates/common/emails/project/project_create.txt:2
 msgid "Hi"
@@ -1704,31 +1702,13 @@ msgstr "Você foi convidado para participar da organização"
 
 #: connect/common/templates/common/emails/project/invite_project.html:18
 #: connect/common/templates/common/emails/project/invite_project.txt:2
-#: connect/common/templates/common/emails/project/project-delete.html:53
-#: connect/common/templates/common/emails/project/project-delete.txt:4
 msgid "from the organization"
 msgstr "da organização"
 
-#: connect/common/templates/common/emails/project/project-delete.html:39
-#: connect/common/templates/common/emails/project/project-delete.txt:3
-msgid "A project has been deleted"
-msgstr "Um projeto foi apagado"
-
-#: connect/common/templates/common/emails/project/project-delete.html:53
-#: connect/common/templates/common/emails/project/project-delete.txt:4
 #: connect/common/templates/common/emails/project/project_create.html:53
 #: connect/common/templates/common/emails/project/project_create.txt:4
 msgid "The project"
 msgstr "O projeto"
-
-#: connect/common/templates/common/emails/project/project-delete.html:54
-#: connect/common/templates/common/emails/project/project-delete.txt:4
-msgid ""
-"was deleted. We hope it has accomplished everything you wanted, and that our "
-"intelligences did a good job"
-msgstr ""
-"foi deletado. Esperamos que tenha construído tudo o que desejava e que "
-"nossas inteligências tenham feito um bom trabalho"
 
 #: connect/common/templates/common/emails/project/project_create.html:53
 #: connect/common/templates/common/emails/project/project_create.txt:4

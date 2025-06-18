@@ -136,13 +136,3 @@ class ProjectEmailTestCase(TestCase):
         )
         self.test_email = "test@example.com"
         self.test_first_name = "Test User"
-
-    def test_send_email_deleted_project(self):
-        self.test_project.send_email_deleted_project(
-            self.test_first_name, self.test_email
-        )
-        self.assertEqual(len(mail.outbox), 1)
-        outbox = mail.outbox[0]
-        self.assertEqual(outbox.subject, "A project was deleted...")
-        self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
-        self.assertEqual(outbox.to[0], self.test_email)

@@ -654,26 +654,6 @@ class Project(models.Model):
         html_mail = send_mass_html_mail(msg_list, fail_silently=False)
         return html_mail
 
-    def send_email_deleted_project(self, first_name: str, email: str):
-        if not settings.SEND_EMAILS:
-            return False  # pragma: no cover
-        context = {
-            "base_url": settings.BASE_URL,
-            "organization_name": self.organization.name,
-            "project_name": self.name,
-            "first_name": first_name,
-        }
-        mail.send_mail(
-            _("A project was deleted..."),
-            render_to_string("common/emails/project/project-delete.txt", context),
-            None,
-            [email],
-            html_message=render_to_string(
-                "common/emails/project/project-delete.html", context
-            ),
-        )
-        return mail
-
     def create_classifier(self, authorization, template_type: str, access_token: str):
         flow_instance = FlowsRESTClient()
         created = False
