@@ -197,32 +197,6 @@ class Organization(models.Model):
             )
         return mail
 
-    def send_email_organization_going_out(self, user: User):
-        if not settings.SEND_EMAILS:
-            return False  # pragma: no cover
-
-        context = {
-            "base_url": settings.BASE_URL,
-            "user_name": user.username,
-            "organization_name": self.name,
-        }
-
-        if user.language == "pt-br":
-            subject = f"Você está deixando a organização {self.name}"
-        else:
-            subject = _(f"You are leaving {self.name}")
-
-        mail.send_mail(
-            subject,
-            render_to_string("common/emails/organization/leaving_org.txt", context),
-            None,
-            [user.email],
-            html_message=render_to_string(
-                "common/emails/organization/leaving_org.html", context
-            ),
-        )
-        return mail
-
     def send_email_organization_removed(self, email: str, user_name: str):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
