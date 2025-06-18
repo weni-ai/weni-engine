@@ -347,16 +347,8 @@ msgstr "Nome de usuário alterado"
 #: connect/authentication/templates/authentication/emails/change_password.txt:2
 #: connect/authentication/templates/authentication/emails/nickname_changed.html:8
 #: connect/authentication/templates/authentication/emails/nickname_changed.txt:2
-#: connect/billing/templates/billing/emails/added_card.html:7
-#: connect/billing/templates/billing/emails/added_card.txt:2
 #: connect/billing/templates/billing/emails/advanced_plan_is_about_to_expire.html:16
 #: connect/billing/templates/billing/emails/advanced_plan_is_about_to_expire.txt:2
-#: connect/billing/templates/billing/emails/changed-plan.html:16
-#: connect/billing/templates/billing/emails/changed-plan.txt:2
-#: connect/billing/templates/billing/emails/changed_card.html:7
-#: connect/billing/templates/billing/emails/changed_card.txt:2
-#: connect/billing/templates/billing/emails/free_plan.html:16
-#: connect/billing/templates/billing/emails/free_plan.txt:2
 #: connect/billing/templates/billing/emails/plan_expired_due_attendence_limit_en.html:16
 #: connect/billing/templates/billing/emails/plan_expired_due_attendence_limit_en.txt:2
 #: connect/billing/templates/billing/emails/plan_is_about_to_expire_en.html:16
@@ -550,28 +542,9 @@ msgstr "UUID de identificação de fluxo"
 msgid "contact name"
 msgstr "nome do contato"
 
-#: connect/billing/templates/billing/emails/added_card.html:14
-#: connect/billing/templates/billing/emails/added_card.txt:3
 #: connect/common/models.py:1715
 msgid "A credit card has been added to the organization"
 msgstr "Um cartão de crédito foi adicionado à organização"
-
-#: connect/billing/templates/billing/emails/added_card.html:17
-#: connect/billing/templates/billing/emails/added_card.txt:4
-msgid ""
-"An Administrator adds new credit card data to bill the organization's plan "
-msgstr ""
-"Um administrador adicionou os dado de um novo cartão de crédito para o "
-"pagamento do plano da organização "
-
-#: connect/billing/templates/billing/emails/added_card.html:18
-#: connect/billing/templates/billing/emails/added_card.txt:4
-msgid ""
-"Your Intelligences, created Flows and the Chat module returned to work "
-"normally. It's wonderful to have your team back."
-msgstr ""
-"Suas Inteligências, Fluxos criados e o módulo de chat voltaram a funcionar "
-"normalmente. É maravilhoso ter sua equipe de volta."
 
 #: connect/billing/templates/billing/emails/advanced_plan_is_about_to_expire.html:41
 #: connect/billing/templates/billing/emails/advanced_plan_is_about_to_expire.txt:3
@@ -612,14 +585,6 @@ msgstr "Evite o bloqueio de seu chatbot acessando"
 msgid "and choose a plan that fits your business needs."
 msgstr " e escolha um plano que se adapte às suas necessidades comerciais."
 
-#: connect/billing/templates/billing/emails/changed-plan.html:40
-#, fuzzy
-#| msgid "plan has been changed"
-msgid "has been changed"
-msgstr "plano foi alterado com sucesso"
-
-#: connect/billing/templates/billing/emails/changed-plan.html:55
-#: connect/billing/templates/billing/emails/changed-plan.txt:4
 #: connect/common/templates/common/emails/organization/change_organization_name.html:21
 #: connect/common/templates/common/emails/organization/change_organization_name.txt:4
 #: connect/common/templates/common/emails/organization/permission_change.html:53
@@ -627,50 +592,15 @@ msgstr "plano foi alterado com sucesso"
 msgid "An administrator of"
 msgstr "Um administrador da"
 
-#: connect/billing/templates/billing/emails/changed-plan.html:56
-msgid "has updated the organization's plan from"
-msgstr "atualizou o plano da organização de"
-
-#: connect/billing/templates/billing/emails/changed-plan.html:57
-#: connect/billing/templates/billing/emails/changed-plan.txt:6
 #: connect/common/templates/common/emails/organization/permission_change.html:54
 #: connect/common/templates/common/emails/organization/permission_change.txt:6
 msgid "to"
 msgstr "para"
 
-#: connect/billing/templates/billing/emails/changed-plan.html:59
-#: connect/billing/templates/billing/emails/changed-plan.txt:8
-msgid "The resources of plan"
-msgstr ""
-
-#: connect/billing/templates/billing/emails/changed-plan.html:59
-#: connect/billing/templates/billing/emails/changed-plan.txt:8
-msgid "are already available for use"
-msgstr ""
-
-#: connect/billing/templates/billing/emails/changed-plan.txt:5
-msgid "has updated the organization's plan"
-msgstr "atualizou o plano da organização para"
-
-#: connect/billing/templates/billing/emails/changed-plan.txt:6
 #: connect/common/templates/common/emails/organization/permission_change.html:54
 #: connect/common/templates/common/emails/organization/permission_change.txt:6
 msgid "from"
 msgstr "de"
-
-#: connect/billing/templates/billing/emails/changed_card.html:14
-#: connect/billing/templates/billing/emails/changed_card.txt:3
-msgid "The organization credit card has been changed"
-msgstr "O cartão de crédito da organização foi alterado com sucesso"
-
-#: connect/billing/templates/billing/emails/changed_card.html:18
-#: connect/billing/templates/billing/emails/changed_card.txt:4
-msgid ""
-"An administrator changed credit card information to bill the organization's "
-"plan"
-msgstr ""
-"Um administrador mudou as informações do cartão de crédito para o pagamento "
-"do plano da organização"
 
 #: connect/billing/templates/billing/emails/finished-plan.html:17
 #: connect/billing/templates/billing/emails/finished-plan.txt:2
@@ -772,8 +702,6 @@ msgctxt "free-plan-expired"
 msgid "We're here to support you every step of the way!"
 msgstr "Estamos aqui para te apoiar em cada passo!"
 
-#: connect/billing/templates/billing/emails/free_plan.html:40
-#: connect/billing/templates/billing/emails/free_plan.txt:3
 #: connect/billing/templates/billing/emails/plan_expired_due_attendence_limit_en.html:41
 #: connect/billing/templates/billing/emails/plan_expired_due_attendence_limit_en.txt:3
 #: connect/billing/templates/billing/emails/plan_is_about_to_expire_en.html:41
@@ -782,30 +710,6 @@ msgstr "Estamos aqui para te apoiar em cada passo!"
 #: connect/common/models.py:1859 connect/common/models.py:1881
 msgid "Your organization"
 msgstr "Sua organização"
-
-#: connect/billing/templates/billing/emails/free_plan.html:40
-#: connect/billing/templates/billing/emails/free_plan.txt:3
-msgid "has the following plan"
-msgstr "tem o seguinte plano"
-
-#: connect/billing/templates/billing/emails/free_plan.html:57
-#: connect/billing/templates/billing/emails/free_plan.txt:5
-msgid "The plan"
-msgstr "O plano"
-
-#: connect/billing/templates/billing/emails/free_plan.html:57
-#: connect/billing/templates/billing/emails/free_plan.txt:5
-msgid "was selected for your organization"
-msgstr "foi selecionado para sua organização"
-
-#: connect/billing/templates/billing/emails/free_plan.html:58
-#: connect/billing/templates/billing/emails/free_plan.txt:6
-msgid ""
-"The members can now take advantage of the benefits and scale their "
-"communication with our tools"
-msgstr ""
-"Os membros podem agora aproveitar os beneficios e dimensionar a comunicação "
-"com nossas ferramentas"
 
 #: connect/billing/templates/billing/emails/plan_expired_due_attendence_limit_en.html:41
 #: connect/billing/templates/billing/emails/plan_expired_due_attendence_limit_en.txt:3
