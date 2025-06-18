@@ -137,31 +137,6 @@ class ProjectEmailTestCase(TestCase):
         self.test_email = "test@example.com"
         self.test_first_name = "Test User"
 
-    def test_send_email_change_project(self):
-
-        self.info = {
-            "old_project_name": "Old Project",
-            "date_before": "2022-01-01",
-            "old_timezone": "America/New_York",
-            "country_loc_suport_before": "USA",
-            "country_loc_suport_now": "Canada",
-            "default_lang_before": "English",
-            "default_lang_now": "French",
-            "secondary_lang_before": "Spanish",
-            "secondary_lang_now": "Spanish",
-            "user": "John Doe",
-        }
-        self.test_project.send_email_change_project(
-            self.test_first_name, self.test_email, self.info
-        )
-
-        self.assertEqual(len(mail.outbox), 1)
-        self.assertEqual(
-            mail.outbox[0].subject, f"The project {self.test_project.name} has changed"
-        )
-        self.assertEqual(mail.outbox[0].from_email, settings.DEFAULT_FROM_EMAIL)
-        self.assertEqual(mail.outbox[0].to, [self.test_email])
-
     def test_send_email_deleted_project(self):
         self.test_project.send_email_deleted_project(
             self.test_first_name, self.test_email

@@ -358,8 +358,6 @@ msgstr "Nome de usuário alterado"
 #: connect/billing/templates/billing/emails/removed_card.txt:2
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.html:16
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:2
-#: connect/common/templates/common/emails/project/project-changed.html:16
-#: connect/common/templates/common/emails/project/project-changed.txt:2
 #: connect/common/templates/common/emails/project/project-delete.html:16
 #: connect/common/templates/common/emails/project/project-delete.txt:2
 #: connect/common/templates/common/emails/project/project_create.html:16
@@ -1127,8 +1125,6 @@ msgid "project name"
 msgstr "Nome do Projeto"
 
 #: connect/common/models.py:690
-#: connect/common/templates/common/emails/project/project-changed.html:135
-#: connect/common/templates/common/emails/project/project-changed.txt:12
 msgid "Timezone"
 msgstr "Fuso horário"
 
@@ -1708,82 +1704,10 @@ msgstr "Você foi convidado para participar da organização"
 
 #: connect/common/templates/common/emails/project/invite_project.html:18
 #: connect/common/templates/common/emails/project/invite_project.txt:2
-#: connect/common/templates/common/emails/project/project-changed.html:55
-#: connect/common/templates/common/emails/project/project-changed.txt:6
 #: connect/common/templates/common/emails/project/project-delete.html:53
 #: connect/common/templates/common/emails/project/project-delete.txt:4
 msgid "from the organization"
 msgstr "da organização"
-
-#: connect/common/templates/common/emails/project/project-changed.html:39
-#: connect/common/templates/common/emails/project/project-changed.txt:3
-msgid "Some information from the project"
-msgstr "Informações do projeto"
-
-#: connect/common/templates/common/emails/project/project-changed.html:39
-#: connect/common/templates/common/emails/project/project-changed.txt:3
-msgid "has changed"
-msgstr "foi alterada"
-
-#: connect/common/templates/common/emails/project/project-changed.html:53
-#: connect/common/templates/common/emails/project/project-changed.txt:4
-msgid "The user"
-msgstr "O usuário"
-
-#: connect/common/templates/common/emails/project/project-changed.html:54
-#: connect/common/templates/common/emails/project/project-changed.txt:5
-msgid "made the following changes to the settings of the project"
-msgstr "fez as seguintes alterações alterações nas configurações do projeto"
-
-#: connect/common/templates/common/emails/project/project-changed.html:56
-#: connect/common/templates/common/emails/project/project-changed.txt:7
-msgid "that you are part of"
-msgstr "que você faz parte"
-
-#: connect/common/templates/common/emails/project/project-changed.html:65
-#: connect/common/templates/common/emails/project/project-changed.txt:8
-msgid "Project Name"
-msgstr "Nome do Projeto"
-
-#: connect/common/templates/common/emails/project/project-changed.html:79
-#: connect/common/templates/common/emails/project/project-changed.html:114
-#: connect/common/templates/common/emails/project/project-changed.html:149
-#: connect/common/templates/common/emails/project/project-changed.html:186
-#: connect/common/templates/common/emails/project/project-changed.html:221
-#: connect/common/templates/common/emails/project/project-changed.html:256
-#: connect/common/templates/common/emails/project/project-changed.txt:9
-msgid "Before"
-msgstr "Antes"
-
-#: connect/common/templates/common/emails/project/project-changed.html:80
-#: connect/common/templates/common/emails/project/project-changed.html:115
-#: connect/common/templates/common/emails/project/project-changed.html:150
-#: connect/common/templates/common/emails/project/project-changed.html:187
-#: connect/common/templates/common/emails/project/project-changed.html:222
-#: connect/common/templates/common/emails/project/project-changed.html:257
-#: connect/common/templates/common/emails/project/project-changed.txt:10
-msgid "Now"
-msgstr "Agora"
-
-#: connect/common/templates/common/emails/project/project-changed.html:100
-#: connect/common/templates/common/emails/project/project-changed.txt:11
-msgid "Date format"
-msgstr "Formato de data"
-
-#: connect/common/templates/common/emails/project/project-changed.html:172
-#: connect/common/templates/common/emails/project/project-changed.txt:13
-msgid "Country for location support in Flows"
-msgstr "País para a localização do suporte dos Fluxos"
-
-#: connect/common/templates/common/emails/project/project-changed.html:207
-#: connect/common/templates/common/emails/project/project-changed.txt:14
-msgid "Flows Default Language"
-msgstr "Idioma padrão dos Fluxos"
-
-#: connect/common/templates/common/emails/project/project-changed.html:242
-#: connect/common/templates/common/emails/project/project-changed.txt:15
-msgid "Flows Secondary Language"
-msgstr "Idioma secundário dos Fluxos"
 
 #: connect/common/templates/common/emails/project/project-delete.html:39
 #: connect/common/templates/common/emails/project/project-delete.txt:3
