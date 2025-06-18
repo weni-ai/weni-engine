@@ -29,7 +29,6 @@ from connect.api.v1.internal.intelligence.intelligence_rest_client import (
 from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
 from rest_framework import status
 from connect.common.helpers import send_mass_html_mail
-from django.db.models import Q
 from connect.template_projects.models import TemplateType
 
 from connect.internals.event_driven.producer.rabbitmq_publisher import RabbitmqPublisher
