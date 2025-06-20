@@ -1,6 +1,0 @@
-{% load i18n %}
-<p>{% trans "Hi" %}, {{ first_name }}!</p>
-<p>{% trans "The organization" %} {{ organization_name }} {% trans "no longer exists" %}</p>
-<p>{% trans "One of their administrators deleted this organization" %} <strong>{{ organization_name }}</strong>,</p>
-<p>{% trans "so you will no longer be able access it through your account. We were saddened by your departure, but understand that life goes on and things change" %}.</p>
-<p>{% trans 'You can still create new organizations and projects, if you wish to continue with us' %}!</p>

@@ -433,75 +433,6 @@ class OrganizationTestCase(TestCase):
         self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
         self.assertEqual(outbox.to[0], self.test_email)
 
-    def test_send_email_organization_create(self):
-        email1 = (
-            self.test_user1.email,
-            self.test_user1.username,
-            self.test_user1.language,
-        )
-        email2 = (
-            self.test_user2.email,
-            self.test_user2.username,
-            self.test_user2.language,
-        )
-        email_list = [email1, email2]
-        self.organization.send_email_organization_create(email_list)
-        self.assertEqual(len(mail.outbox), 2)
-        outbox = mail.outbox[0]
-        self.assertEqual(
-            outbox.subject, f"You just gave life to {self.organization.name}"
-        )
-        self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
-        self.assertEqual(outbox.to[0], self.test_user1.email)
-
-    def test_send_email_remove_permission_organization(self):
-        sended_mail = self.organization.send_email_remove_permission_organization(
-            self.test_first_name, self.test_email
-        )
-        self.assertEqual(len(sended_mail.outbox), 1)
-        outbox = sended_mail.outbox[0]
-        self.assertEqual(
-            outbox.subject, f"You have been removed from {self.organization.name}"
-        )
-        self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
-        self.assertEqual(outbox.to[0], self.test_email)
-
-    def test_send_email_delete_organization(self):
-        self.organization.authorizations.create(
-            user=self.test_user1, role=OrganizationRole.ADMIN.value
-        )
-        self.organization.authorizations.create(
-            user=self.test_user2, role=OrganizationRole.ADMIN.value
-        )
-
-        self.organization.send_email_delete_organization()
-
-        self.assertEqual(len(mail.outbox), 2)
-        self.assertEqual(
-            mail.outbox[0].subject,
-            "The organization Test Organization no longer exists",
-        )
-        self.assertEqual(
-            mail.outbox[1].subject, "A organização Test Organization deixou de existir"
-        )
-        self.assertIn(f"{self.test_user1.username}", mail.outbox[0].body)
-        self.assertIn(f"{self.test_user2.username}", mail.outbox[1].body)
-
-    def test_send_email_change_organization_name(self):
-        prev_name = self.organization.name
-        new_name = "new org name"
-        emails = [
-            (self.test_user1.email, self.test_user1.username, self.test_user1.language),
-            (self.test_user2.email, self.test_user2.username, self.test_user2.language),
-        ]
-        self.organization.send_email_change_organization_name(
-            prev_name, new_name, emails
-        )
-        self.assertEqual(len(mail.outbox), 2)
-
-        for email in mail.outbox:
-            self.assertIn(f"{new_name}", email.body)
-
     def test_send_email_access_code(self):
         organization = self.organization
         email = "test@example.com"
@@ -516,19 +447,6 @@ class OrganizationTestCase(TestCase):
         self.assertEqual(
             sent_email.subject, "You receive an access code to Weni Platform"
         )
-
-    def test_send_email_permission_change(self):
-        sended_email = self.organization.send_email_permission_change(
-            self.test_user1, "Admin", "Viewer"
-        )
-        self.assertEqual(len(sended_email.outbox), 1)
-        outbox = sended_email.outbox[0]
-        self.assertEqual(
-            outbox.subject,
-            f"An administrator of {self.organization.name} has updated your permission",
-        )
-        self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
-        self.assertEqual(outbox.to[0], self.test_email)
 
     @patch("connect.billing.get_gateway")
     def test_days_till_trial_end(self, mock_get_gateway):
@@ -631,14 +549,6 @@ class BillingPlanTestCase(TestCase):
         outbox = mail.outbox[0]
         self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
         self.assertEqual(outbox.to[0], self.test_email[0])
-
-    def test_send_email_end_trial(self):
-        email_list = [self.test_user1.email]
-        self.billing.send_email_end_trial(email_list)
-        self.assertEqual(len(mail.outbox), 1)
-        outbox = mail.outbox[0]
-        self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
-        self.assertEqual(outbox.to[0], self.test_user1.email)
 
 
 @unittest.skip("Test broken, need to be fixed")

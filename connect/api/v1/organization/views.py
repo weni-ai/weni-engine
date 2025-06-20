@@ -244,7 +244,6 @@ class OrganizationViewSet(
 
     def perform_destroy(self, instance):
         intelligence_organization = instance.inteligence_organization
-        instance.send_email_delete_organization()
         instance.delete()
         ai_client = IntelligenceRESTClient()
         ai_client.delete_organization(
@@ -253,14 +252,8 @@ class OrganizationViewSet(
         )
 
     def update(self, request, *args, **kwargs):
-        data = request.data
         partial = kwargs.pop("partial", False)
         instance = self.get_object()
-
-        if data.get("name"):
-            instance.send_email_change_organization_name(
-                instance.name, data.get("name")
-            )
 
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
@@ -835,10 +828,6 @@ class OrganizationAuthorizationViewSet(
             OrganizationAdminManagerAuthorization,
         ]
         data = self.request.data
-        instance = self.get_object()
-
-        old_permission = OrganizationRole(instance.role).name
-        new_permission = OrganizationRole(int(data.get("role"))).name
 
         auth_dto = UpdateAuthorizationDTO(
             id=self.kwargs.get("user__id"),
@@ -849,10 +838,6 @@ class OrganizationAuthorizationViewSet(
 
         usecase = UpdateAuthorizationUseCase(message_publisher=RabbitmqPublisher())
         authorization = usecase.update_authorization(auth_dto)
-
-        instance.organization.send_email_permission_change(
-            instance.user, old_permission, new_permission
-        )
 
         return Response(data={"role": authorization.role})
 
