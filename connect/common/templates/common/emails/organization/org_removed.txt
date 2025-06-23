@@ -1,5 +1,0 @@
-{% load i18n %}
-<p>{%trans "Hi" %}, {{user_name}}</p>
-<p>{% trans "You have been removed from the organization" %}{{ organization_name }}</p>
-<p>{% trans "An administrator of the organization" %} {{ organization_name }} {% trans "has removed you from the organization, so you won't be able to access their projects anymore. We were saddened by your departure, but understand that life goes on and things change" %}.</p>
-<p>{% trans "You can still create new organizations and projects, if you wish to continue with us" %}!</p>

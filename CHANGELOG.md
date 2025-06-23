@@ -1,10 +1,17 @@
-## 3.30.0
+# 3.30.1
+## *Delete*
+  - Remove unused emails
+
+# 3.30.0
+## *Add*
   - Updated emails templates and removed no longer needed ones
 
-## 3.29.14
+# 3.29.14
+## *Add*
   - Add project status to v2 serializer
 
-## 3.29.13
+# 3.29.13
+## *Add*
   - Add project status field, to indicate if it is in test, active or inactive
 
 # 3.29.12

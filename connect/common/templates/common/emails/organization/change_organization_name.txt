@@ -1,5 +1,0 @@
-{% load i18n %}
-<p>{% trans "Hi" %}, {{ user_name }}!</p>
-{{ organization_previous_name }} {% trans "is now named" %} {{ organization_new_name }}!
-<p>{% trans "An administrator of" %} <strong>{{ organization_previous_name }}</strong> {% trans "has updated the name of the organization to" %} <strong>{{ organization_new_name }}</strong>, {% trans "stay tuned when you search for it" %}.</p>
-<p>{% trans "To learn more about the change, contact a person responsible for your organization" %}.</p>

@@ -345,18 +345,8 @@ msgstr "Nome de usuário alterado"
 
 #: connect/authentication/templates/authentication/emails/change_password.html:6
 #: connect/authentication/templates/authentication/emails/change_password.txt:2
-#: connect/authentication/templates/authentication/emails/nickname_changed.html:8
-#: connect/authentication/templates/authentication/emails/nickname_changed.txt:2
-#: connect/billing/templates/billing/emails/added_card.html:7
-#: connect/billing/templates/billing/emails/added_card.txt:2
 #: connect/billing/templates/billing/emails/advanced_plan_is_about_to_expire.html:16
 #: connect/billing/templates/billing/emails/advanced_plan_is_about_to_expire.txt:2
-#: connect/billing/templates/billing/emails/changed-plan.html:16
-#: connect/billing/templates/billing/emails/changed-plan.txt:2
-#: connect/billing/templates/billing/emails/changed_card.html:7
-#: connect/billing/templates/billing/emails/changed_card.txt:2
-#: connect/billing/templates/billing/emails/free_plan.html:16
-#: connect/billing/templates/billing/emails/free_plan.txt:2
 #: connect/billing/templates/billing/emails/plan_expired_due_attendence_limit_en.html:16
 #: connect/billing/templates/billing/emails/plan_expired_due_attendence_limit_en.txt:2
 #: connect/billing/templates/billing/emails/plan_is_about_to_expire_en.html:16
@@ -366,25 +356,6 @@ msgstr "Nome de usuário alterado"
 #: connect/billing/templates/billing/emails/removed_card.txt:2
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.html:16
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:2
-#: connect/common/templates/common/emails/organization/change_organization_name.html:7
-#: connect/common/templates/common/emails/organization/change_organization_name.txt:2
-#: connect/common/templates/common/emails/organization/delete_organization.html:16
-#: connect/common/templates/common/emails/organization/delete_organization.txt:2
-#: connect/common/templates/common/emails/organization/leaving_org.html:6
-#: connect/common/templates/common/emails/organization/leaving_org.txt:2
-#: connect/common/templates/common/emails/organization/org_removed.html:7
-#: connect/common/templates/common/emails/organization/org_removed.txt:2
-#: connect/common/templates/common/emails/organization/organization_create.html:16
-#: connect/common/templates/common/emails/organization/permission_change.html:16
-#: connect/common/templates/common/emails/organization/permission_change.txt:2
-#: connect/common/templates/common/emails/organization/remove_permission_organization.html:16
-#: connect/common/templates/common/emails/organization/remove_permission_organization.txt:2
-#: connect/common/templates/common/emails/project/project-changed.html:16
-#: connect/common/templates/common/emails/project/project-changed.txt:2
-#: connect/common/templates/common/emails/project/project-delete.html:16
-#: connect/common/templates/common/emails/project/project-delete.txt:2
-#: connect/common/templates/common/emails/project/project_create.html:16
-#: connect/common/templates/common/emails/project/project_create.txt:2
 msgid "Hi"
 msgstr "Oi"
 
@@ -446,26 +417,6 @@ msgid ""
 msgstr ""
 "Sua senha foi alterada. Lembre-se de não compartilhar com ninguém para "
 "manter sua segurança e privacidade."
-
-#: connect/authentication/templates/authentication/emails/nickname_changed.html:15
-#: connect/authentication/templates/authentication/emails/nickname_changed.txt:3
-msgid "Nickname successfully changed"
-msgstr "Nome de usuário alterado com sucesso"
-
-#: connect/authentication/templates/authentication/emails/nickname_changed.html:22
-#: connect/authentication/templates/authentication/emails/nickname_changed.txt:4
-msgid "Your nickname changed of @"
-msgstr "Seu nome de usuário foi alterado de @"
-
-#: connect/authentication/templates/authentication/emails/nickname_changed.html:22
-#: connect/authentication/templates/authentication/emails/nickname_changed.txt:4
-msgid " to "
-msgstr " para "
-
-#: connect/authentication/templates/authentication/emails/nickname_changed.html:22
-#: connect/authentication/templates/authentication/emails/nickname_changed.txt:4
-msgid " we hope you like your new nickname"
-msgstr " nós esperamos que você goste do seu novo nome de usuário"
 
 #: connect/authentication/models.py:221
 msgid "Your Weni Platform account is ready! Log in now"
@@ -550,28 +501,9 @@ msgstr "UUID de identificação de fluxo"
 msgid "contact name"
 msgstr "nome do contato"
 
-#: connect/billing/templates/billing/emails/added_card.html:14
-#: connect/billing/templates/billing/emails/added_card.txt:3
 #: connect/common/models.py:1715
 msgid "A credit card has been added to the organization"
 msgstr "Um cartão de crédito foi adicionado à organização"
-
-#: connect/billing/templates/billing/emails/added_card.html:17
-#: connect/billing/templates/billing/emails/added_card.txt:4
-msgid ""
-"An Administrator adds new credit card data to bill the organization's plan "
-msgstr ""
-"Um administrador adicionou os dado de um novo cartão de crédito para o "
-"pagamento do plano da organização "
-
-#: connect/billing/templates/billing/emails/added_card.html:18
-#: connect/billing/templates/billing/emails/added_card.txt:4
-msgid ""
-"Your Intelligences, created Flows and the Chat module returned to work "
-"normally. It's wonderful to have your team back."
-msgstr ""
-"Suas Inteligências, Fluxos criados e o módulo de chat voltaram a funcionar "
-"normalmente. É maravilhoso ter sua equipe de volta."
 
 #: connect/billing/templates/billing/emails/advanced_plan_is_about_to_expire.html:41
 #: connect/billing/templates/billing/emails/advanced_plan_is_about_to_expire.txt:3
@@ -612,66 +544,6 @@ msgstr "Evite o bloqueio de seu chatbot acessando"
 msgid "and choose a plan that fits your business needs."
 msgstr " e escolha um plano que se adapte às suas necessidades comerciais."
 
-#: connect/billing/templates/billing/emails/changed-plan.html:40
-#, fuzzy
-#| msgid "plan has been changed"
-msgid "has been changed"
-msgstr "plano foi alterado com sucesso"
-
-#: connect/billing/templates/billing/emails/changed-plan.html:55
-#: connect/billing/templates/billing/emails/changed-plan.txt:4
-#: connect/common/templates/common/emails/organization/change_organization_name.html:21
-#: connect/common/templates/common/emails/organization/change_organization_name.txt:4
-#: connect/common/templates/common/emails/organization/permission_change.html:53
-#: connect/common/templates/common/emails/organization/permission_change.txt:5
-msgid "An administrator of"
-msgstr "Um administrador da"
-
-#: connect/billing/templates/billing/emails/changed-plan.html:56
-msgid "has updated the organization's plan from"
-msgstr "atualizou o plano da organização de"
-
-#: connect/billing/templates/billing/emails/changed-plan.html:57
-#: connect/billing/templates/billing/emails/changed-plan.txt:6
-#: connect/common/templates/common/emails/organization/permission_change.html:54
-#: connect/common/templates/common/emails/organization/permission_change.txt:6
-msgid "to"
-msgstr "para"
-
-#: connect/billing/templates/billing/emails/changed-plan.html:59
-#: connect/billing/templates/billing/emails/changed-plan.txt:8
-msgid "The resources of plan"
-msgstr ""
-
-#: connect/billing/templates/billing/emails/changed-plan.html:59
-#: connect/billing/templates/billing/emails/changed-plan.txt:8
-msgid "are already available for use"
-msgstr ""
-
-#: connect/billing/templates/billing/emails/changed-plan.txt:5
-msgid "has updated the organization's plan"
-msgstr "atualizou o plano da organização para"
-
-#: connect/billing/templates/billing/emails/changed-plan.txt:6
-#: connect/common/templates/common/emails/organization/permission_change.html:54
-#: connect/common/templates/common/emails/organization/permission_change.txt:6
-msgid "from"
-msgstr "de"
-
-#: connect/billing/templates/billing/emails/changed_card.html:14
-#: connect/billing/templates/billing/emails/changed_card.txt:3
-msgid "The organization credit card has been changed"
-msgstr "O cartão de crédito da organização foi alterado com sucesso"
-
-#: connect/billing/templates/billing/emails/changed_card.html:18
-#: connect/billing/templates/billing/emails/changed_card.txt:4
-msgid ""
-"An administrator changed credit card information to bill the organization's "
-"plan"
-msgstr ""
-"Um administrador mudou as informações do cartão de crédito para o pagamento "
-"do plano da organização"
-
 #: connect/billing/templates/billing/emails/finished-plan.html:17
 #: connect/billing/templates/billing/emails/finished-plan.txt:2
 msgid "Oh no,"
@@ -711,11 +583,6 @@ msgstr "ou escolher outro que atenda às necessidades de seu negócio."
 #: connect/billing/templates/billing/emails/finished-plan.txt:5
 msgid "Our goal is to continue growing alongside you!"
 msgstr "Nosso objetivo é continuar caminhando junto com você!"
-
-#: connect/common/templates/common/emails/organization/delete_organization.html:39
-#: connect/common/templates/common/emails/organization/delete_organization.txt:3
-msgid "The organization"
-msgstr "A organização"
 
 #: connect/common/models.py:1861
 msgid "has already surpassed 200 active contacts"
@@ -772,8 +639,6 @@ msgctxt "free-plan-expired"
 msgid "We're here to support you every step of the way!"
 msgstr "Estamos aqui para te apoiar em cada passo!"
 
-#: connect/billing/templates/billing/emails/free_plan.html:40
-#: connect/billing/templates/billing/emails/free_plan.txt:3
 #: connect/billing/templates/billing/emails/plan_expired_due_attendence_limit_en.html:41
 #: connect/billing/templates/billing/emails/plan_expired_due_attendence_limit_en.txt:3
 #: connect/billing/templates/billing/emails/plan_is_about_to_expire_en.html:41
@@ -782,30 +647,6 @@ msgstr "Estamos aqui para te apoiar em cada passo!"
 #: connect/common/models.py:1859 connect/common/models.py:1881
 msgid "Your organization"
 msgstr "Sua organização"
-
-#: connect/billing/templates/billing/emails/free_plan.html:40
-#: connect/billing/templates/billing/emails/free_plan.txt:3
-msgid "has the following plan"
-msgstr "tem o seguinte plano"
-
-#: connect/billing/templates/billing/emails/free_plan.html:57
-#: connect/billing/templates/billing/emails/free_plan.txt:5
-msgid "The plan"
-msgstr "O plano"
-
-#: connect/billing/templates/billing/emails/free_plan.html:57
-#: connect/billing/templates/billing/emails/free_plan.txt:5
-msgid "was selected for your organization"
-msgstr "foi selecionado para sua organização"
-
-#: connect/billing/templates/billing/emails/free_plan.html:58
-#: connect/billing/templates/billing/emails/free_plan.txt:6
-msgid ""
-"The members can now take advantage of the benefits and scale their "
-"communication with our tools"
-msgstr ""
-"Os membros podem agora aproveitar os beneficios e dimensionar a comunicação "
-"com nossas ferramentas"
 
 #: connect/billing/templates/billing/emails/plan_expired_due_attendence_limit_en.html:41
 #: connect/billing/templates/billing/emails/plan_expired_due_attendence_limit_en.txt:3
@@ -896,7 +737,6 @@ msgid "It's wonderful to have your team back"
 msgstr "É maravilhoso ter seu time de volta"
 
 #: connect/billing/templates/billing/emails/reactived-plan.txt:2
-#: connect/common/templates/common/emails/organization/organization_create.txt:2
 msgctxt "common-hi"
 msgid "Hi,"
 msgstr "Oi,"
@@ -1259,8 +1099,6 @@ msgid "project name"
 msgstr "Nome do Projeto"
 
 #: connect/common/models.py:690
-#: connect/common/templates/common/emails/project/project-changed.html:135
-#: connect/common/templates/common/emails/project/project-changed.txt:12
 msgid "Timezone"
 msgstr "Fuso horário"
 
@@ -1307,8 +1145,6 @@ msgid "Project template type"
 msgstr "Nome do Projeto"
 
 #: connect/common/models.py:805
-#: connect/common/templates/common/emails/project/project_create.html:39
-#: connect/common/templates/common/emails/project/project_create.txt:3
 msgid "Your project has been successfully created!"
 msgstr "Seu projeto foi criado com sucesso!"
 
@@ -1770,65 +1606,6 @@ msgstr "De 100001 até 250000 contatos ativos"
 msgid "created on"
 msgstr "criado em"
 
-#: connect/common/templates/common/emails/organization/change_organization_name.html:14
-#: connect/common/templates/common/emails/organization/change_organization_name.txt:3
-msgid "is now named"
-msgstr "agora se chama"
-
-#: connect/common/templates/common/emails/organization/change_organization_name.html:22
-#: connect/common/templates/common/emails/organization/change_organization_name.txt:4
-msgid "has updated the name of the organization to"
-msgstr "atualizou o nome da organização para"
-
-#: connect/common/templates/common/emails/organization/change_organization_name.html:23
-#: connect/common/templates/common/emails/organization/change_organization_name.txt:4
-msgid "stay tuned when you search for it"
-msgstr "fique atento(a) ao pesquisar por ela"
-
-#: connect/common/templates/common/emails/organization/change_organization_name.html:25
-#: connect/common/templates/common/emails/organization/change_organization_name.txt:5
-msgid ""
-"To learn more about the change, contact a person responsible for your "
-"organization"
-msgstr ""
-"Para saber mais sobre a mudança, entre em contato com um responsável pela "
-"organização"
-
-#: connect/common/templates/common/emails/organization/delete_organization.html:39
-#: connect/common/templates/common/emails/organization/delete_organization.txt:3
-msgid "no longer exists"
-msgstr "não existe mais"
-
-#: connect/common/templates/common/emails/organization/delete_organization.html:60
-#: connect/common/templates/common/emails/organization/delete_organization.txt:4
-msgid "One of their administrators deleted this organization"
-msgstr "Um dos administradores excluiu esta organização"
-
-#: connect/common/templates/common/emails/organization/delete_organization.html:61
-#: connect/common/templates/common/emails/organization/delete_organization.txt:5
-msgid ""
-"so you will no longer be able access it through your account. We were "
-"saddened by your departure, but understand that life goes on and things "
-"change"
-msgstr ""
-"então você não pode mais acessá-lo através de sua conta. Ficamos tristes com "
-"sua partida, mas entendemos que a vida segue e as coisas mudam"
-
-#: connect/common/templates/common/emails/organization/delete_organization.html:70
-#: connect/common/templates/common/emails/organization/delete_organization.txt:6
-#: connect/common/templates/common/emails/organization/leaving_org.html:27
-#: connect/common/templates/common/emails/organization/leaving_org.txt:6
-#: connect/common/templates/common/emails/organization/org_removed.html:33
-#: connect/common/templates/common/emails/organization/org_removed.txt:5
-#: connect/common/templates/common/emails/organization/remove_permission_organization.html:62
-#: connect/common/templates/common/emails/organization/remove_permission_organization.txt:4
-msgid ""
-"You can still create new organizations and projects, if you wish to continue "
-"with us"
-msgstr ""
-"Você ainda pode criar outras organizações e projetos se quiser continuar "
-"conosco"
-
 #: connect/common/templates/common/emails/project/invite_project.html:39
 msgid "Uhuuul, now you are one of us"
 msgstr "Uhuuul, agora você é um(a) de nós!"
@@ -1890,100 +1667,6 @@ msgstr "enviou um convite para você se juntar à organização na Weni Platafor
 msgid "To accept, simply click the button below and complete your registration. If you're already registered, just log in you account."
 msgstr "Para aceitar, basta clicar no botão abaixo para completar o seu cadastro. Se você já fez isso, é só logar na sua conta."
 
-
-#: connect/common/templates/common/emails/organization/leaving_org.html:13
-#: connect/common/templates/common/emails/organization/leaving_org.txt:3
-msgid "You are leaving the organization "
-msgstr "Você está deixando a organização "
-
-#: connect/common/templates/common/emails/organization/leaving_org.html:17
-#: connect/common/templates/common/emails/organization/leaving_org.txt:4
-msgid "You left the"
-msgstr "Você deixou"
-
-#: connect/common/templates/common/emails/organization/leaving_org.html:17
-#: connect/common/templates/common/emails/organization/leaving_org.txt:4
-msgid " successfully."
-msgstr " com sucesso."
-
-#: connect/common/templates/common/emails/organization/leaving_org.html:18
-#: connect/common/templates/common/emails/organization/leaving_org.txt:5
-msgid ""
-"We are saddened by your departure, but we understand that life passes and "
-"things change"
-msgstr ""
-"Ficamos tristes com sua saída, mas entendemos que a vida segue e as coisas "
-"mudam"
-
-#: connect/common/templates/common/emails/organization/org_removed.html:13
-#: connect/common/templates/common/emails/organization/org_removed.txt:3
-msgid "You have been removed from the organization"
-msgstr "Você foi removido(a) da organização"
-
-#: connect/common/templates/common/emails/organization/org_removed.html:24
-#: connect/common/templates/common/emails/organization/org_removed.txt:4
-msgid "An administrator of the organization"
-msgstr "Um dos administradores da organização"
-
-#: connect/common/templates/common/emails/organization/org_removed.html:24
-#: connect/common/templates/common/emails/organization/org_removed.txt:4
-msgid ""
-"has removed you from the organization, so you won't be able to access their "
-"projects anymore. We were saddened by your departure, but understand that "
-"life goes on and things change"
-msgstr ""
-"removeu você da organização, então você não irá conseguir mais acessarmais "
-"seus projetos. Ficamos tristes com sua partida, mas entendemos que a vida "
-"segue e as coisas mudam"
-
-#: connect/common/templates/common/emails/organization/organization_create.html:39
-#: connect/common/templates/common/emails/organization/organization_create.txt:3
-msgid "You just gave life to"
-msgstr "Você acaba de dar vida à"
-
-#: connect/common/templates/common/emails/organization/organization_create.html:60
-#: connect/common/templates/common/emails/organization/organization_create.txt:4
-msgid ""
-"Your organization was successfully created! You can now invite members to "
-"help you build projects and increase exponentially the way you automate your "
-"life with our Intelligences and Flows modules"
-msgstr ""
-"Sua organização foi criada com sucesso! Agora você já pode convidar membros "
-"para te ajudar na construção de projetos e aumentar cada vez mais a maneira "
-"como você automatiza sua vida com nossas Inteligências e Fluxos"
-
-#: connect/common/templates/common/emails/organization/permission_change.html:39
-#: connect/common/templates/common/emails/organization/permission_change.txt:3
-msgid "A new permission has been assigned to you"
-msgstr "Uma nova permissão foi atribuida a você"
-
-#: connect/common/templates/common/emails/organization/permission_change.html:53
-#: connect/common/templates/common/emails/organization/permission_change.txt:5
-msgid "has updated your permission"
-msgstr "atualizou sua permissão"
-
-#: connect/common/templates/common/emails/organization/permission_change.html:56
-#: connect/common/templates/common/emails/organization/permission_change.txt:8
-msgid "Use your new permission responsibly"
-msgstr "Use sua nova permissão com responsabilidade"
-
-#: connect/common/templates/common/emails/organization/remove_permission_organization.html:39
-#: connect/common/templates/common/emails/organization/remove_permission_organization.txt:3
-msgid "You have left the"
-msgstr "Você deixou"
-
-#: connect/common/templates/common/emails/organization/remove_permission_organization.html:53
-msgid "Your departure from"
-msgstr "Sua partida da"
-
-#: connect/common/templates/common/emails/organization/remove_permission_organization.html:53
-msgid ""
-"was accomplished successfully. We were saddened by your departure, but "
-"understand that life goes on and things change"
-msgstr ""
-"foi realizado. Ficamos tristes com sua saída, mas entendemos que a vida "
-"segue e as coisas mudam"
-
 #: connect/common/templates/common/emails/project/invite_project.html:18
 #: connect/common/templates/common/emails/project/invite_project.txt:2
 #, fuzzy
@@ -1993,122 +1676,8 @@ msgstr "Você foi convidado para participar da organização"
 
 #: connect/common/templates/common/emails/project/invite_project.html:18
 #: connect/common/templates/common/emails/project/invite_project.txt:2
-#: connect/common/templates/common/emails/project/project-changed.html:55
-#: connect/common/templates/common/emails/project/project-changed.txt:6
-#: connect/common/templates/common/emails/project/project-delete.html:53
-#: connect/common/templates/common/emails/project/project-delete.txt:4
 msgid "from the organization"
 msgstr "da organização"
-
-#: connect/common/templates/common/emails/project/project-changed.html:39
-#: connect/common/templates/common/emails/project/project-changed.txt:3
-msgid "Some information from the project"
-msgstr "Informações do projeto"
-
-#: connect/common/templates/common/emails/project/project-changed.html:39
-#: connect/common/templates/common/emails/project/project-changed.txt:3
-msgid "has changed"
-msgstr "foi alterada"
-
-#: connect/common/templates/common/emails/project/project-changed.html:53
-#: connect/common/templates/common/emails/project/project-changed.txt:4
-msgid "The user"
-msgstr "O usuário"
-
-#: connect/common/templates/common/emails/project/project-changed.html:54
-#: connect/common/templates/common/emails/project/project-changed.txt:5
-msgid "made the following changes to the settings of the project"
-msgstr "fez as seguintes alterações alterações nas configurações do projeto"
-
-#: connect/common/templates/common/emails/project/project-changed.html:56
-#: connect/common/templates/common/emails/project/project-changed.txt:7
-msgid "that you are part of"
-msgstr "que você faz parte"
-
-#: connect/common/templates/common/emails/project/project-changed.html:65
-#: connect/common/templates/common/emails/project/project-changed.txt:8
-msgid "Project Name"
-msgstr "Nome do Projeto"
-
-#: connect/common/templates/common/emails/project/project-changed.html:79
-#: connect/common/templates/common/emails/project/project-changed.html:114
-#: connect/common/templates/common/emails/project/project-changed.html:149
-#: connect/common/templates/common/emails/project/project-changed.html:186
-#: connect/common/templates/common/emails/project/project-changed.html:221
-#: connect/common/templates/common/emails/project/project-changed.html:256
-#: connect/common/templates/common/emails/project/project-changed.txt:9
-msgid "Before"
-msgstr "Antes"
-
-#: connect/common/templates/common/emails/project/project-changed.html:80
-#: connect/common/templates/common/emails/project/project-changed.html:115
-#: connect/common/templates/common/emails/project/project-changed.html:150
-#: connect/common/templates/common/emails/project/project-changed.html:187
-#: connect/common/templates/common/emails/project/project-changed.html:222
-#: connect/common/templates/common/emails/project/project-changed.html:257
-#: connect/common/templates/common/emails/project/project-changed.txt:10
-msgid "Now"
-msgstr "Agora"
-
-#: connect/common/templates/common/emails/project/project-changed.html:100
-#: connect/common/templates/common/emails/project/project-changed.txt:11
-msgid "Date format"
-msgstr "Formato de data"
-
-#: connect/common/templates/common/emails/project/project-changed.html:172
-#: connect/common/templates/common/emails/project/project-changed.txt:13
-msgid "Country for location support in Flows"
-msgstr "País para a localização do suporte dos Fluxos"
-
-#: connect/common/templates/common/emails/project/project-changed.html:207
-#: connect/common/templates/common/emails/project/project-changed.txt:14
-msgid "Flows Default Language"
-msgstr "Idioma padrão dos Fluxos"
-
-#: connect/common/templates/common/emails/project/project-changed.html:242
-#: connect/common/templates/common/emails/project/project-changed.txt:15
-msgid "Flows Secondary Language"
-msgstr "Idioma secundário dos Fluxos"
-
-#: connect/common/templates/common/emails/project/project-delete.html:39
-#: connect/common/templates/common/emails/project/project-delete.txt:3
-msgid "A project has been deleted"
-msgstr "Um projeto foi apagado"
-
-#: connect/common/templates/common/emails/project/project-delete.html:53
-#: connect/common/templates/common/emails/project/project-delete.txt:4
-#: connect/common/templates/common/emails/project/project_create.html:53
-#: connect/common/templates/common/emails/project/project_create.txt:4
-msgid "The project"
-msgstr "O projeto"
-
-#: connect/common/templates/common/emails/project/project-delete.html:54
-#: connect/common/templates/common/emails/project/project-delete.txt:4
-msgid ""
-"was deleted. We hope it has accomplished everything you wanted, and that our "
-"intelligences did a good job"
-msgstr ""
-"foi deletado. Esperamos que tenha construído tudo o que desejava e que "
-"nossas inteligências tenham feito um bom trabalho"
-
-#: connect/common/templates/common/emails/project/project_create.html:53
-#: connect/common/templates/common/emails/project/project_create.txt:4
-msgid ""
-"was created, and you can now start using our Intelligences and Flows modules "
-"to transform the way you work"
-msgstr ""
-"foi criado, e agora você pode iniciar a criação de Inteligências e Fluxos "
-"para transformar a maneira como você trabalha"
-
-#: connect/common/templates/common/emails/project/project_create.html:62
-#: connect/common/templates/common/emails/project/project_create.txt:5
-msgid "Remember that everyone in the organization"
-msgstr "Lembre-se de que todos na organização"
-
-#: connect/common/templates/common/emails/project/project_create.html:62
-#: connect/common/templates/common/emails/project/project_create.txt:5
-msgid "that you created the project in, can view it, ok"
-msgstr "em que você criou o projeto podem visualizar ele, ok ?!"
 
 #: connect/settings.py:228
 msgid "An error has occurred"

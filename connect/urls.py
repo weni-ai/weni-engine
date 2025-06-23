@@ -95,34 +95,6 @@ if settings.DEBUG:
                         ),
                     ),
                     path(
-                        "project-create/",
-                        render_template(
-                            "authentication/emails/project_create.html",
-                            base_url=settings.BASE_URL,
-                            first_name="Daniel Yohan",
-                            project_name="Project Test",
-                            organization_name="Org Test",
-                        ),
-                    ),
-                    path(
-                        "remove-permission-organization/",
-                        render_template(
-                            "authentication/emails/remove_permission_organization.html",
-                            base_url=settings.BASE_URL,
-                            first_name="Daniel Yohan",
-                            organization_name="Org Test",
-                        ),
-                    ),
-                    path(
-                        "delete-organization/",
-                        render_template(
-                            "authentication/emails/delete_organization.html",
-                            base_url=settings.BASE_URL,
-                            first_name="Daniel Yohan",
-                            organization_name="Org Test",
-                        ),
-                    ),
-                    path(
                         "invite-organization",
                         render_template(
                             "common/emails/organization/invite_organization.html",
@@ -132,77 +104,11 @@ if settings.DEBUG:
                         ),
                     ),
                     path(
-                        "organization-going-out",
-                        render_template(
-                            "common/emails/organization/leaving_org.html",
-                            base_url=settings.BASE_URL,
-                            user_name="João",
-                            organization_name="Org Test",
-                        ),
-                    ),
-                    path(
-                        "organization-removed",
-                        render_template(
-                            "common/emails/organization/org_removed.html",
-                            base_url=settings.BASE_URL,
-                            user_name="João",
-                            organization_name="Org Test",
-                        ),
-                    ),
-                    path(
-                        "organization-created",
-                        render_template(
-                            "common/emails/organization/organization_create.html",
-                            base_url=settings.BASE_URL,
-                            first_name="João",
-                            webapp_base_url=settings.WEBAPP_BASE_URL,
-                            organization_name="Org Test",
-                        ),
-                    ),
-                    path(
-                        "remove-permission",
-                        render_template(
-                            "common/emails/organization/remove_permission_organization.html",
-                            base_url=settings.BASE_URL,
-                            first_name="João",
-                            organization_name="Org Test",
-                        ),
-                    ),
-                    path(
-                        "delete-organization",
-                        render_template(
-                            "common/emails/organization/delete_organization.html",
-                            base_url=settings.BASE_URL,
-                            first_name="João",
-                            organization_name="Org Test",
-                        ),
-                    ),
-                    path(
-                        "change-organization-name",
-                        render_template(
-                            "common/emails/organization/change_organization_name.html",
-                            base_url=settings.BASE_URL,
-                            user_name="João",
-                            organization_previous_name="Old Test",
-                            organization_new_name="New Org",
-                        ),
-                    ),
-                    path(
                         "access-code",
                         render_template(
                             "authentication/emails/access_code.html",
                             base_url=settings.BASE_URL,
                             access_code="AEIJKY",
-                        ),
-                    ),
-                    path(
-                        "permission-change",
-                        render_template(
-                            "common/emails/organization/permission_change.html",
-                            base_url=settings.BASE_URL,
-                            user_name="João",
-                            old_permission="Viewer",
-                            new_permission="Administrator",
                         ),
                     ),
                     path(
