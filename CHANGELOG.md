@@ -1,3 +1,10 @@
+# 3.31.0
+## *Add*
+  - Implement rate limiting configuration from settings
+## *Fix*
+  - Change billing plan in Commerce Serializer
+  - Add try to not get user if does not exists
+
 # 3.30.1
 ## *Delete*
   - Remove unused emails
