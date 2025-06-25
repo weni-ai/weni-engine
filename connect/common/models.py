@@ -171,9 +171,14 @@ class Organization(models.Model):
     def send_email_invite_organization(self, email):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
-        user = User.objects.get(email=email)
-        language = user.language
-        user_name = user.first_name + " " + user.last_name
+
+        try:
+            user = User.objects.get(email=email)
+            language = user.language or settings.DEFAULT_LANGUAGE
+            user_name = user.first_name + " " + user.last_name
+        except User.DoesNotExist:
+            language = settings.DEFAULT_LANGUAGE
+            user_name = email
 
         context = {
             "base_url": settings.BASE_URL,
