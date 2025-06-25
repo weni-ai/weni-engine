@@ -181,7 +181,7 @@ class Organization(models.Model):
             user_name = user.first_name + " " + user.last_name
         except User.DoesNotExist:
             language = settings.DEFAULT_LANGUAGE
-            user_name = email
+            user_name = ""
 
         context = {
             "base_url": settings.BASE_URL,
