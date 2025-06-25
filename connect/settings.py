@@ -102,6 +102,9 @@ env = environ.Env(
     VERIFICATION_MARKETING_TOKEN=(str, ""),
     ELASTICSEARCH_TIMEOUT_REQUEST=(int, 10),
     FILTER_SENTRY_EVENTS=(list, []),
+    RATE_LIMIT_REQUESTS=(int, 10),
+    RATE_LIMIT_WINDOW=(int, 60),
+    RATE_LIMIT_BLOCK_TIME=(int, 300),
 )
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -577,3 +580,8 @@ KC_DB_HOST = env.str("KC_DB_HOST", default="")
 KC_DB_PORT = env.int("KC_DB_PORT", default=0)
 
 DATA_UPLOAD_MAX_NUMBER_FIELDS = env.int("DATA_UPLOAD_MAX_NUMBER_FIELDS", default=10000)
+
+# Rate Limiting
+RATE_LIMIT_REQUESTS = env.int("RATE_LIMIT_REQUESTS")
+RATE_LIMIT_WINDOW = env.int("RATE_LIMIT_WINDOW")
+RATE_LIMIT_BLOCK_TIME = env.int("RATE_LIMIT_BLOCK_TIME")

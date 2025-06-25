@@ -446,7 +446,7 @@ class RequestPermissionProjectViewSet(
     permission_classes = [IsAuthenticated]
     metadata_class = Metadata
 
-    @rate_limit(requests=5, window=60, block_time=300)
+    @rate_limit(requests=settings.RATE_LIMIT_REQUESTS, window=settings.RATE_LIMIT_WINDOW, block_time=settings.RATE_LIMIT_BLOCK_TIME)
     def create(self, request, *args, **kwargs):
         created_by: User = self.request.user
         role: int = int(self.request.data.get("role"))
