@@ -10,6 +10,7 @@ import pendulum
 import stripe
 from celery import current_app
 from django.conf import settings
+from django.core import mail
 from django.db import models
 from django.db.models import Q, Sum
 from django.template.loader import render_to_string
@@ -712,25 +713,22 @@ class Project(models.Model):
     def send_email_invite_project(self, email):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
-        user = User.objects.get(email=email)
-        language = user.language
-
         context = {
             "base_url": settings.BASE_URL,
             "webapp_base_url": settings.WEBAPP_BASE_URL,
             "organization_name": self.organization.name,
             "project_name": self.name,
         }
-
-        with translation.override(language):
-            email = send_email(
-                _("Invitation to join organization"),
-                email,
-                "common/emails/project/invite_project.txt",
-                "common/emails/project/invite_project.html",
-                context,
-            )
-        return email
+        mail.send_mail(
+            _("Invitation to join organization"),
+            render_to_string("common/emails/project/invite_project.txt", context),
+            None,
+            [email],
+            html_message=render_to_string(
+                "common/emails/project/invite_project.html", context
+            ),
+        )
+        return mail
 
     def get_contacts(self, before: str, after: str, counting_method: str = None):
         from connect.billing.models import Contact
