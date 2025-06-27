@@ -187,22 +187,6 @@ class User(AbstractBaseUser, PermissionsMixin):
                 context,
             )
 
-    def send_email_nickname_changed(self, before_nickname: str, new_nickname: str):
-        if not settings.SEND_EMAILS:
-            return False
-        context = {
-            "user_name": self.first_name,
-            "before_nickname": before_nickname,
-            "new_nickname": new_nickname,
-        }
-        send_email(
-            _("Nickname changed"),
-            self.email,
-            "authentication/emails/nickname_changed.txt",
-            "authentication/emails/nickname_changed.html",
-            context,
-        )
-
     def send_email_access_password(self, password: str):
         if not settings.SEND_EMAILS:
             return False

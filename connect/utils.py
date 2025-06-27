@@ -71,7 +71,7 @@ def check_module_permission(claims, user):
     return False
 
 
-def rate_limit(requests=5, window=60, block_time=300):
+def rate_limit(requests: int, window: int, block_time: int):
     def decorator(view_func):
         @functools.wraps(view_func)
         def wrapper(*args, **kwargs):
