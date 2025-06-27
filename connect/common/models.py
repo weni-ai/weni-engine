@@ -6,7 +6,6 @@ from datetime import timedelta
 from decimal import Decimal
 import pendulum
 from django.conf import settings
-from django.core import mail
 from django.db import models
 from django.db.models import Sum
 from django.template.loader import render_to_string
@@ -30,6 +29,7 @@ from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
 from rest_framework import status
 from connect.common.helpers import send_mass_html_mail
 from connect.template_projects.models import TemplateType
+from connect.common.utils import send_email
 
 from connect.internals.event_driven.producer.rabbitmq_publisher import RabbitmqPublisher
 
@@ -188,18 +188,14 @@ class Organization(models.Model):
         }
 
         with translation.override(language):
-            mail.send_mail(
+            email = send_email(
                 _("You've been invited to join ") + self.name,
-                render_to_string(
-                    "common/emails/organization/invite_organization.txt", context
-                ),
-                None,
-                [email],
-                html_message=render_to_string(
-                    "common/emails/organization/invite_organization.html", context
-                ),
+                email,
+                "common/emails/organization/invite_organization.txt",
+                "common/emails/organization/invite_organization.html",
+                context,
             )
-        return mail
+        return email
 
     def send_email_access_code(self, email: str, user_name: str, access_code: str):
         if not settings.SEND_EMAILS:
@@ -215,18 +211,14 @@ class Organization(models.Model):
         }
 
         with translation.override(language):
-            mail.send_mail(
+            email = send_email(
                 _("You've received an access code for Weni Platform"),
-                render_to_string(
-                    "authentication/emails/access_code.txt", context
-                ),
-                None,
-                [email],
-                html_message=render_to_string(
-                    "authentication/emails/access_code.html", context
-                ),
+                email,
+                "authentication/emails/access_code.txt",
+                "authentication/emails/access_code.html",
+                context,
             )
-        return mail
+        return email
 
     @property
     def active_contacts(self):
@@ -712,22 +704,25 @@ class Project(models.Model):
     def send_email_invite_project(self, email):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
+        user = User.objects.get(email=email)
+        language = user.language
+
         context = {
             "base_url": settings.BASE_URL,
             "webapp_base_url": settings.WEBAPP_BASE_URL,
             "organization_name": self.organization.name,
             "project_name": self.name,
         }
-        mail.send_mail(
-            _("Invitation to join organization"),
-            render_to_string("common/emails/project/invite_project.txt", context),
-            None,
-            [email],
-            html_message=render_to_string(
-                "common/emails/project/invite_project.html", context
-            ),
-        )
-        return mail
+
+        with translation.override(language):
+            email = send_email(
+                _("Invitation to join organization"),
+                email,
+                "common/emails/project/invite_project.txt",
+                "common/emails/project/invite_project.html",
+                context,
+            )
+        return email
 
     def get_contacts(self, before: str, after: str, counting_method: str = None):
         from connect.billing.models import Contact

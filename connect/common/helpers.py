@@ -1,3 +1,6 @@
+import json
+
+from django.conf import settings
 from django.core.mail import get_connection, EmailMultiAlternatives
 
 
@@ -19,8 +22,14 @@ def send_mass_html_mail(
         username=user, password=password, fail_silently=fail_silently
     )
     messages = []
+
+    unsubscribe_group_id = getattr(settings, "SENDGRID_UNSUBSCRIBE_GROUP_ID", None)
+    headers = {}
+    if unsubscribe_group_id:
+        headers["X-SMTPAPI"] = json.dumps({"asm_group_id": int(unsubscribe_group_id)})
+
     for subject, text, html, from_email, recipient in datatuple:
-        message = EmailMultiAlternatives(subject, text, from_email, recipient)
+        message = EmailMultiAlternatives(subject, text, from_email, recipient, headers=headers)
         message.attach_alternative(html, "text/html")
         messages.append(message)
     return connection.send_messages(messages)
