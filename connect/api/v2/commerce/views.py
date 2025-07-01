@@ -3,6 +3,7 @@ from rest_framework import status
 from rest_framework import views
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.mixins import CreateModelMixin
+from sentry_sdk import capture_exception
 from connect.api.v2.commerce.permissions import CanCommunicateInternally
 from connect.api.v2.commerce.serializers import CommerceSerializer
 from connect.api.v2.paginations import CustomCursorPagination
@@ -40,10 +41,11 @@ class CommerceProjectCheckExists(views.APIView):
     def get(self, request):
         user_email = request.query_params.get("user_email")
         vtex_account = request.query_params.get("vtex_account")
-        project = Project.objects.filter(vtex_account=vtex_account)
-        if project.count() > 0:
-            project = project.first()
-        else:
+        
+        try:
+            project = Project.objects.get(vtex_account=vtex_account)
+        except Project.DoesNotExist as e:
+            capture_exception(e)
             return Response(
                 {
                     "message": f"Project with vtex_account {vtex_account} doesn't exists!",
