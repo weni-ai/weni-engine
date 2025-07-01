@@ -59,6 +59,14 @@ class CommerceProjectCheckExists(views.APIView):
                 },
                 status=status.HTTP_200_OK,
             )
+        except Project.MultipleObjectsReturned as e:
+            capture_exception(e)
+            return Response(
+                {
+                    "message": f"Project with vtex_account {vtex_account} has multiple projects!",
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         organization = project.organization
         permission = ProjectAuthorization.objects.filter(

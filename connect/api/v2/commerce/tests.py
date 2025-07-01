@@ -154,3 +154,33 @@ class CommerceProjectCheckExistsTestCase(APITestCase):
         mock_capture_exception.assert_called_once()
         call_args = mock_capture_exception.call_args[0]
         self.assertIsInstance(call_args[0], Project.DoesNotExist)
+
+    @patch("connect.api.v2.commerce.views.capture_exception")
+    def test_multiple_projects_same_vtex_account(self, mock_capture_exception):
+        """Test when multiple projects exist with the same vtex_account - should call Sentry and return HTTP 400"""
+        # Create a second project with the same vtex_account
+        Project.objects.create(
+            name="Duplicate Commerce Project",
+            organization=self.organization,
+            vtex_account="test-vtex-account",  # Same vtex_account as self.project
+            flow_organization=uuid.uuid4(),
+            project_type=TypeProject.COMMERCE,
+        )
+
+        response = self.client.get(
+            self.url,
+            {
+                "user_email": self.user.email,
+                "vtex_account": "test-vtex-account",
+            },
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("has multiple projects", response.data["message"])
+
+        # Verify Sentry was called
+        mock_capture_exception.assert_called_once()
+
+        # Verify the exception is Project.MultipleObjectsReturned
+        call_args = mock_capture_exception.call_args[0]
+        self.assertIsInstance(call_args[0], Project.MultipleObjectsReturned)
