@@ -7,7 +7,13 @@ from sentry_sdk import capture_exception
 from connect.api.v2.commerce.permissions import CanCommunicateInternally
 from connect.api.v2.commerce.serializers import CommerceSerializer
 from connect.api.v2.paginations import CustomCursorPagination
-from connect.common.models import Organization, Project, ProjectAuthorization, OrganizationRole, RequestPermissionOrganization
+from connect.common.models import (
+    Organization,
+    Project,
+    ProjectAuthorization,
+    OrganizationRole,
+    RequestPermissionOrganization,
+)
 from connect.authentication.models import User
 from connect.usecases.users.create import CreateKeycloakUserUseCase
 from connect.usecases.users.user_dto import KeycloakUserDTO
@@ -41,7 +47,7 @@ class CommerceProjectCheckExists(views.APIView):
     def get(self, request):
         user_email = request.query_params.get("user_email")
         vtex_account = request.query_params.get("vtex_account")
-        
+
         try:
             project = Project.objects.get(vtex_account=vtex_account)
         except Project.DoesNotExist as e:
@@ -49,13 +55,15 @@ class CommerceProjectCheckExists(views.APIView):
             return Response(
                 {
                     "message": f"Project with vtex_account {vtex_account} doesn't exists!",
-                    "data": {
-                        "has_project": False
-                    }
-                }, status=status.HTTP_200_OK)
+                    "data": {"has_project": False},
+                },
+                status=status.HTTP_200_OK,
+            )
 
         organization = project.organization
-        permission = ProjectAuthorization.objects.filter(project=project, user__email=user_email)
+        permission = ProjectAuthorization.objects.filter(
+            project=project, user__email=user_email
+        )
 
         if permission.count() > 0:
             permission = permission.first()
@@ -81,8 +89,7 @@ class CommerceProjectCheckExists(views.APIView):
         return Response(
             {
                 "message": f"Project {project.name} exists and user {user_email} has permission",
-                "data": {
-                    "project_uuid": project.uuid,
-                    "has_project": True
-                }
-            }, status=status.HTTP_200_OK)
+                "data": {"project_uuid": project.uuid, "has_project": True},
+            },
+            status=status.HTTP_200_OK,
+        )
