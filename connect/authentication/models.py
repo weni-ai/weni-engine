@@ -6,12 +6,11 @@ from django.contrib.auth.models import PermissionsMixin
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.db.models import JSONField
-from django.core.mail import send_mail
 from django.db import models
-from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 from django.utils import translation
 
+from connect.common.utils import send_email
 from connect.storages import AvatarUserMediaStorage
 
 from connect.api.v1.keycloak import KeycloakControl
@@ -180,14 +179,12 @@ class User(AbstractBaseUser, PermissionsMixin):
         context = {"name": self.first_name}
 
         with translation.override(self.language):
-            send_mail(
+            send_email(
                 _("Your password has been changed"),
-                render_to_string("authentication/emails/change_password.txt"),
-                None,
-                [self.email],
-                html_message=render_to_string(
-                    "authentication/emails/change_password.html", context
-                ),
+                self.email,
+                "authentication/emails/change_password.txt",
+                "authentication/emails/change_password.html",
+                context,
             )
 
     def send_email_access_password(self, password: str):
@@ -199,14 +196,12 @@ class User(AbstractBaseUser, PermissionsMixin):
             "password": password,
         }
         with translation.override(self.language):
-            send_mail(
+            send_email(
                 _("Your Weni Platform account is ready! Log in now"),
-                render_to_string("authentication/emails/first_password.txt"),
-                None,
-                [self.email],
-                html_message=render_to_string(
-                    "authentication/emails/first_password.html", context
-                ),
+                self.email,
+                "authentication/emails/first_password.txt",
+                "authentication/emails/first_password.html",
+                context,
             )
 
     def send_request_flow_user_info(self, flow_data):  # pragma: no cover
