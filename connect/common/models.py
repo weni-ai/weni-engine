@@ -704,8 +704,11 @@ class Project(models.Model):
     def send_email_invite_project(self, email):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
-        user = User.objects.get(email=email)
-        language = user.language
+        try:
+            user = User.objects.get(email=email)
+            language = user.language or settings.DEFAULT_LANGUAGE
+        except User.DoesNotExist:
+            language = settings.DEFAULT_LANGUAGE
 
         context = {
             "base_url": settings.BASE_URL,
