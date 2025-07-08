@@ -1,3 +1,11 @@
+# 3.32.1
+## *Fix*
+  - fix: Handle missing user in email invite by setting default language
+
+# 3.32.0
+## *Add*
+  - Refactor email sending functionality to support unsubscriptions
+
 # 3.31.0
 ## *Add*
   - Implement rate limiting configuration from settings
