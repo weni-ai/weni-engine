@@ -4,6 +4,7 @@ import uuid
 import re
 
 from django.conf import settings
+from django.utils.html import strip_tags
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 from rest_framework.exceptions import PermissionDenied
@@ -13,6 +14,7 @@ from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
 from connect.api.v1 import fields
 from connect.api.v1.fields import TextField
 from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
+
 from ..internal.intelligence.intelligence_rest_client import IntelligenceRESTClient
 from connect.api.v1.project.validators import CanContributeInOrganizationValidator
 from connect.common import tasks
@@ -100,6 +102,20 @@ class ProjectSerializer(serializers.ModelSerializer):
     redirect_url = serializers.SerializerMethodField()
     project_mode = serializers.IntegerField(read_only=True)
     template_type = serializers.SerializerMethodField()
+
+    def validate_name(self, value):
+        stripped_value = strip_tags(value)
+        if not stripped_value.strip():
+            raise ValidationError(_("Name cannot be empty or contain only HTML tags"))
+        return stripped_value
+
+    def validate_description(self, value):
+        if value:
+            stripped_value = strip_tags(value)
+            if not stripped_value.strip():
+                raise ValidationError(_("Description cannot contain only HTML tags"))
+            return stripped_value
+        return value
 
     def get_template_type(self, obj):
         if obj.is_template and obj.template_project.exists():
