@@ -4,6 +4,7 @@ import logging
 from django.http import JsonResponse
 from django.contrib.auth import get_user_model
 from django.conf import settings
+from django.utils.html import strip_tags
 from django.utils.translation import ugettext_lazy as _
 
 from rest_framework import serializers
@@ -151,6 +152,18 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
     )
 
     show_chat_help = serializers.SerializerMethodField()
+
+    def validate_name(self, value):
+        stripped_value = strip_tags(value)
+        if not stripped_value.strip():
+            raise ValidationError(_("Name cannot be empty or contain only HTML tags"))
+        return stripped_value
+
+    def validate_description(self, value):
+        stripped_value = strip_tags(value)
+        if not stripped_value.strip():
+            raise ValidationError(_("Description cannot be empty or contain only HTML tags"))
+        return stripped_value
 
     def create_organization(self, validated_data):  # pragma: no cover
         organization = {"id": 0}
