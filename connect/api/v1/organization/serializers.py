@@ -162,7 +162,9 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
     def validate_description(self, value):
         stripped_value = strip_tags(value)
         if not stripped_value.strip():
-            raise ValidationError(_("Description cannot be empty or contain only HTML tags"))
+            raise ValidationError(
+                _("Description cannot be empty or contain only HTML tags")
+            )
         return stripped_value
 
     def create_organization(self, validated_data):  # pragma: no cover

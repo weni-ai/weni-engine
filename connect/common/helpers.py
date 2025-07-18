@@ -29,7 +29,9 @@ def send_mass_html_mail(
         headers["X-SMTPAPI"] = json.dumps({"asm_group_id": int(unsubscribe_group_id)})
 
     for subject, text, html, from_email, recipient in datatuple:
-        message = EmailMultiAlternatives(subject, text, from_email, recipient, headers=headers)
+        message = EmailMultiAlternatives(
+            subject, text, from_email, recipient, headers=headers
+        )
         message.attach_alternative(html, "text/html")
         messages.append(message)
     return connection.send_messages(messages)

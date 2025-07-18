@@ -23,31 +23,50 @@ from connect.api.v1.internal.permissions import ModuleHasPermission
 from connect.api.v1.metadata import Metadata
 from connect.api.v1.organization.permissions import Has2FA
 from connect.api.v1.project.filters import ProjectOrgFilter
-from connect.api.v1.project.permissions import CanChangeProjectStatus, ProjectHasPermission
+from connect.api.v1.project.permissions import (
+    CanChangeProjectStatus,
+    ProjectHasPermission,
+)
 from connect.api.v1.project.serializers import (
-    ClassifierSerializer, CreateChannelSerializer, CreateClassifierSerializer,
-    CreateWACChannelSerializer, DestroyClassifierSerializer,
-    ProjectSearchSerializer, ProjectSerializer, ReleaseChannelSerializer,
-    RequestPermissionProjectSerializer, RequestRocketPermissionSerializer,
-    RetrieveClassifierSerializer, TemplateProjectSerializer, UpdateProjectStatusSerializer,
-    UserAPITokenSerializer)
+    ClassifierSerializer,
+    CreateChannelSerializer,
+    CreateClassifierSerializer,
+    CreateWACChannelSerializer,
+    DestroyClassifierSerializer,
+    ProjectSearchSerializer,
+    ProjectSerializer,
+    ReleaseChannelSerializer,
+    RequestPermissionProjectSerializer,
+    RequestRocketPermissionSerializer,
+    RetrieveClassifierSerializer,
+    TemplateProjectSerializer,
+    UpdateProjectStatusSerializer,
+    UserAPITokenSerializer,
+)
 from connect.authentication.models import User
 from connect.billing.models import Contact
 from connect.celery import app as celery_app
 from connect.common import tasks
-from connect.common.models import (OpenedProject, Organization,
-                                   OrganizationAuthorization, Project,
-                                   ProjectAuthorization,
-                                   RequestPermissionProject,
-                                   RequestRocketPermission, TemplateProject)
-from connect.internals.event_driven.producer.rabbitmq_publisher import \
-    RabbitmqPublisher
+from connect.common.models import (
+    OpenedProject,
+    Organization,
+    OrganizationAuthorization,
+    Project,
+    ProjectAuthorization,
+    RequestPermissionProject,
+    RequestRocketPermission,
+    TemplateProject,
+)
+from connect.internals.event_driven.producer.rabbitmq_publisher import RabbitmqPublisher
 from connect.usecases.authorizations.create import CreateAuthorizationUseCase
 from connect.usecases.authorizations.delete import DeleteAuthorizationUseCase
-from connect.usecases.authorizations.dto import (CreateProjectAuthorizationDTO,
-                                                 DeleteProjectAuthorizationDTO)
-from connect.usecases.authorizations.exceptions import \
-    UserHasNoPermissionToManageProject
+from connect.usecases.authorizations.dto import (
+    CreateProjectAuthorizationDTO,
+    DeleteProjectAuthorizationDTO,
+)
+from connect.usecases.authorizations.exceptions import (
+    UserHasNoPermissionToManageProject,
+)
 from connect.utils import count_contacts, rate_limit
 
 logger = logging.getLogger(__name__)
@@ -446,7 +465,11 @@ class RequestPermissionProjectViewSet(
     permission_classes = [IsAuthenticated]
     metadata_class = Metadata
 
-    @rate_limit(requests=settings.RATE_LIMIT_REQUESTS, window=settings.RATE_LIMIT_WINDOW, block_time=settings.RATE_LIMIT_BLOCK_TIME)
+    @rate_limit(
+        requests=settings.RATE_LIMIT_REQUESTS,
+        window=settings.RATE_LIMIT_WINDOW,
+        block_time=settings.RATE_LIMIT_BLOCK_TIME,
+    )
     def create(self, request, *args, **kwargs):
         created_by: User = self.request.user
         role: int = int(self.request.data.get("role"))
