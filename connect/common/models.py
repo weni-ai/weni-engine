@@ -556,7 +556,7 @@ class Project(models.Model):
         _("Project status"),
         choices=ProjectStatus.choices,
         default=ProjectStatus.ACTIVE,
-        max_length=8
+        max_length=8,
     )
 
     def __str__(self):
@@ -1532,13 +1532,13 @@ class BillingPlan(models.Model):
 
             with translation.override(language_code):
                 message = render_to_string("billing/emails/removed_card.txt", context)
-                html_message = render_to_string("billing/emails/removed_card.html", context)
+                html_message = render_to_string(
+                    "billing/emails/removed_card.html", context
+                )
             if language_code == "en-us":
                 subject = _("Attention: credit card removed from Weni Platform")
             else:
-                subject = _(
-                    "Cartão de crédito removido na Weni Plataforma"
-                )
+                subject = _("Cartão de crédito removido na Weni Plataforma")
 
             recipient_list = [user_email]
             msg = (subject, message, html_message, from_email, recipient_list)
@@ -1567,7 +1567,9 @@ class BillingPlan(models.Model):
                 html_message = render_to_string(
                     "billing/emails/free-plan-expired.html", context
                 )
-                message = render_to_string("billing/emails/free-plan-expired.txt", context)
+                message = render_to_string(
+                    "billing/emails/free-plan-expired.txt", context
+                )
 
             if language_code == "en-us":
                 subject = _("Your Free Plan on Weni has expired")

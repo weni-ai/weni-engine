@@ -23,12 +23,17 @@ from connect.common.mocks import StripeMockGateway
 
 @override_settings(USE_EDA_PERMISSIONS=False)
 class CRMOrganizationViewSetTestCase(APITestCase):
-
     @patch("connect.authentication.signals.RabbitmqPublisher")
     @patch("connect.common.signals.RabbitmqPublisher")
     @patch("connect.common.signals.update_user_permission_project")
     @patch("connect.billing.get_gateway")
-    def setUp(self, mock_get_gateway, mock_permission, mock_rabbitmq_common, mock_rabbitmq_auth):
+    def setUp(
+        self,
+        mock_get_gateway,
+        mock_permission,
+        mock_rabbitmq_common,
+        mock_rabbitmq_auth,
+    ):
         mock_get_gateway.return_value = StripeMockGateway()
         mock_permission.return_value = True
         mock_rabbitmq_common.return_value = Mock()
@@ -43,10 +48,18 @@ class CRMOrganizationViewSetTestCase(APITestCase):
         self.org2 = self._create_org("Test Organization 2", days_ago=5)
         self.org3 = self._create_org("Test Organization 3", days_ago=1)
 
-        self.project1 = self._create_project("Project 1", self.org1, "vtex-account-1", TypeProject.COMMERCE)
-        self.project2 = self._create_project("Project 2", self.org1, "", TypeProject.GENERAL)
-        self.project3 = self._create_project("Project 3", self.org2, "vtex-account-2", TypeProject.COMMERCE)
-        self.project4 = self._create_project("Project 4", self.org3, None, TypeProject.GENERAL)
+        self.project1 = self._create_project(
+            "Project 1", self.org1, "vtex-account-1", TypeProject.COMMERCE
+        )
+        self.project2 = self._create_project(
+            "Project 2", self.org1, "", TypeProject.GENERAL
+        )
+        self.project3 = self._create_project(
+            "Project 3", self.org2, "vtex-account-2", TypeProject.COMMERCE
+        )
+        self.project4 = self._create_project(
+            "Project 4", self.org3, None, TypeProject.GENERAL
+        )
 
         self._create_auth_data()
         self.list_url = reverse("crm-organizations-list")
@@ -61,36 +74,55 @@ class CRMOrganizationViewSetTestCase(APITestCase):
         )
 
     def _create_project(self, name, org, vtex_account, project_type):
-        kwargs = {"name": name, "organization": org, "flow_organization": uuid.uuid4(), "project_type": project_type}
+        kwargs = {
+            "name": name,
+            "organization": org,
+            "flow_organization": uuid.uuid4(),
+            "project_type": project_type,
+        }
         if vtex_account is not None:
             kwargs["vtex_account"] = vtex_account
         return Project.objects.create(**kwargs)
 
     def _create_auth_data(self):
         self.org1_auth = OrganizationAuthorization.objects.create(
-            user=self.crm_user, organization=self.org1, role=OrganizationRole.ADMIN.value
+            user=self.crm_user,
+            organization=self.org1,
+            role=OrganizationRole.ADMIN.value,
         )
         self.org1_auth_regular = OrganizationAuthorization.objects.create(
-            user=self.regular_user, organization=self.org1, role=OrganizationRole.VIEWER.value
+            user=self.regular_user,
+            organization=self.org1,
+            role=OrganizationRole.VIEWER.value,
         )
         OrganizationAuthorization.objects.create(
-            user=self.regular_user, organization=self.org2, role=OrganizationRole.NOT_SETTED.value
+            user=self.regular_user,
+            organization=self.org2,
+            role=OrganizationRole.NOT_SETTED.value,
         )
         self.org2_auth = OrganizationAuthorization.objects.create(
-            user=self.crm_user, organization=self.org2, role=OrganizationRole.CONTRIBUTOR.value
+            user=self.crm_user,
+            organization=self.org2,
+            role=OrganizationRole.CONTRIBUTOR.value,
         )
 
         ProjectAuthorization.objects.create(
-            user=self.crm_user, project=self.project1, role=ProjectRole.MODERATOR.value,
-            organization_authorization=self.org1_auth
+            user=self.crm_user,
+            project=self.project1,
+            role=ProjectRole.MODERATOR.value,
+            organization_authorization=self.org1_auth,
         )
         ProjectAuthorization.objects.create(
-            user=self.regular_user, project=self.project1, role=ProjectRole.NOT_SETTED.value,
-            organization_authorization=self.org1_auth_regular
+            user=self.regular_user,
+            project=self.project1,
+            role=ProjectRole.NOT_SETTED.value,
+            organization_authorization=self.org1_auth_regular,
         )
         ProjectAuthorization.objects.create(
-            user=self.crm_user, project=self.project3, role=ProjectRole.CONTRIBUTOR.value,
-            organization_authorization=self.org2_auth
+            user=self.crm_user,
+            project=self.project3,
+            role=ProjectRole.CONTRIBUTOR.value,
+            organization_authorization=self.org2_auth,
         )
 
     def _auth_as_crm(self):
@@ -126,22 +158,22 @@ class CRMOrganizationViewSetTestCase(APITestCase):
         self._auth_as_crm()
         response = self.client.get(self.list_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        
+
         for field in ["next", "previous", "results"]:
             self.assertIn(field, response.data)
-        
+
         results = response.data["results"]
         self.assertGreater(len(results), 0)
-        
+
         org = results[0]
         for field in ["uuid", "name", "created_at", "users", "projects"]:
             self.assertIn(field, org)
-        
+
         if org["users"]:
             user = org["users"][0]
             for field in ["email", "first_name", "last_name", "role", "role_name"]:
                 self.assertIn(field, user)
-        
+
         if org["projects"]:
             project = org["projects"][0]
             for field in ["name", "uuid", "vtex_account"]:
@@ -152,7 +184,9 @@ class CRMOrganizationViewSetTestCase(APITestCase):
     @override_settings(ALLOW_CRM_ACCESS=True, CRM_EMAILS_LIST=["crmuser@user.com"])
     def test_filter_by_organization_uuid(self):
         self._auth_as_crm()
-        response = self.client.get(self.list_url, {"organization_uuid": str(self.org1.uuid)})
+        response = self.client.get(
+            self.list_url, {"organization_uuid": str(self.org1.uuid)}
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         results = response.data["results"]
         self.assertEqual(len(results), 1)
@@ -161,13 +195,15 @@ class CRMOrganizationViewSetTestCase(APITestCase):
     @override_settings(ALLOW_CRM_ACCESS=True, CRM_EMAILS_LIST=["crmuser@user.com"])
     def test_filter_by_project_uuid_special_logic(self):
         self._auth_as_crm()
-        response = self.client.get(self.list_url, {"project_uuid": str(self.project1.uuid)})
+        response = self.client.get(
+            self.list_url, {"project_uuid": str(self.project1.uuid)}
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         results = response.data["results"]
-        
+
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0]["uuid"], str(self.org1.uuid))
-        
+
         projects = results[0]["projects"]
         self.assertEqual(len(projects), 1)
         self.assertEqual(projects[0]["uuid"], str(self.project1.uuid))
@@ -190,7 +226,7 @@ class CRMOrganizationViewSetTestCase(APITestCase):
         response = self.client.get(self.list_url, {"has_vtex_account": "true"})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         results = response.data["results"]
-        
+
         org_uuids = [org["uuid"] for org in results]
         self.assertIn(str(self.org1.uuid), org_uuids)
         self.assertIn(str(self.org2.uuid), org_uuids)
@@ -202,7 +238,7 @@ class CRMOrganizationViewSetTestCase(APITestCase):
         response = self.client.get(self.list_url, {"has_vtex_account": "false"})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         results = response.data["results"]
-        
+
         org_uuids = [org["uuid"] for org in results]
         self.assertIn(str(self.org3.uuid), org_uuids)
 
@@ -213,7 +249,7 @@ class CRMOrganizationViewSetTestCase(APITestCase):
         response = self.client.get(self.list_url, {"created_after": yesterday})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         results = response.data["results"]
-        
+
         org_uuids = [org["uuid"] for org in results]
         self.assertIn(str(self.org3.uuid), org_uuids)
 
@@ -221,15 +257,17 @@ class CRMOrganizationViewSetTestCase(APITestCase):
     def test_filter_invalid_date_format(self):
         self._auth_as_crm()
         response = self.client.get(self.list_url, {"created_after": "2024-01-15"})
-        self.assertIn(response.status_code, [status.HTTP_400_BAD_REQUEST, status.HTTP_200_OK])
+        self.assertIn(
+            response.status_code, [status.HTTP_400_BAD_REQUEST, status.HTTP_200_OK]
+        )
 
     @override_settings(ALLOW_CRM_ACCESS=True, CRM_EMAILS_LIST=["crmuser@user.com"])
     def test_combined_filters(self):
         self._auth_as_crm()
-        response = self.client.get(self.list_url, {
-            "has_vtex_account": "true",
-            "organization_uuid": str(self.org1.uuid)
-        })
+        response = self.client.get(
+            self.list_url,
+            {"has_vtex_account": "true", "organization_uuid": str(self.org1.uuid)},
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         results = response.data["results"]
         self.assertEqual(len(results), 1)
@@ -239,16 +277,18 @@ class CRMOrganizationViewSetTestCase(APITestCase):
     @override_settings(ALLOW_CRM_ACCESS=True, CRM_EMAILS_LIST=["crmuser@user.com"])
     def test_exclude_not_setted_roles(self):
         self._auth_as_crm()
-        response = self.client.get(self.list_url, {"organization_uuid": str(self.org1.uuid)})
+        response = self.client.get(
+            self.list_url, {"organization_uuid": str(self.org1.uuid)}
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         results = response.data["results"]
-        
+
         org = results[0]
         users = org["users"]
         user_emails = [user["email"] for user in users]
         self.assertIn("crmuser@user.com", user_emails)
         self.assertIn("regularuser@user.com", user_emails)
-        
+
         for user in users:
             self.assertNotEqual(user["role"], OrganizationRole.NOT_SETTED.value)
             self.assertIsNotNone(user["role_name"])
@@ -256,13 +296,15 @@ class CRMOrganizationViewSetTestCase(APITestCase):
     @override_settings(ALLOW_CRM_ACCESS=True, CRM_EMAILS_LIST=["crmuser@user.com"])
     def test_retrieve_specific_organization(self):
         self._auth_as_crm()
-        detail_url = reverse("crm-organizations-detail", kwargs={"uuid": self.org1.uuid})
+        detail_url = reverse(
+            "crm-organizations-detail", kwargs={"uuid": self.org1.uuid}
+        )
         response = self.client.get(detail_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        
+
         self.assertEqual(response.data["uuid"], str(self.org1.uuid))
         self.assertEqual(response.data["name"], self.org1.name)
-        
+
         projects = response.data["projects"]
         project_names = [p["name"] for p in projects]
         self.assertIn("Project 1", project_names)
@@ -273,10 +315,10 @@ class CRMOrganizationViewSetTestCase(APITestCase):
         self._auth_as_crm()
         response = self.client.get(self.list_url, {"page_size": 1})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        
+
         for field in ["next", "previous", "results"]:
             self.assertIn(field, response.data)
-        
+
         results = response.data["results"]
         self.assertEqual(len(results), 1)
 
@@ -285,7 +327,7 @@ class CRMOrganizationViewSetTestCase(APITestCase):
         self._auth_as_crm()
         response = self.client.get(self.list_url, {"ordering": "-created_at"})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        
+
         results = response.data["results"]
         if len(results) > 1:
             created_dates = [org["created_at"] for org in results]
@@ -294,29 +336,33 @@ class CRMOrganizationViewSetTestCase(APITestCase):
     @override_settings(ALLOW_CRM_ACCESS=True, CRM_EMAILS_LIST=["crmuser@user.com"])
     def test_vtex_account_field_handling(self):
         self._auth_as_crm()
-        response = self.client.get(self.list_url, {"organization_uuid": str(self.org1.uuid)})
+        response = self.client.get(
+            self.list_url, {"organization_uuid": str(self.org1.uuid)}
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         results = response.data["results"]
-        
+
         org = results[0]
         projects = org["projects"]
-        
+
         project1_data = next(p for p in projects if p["name"] == "Project 1")
         project2_data = next(p for p in projects if p["name"] == "Project 2")
-        
+
         self.assertEqual(project1_data["vtex_account"], "vtex-account-1")
         self.assertEqual(project2_data["vtex_account"], "")
 
     @override_settings(ALLOW_CRM_ACCESS=True, CRM_EMAILS_LIST=["crmuser@user.com"])
     def test_method_not_allowed(self):
         self._auth_as_crm()
-        
+
         response = self.client.post(self.list_url, {})
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
-        
-        detail_url = reverse("crm-organizations-detail", kwargs={"uuid": self.org1.uuid})
+
+        detail_url = reverse(
+            "crm-organizations-detail", kwargs={"uuid": self.org1.uuid}
+        )
         response = self.client.put(detail_url, {})
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
-        
+
         response = self.client.delete(detail_url)
-        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED) 
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)

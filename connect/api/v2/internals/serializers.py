@@ -12,7 +12,6 @@ from connect.common.models import (
     RequestPermissionOrganization,
     OrganizationLevelRole,
     OrganizationRole,
-    ProjectRole,
     Project,
 )
 
