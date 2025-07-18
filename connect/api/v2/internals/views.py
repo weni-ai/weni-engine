@@ -93,6 +93,9 @@ class CRMOrganizationViewSet(
 
     def get_queryset(self):
         """Apply base filters"""
+        if getattr(self, "swagger_fake_view", False):
+            return Organization.objects.none()  # pragma: no cover
+
         queryset = super().get_queryset()
 
         queryset = queryset.select_related().prefetch_related(
@@ -115,3 +118,19 @@ class CRMOrganizationViewSet(
                 ordering.append(param)
 
         return ordering or ["created_at"]
+
+    @swagger_auto_schema(
+        operation_description="List organizations for CRM users with filtering",
+        tags=["CRM Organizations"],
+    )
+    def list(self, request, *args, **kwargs):
+        """List organizations with filtering capabilities for CRM users"""
+        return super().list(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        operation_description="Retrieve specific organization details",
+        tags=["CRM Organizations"],
+    )
+    def retrieve(self, request, *args, **kwargs):
+        """Retrieve a specific organization by UUID"""
+        return super().retrieve(request, *args, **kwargs)
