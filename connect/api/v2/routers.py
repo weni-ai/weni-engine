@@ -56,6 +56,12 @@ router.register(
     "organizations", organization_views.OrganizationViewSet, basename="organizations"
 )
 
+router.register(
+    r"internal/organizations",
+    connect_internal_views.CRMOrganizationViewSet,
+    basename="crm-organizations",
+)
+
 projects_router = routers.NestedSimpleRouter(
     router, r"organizations", lookup="organization"
 )
