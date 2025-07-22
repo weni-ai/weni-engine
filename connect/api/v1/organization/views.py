@@ -881,7 +881,6 @@ class OrganizationAuthorizationViewSet(
         obj = organization.get_user_authorization(self.request.user)
 
         self.check_object_permissions(self.request, obj)
-        organization.send_email_organization_going_out(obj.user)
         obj.delete()
         return Response(status=204)
 
