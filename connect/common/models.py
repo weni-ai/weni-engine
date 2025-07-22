@@ -182,7 +182,7 @@ class Organization(models.Model):
             user_name = user.first_name + " " + user.last_name
         except User.DoesNotExist:
             language = settings.DEFAULT_LANGUAGE
-            user_name = ""
+            user_name = email
 
         context = {
             "base_url": settings.BASE_URL,
@@ -713,6 +713,12 @@ class Project(models.Model):
     def send_email_invite_project(self, email):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
+        try:
+            user = User.objects.get(email=email)
+            language = user.language or settings.DEFAULT_LANGUAGE
+        except User.DoesNotExist:
+            language = settings.DEFAULT_LANGUAGE
+
         context = {
             "base_url": settings.BASE_URL,
             "webapp_base_url": settings.WEBAPP_BASE_URL,

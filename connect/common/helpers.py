@@ -26,7 +26,7 @@ def send_mass_html_mail(
     unsubscribe_group_id = getattr(settings, "SENDGRID_UNSUBSCRIBE_GROUP_ID", None)
     headers = {}
     if unsubscribe_group_id:
-        headers["X-SMTPAPI"] = json.dumps({"asm": {"group_id": int(unsubscribe_group_id)}})
+        headers["X-SMTPAPI"] = json.dumps({"asm_group_id": int(unsubscribe_group_id)})
 
     for subject, text, html, from_email, recipient in datatuple:
         message = EmailMultiAlternatives(subject, text, from_email, recipient, headers=headers)

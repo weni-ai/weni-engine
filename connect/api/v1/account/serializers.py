@@ -1,7 +1,9 @@
 from django.conf import settings
 from django.contrib.auth.password_validation import validate_password
+from django.forms import ValidationError
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
+from django.utils.html import strip_tags
 from rest_framework import serializers
 from keycloak import exceptions
 
@@ -128,6 +130,22 @@ class UserSerializer(serializers.ModelSerializer):
         except exceptions.KeycloakGetError as error:
             return error
         return True
+
+    def validate_first_name(self, value):
+        stripped_value = strip_tags(value)
+        if not stripped_value.strip():
+            raise ValidationError(
+                _("First name cannot be empty or contain only HTML tags")
+            )
+        return stripped_value
+
+    def validate_last_name(self, value):
+        stripped_value = strip_tags(value)
+        if not stripped_value.strip():
+            raise ValidationError(
+                _("Last name cannot be empty or contain only HTML tags")
+            )
+        return stripped_value
 
 
 class UserPhotoSerializer(serializers.Serializer):
