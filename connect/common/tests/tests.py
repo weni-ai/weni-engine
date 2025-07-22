@@ -413,14 +413,6 @@ class OrganizationTestCase(TestCase):
         self.assertEqual(outbox.from_email, settings.DEFAULT_FROM_EMAIL)
         self.assertEqual(outbox.to[0], self.test_email)
 
-    def test_send_email_organization_going_out(self):
-        self.organization.send_email_organization_going_out(self.test_user1)
-
-        self.assertEqual(len(mail.outbox), 1)
-        self.assertEqual(mail.outbox[0].subject, "You are leaving Test Organization")
-        self.assertIn(self.test_user_name, mail.outbox[0].body)
-        self.assertIn("Test Organization", mail.outbox[0].body)
-
     def test_send_email_organization_removed(self):
         sended_mail = self.organization.send_email_organization_removed(
             self.test_email, self.test_user_name

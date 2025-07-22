@@ -1,6 +1,11 @@
+# 3.32.2
+## *Add*
+  - Sentry monitoring for missing vtex projects
+  - Strip Tags validation on forms
+
 # 3.32.1
 ## *Fix*
-  - fix: Handle missing user in email invite by setting default language
+  - Handle missing user in email invite by setting default language
 
 # 3.32.0
 ## *Add*
