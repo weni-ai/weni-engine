@@ -1,3 +1,11 @@
+# 3.32.4
+## *Fix*
+  - Fix error to leave organization
+
+# 3.32.3
+## *Add*
+  - Feature: Add CRM Organizations API endpoint
+
 # 3.32.2
 ## *Add*
   - Sentry monitoring for missing vtex projects
