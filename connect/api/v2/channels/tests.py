@@ -66,57 +66,59 @@ class ListChannelsAPIViewPermissionsTestCase(TestCase):
         )
         user.user_permissions.add(perm)
 
-    def test_module_can_list_all_projects_channels(self):
-        self._grant_module_permission(self.user)
-        request = self.factory.get(self.url)
-        force_authenticate(request, user=self.user, token=self.user.auth_token)
+    def _get(self, url: str, user=None):
+        request = self.factory.get(url)
+        if user:
+            force_authenticate(request, user=user, token=user.auth_token)
+        return request
 
-        # FlowsRESTClient.list_channel will be hit; keep it simple by mocking minimal response
-        from unittest.mock import patch
-
-        sample_resp = [
-            {"uuid": str(uuid.uuid4()), "name": "ch1", "config": {}, "address": "a", "org": str(self.project.flow_organization), "is_active": True},
+    def _sample_channels_resp(self, org=None):
+        return [
+            {
+                "uuid": str(uuid.uuid4()),
+                "name": "ch1",
+                "config": {},
+                "address": "a",
+                "org": str(org or self.project.flow_organization),
+                "is_active": True,
+            }
         ]
+
+    def _call_with_mocked_flows(self, request, resp=None):
+        if resp is None:
+            resp = self._sample_channels_resp()
         with patch(
             "connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.list_channel",
-            return_value=sample_resp,
+            return_value=resp,
         ):
-            response = self.view(request)
+            return self.view(request)
+
+    def test_module_can_list_all_projects_channels(self):
+        self._grant_module_permission(self.user)
+        request = self._get(self.url, user=self.user)
+        response = self._call_with_mocked_flows(request)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_user_with_project_permission_must_pass_project_uuid_and_succeeds(self):
         url = f"/v2/projects/channels?channel_type=WA&project_uuid={self.project.uuid}"
-        request = self.factory.get(url)
-        force_authenticate(request, user=self.user, token=self.user.auth_token)
-
-        from unittest.mock import patch
-
-        sample_resp = [
-            {"uuid": str(uuid.uuid4()), "name": "ch1", "config": {}, "address": "a", "org": str(self.project.flow_organization), "is_active": True},
-        ]
-        with patch(
-            "connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.list_channel",
-            return_value=sample_resp,
-        ):
-            response = self.view(request)
+        request = self._get(url, user=self.user)
+        response = self._call_with_mocked_flows(request)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_user_without_project_permission_forbidden(self):
         url = f"/v2/projects/channels?channel_type=WA&project_uuid={self.project.uuid}"
-        request = self.factory.get(url)
-        force_authenticate(request, user=self.user_noauth, token=self.user_noauth.auth_token)
+        request = self._get(url, user=self.user_noauth)
 
         response = self.view(request)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_user_without_project_uuid_validation_error(self):
-        request = self.factory.get(self.url)
-        force_authenticate(request, user=self.user, token=self.user.auth_token)
+        request = self._get(self.url, user=self.user)
 
         response = self.view(request)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_unauthenticated_user_unauthorized(self):
-        request = self.factory.get(self.url)
+        request = self._get(self.url)
         response = self.view(request)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
