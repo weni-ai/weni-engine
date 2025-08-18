@@ -1,6 +1,7 @@
 import uuid
 
-from django.test import TestCase
+from django.test import TestCase, override_settings
+from unittest.mock import patch
 from rest_framework import status
 from rest_framework.test import APIRequestFactory, force_authenticate
 
@@ -15,8 +16,11 @@ from connect.common.models import (
 )
 
 
+@override_settings(USE_EDA_PERMISSIONS=False)  # Disable EDA to avoid RabbitMQ issues
 class ListChannelsAPIViewPermissionsTestCase(TestCase):
-    def setUp(self):
+    @patch("connect.authentication.signals.RabbitmqPublisher")
+    @patch("connect.common.signals.RabbitmqPublisher")
+    def setUp(self, mock_rabbitmq_common, mock_rabbitmq_auth):
         self.factory = APIRequestFactory()
 
         self.user, _ = create_user_and_token("user")
