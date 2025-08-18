@@ -1,3 +1,7 @@
+# 3.32.5
+## *Add*
+  - Add user pararm and internal authentication to ProjectAuthView
+
 # 3.32.4
 ## *Fix*
   - Fix error to leave organization
