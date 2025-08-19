@@ -1,37 +1,37 @@
 import decimal
-import logging
 import json
+import logging
 import uuid as uuid4
 from datetime import timedelta
 from decimal import Decimal
+from enum import Enum
+
 import pendulum
+import stripe
+from celery import current_app
 from django.conf import settings
+from django.core import mail
 from django.db import models
-from django.db.models import Sum
+from django.db.models import Q, Sum
 from django.template.loader import render_to_string
 from django.utils import timezone, translation
-
-from django.utils.translation import activate, ugettext_lazy as _
-
+from django.utils.translation import activate
+from django.utils.translation import ugettext_lazy as _
+from rest_framework import status
 from timezone_field import TimeZoneField
 
 from connect import billing
+from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
+from connect.api.v1.internal.intelligence.intelligence_rest_client import \
+    IntelligenceRESTClient
 from connect.authentication.models import User
 from connect.billing.gateways.stripe_gateway import StripeGateway
+from connect.common.exceptions import (OrganizationAuthorizationException,
+                                       ProjectAuthorizationException)
 from connect.common.gateways.rocket_gateway import Rocket
-from enum import Enum
-from celery import current_app
-import stripe
-from connect.api.v1.internal.intelligence.intelligence_rest_client import (
-    IntelligenceRESTClient,
-)
-from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
-from rest_framework import status
 from connect.common.helpers import send_mass_html_mail
 from connect.template_projects.models import TemplateType
 from connect.common.utils import send_email
-
-from connect.internals.event_driven.producer.rabbitmq_publisher import RabbitmqPublisher
 
 logger = logging.getLogger(__name__)
 
@@ -153,12 +153,16 @@ class Organization(models.Model):
     def get_user_authorization(self, user, **kwargs):
         if user.is_anonymous:
             return OrganizationAuthorization(organization=self)  # pragma: no cover
-        get, created = OrganizationAuthorization.objects.get_or_create(
-            user=user,
-            organization=self,
-            **kwargs,
-        )
-        return get
+        try:
+            return OrganizationAuthorization.objects.get(
+                user=user,
+                organization=self,
+                **kwargs,
+            )
+        except OrganizationAuthorization.DoesNotExist:
+            raise OrganizationAuthorizationException(
+                f"User {user.email} not authorized to access organization {self.name}"
+            )
 
     def perform_destroy_ai_organization(self, user_email):
         intelligence_organization = self.inteligence_organization
@@ -556,7 +560,7 @@ class Project(models.Model):
         _("Project status"),
         choices=ProjectStatus.choices,
         default=ProjectStatus.ACTIVE,
-        max_length=8
+        max_length=8,
     )
 
     def __str__(self):
@@ -571,13 +575,19 @@ class Project(models.Model):
     def get_user_authorization(self, user, **kwargs):
         if user.is_anonymous:
             return ProjectAuthorization(project=self)  # pragma: no cover
-        get, created = ProjectAuthorization.objects.get_or_create(
-            user=user,
-            project=self,
-            organization_authorization=self.organization.get_user_authorization(user),
-            **kwargs,
-        )
-        return get
+        try:
+            return ProjectAuthorization.objects.get(
+                user=user,
+                project=self,
+                organization_authorization=self.organization.get_user_authorization(
+                    user
+                ),
+                **kwargs,
+            )
+        except ProjectAuthorization.DoesNotExist:
+            raise ProjectAuthorizationException(
+                f"User {user.email} not authorized to access project {self.name}"
+            )
 
     def project_search(self, text: str):
         """Searches for project in flows and intelligence"""
@@ -642,9 +652,8 @@ class Project(models.Model):
         return created, data
 
     def create_chats_project(self):
-        from connect.api.v1.internal.chats.chats_rest_client import (
-            ChatsRESTClient,
-        )  # to avoid circular import
+        from connect.api.v1.internal.chats.chats_rest_client import \
+            ChatsRESTClient  # to avoid circular import
 
         created = False
         chats_client = ChatsRESTClient()
@@ -716,20 +725,21 @@ class Project(models.Model):
             "organization_name": self.organization.name,
             "project_name": self.name,
         }
-
-        with translation.override(language):
-            email = send_email(
-                _("Invitation to join organization"),
-                email,
-                "common/emails/project/invite_project.txt",
-                "common/emails/project/invite_project.html",
-                context,
-            )
-        return email
+        mail.send_mail(
+            _("Invitation to join organization"),
+            render_to_string("common/emails/project/invite_project.txt", context),
+            None,
+            [email],
+            html_message=render_to_string(
+                "common/emails/project/invite_project.html", context
+            ),
+        )
+        return mail
 
     def get_contacts(self, before: str, after: str, counting_method: str = None):
         from connect.billing.models import Contact
-        from connect.billing.utils import get_attendances, custom_get_attendances
+        from connect.billing.utils import (custom_get_attendances,
+                                           get_attendances)
 
         if not counting_method:
             counting_method = self.organization.organization_billing.plan_method
@@ -1532,13 +1542,13 @@ class BillingPlan(models.Model):
 
             with translation.override(language_code):
                 message = render_to_string("billing/emails/removed_card.txt", context)
-                html_message = render_to_string("billing/emails/removed_card.html", context)
+                html_message = render_to_string(
+                    "billing/emails/removed_card.html", context
+                )
             if language_code == "en-us":
                 subject = _("Attention: credit card removed from Weni Platform")
             else:
-                subject = _(
-                    "Cartão de crédito removido na Weni Plataforma"
-                )
+                subject = _("Cartão de crédito removido na Weni Plataforma")
 
             recipient_list = [user_email]
             msg = (subject, message, html_message, from_email, recipient_list)
@@ -1567,7 +1577,9 @@ class BillingPlan(models.Model):
                 html_message = render_to_string(
                     "billing/emails/free-plan-expired.html", context
                 )
-                message = render_to_string("billing/emails/free-plan-expired.txt", context)
+                message = render_to_string(
+                    "billing/emails/free-plan-expired.txt", context
+                )
 
             if language_code == "en-us":
                 subject = _("Your Free Plan on Weni has expired")
