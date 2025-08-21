@@ -77,7 +77,7 @@ class ListChannelsAPIView(views.APIView):  # pragma: no cover
 
             response = flow_instance.list_channel(
                 channel_type=channel_type,
-                project_uuid=str(project.flow_organization),
+                project_uuid=project.uuid,
             )
         else:
             response = flow_instance.list_channel(channel_type=channel_type)
