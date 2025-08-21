@@ -79,7 +79,7 @@ class ListChannelsAPIViewPermissionsTestCase(TestCase):
                 "name": "ch1",
                 "config": {},
                 "address": "a",
-                "org": str(org or self.project.flow_organization),
+                "org": self.project.uuid,
                 "is_active": True,
             }
         ]

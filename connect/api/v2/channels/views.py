@@ -85,9 +85,8 @@ class ListChannelsAPIView(views.APIView):  # pragma: no cover
         channels = []
         for channel in response:
             org = channel.get("org")
-            project = Project.objects.filter(flow_organization=org)
+            project = Project.objects.get(uuid=org)
             if project:
-                project = project.first()
                 channel_data = dict(
                     uuid=str(channel.get("uuid")),
                     name=channel.get("name"),
