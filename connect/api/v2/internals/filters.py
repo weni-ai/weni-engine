@@ -3,7 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 from django_filters import rest_framework as filters
 from rest_framework.exceptions import NotFound
 
-from connect.common.models import Organization, Project
+from connect.common.models import Organization, Project, BillingPlan
 
 
 class CRMOrganizationFilter(filters.FilterSet):
@@ -45,6 +45,23 @@ class CRMOrganizationFilter(filters.FilterSet):
         help_text=_("Organizations created before this date (format: DD-MM-YYYY)"),
         input_formats=["%d-%m-%Y"],
     )
+
+    is_suspended = filters.BooleanFilter(
+        method="filter_is_suspended",
+        help_text=_("Filter organizations that are suspended (true/false)"),
+    )
+
+    plan = filters.ChoiceFilter(
+        field_name="organization_billing__plan",
+        choices=BillingPlan.PLAN_CHOICES,
+        help_text=_("Filter organizations by billing plan (free, trial, start, scale, advanced, enterprise)"),
+    )
+
+    def filter_is_suspended(self, queryset, name, value):
+        """Filter organizations by suspension status using Organization.is_suspended."""
+        if value is None:
+            return queryset
+        return queryset.filter(is_suspended=value)
 
     def filter_by_project_uuid(self, queryset, name, value):
         """
