@@ -46,6 +46,11 @@ class CRMOrganizationFilter(filters.FilterSet):
         input_formats=["%d-%m-%Y"],
     )
 
+    is_suspended = filters.BooleanFilter(
+        method="filter_is_suspended",
+        help_text=_("Filter organizations that are suspended (true/false)"),
+    )
+
     def filter_by_project_uuid(self, queryset, name, value):
         """
         Special filter logic: When filtering by project UUID, return only the
