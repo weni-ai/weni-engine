@@ -1232,6 +1232,12 @@ class BillingPlan(models.Model):
 
     card_is_valid = models.BooleanField(_("Card is valid"), default=False)
     trial_end_date = models.DateTimeField(_("Trial end date"), null=True, blank=True)
+    trial_extension_enabled = models.BooleanField(
+        _("Trial extension enabled"), default=False
+    )
+    trial_extension_end_date = models.DateTimeField(
+        _("Trial extension end date"), null=True, blank=True
+    )
 
     def save(
         self,
@@ -1700,8 +1706,47 @@ class BillingPlan(models.Model):
     def days_till_trial_end(self):
         if self.plan == BillingPlan.PLAN_TRIAL:
             today = pendulum.now()
-            trial_end = pendulum.instance(self.trial_end_date)
+            end_date = (
+                self.trial_extension_end_date
+                if self.trial_extension_enabled and self.trial_extension_end_date
+                else self.trial_end_date
+            )
+            if not end_date:
+                return None
+            trial_end = pendulum.instance(end_date)
             return today.diff(trial_end, False).in_days()
+
+    def enable_trial_extension(self) -> bool:
+        """Enable one-time trial extension (+1 month) and reactivate org if suspended.
+
+        Returns True if enabled now; False if not eligible or already enabled.
+        """
+
+        self.trial_extension_enabled = True
+        self.trial_extension_end_date = pendulum.now().end_of("day").add(months=1)
+        self.is_active = True
+        self.save(
+            update_fields=[
+                "trial_extension_enabled",
+                "trial_extension_end_date",
+                "is_active",
+            ]
+        )
+        if self.organization.is_suspended:
+            try:
+                NewsletterOrganization.objects.filter(
+                    title="trial-ended",
+                    organization=self.organization,
+                ).delete()
+            except Exception:
+                pass
+            self.organization.is_suspended = False
+            self.organization.save(update_fields=["is_suspended"])
+            for project in self.organization.project.all():
+                current_app.send_task(  # pragma: no cover
+                    name="update_suspend_project", args=[project.uuid, False]
+                )
+        return True
 
 
 class Invoice(models.Model):

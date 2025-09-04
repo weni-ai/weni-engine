@@ -188,9 +188,20 @@ def problem_capture_invoice():
 @app.task(name="end_trial_plan")
 def end_trial_plan():
     yesterday = pendulum.yesterday()
+    # End first trial period for orgs that haven't enabled the extension
     for organization in Organization.objects.filter(
         organization_billing__plan=BillingPlan.PLAN_TRIAL,
+        organization_billing__trial_extension_enabled=False,
         organization_billing__trial_end_date__date=yesterday.date(),
+    ):
+        organization.organization_billing.end_trial_period()
+        organization.organization_billing.send_email_trial_plan_expired_due_time_limit()
+
+    # End second trial period (extension)
+    for organization in Organization.objects.filter(
+        organization_billing__plan=BillingPlan.PLAN_TRIAL,
+        organization_billing__trial_extension_enabled=True,
+        organization_billing__trial_extension_end_date__date=yesterday.date(),
     ):
         organization.organization_billing.end_trial_period()
         organization.organization_billing.send_email_trial_plan_expired_due_time_limit()
