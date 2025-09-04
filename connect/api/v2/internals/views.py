@@ -86,7 +86,7 @@ class CRMOrganizationViewSet(
 
     queryset = Organization.objects.all()
     serializer_class = CRMOrganizationSerializer
-    permission_classes = [IsAuthenticated, IsCRMUser]
+    permission_classes = [IsAuthenticated, IsCRMUser | ModuleHasPermission]
     pagination_class = CustomCursorPagination
     filter_backends = [DjangoFilterBackend]
     filterset_class = CRMOrganizationFilter
