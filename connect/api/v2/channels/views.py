@@ -85,7 +85,10 @@ class ListChannelsAPIView(views.APIView):  # pragma: no cover
         channels = []
         for channel in response:
             org = channel.get("org")
-            project = Project.objects.get(uuid=org)
+            try:
+                project = Project.objects.get(uuid=org)
+            except Project.DoesNotExist:
+                project = None
             if project:
                 channel_data = dict(
                     uuid=str(channel.get("uuid")),
