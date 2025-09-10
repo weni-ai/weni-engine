@@ -1147,6 +1147,7 @@ class BillingPlan(models.Model):
     PLAN_ADVANCED = "advanced"
     PLAN_ENTERPRISE = "enterprise"
     PLAN_CUSTOM = "custom"
+    PLAN_INTERNAL_WENI = "internal_weni"
 
     PLAN_CHOICES = [
         (PLAN_FREE, _("free")),
@@ -1155,6 +1156,7 @@ class BillingPlan(models.Model):
         (PLAN_SCALE, _("scale")),
         (PLAN_ADVANCED, _("advanced")),
         (PLAN_ENTERPRISE, _("enterprise")),
+        (PLAN_INTERNAL_WENI, _("internal_weni")),
     ]
 
     ATTENDANCES = "attendances"
@@ -1184,7 +1186,7 @@ class BillingPlan(models.Model):
         _("notes administration"), null=True, blank=True
     )
     fixed_discount = models.FloatField(_("fixed discount"), default=0)
-    plan = models.CharField(_("plan"), max_length=10, choices=PLAN_CHOICES)
+    plan = models.CharField(_("plan"), max_length=13, choices=PLAN_CHOICES)
     plan_method = models.CharField(
         _("plan_method"),
         max_length=15,
