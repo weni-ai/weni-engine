@@ -3,11 +3,10 @@ import json
 from rest_framework import views, mixins
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
-from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 
-from connect.common.models import Organization, Project, BillingPlan
+from connect.common.models import Organization, Project
 from connect.api.v2.internals.serializers import (
     OrganizationAISerializer,
     CustomParameterSerializer,
@@ -135,68 +134,3 @@ class CRMOrganizationViewSet(
     def retrieve(self, request, *args, **kwargs):
         """Retrieve a specific organization by UUID"""
         return super().retrieve(request, *args, **kwargs)
-
-    @action(detail=True, methods=["post"], url_path="trial-extension")
-    def trial_extension(self, request, *args, **kwargs):
-        """QA helper endpoint for trial extension flows (CRM users only).
-
-        Body expects {"action": "enable|force_end_first|force_end_extension|set_first_end|set_extension_end|status", "date": "YYYY-MM-DD"}
-        """
-        organization: Organization = self.get_object()
-        billing: BillingPlan = organization.organization_billing
-
-        op = request.data.get("action")
-        date_str = request.data.get("date")
-
-        def status_payload():
-            return {
-                "plan": billing.plan,
-                "is_active": billing.is_active,
-                "trial_end_date": billing.trial_end_date,
-                "trial_extension_enabled": billing.trial_extension_enabled,
-                "trial_extension_end_date": billing.trial_extension_end_date,
-                "org_is_suspended": organization.is_suspended,
-            }
-
-        if op == "status":
-            return Response(status_payload())
-
-        if op == "enable":
-            if billing.enable_trial_extension():
-                return Response(status_payload())
-            return Response({"detail": "Not eligible to enable trial extension."}, status=400)
-
-        if op == "force_end_first" or op == "force_end_extension":
-            billing.end_trial_period()
-            billing.send_email_trial_plan_expired_due_time_limit()
-            return Response(status_payload())
-
-        if op == "set_first_end":
-            if billing.plan != BillingPlan.PLAN_TRIAL:
-                return Response({"detail": "Plan must be trial."}, status=400)
-            if not date_str:
-                return Response({"detail": "Missing 'date' (YYYY-MM-DD)."}, status=400)
-            import pendulum
-
-            try:
-                billing.trial_end_date = pendulum.parse(date_str).end_of("day")
-                billing.save(update_fields=["trial_end_date"])
-                return Response(status_payload())
-            except Exception:
-                return Response({"detail": "Invalid 'date' format."}, status=400)
-
-        if op == "set_extension_end":
-            if not billing.trial_extension_enabled:
-                return Response({"detail": "Trial extension is not enabled."}, status=400)
-            if not date_str:
-                return Response({"detail": "Missing 'date' (YYYY-MM-DD)."}, status=400)
-            import pendulum
-
-            try:
-                billing.trial_extension_end_date = pendulum.parse(date_str).end_of("day")
-                billing.save(update_fields=["trial_extension_end_date"])
-                return Response(status_payload())
-            except Exception:
-                return Response({"detail": "Invalid 'date' format."}, status=400)
-
-        return Response({"detail": "Invalid action."}, status=400)
