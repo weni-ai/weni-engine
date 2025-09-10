@@ -1,3 +1,11 @@
+# 3.32.7
+## *Add*
+  - Add ModulePermission in CRM view
+
+# 3.32.6
+## *Add*
+  - Add filter is_suspended in CRM view
+
 # 3.32.5
 ## *Add*
   - Add user pararm and internal authentication to ProjectAuthView

@@ -193,7 +193,7 @@ class CRMOrganizationViewSetTestCase(APITestCase):
         self.assertEqual(results[0]["uuid"], str(self.org1.uuid))
 
     @override_settings(ALLOW_CRM_ACCESS=True, CRM_EMAILS_LIST=["crmuser@user.com"])
-    def test_filter_by_project_uuid_special_logic(self):
+    def test_filter_by_project_uuid_returns_all_org_projects(self):
         self._auth_as_crm()
         response = self.client.get(
             self.list_url, {"project_uuid": str(self.project1.uuid)}
@@ -204,9 +204,12 @@ class CRMOrganizationViewSetTestCase(APITestCase):
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0]["uuid"], str(self.org1.uuid))
 
+        # Should return all projects from the organization, not just the filtered one
         projects = results[0]["projects"]
-        self.assertEqual(len(projects), 1)
-        self.assertEqual(projects[0]["uuid"], str(self.project1.uuid))
+        self.assertEqual(len(projects), 2)  # org1 has project1 and project2
+        project_uuids = [p["uuid"] for p in projects]
+        self.assertIn(str(self.project1.uuid), project_uuids)
+        self.assertIn(str(self.project2.uuid), project_uuids)
 
     @override_settings(ALLOW_CRM_ACCESS=True, CRM_EMAILS_LIST=["crmuser@user.com"])
     def test_filter_project_uuid_not_found(self):

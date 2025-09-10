@@ -228,14 +228,6 @@ class CRMOrganizationSerializer(serializers.ModelSerializer):
         return CRMUserSerializer(users, many=True).data
 
     def get_projects(self, obj):
-        """Get organization projects, with special handling for project_uuid filter"""
-        request = self.context.get("request")
-
-        filtered_project_uuid = getattr(request, "filtered_project_uuid", None)
-
-        if filtered_project_uuid:
-            projects = obj.project.filter(uuid=filtered_project_uuid)
-        else:
-            projects = obj.project.all()
-
+        """Get all organization projects"""
+        projects = obj.project.all()
         return CRMProjectSerializer(projects, many=True).data
