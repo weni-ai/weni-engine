@@ -21,7 +21,7 @@ class CRMOrganizationFilter(filters.FilterSet):
     project_uuid = filters.UUIDFilter(
         method="filter_by_project_uuid",
         help_text=_(
-            "Filter by project UUID - returns only the organization containing that project"
+            "Filter by project UUID - returns the organization containing that project with all its projects"
         ),
     )
 
@@ -65,13 +65,11 @@ class CRMOrganizationFilter(filters.FilterSet):
 
     def filter_by_project_uuid(self, queryset, name, value):
         """
-        Special filter logic: When filtering by project UUID, return only the
-        organization containing that project. The serializer will handle showing
-        only that specific project in the projects list.
+        Filter logic: When filtering by project UUID, return the organization
+        containing that project and show all projects from that organization.
         """
         try:
             project = Project.objects.get(uuid=value)
-            self.request.filtered_project_uuid = value
             return queryset.filter(uuid=project.organization.uuid)
         except Project.DoesNotExist:
             raise NotFound(_("Project {} does not exist").format(value))
