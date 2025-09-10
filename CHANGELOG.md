@@ -1,3 +1,7 @@
+# 3.33.0
+## *Add*
+  - Add trial extension feature
+
 # 3.32.7
 ## *Add*
   - Add ModulePermission in CRM view
