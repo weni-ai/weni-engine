@@ -3,11 +3,10 @@ import json
 from rest_framework import views, mixins
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
-from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 
-from connect.common.models import Organization, Project, BillingPlan
+from connect.common.models import Organization, Project
 from connect.api.v2.internals.serializers import (
     OrganizationAISerializer,
     CustomParameterSerializer,
