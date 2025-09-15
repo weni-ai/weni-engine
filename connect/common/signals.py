@@ -80,22 +80,6 @@ def create_service_default_in_all_user(sender, instance, created, **kwargs):
             project.service_status.create(service=instance)
 
 
-@receiver(pre_save, sender=Organization)
-def organization_pre_save(sender, instance, **kwargs):
-    """
-    Capture the previous state of the organization before saving.
-    This allows us to detect changes in the is_suspended field.
-    """
-    if instance.pk:
-        try:
-            old_instance = Organization.objects.get(pk=instance.pk)
-            instance._old_is_suspended = old_instance.is_suspended
-        except Organization.DoesNotExist:
-            instance._old_is_suspended = None
-    else:
-        instance._old_is_suspended = None
-
-
 @receiver(post_save, sender=Organization)
 def update_organization(instance, **kwargs):
     from connect.usecases.organizations.eda_publisher import OrganizationEDAPublisher
@@ -112,8 +96,7 @@ def update_organization(instance, **kwargs):
     if settings.USE_EDA and not settings.TESTING:
         eda_publisher = OrganizationEDAPublisher()
 
-        old_is_suspended = getattr(instance, '_old_is_suspended', None)
-        if old_is_suspended is not None and old_is_suspended != instance.is_suspended:
+        if instance.tracker.has_changed("is_suspended"):
             if instance.is_suspended:
                 eda_publisher.publish_organization_deactivated(instance.uuid)
             else:
