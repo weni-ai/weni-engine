@@ -1,7 +1,7 @@
 import logging
 
 from django.conf import settings
-from django.db.models.signals import post_save, post_delete
+from django.db.models.signals import post_save, post_delete, pre_save
 from django.dispatch import receiver
 from django.utils import timezone
 
@@ -82,6 +82,8 @@ def create_service_default_in_all_user(sender, instance, created, **kwargs):
 
 @receiver(post_save, sender=Organization)
 def update_organization(instance, **kwargs):
+    from connect.usecases.organizations.eda_publisher import OrganizationEDAPublisher
+
     for project in instance.project.all():
         celery_app.send_task(  # pragma: no cover
             name="update_suspend_project",
@@ -90,6 +92,15 @@ def update_organization(instance, **kwargs):
                 instance.is_suspended,
             ],
         )
+
+    if settings.USE_EDA and not settings.TESTING:
+        eda_publisher = OrganizationEDAPublisher()
+
+        if instance.tracker.has_changed("is_suspended"):
+            if instance.is_suspended:
+                eda_publisher.publish_organization_deactivated(instance.uuid)
+            else:
+                eda_publisher.publish_organization_activated(instance.uuid)
 
 
 @receiver(post_delete, sender=ProjectAuthorization)
