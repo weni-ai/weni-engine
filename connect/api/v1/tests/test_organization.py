@@ -1109,3 +1109,64 @@ class RequestPermissionOrganizationSerializerTestCase(TestCase):
 
         data = self.test_serializer.get_user_data(request_permission)
         self.assertEqual(data["name"], non_existing_email)
+
+
+class OrganizationFieldTrackerTestCase(TestCase):
+    """Test FieldTracker functionality for Organization model"""
+
+    def setUp(self):
+        self.user, self.token = create_user_and_token("test_user")
+        self.organization = Organization.objects.create(
+            name="Test Organization", description="Test Description", is_suspended=False
+        )
+        BillingPlan.objects.create(
+            organization=self.organization,
+            plan=BillingPlan.PLAN_FREE,
+            gateway=StripeMockGateway(),
+        )
+
+    def test_field_tracker_detects_suspension_changes(self):
+        """Test that FieldTracker correctly detects changes to is_suspended field"""
+        # Initially, no changes should be detected
+        self.assertFalse(self.organization.tracker.has_changed("is_suspended"))
+        self.assertIsNone(self.organization.tracker.previous("is_suspended"))
+
+        # Change the suspension status
+        self.organization.is_suspended = True
+
+        # Before saving, tracker should detect the change
+        self.assertTrue(self.organization.tracker.has_changed("is_suspended"))
+        self.assertEqual(self.organization.tracker.previous("is_suspended"), False)
+
+        # Save the organization
+        self.organization.save()
+
+        # After saving, the tracker should reset
+        self.assertFalse(self.organization.tracker.has_changed("is_suspended"))
+        self.assertEqual(self.organization.tracker.previous("is_suspended"), True)
+
+        # Change back to not suspended
+        self.organization.is_suspended = False
+        self.assertTrue(self.organization.tracker.has_changed("is_suspended"))
+        self.assertEqual(self.organization.tracker.previous("is_suspended"), True)
+
+        self.organization.save()
+        self.assertFalse(self.organization.tracker.has_changed("is_suspended"))
+        self.assertEqual(self.organization.tracker.previous("is_suspended"), False)
+
+    def test_field_tracker_changed_method(self):
+        """Test the changed() method returns correct field changes"""
+        # No changes initially
+        self.assertEqual(self.organization.tracker.changed(), {})
+
+        # Make a change
+        self.organization.is_suspended = True
+        changed_fields = self.organization.tracker.changed()
+
+        # Should detect the change
+        self.assertIn("is_suspended", changed_fields)
+        self.assertEqual(changed_fields["is_suspended"], False)
+
+        # Save and verify reset
+        self.organization.save()
+        self.assertEqual(self.organization.tracker.changed(), {})
