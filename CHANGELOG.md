@@ -1,3 +1,6 @@
+# 3.34.0
+  - Add project permission into list channels endpoint
+
 # 3.33.1
   - Add a publisher to notify when an organization is activated or deactivated
 
