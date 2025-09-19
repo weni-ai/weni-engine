@@ -19,6 +19,7 @@ from django.utils.translation import activate
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import status
 from timezone_field import TimeZoneField
+from model_utils import FieldTracker
 
 from connect import billing
 from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
@@ -146,6 +147,8 @@ class Organization(models.Model):
     )
     config = models.JSONField(default=dict)
     objects = OrganizationManager()
+
+    tracker = FieldTracker(fields=["is_suspended"])
 
     def __str__(self):
         return f"{self.uuid} - {self.name}"

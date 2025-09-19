@@ -111,7 +111,7 @@ class OrganizationAdmin(admin.ModelAdmin):
     search_fields = ["name", "inteligence_organization"]
 
     def save_model(self, request, obj, form, change):
-        if obj.is_suspended != form.initial.get("is_suspended", False):
+        if change and obj.is_suspended != form.initial.get("is_suspended", False):
             if not obj.is_suspended:
                 NewsletterOrganization.destroy_newsletter(obj)
         super().save_model(request, obj, form, change)
