@@ -1,3 +1,7 @@
+# 3.34.1
+## *Fix*
+  - Enhance ListChannelsAPIView to accept project_uuid as a query parameter
+
 # 3.34.0
   - Add project permission into list channels endpoint
 
