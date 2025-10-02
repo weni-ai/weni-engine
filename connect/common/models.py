@@ -1728,7 +1728,12 @@ class BillingPlan(models.Model):
         """
 
         self.trial_extension_enabled = True
-        self.trial_extension_end_date = pendulum.now().end_of("day").add(months=1)
+        trial_end_date = pendulum.instance(self.trial_end_date)
+        if trial_end_date > pendulum.now():
+            self.trial_extension_end_date = trial_end_date.add(months=1)
+        else:
+            self.trial_extension_end_date = pendulum.now().end_of("day").add(months=1)
+
         self.is_active = True
         self.save(
             update_fields=[
