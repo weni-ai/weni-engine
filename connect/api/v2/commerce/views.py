@@ -3,10 +3,17 @@ from rest_framework import status
 from rest_framework import views
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.mixins import CreateModelMixin
+from sentry_sdk import capture_exception
 from connect.api.v2.commerce.permissions import CanCommunicateInternally
 from connect.api.v2.commerce.serializers import CommerceSerializer
 from connect.api.v2.paginations import CustomCursorPagination
-from connect.common.models import Organization, Project, ProjectAuthorization, OrganizationRole, RequestPermissionOrganization
+from connect.common.models import (
+    Organization,
+    Project,
+    ProjectAuthorization,
+    OrganizationRole,
+    RequestPermissionOrganization,
+)
 from connect.authentication.models import User
 from connect.usecases.users.create import CreateKeycloakUserUseCase
 from connect.usecases.users.user_dto import KeycloakUserDTO
@@ -40,20 +47,31 @@ class CommerceProjectCheckExists(views.APIView):
     def get(self, request):
         user_email = request.query_params.get("user_email")
         vtex_account = request.query_params.get("vtex_account")
-        project = Project.objects.filter(vtex_account=vtex_account)
-        if project.count() > 0:
-            project = project.first()
-        else:
+
+        try:
+            project = Project.objects.get(vtex_account=vtex_account)
+        except Project.DoesNotExist as e:
+            capture_exception(e)
             return Response(
                 {
                     "message": f"Project with vtex_account {vtex_account} doesn't exists!",
-                    "data": {
-                        "has_project": False
-                    }
-                }, status=status.HTTP_200_OK)
+                    "data": {"has_project": False},
+                },
+                status=status.HTTP_200_OK,
+            )
+        except Project.MultipleObjectsReturned as e:
+            capture_exception(e)
+            return Response(
+                {
+                    "message": f"Project with vtex_account {vtex_account} has multiple projects!",
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         organization = project.organization
-        permission = ProjectAuthorization.objects.filter(project=project, user__email=user_email)
+        permission = ProjectAuthorization.objects.filter(
+            project=project, user__email=user_email
+        )
 
         if permission.count() > 0:
             permission = permission.first()
@@ -79,8 +97,7 @@ class CommerceProjectCheckExists(views.APIView):
         return Response(
             {
                 "message": f"Project {project.name} exists and user {user_email} has permission",
-                "data": {
-                    "project_uuid": project.uuid,
-                    "has_project": True
-                }
-            }, status=status.HTTP_200_OK)
+                "data": {"project_uuid": project.uuid, "has_project": True},
+            },
+            status=status.HTTP_200_OK,
+        )

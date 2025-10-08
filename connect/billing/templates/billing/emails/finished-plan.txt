@@ -1,13 +1,7 @@
 {% load i18n %}
-<p>{% trans "Hi" %}, {{ user_name }}</p>
-<p>{% trans "The plan for your organization" %} <strong>{{organization_name}}</strong> {% trans "has been finalized" %}</p>
-<p>
-    {% trans "An administrator has terminated the organization plan" %}.
-    <strong>{{organization_name}}</strong>.
-</p>
-<p>
-    {% trans "At the moment, the functioning of your Intelligences, Flows and the Chat module are interrupted" %}.
-</p>
-<p>
-    {% trans "To continue using the Weni Platform ask your organization's administrator to reactivate the plan or choose a new one, that makes sense for your projects. We want you to stay with us" %}
-</p>
+<p>{% trans 'Oh no,' %} {{ user_name }}!</p>
+<p>{% trans "The plan for your organization" %} {{organization_name}} {% trans "has ended. As a result," %} <strong>{% trans "your intelligent agents are currently offline."%}</strong></p>
+<p>{% trans "To keep using the Weni Platform, simply ask your organization's administrator" %} <strong>{% trans "to reactivate the plan" %}</strong> {% trans "or select a new one that meets your business needs." %}</p>
+<p>{% trans 'Our goal is to continue growing alongside you!' %}</p>
+<p>{% trans 'Best regards,' %}</p>
+<p>{% trans 'Weni by VTEX Team' %}</p>

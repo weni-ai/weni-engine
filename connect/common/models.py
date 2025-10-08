@@ -10,15 +10,14 @@ import pendulum
 import stripe
 from celery import current_app
 from django.conf import settings
-from django.core import mail
 from django.db import models
 from django.db.models import Q, Sum
 from django.template.loader import render_to_string
-from django.utils import timezone
-from django.utils.translation import activate
-from django.utils.translation import ugettext_lazy as _
+from django.utils import timezone, translation
+from django.utils.translation import activate, ugettext_lazy as _
 from rest_framework import status
 from timezone_field import TimeZoneField
+from model_utils import FieldTracker
 
 from connect import billing
 from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
@@ -30,9 +29,9 @@ from connect.common.exceptions import (OrganizationAuthorizationException,
                                        ProjectAuthorizationException)
 from connect.common.gateways.rocket_gateway import Rocket
 from connect.common.helpers import send_mass_html_mail
-from connect.internals.event_driven.producer.rabbitmq_publisher import \
-    RabbitmqPublisher
+from connect.internals.event_driven.producer.rabbitmq_publisher import RabbitmqPublisher
 from connect.template_projects.models import TemplateType
+from connect.common.utils import send_email
 
 logger = logging.getLogger(__name__)
 
@@ -148,6 +147,8 @@ class Organization(models.Model):
     config = models.JSONField(default=dict)
     objects = OrganizationManager()
 
+    tracker = FieldTracker(fields=["is_suspended"])
+
     def __str__(self):
         return f"{self.uuid} - {self.name}"
 
@@ -176,246 +177,38 @@ class Organization(models.Model):
     def send_email_invite_organization(self, email):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
+
+        try:
+            user = User.objects.get(email=email)
+            language = user.language or settings.DEFAULT_LANGUAGE
+            user_name = user.first_name + " " + user.last_name
+        except User.DoesNotExist:
+            language = settings.DEFAULT_LANGUAGE
+            user_name = email
+
         context = {
             "base_url": settings.BASE_URL,
             "webapp_base_url": settings.WEBAPP_BASE_URL,
             "organization_name": self.name,
-        }
-        mail.send_mail(
-            _("Invitation to join organization"),
-            render_to_string(
-                "common/emails/organization/invite_organization.txt", context
-            ),
-            None,
-            [email],
-            html_message=render_to_string(
-                "common/emails/organization/invite_organization.html", context
-            ),
-        )
-        return mail
-
-    def send_email_organization_going_out(self, user: User):
-        if not settings.SEND_EMAILS:
-            return False  # pragma: no cover
-
-        context = {
-            "base_url": settings.BASE_URL,
-            "user_name": user.username,
-            "organization_name": self.name,
-        }
-
-        if user.language == "pt-br":
-            subject = f"Você está deixando a organização {self.name}"
-        else:
-            subject = _(f"You are leaving {self.name}")
-
-        mail.send_mail(
-            subject,
-            render_to_string("common/emails/organization/leaving_org.txt", context),
-            None,
-            [user.email],
-            html_message=render_to_string(
-                "common/emails/organization/leaving_org.html", context
-            ),
-        )
-        return mail
-
-    def send_email_organization_removed(self, email: str, user_name: str):
-        if not settings.SEND_EMAILS:
-            return False  # pragma: no cover
-        context = {
-            "base_url": settings.BASE_URL,
             "user_name": user_name,
-            "organization_name": self.name,
-        }
-        mail.send_mail(
-            _("You have been removed from") + f" {self.name}",
-            render_to_string("common/emails/organization/org_removed.txt", context),
-            None,
-            [email],
-            html_message=render_to_string(
-                "common/emails/organization/org_removed.html", context
-            ),
-        )
-        return mail
-
-    def send_email_organization_create(self, emails: list = None):
-        if not settings.SEND_EMAILS:
-            return False  # pragma: no cover
-
-        if not emails:
-            filter = Q(role=OrganizationRole.VIEWER.value) | Q(
-                user__email_setup__receive_organization_emails=False
-            )
-            emails = (
-                self.authorizations.exclude(filter)
-                .values_list("user__email", "user__username", "user__language")
-                .order_by("user__language")
-            )
-
-        from_email = None
-
-        context = {
-            "base_url": settings.BASE_URL,
-            "webapp_base_url": settings.WEBAPP_BASE_URL,
-            "organization_name": self.name,
         }
 
-        msg_list = []
-
-        for email in emails:
-            username = email[1]
-            context["first_name"] = username
-
-            language = email[2]
-
-            if language == "pt-br":
-                subject = f"Você acabou de dar vida a {self.name}"
-            else:
-                subject = _(f"You just gave life to {self.name}")
-
-            message = render_to_string(
-                "common/emails/organization/organization_create.txt",
+        with translation.override(language):
+            email = send_email(
+                _("You've been invited to join ") + self.name,
+                email,
+                "common/emails/organization/invite_organization.txt",
+                "common/emails/organization/invite_organization.html",
                 context,
             )
-            html_message = render_to_string(
-                "common/emails/organization/organization_create.html",
-                context,
-            )
-
-            recipient_list = [email[0]]
-            msg = (subject, message, html_message, from_email, recipient_list)
-            msg_list.append(msg)
-
-        html_mail = send_mass_html_mail(msg_list, fail_silently=False)
-        return html_mail
-
-    def send_email_remove_permission_organization(self, first_name: str, email: str):
-        if not settings.SEND_EMAILS:
-            return False  # pragma: no cover
-        context = {
-            "base_url": settings.BASE_URL,
-            "organization_name": self.name,
-            "first_name": first_name,
-        }
-        mail.send_mail(
-            _("You have been removed from") + f" {self.name}",
-            render_to_string(
-                "common/emails/organization/remove_permission_organization.txt", context
-            ),
-            None,
-            [email],
-            html_message=render_to_string(
-                "common/emails/organization/remove_permission_organization.html",
-                context,
-            ),
-        )
-        return mail
-
-    def send_email_delete_organization(self, emails: list = None):
-        if not settings.SEND_EMAILS:
-            return False  # pragma: no cover
-
-        if not emails:
-            emails = (
-                self.authorizations.exclude(role=OrganizationRole.VIEWER.value)
-                .values_list("user__email", "user__username", "user__language")
-                .order_by("user__language")
-            )
-
-        from_email = None
-
-        context = {
-            "base_url": settings.BASE_URL,
-            "webapp_base_url": settings.WEBAPP_BASE_URL,
-            "organization_name": self.name,
-        }
-
-        msg_list = []
-
-        for email in emails:
-            username = email[1]
-            context["first_name"] = username
-
-            language = email[2]
-
-            if language == "pt-br":
-                subject = f"A organização { self.name } deixou de existir"
-            else:
-                subject = _(f"The organization { self.name } no longer exists")
-
-            message = render_to_string(
-                "common/emails/organization/delete_organization.txt",
-                context,
-            )
-            html_message = render_to_string(
-                "common/emails/organization/delete_organization.html",
-                context,
-            )
-
-            recipient_list = [email[0]]
-            msg = (subject, message, html_message, from_email, recipient_list)
-            msg_list.append(msg)
-
-        html_mail = send_mass_html_mail(msg_list, fail_silently=False)
-        return html_mail
-
-    def send_email_change_organization_name(
-        self, prev_name: str, new_name: str, emails: list = None
-    ):
-        if not settings.SEND_EMAILS:
-            return False  # pragma: no cover
-
-        if not emails:
-            emails = (
-                self.authorizations.exclude(role=OrganizationRole.VIEWER.value)
-                .values_list("user__email", "user__username", "user__language")
-                .order_by("user__language")
-            )
-
-        from_email = None
-
-        context = {
-            "webapp_billing_url": f"{settings.WEBAPP_BASE_URL}/orgs/{self.uuid}/billing",
-            "org_name": self.name,
-            "organization_previous_name": prev_name,
-            "organization_new_name": new_name,
-        }
-
-        msg_list = []
-
-        for email in emails:
-            username = email[1]
-            context["user_name"] = username
-
-            language = email[2]
-
-            if language == "pt-br":
-                subject = f"{prev_name} agora se chama {new_name}!"
-            else:
-                subject = _(f"{prev_name} is now named {new_name}!")
-
-            message = render_to_string(
-                "common/emails/organization/change_organization_name.txt",
-                context,
-            )
-            html_message = render_to_string(
-                "common/emails/organization/change_organization_name.html",
-                context,
-            )
-
-            recipient_list = [email[0]]
-            msg = (subject, message, html_message, from_email, recipient_list)
-            msg_list.append(msg)
-
-        html_mail = send_mass_html_mail(msg_list, fail_silently=False)
-        return html_mail
+        return email
 
     def send_email_access_code(self, email: str, user_name: str, access_code: str):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
 
         user = User.objects.get(email=email)
+        language = user.language
 
         context = {
             "base_url": settings.BASE_URL,
@@ -423,54 +216,15 @@ class Organization(models.Model):
             "user_name": user_name,
         }
 
-        mail.send_mail(
-            _("You receive an access code to Weni Platform"),
-            render_to_string(
-                f"authentication/emails/access_code_{user.language}.txt", context
-            ),
-            None,
-            [email],
-            html_message=render_to_string(
-                f"authentication/emails/access_code_{user.language}.html", context
-            ),
-        )
-        return mail
-
-    def send_email_permission_change(
-        self, user: User, old_permission: str, new_permission: str
-    ):
-        if not settings.SEND_EMAILS:
-            return False  # pragma: no cover
-
-        context = {
-            "base_url": settings.BASE_URL,
-            "user_name": user.username,
-            "old_permission": old_permission,
-            "new_permission": new_permission,
-            "org_name": self.name,
-        }
-
-        activate(user.language)
-
-        if user.language == "pt-br":
-            subject = (
-                f"Um administrador da organização { self.name } atualizou sua permissão"
+        with translation.override(language):
+            email = send_email(
+                _("You've received an access code for Weni Platform"),
+                email,
+                "authentication/emails/access_code.txt",
+                "authentication/emails/access_code.html",
+                context,
             )
-        else:
-            subject = _(f"An administrator of {self.name } has updated your permission")
-
-        mail.send_mail(
-            subject,
-            render_to_string(
-                "common/emails/organization/permission_change.txt", context
-            ),
-            None,
-            [user.email],
-            html_message=render_to_string(
-                "common/emails/organization/permission_change.html", context
-            ),
-        )
-        return mail
+        return email
 
     @property
     def active_contacts(self):
@@ -680,6 +434,17 @@ class TypeProject(models.IntegerChoices):
     COMMERCE = 2, "commerce"
 
 
+class ProjectMode(models.IntegerChoices):
+    WENI_FRAMEWORK = 1, "weni framework"
+    OPINIONATED = 2, "opinionated"
+
+
+class ProjectStatus(models.TextChoices):
+    ACTIVE = "ACTIVE", _("active")
+    INACTIVE = "INACTIVE", _("inactive")
+    IN_TEST = "IN_TEST", _("in test")
+
+
 class Project(models.Model):
     class Meta:
         verbose_name = _("project")
@@ -785,12 +550,29 @@ class Project(models.Model):
     project_type = models.IntegerField(
         _("Project type"), choices=TypeProject.choices, default=TypeProject.GENERAL
     )
+    project_mode = models.IntegerField(
+        _("Project mode"),
+        choices=ProjectMode.choices,
+        default=ProjectMode.WENI_FRAMEWORK,
+    )
     vtex_account = models.CharField(
         _("VTEX account"), null=True, blank=True, max_length=100
+    )
+    status = models.CharField(
+        _("Project status"),
+        choices=ProjectStatus.choices,
+        default=ProjectStatus.ACTIVE,
+        max_length=8,
     )
 
     def __str__(self):
         return f"{self.uuid} - Project: {self.name} - Org: {self.organization.name}"
+
+    def save(self, *args, **kwargs):
+        if self._state.adding and self.project_type == TypeProject.COMMERCE:
+            self.project_mode = ProjectMode.OPINIONATED
+
+        super().save(*args, **kwargs)
 
     def get_user_authorization(self, user, **kwargs):
         if user.is_anonymous:
@@ -829,120 +611,6 @@ class Project(models.Model):
         project_uuid = self.uuid
 
         current_app.send_task("delete_project", args=[project_uuid, user_email])
-
-    def send_email_create_project(self, emails: list = None):
-        if not settings.SEND_EMAILS:
-            return False  # pragma: no cover
-
-        if not emails:
-            filter = Q(role=OrganizationRole.VIEWER.value) | Q(
-                user__email_setup__receive_project_emails=False
-            )
-            emails = (
-                self.project_authorizations.exclude(filter)
-                .values_list("user__email", "user__username", "user__language")
-                .order_by("user__language")
-            )
-
-        from_email = None
-        msg_list = []
-
-        context = {
-            "base_url": settings.BASE_URL,
-            "organization_name": self.organization.name,
-            "project_name": self.name,
-        }
-
-        for email in emails:
-            username = email[1]
-            context["first_name"] = username
-
-            language = email[2]
-
-            if language == "pt-br":
-                subject = "Seu projeto foi criado com sucesso!"
-            else:
-                subject = _("Your project has been successfully created!")
-
-            message = render_to_string(
-                "common/emails/project/project_create.txt",
-                context,
-            )
-            html_message = render_to_string(
-                "common/emails/project/project_create.html",
-                context,
-            )
-
-            recipient_list = [email[0]]
-            msg = (subject, message, html_message, from_email, recipient_list)
-            msg_list.append(msg)
-
-        html_mail = send_mass_html_mail(msg_list, fail_silently=False)
-        return html_mail
-
-    def send_email_change_project(self, first_name: str, email: str, info: dict):
-        if not settings.SEND_EMAILS:
-            return False  # pragma: no cover
-
-        old_project_name = info.get("old_project_name")
-        date_before = info.get("date_before")
-        timezone_before = info.get("old_timezone")
-        country_loc_suport_before = info.get("country_loc_suport_before")
-        country_loc_suport_now = info.get("country_loc_suport_now")
-        default_lang_before = info.get("default_lang_before")
-        default_lang_now = info.get("default_lang_now")
-        secondary_lang_before = info.get("secondary_lang_before")
-        secondary_lang_now = info.get("secondary_lang_now")
-        user = info.get("user")
-
-        context = {
-            "base_url": settings.BASE_URL,
-            "organization_name": self.organization.name,
-            "project_name": self.name,
-            "old_project_name": old_project_name,
-            "first_name": first_name,
-            "user": user,
-            "date_before": date_before,
-            "date_now": self.date_format,
-            "timezone_before": timezone_before,
-            "timezone_now": str(self.timezone),
-            "country_loc_suport_before": country_loc_suport_before,
-            "country_loc_suport_now": country_loc_suport_now,
-            "default_lang_before": default_lang_before,
-            "default_lang_now": default_lang_now,
-            "secondary_lang_before": secondary_lang_before,
-            "secondary_lang_now": secondary_lang_now,
-        }
-        mail.send_mail(
-            _(f"The project {self.name} has changed"),
-            render_to_string("common/emails/project/project-changed.txt", context),
-            None,
-            [email],
-            html_message=render_to_string(
-                "common/emails/project/project-changed.html", context
-            ),
-        )
-        return mail
-
-    def send_email_deleted_project(self, first_name: str, email: str):
-        if not settings.SEND_EMAILS:
-            return False  # pragma: no cover
-        context = {
-            "base_url": settings.BASE_URL,
-            "organization_name": self.organization.name,
-            "project_name": self.name,
-            "first_name": first_name,
-        }
-        mail.send_mail(
-            _("A project was deleted..."),
-            render_to_string("common/emails/project/project-delete.txt", context),
-            None,
-            [email],
-            html_message=render_to_string(
-                "common/emails/project/project-delete.html", context
-            ),
-        )
-        return mail
 
     def create_classifier(self, authorization, template_type: str, access_token: str):
         flow_instance = FlowsRESTClient()
@@ -1047,22 +715,28 @@ class Project(models.Model):
     def send_email_invite_project(self, email):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
+        try:
+            user = User.objects.get(email=email)
+            language = user.language or settings.DEFAULT_LANGUAGE
+        except User.DoesNotExist:
+            language = settings.DEFAULT_LANGUAGE
+
         context = {
             "base_url": settings.BASE_URL,
             "webapp_base_url": settings.WEBAPP_BASE_URL,
             "organization_name": self.organization.name,
             "project_name": self.name,
         }
-        mail.send_mail(
-            _("Invitation to join organization"),
-            render_to_string("common/emails/project/invite_project.txt", context),
-            None,
-            [email],
-            html_message=render_to_string(
-                "common/emails/project/invite_project.html", context
-            ),
-        )
-        return mail
+
+        with translation.override(language):
+            email = send_email(
+                _("Invitation to join organization"),
+                email,
+                "common/emails/project/invite_project.txt",
+                "common/emails/project/invite_project.html",
+                context,
+            )
+        return email
 
     def get_contacts(self, before: str, after: str, counting_method: str = None):
         from connect.billing.models import Contact
@@ -1485,6 +1159,7 @@ class BillingPlan(models.Model):
     PLAN_ADVANCED = "advanced"
     PLAN_ENTERPRISE = "enterprise"
     PLAN_CUSTOM = "custom"
+    PLAN_INTERNAL_WENI = "internal_weni"
 
     PLAN_CHOICES = [
         (PLAN_FREE, _("free")),
@@ -1493,6 +1168,7 @@ class BillingPlan(models.Model):
         (PLAN_SCALE, _("scale")),
         (PLAN_ADVANCED, _("advanced")),
         (PLAN_ENTERPRISE, _("enterprise")),
+        (PLAN_INTERNAL_WENI, _("internal_weni")),
     ]
 
     ATTENDANCES = "attendances"
@@ -1522,7 +1198,7 @@ class BillingPlan(models.Model):
         _("notes administration"), null=True, blank=True
     )
     fixed_discount = models.FloatField(_("fixed discount"), default=0)
-    plan = models.CharField(_("plan"), max_length=10, choices=PLAN_CHOICES)
+    plan = models.CharField(_("plan"), max_length=13, choices=PLAN_CHOICES)
     plan_method = models.CharField(
         _("plan_method"),
         max_length=15,
@@ -1570,6 +1246,12 @@ class BillingPlan(models.Model):
 
     card_is_valid = models.BooleanField(_("Card is valid"), default=False)
     trial_end_date = models.DateTimeField(_("Trial end date"), null=True, blank=True)
+    trial_extension_enabled = models.BooleanField(
+        _("Trial extension enabled"), default=False
+    )
+    trial_extension_end_date = models.DateTimeField(
+        _("Trial extension end date"), null=True, blank=True
+    )
 
     def save(
         self,
@@ -1822,42 +1504,6 @@ class BillingPlan(models.Model):
         elif count == 0:
             return 1
 
-    def send_email_added_card(self, user_name: str, email: list):
-        if not settings.SEND_EMAILS:
-            return False  # pragma: no cover
-        context = {
-            "base_url": settings.BASE_URL,
-            "organization_name": self.organization.name,
-            "user_name": user_name,
-        }
-        mail.send_mail(
-            _("A credit card has been added to the organization")
-            + f" {self.organization.name}",
-            render_to_string("billing/emails/added_card.txt", context),
-            None,
-            email,
-            html_message=render_to_string("billing/emails/added_card.html", context),
-        )
-        return mail
-
-    def send_email_changed_card(self, user_name: str, email: str):
-        if not settings.SEND_EMAILS:
-            return False  # pragma: no cover
-        context = {
-            "base_url": settings.BASE_URL,
-            "organization_name": self.organization.name,
-            "user_name": user_name,
-        }
-        mail.send_mail(
-            _("A credit card has been updated in the organization")
-            + f" {self.organization.name}",
-            render_to_string("billing/emails/changed_card.txt", context),
-            None,
-            email,
-            html_message=render_to_string("billing/emails/changed_card.html", context),
-        )
-        return mail
-
     def send_email_finished_plan(self, user_name: str, email: list):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
@@ -1870,44 +1516,15 @@ class BillingPlan(models.Model):
         msg_list = []
         for user_email in email:
             language_code = User.objects.get(email=user_email).language
-            activate(language_code)
-            message = render_to_string("billing/emails/finished-plan.txt", context)
-            html_message = render_to_string(
-                "billing/emails/finished-plan.html", context
-            )
+            with translation.override(language_code):
+                message = render_to_string("billing/emails/finished-plan.txt", context)
+                html_message = render_to_string(
+                    "billing/emails/finished-plan.html", context
+                )
             if language_code == "en-us":
-                subject = _("Your organization's plan has ended")
+                subject = _("Plan ended on Weni Platform")
             else:
-                subject = _("O plano da sua organização foi encerrado.")
-
-            recipient_list = [user_email]
-            msg = (subject, message, html_message, from_email, recipient_list)
-            msg_list.append(msg)
-
-        html_mail = send_mass_html_mail(msg_list, fail_silently=False)
-        return html_mail
-
-    def send_email_reactivated_plan(self, user_name: str, email: list):
-        if not settings.SEND_EMAILS:
-            return False  # pragma: no cover
-        context = {
-            "base_url": settings.BASE_URL,
-            "organization_name": self.organization.name,
-            "user_name": user_name,
-        }
-        from_email = None
-        msg_list = []
-        for user_email in email:
-            language_code = User.objects.get(email=user_email).language
-            activate(language_code)
-            message = render_to_string("billing/emails/reactived-plan.txt", context)
-            html_message = render_to_string(
-                "billing/emails/reactived-plan.html", context
-            )
-            if language_code == "en-us":
-                subject = _("Your organization's plan has been reactivated.")
-            else:
-                subject = _("O plano da sua organização foi reativado.")
+                subject = _("Plano encerrado na Weni Plataforma")
 
             recipient_list = [user_email]
             msg = (subject, message, html_message, from_email, recipient_list)
@@ -1927,16 +1544,21 @@ class BillingPlan(models.Model):
         from_email = None
         msg_list = []
         for user_email in email:
-            language_code = User.objects.get(email=user_email).language
-            activate(language_code)
-            message = render_to_string("billing/emails/removed_card.txt", context)
-            html_message = render_to_string("billing/emails/removed_card.html", context)
-            if language_code == "en-us":
-                subject = _("Your organization's credit card was removed")
-            else:
-                subject = _(
-                    "O cartão de crédito vinculado a sua organização foi removido"
+            user = User.objects.get(email=user_email)
+            language_code = user.language
+            user_name = user.first_name + " " + user.last_name
+
+            context["user_name"] = user_name
+
+            with translation.override(language_code):
+                message = render_to_string("billing/emails/removed_card.txt", context)
+                html_message = render_to_string(
+                    "billing/emails/removed_card.html", context
                 )
+            if language_code == "en-us":
+                subject = _("Attention: credit card removed from Weni Platform")
+            else:
+                subject = _("Cartão de crédito removido na Weni Plataforma")
 
             recipient_list = [user_email]
             msg = (subject, message, html_message, from_email, recipient_list)
@@ -1953,59 +1575,33 @@ class BillingPlan(models.Model):
             "organization_name": self.organization.name,
             "user_name": user_name,
         }
-        mail.send_mail(
-            _("Your organization")
-            + f" {self.organization.name} "
-            + _("has already surpassed 200 active contacts"),
-            render_to_string("billing/emails/free-plan-expired.txt", context),
-            None,
-            email,
-            html_message=render_to_string(
-                "billing/emails/free-plan-expired.html", context
-            ),
-        )
-        return mail
+        from_email = None
+        msg_list = []
+        for user_email in email:
+            user = User.objects.get(email=user_email)
+            language_code = user.language
+            user_name = user.first_name + " " + user.last_name
+            context["user_name"] = user_name
 
-    def send_email_chosen_plan(self, user_name: str, email: str, plan: str):
-        if not settings.SEND_EMAILS:
-            return False  # pragma: no cover
-        context = {
-            "base_url": settings.BASE_URL,
-            "user_name": user_name,
-            "org_name": self.organization.name,
-            "plan": plan,
-        }
-        mail.send_mail(
-            _("Your organization")
-            + f" {self.organization.name} "
-            + _("has the plan")
-            + ": "
-            + f"{plan.title()}",
-            render_to_string("billing/emails/free_plan.txt", context),
-            None,
-            [email],
-            html_message=render_to_string("billing/emails/free_plan.html", context),
-        )
-        return mail
+            with translation.override(language_code):
+                html_message = render_to_string(
+                    "billing/emails/free-plan-expired.html", context
+                )
+                message = render_to_string(
+                    "billing/emails/free-plan-expired.txt", context
+                )
 
-    def send_email_changed_plan(self, user_name: str, email: list, old_plan: str):
-        if not settings.SEND_EMAILS:
-            return False  # pragma: no cover
-        context = {
-            "base_url": settings.BASE_URL,
-            "organization_name": self.organization.name,
-            "user_name": user_name,
-            "old_plan": old_plan,
-            "actual_plan": self.plan,
-        }
-        mail.send_mail(
-            _("Your organization's plan has been updated"),
-            render_to_string("billing/emails/changed-plan.txt", context),
-            None,
-            email,
-            html_message=render_to_string("billing/emails/changed-plan.html", context),
-        )
-        return mail
+            if language_code == "en-us":
+                subject = _("Your Free Plan on Weni has expired")
+            else:
+                subject = _("Seu plano gratuito na Weni expirou")
+
+            recipient_list = [user_email]
+            msg = (subject, message, html_message, from_email, recipient_list)
+            msg_list.append(msg)
+
+        html_mail = send_mass_html_mail(msg_list, fail_silently=False)
+        return html_mail
 
     def send_email_trial_plan_expired_due_time_limit(self, emails: list = None):
         if not settings.SEND_EMAILS:
@@ -2033,12 +1629,13 @@ class BillingPlan(models.Model):
             language_code = email[2]
             username = email[1]
             context["user_name"] = username
-            message = render_to_string(
-                "billing/emails/trial_plan_expired_due_time_limit_en.txt", context
-            )
-            html_message = render_to_string(
-                "billing/emails/trial_plan_expired_due_time_limit_en.html", context
-            )
+            with translation.override(language_code):
+                message = render_to_string(
+                    "billing/emails/trial_plan_expired_due_time_limit_en.txt", context
+                )
+                html_message = render_to_string(
+                    "billing/emails/trial_plan_expired_due_time_limit_en.html", context
+                )
             if language_code == "en-us":
                 subject = _("Your trial plan has expired")
             else:
@@ -2049,53 +1646,6 @@ class BillingPlan(models.Model):
             msg_list.append(msg)
 
         html_mail = send_mass_html_mail(msg_list, fail_silently=False)
-        return html_mail
-
-    def send_email_plan_expired_due_attendance_limit(self, emails: list = None):
-        if not settings.SEND_EMAILS:
-            return False  # pragma: no cover
-
-        if not emails:
-            emails = (
-                self.organization.authorizations.exclude(
-                    role=OrganizationRole.VIEWER.value
-                )
-                .values_list("user__email", "user__username", "user__language")
-                .order_by("user__language")
-            )
-
-        from_email = None
-        msg_list = []
-
-        context = {
-            "webapp_billing_url": f"{settings.WEBAPP_BASE_URL}/orgs/{self.organization.uuid}/billing",
-            "plan": self.plan,
-            "plan_limit": self.plan_limit,
-            "org_name": self.organization.name,
-        }
-
-        for email in emails:
-            language_code = email[2]
-            activate(language_code)
-            username = email[1]
-            context["user_name"] = username
-            html_message = render_to_string(
-                "billing/emails/plan_expired_due_attendence_limit_en.html", context
-            )
-            message = render_to_string(
-                "billing/emails/plan_expired_due_attendence_limit_en.txt", context
-            )
-            if language_code == "en-us":
-                subject = _(f"You reached {self.plan_limit} attendances")
-            else:
-                subject = _(f"Você atingiu {self.plan_limit} atendimentos")
-
-            recipient_list = [email[0]]
-            msg = (subject, message, html_message, from_email, recipient_list)
-            msg_list.append(msg)
-
-        html_mail = send_mass_html_mail(msg_list, fail_silently=False)
-
         return html_mail
 
     def send_email_plan_is_about_to_expire(self, emails: list = None):
@@ -2147,25 +1697,6 @@ class BillingPlan(models.Model):
         html_mail = send_mass_html_mail(msg_list, fail_silently=False)
         return html_mail
 
-    def send_email_end_trial(self, email: list):
-        if not settings.SEND_EMAILS:
-            return False  # pragma: no cover
-        context = {
-            "base_url": settings.BASE_URL,
-            "webapp_base_url": settings.WEBAPP_BASE_URL,
-            "organization_name": self.organization.name,
-        }
-        mail.send_mail(
-            _("Your trial period has ended"),
-            render_to_string("common/emails/organization/end_trial.txt", context),
-            None,
-            email,
-            html_message=render_to_string(
-                "common/emails/organization/end_trial.html", context
-            ),
-        )
-        return mail
-
     def end_trial_period(self):
         newsletter = Newsletter.objects.create()
 
@@ -2189,8 +1720,52 @@ class BillingPlan(models.Model):
     def days_till_trial_end(self):
         if self.plan == BillingPlan.PLAN_TRIAL:
             today = pendulum.now()
-            trial_end = pendulum.instance(self.trial_end_date)
+            end_date = (
+                self.trial_extension_end_date
+                if self.trial_extension_enabled and self.trial_extension_end_date
+                else self.trial_end_date
+            )
+            if not end_date:
+                return None
+            trial_end = pendulum.instance(end_date)
             return today.diff(trial_end, False).in_days()
+
+    def enable_trial_extension(self) -> bool:
+        """Enable one-time trial extension (+1 month) and reactivate org if suspended.
+
+        Returns True if enabled now; False if not eligible or already enabled.
+        """
+
+        self.trial_extension_enabled = True
+        trial_end_date = pendulum.instance(self.trial_end_date)
+        if trial_end_date > pendulum.now():
+            self.trial_extension_end_date = trial_end_date.add(months=1)
+        else:
+            self.trial_extension_end_date = pendulum.now().end_of("day").add(months=1)
+
+        self.is_active = True
+        self.save(
+            update_fields=[
+                "trial_extension_enabled",
+                "trial_extension_end_date",
+                "is_active",
+            ]
+        )
+        if self.organization.is_suspended:
+            try:
+                NewsletterOrganization.objects.filter(
+                    title="trial-ended",
+                    organization=self.organization,
+                ).delete()
+            except Exception:
+                pass
+            self.organization.is_suspended = False
+            self.organization.save(update_fields=["is_suspended"])
+            for project in self.organization.project.all():
+                current_app.send_task(  # pragma: no cover
+                    name="update_suspend_project", args=[project.uuid, False]
+                )
+        return True
 
 
 class Invoice(models.Model):

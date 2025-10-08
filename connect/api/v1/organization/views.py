@@ -244,7 +244,6 @@ class OrganizationViewSet(
 
     def perform_destroy(self, instance):
         intelligence_organization = instance.inteligence_organization
-        instance.send_email_delete_organization()
         instance.delete()
         ai_client = IntelligenceRESTClient()
         ai_client.delete_organization(
@@ -253,14 +252,8 @@ class OrganizationViewSet(
         )
 
     def update(self, request, *args, **kwargs):
-        data = request.data
         partial = kwargs.pop("partial", False)
         instance = self.get_object()
-
-        if data.get("name"):
-            instance.send_email_change_organization_name(
-                instance.name, data.get("name")
-            )
 
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
@@ -488,14 +481,7 @@ class OrganizationViewSet(
                 "update_suspend_project",
                 args=[str(project.uuid), False],
             )
-        user_name = (
-            org_billing.organization.name
-            if request.user is None
-            else request.user.first_name
-        )
-        org_billing.send_email_reactivated_plan(
-            user_name, organization.authorizations.values_list("user__email", flat=True)
-        )
+
         result = {
             "plan": org_billing.plan,
             "is_active": org_billing.is_active,
@@ -515,14 +501,8 @@ class OrganizationViewSet(
         organization = get_object_or_404(Organization, uuid=organization_uuid)
         self.check_object_permissions(self.request, organization)
         org_billing = organization.organization_billing
-        old_plan = organization.organization_billing.plan
         change_plan = org_billing.change_plan(plan)
         if change_plan:
-            organization.organization_billing.send_email_changed_plan(
-                organization.name,
-                organization.authorizations.values_list("user__email", flat=True),
-                old_plan,
-            )
             NewsletterOrganization.destroy_newsletter(organization)
             return JsonResponse(
                 data={"plan": org_billing.plan}, status=status.HTTP_200_OK
@@ -771,11 +751,6 @@ class OrganizationViewSet(
             change_plan = org_billing.change_plan(plan)
 
             if change_plan:
-                organization.organization_billing.send_email_changed_plan(
-                    organization.name,
-                    organization.authorizations.values_list("user__email", flat=True),
-                    old_plan,
-                )
                 return JsonResponse(
                     data={
                         "status": "SUCCESS",
@@ -853,10 +828,6 @@ class OrganizationAuthorizationViewSet(
             OrganizationAdminManagerAuthorization,
         ]
         data = self.request.data
-        instance = self.get_object()
-
-        old_permission = OrganizationRole(instance.role).name
-        new_permission = OrganizationRole(int(data.get("role"))).name
 
         auth_dto = UpdateAuthorizationDTO(
             id=self.kwargs.get("user__id"),
@@ -867,10 +838,6 @@ class OrganizationAuthorizationViewSet(
 
         usecase = UpdateAuthorizationUseCase(message_publisher=RabbitmqPublisher())
         authorization = usecase.update_authorization(auth_dto)
-
-        instance.organization.send_email_permission_change(
-            instance.user, old_permission, new_permission
-        )
 
         return Response(data={"role": authorization.role})
 
@@ -914,7 +881,6 @@ class OrganizationAuthorizationViewSet(
         obj = organization.get_user_authorization(self.request.user)
 
         self.check_object_permissions(self.request, obj)
-        organization.send_email_organization_going_out(obj.user)
         obj.delete()
         return Response(status=204)
 

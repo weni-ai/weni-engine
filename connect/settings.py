@@ -102,6 +102,9 @@ env = environ.Env(
     VERIFICATION_MARKETING_TOKEN=(str, ""),
     ELASTICSEARCH_TIMEOUT_REQUEST=(int, 10),
     FILTER_SENTRY_EVENTS=(list, []),
+    RATE_LIMIT_REQUESTS=(int, 10),
+    RATE_LIMIT_WINDOW=(int, 60),
+    RATE_LIMIT_BLOCK_TIME=(int, 300),
 )
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -154,9 +157,11 @@ INSTALLED_APPS = [
     "corsheaders",
     "django_grpc_framework",
     "stripe",
+    "django_prometheus",
 ]
 
 MIDDLEWARE = [
+    "django_prometheus.middleware.PrometheusBeforeMiddleware",
     "elasticapm.contrib.django.middleware.TracingMiddleware",
     "elasticapm.contrib.django.middleware.Catch404Middleware",
     "django.middleware.security.SecurityMiddleware",
@@ -169,6 +174,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django_prometheus.middleware.PrometheusAfterMiddleware",
 ]
 
 ROOT_URLCONF = "connect.urls"
@@ -442,6 +448,7 @@ else:
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 SEND_EMAILS = env.bool("SEND_EMAILS")
+SENDGRID_UNSUBSCRIBE_GROUP_ID = env.str("SENDGRID_UNSUBSCRIBE_GROUP_ID", default=None)
 
 # Products URL
 
@@ -574,3 +581,8 @@ KC_DB_HOST = env.str("KC_DB_HOST", default="")
 KC_DB_PORT = env.int("KC_DB_PORT", default=0)
 
 DATA_UPLOAD_MAX_NUMBER_FIELDS = env.int("DATA_UPLOAD_MAX_NUMBER_FIELDS", default=10000)
+
+# Rate Limiting
+RATE_LIMIT_REQUESTS = env.int("RATE_LIMIT_REQUESTS")
+RATE_LIMIT_WINDOW = env.int("RATE_LIMIT_WINDOW")
+RATE_LIMIT_BLOCK_TIME = env.int("RATE_LIMIT_BLOCK_TIME")

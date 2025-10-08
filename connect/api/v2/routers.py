@@ -56,6 +56,12 @@ router.register(
     "organizations", organization_views.OrganizationViewSet, basename="organizations"
 )
 
+router.register(
+    r"internal/organizations",
+    connect_internal_views.CRMOrganizationViewSet,
+    basename="crm-organizations",
+)
+
 projects_router = routers.NestedSimpleRouter(
     router, r"organizations", lookup="organization"
 )
@@ -115,6 +121,11 @@ urlpatterns = [
         "projects/<uuid>/set-type",
         project_views.ProjectViewSet.as_view({"post": "set_type"}),
         name="set-type",
+    ),
+    path(
+        "projects/<uuid>/set-mode",
+        project_views.ProjectViewSet.as_view({"post": "set_mode"}),
+        name="set-mode",
     ),
     path(
         "projects/<project_uuid>/user-api-token",

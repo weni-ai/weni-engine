@@ -1,3 +1,82 @@
+# 3.34.1
+## *Fix*
+  - Enhance ListChannelsAPIView to accept project_uuid as a query parameter
+
+# 3.34.0
+  - Add project permission into list channels endpoint
+
+# 3.33.1
+  - Add a publisher to notify when an organization is activated or deactivated
+
+# 3.33.0
+## *Add*
+  - Add trial extension feature
+
+# 3.32.7
+## *Add*
+  - Add ModulePermission in CRM view
+
+# 3.32.6
+## *Add*
+  - Add filter is_suspended in CRM view
+
+# 3.32.5
+## *Add*
+  - Add user pararm and internal authentication to ProjectAuthView
+
+# 3.32.4
+## *Fix*
+  - Fix error to leave organization
+
+# 3.32.3
+## *Add*
+  - Feature: Add CRM Organizations API endpoint
+
+# 3.32.2
+## *Add*
+  - Sentry monitoring for missing vtex projects
+  - Strip Tags validation on forms
+
+# 3.32.1
+## *Fix*
+  - Handle missing user in email invite by setting default language
+
+# 3.32.0
+## *Add*
+  - Refactor email sending functionality to support unsubscriptions
+
+# 3.31.0
+## *Add*
+  - Implement rate limiting configuration from settings
+## *Fix*
+  - Change billing plan in Commerce Serializer
+  - Add try to not get user if does not exists
+
+# 3.30.1
+## *Delete*
+  - Remove unused emails
+
+# 3.30.0
+## *Add*
+  - Updated emails templates and removed no longer needed ones
+
+# 3.29.14
+## *Add*
+  - Add project status to v2 serializer
+
+# 3.29.13
+## *Add*
+  - Add project status field, to indicate if it is in test, active or inactive
+
+# 3.29.12
+## *Add*
+  - Metrics endpoint for django-prometheus
+
+# 3.29.11
+## *Add*
+  - Flag to indicate the mode (extended or opinionated) for a project
+  - project_type validation, to prevent it from changing from general to commerce
+
 # 3.29.10
 ## *Add*
   - Add sanitize function on Project and Organization name on creation

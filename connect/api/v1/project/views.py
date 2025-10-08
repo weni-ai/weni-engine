@@ -9,6 +9,7 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django_filters.rest_framework import DjangoFilterBackend
+from drf_yasg2.utils import swagger_auto_schema
 from rest_framework import mixins, status
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied, ValidationError
@@ -22,31 +23,50 @@ from connect.api.v1.internal.permissions import ModuleHasPermission
 from connect.api.v1.metadata import Metadata
 from connect.api.v1.organization.permissions import Has2FA
 from connect.api.v1.project.filters import ProjectOrgFilter
-from connect.api.v1.project.permissions import ProjectHasPermission
+from connect.api.v1.project.permissions import (
+    CanChangeProjectStatus,
+    ProjectHasPermission,
+)
 from connect.api.v1.project.serializers import (
-    ClassifierSerializer, CreateChannelSerializer, CreateClassifierSerializer,
-    CreateWACChannelSerializer, DestroyClassifierSerializer,
-    ProjectSearchSerializer, ProjectSerializer, ReleaseChannelSerializer,
-    RequestPermissionProjectSerializer, RequestRocketPermissionSerializer,
-    RetrieveClassifierSerializer, TemplateProjectSerializer,
-    UserAPITokenSerializer)
+    ClassifierSerializer,
+    CreateChannelSerializer,
+    CreateClassifierSerializer,
+    CreateWACChannelSerializer,
+    DestroyClassifierSerializer,
+    ProjectSearchSerializer,
+    ProjectSerializer,
+    ReleaseChannelSerializer,
+    RequestPermissionProjectSerializer,
+    RequestRocketPermissionSerializer,
+    RetrieveClassifierSerializer,
+    TemplateProjectSerializer,
+    UpdateProjectStatusSerializer,
+    UserAPITokenSerializer,
+)
 from connect.authentication.models import User
 from connect.billing.models import Contact
 from connect.celery import app as celery_app
 from connect.common import tasks
-from connect.common.models import (OpenedProject, Organization,
-                                   OrganizationAuthorization, Project,
-                                   ProjectAuthorization,
-                                   RequestPermissionProject,
-                                   RequestRocketPermission, TemplateProject)
-from connect.internals.event_driven.producer.rabbitmq_publisher import \
-    RabbitmqPublisher
+from connect.common.models import (
+    OpenedProject,
+    Organization,
+    OrganizationAuthorization,
+    Project,
+    ProjectAuthorization,
+    RequestPermissionProject,
+    RequestRocketPermission,
+    TemplateProject,
+)
+from connect.internals.event_driven.producer.rabbitmq_publisher import RabbitmqPublisher
 from connect.usecases.authorizations.create import CreateAuthorizationUseCase
 from connect.usecases.authorizations.delete import DeleteAuthorizationUseCase
-from connect.usecases.authorizations.dto import (CreateProjectAuthorizationDTO,
-                                                 DeleteProjectAuthorizationDTO)
-from connect.usecases.authorizations.exceptions import \
-    UserHasNoPermissionToManageProject
+from connect.usecases.authorizations.dto import (
+    CreateProjectAuthorizationDTO,
+    DeleteProjectAuthorizationDTO,
+)
+from connect.usecases.authorizations.exceptions import (
+    UserHasNoPermissionToManageProject,
+)
 from connect.utils import count_contacts, rate_limit
 
 logger = logging.getLogger(__name__)
@@ -413,6 +433,26 @@ class ProjectViewSet(
         task = tasks.list_project_flows(str(project.flow_organization))
         return Response(task)
 
+    @swagger_auto_schema(
+        request=UpdateProjectStatusSerializer,
+        responses={200: UpdateProjectStatusSerializer},
+    )
+    @action(
+        detail=True,
+        methods=["PATCH"],
+        url_name="update-status",
+        permission_classes=[IsAuthenticated, CanChangeProjectStatus],
+        serializer_class=UpdateProjectStatusSerializer,
+    )
+    def update_status(self, request, *args, **kwargs) -> Response:
+        project = self.get_object()
+
+        serializer = self.get_serializer(project, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 class RequestPermissionProjectViewSet(
     mixins.ListModelMixin,
@@ -425,7 +465,11 @@ class RequestPermissionProjectViewSet(
     permission_classes = [IsAuthenticated]
     metadata_class = Metadata
 
-    @rate_limit(requests=5, window=60, block_time=300)
+    @rate_limit(
+        requests=settings.RATE_LIMIT_REQUESTS,
+        window=settings.RATE_LIMIT_WINDOW,
+        block_time=settings.RATE_LIMIT_BLOCK_TIME,
+    )
     def create(self, request, *args, **kwargs):
         created_by: User = self.request.user
         role: int = int(self.request.data.get("role"))

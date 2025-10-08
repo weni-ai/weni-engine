@@ -1,85 +1,94 @@
 {% extends 'authentication/emails/base.html' %}
 {% load static i18n %}
-
 {% block main-content %}
-    <section style="width: 574px; margin: 48px">
-          <div
-            style="
-              font-family: 'Lato', sans-serif;
-              font-style: normal;
-              font-weight: normal;
-              font-size: 20px;
-              line-height: 28px;
-              color: #808080;
-            "
-          >
-              {% trans "Hi" %},
-            <span
-              style="
-                font-family: 'Lato', sans-serif;
-                color: #262626;
-                font-size: 20px;
-                font-weight: bold;
-                line-height: 28px;
-                font-style: normal;
-              "
-              >{{ user_name }}!</span
-            >
-          </div>
 
-          <div
-            style="
-              font-family: 'Lato', sans-serif;
-              font-weight: bold;
-              font-size: 20px;
-              line-height: 28px;
-              color: #262626;
-              margin-top: 24px;
-            "
-          >
-              {% trans "The credit card linked to the organization" %} {{ org_name }} {% trans "has been removed" %}
-          </div>
+<section style="margin: 24px auto; padding: 0 32px;">
+  <div
+    style="
+      font-family: 'Lato', sans-serif;
+      font-style: normal;
+      font-weight: 700;
+      font-size: 16px;
+      line-height: 24px;
+      color: #3b414d;
+    "
+  >
+    {% trans "Hi" %},
+    <span
+      style="
+        font-family: 'Lato', sans-serif;
+        font-style: normal;
+        font-weight: 700;
+        font-size: 14px;
+        line-height: 22px;
+        color: #3B414D;
+        margin-top: 12px;
+      "
+      >{{ user_name }}!</span
+    >
+  </div>
 
-          <div
-            style="
-              font-family: 'Lato', sans-serif;
-              font-style: normal;
-              font-weight: normal;
-              font-size: 16px;
-              line-height: 24px;
-              color: #808080;
-              margin-top: 24px;
-            "
-          >
-              <p>
-                {% trans "An administrator has removed the credit card associated with your organization" %}
-                <strong>{{ org_name }}</strong>
-                {% trans "preventing the current plan's billing" %}.
-              </p>
-              <p>
-                {% trans "At the moment, the status of your Intelligences, created Flows and the Chat module is frozen" %}.
-              </p>
-          </div>
+  <div
+    style="
+      font-family: 'Lato', sans-serif;
+      font-style: normal;
+      font-weight: 700;
+      font-size: 14px;
+      line-height: 22px;
+      color: #3B414D;
+      margin-top: 12px;
+    "
+  >
+    {% trans "Your account needs urgent attention!" %}
+  </div>
 
-          <div
-            style="
-              font-family: 'Lato', sans-serif;
-              font-style: normal;
-              font-weight: normal;
-              font-size: 16px;
-              line-height: 24px;
-              color: #808080;
-              margin-top: 24px;
-            "
-          >
-              {% trans "To continue using the weni platform, request the organization's administrator to add a valid credit card in the billing section. We want you to stay with us" %}.
-            <span style="margin-left: 1px">
-              <img
-                style="max-height: 16px"
-                src="{% static 'emojis/winking-face.png' %}"
-                alt=""
-              />
-            </span>
-          </div>
-        </section>
+  <div
+    style="
+      font-family: 'Lato', sans-serif;
+      font-style: normal;
+      font-weight: normal;
+      font-size: 14px;
+      line-height: 22px;
+      color: #3B414D;
+      margin-top: 12px;
+    "
+  >
+    {% trans "The credit card for" %}
+    {{ org_name }}
+    {% trans "has been removed. This change has paused your plan's billing and deactivated you agents." %}
+  </div>
+
+  <div
+    style="
+      font-family: 'Lato', sans-serif;
+      font-style: normal;
+      font-weight: normal;
+      font-size: 14px;
+      line-height: 22px;
+      color: #3B414D;
+      margin-top: 12px;
+    "
+  >
+    {% trans "To continue using the Weni Platform, simply ask the administrator to update the card in the" %}
+    <a href="{{ webapp_billing_url }}" style="color: #009E96; text-decoration: underline; text-underline-offset: 4px;">{% trans 'Billing' %}</a>
+    {% trans "section. Once updated, everything will be back to normal!" %}
+  </div>
+
+  <div
+    style="
+      font-family: 'Lato', sans-serif;
+      font-style: normal;
+      font-weight: normal;
+      font-size: 14px;
+      line-height: 22px;
+      color: #3b414d;
+      margin-top: 12px;
+      margin-bottom: 32px;
+    "
+  >
+    {% trans 'Best regards,' %}
+    <br />
+    {% trans 'Weni by VTEX Team' %}
+  </div>
+</section>
 {% endblock %}

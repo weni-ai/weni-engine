@@ -4,6 +4,7 @@ import uuid
 import re
 
 from django.conf import settings
+from django.utils.html import strip_tags
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 from rest_framework.exceptions import PermissionDenied
@@ -13,12 +14,14 @@ from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
 from connect.api.v1 import fields
 from connect.api.v1.fields import TextField
 from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
+
 from ..internal.intelligence.intelligence_rest_client import IntelligenceRESTClient
 from connect.api.v1.project.validators import CanContributeInOrganizationValidator
 from connect.common import tasks
 from connect.common.models import (
     ChatsRole,
     ProjectAuthorization,
+    ProjectStatus,
     RocketAuthorization,
     Service,
     Project,
@@ -64,7 +67,9 @@ class ProjectSerializer(serializers.ModelSerializer):
             "wa_demo_token",
             "redirect_url",
             "description",
-            "project_type",
+            "project_mode",
+            "template_type",
+            "status",
         ]
         ref_name = None
 
@@ -91,13 +96,28 @@ class ProjectSerializer(serializers.ModelSerializer):
     pending_authorizations = serializers.SerializerMethodField(style={"show": False})
     authorization = serializers.SerializerMethodField(style={"show": False})
     last_opened_on = serializers.SerializerMethodField()
-    project_type = serializers.SerializerMethodField()
     flow_uuid = serializers.SerializerMethodField()
     first_access = serializers.SerializerMethodField()
     wa_demo_token = serializers.SerializerMethodField()
     redirect_url = serializers.SerializerMethodField()
+    project_mode = serializers.IntegerField(read_only=True)
+    template_type = serializers.SerializerMethodField()
 
-    def get_project_type(self, obj):
+    def validate_name(self, value):
+        stripped_value = strip_tags(value)
+        if not stripped_value.strip():
+            raise ValidationError(_("Name cannot be empty or contain only HTML tags"))
+        return stripped_value
+
+    def validate_description(self, value):
+        if value:
+            stripped_value = strip_tags(value)
+            if not stripped_value.strip():
+                raise ValidationError(_("Description cannot contain only HTML tags"))
+            return stripped_value
+        return value
+
+    def get_template_type(self, obj):
         if obj.is_template and obj.template_project.exists():
             return f"template:{obj.template_type}"
         else:
@@ -544,9 +564,11 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
                 classifier_uuid = tasks.create_classifier(
                     project_uuid=str(project.flow_organization),
                     user_email=request.user.email,
-                    classifier_name="Farewell & Greetings"
-                    if project.template_type == Project.TYPE_LEAD_CAPTURE
-                    else "Binary Answers",
+                    classifier_name=(
+                        "Farewell & Greetings"
+                        if project.template_type == Project.TYPE_LEAD_CAPTURE
+                        else "Binary Answers"
+                    ),
                     access_token=access_token,
                 ).get("uuid")
             except Exception as error:
@@ -631,3 +653,11 @@ class UserAPITokenSerializer(serializers.Serializer):
         except Project.DoesNotExist:
             raise serializers.ValidationError("This project does not exist")
         return value
+
+
+class UpdateProjectStatusSerializer(serializers.ModelSerializer):
+    status = serializers.ChoiceField(choices=ProjectStatus.choices, required=True)
+
+    class Meta:
+        model = Project
+        fields = ["status"]

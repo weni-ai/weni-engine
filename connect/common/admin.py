@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django import forms
 
 from connect.common.models import (
     Newsletter,
@@ -13,6 +14,56 @@ from connect.common.models import (
 )
 
 
+class BillingPlanAdminForm(forms.ModelForm):
+    class Meta:
+        model = BillingPlan
+        fields = "__all__"
+
+    def clean(self):
+        cleaned_data = super().clean()
+        new_flag = cleaned_data.get("trial_extension_enabled")
+        original_flag = self.initial.get(
+            "trial_extension_enabled", self.instance.trial_extension_enabled
+        )
+
+        if self.instance.pk and original_flag and not new_flag:
+            raise forms.ValidationError(
+                "Trial extension cannot be disabled once enabled."
+            )
+
+        if (not original_flag) and new_flag:
+            if self.instance.plan != BillingPlan.PLAN_TRIAL:
+                raise forms.ValidationError(
+                    "Trial extension is only available for organizations on the trial plan."
+                )
+            if not self.instance.trial_end_date:
+                raise forms.ValidationError(
+                    "Trial end date is not set for this organization."
+                )
+
+        return cleaned_data
+
+    def save(self, commit=True):
+        original_flag = self.initial.get(
+            "trial_extension_enabled", self.instance.trial_extension_enabled
+        )
+        instance = super().save(commit=False)
+        new_flag = self.cleaned_data.get("trial_extension_enabled")
+        if (not original_flag) and new_flag:
+            if instance.pk is None and commit:
+                instance.trial_extension_enabled = False
+                instance.save()
+            elif instance.pk is not None:
+                BillingPlan.objects.filter(pk=instance.pk).update(
+                    trial_extension_enabled=False
+                )
+            instance.enable_trial_extension()
+        else:
+            if commit:
+                instance.save()
+        return instance
+
+
 class ProxyOrg(Organization):
     class Meta:
         proxy = True
@@ -22,6 +73,7 @@ class ProxyOrg(Organization):
 
 class BillingPlanInline(admin.TabularInline):
     model = BillingPlan
+    form = BillingPlanAdminForm
     extra = 1
     min_num = 1
     readonly_fields = [
@@ -34,6 +86,8 @@ class BillingPlanInline(admin.TabularInline):
         "card_expiration_date",
         "cardholder_name",
         "card_brand",
+        "trial_end_date",
+        "trial_extension_end_date",
     ]
     can_delete = False
 
@@ -51,7 +105,7 @@ class OrganizationAdmin(admin.ModelAdmin):
     search_fields = ["name", "inteligence_organization"]
 
     def save_model(self, request, obj, form, change):
-        if obj.is_suspended != form.initial.get("is_suspended", False):
+        if change and obj.is_suspended != form.initial.get("is_suspended", False):
             if not obj.is_suspended:
                 NewsletterOrganization.destroy_newsletter(obj)
         super().save_model(request, obj, form, change)

@@ -1,4 +1,0 @@
-{% load i18n %}
-<p>{% trans 'Hi' %}, {{ user_name }}!</p>
-<p>{% trans 'A credit card has been added to the organization' %} {{ organization_name }}</p>
-<p>{% trans "An Administrator adds new credit card data to bill the organization's plan "%} {{ organization_name }}</strong>. {% trans "Your Intelligences, created Flows and the Chat module returned to work normally. It's wonderful to have your team back." %}</p>

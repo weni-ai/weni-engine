@@ -1,5 +1,6 @@
 from rest_framework import mixins, status
 from rest_framework.viewsets import GenericViewSet
+from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
@@ -9,6 +10,7 @@ from connect.api.v1.project.permissions import ProjectHasPermission
 
 from connect.common.models import Project, OpenedProject, TypeProject
 from connect.api.v2.projects.serializers import (
+    ChangeProjectModeSerializer,
     ProjectSerializer,
     ProjectUpdateSerializer,
     ProjectListAuthorizationSerializer,
@@ -116,7 +118,7 @@ class ProjectViewSet(
 
     @action(detail=True, methods=["POST"], url_name="set-type")
     def set_type(self, request, **kwargs):
-        instance = self.get_object()
+        instance: Project = self.get_object()
         try:
             project_type = request.data.get("project_type")
 
@@ -129,6 +131,17 @@ class ProjectViewSet(
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
+            if (
+                instance.project_type == TypeProject.GENERAL
+                and project_type == TypeProject.COMMERCE
+            ):
+                return Response(
+                    {
+                        "detail": f"It is not possible to change the type from {TypeProject.GENERAL} to {TypeProject.COMMERCE}"
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
             instance.project_type = project_type
             instance.save(update_fields=["project_type"])
 
@@ -138,6 +151,21 @@ class ProjectViewSet(
 
         except Exception as e:
             return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(
+        detail=True,
+        methods=["POST"],
+        url_name="set-mode",
+        serializer_class=ChangeProjectModeSerializer,
+    )
+    def set_mode(self, request: Request, **kwargs) -> Response:
+        instance: Project = self.get_object()
+
+        serializer = ChangeProjectModeSerializer(instance, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class ProjectAuthorizationViewSet(mixins.RetrieveModelMixin, GenericViewSet):

@@ -164,3 +164,70 @@ class RequestPermissionOrganizationSerializer(serializers.ModelSerializer):
             )
 
         return user_data
+
+
+# CRM Serializers for the new CRM Organizations endpoint
+
+
+class CRMUserSerializer(serializers.ModelSerializer):
+    """Serializer for user data in CRM responses"""
+
+    class Meta:
+        model = User
+        fields = ["email", "first_name", "last_name", "role", "role_name"]
+
+    role = serializers.SerializerMethodField()
+    role_name = serializers.SerializerMethodField()
+
+    def get_role(self, obj):
+        """Get role from the authorization context"""
+        authorization = getattr(obj, "_authorization", None)
+        return authorization.role if authorization else None
+
+    def get_role_name(self, obj):
+        """Get human-readable role name"""
+        authorization = getattr(obj, "_authorization", None)
+        if authorization:
+            if hasattr(authorization, "role_verbose"):
+                return authorization.role_verbose
+            # Fallback to choices lookup
+            role_choices = dict(authorization.ROLE_CHOICES)
+            return role_choices.get(authorization.role, "unknown")
+        return None
+
+
+class CRMProjectSerializer(serializers.ModelSerializer):
+    """Serializer for project data in CRM responses"""
+
+    class Meta:
+        model = Project
+        fields = ["name", "uuid", "vtex_account"]
+
+
+class CRMOrganizationSerializer(serializers.ModelSerializer):
+    """Main serializer for CRM Organization responses"""
+
+    class Meta:
+        model = Organization
+        fields = ["uuid", "name", "created_at", "users", "projects"]
+
+    users = serializers.SerializerMethodField()
+    projects = serializers.SerializerMethodField()
+
+    def get_users(self, obj):
+        """Get organization users excluding NOT_SETTED roles"""
+        org_authorizations = obj.authorizations.exclude(
+            role=OrganizationRole.NOT_SETTED.value
+        ).select_related("user")
+
+        users = []
+        for auth in org_authorizations:
+            auth.user._authorization = auth
+            users.append(auth.user)
+
+        return CRMUserSerializer(users, many=True).data
+
+    def get_projects(self, obj):
+        """Get all organization projects"""
+        projects = obj.project.all()
+        return CRMProjectSerializer(projects, many=True).data
