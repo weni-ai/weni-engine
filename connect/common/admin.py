@@ -40,12 +40,6 @@ class BillingPlanAdminForm(forms.ModelForm):
                 raise forms.ValidationError(
                     "Trial end date is not set for this organization."
                 )
-            import pendulum
-
-            if pendulum.now() <= pendulum.instance(self.instance.trial_end_date):
-                raise forms.ValidationError(
-                    "Trial extension can only be enabled after the first trial ends."
-                )
 
         return cleaned_data
 

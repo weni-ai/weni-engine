@@ -15,8 +15,7 @@ from django.db import models
 from django.db.models import Q, Sum
 from django.template.loader import render_to_string
 from django.utils import timezone, translation
-from django.utils.translation import activate
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import activate, ugettext_lazy as _
 from rest_framework import status
 from timezone_field import TimeZoneField
 from model_utils import FieldTracker
@@ -31,6 +30,7 @@ from connect.common.exceptions import (OrganizationAuthorizationException,
                                        ProjectAuthorizationException)
 from connect.common.gateways.rocket_gateway import Rocket
 from connect.common.helpers import send_mass_html_mail
+from connect.internals.event_driven.producer.rabbitmq_publisher import RabbitmqPublisher
 from connect.template_projects.models import TemplateType
 from connect.common.utils import send_email
 
@@ -1738,7 +1738,12 @@ class BillingPlan(models.Model):
         """
 
         self.trial_extension_enabled = True
-        self.trial_extension_end_date = pendulum.now().end_of("day").add(months=1)
+        trial_end_date = pendulum.instance(self.trial_end_date)
+        if trial_end_date > pendulum.now():
+            self.trial_extension_end_date = trial_end_date.add(months=1)
+        else:
+            self.trial_extension_end_date = pendulum.now().end_of("day").add(months=1)
+
         self.is_active = True
         self.save(
             update_fields=[
