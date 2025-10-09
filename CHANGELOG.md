@@ -1,3 +1,10 @@
+# 3.34.3
+  - Refactor invalid get or create on Roles validation
+  - Remove Intelligences Recent Activities
+
+# 3.34.2
+  - Enhance trial extension feature rules
+
 # 3.34.1
 ## *Fix*
   - Enhance ListChannelsAPIView to accept project_uuid as a query parameter
