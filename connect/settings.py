@@ -160,7 +160,6 @@ INSTALLED_APPS = [
     "django_grpc_framework",
     "stripe",
     "django_prometheus",
-    "weni_feature_flags",
 ]
 
 MIDDLEWARE = [
@@ -593,6 +592,3 @@ RATE_LIMIT_BLOCK_TIME = env.int("RATE_LIMIT_BLOCK_TIME")
 # GrowthBook / Feature Flags
 GROWTHBOOK_CLIENT_KEY = env.str("GROWTHBOOK_CLIENT_KEY")
 GROWTHBOOK_HOST_BASE_URL = env.str("GROWTHBOOK_HOST_BASE_URL")
-GROWTHBOOK_REQUESTS_TIMEOUT = env.int("GROWTHBOOK_REQUESTS_TIMEOUT")
-CACHE_KEY_PREFIX = env.str("CACHE_KEY_PREFIX")
-FEATURES_CACHE_TTL = env.int("FEATURES_CACHE_TTL")
