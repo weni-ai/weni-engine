@@ -160,6 +160,7 @@ INSTALLED_APPS = [
     "django_grpc_framework",
     "stripe",
     "django_prometheus",
+    "weni_feature_flags",
 ]
 
 MIDDLEWARE = [
