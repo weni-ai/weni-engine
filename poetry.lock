@@ -3325,13 +3325,13 @@ files = [
 
 [[package]]
 name = "weni-feature-flags"
-version = "0.1.3a1"
+version = "0.1.4a0"
 description = "Weni's feature flags SDK for Python backends"
 optional = false
-python-versions = ">=3.8,<4.0"
+python-versions = "<4.0,>=3.8"
 files = [
-    {file = "weni_feature_flags-0.1.3a1-py3-none-any.whl", hash = "sha256:f9dce9a1c102c65301efeea914d587ffa92286a91b607710df4ab9a322b81ec3"},
-    {file = "weni_feature_flags-0.1.3a1.tar.gz", hash = "sha256:bf4197e4c4fccb5df53340a7397e0b66a0270543f1a34fe65702f71da535911c"},
+    {file = "weni_feature_flags-0.1.4a0-py3-none-any.whl", hash = "sha256:d5f7c9a3b92bfc87f7b348b394a3fc91ca88f79be82e58e508b326fc05a41e60"},
+    {file = "weni_feature_flags-0.1.4a0.tar.gz", hash = "sha256:91306ee36cbff05eea6250d2e47f23bc2de1a230507878603b43476d1e81be79"},
 ]
 
 [package.dependencies]
@@ -3341,11 +3341,6 @@ django-redis = ">=4.0.0,<6.0"
 djangorestframework = ">=3.12.0,<4.0"
 growthbook = ">=1.0.0,<2.0"
 requests = ">=2.25.0,<3.0"
-
-[package.source]
-type = "legacy"
-url = "https://test.pypi.org/simple"
-reference = "testpypi"
 
 [[package]]
 name = "weni-protobuffers"
@@ -3653,4 +3648,4 @@ testing = ["coverage[toml]", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = "~=3.8"
-content-hash = "8ca2c757f41752c38a6e79d8b3601f4cc22f503bc6cfbf0129c4c0da73ee827e"
+content-hash = "0f96d53896d30c68be89d7ae04c5cfc52c16aa6a9bc4bf1333f63fd9f3712aec"
