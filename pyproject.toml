@@ -64,4 +64,3 @@ build-backend = "poetry.core.masonry.api"
 [[tool.poetry.source]]
 name = "testpypi"
 url = "https://test.pypi.org/simple/"
-priority = "explicit"
