@@ -2132,10 +2132,7 @@ class RecentActivity(models.Model):
         }
 
         if intelligence_id:
-            organization = Organization.objects.get(
-                inteligence_organization=intelligence_id
-            )
-            list_projects.append(organization.project.first())
+            raise Exception("Intelligence ID is not supported for recent activities")
         elif organization_uuid:
             organization = Organization.objects.get(uuid=organization_uuid)
             list_projects = list(organization.project.all())
