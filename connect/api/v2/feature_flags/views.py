@@ -66,15 +66,9 @@ class FeatureFlagsAPIView(views.APIView):
             
             # Get active feature flags for the user and project
             active_features = service.get_active_feature_flags_for_attributes(attributes)
-            
-            # Format response
-            features_list = [
-                {"key": key, "value": value}
-                for key, value in active_features.items()
-            ]
-            
+ 
             return JsonResponse(
-                {"features": features_list},
+                {"features": active_features},
                 status=status.HTTP_200_OK
             )
             
@@ -84,6 +78,3 @@ class FeatureFlagsAPIView(views.APIView):
                 {"error": "Failed to retrieve feature flags", "detail": str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-
-
-
