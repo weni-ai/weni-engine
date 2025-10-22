@@ -84,12 +84,18 @@ class FeatureFlagsAPIViewTestCase(TestCase):
         self.assertIn("features", response.json())
         
         features = response.json()["features"]
+        # Features is now a dictionary, not a list
+        self.assertIsInstance(features, dict)
         self.assertEqual(len(features), 2)
         
-        # Verify feature structure
-        feature_keys = [f["key"] for f in features]
-        self.assertIn("new-dashboard", feature_keys)
-        self.assertIn("beta-feature", feature_keys)
+        # Verify feature keys are present
+        self.assertIn("new-dashboard", features)
+        self.assertIn("beta-feature", features)
+        
+        # Verify feature values
+        self.assertEqual(features["new-dashboard"]["enabled"], True)
+        self.assertEqual(features["new-dashboard"]["variant"], "new")
+        self.assertEqual(features["beta-feature"]["enabled"], False)
     
     @patch("connect.api.v2.feature_flags.views.FeatureFlagsService")
     def test_feature_flags_endpoint_handles_service_errors(self, mock_service):
@@ -157,6 +163,3 @@ class FeatureFlagsAPIViewTestCase(TestCase):
         
         self.assertEqual(attributes["userEmail"], self.user.email)
         self.assertEqual(attributes["projectUUID"], str(self.project.uuid))
-
-
-
