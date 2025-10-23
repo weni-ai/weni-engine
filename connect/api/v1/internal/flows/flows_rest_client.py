@@ -410,6 +410,10 @@ class FlowsRESTClient:
         from connect.common.models import Project
 
         project = Project.objects.get(uuid=project_uuid)
+        # Normalize payload to match Flows API expectations
+        # Accept legacy key 'organization_name' but send 'name' to Flows
+        if "organization_name" in kwargs and "name" not in kwargs:
+            kwargs["name"] = kwargs.pop("organization_name")
         kwargs.update({"timezone": str(project.timezone)})
         try:
             response = requests.patch(
