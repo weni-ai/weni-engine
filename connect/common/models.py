@@ -11,7 +11,7 @@ import stripe
 from celery import current_app
 from django.conf import settings
 from django.db import models
-from django.db.models import Q, Sum
+from django.db.models import Sum
 from django.template.loader import render_to_string
 from django.utils import timezone, translation
 from django.utils.translation import activate, ugettext_lazy as _
