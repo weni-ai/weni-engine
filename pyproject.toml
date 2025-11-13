@@ -50,6 +50,7 @@ factory-boy = "^3.3.0"
 pyjwt = "^2.9.0"
 django-prometheus = "^2.3.1"
 django-model-utils = "^5.0.0"
+weni-feature-flags = "^0.1.4a0"
 
 [tool.poetry.dev-dependencies]
 flake8 = "~=3.9.2"
