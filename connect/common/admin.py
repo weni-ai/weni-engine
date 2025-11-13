@@ -102,7 +102,7 @@ class OrganizationAuthorizationInline(admin.TabularInline):
 
 class OrganizationAdmin(admin.ModelAdmin):
     inlines = [BillingPlanInline]
-    search_fields = ["name", "inteligence_organization"]
+    search_fields = ["name", "inteligence_organization", "uuid"]
 
     def save_model(self, request, obj, form, change):
         if change and obj.is_suspended != form.initial.get("is_suspended", False):
