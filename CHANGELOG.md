@@ -1,3 +1,6 @@
+# 3.34.4
+  - Fix bug to invite new users to organization and projects
+
 # 3.34.3
   - Refactor invalid get or create on Roles validation
   - Remove Intelligences Recent Activities
