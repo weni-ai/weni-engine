@@ -1,3 +1,7 @@
+# 3.34.5
+  - Add uuid filter in org Admin page
+  - Get name in update project endpoint to update flows
+
 # 3.34.4
   - Fix bug to invite new users to organization and projects
 
