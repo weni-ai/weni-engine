@@ -562,6 +562,7 @@ if USE_EDA:
 
     EDA_BROKER_HOST = env.str("EDA_BROKER_HOST", default="localhost")
     EDA_BROKER_PORT = env.int("EDA_BROKER_PORT", default=5672)
+    EDA_BROKER_USE_SSL = env.bool("EDA_BROKER_USE_SSL", default=EDA_BROKER_PORT == 5671)
     EDA_BROKER_USER = env.str("EDA_BROKER_USER", default="guest")
     EDA_BROKER_PASSWORD = env.str("EDA_BROKER_PASSWORD", default="guest")
     EDA_VIRTUAL_HOST = env.str("EDA_VIRTUAL_HOST", default="/")
