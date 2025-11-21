@@ -1,6 +1,7 @@
 import time
+import ssl
 
-from pika import BlockingConnection, ConnectionParameters, PlainCredentials
+from pika import BlockingConnection, ConnectionParameters, PlainCredentials, SSLOptions
 
 from django.conf import settings
 
@@ -29,6 +30,11 @@ class RabbitMQConnection:
             self._establish_connection()
 
     def _establish_connection(self):
+        ssl_options = None
+        if settings.EDA_BROKER_USE_SSL:
+            context = ssl.create_default_context()
+            ssl_options = SSLOptions(context)
+
         self.connection = BlockingConnection(
             ConnectionParameters(
                 host=settings.EDA_BROKER_HOST,
@@ -38,6 +44,7 @@ class RabbitMQConnection:
                     password=settings.EDA_BROKER_PASSWORD,
                 ),
                 virtual_host=settings.EDA_VIRTUAL_HOST,
+                ssl_options=ssl_options,
             )
         )
         self.channel = self.connection.channel()
