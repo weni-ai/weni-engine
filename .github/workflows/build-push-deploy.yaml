@@ -1,0 +1,44 @@
+name: Build, push and deploy
+
+on:
+  push:
+    tags:
+      - '*.*.*-develop'
+      - '*.*.*-staging'
+      - '*.*.*'
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      repository_name: ${{ steps.setup.outputs.repository_name }}
+    steps:
+      - name: Setup outputs
+        id: setup
+        run: |
+          {
+            echo "repository_name=${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/}"
+          } | tee -a "${GITHUB_OUTPUT}"
+
+          {
+            echo "### Workflow Outputs"
+            echo "| Variable        | Value           |"
+            echo "| --------------- | --------------- |"
+            echo "| repository_name | Repository name |"
+          } | tee -a "${GITHUB_STEP_SUMMARY}"
+
+  call-workflow:
+    uses: weni-ai/actions-workflows/.github/workflows/reusable-workflow.yaml@main
+    needs:
+      - setup
+    with:
+      deploy_type: 'kubernetes'
+      image_repository: "connectof/connect-engine"
+      image_registry_url: 'docker.io'
+      target_application: "${{ needs.setup.outputs.repository_name }}"
+      target_repository: 'weni-ai/kubernetes-manifests-platform'
+      #target_repository_branch: 'main'
+      target_patch_file: 'image.json'
+    secrets: inherit
+
+# vim: nu ts=2 fdm=indent et ft=yaml shiftwidth=2 softtabstop=2:
