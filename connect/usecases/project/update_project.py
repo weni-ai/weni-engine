@@ -11,6 +11,7 @@ class UpdateProjectUseCase:
             "project_uuid": str(project.uuid),
             "description": project.description,
             "user_email": user_email,
+            "language": project.language,
         }
 
         celery_app.send_task(
