@@ -35,12 +35,11 @@ jobs:
       deploy_type: 'kubernetes'
       image_repository: "connectof/connect-engine"
       image_registry_url: 'docker.io'
+      aws_ssm_registry_username: '/cloud/registry/USERNAME'
       target_application: "${{ needs.setup.outputs.repository_name }}"
       target_repository: 'weni-ai/kubernetes-manifests-platform'
       #target_repository_branch: 'main'
       target_patch_file: 'image.json'
-      #image_registry_username: ${{ secrets.DOCKERHUB_USERNAME }}
-      #image_registry_password: ${{ secrets.DOCKERHUB_TOKEN }}
     #secrets: inherit
     secrets:
       REGISTRY_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
