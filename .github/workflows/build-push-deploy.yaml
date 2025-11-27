@@ -39,8 +39,8 @@ jobs:
       target_repository: 'weni-ai/kubernetes-manifests-platform'
       #target_repository_branch: 'main'
       target_patch_file: 'image.json'
-      image_registry_username: ${{ secrets.DOCKERHUB_USERNAME }}
-      image_registry_password: ${{ secrets.DOCKERHUB_TOKEN }}
+      #image_registry_username: ${{ secrets.DOCKERHUB_USERNAME }}
+      #image_registry_password: ${{ secrets.DOCKERHUB_TOKEN }}
     #secrets: inherit
     secrets:
       REGISTRY_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
