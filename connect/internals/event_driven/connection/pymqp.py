@@ -14,13 +14,21 @@ class RabbitMQPymqpConnection:
         return cls._instance
 
     def _establish_connection(self):
-        self.connection = amqp.Connection(
-            host=settings.EDA_BROKER_HOST,
-            virtual_host=settings.EDA_VIRTUAL_HOST,
-            userid=settings.EDA_BROKER_USER,
-            password=settings.EDA_BROKER_PASSWORD,
-            port=settings.EDA_BROKER_PORT,
-        )
+        connection_params = {
+            "host": settings.EDA_BROKER_HOST,
+            "virtual_host": settings.EDA_VIRTUAL_HOST,
+            "userid": settings.EDA_BROKER_USER,
+            "password": settings.EDA_BROKER_PASSWORD,
+            "port": settings.EDA_BROKER_PORT,
+        }
+
+        if settings.EDA_BROKER_USE_SSL:
+            # PyAMQP supports SSL via the 'ssl' parameter
+            # For AWS MQ, we use ssl=True without certificate verification
+            # as AWS MQ uses self-signed certificates
+            connection_params["ssl"] = True
+
+        self.connection = amqp.Connection(**connection_params)
         self.channel = self.connection.channel()
 
     def connect(self):
