@@ -42,8 +42,8 @@ jobs:
       target_patch_file: 'image.json'
     #secrets: inherit
     secrets:
-      REGISTRY_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-      REGISTRY_TOKEN: ${{ secrets.REGISTRY_TOKEN }}
+    #  REGISTRY_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+    #  REGISTRY_TOKEN: ${{ secrets.REGISTRY_TOKEN }}
       ROLE_ARN: ${{ secrets.ROLE_ARN }}
 
 # vim: nu ts=2 fdm=indent et ft=yaml shiftwidth=2 softtabstop=2:
