@@ -555,8 +555,12 @@ OMIE_APP_SECRET = env.str("OMIE_APP_SECRET", default="sk_test")
 USE_EDA = env.bool("USE_EDA", default=False)
 
 if USE_EDA:
+    # To use pika (same as publisher), change to:
+    # "connect.internals.event_driven.connection.pika_backend.PikaConnectionBackend"
+    # To use amqp (original), use:
+    # "connect.internals.event_driven.connection.pymqp.PyAMQPConnectionBackend"
     EDA_CONNECTION_BACKEND = (
-        "connect.internals.event_driven.connection.pymqp.PyAMQPConnectionBackend"
+        "connect.internals.event_driven.connection.pika_backend.PikaConnectionBackend"
     )
     EDA_CONSUMERS_HANDLE = "connect.internals.event_driven.handle.handle_consumers"
 

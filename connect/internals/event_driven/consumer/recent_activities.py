@@ -1,5 +1,3 @@
-import amqp
-
 from sentry_sdk import capture_exception
 from .rabbitmq_consumer import EDAConsumer
 
@@ -10,7 +8,7 @@ from connect.usecases.recent_activities.exceptions import InvalidActionEntityCom
 
 
 class RecentActivitiesConsumer(EDAConsumer):
-    def consume(self, message: amqp.Message):
+    def consume(self, message):
         try:
             msg_body = JSONParser.parse(message.body)
             print(f"[RecentActivitiesConsumer] - Consuming a message. Body: {msg_body}")
