@@ -146,13 +146,19 @@ class ProjectViewSetTestCase(TestCase):
     def test_update_project(self, mock_publisher):
         mock_publisher.side_effect = [True]
 
+        self.project1.language = "en-us"
+        self.project1.save()
+
+        self.assertEquals(self.project1.language, "en-us")
+
         organization_uuid = str(self.org_1.uuid)
         project_uuid = str(self.project1.uuid)
         data = {
             "name": "Test V2 Project (update)",
             "timezone": "America/Argentina/Buenos_Aires",
+            "language": "pt-br",
         }
-        path = f"/v2/organizations/{organization_uuid}projects/{project_uuid}"
+        path = f"/v2/organizations/{organization_uuid}/projects/{project_uuid}"
         method = {"patch": "update"}
         user = self.user
 
@@ -167,7 +173,13 @@ class ProjectViewSetTestCase(TestCase):
         self.assertEquals(
             "America/Argentina/Buenos_Aires", content_data.get("timezone")
         )
+        self.assertEquals(
+            "pt-br", content_data.get("language")
+        )
         self.assertEquals(response.status_code, status.HTTP_200_OK)
+
+        self.project1.refresh_from_db()
+        self.assertEquals(self.project1.language, "pt-br")
 
     @patch(
         "connect.api.v1.internal.intelligence.intelligence_rest_client.IntelligenceRESTClient.get_organization_intelligences"

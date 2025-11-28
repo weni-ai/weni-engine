@@ -564,6 +564,13 @@ class Project(models.Model):
         default=ProjectStatus.ACTIVE,
         max_length=8,
     )
+    language = models.CharField(
+        _("Project Language"),
+        max_length=64,
+        null=True,
+        choices=settings.LANGUAGES,
+        default=settings.DEFAULT_LANGUAGE,
+    )
 
     def __str__(self):
         return f"{self.uuid} - Project: {self.name} - Org: {self.organization.name}"
