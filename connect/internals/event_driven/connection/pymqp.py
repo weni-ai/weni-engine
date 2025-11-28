@@ -24,11 +24,16 @@ class RabbitMQPymqpConnection:
 
         if settings.EDA_BROKER_USE_SSL:
             # PyAMQP supports SSL via the 'ssl' parameter
-            # For AWS MQ, we use ssl=True without certificate verification
-            # as AWS MQ uses self-signed certificates
+            # For AWS MQ, we use ssl=True
+            # Note: PyAMQP may use system default SSL settings
+            # For AWS MQ with self-signed certificates, you may need to
+            # set SSL_CERT_FILE and SSL_CERT_DIR environment variables
+            # or configure SSL at the system level
             connection_params["ssl"] = True
 
         self.connection = amqp.Connection(**connection_params)
+        # PyAMQP 2.0+ requires explicit connect() call before using the connection
+        self.connection.connect()
         self.channel = self.connection.channel()
 
     def connect(self):
