@@ -63,25 +63,27 @@ class ListChannelsAPIView(views.APIView):  # pragma: no cover
         if not channel_type:
             raise ValidationError("Need pass the channel_type")
 
+        exclude_wpp_demo = request.query_params.get("exclude_wpp_demo", False)
+
         is_module = request.user.has_perm("authentication.can_communicate_internally")
 
         flow_instance = FlowsRESTClient()
 
+        project_uuid = request.query_params.get("project_uuid")
+
         if not is_module:
-            project_uuid = request.query_params.get("project_uuid")
             if not project_uuid:
                 raise ValidationError("Need pass the project_uuid")
 
             project = Project.objects.get(uuid=project_uuid)
             self.check_object_permissions(request, project)
+            project_uuid = project.uuid
 
-            response = flow_instance.list_channel(
-                channel_type=channel_type,
-                project_uuid=project.uuid,
-            )
-        else:
-            project_uuid = request.query_params.get("project_uuid")
-            response = flow_instance.list_channel(channel_type=channel_type, project_uuid=project_uuid)
+        response = flow_instance.list_channel(
+            channel_type=channel_type,
+            project_uuid=project_uuid,
+            exclude_wpp_demo=exclude_wpp_demo,
+        )
 
         channels = []
         for channel in response:
