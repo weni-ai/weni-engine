@@ -1,3 +1,6 @@
+# 3.35.0
+  - Feat: project language
+
 # 3.34.5
   - Add uuid filter in org Admin page
   - Get name in update project endpoint to update flows
