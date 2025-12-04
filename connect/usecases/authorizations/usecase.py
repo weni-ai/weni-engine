@@ -21,6 +21,7 @@ class AuthorizationUseCase:
         OrganizationRole.ADMIN.value: ProjectRole.MODERATOR.value,
         OrganizationRole.CONTRIBUTOR.value: ProjectRole.CONTRIBUTOR.value,
         OrganizationRole.SUPPORT.value: ProjectRole.SUPPORT.value,
+        OrganizationRole.MARKETING.value: ProjectRole.MARKETING.value,
     }
 
     def __init__(

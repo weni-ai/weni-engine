@@ -299,11 +299,11 @@ class Organization(models.Model):
 
 
 class OrganizationLevelRole(Enum):
-    NOTHING, VIEWER, CONTRIBUTOR, ADMIN, FINANCIAL, SUPPORT = list(range(6))
+    NOTHING, VIEWER, CONTRIBUTOR, ADMIN, FINANCIAL, SUPPORT, MARKETING = list(range(7))
 
 
 class OrganizationRole(Enum):
-    NOT_SETTED, VIEWER, CONTRIBUTOR, ADMIN, FINANCIAL, SUPPORT = list(range(6))
+    NOT_SETTED, VIEWER, CONTRIBUTOR, ADMIN, FINANCIAL, SUPPORT, MARKETING = list(range(7))
 
 
 class OrganizationAuthorization(models.Model):
@@ -319,6 +319,7 @@ class OrganizationAuthorization(models.Model):
         (OrganizationRole.VIEWER.value, _("viewer")),
         (OrganizationRole.FINANCIAL.value, _("financial")),
         (OrganizationRole.SUPPORT.value, _("support")),
+        (OrganizationRole.MARKETING.value, _("marketing")),
     ]
 
     uuid = models.UUIDField(
@@ -356,6 +357,9 @@ class OrganizationAuthorization(models.Model):
 
         if self.role == OrganizationRole.SUPPORT.value:
             return OrganizationLevelRole.SUPPORT.value
+        
+        if self.role == OrganizationRole.MARKETING.value:
+            return OrganizationLevelRole.MARKETING.value
 
     @property
     def can_read(self):
@@ -365,6 +369,7 @@ class OrganizationAuthorization(models.Model):
             OrganizationLevelRole.ADMIN.value,
             OrganizationLevelRole.VIEWER.value,
             OrganizationLevelRole.SUPPORT.value,
+            OrganizationLevelRole.MARKETING.value,
         ]
 
     @property
@@ -373,6 +378,7 @@ class OrganizationAuthorization(models.Model):
             OrganizationLevelRole.CONTRIBUTOR.value,
             OrganizationLevelRole.ADMIN.value,
             OrganizationLevelRole.SUPPORT.value,
+            OrganizationLevelRole.MARKETING.value,
         ]
 
     @property
@@ -380,6 +386,7 @@ class OrganizationAuthorization(models.Model):
         return self.level in [
             OrganizationLevelRole.ADMIN.value,
             OrganizationLevelRole.SUPPORT.value,
+            OrganizationLevelRole.MARKETING.value,
         ]
 
     @property
@@ -387,6 +394,7 @@ class OrganizationAuthorization(models.Model):
         return self.level in [
             OrganizationLevelRole.ADMIN.value,
             OrganizationLevelRole.SUPPORT.value,
+            OrganizationLevelRole.MARKETING.value,
         ]
 
     @property
@@ -399,6 +407,7 @@ class OrganizationAuthorization(models.Model):
             OrganizationLevelRole.ADMIN.value,
             OrganizationLevelRole.FINANCIAL.value,
             OrganizationLevelRole.SUPPORT.value,
+            OrganizationLevelRole.MARKETING.value,
         ]
 
     @property
@@ -880,11 +889,11 @@ class ChatsAuthorization(models.Model):
 
 
 class ProjectRole(Enum):
-    NOT_SETTED, VIEWER, CONTRIBUTOR, MODERATOR, SUPPORT, CHAT_USER = list(range(6))
+    NOT_SETTED, VIEWER, CONTRIBUTOR, MODERATOR, SUPPORT, CHAT_USER, MARKETING = list(range(7))
 
 
 class ProjectRoleLevel(Enum):
-    NOTHING, VIEWER, CONTRIBUTOR, MODERATOR, SUPPORT, CHAT_USER = list(range(6))
+    NOTHING, VIEWER, CONTRIBUTOR, MODERATOR, SUPPORT, CHAT_USER, MARKETING = list(range(7))
 
 
 class ProjectAuthorization(models.Model):
@@ -898,6 +907,7 @@ class ProjectAuthorization(models.Model):
         (ProjectRole.MODERATOR.value, _("moderator")),
         (ProjectRole.SUPPORT.value, _("support")),
         (ProjectRole.CHAT_USER.value, _("Chat user")),
+        (ProjectRole.MARKETING.value, _("marketing")),
     ]
     uuid = models.UUIDField(
         _("UUID"), primary_key=True, default=uuid4.uuid4, editable=False
@@ -935,12 +945,15 @@ class ProjectAuthorization(models.Model):
             return ProjectRoleLevel.VIEWER.value
         elif self.role == ProjectRole.SUPPORT.value:
             return ProjectRoleLevel.SUPPORT.value
+        elif self.role == ProjectRole.MARKETING.value:
+            return ProjectRoleLevel.MARKETING.value
 
     @property
     def is_moderator(self):
         return self.level in [
             ProjectRoleLevel.MODERATOR.value,
             ProjectRoleLevel.SUPPORT.value,
+            ProjectRoleLevel.MARKETING.value,
         ]
 
     @property
@@ -948,6 +961,7 @@ class ProjectAuthorization(models.Model):
         return self.level in [
             ProjectRoleLevel.MODERATOR.value,
             ProjectRoleLevel.SUPPORT.value,
+            ProjectRoleLevel.MARKETING.value,
         ]
 
     @property
@@ -958,6 +972,7 @@ class ProjectAuthorization(models.Model):
             ProjectRoleLevel.VIEWER.value,
             ProjectRoleLevel.SUPPORT.value,
             ProjectRoleLevel.CHAT_USER.value,
+            ProjectRoleLevel.MARKETING.value,
         ]
 
     @property
@@ -966,6 +981,7 @@ class ProjectAuthorization(models.Model):
             ProjectRoleLevel.MODERATOR.value,
             ProjectRoleLevel.CONTRIBUTOR.value,
             ProjectRoleLevel.SUPPORT.value,
+            ProjectRoleLevel.MARKETING.value,
         ]
 
 
