@@ -1,3 +1,6 @@
+# 3.35.1
+  - Enhance FlowsRESTClient and ListChannelsAPIView to support exclude_wpp_demo parameter
+
 # 3.35.0
   - Feat: project language
 
