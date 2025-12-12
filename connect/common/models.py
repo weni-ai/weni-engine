@@ -393,7 +393,6 @@ class OrganizationAuthorization(models.Model):
         return self.level in [
             OrganizationLevelRole.ADMIN.value,
             OrganizationLevelRole.SUPPORT.value,
-            OrganizationLevelRole.MARKETING.value,
         ]
 
     @property
