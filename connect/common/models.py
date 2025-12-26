@@ -614,11 +614,6 @@ class Project(models.Model):
 
         return {"flow": flows_result, "intelligence": intelligence_result}
 
-    def perform_destroy_flows_project(self, user_email: str):
-        project_uuid = self.uuid
-
-        current_app.send_task("delete_project", args=[project_uuid, user_email])
-
     def create_classifier(self, authorization, template_type: str, access_token: str):
         flow_instance = FlowsRESTClient()
         created = False
