@@ -60,8 +60,11 @@ class ProjectEDAPublisher:
         self,
         project_uuid: UUID,
         user_email: str,
+        name: Optional[str] = None,
         description: Optional[str] = None,
         language: Optional[str] = None,
+        timezone: Optional[str] = None,
+        date_format: Optional[str] = None,
         updated_at: Optional[pendulum.DateTime] = None,
     ) -> None:
         """
@@ -70,8 +73,11 @@ class ProjectEDAPublisher:
         Args:
             project_uuid: UUID of the updated project
             user_email: Email of the user who updated the project
+            name: New project name
             description: New project description
             language: New project language
+            timezone: New project timezone
+            date_format: New project date format
             updated_at: Timestamp of update (defaults to now)
         """
         if not self.rabbitmq_publisher:
@@ -84,8 +90,11 @@ class ProjectEDAPublisher:
             "project_uuid": str(project_uuid),
             "action": "updated",
             "user_email": user_email,
+            "name": name,
             "description": description,
             "language": language,
+            "timezone": timezone,
+            "date_format": date_format,
             "timestamp": updated_at.to_iso8601_string(),
         }
 
