@@ -11,9 +11,10 @@ class ProjectEDAPublisher:
     """
     Publisher for project-related events via EDA (Event-Driven Architecture).
 
-    Publishes to exchange 'update-projects.topic' with routing keys:
-    - project.deleted
-    - project.updated
+    Publishes to exchange 'update-projects.topic' without routing keys.
+    Events are differentiated by the 'action' field in the message body:
+    - action: "deleted"
+    - action: "updated"
     """
 
     def __init__(self):
@@ -52,7 +53,7 @@ class ProjectEDAPublisher:
         self.rabbitmq_publisher.send_message(
             body=message_body,
             exchange="update-projects.topic",
-            routing_key="project.deleted",
+            routing_key="",
         )
 
     def publish_project_updated(
@@ -91,6 +92,6 @@ class ProjectEDAPublisher:
         self.rabbitmq_publisher.send_message(
             body=message_body,
             exchange="update-projects.topic",
-            routing_key="project.updated",
+            routing_key="",
         )
 
