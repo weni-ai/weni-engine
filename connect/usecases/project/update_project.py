@@ -1,26 +1,18 @@
-from django.conf import settings
-
 from connect.celery import app as celery_app
 from connect.common.models import Project
-from connect.internals.event_driven.producer.rabbitmq_publisher import RabbitmqPublisher
+from connect.usecases.project.eda_publisher import ProjectEDAPublisher
 
 
 class UpdateProjectUseCase:
+    def __init__(self):
+        self.eda_publisher = ProjectEDAPublisher()
+
     def send_updated_project(self, project: Project, user_email: str):
-        message_body = {
-            "project_uuid": str(project.uuid),
-            "description": project.description,
-            "user_email": user_email,
-            "language": project.language,
-        }
 
-        celery_app.send_task(
-            "update_project",
-            args=[project.uuid, project.name],
+        # Publish update event via EDA to notify Flows and Billing
+        self.eda_publisher.publish_project_updated(
+            project_uuid=project.uuid,
+            user_email=user_email,
+            description=project.description,
+            language=project.language,
         )
-
-        if not settings.TESTING:
-            self.rabbitmq_publisher = RabbitmqPublisher()
-            self.rabbitmq_publisher.send_message(
-                message_body, exchange="update-projects.topic", routing_key=""
-            )
