@@ -13,6 +13,9 @@ class UpdateProjectUseCase:
         self.eda_publisher.publish_project_updated(
             project_uuid=project.uuid,
             user_email=user_email,
+            name=project.name,
             description=project.description,
             language=project.language,
+            timezone=str(project.timezone) if project.timezone else None,
+            date_format=project.date_format,
         )
