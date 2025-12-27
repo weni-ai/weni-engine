@@ -1,0 +1,9 @@
+{% load i18n %}
+
+<p>Oi, {{ user_name }}</p>
+Sua base de conhecimento ultrapassou o limite de caracteres!
+
+<p>A base de conhecimento da inteligência <strong>{{ ai_name }}</strong> ultrapassou o limite de caracteres.<p>
+<p>Ajuste para o limite permitido pelo chatGPT de <strong>25000</strong> caracteres para que ela funcione corretamente.<p>
+
+<p>Total de caracteres permitidos: 25000 <br> Total de caracteres da base de conhecimento: 89000</p>
