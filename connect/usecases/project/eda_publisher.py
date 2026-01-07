@@ -15,6 +15,7 @@ class ProjectEDAPublisher:
     Events are differentiated by the 'action' field in the message body:
     - action: "deleted"
     - action: "updated"
+    - action: "status_updated"
     """
 
     def __init__(self):
@@ -95,6 +96,42 @@ class ProjectEDAPublisher:
             "language": language,
             "timezone": timezone,
             "date_format": date_format,
+            "timestamp": updated_at.to_iso8601_string(),
+        }
+
+        self.rabbitmq_publisher.send_message(
+            body=message_body,
+            exchange="update-projects.topic",
+            routing_key="",
+        )
+
+    def publish_project_status_updated(
+        self,
+        project_uuid: UUID,
+        user_email: str,
+        status: str,
+        updated_at: Optional[pendulum.DateTime] = None,
+    ) -> None:
+        """
+        Publish a project status updated event.
+
+        Args:
+            project_uuid: UUID of the updated project
+            user_email: Email of the user who updated the project status
+            status: New project status (ACTIVE, INACTIVE, IN_TEST)
+            updated_at: Timestamp of update (defaults to now)
+        """
+        if not self.rabbitmq_publisher:
+            return
+
+        if updated_at is None:
+            updated_at = pendulum.now("UTC")
+
+        message_body = {
+            "project_uuid": str(project_uuid),
+            "action": "status_updated",
+            "user_email": user_email,
+            "status": status,
             "timestamp": updated_at.to_iso8601_string(),
         }
 
