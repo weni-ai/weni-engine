@@ -1,26 +1,26 @@
-from django.conf import settings
-
-from connect.celery import app as celery_app
 from connect.common.models import Project
-from connect.internals.event_driven.producer.rabbitmq_publisher import RabbitmqPublisher
+from connect.usecases.project.eda_publisher import ProjectEDAPublisher
 
 
 class UpdateProjectUseCase:
-    def send_updated_project(self, project: Project, user_email: str):
-        message_body = {
-            "project_uuid": str(project.uuid),
-            "description": project.description,
-            "user_email": user_email,
-            "language": project.language,
-        }
+    def __init__(self):
+        self.eda_publisher = ProjectEDAPublisher()
 
-        celery_app.send_task(
-            "update_project",
-            args=[project.uuid, project.name],
+    def send_updated_project(self, project: Project, user_email: str):
+
+        self.eda_publisher.publish_project_updated(
+            project_uuid=project.uuid,
+            user_email=user_email,
+            name=project.name,
+            description=project.description,
+            language=project.language,
+            timezone=str(project.timezone) if project.timezone else None,
+            date_format=project.date_format,
         )
 
-        if not settings.TESTING:
-            self.rabbitmq_publisher = RabbitmqPublisher()
-            self.rabbitmq_publisher.send_message(
-                message_body, exchange="update-projects.topic", routing_key=""
-            )
+    def send_updated_project_status(self, project: Project, user_email: str):
+        self.eda_publisher.publish_project_status_updated(
+            project_uuid=project.uuid,
+            user_email=user_email,
+            status=project.status,
+        )

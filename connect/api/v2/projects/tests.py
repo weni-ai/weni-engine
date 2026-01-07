@@ -173,9 +173,7 @@ class ProjectViewSetTestCase(TestCase):
         self.assertEquals(
             "America/Argentina/Buenos_Aires", content_data.get("timezone")
         )
-        self.assertEquals(
-            "pt-br", content_data.get("language")
-        )
+        self.assertEquals("pt-br", content_data.get("language"))
         self.assertEquals(response.status_code, status.HTTP_200_OK)
 
         self.project1.refresh_from_db()

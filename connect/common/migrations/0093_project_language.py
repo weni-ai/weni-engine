@@ -6,13 +6,23 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('common', '0092_auto_20250910_1341'),
+        ("common", "0092_auto_20250910_1341"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='project',
-            name='language',
-            field=models.CharField(choices=[('en-us', 'English'), ('pt-br', 'Portuguese'), ('es', 'Spanish')], default='en-us', max_length=64, null=True, verbose_name='Project Language'),
+            model_name="project",
+            name="language",
+            field=models.CharField(
+                choices=[
+                    ("en-us", "English"),
+                    ("pt-br", "Portuguese"),
+                    ("es", "Spanish"),
+                ],
+                default="en-us",
+                max_length=64,
+                null=True,
+                verbose_name="Project Language",
+            ),
         ),
     ]

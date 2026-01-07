@@ -16,6 +16,7 @@ from connect.api.v2.projects.serializers import (
     ProjectListAuthorizationSerializer,
     OpenedProjectSerializer,
 )
+from connect.usecases.project import ProjectEDAPublisher
 
 from django.utils import timezone
 from connect.api.v2.paginations import (
@@ -112,7 +113,14 @@ class ProjectViewSet(
 
     def perform_destroy(self, instance):
         user_email = self.request.user.email
-        instance.perform_destroy_flows_project(user_email)
+        project_uuid = instance.uuid
+
+        # Publish delete event via EDA to notify Flows and Billing
+        eda_publisher = ProjectEDAPublisher()
+        eda_publisher.publish_project_deleted(
+            project_uuid=project_uuid,
+            user_email=user_email,
+        )
 
         instance.delete()
 
