@@ -1,4 +1,3 @@
-from connect.celery import app as celery_app
 from connect.common.models import Project
 from connect.usecases.project.eda_publisher import ProjectEDAPublisher
 

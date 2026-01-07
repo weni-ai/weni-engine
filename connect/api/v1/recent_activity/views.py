@@ -26,7 +26,9 @@ class RecentActivityAPIView(views.APIView):
         if intelligence_id:
             return Response(
                 status=status.HTTP_200_OK,
-                data={"message": "The Intelligence ID is not supported. Action ignored"},
+                data={
+                    "message": "The Intelligence ID is not supported. Action ignored"
+                },
             )
 
         action = request.data.get("action")

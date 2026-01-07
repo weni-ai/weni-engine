@@ -21,12 +21,15 @@ from model_utils import FieldTracker
 
 from connect import billing
 from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
-from connect.api.v1.internal.intelligence.intelligence_rest_client import \
-    IntelligenceRESTClient
+from connect.api.v1.internal.intelligence.intelligence_rest_client import (
+    IntelligenceRESTClient,
+)
 from connect.authentication.models import User
 from connect.billing.gateways.stripe_gateway import StripeGateway
-from connect.common.exceptions import (OrganizationAuthorizationException,
-                                       ProjectAuthorizationException)
+from connect.common.exceptions import (
+    OrganizationAuthorizationException,
+    ProjectAuthorizationException,
+)
 from connect.common.gateways.rocket_gateway import Rocket
 from connect.common.helpers import send_mass_html_mail
 from connect.internals.event_driven.producer.rabbitmq_publisher import RabbitmqPublisher
@@ -656,8 +659,9 @@ class Project(models.Model):
         return created, data
 
     def create_chats_project(self):
-        from connect.api.v1.internal.chats.chats_rest_client import \
-            ChatsRESTClient  # to avoid circular import
+        from connect.api.v1.internal.chats.chats_rest_client import (
+            ChatsRESTClient,
+        )  # to avoid circular import
 
         created = False
         chats_client = ChatsRESTClient()
@@ -742,8 +746,7 @@ class Project(models.Model):
 
     def get_contacts(self, before: str, after: str, counting_method: str = None):
         from connect.billing.models import Contact
-        from connect.billing.utils import (custom_get_attendances,
-                                           get_attendances)
+        from connect.billing.utils import custom_get_attendances, get_attendances
 
         if not counting_method:
             counting_method = self.organization.organization_billing.plan_method
