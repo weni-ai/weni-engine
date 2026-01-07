@@ -67,6 +67,7 @@ from connect.usecases.authorizations.dto import (
 from connect.usecases.authorizations.exceptions import (
     UserHasNoPermissionToManageProject,
 )
+from connect.usecases.project.update_project import UpdateProjectUseCase
 from connect.utils import count_contacts, rate_limit
 
 logger = logging.getLogger(__name__)
@@ -450,6 +451,10 @@ class ProjectViewSet(
         serializer = self.get_serializer(project, data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+
+        project.refresh_from_db()
+
+        UpdateProjectUseCase().send_updated_project_status(project, request.user.email)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
