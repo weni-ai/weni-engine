@@ -35,6 +35,8 @@ from connect.api.v2.organizations import views as organization_views
 from connect.api.v2.projects import views as project_views
 from connect.api.v2.internals import views as connect_internal_views
 from connect.api.v2.auth.views import KeycloakAuthView, ProjectAuthView
+from connect.api.v2.feature_flags.views import FeatureFlagsAPIView
+from weni_feature_flags.views import FeatureFlagsWebhookView
 
 router = routers.SimpleRouter()
 router.register(
@@ -153,6 +155,8 @@ urlpatterns = [
         name="check-exists-project",
     ),
     path("auth/", KeycloakAuthView.as_view(), name="keycloak-auth"),
+    path("feature-flags/", FeatureFlagsAPIView.as_view(), name="feature-flags"),
+    path("feature-flags/webhook/", FeatureFlagsWebhookView.as_view(), name="feature-flags-webhook"),
 ]
 urlpatterns += [
     path("", include(projects_router.urls)),

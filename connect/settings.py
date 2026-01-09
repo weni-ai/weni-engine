@@ -105,6 +105,8 @@ env = environ.Env(
     RATE_LIMIT_REQUESTS=(int, 10),
     RATE_LIMIT_WINDOW=(int, 60),
     RATE_LIMIT_BLOCK_TIME=(int, 300),
+    GROWTHBOOK_CLIENT_KEY=(str, ""),
+    GROWTHBOOK_HOST_BASE_URL=(str, ""),
 )
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -158,6 +160,7 @@ INSTALLED_APPS = [
     "django_grpc_framework",
     "stripe",
     "django_prometheus",
+    "weni_feature_flags",
 ]
 
 MIDDLEWARE = [
@@ -586,3 +589,7 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = env.int("DATA_UPLOAD_MAX_NUMBER_FIELDS", default
 RATE_LIMIT_REQUESTS = env.int("RATE_LIMIT_REQUESTS")
 RATE_LIMIT_WINDOW = env.int("RATE_LIMIT_WINDOW")
 RATE_LIMIT_BLOCK_TIME = env.int("RATE_LIMIT_BLOCK_TIME")
+
+# GrowthBook / Feature Flags
+GROWTHBOOK_CLIENT_KEY = env.str("GROWTHBOOK_CLIENT_KEY")
+GROWTHBOOK_HOST_BASE_URL = env.str("GROWTHBOOK_HOST_BASE_URL")
