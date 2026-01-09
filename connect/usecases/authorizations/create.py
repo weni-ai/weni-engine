@@ -32,7 +32,7 @@ class CreateAuthorizationUseCase(AuthorizationUseCase):
                 "has_2fa": user.has_2fa,
             },
         )
-        
+
         if not created:
             authorization.role = auth_dto.role
             authorization.has_2fa = user.has_2fa
@@ -62,7 +62,7 @@ class CreateAuthorizationUseCase(AuthorizationUseCase):
                 "role": role,
             },
         )
-        
+
         if not created:
             project_auth.role = role
             project_auth.save()
@@ -183,6 +183,6 @@ class CreateAuthorizationUseCase(AuthorizationUseCase):
             request_permission.role = auth_dto.role
             request_permission.created_by = created_by_user
             request_permission.save()
-        
+
         project.send_email_invite_project(request_permission.email)
         return request_permission

@@ -356,7 +356,7 @@ class OrganizationAuthorization(models.Model):
 
         if self.role == OrganizationRole.SUPPORT.value:
             return OrganizationLevelRole.SUPPORT.value
-        
+
         if self.role == OrganizationRole.MARKETING.value:
             return OrganizationLevelRole.MARKETING.value
 
