@@ -289,14 +289,15 @@ class FlowsRESTClient:
         is_active: str = "True",
         channel_type: str = "WA",
         project_uuid: str = None,
+        exclude_wpp_demo: bool = False,
     ):
-        params = {}
+        params = dict(
+            is_active=is_active,
+            channel_type=channel_type,
+            exclude_wpp_demo=exclude_wpp_demo,
+        )
         if project_uuid:
-            params = dict(
-                is_active=is_active, channel_type=channel_type, org=project_uuid
-            )
-        else:
-            params = dict(is_active=is_active, channel_type=channel_type)
+            params["org"] = project_uuid
         response = requests.get(
             url=f"{self.base_url}/api/v2/internals/channel/",
             headers=self.authentication_instance.headers,
@@ -410,6 +411,10 @@ class FlowsRESTClient:
         from connect.common.models import Project
 
         project = Project.objects.get(uuid=project_uuid)
+        # Normalize payload to match Flows API expectations
+        # Accept legacy key 'organization_name' but send 'name' to Flows
+        if "organization_name" in kwargs and "name" not in kwargs:
+            kwargs["name"] = kwargs.pop("organization_name")
         kwargs.update({"timezone": str(project.timezone)})
         try:
             response = requests.patch(

@@ -25,13 +25,22 @@ class CreateAuthorizationUseCase(AuthorizationUseCase):
     def create_organization_authorization(
         self, auth_dto: CreateAuthorizationDTO, user: User, org: Organization
     ) -> OrganizationAuthorization:
-        authorization: OrganizationAuthorization = org.authorizations.create(
-            user=user, role=auth_dto.role, has_2fa=user.has_2fa
+        authorization, created = org.authorizations.get_or_create(
+            user=user,
+            defaults={
+                "role": auth_dto.role,
+                "has_2fa": user.has_2fa,
+            },
         )
+
+        if not created:
+            authorization.role = auth_dto.role
+            authorization.has_2fa = user.has_2fa
+            authorization.save()
 
         if self.publish_message:
             self.publish_organization_authorization_message(
-                action="create",
+                action="create" if created else "update",
                 org_uuid=str(org.uuid),
                 user_email=user.email,
                 role=authorization.role,
@@ -46,19 +55,20 @@ class CreateAuthorizationUseCase(AuthorizationUseCase):
         role: int,
         org_auth: OrganizationAuthorization,
     ) -> ProjectAuthorization:
-        try:
-            project_auth: ProjectAuthorization = project.project_authorizations.get(
-                user=user
-            )
+        project_auth, created = project.project_authorizations.get_or_create(
+            user=user,
+            defaults={
+                "organization_authorization": org_auth,
+                "role": role,
+            },
+        )
+
+        if not created:
             project_auth.role = role
             project_auth.save()
             action = "update"
-
-        except ProjectAuthorization.DoesNotExist:
+        else:
             action = "create"
-            project_auth: ProjectAuthorization = project.project_authorizations.create(
-                user=user, organization_authorization=org_auth, role=role
-            )
 
         if self.publish_message:
             print(action)
@@ -160,22 +170,19 @@ class CreateAuthorizationUseCase(AuthorizationUseCase):
         created_by_user: User = RetrieveUserUseCase().get_user_by_email(
             email=auth_dto.created_by_email
         )
-        try:
-            request_permission = RequestPermissionProject.objects.get(
-                email=auth_dto.user_email, project=project
-            )
+        request_permission, created = RequestPermissionProject.objects.get_or_create(
+            email=auth_dto.user_email,
+            project=project,
+            defaults={
+                "role": auth_dto.role,
+                "created_by": created_by_user,
+            },
+        )
+
+        if not created:
             request_permission.role = auth_dto.role
             request_permission.created_by = created_by_user
             request_permission.save()
-            project.send_email_invite_project(request_permission.email)
-            return request_permission
 
-        except RequestPermissionProject.DoesNotExist:
-            request_permission = RequestPermissionProject.objects.create(
-                email=auth_dto.user_email,
-                project=project,
-                role=auth_dto.role,
-                created_by=created_by_user,
-            )
-            project.send_email_invite_project(request_permission.email)
-            return request_permission
+        project.send_email_invite_project(request_permission.email)
+        return request_permission

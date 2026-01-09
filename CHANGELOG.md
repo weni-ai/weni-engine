@@ -1,3 +1,22 @@
+# 3.37.0
+  - feat: add marketing role permission
+
+# 3.36.0
+  - Add publisher to project events
+
+# 3.35.1
+  - Enhance FlowsRESTClient and ListChannelsAPIView to support exclude_wpp_demo parameter
+
+# 3.35.0
+  - Feat: project language
+
+# 3.34.5
+  - Add uuid filter in org Admin page
+  - Get name in update project endpoint to update flows
+
+# 3.34.4
+  - Fix bug to invite new users to organization and projects
+
 # 3.34.3
   - Refactor invalid get or create on Roles validation
   - Remove Intelligences Recent Activities

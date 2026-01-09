@@ -485,19 +485,23 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
 class ProjectUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
-        fields = ["name", "timezone", "date_format", "uuid", "description"]
+        fields = ["name", "timezone", "date_format", "uuid", "description", "language"]
         ref_name = None
 
     name = serializers.CharField(max_length=500, required=False)
     description = serializers.CharField(max_length=1000, required=False)
     timezone = fields.TimezoneField(required=False)
     date_format = serializers.CharField(max_length=1, required=False)
+    language = serializers.CharField(max_length=64, required=False)
 
     def update(self, instance, validated_data):  # pragma: no cover
         data = validated_data
 
         if validated_data.get("timezone"):
             data["timezone"] = str(data["timezone"])
+
+        if validated_data.get("language"):
+            data["language"] = str(data["language"])
 
         try:
             instance = super().update(instance, validated_data)

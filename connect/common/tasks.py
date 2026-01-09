@@ -85,19 +85,6 @@ def update_project(organization_uuid: str, organization_name: str):
     return True
 
 
-@app.task(name="delete_project")
-def delete_project(project_uuid: str, user_email):
-    if settings.USE_FLOW_REST:
-        flow_instance = FlowsRESTClient()
-    else:
-        flow_instance = utils.get_grpc_types().get("flow")
-    flow_instance.delete_project(
-        project_uuid=project_uuid,
-        user_email=user_email,
-    )
-    return True
-
-
 @app.task(
     name="update_user_permission_project",
     autoretry_for=(_InactiveRpcError, Exception),

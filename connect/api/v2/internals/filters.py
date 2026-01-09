@@ -54,7 +54,9 @@ class CRMOrganizationFilter(filters.FilterSet):
     plan = filters.ChoiceFilter(
         field_name="organization_billing__plan",
         choices=BillingPlan.PLAN_CHOICES,
-        help_text=_("Filter organizations by billing plan (free, trial, start, scale, advanced, enterprise)"),
+        help_text=_(
+            "Filter organizations by billing plan (free, trial, start, scale, advanced, enterprise)"
+        ),
     )
 
     def filter_is_suspended(self, queryset, name, value):
