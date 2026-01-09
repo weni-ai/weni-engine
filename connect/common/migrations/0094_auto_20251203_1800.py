@@ -6,28 +6,76 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('common', '0093_project_language'),
+        ("common", "0093_project_language"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='organizationauthorization',
-            name='role',
-            field=models.PositiveIntegerField(choices=[(0, 'not set'), (2, 'contributor'), (3, 'admin'), (1, 'viewer'), (4, 'financial'), (5, 'support'), (6, 'marketing')], default=0, verbose_name='role'),
+            model_name="organizationauthorization",
+            name="role",
+            field=models.PositiveIntegerField(
+                choices=[
+                    (0, "not set"),
+                    (2, "contributor"),
+                    (3, "admin"),
+                    (1, "viewer"),
+                    (4, "financial"),
+                    (5, "support"),
+                    (6, "marketing"),
+                ],
+                default=0,
+                verbose_name="role",
+            ),
         ),
         migrations.AlterField(
-            model_name='projectauthorization',
-            name='role',
-            field=models.PositiveIntegerField(choices=[(0, 'not set'), (1, 'viewer'), (2, 'contributor'), (3, 'moderator'), (4, 'support'), (5, 'Chat user'), (6, 'marketing')], default=0, verbose_name='role'),
+            model_name="projectauthorization",
+            name="role",
+            field=models.PositiveIntegerField(
+                choices=[
+                    (0, "not set"),
+                    (1, "viewer"),
+                    (2, "contributor"),
+                    (3, "moderator"),
+                    (4, "support"),
+                    (5, "Chat user"),
+                    (6, "marketing"),
+                ],
+                default=0,
+                verbose_name="role",
+            ),
         ),
         migrations.AlterField(
-            model_name='requestpermissionorganization',
-            name='role',
-            field=models.PositiveIntegerField(choices=[(0, 'not set'), (2, 'contributor'), (3, 'admin'), (1, 'viewer'), (4, 'financial'), (5, 'support'), (6, 'marketing')], default=0, verbose_name='role'),
+            model_name="requestpermissionorganization",
+            name="role",
+            field=models.PositiveIntegerField(
+                choices=[
+                    (0, "not set"),
+                    (2, "contributor"),
+                    (3, "admin"),
+                    (1, "viewer"),
+                    (4, "financial"),
+                    (5, "support"),
+                    (6, "marketing"),
+                ],
+                default=0,
+                verbose_name="role",
+            ),
         ),
         migrations.AlterField(
-            model_name='requestpermissionproject',
-            name='role',
-            field=models.PositiveIntegerField(choices=[(0, 'not set'), (1, 'viewer'), (2, 'contributor'), (3, 'moderator'), (4, 'support'), (5, 'Chat user'), (6, 'marketing')], default=0, verbose_name='role'),
+            model_name="requestpermissionproject",
+            name="role",
+            field=models.PositiveIntegerField(
+                choices=[
+                    (0, "not set"),
+                    (1, "viewer"),
+                    (2, "contributor"),
+                    (3, "moderator"),
+                    (4, "support"),
+                    (5, "Chat user"),
+                    (6, "marketing"),
+                ],
+                default=0,
+                verbose_name="role",
+            ),
         ),
     ]
