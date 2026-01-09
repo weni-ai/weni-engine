@@ -1,3 +1,6 @@
+# 3.37.0
+  - feat: add marketing role permission
+
 # 3.36.0
   - Add publisher to project events
 
