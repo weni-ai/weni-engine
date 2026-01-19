@@ -16,7 +16,6 @@ class SentryConfig(AppConfig):
         if not settings.USE_SENTRY:
             return
 
-    if settings.USE_SENTRY:
         sentry_sdk.init(
             dsn=settings.SENTRY_URL,
             integrations=[DjangoIntegration()],

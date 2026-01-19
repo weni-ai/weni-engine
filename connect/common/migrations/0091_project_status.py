@@ -6,13 +6,22 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('common', '0090_project_project_mode'),
+        ("common", "0090_project_project_mode"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='project',
-            name='status',
-            field=models.CharField(choices=[('ACTIVE', 'active'), ('INACTIVE', 'inactive'), ('IN_TEST', 'in test')], default='ACTIVE', max_length=8, verbose_name='Project status'),
+            model_name="project",
+            name="status",
+            field=models.CharField(
+                choices=[
+                    ("ACTIVE", "active"),
+                    ("INACTIVE", "inactive"),
+                    ("IN_TEST", "in test"),
+                ],
+                default="ACTIVE",
+                max_length=8,
+                verbose_name="Project status",
+            ),
         ),
     ]

@@ -1,4 +1,4 @@
-from typing import Dict, Optional
+from typing import Optional
 from uuid import UUID
 
 import pendulum

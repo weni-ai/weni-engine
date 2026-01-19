@@ -13,6 +13,8 @@ from connect.common.models import (
     RequestPermissionProject,
     OrganizationAuthorization,
     ProjectAuthorization,
+    OrganizationRole,
+    ProjectRole,
 )
 
 from connect.usecases.authorizations.create import CreateAuthorizationUseCase
@@ -423,3 +425,107 @@ class OrganizationViewSetTestCase(TestCase, TestCaseSetUp):
 
         self.request_permission_project(data)
         self.assertEquals(ProjectAuthorization.objects.count(), 2)
+
+
+class MarketingRoleTestCase(TestCase, TestCaseSetUp):
+    """Tests for the MARKETING role (role=6) at organization and project levels."""
+
+    def setUp(self):
+        self.superuser = User.objects.create(
+            email="super@test.user", username="superuser"
+        )
+        self.user = User.objects.create(
+            email="marketing@test.user", username="MarketingTestUser", has_2fa=True
+        )
+        self.org = Organization.objects.create(
+            name="Marketing test org",
+            description="Marketing test org",
+            inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan=BillingPlan.PLAN_TRIAL,
+        )
+        self.project = self.org.project.create(name="Marketing test project")
+
+    def test_marketing_role_value(self):
+        """Test that MARKETING role has correct enum value."""
+        self.assertEqual(OrganizationRole.MARKETING.value, 6)
+        self.assertEqual(ProjectRole.MARKETING.value, 6)
+
+    def test_marketing_org_authorization_properties(self):
+        """Test that MARKETING role has correct permission properties at org level."""
+        role = OrganizationRole.MARKETING.value
+        self.create_auth(self.user, self.org, role)
+        authorization = self.org.authorizations.get(user=self.user)
+
+        self.assertEqual(authorization.role, 6)
+        self.assertTrue(authorization.can_read)
+        self.assertTrue(authorization.can_contribute)
+        self.assertTrue(authorization.can_write)
+        self.assertFalse(authorization.is_admin)
+
+    def test_marketing_role_maps_to_project(self):
+        """Test that MARKETING org role propagates correctly to project."""
+        role = OrganizationRole.MARKETING.value
+        self.create_auth(self.user, self.org, role, publish_message=False)
+
+        project_auth = self.project.get_user_authorization(self.user)
+        self.assertEqual(project_auth.role, ProjectRole.MARKETING.value)
+
+    def test_marketing_project_authorization_properties(self):
+        """Test that MARKETING role has correct permission properties at project level."""
+        role = OrganizationRole.MARKETING.value
+        self.create_auth(self.user, self.org, role, publish_message=False)
+
+        project_auth = self.project.get_user_authorization(self.user)
+
+        self.assertEqual(project_auth.role, 6)
+        self.assertTrue(project_auth.can_read)
+        self.assertTrue(project_auth.can_contribute)
+        self.assertTrue(project_auth.can_write)
+        self.assertTrue(project_auth.is_moderator)
+        self.assertFalse(project_auth.is_admin)
+
+    def test_update_to_marketing_role(self):
+        """Test updating an existing authorization to MARKETING role."""
+        # First create with CONTRIBUTOR role
+        initial_role = OrganizationRole.CONTRIBUTOR.value
+        self.create_auth(self.user, self.org, initial_role)
+
+        # Update to MARKETING role
+        update_role = OrganizationRole.MARKETING.value
+        auth_dto = UpdateAuthorizationDTO(
+            user_email=self.user.email,
+            org_uuid=str(self.org.uuid),
+            role=update_role,
+            request_user=self.superuser.email,
+        )
+
+        usecase = UpdateAuthorizationUseCase(message_publisher=MockRabbitMQPublisher())
+        authorization = usecase.update_authorization(auth_dto)
+
+        project_auth = self.project.get_user_authorization(self.user)
+
+        self.assertEqual(authorization.role, update_role)
+        self.assertEqual(project_auth.role, ProjectRole.MARKETING.value)
+
+    def test_create_marketing_authorization_for_single_project(self):
+        """Test creating MARKETING authorization for a single project."""
+        # First create superuser auth to have permission
+        self.org.authorizations.create(user=self.superuser, role=OrganizationRole.ADMIN.value)
+        ProjectAuthorization.objects.create(
+            user=self.superuser,
+            project=self.project,
+            role=ProjectRole.MODERATOR.value,
+        )
+
+        role = ProjectRole.MARKETING.value
+        auth_dto = CreateProjectAuthorizationDTO(
+            user_email=self.user.email,
+            project_uuid=str(self.project.uuid),
+            role=role,
+            created_by_email=self.superuser.email,
+        )
+        usecase = CreateAuthorizationUseCase(MockRabbitMQPublisher())
+        project_auth = usecase.create_authorization_for_a_single_project(auth_dto)
+
+        self.assertEqual(project_auth.role, role)

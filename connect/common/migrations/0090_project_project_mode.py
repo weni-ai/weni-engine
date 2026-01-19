@@ -6,13 +6,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('common', '0089_project_vtex_account'),
+        ("common", "0089_project_vtex_account"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='project',
-            name='project_mode',
-            field=models.IntegerField(choices=[(1, 'weni framework'), (2, 'opinionated')], default=1, verbose_name='Project mode'),
+            model_name="project",
+            name="project_mode",
+            field=models.IntegerField(
+                choices=[(1, "weni framework"), (2, "opinionated")],
+                default=1,
+                verbose_name="Project mode",
+            ),
         ),
     ]

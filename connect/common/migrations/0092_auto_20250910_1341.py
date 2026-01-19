@@ -6,23 +6,39 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('common', '0091_project_status'),
+        ("common", "0091_project_status"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='billingplan',
-            name='trial_extension_enabled',
-            field=models.BooleanField(default=False, verbose_name='Trial extension enabled'),
+            model_name="billingplan",
+            name="trial_extension_enabled",
+            field=models.BooleanField(
+                default=False, verbose_name="Trial extension enabled"
+            ),
         ),
         migrations.AddField(
-            model_name='billingplan',
-            name='trial_extension_end_date',
-            field=models.DateTimeField(blank=True, null=True, verbose_name='Trial extension end date'),
+            model_name="billingplan",
+            name="trial_extension_end_date",
+            field=models.DateTimeField(
+                blank=True, null=True, verbose_name="Trial extension end date"
+            ),
         ),
         migrations.AlterField(
-            model_name='billingplan',
-            name='plan',
-            field=models.CharField(choices=[('free', 'free'), ('trial', 'trial'), ('start', 'start'), ('scale', 'scale'), ('advanced', 'advanced'), ('enterprise', 'enterprise'), ('internal_weni', 'internal_weni')], max_length=13, verbose_name='plan'),
+            model_name="billingplan",
+            name="plan",
+            field=models.CharField(
+                choices=[
+                    ("free", "free"),
+                    ("trial", "trial"),
+                    ("start", "start"),
+                    ("scale", "scale"),
+                    ("advanced", "advanced"),
+                    ("enterprise", "enterprise"),
+                    ("internal_weni", "internal_weni"),
+                ],
+                max_length=13,
+                verbose_name="plan",
+            ),
         ),
     ]

@@ -1,3 +1,9 @@
+# 3.37.0
+  - feat: add marketing role permission
+
+# 3.36.0
+  - Add publisher to project events
+
 # 3.35.1
   - Enhance FlowsRESTClient and ListChannelsAPIView to support exclude_wpp_demo parameter
 

@@ -56,7 +56,9 @@ class ChannelsAPIView(views.APIView):  # pragma: no cover
 
 
 class ListChannelsAPIView(views.APIView):  # pragma: no cover
-    permission_classes = [ModuleHasPermission | (IsAuthenticated & ProjectHasPermission)]
+    permission_classes = [
+        ModuleHasPermission | (IsAuthenticated & ProjectHasPermission)
+    ]
 
     def get(self, request):
         channel_type = request.query_params.get("channel_type", None)

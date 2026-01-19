@@ -140,4 +140,3 @@ class ProjectEDAPublisher:
             exchange="update-projects.topic",
             routing_key="",
         )
-
