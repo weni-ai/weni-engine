@@ -145,6 +145,7 @@ class InternalProjectsListView(views.APIView):
     Returns projects in format: {count, next, previous, results: [{uuid, timezone}]}
     Authentication: Bearer token via PROJECTS_API_TOKEN setting
     """
+    authentication_classes = []
     permission_classes = [ProjectsAPITokenPermission]
     pagination_class = ProjectsPageNumberPagination
 
