@@ -9,6 +9,8 @@ class ProjectsAPITokenPermission(BasePermission):
     """
     def has_permission(self, request, view):
         token = request.META.get("HTTP_AUTHORIZATION")
+        print("Token: ", token)
+        print("Expected token: ", getattr(settings, 'PROJECTS_API_TOKEN', ''))
         if token is None or not token.startswith("Bearer "):
             return False
 
