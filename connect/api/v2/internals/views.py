@@ -154,13 +154,13 @@ class InternalProjectsListView(views.APIView):
         Query params: page, page_size
         """
         queryset = Project.objects.all().order_by('uuid')
-        
+
         paginator = self.pagination_class()
         page = paginator.paginate_queryset(queryset, request)
-        
+
         if page is not None:
             serializer = InternalProjectsListSerializer(page, many=True)
             return paginator.get_paginated_response(serializer.data)
-        
+
         serializer = InternalProjectsListSerializer(queryset, many=True)
         return Response(serializer.data)
