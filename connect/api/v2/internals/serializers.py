@@ -231,3 +231,22 @@ class CRMOrganizationSerializer(serializers.ModelSerializer):
         """Get all organization projects"""
         projects = obj.project.all()
         return CRMProjectSerializer(projects, many=True).data
+
+
+class InternalProjectsListSerializer(serializers.ModelSerializer):
+    """
+    Simplified serializer for internal projects list API.
+    Returns only uuid and timezone fields.
+    """
+    class Meta:
+        model = Project
+        fields = ["uuid", "timezone"]
+
+    uuid = serializers.UUIDField(read_only=True)
+    timezone = serializers.SerializerMethodField()
+
+    def get_timezone(self, obj):
+        """Return timezone as string or None"""
+        if obj.timezone:
+            return str(obj.timezone)
+        return None

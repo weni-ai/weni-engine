@@ -12,8 +12,11 @@ from connect.api.v2.internals.serializers import (
     CustomParameterSerializer,
     InternalProjectSerializer,
     CRMOrganizationSerializer,
+    InternalProjectsListSerializer,
 )
 from connect.api.v2.internals.filters import CRMOrganizationFilter
+from connect.api.v2.internals.permissions import ProjectsAPITokenPermission
+from connect.api.v2.internals.paginations import ProjectsPageNumberPagination
 from connect.api.v1.internal.permissions import ModuleHasPermission
 from connect.api.v1.organization.permissions import IsCRMUser
 from connect.api.v2.paginations import CustomCursorPagination
@@ -134,3 +137,30 @@ class CRMOrganizationViewSet(
     def retrieve(self, request, *args, **kwargs):
         """Retrieve a specific organization by UUID"""
         return super().retrieve(request, *args, **kwargs)
+
+
+class InternalProjectsListView(views.APIView):
+    """
+    Internal API endpoint to list all projects with pagination.
+    Returns projects in format: {count, next, previous, results: [{uuid, timezone}]}
+    Authentication: Bearer token via PROJECTS_API_TOKEN setting
+    """
+    permission_classes = [ProjectsAPITokenPermission]
+    pagination_class = ProjectsPageNumberPagination
+
+    def get(self, request, **kwargs):
+        """
+        List all projects with pagination.
+        Query params: page, page_size
+        """
+        queryset = Project.objects.all().order_by('uuid')
+        
+        paginator = self.pagination_class()
+        page = paginator.paginate_queryset(queryset, request)
+        
+        if page is not None:
+            serializer = InternalProjectsListSerializer(page, many=True)
+            return paginator.get_paginated_response(serializer.data)
+        
+        serializer = InternalProjectsListSerializer(queryset, many=True)
+        return Response(serializer.data)
