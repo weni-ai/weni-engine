@@ -1,3 +1,6 @@
+# 3.38.0
+  - feat: add internal projects API
+
 # 3.37.0
   - feat: add marketing role permission
 
