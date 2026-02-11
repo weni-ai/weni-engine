@@ -166,4 +166,8 @@ urlpatterns += [
             {"patch": "partial_update"}
         ),
     ),
+    path(
+        "internals/connect/projects",
+        connect_internal_views.InternalProjectsListView.as_view(),
+    ),
 ]
