@@ -29,7 +29,7 @@ from connect.api.v2.template_projects.views import (
 )
 from connect.api.v2.commerce.views import (
     CommerceOrganizationViewSet,
-    CommerceProjectCheckExists,
+    CreateVtexProjectView,
 )
 from connect.api.v2.organizations import views as organization_views
 from connect.api.v2.projects import views as project_views
@@ -148,9 +148,9 @@ urlpatterns = [
         name="recent-activities",
     ),
     path(
-        "commerce/check-project",
-        CommerceProjectCheckExists.as_view(),
-        name="check-exists-project",
+        "commerce/create-vtex-project/",
+        CreateVtexProjectView.as_view(),
+        name="create-vtex-project",
     ),
     path("auth/", KeycloakAuthView.as_view(), name="keycloak-auth"),
 ]
