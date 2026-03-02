@@ -582,6 +582,11 @@ class Project(models.Model):
         choices=settings.LANGUAGES,
         default=settings.DEFAULT_LANGUAGE,
     )
+    config = models.JSONField(
+        _("Project configuration"),
+        default=dict,
+        blank=True,
+    )
 
     def __str__(self):
         return f"{self.uuid} - Project: {self.name} - Org: {self.organization.name}"

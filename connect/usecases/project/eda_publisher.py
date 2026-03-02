@@ -66,6 +66,7 @@ class ProjectEDAPublisher:
         language: Optional[str] = None,
         timezone: Optional[str] = None,
         date_format: Optional[str] = None,
+        config: Optional[dict] = None,
         updated_at: Optional[pendulum.DateTime] = None,
     ) -> None:
         """
@@ -79,6 +80,7 @@ class ProjectEDAPublisher:
             language: New project language
             timezone: New project timezone
             date_format: New project date format
+            config: Project configuration dict
             updated_at: Timestamp of update (defaults to now)
         """
         if not self.rabbitmq_publisher:
@@ -96,6 +98,7 @@ class ProjectEDAPublisher:
             "language": language,
             "timezone": timezone,
             "date_format": date_format,
+            "config": config,
             "timestamp": updated_at.to_iso8601_string(),
         }
 
