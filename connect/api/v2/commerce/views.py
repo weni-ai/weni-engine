@@ -1,22 +1,17 @@
+from rest_framework import status, views
 from rest_framework.response import Response
-from rest_framework import status
-from rest_framework import views
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.mixins import CreateModelMixin
-from sentry_sdk import capture_exception
+
 from connect.api.v2.commerce.permissions import CanCommunicateInternally
-from connect.api.v2.commerce.serializers import CommerceSerializer
-from connect.api.v2.paginations import CustomCursorPagination
-from connect.common.models import (
-    Organization,
-    Project,
-    ProjectAuthorization,
-    OrganizationRole,
-    RequestPermissionOrganization,
+from connect.api.v2.commerce.serializers import (
+    CommerceSerializer,
+    CreateVtexProjectSerializer,
 )
-from connect.authentication.models import User
-from connect.usecases.users.create import CreateKeycloakUserUseCase
-from connect.usecases.users.user_dto import KeycloakUserDTO
+from connect.api.v2.paginations import CustomCursorPagination
+from connect.common.models import Organization
+from connect.usecases.commerce.create_vtex_project import CreateVtexProjectUseCase
+from connect.usecases.commerce.dto import CreateVtexProjectDTO
 
 
 class CommerceOrganizationViewSet(CreateModelMixin, GenericViewSet):
@@ -40,64 +35,14 @@ class CommerceOrganizationViewSet(CreateModelMixin, GenericViewSet):
         return Response(response, status=status.HTTP_201_CREATED)
 
 
-class CommerceProjectCheckExists(views.APIView):
-
+class CreateVtexProjectView(views.APIView):
     permission_classes = [CanCommunicateInternally]
 
-    def get(self, request):
-        user_email = request.query_params.get("user_email")
-        vtex_account = request.query_params.get("vtex_account")
+    def post(self, request):
+        serializer = CreateVtexProjectSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-        try:
-            project = Project.objects.get(vtex_account=vtex_account)
-        except Project.DoesNotExist as e:
-            capture_exception(e)
-            return Response(
-                {
-                    "message": f"Project with vtex_account {vtex_account} doesn't exists!",
-                    "data": {"has_project": False},
-                },
-                status=status.HTTP_200_OK,
-            )
-        except Project.MultipleObjectsReturned as e:
-            capture_exception(e)
-            return Response(
-                {
-                    "message": f"Project with vtex_account {vtex_account} has multiple projects!",
-                },
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        dto = CreateVtexProjectDTO(**serializer.validated_data)
+        result = CreateVtexProjectUseCase().execute(dto)
 
-        organization = project.organization
-        permission = ProjectAuthorization.objects.filter(
-            project=project, user__email=user_email
-        )
-
-        if permission.count() > 0:
-            permission = permission.first()
-        else:
-            try:
-                user = User.objects.get(email=user_email)
-            except Exception as e:
-                print(f"error: {e}")
-                user_dto = KeycloakUserDTO(
-                    email=user_email,
-                    company_name=project.organization.name,
-                )
-                create_keycloak_user_use_case = CreateKeycloakUserUseCase(user_dto)
-                user_info = create_keycloak_user_use_case.execute()
-                user = user_info.get("user")
-                user.send_email_access_password(user_info.get("password"))
-            RequestPermissionOrganization.objects.create(
-                email=user.email,
-                organization=organization,
-                role=OrganizationRole.ADMIN.value,
-                created_by=user,
-            )
-        return Response(
-            {
-                "message": f"Project {project.name} exists and user {user_email} has permission",
-                "data": {"project_uuid": project.uuid, "has_project": True},
-            },
-            status=status.HTTP_200_OK,
-        )
+        return Response(result, status=status.HTTP_200_OK)

@@ -143,3 +143,11 @@ class CommerceSerializer(serializers.Serializer):
         except Exception as e:
             raise serializers.ValidationError({"error": str(e)})
         return data
+
+
+class CreateVtexProjectSerializer(serializers.Serializer):
+    user_email = serializers.EmailField(required=True)
+    vtex_account = serializers.CharField(required=True, max_length=100)
+    language = serializers.ChoiceField(required=True, choices=settings.LANGUAGES)
+    organization_name = serializers.CharField(required=True)
+    project_name = serializers.CharField(required=True)
