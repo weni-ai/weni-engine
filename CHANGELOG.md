@@ -1,3 +1,8 @@
+# 3.39.0
+  - feat: Adds config field to Project and propagates via EDA
+  - feat: Adds set-vtex-host-store endpoint to Gallery
+  - feat: Creating a project, user and permissions for VTEX
+
 # 3.38.0
   - feat: add internal projects API
 
