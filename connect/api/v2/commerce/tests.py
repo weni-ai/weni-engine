@@ -23,6 +23,7 @@ from connect.common.models import (
 from connect.common.mocks import StripeMockGateway
 from connect.usecases.commerce.create_vtex_project import CreateVtexProjectUseCase
 from connect.usecases.commerce.dto import CreateVtexProjectDTO
+from connect.usecases.commerce.set_vtex_host_store import SetVtexHostStoreUseCase
 
 
 @override_settings(USE_EDA_PERMISSIONS=False)  # Disable EDA to avoid RabbitMQ issues
@@ -453,3 +454,218 @@ class CreateVtexProjectUseCaseTestCase(APITestCase):
             use_case.execute(dto)
 
         self.assertIn("Multiple projects", str(ctx.exception))
+
+
+@override_settings(USE_EDA_PERMISSIONS=False)
+class SetVtexHostStoreViewTestCase(APITestCase):
+    """Tests for PATCH /v2/commerce/projects/<uuid>/set-vtex-host-store/"""
+
+    @patch("connect.authentication.signals.RabbitmqPublisher")
+    @patch("connect.common.signals.RabbitmqPublisher")
+    @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.billing.get_gateway")
+    def setUp(
+        self,
+        mock_get_gateway,
+        mock_permission,
+        mock_rabbitmq_common,
+        mock_rabbitmq_auth,
+    ):
+        mock_get_gateway.return_value = StripeMockGateway()
+        mock_permission.return_value = True
+        mock_rabbitmq_common.return_value = Mock()
+        mock_rabbitmq_auth.return_value = Mock()
+
+        self.client = APIClient()
+        self.user, self.token = create_user_and_token("hostuser")
+
+        content_type = ContentType.objects.get_for_model(User)
+        permission, _ = Permission.objects.get_or_create(
+            codename="can_communicate_internally",
+            name="can communicate internally",
+            content_type=content_type,
+        )
+        self.user.user_permissions.add(permission)
+        self.client.force_authenticate(user=self.user)
+
+        self.organization = Organization.objects.create(
+            name="host-org",
+            description="Organization host-org",
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan=BillingPlan.PLAN_TRIAL,
+        )
+        self.project = Project.objects.create(
+            name="host-project",
+            organization=self.organization,
+            vtex_account="host-store",
+            flow_organization=uuid.uuid4(),
+            project_type=TypeProject.COMMERCE,
+        )
+
+    def _url(self, project_uuid=None):
+        uid = project_uuid or str(self.project.uuid)
+        return reverse("set-vtex-host-store", kwargs={"project_uuid": uid})
+
+    @patch(
+        "connect.usecases.commerce.set_vtex_host_store.UpdateProjectUseCase"
+    )
+    def test_set_vtex_host_store_successfully(self, mock_update_uc):
+        """Sets vtex_host_store in project config and returns 200."""
+        mock_update_uc.return_value = Mock()
+
+        response = self.client.patch(
+            self._url(),
+            {"vtex_host_store": "https://www.mystore.com.br/"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            response.data["vtex_host_store"], "https://www.mystore.com.br/"
+        )
+
+        self.project.refresh_from_db()
+        self.assertEqual(
+            self.project.config["vtex_host_store"],
+            "https://www.mystore.com.br/",
+        )
+
+    @patch(
+        "connect.usecases.commerce.set_vtex_host_store.UpdateProjectUseCase"
+    )
+    def test_preserves_existing_config_keys(self, mock_update_uc):
+        """Setting vtex_host_store should not overwrite other config keys."""
+        mock_update_uc.return_value = Mock()
+
+        self.project.config = {"store_type": "vtex-io"}
+        self.project.save(update_fields=["config"])
+
+        response = self.client.patch(
+            self._url(),
+            {"vtex_host_store": "https://www.mystore.com.br/"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.project.refresh_from_db()
+        self.assertEqual(self.project.config["store_type"], "vtex-io")
+        self.assertEqual(
+            self.project.config["vtex_host_store"],
+            "https://www.mystore.com.br/",
+        )
+
+    @patch(
+        "connect.usecases.commerce.set_vtex_host_store.UpdateProjectUseCase"
+    )
+    def test_publishes_eda_event(self, mock_update_uc):
+        """After saving config, the use case should publish an EDA update event."""
+        mock_instance = Mock()
+        mock_update_uc.return_value = mock_instance
+
+        self.client.patch(
+            self._url(),
+            {"vtex_host_store": "https://www.mystore.com.br/"},
+            format="json",
+        )
+
+        mock_instance.send_updated_project.assert_called_once()
+
+    def test_project_not_found_returns_404(self):
+        """Using a non-existent project UUID should return 404."""
+        fake_uuid = str(uuid.uuid4())
+        response = self.client.patch(
+            self._url(fake_uuid),
+            {"vtex_host_store": "https://www.mystore.com.br/"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_missing_vtex_host_store_returns_400(self):
+        """Sending an empty body should fail validation."""
+        response = self.client.patch(self._url(), {}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_invalid_url_returns_400(self):
+        """vtex_host_store must be a valid URL."""
+        response = self.client.patch(
+            self._url(),
+            {"vtex_host_store": "not-a-url"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_unauthenticated_request_returns_403(self):
+        """A user without internal permission should be rejected."""
+        unauth_client = APIClient()
+        other_user, _ = create_user_and_token("noperm-host")
+        unauth_client.force_authenticate(user=other_user)
+
+        response = unauth_client.patch(
+            self._url(),
+            {"vtex_host_store": "https://www.mystore.com.br/"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+@override_settings(USE_EDA_PERMISSIONS=False)
+class SetVtexHostStoreUseCaseTestCase(APITestCase):
+    """Unit tests for SetVtexHostStoreUseCase."""
+
+    @patch("connect.authentication.signals.RabbitmqPublisher")
+    @patch("connect.common.signals.RabbitmqPublisher")
+    @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.billing.get_gateway")
+    def setUp(
+        self,
+        mock_get_gateway,
+        mock_permission,
+        mock_rabbitmq_common,
+        mock_rabbitmq_auth,
+    ):
+        mock_get_gateway.return_value = StripeMockGateway()
+        mock_permission.return_value = True
+        mock_rabbitmq_common.return_value = Mock()
+        mock_rabbitmq_auth.return_value = Mock()
+
+        self.organization = Organization.objects.create(
+            name="uc-org",
+            description="Organization uc-org",
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan=BillingPlan.PLAN_TRIAL,
+        )
+        self.project = Project.objects.create(
+            name="uc-project",
+            organization=self.organization,
+            vtex_account="uc-store",
+            flow_organization=uuid.uuid4(),
+            project_type=TypeProject.COMMERCE,
+        )
+
+    def test_execute_sets_config_and_publishes(self):
+        """execute() should persist vtex_host_store in config and call EDA publisher."""
+        mock_update = Mock()
+        use_case = SetVtexHostStoreUseCase(update_project_usecase=mock_update)
+
+        result = use_case.execute(
+            str(self.project.uuid), "https://www.example.com/"
+        )
+
+        self.project.refresh_from_db()
+        self.assertEqual(
+            self.project.config["vtex_host_store"],
+            "https://www.example.com/",
+        )
+        self.assertEqual(result["vtex_host_store"], "https://www.example.com/")
+        mock_update.send_updated_project.assert_called_once_with(
+            self.project, user_email=""
+        )
+
+    def test_execute_raises_for_nonexistent_project(self):
+        """execute() should raise Project.DoesNotExist for unknown UUID."""
+        mock_update = Mock()
+        use_case = SetVtexHostStoreUseCase(update_project_usecase=mock_update)
+
+        with self.assertRaises(Project.DoesNotExist):
+            use_case.execute(str(uuid.uuid4()), "https://www.example.com/")

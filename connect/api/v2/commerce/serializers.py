@@ -151,3 +151,7 @@ class CreateVtexProjectSerializer(serializers.Serializer):
     language = serializers.ChoiceField(required=True, choices=settings.LANGUAGES)
     organization_name = serializers.CharField(required=True)
     project_name = serializers.CharField(required=True)
+
+
+class SetVtexHostStoreSerializer(serializers.Serializer):
+    vtex_host_store = serializers.URLField(required=True)
