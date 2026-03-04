@@ -1,7 +1,7 @@
 from rest_framework import permissions
 
 from connect.api.v1 import READ_METHODS, WRITE_METHODS
-from connect.common.models import ProjectRole
+from connect.common.models import Project, ProjectRole
 
 
 class ProjectHasPermission(permissions.BasePermission):  # pragma: no cover
@@ -17,6 +17,25 @@ class ProjectHasPermission(permissions.BasePermission):  # pragma: no cover
                 return authorization.can_write
             return authorization.is_admin
         return False
+
+
+class IsProjectAdmin(permissions.BasePermission):
+    """Checks if the authenticated user is an admin of the project's organization."""
+
+    def has_permission(self, request, view):
+        project_uuid = view.kwargs.get("uuid")
+        if not project_uuid:
+            return False
+
+        try:
+            project = Project.objects.select_related("organization").get(
+                uuid=project_uuid
+            )
+        except Project.DoesNotExist:
+            return True
+
+        authorization = project.organization.get_user_authorization(request.user)
+        return authorization.is_admin
 
 
 class CanChangeProjectStatus(permissions.BasePermission):

@@ -119,6 +119,11 @@ urlpatterns = [
         name="create-wac-channel",
     ),
     path(
+        "projects/<uuid>/detail",
+        project_views.ProjectDetailView.as_view(),
+        name="project-detail",
+    ),
+    path(
         "projects/<uuid>/set-type",
         project_views.ProjectViewSet.as_view({"post": "set_type"}),
         name="set-type",
