@@ -1,22 +1,25 @@
-from rest_framework import mixins, status
+from rest_framework import mixins, status, views
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 
+from connect.api.v1.internal.permissions import ModuleHasPermission
 from connect.api.v1.organization.permissions import Has2FA
-from connect.api.v1.project.permissions import ProjectHasPermission
+from connect.api.v1.project.permissions import IsProjectAdmin, ProjectHasPermission
 
 from connect.common.models import Project, OpenedProject, TypeProject
 from connect.api.v2.projects.serializers import (
     ChangeProjectModeSerializer,
+    ProjectDetailSerializer,
     ProjectSerializer,
     ProjectUpdateSerializer,
     ProjectListAuthorizationSerializer,
     OpenedProjectSerializer,
 )
 from connect.usecases.project import ProjectEDAPublisher
+from connect.usecases.project.get_project_detail import GetProjectDetailUseCase
 
 from django.utils import timezone
 from connect.api.v2.paginations import (
@@ -212,3 +215,13 @@ class OpenedProjectViewSet(mixins.ListModelMixin, GenericViewSet):
             if field in valid_fields:
                 ordering.append(param)
         return ordering or ["project", "day"]
+
+
+class ProjectDetailView(views.APIView):
+    permission_classes = [ModuleHasPermission | (IsAuthenticated & IsProjectAdmin)]
+
+    def get(self, request, uuid):
+        use_case = GetProjectDetailUseCase()
+        project = use_case.execute(project_uuid=uuid)
+        serializer = ProjectDetailSerializer(project)
+        return Response(serializer.data)

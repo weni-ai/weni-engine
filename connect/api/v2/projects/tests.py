@@ -16,7 +16,7 @@ from connect.common.models import (
     ProjectMode,
     TypeProject,
 )
-from connect.api.v2.projects.views import ProjectViewSet
+from connect.api.v2.projects.views import ProjectDetailView, ProjectViewSet
 from connect.common.mocks import StripeMockGateway
 
 from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
@@ -532,3 +532,112 @@ class ProjectAuthorizationTestCase(TestCase):
         users_count = len(users_list)
         self.assertEquals(response.status_code, status.HTTP_200_OK)
         self.assertEquals(users_count, 1)
+
+
+class ProjectDetailViewTestCase(TestCase):
+    @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.billing.get_gateway")
+    @patch(
+        "connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.update_user_permission_project"
+    )
+    @patch(
+        "connect.api.v1.internal.integrations.integrations_rest_client.IntegrationsRESTClient.update_user_permission_project"
+    )
+    def setUp(self, integrations_rest, flows_rest, mock_get_gateway, mock_permission):
+        integrations_rest.side_effect = [200, 200]
+        flows_rest.side_effect = [200, 200]
+        mock_get_gateway.return_value = StripeMockGateway()
+        mock_permission.return_value = True
+        self.factory = APIRequestFactory()
+        self.user, self.user_token = create_user_and_token("detail_user")
+
+        self.org = Organization.objects.create(
+            name="Detail Org",
+            description="Org for detail tests",
+            inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan=BillingPlan.PLAN_TRIAL,
+        )
+
+        self.org_auth = self.org.authorizations.create(
+            user=self.user, role=OrganizationRole.ADMIN.value
+        )
+
+        self.project = Project.objects.create(
+            name="Detail Project",
+            flow_organization=uuid.uuid4(),
+            organization=self.org,
+            config={"nexus_ai_enabled": True, "vtex_store_type": "io"},
+        )
+
+    def _make_request(self, project_uuid, user=None):
+        url = f"/v2/projects/{project_uuid}/detail"
+        request = self.factory.get(url)
+        if user:
+            force_authenticate(request, user=user, token=user.auth_token)
+        response = ProjectDetailView.as_view()(request, uuid=project_uuid)
+        response.render()
+        return response, json.loads(response.content) if response.content else {}
+
+    def test_returns_200_with_project_data(self):
+        response, data = self._make_request(str(self.project.uuid), self.user)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(data["uuid"], str(self.project.uuid))
+        self.assertEqual(data["name"], "Detail Project")
+        self.assertEqual(
+            data["config"], {"nexus_ai_enabled": True, "vtex_store_type": "io"}
+        )
+        self.assertIn("created_at", data)
+        self.assertIn("status", data)
+        self.assertIn("project_type", data)
+        self.assertIn("project_mode", data)
+        self.assertIn("organization_billing", data)
+
+    def test_unauthenticated_returns_401(self):
+        response, _ = self._make_request(str(self.project.uuid), user=None)
+
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_non_admin_user_returns_403(self):
+        contributor_user, _ = create_user_and_token("contributor_user")
+        self.org.authorizations.create(
+            user=contributor_user, role=OrganizationRole.CONTRIBUTOR.value
+        )
+
+        response, _ = self._make_request(str(self.project.uuid), contributor_user)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_user_without_org_returns_403(self):
+        other_user, _ = create_user_and_token("no_access_user")
+
+        response, _ = self._make_request(str(self.project.uuid), other_user)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_nonexistent_project_returns_404(self):
+        fake_uuid = str(uuid.uuid4())
+
+        response, _ = self._make_request(fake_uuid, self.user)
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_internal_module_user_bypasses_org_permission(self):
+        from django.contrib.auth.models import Permission
+        from django.contrib.contenttypes.models import ContentType
+        from connect.authentication.models import User
+
+        internal_user, _ = create_user_and_token("internal_module")
+        content_type = ContentType.objects.get_for_model(User)
+        permission, _ = Permission.objects.get_or_create(
+            codename="can_communicate_internally",
+            name="can communicate internally",
+            content_type=content_type,
+        )
+        internal_user.user_permissions.add(permission)
+
+        response, data = self._make_request(str(self.project.uuid), internal_user)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(data["uuid"], str(self.project.uuid))
