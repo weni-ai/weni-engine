@@ -1673,6 +1673,55 @@ class BillingPlan(models.Model):
         html_mail = send_mass_html_mail(msg_list, fail_silently=False)
         return html_mail
 
+    def send_email_trial_plan_expired_due_message_limit(
+        self, message_limit: int, emails: list = None
+    ):
+        if not settings.SEND_EMAILS:
+            return False  # pragma: no cover
+
+        if not emails:
+            emails = (
+                self.organization.authorizations.exclude(
+                    role=OrganizationRole.VIEWER.value
+                )
+                .values_list("user__email", "user__username", "user__language")
+                .order_by("user__language")
+            )
+
+        from_email = None
+
+        context = {
+            "webapp_billing_url": f"{settings.WEBAPP_BASE_URL}/orgs/{self.organization.uuid}/billing",
+            "org_name": self.organization.name,
+            "message_limit": message_limit,
+        }
+
+        msg_list = []
+        for email in emails:
+            language_code = email[2]
+            username = email[1]
+            context["user_name"] = username
+            with translation.override(language_code):
+                message = render_to_string(
+                    "billing/emails/trial_plan_expired_due_message_limit_en.txt",
+                    context,
+                )
+                html_message = render_to_string(
+                    "billing/emails/trial_plan_expired_due_message_limit_en.html",
+                    context,
+                )
+            if language_code == "en-us":
+                subject = _("Your trial plan has expired due to conversation limit")
+            else:
+                subject = "Seu plano Trial expirou por limite de conversas"
+
+            recipient_list = [email[0]]
+            msg = (subject, message, html_message, from_email, recipient_list)
+            msg_list.append(msg)
+
+        html_mail = send_mass_html_mail(msg_list, fail_silently=False)
+        return html_mail
+
     def send_email_plan_is_about_to_expire(self, emails: list = None):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover

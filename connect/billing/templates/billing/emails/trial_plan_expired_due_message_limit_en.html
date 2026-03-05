@@ -1,0 +1,111 @@
+{% extends 'authentication/emails/base.html' %}
+{% load static i18n %}
+
+{% block main-content %}
+<section style="margin: 24px auto; padding: 0 32px;">
+  <div
+    style="
+      font-family: 'Lato', sans-serif;
+      font-style: normal;
+      font-weight: 700;
+      font-size: 16px;
+      line-height: 24px;
+      color: #3B414D;
+    "
+  >
+    {% trans 'Hey' %}
+    <span
+      style="
+        font-family: 'Lato', sans-serif;
+        color: #3B414D;
+        font-size: 16px;
+        font-weight: 700;
+        line-height: 24px;
+        font-style: normal;
+      "
+    >
+      {{ user_name }},
+    </span>
+    {% trans 'your Trial Plan has reached the conversation limit!' %}
+  </div>
+
+  <div
+    style="
+      font-family: 'Lato', sans-serif;
+      font-style: normal;
+      font-weight: normal;
+      font-size: 14px;
+      line-height: 22px;
+      color: #3B414D;
+      margin-top: 12px;
+    "
+  >
+    {% trans 'Your organization' %} {{ org_name }} <span style="font-weight: 700;">{% trans 'has reached the limit of' %} {{ message_limit }} {% trans 'conversations,' %}</span> {% trans "and it's time to move forward to the next stage." %}
+  </div>
+
+  <div
+    style="
+      font-family: 'Lato', sans-serif;
+      font-style: normal;
+      font-weight: normal;
+      font-size: 14px;
+      line-height: 22px;
+      color: #3B414D;
+      margin-top: 12px;
+    "
+  >
+    {% trans 'Please note that ' %} <span style="font-weight: 700;">{% trans 'your agents are currently unable to send messages' %}</span> {% trans ' until you select a plan that best suits your business needs.' %}
+  </div>
+
+  <div
+    style="
+      font-family: 'Lato', sans-serif;
+      font-style: normal;
+      font-weight: normal;
+      font-size: 14px;
+      line-height: 22px;
+      color: #3B414D;
+      margin-top: 12px;
+    "
+  >
+    {% trans 'Rest assured, ' %}
+    <span style="font-weight: 700;">{% trans 'you still have access to the platform.'%}</span>
+    {% trans 'To reactivate your agents and continue enjoying all the benefits, simply ' %}
+    <span style="font-weight: 700;">{% trans 'choose the most suitable plan' %}</span>
+    {% trans 'in the' %}
+    <a href="{{ webapp_billing_url }}" style="color: #009E96; text-decoration: underline; text-underline-offset: 4px;">{% trans 'Billing' %}</a>
+    {% trans ' section.' %}
+  </div>
+
+  <div
+    style="
+      font-family: 'Lato', sans-serif;
+      font-style: normal;
+      font-weight: normal;
+      font-size: 14px;
+      line-height: 22px;
+      color: #3B414D;
+      margin-top: 12px;
+    "
+  >
+    {% trans "We're here to support you every step of the way!" context "trial-plan-expired" %}
+  </div>
+
+  <div
+    style="
+      font-family: 'Lato', sans-serif;
+      font-style: normal;
+      font-weight: normal;
+      font-size: 14px;
+      line-height: 22px;
+      color: #3B414D;
+      margin-top: 12px;
+      margin-bottom: 32px;
+    "
+  >
+    {% trans 'Best regards,' %}
+    <br>
+    {% trans 'Weni by VTEX Team' %}
+  </div>
+</section>
+{% endblock %}

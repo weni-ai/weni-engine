@@ -153,5 +153,9 @@ class CreateVtexProjectSerializer(serializers.Serializer):
     project_name = serializers.CharField(required=True)
 
 
+class SuspendVtexProjectSerializer(serializers.Serializer):
+    message_limit = serializers.IntegerField(required=True, min_value=1)
+
+
 class SetVtexHostStoreSerializer(serializers.Serializer):
     vtex_host_store = serializers.URLField(required=True)
