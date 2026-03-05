@@ -154,7 +154,7 @@ class CreateVtexProjectSerializer(serializers.Serializer):
 
 
 class SuspendVtexProjectSerializer(serializers.Serializer):
-    message_limit = serializers.IntegerField(required=True, min_value=1)
+    conversation_limit = serializers.IntegerField(required=True, min_value=1)
 
 
 class SetVtexHostStoreSerializer(serializers.Serializer):

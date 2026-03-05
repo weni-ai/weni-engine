@@ -65,7 +65,7 @@ class SuspendVtexProjectView(views.APIView):
 
         dto = SuspendVtexProjectDTO(
             project_uuid=project_uuid,
-            message_limit=serializer.validated_data["message_limit"],
+            conversation_limit=serializer.validated_data["conversation_limit"],
         )
 
         try:

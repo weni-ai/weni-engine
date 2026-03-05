@@ -35,10 +35,12 @@ class SuspendVtexProjectUseCase:
 
         logger.info(
             f"Suspending project {dto.project_uuid} "
-            f"due to message limit ({dto.message_limit})"
+            f"due to conversation limit ({dto.conversation_limit})"
         )
 
         billing.end_trial_period()
-        billing.send_email_trial_plan_expired_due_message_limit(dto.message_limit)
+        billing.send_email_trial_plan_expired_due_conversation_limit(
+            dto.conversation_limit
+        )
 
         return {"project_uuid": str(project.uuid), "suspended": True}

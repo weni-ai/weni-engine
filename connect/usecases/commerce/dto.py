@@ -13,4 +13,4 @@ class CreateVtexProjectDTO:
 @dataclass(frozen=True)
 class SuspendVtexProjectDTO:
     project_uuid: str
-    message_limit: int
+    conversation_limit: int

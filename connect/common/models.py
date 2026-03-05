@@ -1673,8 +1673,8 @@ class BillingPlan(models.Model):
         html_mail = send_mass_html_mail(msg_list, fail_silently=False)
         return html_mail
 
-    def send_email_trial_plan_expired_due_message_limit(
-        self, message_limit: int, emails: list = None
+    def send_email_trial_plan_expired_due_conversation_limit(
+        self, conversation_limit: int, emails: list = None
     ):
         if not settings.SEND_EMAILS:
             return False  # pragma: no cover
@@ -1693,7 +1693,7 @@ class BillingPlan(models.Model):
         context = {
             "webapp_billing_url": f"{settings.WEBAPP_BASE_URL}/orgs/{self.organization.uuid}/billing",
             "org_name": self.organization.name,
-            "message_limit": message_limit,
+            "conversation_limit": conversation_limit,
         }
 
         msg_list = []
@@ -1703,11 +1703,11 @@ class BillingPlan(models.Model):
             context["user_name"] = username
             with translation.override(language_code):
                 message = render_to_string(
-                    "billing/emails/trial_plan_expired_due_message_limit_en.txt",
+                    "billing/emails/trial_plan_expired_due_conversation_limit_en.txt",
                     context,
                 )
                 html_message = render_to_string(
-                    "billing/emails/trial_plan_expired_due_message_limit_en.html",
+                    "billing/emails/trial_plan_expired_due_conversation_limit_en.html",
                     context,
                 )
             if language_code == "en-us":

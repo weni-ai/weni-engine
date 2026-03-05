@@ -729,7 +729,7 @@ class SuspendVtexProjectViewTestCase(APITestCase):
 
         response = self.client.post(
             self._url(),
-            {"message_limit": 1000},
+            {"conversation_limit": 1000},
             format="json",
         )
 
@@ -752,7 +752,7 @@ class SuspendVtexProjectViewTestCase(APITestCase):
 
         response = self.client.post(
             self._url(),
-            {"message_limit": 1000},
+            {"conversation_limit": 1000},
             format="json",
         )
 
@@ -765,22 +765,22 @@ class SuspendVtexProjectViewTestCase(APITestCase):
         fake_uuid = str(uuid.uuid4())
         response = self.client.post(
             self._url(fake_uuid),
-            {"message_limit": 1000},
+            {"conversation_limit": 1000},
             format="json",
         )
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_missing_message_limit_returns_400(self):
+    def test_missing_conversation_limit_returns_400(self):
         """Sending an empty body should fail validation."""
         response = self.client.post(self._url(), {}, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_invalid_message_limit_returns_400(self):
-        """message_limit must be a positive integer."""
+    def test_invalid_conversation_limit_returns_400(self):
+        """conversation_limit must be a positive integer."""
         response = self.client.post(
             self._url(),
-            {"message_limit": 0},
+            {"conversation_limit": 0},
             format="json",
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -793,7 +793,7 @@ class SuspendVtexProjectViewTestCase(APITestCase):
 
         response = unauth_client.post(
             self._url(),
-            {"message_limit": 1000},
+            {"conversation_limit": 1000},
             format="json",
         )
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -811,7 +811,7 @@ class SuspendVtexProjectViewTestCase(APITestCase):
 
         response = self.client.post(
             self._url(),
-            {"message_limit": 1000},
+            {"conversation_limit": 1000},
             format="json",
         )
 
@@ -860,7 +860,7 @@ class SuspendVtexProjectUseCaseTestCase(APITestCase):
 
         dto = SuspendVtexProjectDTO(
             project_uuid=str(self.project.uuid),
-            message_limit=1000,
+            conversation_limit=1000,
         )
         use_case = SuspendVtexProjectUseCase()
         result = use_case.execute(dto)
@@ -872,14 +872,14 @@ class SuspendVtexProjectUseCaseTestCase(APITestCase):
         self.assertFalse(self.organization.organization_billing.is_active)
 
     @patch(
-        "connect.common.models.BillingPlan.send_email_trial_plan_expired_due_message_limit"
+        "connect.common.models.BillingPlan.send_email_trial_plan_expired_due_conversation_limit"
     )
     @patch("connect.common.models.BillingPlan.end_trial_period")
-    def test_execute_sends_message_limit_email(self, mock_end_trial, mock_email):
+    def test_execute_sends_conversation_limit_email(self, mock_end_trial, mock_email):
         """execute() should call the message-limit email method."""
         dto = SuspendVtexProjectDTO(
             project_uuid=str(self.project.uuid),
-            message_limit=1000,
+            conversation_limit=1000,
         )
         use_case = SuspendVtexProjectUseCase()
         use_case.execute(dto)
@@ -897,7 +897,7 @@ class SuspendVtexProjectUseCaseTestCase(APITestCase):
 
         dto = SuspendVtexProjectDTO(
             project_uuid=str(self.project.uuid),
-            message_limit=1000,
+            conversation_limit=1000,
         )
         use_case = SuspendVtexProjectUseCase()
         result = use_case.execute(dto)
@@ -908,7 +908,7 @@ class SuspendVtexProjectUseCaseTestCase(APITestCase):
         """execute() should raise Project.DoesNotExist for unknown UUID."""
         dto = SuspendVtexProjectDTO(
             project_uuid=str(uuid.uuid4()),
-            message_limit=1000,
+            conversation_limit=1000,
         )
         use_case = SuspendVtexProjectUseCase()
 
@@ -926,7 +926,7 @@ class SuspendVtexProjectUseCaseTestCase(APITestCase):
 
         dto = SuspendVtexProjectDTO(
             project_uuid=str(self.project.uuid),
-            message_limit=1000,
+            conversation_limit=1000,
         )
         use_case = SuspendVtexProjectUseCase()
 
