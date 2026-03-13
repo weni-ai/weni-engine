@@ -19,6 +19,7 @@ from connect.api.v1.project.serializers import ProjectAuthorizationSerializer
 
 from connect.celery import app as celery_app
 from connect.common.models import (
+    BillingPlan,
     ProjectAuthorization,
     Project,
     Organization,
@@ -616,3 +617,31 @@ class ChangeProjectModeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
         fields = ["uuid", "project_mode"]
+
+
+class ProjectBillingSerializer(serializers.Serializer):
+    plan = serializers.CharField()
+    trial_end_date = serializers.DateTimeField()
+    days_till_trial_end = serializers.IntegerField()
+
+
+class ProjectDetailSerializer(serializers.Serializer):
+    uuid = serializers.UUIDField()
+    name = serializers.CharField()
+    description = serializers.CharField()
+    timezone = serializers.CharField()
+    date_format = serializers.CharField()
+    config = serializers.JSONField()
+    created_at = serializers.DateTimeField()
+    status = serializers.CharField()
+    project_type = serializers.IntegerField()
+    project_mode = serializers.IntegerField()
+    vtex_account = serializers.CharField()
+    organization_billing = serializers.SerializerMethodField()
+
+    def get_organization_billing(self, obj):
+        try:
+            billing = obj.organization.organization_billing
+        except BillingPlan.DoesNotExist:
+            return None
+        return ProjectBillingSerializer(billing).data
