@@ -1,3 +1,6 @@
+# 3.40.1
+  - chore: Update email templates to reflect rebranding from Weni by VTEX to VTEX Agentic CX across various notification emails
+
 # 3.40.0
   - feat: Adds project detail endpoint with config and billing info
 
