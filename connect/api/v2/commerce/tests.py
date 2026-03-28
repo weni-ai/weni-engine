@@ -22,8 +22,9 @@ from connect.common.models import (
 )
 from connect.common.mocks import StripeMockGateway
 from connect.usecases.commerce.create_vtex_project import CreateVtexProjectUseCase
-from connect.usecases.commerce.dto import CreateVtexProjectDTO
+from connect.usecases.commerce.dto import CreateVtexProjectDTO, SuspendVtexProjectDTO
 from connect.usecases.commerce.set_vtex_host_store import SetVtexHostStoreUseCase
+from connect.usecases.commerce.suspend_vtex_project import SuspendVtexProjectUseCase
 
 
 @override_settings(USE_EDA_PERMISSIONS=False)  # Disable EDA to avoid RabbitMQ issues
@@ -669,3 +670,267 @@ class SetVtexHostStoreUseCaseTestCase(APITestCase):
 
         with self.assertRaises(Project.DoesNotExist):
             use_case.execute(str(uuid.uuid4()), "https://www.example.com/")
+
+
+@override_settings(USE_EDA_PERMISSIONS=False)
+class SuspendVtexProjectViewTestCase(APITestCase):
+    """Tests for POST /v2/commerce/projects/<uuid>/suspend/"""
+
+    @patch("connect.authentication.signals.RabbitmqPublisher")
+    @patch("connect.common.signals.RabbitmqPublisher")
+    @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.billing.get_gateway")
+    def setUp(
+        self,
+        mock_get_gateway,
+        mock_permission,
+        mock_rabbitmq_common,
+        mock_rabbitmq_auth,
+    ):
+        mock_get_gateway.return_value = StripeMockGateway()
+        mock_permission.return_value = True
+        mock_rabbitmq_common.return_value = Mock()
+        mock_rabbitmq_auth.return_value = Mock()
+
+        self.client = APIClient()
+        self.user, self.token = create_user_and_token("suspenduser")
+
+        content_type = ContentType.objects.get_for_model(User)
+        permission, _ = Permission.objects.get_or_create(
+            codename="can_communicate_internally",
+            name="can communicate internally",
+            content_type=content_type,
+        )
+        self.user.user_permissions.add(permission)
+        self.client.force_authenticate(user=self.user)
+
+        self.organization = Organization.objects.create(
+            name="suspend-org",
+            description="Organization suspend-org",
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan=BillingPlan.PLAN_TRIAL,
+        )
+        self.project = Project.objects.create(
+            name="suspend-project",
+            organization=self.organization,
+            vtex_account="suspend-store",
+            flow_organization=uuid.uuid4(),
+            project_type=TypeProject.COMMERCE,
+        )
+
+    def _url(self, project_uuid=None):
+        uid = project_uuid or str(self.project.uuid)
+        return reverse("suspend-vtex-project", kwargs={"project_uuid": uid})
+
+    @patch("connect.common.models.send_mass_html_mail")
+    def test_suspend_project_successfully(self, mock_mail):
+        """Suspending a trial project should set is_suspended=True and return 200."""
+        mock_mail.return_value = None
+
+        response = self.client.post(
+            self._url(),
+            {"conversation_limit": 1000},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(response.data["suspended"])
+
+        self.organization.refresh_from_db()
+        self.assertTrue(self.organization.is_suspended)
+
+        billing = self.organization.organization_billing
+        self.assertFalse(billing.is_active)
+
+    @patch("connect.common.models.send_mass_html_mail")
+    def test_idempotent_when_already_suspended(self, mock_mail):
+        """Calling suspend on an already-suspended project returns 200
+        with already_suspended=True and does not send duplicate emails."""
+        mock_mail.return_value = None
+        self.organization.is_suspended = True
+        self.organization.save(update_fields=["is_suspended"])
+
+        response = self.client.post(
+            self._url(),
+            {"conversation_limit": 1000},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(response.data["already_suspended"])
+        mock_mail.assert_not_called()
+
+    def test_project_not_found_returns_404(self):
+        """Using a non-existent project UUID should return 404."""
+        fake_uuid = str(uuid.uuid4())
+        response = self.client.post(
+            self._url(fake_uuid),
+            {"conversation_limit": 1000},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_missing_conversation_limit_returns_400(self):
+        """Sending an empty body should fail validation."""
+        response = self.client.post(self._url(), {}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_invalid_conversation_limit_returns_400(self):
+        """conversation_limit must be a positive integer."""
+        response = self.client.post(
+            self._url(),
+            {"conversation_limit": 0},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_unauthenticated_request_returns_403(self):
+        """A user without internal permission should be rejected."""
+        unauth_client = APIClient()
+        other_user, _ = create_user_and_token("noperm-suspend")
+        unauth_client.force_authenticate(user=other_user)
+
+        response = unauth_client.post(
+            self._url(),
+            {"conversation_limit": 1000},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    @patch("connect.billing.get_gateway")
+    @patch("connect.common.models.send_mass_html_mail")
+    def test_non_trial_plan_returns_400(self, mock_mail, mock_gateway):
+        """Suspending a project that is not on a trial plan should return 400."""
+        mock_gateway.return_value = StripeMockGateway()
+        mock_mail.return_value = None
+
+        billing = self.organization.organization_billing
+        billing.plan = BillingPlan.PLAN_START
+        billing.save(update_fields=["plan"])
+
+        response = self.client.post(
+            self._url(),
+            {"conversation_limit": 1000},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("not on a trial plan", response.data["detail"])
+
+
+@override_settings(USE_EDA_PERMISSIONS=False)
+class SuspendVtexProjectUseCaseTestCase(APITestCase):
+    """Unit tests for SuspendVtexProjectUseCase."""
+
+    @patch("connect.authentication.signals.RabbitmqPublisher")
+    @patch("connect.common.signals.RabbitmqPublisher")
+    @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.billing.get_gateway")
+    def setUp(
+        self,
+        mock_get_gateway,
+        mock_permission,
+        mock_rabbitmq_common,
+        mock_rabbitmq_auth,
+    ):
+        mock_get_gateway.return_value = StripeMockGateway()
+        mock_permission.return_value = True
+        mock_rabbitmq_common.return_value = Mock()
+        mock_rabbitmq_auth.return_value = Mock()
+
+        self.organization = Organization.objects.create(
+            name="uc-suspend-org",
+            description="Organization uc-suspend-org",
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan=BillingPlan.PLAN_TRIAL,
+        )
+        self.project = Project.objects.create(
+            name="uc-suspend-project",
+            organization=self.organization,
+            vtex_account="uc-suspend-store",
+            flow_organization=uuid.uuid4(),
+            project_type=TypeProject.COMMERCE,
+        )
+
+    @patch("connect.common.models.send_mass_html_mail")
+    def test_execute_suspends_organization(self, mock_mail):
+        """execute() should suspend the organization and deactivate the billing plan."""
+        mock_mail.return_value = None
+
+        dto = SuspendVtexProjectDTO(
+            project_uuid=str(self.project.uuid),
+            conversation_limit=1000,
+        )
+        use_case = SuspendVtexProjectUseCase()
+        result = use_case.execute(dto)
+
+        self.assertTrue(result["suspended"])
+
+        self.organization.refresh_from_db()
+        self.assertTrue(self.organization.is_suspended)
+        self.assertFalse(self.organization.organization_billing.is_active)
+
+    @patch(
+        "connect.common.models.BillingPlan.send_email_trial_plan_expired_due_conversation_limit"
+    )
+    @patch("connect.common.models.BillingPlan.end_trial_period")
+    def test_execute_sends_conversation_limit_email(self, mock_end_trial, mock_email):
+        """execute() should call the message-limit email method."""
+        dto = SuspendVtexProjectDTO(
+            project_uuid=str(self.project.uuid),
+            conversation_limit=1000,
+        )
+        use_case = SuspendVtexProjectUseCase()
+        use_case.execute(dto)
+
+        mock_end_trial.assert_called_once()
+        mock_email.assert_called_once_with(1000)
+
+    @patch("connect.common.models.send_mass_html_mail")
+    def test_execute_skips_when_already_suspended(self, mock_mail):
+        """execute() should return early when organization is already suspended."""
+        mock_mail.return_value = None
+
+        self.organization.is_suspended = True
+        self.organization.save(update_fields=["is_suspended"])
+
+        dto = SuspendVtexProjectDTO(
+            project_uuid=str(self.project.uuid),
+            conversation_limit=1000,
+        )
+        use_case = SuspendVtexProjectUseCase()
+        result = use_case.execute(dto)
+
+        self.assertTrue(result["already_suspended"])
+
+    def test_execute_raises_for_nonexistent_project(self):
+        """execute() should raise Project.DoesNotExist for unknown UUID."""
+        dto = SuspendVtexProjectDTO(
+            project_uuid=str(uuid.uuid4()),
+            conversation_limit=1000,
+        )
+        use_case = SuspendVtexProjectUseCase()
+
+        with self.assertRaises(Project.DoesNotExist):
+            use_case.execute(dto)
+
+    @patch("connect.billing.get_gateway")
+    def test_execute_raises_for_non_trial_plan(self, mock_gateway):
+        """execute() should raise ValueError when the plan is not trial."""
+        mock_gateway.return_value = StripeMockGateway()
+
+        billing = self.organization.organization_billing
+        billing.plan = BillingPlan.PLAN_START
+        billing.save(update_fields=["plan"])
+
+        dto = SuspendVtexProjectDTO(
+            project_uuid=str(self.project.uuid),
+            conversation_limit=1000,
+        )
+        use_case = SuspendVtexProjectUseCase()
+
+        with self.assertRaises(ValueError) as ctx:
+            use_case.execute(dto)
+
+        self.assertIn("not on a trial plan", str(ctx.exception))

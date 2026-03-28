@@ -31,6 +31,7 @@ from connect.api.v2.commerce.views import (
     CommerceOrganizationViewSet,
     CreateVtexProjectView,
     SetVtexHostStoreView,
+    SuspendVtexProjectView,
 )
 from connect.api.v2.organizations import views as organization_views
 from connect.api.v2.projects import views as project_views
@@ -157,6 +158,11 @@ urlpatterns = [
         "commerce/create-vtex-project/",
         CreateVtexProjectView.as_view(),
         name="create-vtex-project",
+    ),
+    path(
+        "commerce/projects/<project_uuid>/suspend/",
+        SuspendVtexProjectView.as_view(),
+        name="suspend-vtex-project",
     ),
     path(
         "commerce/projects/<project_uuid>/set-vtex-host-store/",

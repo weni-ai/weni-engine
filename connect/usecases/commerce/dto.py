@@ -8,3 +8,9 @@ class CreateVtexProjectDTO:
     language: str
     organization_name: str
     project_name: str
+
+
+@dataclass(frozen=True)
+class SuspendVtexProjectDTO:
+    project_uuid: str
+    conversation_limit: int
