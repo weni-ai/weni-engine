@@ -152,6 +152,13 @@ class Organization(models.Model):
 
     tracker = FieldTracker(fields=["is_suspended"])
 
+    @property
+    def has_vtex_project(self):
+        return self.project.filter(
+            vtex_account__isnull=False,
+            vtex_account__gt="",
+        ).exists()
+
     def __str__(self):
         return f"{self.uuid} - {self.name}"
 
