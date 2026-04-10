@@ -4,5 +4,5 @@
 <p>{% trans "A member of" %} {{ organization_name }} {% trans "has sent you an invitation to join their organization." %}</p>
 <p>{% trans "To accept, simply click the button below and complete your registration. If you're already registered, just log in you account." %}</p>
 <p>{% trans "Best regards," %}</p>
-<p>{% trans "Weni by VTEX Team" %}</p>
+<p>{% trans "VTEX CX Platform Team" %}</p>
 <p><a href="{{ webapp_base_url }}"> {% trans "Join org" %} </a></p>

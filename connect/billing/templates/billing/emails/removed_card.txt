@@ -6,9 +6,9 @@
     {{ org_name }}
     {% trans "has been removed. This change has paused your plan's billing and deactivated you agents." %}
 </p>
-    {% trans "To continue using the Weni Platform, simply ask the administrator to update the card in the" %}
+    {% trans "To continue using the VTEX CX Platform, simply ask the administrator to update the card in the" %}
     <a href="{{ webapp_billing_url }}" style="color: #009E96; text-decoration: underline; text-underline-offset: 4px;">{% trans 'Billing' %}</a>
     {% trans "section. Once updated, everything will be back to normal!" %}
 </p>
 <p>{% trans 'Best regards,' %}</p>
-<p>{% trans 'Weni by VTEX Team' %}</p>
+<p>{% trans 'VTEX CX Platform Team' %}</p>

@@ -221,7 +221,7 @@ class Organization(models.Model):
 
         with translation.override(language):
             email = send_email(
-                _("You've received an access code for Weni Platform"),
+                _("You've received an access code for VTEX CX Platform"),
                 email,
                 "authentication/emails/access_code.txt",
                 "authentication/emails/access_code.html",
@@ -1547,9 +1547,9 @@ class BillingPlan(models.Model):
                     "billing/emails/finished-plan.html", context
                 )
             if language_code == "en-us":
-                subject = _("Plan ended on Weni Platform")
+                subject = _("Plan ended on VTEX CX Platform")
             else:
-                subject = _("Plano encerrado na Weni Plataforma")
+                subject = _("Plano encerrado na VTEX CX Platform")
 
             recipient_list = [user_email]
             msg = (subject, message, html_message, from_email, recipient_list)
@@ -1581,9 +1581,9 @@ class BillingPlan(models.Model):
                     "billing/emails/removed_card.html", context
                 )
             if language_code == "en-us":
-                subject = _("Attention: credit card removed from Weni Platform")
+                subject = _("Attention: credit card removed from VTEX CX Platform")
             else:
-                subject = _("Cartão de crédito removido na Weni Plataforma")
+                subject = _("Cartão de crédito removido na VTEX CX Platform")
 
             recipient_list = [user_email]
             msg = (subject, message, html_message, from_email, recipient_list)
@@ -1617,9 +1617,9 @@ class BillingPlan(models.Model):
                 )
 
             if language_code == "en-us":
-                subject = _("Your Free Plan on Weni has expired")
+                subject = _("Your Free Plan on VTEX CX Platform has expired")
             else:
-                subject = _("Seu plano gratuito na Weni expirou")
+                subject = _("Seu plano gratuito na VTEX CX Platform expirou")
 
             recipient_list = [user_email]
             msg = (subject, message, html_message, from_email, recipient_list)

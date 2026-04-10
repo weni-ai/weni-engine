@@ -1,7 +1,7 @@
 {% load i18n %}
 <p>{% trans 'Oh no,' %} {{ user_name }}!</p>
 <p>{% trans "The plan for your organization" %} {{organization_name}} {% trans "has ended. As a result," %} <strong>{% trans "your intelligent agents are currently offline."%}</strong></p>
-<p>{% trans "To keep using the Weni Platform, simply ask your organization's administrator" %} <strong>{% trans "to reactivate the plan" %}</strong> {% trans "or select a new one that meets your business needs." %}</p>
+<p>{% trans "To keep using the VTEX CX Platform, simply ask your organization's administrator" %} <strong>{% trans "to reactivate the plan" %}</strong> {% trans "or select a new one that meets your business needs." %}</p>
 <p>{% trans 'Our goal is to continue growing alongside you!' %}</p>
 <p>{% trans 'Best regards,' %}</p>
-<p>{% trans 'Weni by VTEX Team' %}</p>
+<p>{% trans 'VTEX CX Platform Team' %}</p>
