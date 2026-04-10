@@ -4,4 +4,4 @@
 <p>{% trans "To keep using the VTEX CX Platform, simply ask your organization's administrator" %} <strong>{% trans "to reactivate the plan" %}</strong> {% trans "or select a new one that meets your business needs." %}</p>
 <p>{% trans 'Our goal is to continue growing alongside you!' %}</p>
 <p>{% trans 'Best regards,' %}</p>
-<p>{% trans 'VTEX CX Platform Team' %}</p>
+<p>{% trans 'VTEX CX Team' %}</p>

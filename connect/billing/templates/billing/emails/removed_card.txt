@@ -11,4 +11,4 @@
     {% trans "section. Once updated, everything will be back to normal!" %}
 </p>
 <p>{% trans 'Best regards,' %}</p>
-<p>{% trans 'VTEX CX Platform Team' %}</p>
+<p>{% trans 'VTEX CX Team' %}</p>

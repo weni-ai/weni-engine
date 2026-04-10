@@ -419,7 +419,7 @@ msgstr ""
 "manter sua segurança e privacidade."
 
 #: connect/authentication/models.py:221
-msgid "Your WVTEX CX Platform account is ready! Log in now"
+msgid "Your VTEX CX Platform account is ready! Log in now"
 msgstr "Seu cadastro na VTEX CX Platform foi concluído! Acesse agora"
 
 #: connect/authentication/templates/authentication/emails/first_password.html:42
@@ -925,7 +925,7 @@ msgstr "Atenciosamente,"
 #: connect/common/templates/common/emails/organization/invite_organization.txt:6
 #: connect/authentication/templates/authentication/emails/change_password.html:72
 #: connect/authentication/templates/authentication/emails/change_password.txt:6
-msgid "VTEX CX Platform Team"
+msgid "VTEX CX Team"
 msgstr "Time VTEX CX Platform"
 
 #: connect/common/models.py:41

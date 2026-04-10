@@ -10,4 +10,4 @@
 </p>
 <p>{% trans "We're here to support you every step of the way!" context "free-plan-expired" %}</p>
 <p>{% trans "Best regards," %}</p>
-<p>{% trans "VTEX CX Platform Team" %}</p>
+<p>{% trans "VTEX CX Team" %}</p>
