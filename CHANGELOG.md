@@ -1,3 +1,7 @@
+# 3.40.1
+  - feat: update agentic cx texts
+  - feat: Enhance ProjectAdmin search functionality by adding UUID field
+
 # 3.40.0
   - feat: Adds project detail endpoint with config and billing info
 
