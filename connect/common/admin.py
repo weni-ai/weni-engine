@@ -117,7 +117,7 @@ class ServiceStatusInline(admin.TabularInline):
 
 class ProjectAdmin(admin.ModelAdmin):
     inlines = [ServiceStatusInline]
-    search_fields = ["name", "organization__name", "organization__uuid"]
+    search_fields = ["name", "organization__name", "organization__uuid", "uuid"]
 
 
 class NewsletterLanguageInline(admin.TabularInline):
