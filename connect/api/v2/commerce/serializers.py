@@ -155,3 +155,7 @@ class CreateVtexProjectSerializer(serializers.Serializer):
 
 class SetVtexHostStoreSerializer(serializers.Serializer):
     vtex_host_store = serializers.URLField(required=True)
+
+
+class UpdateProjectConfigSerializer(serializers.Serializer):
+    config = serializers.DictField(required=True, allow_empty=False)
