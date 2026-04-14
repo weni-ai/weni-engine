@@ -4,10 +4,10 @@
 <p>{% trans "This means that our free plan is no longer enough to keep up with the growth of" %} {{ organization_name }}.</p>
 <p>
     <strong>{% trans "To continue using your intelligent agents," %}</strong>
-    {% trans "artificial intelligence, and all the other features of the Weni Platform," %}
+    {% trans "artificial intelligence, and all the other features of the VTEX CX Platform," %}
     <strong>{% trans "choose a plan"%}</strong>
     {% trans "that aligns with your goals." %}
 </p>
 <p>{% trans "We're here to support you every step of the way!" context "free-plan-expired" %}</p>
 <p>{% trans "Best regards," %}</p>
-<p>{% trans "Weni by VTEX Team" %}</p>
+<p>{% trans "VTEX CX Team" %}</p>

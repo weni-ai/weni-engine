@@ -437,7 +437,7 @@ class OrganizationTestCase(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         sent_email = mail.outbox[0]
         self.assertEqual(
-            sent_email.subject, "You receive an access code to Weni Platform"
+            sent_email.subject, "You receive an access code to VTEX CX Platform"
         )
 
     @patch("connect.billing.get_gateway")
