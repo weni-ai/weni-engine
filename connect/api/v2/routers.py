@@ -31,6 +31,7 @@ from connect.api.v2.commerce.views import (
     CommerceOrganizationViewSet,
     CreateVtexProjectView,
     SetVtexHostStoreView,
+    UpdateProjectConfigView,
 )
 from connect.api.v2.organizations import views as organization_views
 from connect.api.v2.projects import views as project_views
@@ -158,10 +159,15 @@ urlpatterns = [
         CreateVtexProjectView.as_view(),
         name="create-vtex-project",
     ),
-    path(
+    path( # TODO: deprecated, can be removed in the near future
         "commerce/projects/<project_uuid>/set-vtex-host-store/",
         SetVtexHostStoreView.as_view(),
         name="set-vtex-host-store",
+    ),
+    path(
+        "commerce/projects/<project_uuid>/config/",
+        UpdateProjectConfigView.as_view(),
+        name="update-project-config",
     ),
     path("auth/", KeycloakAuthView.as_view(), name="keycloak-auth"),
 ]
