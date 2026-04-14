@@ -11,6 +11,7 @@ from connect.api.v2.commerce.serializers import (
     CreateVtexProjectSerializer,
     SetVtexHostStoreSerializer,
     SuspendVtexProjectSerializer,
+    UpdateProjectConfigSerializer,
 )
 from connect.api.v2.paginations import CustomCursorPagination
 from connect.common.models import Organization, Project
@@ -18,6 +19,7 @@ from connect.usecases.commerce.create_vtex_project import CreateVtexProjectUseCa
 from connect.usecases.commerce.dto import CreateVtexProjectDTO, SuspendVtexProjectDTO
 from connect.usecases.commerce.set_vtex_host_store import SetVtexHostStoreUseCase
 from connect.usecases.commerce.suspend_vtex_project import SuspendVtexProjectUseCase
+from connect.usecases.commerce.update_project_config import UpdateProjectConfigUseCase
 
 logger = logging.getLogger(__name__)
 
@@ -95,6 +97,27 @@ class SetVtexHostStoreView(views.APIView):
             result = SetVtexHostStoreUseCase().execute(
                 project_uuid=project_uuid,
                 vtex_host_store=serializer.validated_data["vtex_host_store"],
+            )
+        except Project.DoesNotExist:
+            return Response(
+                {"detail": "Project not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        return Response(result, status=status.HTTP_200_OK)
+
+
+class UpdateProjectConfigView(views.APIView):
+    permission_classes = [CanCommunicateInternally]
+
+    def patch(self, request, project_uuid):
+        serializer = UpdateProjectConfigSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            result = UpdateProjectConfigUseCase().execute(
+                project_uuid=project_uuid,
+                config=serializer.validated_data["config"],
             )
         except Project.DoesNotExist:
             return Response(

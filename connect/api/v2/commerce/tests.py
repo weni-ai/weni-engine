@@ -25,6 +25,7 @@ from connect.usecases.commerce.create_vtex_project import CreateVtexProjectUseCa
 from connect.usecases.commerce.dto import CreateVtexProjectDTO, SuspendVtexProjectDTO
 from connect.usecases.commerce.set_vtex_host_store import SetVtexHostStoreUseCase
 from connect.usecases.commerce.suspend_vtex_project import SuspendVtexProjectUseCase
+from connect.usecases.commerce.update_project_config import UpdateProjectConfigUseCase
 
 
 @override_settings(USE_EDA_PERMISSIONS=False)  # Disable EDA to avoid RabbitMQ issues
@@ -934,3 +935,210 @@ class SuspendVtexProjectUseCaseTestCase(APITestCase):
             use_case.execute(dto)
 
         self.assertIn("not on a trial plan", str(ctx.exception))
+
+
+@override_settings(USE_EDA_PERMISSIONS=False)
+class UpdateProjectConfigViewTestCase(APITestCase):
+    """Tests for PATCH /v2/commerce/projects/<uuid>/config/"""
+
+    @patch("connect.authentication.signals.RabbitmqPublisher")
+    @patch("connect.common.signals.RabbitmqPublisher")
+    @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.billing.get_gateway")
+    def setUp(
+        self,
+        mock_get_gateway,
+        mock_permission,
+        mock_rabbitmq_common,
+        mock_rabbitmq_auth,
+    ):
+        mock_get_gateway.return_value = StripeMockGateway()
+        mock_permission.return_value = True
+        mock_rabbitmq_common.return_value = Mock()
+        mock_rabbitmq_auth.return_value = Mock()
+
+        self.client = APIClient()
+        self.user, self.token = create_user_and_token("configuser")
+
+        content_type = ContentType.objects.get_for_model(User)
+        permission, _ = Permission.objects.get_or_create(
+            codename="can_communicate_internally",
+            name="can communicate internally",
+            content_type=content_type,
+        )
+        self.user.user_permissions.add(permission)
+        self.client.force_authenticate(user=self.user)
+
+        self.organization = Organization.objects.create(
+            name="config-org",
+            description="Organization config-org",
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan=BillingPlan.PLAN_TRIAL,
+        )
+        self.project = Project.objects.create(
+            name="config-project",
+            organization=self.organization,
+            vtex_account="config-store",
+            flow_organization=uuid.uuid4(),
+            project_type=TypeProject.COMMERCE,
+        )
+
+    def _url(self, project_uuid=None):
+        uid = project_uuid or str(self.project.uuid)
+        return reverse("update-project-config", kwargs={"project_uuid": uid})
+
+    @patch(
+        "connect.usecases.commerce.update_project_config.UpdateProjectUseCase"
+    )
+    def test_update_config_successfully(self, mock_update_uc):
+        """PATCH with valid config dict returns 200 and persists the values."""
+        mock_update_uc.return_value = Mock()
+
+        response = self.client.patch(
+            self._url(),
+            {"config": {"vtex_host_store": "https://www.mystore.com.br/"}},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            response.data["config"]["vtex_host_store"],
+            "https://www.mystore.com.br/",
+        )
+
+        self.project.refresh_from_db()
+        self.assertEqual(
+            self.project.config["vtex_host_store"],
+            "https://www.mystore.com.br/",
+        )
+
+    @patch(
+        "connect.usecases.commerce.update_project_config.UpdateProjectUseCase"
+    )
+    def test_merges_with_existing_config(self, mock_update_uc):
+        """New keys should be added without removing existing ones."""
+        mock_update_uc.return_value = Mock()
+
+        self.project.config = {"store_type": "vtex-io"}
+        self.project.save(update_fields=["config"])
+
+        response = self.client.patch(
+            self._url(),
+            {"config": {"vtex_host_store": "https://www.mystore.com.br/"}},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.project.refresh_from_db()
+        self.assertEqual(self.project.config["store_type"], "vtex-io")
+        self.assertEqual(
+            self.project.config["vtex_host_store"],
+            "https://www.mystore.com.br/",
+        )
+
+    @patch(
+        "connect.usecases.commerce.update_project_config.UpdateProjectUseCase"
+    )
+    def test_overwrite_existing_key(self, mock_update_uc):
+        """Sending an existing key with a new value should overwrite it."""
+        mock_update_uc.return_value = Mock()
+
+        self.project.config = {"store_type": "vtex-io"}
+        self.project.save(update_fields=["config"])
+
+        response = self.client.patch(
+            self._url(),
+            {"config": {"store_type": "vtex-cms"}},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.project.refresh_from_db()
+        self.assertEqual(self.project.config["store_type"], "vtex-cms")
+
+    def test_empty_config_returns_400(self):
+        """Sending an empty config dict should fail validation."""
+        response = self.client.patch(
+            self._url(), {"config": {}}, format="json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_missing_config_returns_400(self):
+        """Sending an empty body should fail validation."""
+        response = self.client.patch(self._url(), {}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_project_not_found_returns_404(self):
+        """Using a non-existent project UUID should return 404."""
+        fake_uuid = str(uuid.uuid4())
+        response = self.client.patch(
+            self._url(fake_uuid),
+            {"config": {"key": "value"}},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+
+@override_settings(USE_EDA_PERMISSIONS=False)
+class UpdateProjectConfigUseCaseTestCase(APITestCase):
+    """Unit tests for UpdateProjectConfigUseCase."""
+
+    @patch("connect.authentication.signals.RabbitmqPublisher")
+    @patch("connect.common.signals.RabbitmqPublisher")
+    @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.billing.get_gateway")
+    def setUp(
+        self,
+        mock_get_gateway,
+        mock_permission,
+        mock_rabbitmq_common,
+        mock_rabbitmq_auth,
+    ):
+        mock_get_gateway.return_value = StripeMockGateway()
+        mock_permission.return_value = True
+        mock_rabbitmq_common.return_value = Mock()
+        mock_rabbitmq_auth.return_value = Mock()
+
+        self.organization = Organization.objects.create(
+            name="uc-config-org",
+            description="Organization uc-config-org",
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan=BillingPlan.PLAN_TRIAL,
+        )
+        self.project = Project.objects.create(
+            name="uc-config-project",
+            organization=self.organization,
+            vtex_account="uc-config-store",
+            flow_organization=uuid.uuid4(),
+            project_type=TypeProject.COMMERCE,
+        )
+
+    def test_execute_merges_config_and_publishes(self):
+        """execute() should merge config keys and call EDA publisher."""
+        mock_update = Mock()
+        use_case = UpdateProjectConfigUseCase(update_project_usecase=mock_update)
+
+        self.project.config = {"existing_key": "existing_value"}
+        self.project.save(update_fields=["config"])
+
+        result = use_case.execute(
+            str(self.project.uuid),
+            {"new_key": "new_value"},
+        )
+
+        self.project.refresh_from_db()
+        self.assertEqual(self.project.config["existing_key"], "existing_value")
+        self.assertEqual(self.project.config["new_key"], "new_value")
+        self.assertEqual(result["config"]["existing_key"], "existing_value")
+        self.assertEqual(result["config"]["new_key"], "new_value")
+        mock_update.send_updated_project.assert_called_once_with(
+            self.project, user_email=""
+        )
+
+    def test_project_not_found_raises(self):
+        """execute() should raise Project.DoesNotExist for unknown UUID."""
+        mock_update = Mock()
+        use_case = UpdateProjectConfigUseCase(update_project_usecase=mock_update)
+
+        with self.assertRaises(Project.DoesNotExist):
+            use_case.execute(str(uuid.uuid4()), {"key": "value"})
