@@ -1,3 +1,6 @@
+# 3.41.1
+  - Remove social media links from base email template footer
+
 # 3.41.0
   - feat: Add UpdateProjectConfig endpoint
 
