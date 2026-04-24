@@ -408,3 +408,104 @@ class BillingTasksTestCase(TestCase):
             ],
         )
         self.assertFalse(response.result)
+
+
+class EndTrialPlanVtexExclusionTestCase(TestCase):
+    """Tests that organizations with VTEX projects are excluded from trial expiration."""
+
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway):
+        mock_get_gateway.return_value = StripeMockGateway()
+
+        self.org_with_vtex = Organization.objects.create(
+            name="Org With VTEX",
+            description="Organization with VTEX project",
+            inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan=BillingPlan.PLAN_TRIAL,
+        )
+        self.vtex_project = Project.objects.create(
+            name="VTEX Project",
+            flow_organization=uuid4.uuid4(),
+            organization=self.org_with_vtex,
+            vtex_account="my-vtex-store",
+        )
+
+        self.org_without_vtex = Organization.objects.create(
+            name="Org Without VTEX",
+            description="Organization without VTEX project",
+            inteligence_organization=2,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan=BillingPlan.PLAN_TRIAL,
+        )
+        self.regular_project = Project.objects.create(
+            name="Regular Project",
+            flow_organization=uuid4.uuid4(),
+            organization=self.org_without_vtex,
+        )
+
+    def test_has_vtex_project_returns_true_when_project_has_vtex_account(self):
+        self.assertTrue(self.org_with_vtex.has_vtex_project)
+
+    def test_has_vtex_project_returns_false_when_no_vtex_account(self):
+        self.assertFalse(self.org_without_vtex.has_vtex_project)
+
+    def test_has_vtex_project_returns_false_for_empty_vtex_account(self):
+        self.vtex_project.vtex_account = ""
+        self.vtex_project.save(update_fields=["vtex_account"])
+        self.assertFalse(self.org_with_vtex.has_vtex_project)
+
+    @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.common.models.current_app.send_task")
+    def test_end_trial_plan_skips_org_with_vtex_project(
+        self, mock_send_task, mock_permission
+    ):
+        """Trial expiration must NOT suspend organizations that have VTEX projects."""
+        date = pendulum.now().add(months=1, days=1)
+        with freeze_time(str(date)):
+            from connect.billing.tasks import end_trial_plan
+
+            end_trial_plan()
+
+        self.org_with_vtex.refresh_from_db()
+        self.assertFalse(self.org_with_vtex.is_suspended)
+        self.assertTrue(self.org_with_vtex.organization_billing.is_active)
+
+    @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.common.models.current_app.send_task")
+    def test_end_trial_plan_suspends_org_without_vtex_project(
+        self, mock_send_task, mock_permission
+    ):
+        """Trial expiration must still suspend organizations without VTEX projects."""
+        date = pendulum.now().add(months=1, days=1)
+        with freeze_time(str(date)):
+            from connect.billing.tasks import end_trial_plan
+
+            end_trial_plan()
+
+        self.org_without_vtex.refresh_from_db()
+        self.assertTrue(self.org_without_vtex.is_suspended)
+        self.assertFalse(self.org_without_vtex.organization_billing.is_active)
+
+    @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.common.models.current_app.send_task")
+    def test_end_trial_plan_skips_vtex_org_with_extension(
+        self, mock_send_task, mock_permission
+    ):
+        """Extended trial must also NOT suspend organizations with VTEX projects."""
+        billing = self.org_with_vtex.organization_billing
+        billing.trial_extension_enabled = True
+        billing.trial_extension_end_date = pendulum.now().end_of("day").add(months=2)
+        billing.save(
+            update_fields=["trial_extension_enabled", "trial_extension_end_date"]
+        )
+
+        date = pendulum.now().add(months=2, days=1)
+        with freeze_time(str(date)):
+            from connect.billing.tasks import end_trial_plan
+
+            end_trial_plan()
+
+        self.org_with_vtex.refresh_from_db()
+        self.assertFalse(self.org_with_vtex.is_suspended)
+        self.assertTrue(self.org_with_vtex.organization_billing.is_active)
