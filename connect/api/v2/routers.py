@@ -187,4 +187,9 @@ urlpatterns += [
         "internals/connect/projects",
         connect_internal_views.InternalProjectsListView.as_view(),
     ),
+    path(
+        "internals/connect/projects/<project_uuid>/plan-status",
+        connect_internal_views.InternalProjectPlanStatusView.as_view(),
+        name="internal-project-plan-status",
+    ),
 ]
