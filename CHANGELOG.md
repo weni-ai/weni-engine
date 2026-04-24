@@ -1,3 +1,6 @@
+# 3.42.0
+  - feat: Skip trial expiration for orgs with VTEX projects
+
 # 3.41.1
   - Remove social media links from base email template footer
 
