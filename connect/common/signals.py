@@ -8,6 +8,7 @@ from django.utils import timezone
 from connect.authentication.models import User
 from connect.common.exceptions import ProjectAuthorizationException
 from connect.common.models import (
+    BillingPlan,
     ChatsRole,
     Project,
     Service,
@@ -18,6 +19,10 @@ from connect.common.models import (
     RequestRocketPermission,
     RequestChatsPermission,
     OpenedProject,
+)
+from connect.usecases.project.get_project_plan_status import (
+    invalidate_organization_plan_status,
+    invalidate_project_plan_status,
 )
 from connect.celery import app as celery_app
 from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
@@ -110,6 +115,33 @@ def update_organization(instance, **kwargs):
                 eda_publisher.publish_organization_deactivated(instance.uuid)
             else:
                 eda_publisher.publish_organization_activated(instance.uuid)
+
+
+@receiver(post_save, sender=Organization)
+def invalidate_plan_status_on_organization_save(sender, instance, **kwargs):
+    """Drop cached plan status when org-level fields that affect it change."""
+    update_fields = kwargs.get("update_fields") or set()
+    if update_fields and "is_suspended" not in update_fields:
+        return
+    invalidate_organization_plan_status(instance)
+
+
+@receiver(post_save, sender=BillingPlan)
+def invalidate_plan_status_on_billing_save(sender, instance, **kwargs):
+    """Drop cached plan status whenever the BillingPlan changes."""
+    invalidate_organization_plan_status(instance.organization)
+
+
+@receiver(post_delete, sender=BillingPlan)
+def invalidate_plan_status_on_billing_delete(sender, instance, **kwargs):
+    """Drop cached plan status when a BillingPlan is deleted."""
+    invalidate_organization_plan_status(instance.organization)
+
+
+@receiver(post_delete, sender=Project)
+def invalidate_plan_status_on_project_delete(sender, instance, **kwargs):
+    """Drop the project's cached plan status when it is removed."""
+    invalidate_project_plan_status(instance.uuid)
 
 
 @receiver(post_delete, sender=ProjectAuthorization)

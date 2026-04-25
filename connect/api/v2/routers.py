@@ -159,7 +159,7 @@ urlpatterns = [
         CreateVtexProjectView.as_view(),
         name="create-vtex-project",
     ),
-    path( # TODO: deprecated, can be removed in the near future
+    path(  # TODO: deprecated, can be removed in the near future
         "commerce/projects/<project_uuid>/set-vtex-host-store/",
         SetVtexHostStoreView.as_view(),
         name="set-vtex-host-store",
@@ -186,5 +186,10 @@ urlpatterns += [
     path(
         "internals/connect/projects",
         connect_internal_views.InternalProjectsListView.as_view(),
+    ),
+    path(
+        "internals/connect/projects/<project_uuid>/plan-status",
+        connect_internal_views.InternalProjectPlanStatusView.as_view(),
+        name="internal-project-plan-status",
     ),
 ]
