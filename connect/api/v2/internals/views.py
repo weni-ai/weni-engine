@@ -14,6 +14,10 @@ from connect.api.v2.internals.serializers import (
     CRMOrganizationSerializer,
     InternalProjectsListSerializer,
 )
+from connect.api.v2.projects.serializers import ProjectPlanStatusSerializer
+from connect.usecases.project.get_project_plan_status import (
+    GetProjectPlanStatusUseCase,
+)
 from connect.api.v2.internals.filters import CRMOrganizationFilter
 from connect.api.v2.internals.permissions import ProjectsAPITokenPermission
 from connect.api.v2.internals.paginations import ProjectsPageNumberPagination
@@ -137,6 +141,30 @@ class CRMOrganizationViewSet(
     def retrieve(self, request, *args, **kwargs):
         """Retrieve a specific organization by UUID"""
         return super().retrieve(request, *args, **kwargs)
+
+
+class InternalProjectPlanStatusView(views.APIView):
+    """Return the cached billing plan status for a project.
+
+    Service-to-service endpoint consumed by the retail/commerce module to check
+    whether a project is on trial. Responses are cached in Redis and
+    automatically invalidated whenever the underlying BillingPlan or
+    Organization changes.
+    """
+
+    permission_classes = [ModuleHasPermission]
+
+    @swagger_auto_schema(
+        operation_description=(
+            "GET /v2/internals/connect/projects/<project_uuid>/plan-status"
+        ),
+        responses={200: ProjectPlanStatusSerializer},
+        tags=["Internal"],
+    )
+    def get(self, request, project_uuid, **kwargs):
+        payload = GetProjectPlanStatusUseCase().execute(project_uuid=project_uuid)
+        serializer = ProjectPlanStatusSerializer(payload)
+        return Response(serializer.data)
 
 
 class InternalProjectsListView(views.APIView):

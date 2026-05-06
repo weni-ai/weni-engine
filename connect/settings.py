@@ -86,6 +86,7 @@ env = environ.Env(
     USE_FLOW_REST=(bool, True),
     PLAN_TRIAL_PRICE=(int, 0),
     PLAN_TRIAL_LIMIT=(int, 100),
+    PLAN_STATUS_CACHE_TTL=(int, 900),
     PLAN_START_LIMIT=(int, 200),
     PLAN_START_PRICE=(int, 390),
     PLAN_SCALE_LIMIT=(int, 500),
@@ -512,6 +513,11 @@ VERIFICATION_AMOUNT = env.float("VERIFICATION_AMOUNT")
 
 PLAN_TRIAL_PRICE = env.int("PLAN_TRIAL_PRICE")
 PLAN_TRIAL_LIMIT = env.int("PLAN_TRIAL_LIMIT")
+
+# TTL (seconds) for the cached project plan status payload returned by the
+# internal `plan-status` endpoint. Cache entries are also invalidated proactively
+# via signals whenever a BillingPlan or Organization.is_suspended changes.
+PLAN_STATUS_CACHE_TTL = env.int("PLAN_STATUS_CACHE_TTL")
 
 PLAN_START_LIMIT = env.int("PLAN_START_LIMIT")
 PLAN_START_PRICE = env.int("PLAN_START_PRICE")
