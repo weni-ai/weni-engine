@@ -625,6 +625,18 @@ class ProjectBillingSerializer(serializers.Serializer):
     days_till_trial_end = serializers.IntegerField()
 
 
+class ProjectPlanStatusSerializer(serializers.Serializer):
+    """Lightweight payload returned by the `plan-status` internal endpoint."""
+
+    project_uuid = serializers.UUIDField()
+    organization_uuid = serializers.UUIDField(allow_null=True)
+    plan = serializers.CharField(allow_null=True)
+    is_trial = serializers.BooleanField()
+    is_trial_active = serializers.BooleanField()
+    is_active = serializers.BooleanField()
+    is_suspended = serializers.BooleanField()
+
+
 class ProjectDetailSerializer(serializers.Serializer):
     uuid = serializers.UUIDField()
     name = serializers.CharField()
