@@ -180,7 +180,7 @@ urlpatterns += [
     path(
         "internals/connect/projects/<uuid>",
         connect_internal_views.InternalProjectViewSet.as_view(
-            {"patch": "partial_update"}
+            {"patch": "partial_update", "get": "retrieve"}
         ),
     ),
     path(

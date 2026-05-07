@@ -233,6 +233,13 @@ class CRMOrganizationSerializer(serializers.ModelSerializer):
         return CRMProjectSerializer(projects, many=True).data
 
 
+class InternalProjectLanguageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Project
+        fields = ["uuid", "language"]
+        read_only_fields = ["uuid", "language"]
+
+
 class InternalProjectsListSerializer(serializers.ModelSerializer):
     """
     Simplified serializer for internal projects list API.
