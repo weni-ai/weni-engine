@@ -1,3 +1,6 @@
+# 3.44.0
+  - feat: Add Romanian language support
+
 # 3.43.0
   - feat: Adds cached plan-status endpoint for retail consumption
 

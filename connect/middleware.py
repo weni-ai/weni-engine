@@ -75,6 +75,8 @@ class WeniOIDCAuthenticationBackend(OIDCAuthenticationBackend):
                 language = settings.LANGUAGES[1][0]
             elif locale.lower() == "es":
                 language = settings.LANGUAGES[2][0]
+            elif locale.lower() == "ro":
+                language = settings.LANGUAGES[3][0]
             else:
                 language = settings.LANGUAGES[0][0]
 
