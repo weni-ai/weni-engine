@@ -38,6 +38,11 @@ from connect.api.v2.projects import views as project_views
 from connect.api.v2.internals import views as connect_internal_views
 from connect.api.v2.auth.views import KeycloakAuthView, ProjectAuthView
 
+from connect.api.v2.internals.business_verification.views import (
+    NotifyBusinessVerificationView,
+)
+
+
 router = routers.SimpleRouter()
 router.register(
     r"projects/template-type", TemplateTypeViewSet, basename="template-type"
@@ -191,5 +196,10 @@ urlpatterns += [
         "internals/connect/projects/<project_uuid>/plan-status",
         connect_internal_views.InternalProjectPlanStatusView.as_view(),
         name="internal-project-plan-status",
+    ),
+    path(
+        "internals/business-verification/notify/",
+        NotifyBusinessVerificationView.as_view(),
+        name="internal-business-verification-notify",
     ),
 ]
