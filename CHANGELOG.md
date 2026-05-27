@@ -1,3 +1,6 @@
+# 3.43.0
+  - feat: Adds cached plan-status endpoint for retail consumption
+
 # 3.42.0
   - feat: Skip trial expiration for orgs with VTEX projects
 

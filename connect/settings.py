@@ -241,7 +241,7 @@ LANGUAGE_CODE = env.str("LANGUAGE_CODE")
 # -----------------------------------------------------------------------------------
 # Available languages for translation
 # -----------------------------------------------------------------------------------
-LANGUAGES = (("en-us", _("English")), ("pt-br", _("Portuguese")), ("es", _("Spanish")))
+LANGUAGES = (("en-us", _("English")), ("pt-br", _("Portuguese")), ("es", _("Spanish")), ("ro", _("Romanian")))
 
 MODELTRANSLATION_DEFAULT_LANGUAGE = "en-us"
 
