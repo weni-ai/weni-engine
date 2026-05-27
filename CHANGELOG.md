@@ -1,3 +1,6 @@
+# 3.46.0
+  - feat: Adds business verification result notification endpoint
+
 # 3.45.0
   - feat: Add Romanian language support
 
