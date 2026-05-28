@@ -6,13 +6,15 @@ from django.conf import settings
 from django.utils.html import strip_tags
 from django.utils.translation import gettext_lazy as _
 
-from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from rest_framework import status
+from weni.eda.eda_publisher import EDAPublisher
+from weni.eda.django.connection_params import AMQConnectionParamsFactory
 
 from connect.api.v1 import fields
+from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
 from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
 from connect.api.v1.project.validators import CanContributeInOrganizationValidator
 from connect.api.v1.project.serializers import ProjectAuthorizationSerializer
@@ -213,6 +215,12 @@ class ProjectSerializer(serializers.ModelSerializer):
         rabbitmq_publisher = RabbitmqPublisher()
         rabbitmq_publisher.send_message(
             message_body, exchange="projects.topic", routing_key=""
+        )
+
+        # TEMPORARY[EDA Migration]: This needs to be adjusted after the migration is complete.
+        amazonmq_publisher = EDAPublisher(AMQConnectionParamsFactory)
+        amazonmq_publisher.send_message(
+            message_body, exchange="projects.topic", routing_key="project.created"
         )
 
     def send_request_flow_product(self, user):

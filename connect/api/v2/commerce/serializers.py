@@ -2,8 +2,10 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 
 from rest_framework import serializers
-from connect.celery import app as celery_app
+from weni.eda.eda_publisher import EDAPublisher
+from weni.eda.django.connection_params import AMQConnectionParamsFactory
 
+from connect.celery import app as celery_app
 from connect.internals.event_driven.producer.rabbitmq_publisher import RabbitmqPublisher
 from connect.usecases.users.create import CreateKeycloakUserUseCase
 from connect.usecases.users.user_dto import KeycloakUserDTO
@@ -86,6 +88,12 @@ class CommerceSerializer(serializers.Serializer):
         rabbitmq_publisher = RabbitmqPublisher()
         rabbitmq_publisher.send_message(
             message_body, exchange="projects.topic", routing_key=""
+        )
+
+        # TEMPORARY[EDA Migration]: This needs to be adjusted after the migration is complete.
+        amazonmq_publisher = EDAPublisher(AMQConnectionParamsFactory)
+        amazonmq_publisher.send_message(
+            message_body, exchange="projects.topic", routing_key="project.created"
         )
 
     def create(self, validated_data):
