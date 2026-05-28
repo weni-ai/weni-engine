@@ -61,6 +61,11 @@ class CommerceSerializer(serializers.Serializer):
                     {"user_email": authorization.user.email, "role": authorization.role}
                 )
 
+        inline_agent_switch = True
+        org_uuid = instance.organization.uuid
+        if org_uuid in settings.NEXUS_AB1_ORGANIZATIONS:
+            inline_agent_switch = False
+
         message_body = {
             "uuid": str(instance.uuid),
             "name": instance.name,
@@ -81,7 +86,7 @@ class CommerceSerializer(serializers.Serializer):
             "brain_on": True,
             "project_type": instance.project_type.value,
             "vtex_account": instance.vtex_account,
-            "inline_agent_switch": True
+            "inline_agent_switch": inline_agent_switch
         }
         rabbitmq_publisher = RabbitmqPublisher()
         rabbitmq_publisher.send_message(
