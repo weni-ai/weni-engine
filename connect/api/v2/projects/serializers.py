@@ -188,6 +188,11 @@ class ProjectSerializer(serializers.ModelSerializer):
                 self.context["request"].data.get("project", {}).get("globals", {})
             )
 
+        inline_agent_switch = True
+        org_uuid = instance.organization.uuid
+        if org_uuid in settings.NEXUS_AB1_ORGANIZATIONS:
+            inline_agent_switch = False
+
         message_body = {
             "uuid": str(instance.uuid),
             "name": instance.name,
@@ -208,7 +213,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             "brain_on": brain_on,
             "project_type": instance.project_type.value,
             "vtex_account": instance.vtex_account,
-            "inline_agent_switch": True
+            "inline_agent_switch": inline_agent_switch
         }
         rabbitmq_publisher = RabbitmqPublisher()
         rabbitmq_publisher.send_message(
