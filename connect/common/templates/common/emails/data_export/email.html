@@ -1,0 +1,29 @@
+{% extends 'authentication/emails/base.html' %}
+{% load i18n %}
+
+{% block main-content %}
+<section style="margin: 24px auto; padding: 0 32px">
+  <div style="font-family: 'Lato', sans-serif; font-weight: 700; font-size: 14px; line-height: 20px; color: #3b414d">
+    {% trans 'Your data export has been processed and ready for download.' %}
+  </div>
+  <div style="font-family: 'Lato', sans-serif; font-size: 14px; line-height: 20px; color: #3b414d; margin-top: 12px">
+    {% trans "Here's what you requested:" %}
+  </div>
+  <ul style="font-family: 'Lato', sans-serif; font-size: 14px; line-height: 20px; color: #3b414d; margin-top: 12px; padding-left: 21px">
+    <li>{% trans 'Period' %}: {{ period }}</li>
+    <li>{% trans 'Template' %}: {{ template_label }}</li>
+    <li>{% trans 'Status' %}: {{ status_label }}</li>
+  </ul>
+  <div style="font-family: 'Lato', sans-serif; font-size: 14px; line-height: 20px; color: #3b414d; margin-top: 12px">
+    {% trans "If the data doesn't match what you expected, you can go back to the platform and generate a new export with adjusted filters." %}
+  </div>
+  <a href="{{ file_url }}" style="text-decoration: none">
+    <div style="padding: 12px 16px; text-align: center; background: #00a49f; border-radius: 8px; color: #fff; font-family: 'Lato', sans-serif; font-weight: 600; font-size: 14px; line-height: 20px; margin-top: 12px">
+      {% trans 'Download File' %}
+    </div>
+  </a>
+  <div style="font-family: 'Lato', sans-serif; font-size: 14px; line-height: 20px; color: #3b414d; margin-top: 12px">
+    VTEX CX Team
+  </div>
+</section>
+{% endblock %}
