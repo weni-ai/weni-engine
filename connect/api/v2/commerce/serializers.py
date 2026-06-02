@@ -63,6 +63,11 @@ class CommerceSerializer(serializers.Serializer):
                     {"user_email": authorization.user.email, "role": authorization.role}
                 )
 
+        inline_agent_switch = True
+        org_uuid = instance.organization.uuid
+        if org_uuid in settings.NEXUS_AB1_ORGANIZATIONS:
+            inline_agent_switch = False
+
         message_body = {
             "uuid": str(instance.uuid),
             "name": instance.name,
@@ -83,7 +88,7 @@ class CommerceSerializer(serializers.Serializer):
             "brain_on": True,
             "project_type": instance.project_type.value,
             "vtex_account": instance.vtex_account,
-            "inline_agent_switch": True
+            "inline_agent_switch": inline_agent_switch
         }
         rabbitmq_publisher = RabbitmqPublisher()
         rabbitmq_publisher.send_message(
@@ -168,3 +173,29 @@ class SetVtexHostStoreSerializer(serializers.Serializer):
 
 class UpdateProjectConfigSerializer(serializers.Serializer):
     config = serializers.DictField(required=True, allow_empty=False)
+
+
+DATA_EXPORT_STATUSES = (
+    "all",
+    "processing",
+    "skipped",
+    "error",
+    "sent",
+    "delivered",
+    "read",
+)
+
+
+class SendDataExportEmailSerializer(serializers.Serializer):
+    user_email = serializers.EmailField(required=True)
+    file_url = serializers.URLField(required=True)
+    start_date = serializers.DateField(required=True)
+    end_date = serializers.DateField(required=True)
+    template = serializers.CharField(required=True)
+    status = serializers.ChoiceField(choices=DATA_EXPORT_STATUSES, required=True)
+    language = serializers.ChoiceField(
+        choices=settings.LANGUAGES,
+        required=False,
+        allow_null=True,
+        default=None,
+    )

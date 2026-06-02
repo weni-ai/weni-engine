@@ -877,3 +877,60 @@ class UpdateProjectConfigUseCaseTestCase(APITestCase):
 
         with self.assertRaises(Project.DoesNotExist):
             use_case.execute(str(uuid.uuid4()), {"key": "value"})
+
+
+class SendDataExportEmailViewTestCase(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user, self.token = create_user_and_token("dataexportuser")
+
+        content_type = ContentType.objects.get_for_model(User)
+        permission, _ = Permission.objects.get_or_create(
+            codename="can_communicate_internally",
+            name="can communicate internally",
+            content_type=content_type,
+        )
+        self.user.user_permissions.add(permission)
+        self.client.force_authenticate(user=self.user)
+
+        self.url = reverse("commerce-send-data-export-email")
+        self.payload = {
+            "user_email": "customer@example.com",
+            "file_url": "https://files.example.com/export.csv",
+            "start_date": "2026-04-01",
+            "end_date": "2026-05-01",
+            "template": "all",
+            "status": "delivered",
+        }
+
+    @patch("connect.api.v2.commerce.views.SendDataExportEmailUseCase")
+    def test_returns_200_and_dispatches(self, use_case_class):
+        use_case_class.return_value.execute.return_value = True
+
+        response = self.client.post(self.url, self.payload, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json(), {"sent": True})
+
+        dto = use_case_class.return_value.execute.call_args.args[0]
+        self.assertEqual(dto.user_email, "customer@example.com")
+        self.assertEqual(dto.status, "delivered")
+        self.assertEqual(dto.template, "all")
+
+    @patch("connect.api.v2.commerce.views.SendDataExportEmailUseCase")
+    def test_rejects_invalid_status(self, use_case_class):
+        payload = {**self.payload, "status": "unknown"}
+
+        response = self.client.post(self.url, payload, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        use_case_class.return_value.execute.assert_not_called()
+
+    def test_returns_403_without_internal_permission(self):
+        other_user, _ = create_user_and_token("nopermission")
+        client = APIClient()
+        client.force_authenticate(user=other_user)
+
+        response = client.post(self.url, self.payload, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

@@ -30,6 +30,7 @@ from connect.api.v2.template_projects.views import (
 from connect.api.v2.commerce.views import (
     CommerceOrganizationViewSet,
     CreateVtexProjectView,
+    SendDataExportEmailView,
     SetVtexHostStoreView,
     UpdateProjectConfigView,
 )
@@ -37,6 +38,11 @@ from connect.api.v2.organizations import views as organization_views
 from connect.api.v2.projects import views as project_views
 from connect.api.v2.internals import views as connect_internal_views
 from connect.api.v2.auth.views import KeycloakAuthView, ProjectAuthView
+
+from connect.api.v2.internals.business_verification.views import (
+    NotifyBusinessVerificationView,
+)
+
 
 router = routers.SimpleRouter()
 router.register(
@@ -169,6 +175,11 @@ urlpatterns = [
         UpdateProjectConfigView.as_view(),
         name="update-project-config",
     ),
+    path(
+        "commerce/send-data-export-email/",
+        SendDataExportEmailView.as_view(),
+        name="commerce-send-data-export-email",
+    ),
     path("auth/", KeycloakAuthView.as_view(), name="keycloak-auth"),
 ]
 urlpatterns += [
@@ -191,5 +202,10 @@ urlpatterns += [
         "internals/connect/projects/<project_uuid>/plan-status",
         connect_internal_views.InternalProjectPlanStatusView.as_view(),
         name="internal-project-plan-status",
+    ),
+    path(
+        "internals/business-verification/notify/",
+        NotifyBusinessVerificationView.as_view(),
+        name="internal-business-verification-notify",
     ),
 ]
