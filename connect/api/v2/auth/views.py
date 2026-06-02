@@ -1,3 +1,5 @@
+from django.conf import settings
+from django.utils import timezone
 from django.contrib.auth import get_user_model
 from rest_framework import status, views
 from rest_framework.exceptions import NotFound, PermissionDenied
@@ -5,16 +7,17 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from connect.api.v2.auth.serializers import KeycloakAuthSerializer
+from connect.api.v2.auth.serializers import KeycloakAuthSerializer, StaffAccessSerializer
 from connect.common.models import ProjectAuthorization
 from connect.middleware import WeniOIDCAuthentication
 from connect.usecases.keycloak.authenticate import KeycloakAuthenticateUseCase
+from connect.authentication.models import StaffAccess
 
 User = get_user_model()
 
 
 class KeycloakAuthView(views.APIView):
-    def post(self, request):
+    def post(self, request: Request):
         serializer = KeycloakAuthSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -70,3 +73,23 @@ class ProjectAuthView(views.APIView):
             "available_roles": self.get_available_roles(),
         }
         return Response(response)
+
+
+class StaffAccessView(views.APIView):
+    def post(self, request: Request, project_uuid: str):
+        request.data["project"] = project_uuid
+
+        serializer = StaffAccessSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        user = serializer.validated_data['user']
+        project = serializer.validated_data['project']
+        expires_at = timezone.now() + settings.STAFF_ACCESS_EXPIRATION_HOURS
+
+        access = StaffAccess.objects.grant_access(user, project, expires_at)
+
+        return Response({
+            "user": access.user_email,
+            "project": access.project_uuid,
+            "expires_at": access.expires_at,
+        }, status=status.HTTP_201_CREATED)

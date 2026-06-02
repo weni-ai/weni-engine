@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 
 import os
 import sys
+from datetime import timedelta
 
 import environ
 from django.utils.log import DEFAULT_LOGGING
@@ -595,3 +596,6 @@ RATE_LIMIT_BLOCK_TIME = env.int("RATE_LIMIT_BLOCK_TIME")
 
 PROJECTS_API_TOKEN = env.str("PROJECTS_API_TOKEN", default="")
 PROJECTS_PAGE_SIZE = env.int("PROJECTS_PAGE_SIZE", default=100)
+
+
+STAFF_ACCESS_EXPIRATION_HOURS = timedelta(hours=env.int("STAFF_ACCESS_EXPIRATION_HOURS", default=1))

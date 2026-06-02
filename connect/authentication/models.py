@@ -1,5 +1,7 @@
-import requests
+from datetime import datetime
+from typing import TYPE_CHECKING
 
+import requests
 from django.conf import settings
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
@@ -14,6 +16,9 @@ from connect.common.utils import send_email
 from connect.storages import AvatarUserMediaStorage
 
 from connect.api.v1.keycloak import KeycloakControl
+
+if TYPE_CHECKING:
+    from connect.common.models import Project
 
 
 class UserManager(BaseUserManager):
@@ -315,3 +320,32 @@ class UserIdentityProvider(models.Model):
         User, on_delete=models.CASCADE, related_name="identity_provider"
     )
     provider = models.CharField(max_length=255)
+
+
+class StaffAccessManager(models.Manager):
+    def grant_access(self, user: User, project: "Project", expires_at: datetime) -> 'StaffAccess':
+        return self.create(
+            user=user,
+            user_email=user.email,
+            project=project,
+            project_uuid=project.uuid,
+            project_name=project.name,
+            expires_at=expires_at
+        )
+
+
+class StaffAccess(models.Model):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="staff_access", null=True)
+    project = models.ForeignKey("common.Project", on_delete=models.SET_NULL, null=True, related_name="staff_access")
+
+    user_email = models.EmailField()
+    project_uuid = models.UUIDField()
+    project_name = models.CharField(max_length=150)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+
+    objects = StaffAccessManager()
+
+    def __str__(self) -> str:
+        return f"User: {self.user_email}, Project: {self.project_uuid} - {self.project_name}"
