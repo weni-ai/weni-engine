@@ -6,6 +6,7 @@ available for download.
 
 import logging
 from datetime import date
+from typing import List
 
 from django.conf import settings
 from django.utils import translation
@@ -54,7 +55,7 @@ class SendDataExportEmailUseCase:
                 "file_url": dto.file_url,
                 "period": self._build_period(dto.start_date, dto.end_date, language),
                 "template_label": self._build_template_label(dto.template),
-                "status_label": str(STATUS_LABELS[dto.status]),
+                "status_label": self._build_status_label(dto.status),
             }
             send_email(
                 subject=str(_("Your data export is ready")),
@@ -81,6 +82,9 @@ class SendDataExportEmailUseCase:
     def _build_period(self, start_date: date, end_date: date, language: str) -> str:
         date_format = "%m/%d/%Y" if language == ENGLISH_LANGUAGE else "%d/%m/%Y"
         return f"{start_date.strftime(date_format)} ~ {end_date.strftime(date_format)}"
+
+    def _build_status_label(self, statuses: List[str]) -> str:
+        return ", ".join(str(STATUS_LABELS[status]) for status in statuses)
 
     def _build_template_label(self, template: str) -> str:
         if template.lower() == ALL_TEMPLATE_OPTION:
