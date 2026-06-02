@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from datetime import date
-from typing import Optional
+from typing import List, Optional
 
 
 @dataclass(frozen=True)
@@ -19,5 +19,5 @@ class SendDataExportEmailDTO:
     start_date: date
     end_date: date
     template: str
-    status: str
+    status: List[str]
     language: Optional[str] = None

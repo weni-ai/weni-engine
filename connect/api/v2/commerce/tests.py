@@ -900,7 +900,7 @@ class SendDataExportEmailViewTestCase(APITestCase):
             "start_date": "2026-04-01",
             "end_date": "2026-05-01",
             "template": "all",
-            "status": "delivered",
+            "status": ["sent", "delivered", "read"],
         }
 
     @patch("connect.api.v2.commerce.views.SendDataExportEmailUseCase")
@@ -914,12 +914,12 @@ class SendDataExportEmailViewTestCase(APITestCase):
 
         dto = use_case_class.return_value.execute.call_args.args[0]
         self.assertEqual(dto.user_email, "customer@example.com")
-        self.assertEqual(dto.status, "delivered")
+        self.assertEqual(dto.status, ["sent", "delivered", "read"])
         self.assertEqual(dto.template, "all")
 
     @patch("connect.api.v2.commerce.views.SendDataExportEmailUseCase")
     def test_rejects_invalid_status(self, use_case_class):
-        payload = {**self.payload, "status": "unknown"}
+        payload = {**self.payload, "status": ["unknown"]}
 
         response = self.client.post(self.url, payload, format="json")
 

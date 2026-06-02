@@ -184,7 +184,11 @@ class SendDataExportEmailSerializer(serializers.Serializer):
     start_date = serializers.DateField(required=True)
     end_date = serializers.DateField(required=True)
     template = serializers.CharField(required=True)
-    status = serializers.ChoiceField(choices=DATA_EXPORT_STATUSES, required=True)
+    status = serializers.ListField(
+        child=serializers.ChoiceField(choices=DATA_EXPORT_STATUSES),
+        required=True,
+        allow_empty=False,
+    )
     language = serializers.ChoiceField(
         choices=settings.LANGUAGES,
         required=False,

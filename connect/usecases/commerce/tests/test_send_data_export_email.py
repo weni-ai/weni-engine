@@ -21,7 +21,7 @@ def _dto(**overrides) -> SendDataExportEmailDTO:
         start_date=date(2026, 4, 1),
         end_date=date(2026, 5, 1),
         template="all",
-        status="all",
+        status=["all"],
         language=None,
     )
     defaults.update(overrides)
@@ -68,11 +68,20 @@ class SendDataExportEmailUseCaseTestCase(TestCase):
         self.assertEqual(context["period"], "01/04/2026 ~ 01/05/2026")
 
     @patch("connect.usecases.commerce.send_data_export_email.send_email")
-    def test_status_enum_is_translated(self, mock_send):
-        self.use_case.execute(_dto(language="en-us", status="delivered"))
+    def test_single_status_enum_is_translated(self, mock_send):
+        self.use_case.execute(_dto(language="en-us", status=["delivered"]))
 
         context = mock_send.call_args.kwargs["context"]
         self.assertEqual(context["status_label"], "Delivered")
+
+    @patch("connect.usecases.commerce.send_data_export_email.send_email")
+    def test_multiple_statuses_are_translated_and_joined(self, mock_send):
+        self.use_case.execute(
+            _dto(language="en-us", status=["sent", "delivered", "read"])
+        )
+
+        context = mock_send.call_args.kwargs["context"]
+        self.assertEqual(context["status_label"], "Sent, Delivered, Read")
 
     @patch("connect.usecases.commerce.send_data_export_email.send_email")
     def test_template_all_is_translated(self, mock_send):
