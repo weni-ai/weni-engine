@@ -63,7 +63,7 @@ class CommerceSerializer(serializers.Serializer):
 
         inline_agent_switch = True
         org_uuid = instance.organization.uuid
-        if org_uuid in settings.NEXUS_AB1_ORGANIZATIONS:
+        if str(org_uuid) in settings.NEXUS_AB1_ORGANIZATIONS:
             inline_agent_switch = False
 
         message_body = {
