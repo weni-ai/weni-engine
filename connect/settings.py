@@ -241,12 +241,7 @@ LANGUAGE_CODE = env.str("LANGUAGE_CODE")
 # -----------------------------------------------------------------------------------
 # Available languages for translation
 # -----------------------------------------------------------------------------------
-LANGUAGES = (
-    ("en-us", _("English")),
-    ("pt-br", _("Portuguese")),
-    ("es", _("Spanish")),
-    ("ro", _("Romanian")),
-)
+LANGUAGES = (("en-us", _("English")), ("pt-br", _("Portuguese")), ("es", _("Spanish")), ("ro", _("Romanian")))
 
 MODELTRANSLATION_DEFAULT_LANGUAGE = "en-us"
 
@@ -600,3 +595,6 @@ RATE_LIMIT_BLOCK_TIME = env.int("RATE_LIMIT_BLOCK_TIME")
 
 PROJECTS_API_TOKEN = env.str("PROJECTS_API_TOKEN", default="")
 PROJECTS_PAGE_SIZE = env.int("PROJECTS_PAGE_SIZE", default=100)
+
+# Temporary nexus settings
+NEXUS_AB1_ORGANIZATIONS = env.list("NEXUS_AB1_ORGANIZATIONS", default=[])

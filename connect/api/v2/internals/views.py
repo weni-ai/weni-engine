@@ -11,6 +11,7 @@ from connect.api.v2.internals.serializers import (
     OrganizationAISerializer,
     CustomParameterSerializer,
     InternalProjectSerializer,
+    InternalProjectLanguageSerializer,
     CRMOrganizationSerializer,
     InternalProjectsListSerializer,
 )
@@ -36,6 +37,11 @@ class InternalProjectViewSet(ModelViewSet):
     queryset = Project.objects.all()
     lookup_field = "uuid"
     serializer_class = InternalProjectSerializer
+
+    def get_serializer_class(self):
+        if self.action == "retrieve":
+            return InternalProjectLanguageSerializer
+        return super().get_serializer_class()
 
 
 class AIGetOrganizationView(views.APIView):
