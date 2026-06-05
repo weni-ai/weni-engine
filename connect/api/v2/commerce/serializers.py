@@ -165,3 +165,33 @@ class SetVtexHostStoreSerializer(serializers.Serializer):
 
 class UpdateProjectConfigSerializer(serializers.Serializer):
     config = serializers.DictField(required=True, allow_empty=False)
+
+
+DATA_EXPORT_STATUSES = (
+    "all",
+    "processing",
+    "skipped",
+    "error",
+    "sent",
+    "delivered",
+    "read",
+)
+
+
+class SendDataExportEmailSerializer(serializers.Serializer):
+    user_email = serializers.EmailField(required=True)
+    file_url = serializers.URLField(required=True)
+    start_date = serializers.DateField(required=True)
+    end_date = serializers.DateField(required=True)
+    template = serializers.CharField(required=True)
+    status = serializers.ListField(
+        child=serializers.ChoiceField(choices=DATA_EXPORT_STATUSES),
+        required=True,
+        allow_empty=False,
+    )
+    language = serializers.ChoiceField(
+        choices=settings.LANGUAGES,
+        required=False,
+        allow_null=True,
+        default=None,
+    )
