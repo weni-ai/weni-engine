@@ -538,6 +538,7 @@ class ProjectAuthorizationTestCase(TestCase):
         self.assertEquals(users_count, 1)
 
 
+@override_settings(USE_EDA_PERMISSIONS=False)
 class ProjectDetailViewTestCase(TestCase):
     @patch("connect.common.signals.update_user_permission_project")
     @patch("connect.billing.get_gateway")
@@ -755,3 +756,130 @@ class ProjectListQuerysetFilterTestCase(TestCase):
 
         self.assertIn(self.authorized_project.uuid, uuids)
         self.assertIn(self.foreign_project.uuid, uuids)
+
+
+@override_settings(
+    USE_EDA_PERMISSIONS=False,
+    CACHES={
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "LOCATION": "project-access-control-tests",
+        }
+    },
+)
+class ProjectViewSetAccessControlTestCase(TestCase):
+    """End-to-end authorization tests for the project endpoints.
+
+    Unlike the queryset unit tests, these exercise the full dispatch
+    (permission classes + serializer) to assert that unauthorized users are
+    denied and authorized users only ever see their own projects.
+    """
+
+    @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.billing.get_gateway")
+    @patch(
+        "connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.update_user_permission_project"
+    )
+    @patch(
+        "connect.api.v1.internal.integrations.integrations_rest_client.IntegrationsRESTClient.update_user_permission_project"
+    )
+    def setUp(self, integrations_rest, flows_rest, mock_get_gateway, mock_permission):
+        integrations_rest.side_effect = [200, 200]
+        flows_rest.side_effect = [200, 200]
+        mock_get_gateway.return_value = StripeMockGateway()
+        mock_permission.return_value = True
+
+        cache.clear()
+        self.factory = APIRequestFactory()
+        self.member, _ = create_user_and_token("ac_member")
+        self.non_member, _ = create_user_and_token("ac_non_member")
+
+        self.org = Organization.objects.create(
+            name="Access Control Org",
+            description="Org for access control tests",
+            inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan=BillingPlan.PLAN_TRIAL,
+        )
+        self.org_auth = self.org.authorizations.create(
+            user=self.member, role=OrganizationRole.ADMIN.value
+        )
+
+        self.authorized_project = Project.objects.create(
+            name="Authorized Project",
+            flow_organization=uuid.uuid4(),
+            organization=self.org,
+        )
+        self.foreign_project = Project.objects.create(
+            name="Foreign Project",
+            flow_organization=uuid.uuid4(),
+            organization=self.org,
+        )
+
+        ProjectAuthorization.objects.filter(user=self.member).delete()
+        ProjectAuthorization.objects.create(
+            user=self.member,
+            project=self.authorized_project,
+            role=ProjectRole.CONTRIBUTOR.value,
+            organization_authorization=self.org_auth,
+        )
+
+    def tearDown(self):
+        cache.clear()
+
+    def _list(self, user=None):
+        request = self.factory.get("/")
+        if user:
+            force_authenticate(request, user=user, token=user.auth_token)
+        response = ProjectViewSet.as_view({"get": "list"})(
+            request, organization_uuid=str(self.org.uuid)
+        )
+        response.render()
+        body = json.loads(response.content) if response.content else {}
+        return response, body
+
+    def _retrieve(self, project_uuid, user=None):
+        request = self.factory.get("/")
+        if user:
+            force_authenticate(request, user=user, token=user.auth_token)
+        response = ProjectViewSet.as_view({"get": "retrieve"})(
+            request, organization_uuid=str(self.org.uuid), uuid=project_uuid
+        )
+        response.render()
+        return response
+
+    def test_list_requires_authentication(self):
+        response, _ = self._list(user=None)
+
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_list_returns_only_authorized_projects(self):
+        response, body = self._list(user=self.member)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        listed_uuids = {item["uuid"] for item in body["results"]}
+        self.assertIn(str(self.authorized_project.uuid), listed_uuids)
+        self.assertNotIn(str(self.foreign_project.uuid), listed_uuids)
+
+    def test_list_is_empty_for_user_without_authorizations(self):
+        self.org.authorizations.create(
+            user=self.non_member, role=OrganizationRole.VIEWER.value
+        )
+        ProjectAuthorization.objects.filter(user=self.non_member).delete()
+
+        response, body = self._list(user=self.non_member)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(body["results"], [])
+
+    def test_retrieve_denied_for_non_member(self):
+        response = self._retrieve(
+            str(self.authorized_project.uuid), user=self.non_member
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_retrieve_allowed_for_member(self):
+        response = self._retrieve(str(self.authorized_project.uuid), user=self.member)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
