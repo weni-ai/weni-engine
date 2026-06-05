@@ -595,3 +595,6 @@ RATE_LIMIT_BLOCK_TIME = env.int("RATE_LIMIT_BLOCK_TIME")
 
 PROJECTS_API_TOKEN = env.str("PROJECTS_API_TOKEN", default="")
 PROJECTS_PAGE_SIZE = env.int("PROJECTS_PAGE_SIZE", default=100)
+
+# Temporary nexus settings
+NEXUS_AB1_ORGANIZATIONS = env.list("NEXUS_AB1_ORGANIZATIONS", default=[])
