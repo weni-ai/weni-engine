@@ -1,9 +1,11 @@
 import json
 import uuid
 from rest_framework import status
+from rest_framework.request import Request
 from rest_framework.test import APIRequestFactory, force_authenticate
 
-from django.test import TestCase
+from django.core.cache import cache
+from django.test import TestCase, override_settings
 from unittest.mock import patch
 import unittest
 
@@ -13,7 +15,9 @@ from connect.common.models import (
     BillingPlan,
     OrganizationRole,
     Project,
+    ProjectAuthorization,
     ProjectMode,
+    ProjectRole,
     TypeProject,
 )
 from connect.api.v2.projects.views import ProjectDetailView, ProjectViewSet
@@ -641,3 +645,113 @@ class ProjectDetailViewTestCase(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(data["uuid"], str(self.project.uuid))
+
+
+@override_settings(
+    USE_EDA_PERMISSIONS=False,
+    CACHES={
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "LOCATION": "project-list-authorization-filter-tests",
+        }
+    },
+)
+class ProjectListQuerysetFilterTestCase(TestCase):
+    """Regression tests for the project list queryset filtering.
+
+    Listing must only return projects the requesting user is effectively
+    authorized to. Otherwise the list serializer raises
+    ProjectAuthorizationException on foreign projects, which leaks as an
+    HTTP 500 (the cause of `weni project list` failing on the CLI).
+    """
+
+    @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.billing.get_gateway")
+    @patch(
+        "connect.api.v1.internal.flows.flows_rest_client.FlowsRESTClient.update_user_permission_project"
+    )
+    @patch(
+        "connect.api.v1.internal.integrations.integrations_rest_client.IntegrationsRESTClient.update_user_permission_project"
+    )
+    def setUp(self, integrations_rest, flows_rest, mock_get_gateway, mock_permission):
+        integrations_rest.side_effect = [200, 200]
+        flows_rest.side_effect = [200, 200]
+        mock_get_gateway.return_value = StripeMockGateway()
+        mock_permission.return_value = True
+
+        cache.clear()
+        self.factory = APIRequestFactory()
+        self.user, _ = create_user_and_token("list_filter_user")
+
+        self.org = Organization.objects.create(
+            name="List Filter Org",
+            description="Org for list filter tests",
+            inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan=BillingPlan.PLAN_TRIAL,
+        )
+        self.org_auth = self.org.authorizations.create(
+            user=self.user, role=OrganizationRole.ADMIN.value
+        )
+
+        self.authorized_project = Project.objects.create(
+            name="Authorized Project",
+            flow_organization=uuid.uuid4(),
+            organization=self.org,
+        )
+        self.foreign_project = Project.objects.create(
+            name="Foreign Project",
+            flow_organization=uuid.uuid4(),
+            organization=self.org,
+        )
+
+        # Project creation auto-grants authorizations to org contributors.
+        # Reset to an explicit state: the user is authorized only to one project.
+        ProjectAuthorization.objects.filter(user=self.user).delete()
+        ProjectAuthorization.objects.create(
+            user=self.user,
+            project=self.authorized_project,
+            role=ProjectRole.CONTRIBUTOR.value,
+            organization_authorization=self.org_auth,
+        )
+
+    def tearDown(self):
+        cache.clear()
+
+    def _build_view(self, action):
+        request = self.factory.get("/")
+        force_authenticate(request, user=self.user, token=self.user.auth_token)
+        view = ProjectViewSet()
+        view.action = action
+        view.request = Request(request)
+        view.kwargs = {"organization_uuid": str(self.org.uuid)}
+        return view
+
+    def test_list_excludes_projects_without_user_authorization(self):
+        view = self._build_view(action="list")
+
+        uuids = set(view.get_queryset().values_list("uuid", flat=True))
+
+        self.assertIn(self.authorized_project.uuid, uuids)
+        self.assertNotIn(self.foreign_project.uuid, uuids)
+
+    def test_list_excludes_not_setted_role_authorization(self):
+        ProjectAuthorization.objects.create(
+            user=self.user,
+            project=self.foreign_project,
+            role=ProjectRole.NOT_SETTED.value,
+            organization_authorization=self.org_auth,
+        )
+        view = self._build_view(action="list")
+
+        uuids = set(view.get_queryset().values_list("uuid", flat=True))
+
+        self.assertNotIn(self.foreign_project.uuid, uuids)
+
+    def test_detail_action_keeps_broad_queryset(self):
+        view = self._build_view(action="retrieve")
+
+        uuids = set(view.get_queryset().values_list("uuid", flat=True))
+
+        self.assertIn(self.authorized_project.uuid, uuids)
+        self.assertIn(self.foreign_project.uuid, uuids)
