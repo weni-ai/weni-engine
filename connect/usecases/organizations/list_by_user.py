@@ -1,6 +1,7 @@
 from typing import List
 
 from django.contrib.auth import get_user_model
+from django.db.models import Count, Q
 
 from connect.common.models import (
     Organization,
@@ -32,9 +33,16 @@ class ListOrgsByUserUseCase:
             .exclude(role__in=self._EXCLUDED_ROLES)
             .values_list("organization", flat=True)
         )
-        organizations = Organization.objects.filter(
-            pk__in=organization_ids
-        ).prefetch_related("project")
+        organizations = (
+            Organization.objects.filter(pk__in=organization_ids)
+            .prefetch_related("project")
+            .annotate(
+                member_count=Count(
+                    "authorizations",
+                    filter=~Q(authorizations__role__in=self._EXCLUDED_ROLES),
+                )
+            )
+        )
 
         return [self._serialize_organization(org) for org in organizations]
 
@@ -42,14 +50,9 @@ class ListOrgsByUserUseCase:
         return {
             "uuid": str(organization.uuid),
             "name": organization.name,
-            "member_count": self._count_members(organization),
+            "member_count": organization.member_count,
             "projects": [
                 {"uuid": str(project.uuid), "name": project.name}
                 for project in organization.project.all()
             ],
         }
-
-    def _count_members(self, organization: Organization) -> int:
-        return organization.authorizations.exclude(
-            role__in=self._EXCLUDED_ROLES
-        ).count()

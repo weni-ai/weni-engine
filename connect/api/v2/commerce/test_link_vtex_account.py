@@ -1,4 +1,5 @@
 import uuid
+from contextlib import contextmanager
 from unittest.mock import patch, Mock
 
 from django.test import override_settings
@@ -24,6 +25,14 @@ from connect.usecases.commerce.exceptions import (
 from connect.usecases.commerce.link_vtex_account import LinkVtexAccountUseCase
 
 
+class _NoOpLockService:
+    """Lock service stub that performs no locking, so tests don't touch Redis."""
+
+    @contextmanager
+    def lock(self, key):
+        yield
+
+
 @override_settings(USE_EDA_PERMISSIONS=False)
 class LinkVtexAccountViewTestCase(APITestCase):
     """Tests for POST /v2/commerce/projects/<uuid>/link-vtex-account/"""
@@ -43,6 +52,13 @@ class LinkVtexAccountViewTestCase(APITestCase):
         mock_permission.return_value = True
         mock_rabbitmq_common.return_value = Mock()
         mock_rabbitmq_auth.return_value = Mock()
+
+        lock_patcher = patch(
+            "connect.usecases.commerce.link_vtex_account.RedisLockService",
+            return_value=_NoOpLockService(),
+        )
+        self.addCleanup(lock_patcher.stop)
+        lock_patcher.start()
 
         self.client = APIClient()
         self.user, self.token = create_user_and_token("linkuser")
@@ -178,7 +194,10 @@ class LinkVtexAccountUseCaseTestCase(APITestCase):
         self.insights = Mock()
 
     def _use_case(self):
-        return LinkVtexAccountUseCase(insights_client=self.insights)
+        return LinkVtexAccountUseCase(
+            insights_client=self.insights,
+            lock_service=_NoOpLockService(),
+        )
 
     def test_execute_links_and_notifies_insights(self):
         result = self._use_case().execute(str(self.project.uuid), "mystore")
