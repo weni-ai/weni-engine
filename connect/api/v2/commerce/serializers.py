@@ -159,6 +159,10 @@ class CreateVtexProjectSerializer(serializers.Serializer):
     project_name = serializers.CharField(required=True)
 
 
+class LinkVtexAccountSerializer(serializers.Serializer):
+    vtex_account = serializers.CharField(required=True, max_length=100)
+
+
 class SetVtexHostStoreSerializer(serializers.Serializer):
     vtex_host_store = serializers.URLField(required=True)
 
