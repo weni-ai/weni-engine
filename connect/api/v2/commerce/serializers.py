@@ -2,8 +2,10 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 
 from rest_framework import serializers
-from connect.celery import app as celery_app
+from weni.eda.eda_publisher import EDAPublisher
+from weni.eda.django.connection_params import AMQConnectionParamsFactory
 
+from connect.celery import app as celery_app
 from connect.internals.event_driven.producer.rabbitmq_publisher import RabbitmqPublisher
 from connect.usecases.users.create import CreateKeycloakUserUseCase
 from connect.usecases.users.user_dto import KeycloakUserDTO
@@ -93,6 +95,12 @@ class CommerceSerializer(serializers.Serializer):
             message_body, exchange="projects.topic", routing_key=""
         )
 
+        # TEMPORARY[EDA Migration]: This needs to be adjusted after the migration is complete.
+        amazonmq_publisher = EDAPublisher(AMQConnectionParamsFactory)
+        amazonmq_publisher.send_message(
+            message_body, exchange="projects.topic", routing_key="project.created"
+        )
+
     def create(self, validated_data):
         user_email = validated_data.get("user_email")
 
@@ -165,3 +173,33 @@ class SetVtexHostStoreSerializer(serializers.Serializer):
 
 class UpdateProjectConfigSerializer(serializers.Serializer):
     config = serializers.DictField(required=True, allow_empty=False)
+
+
+DATA_EXPORT_STATUSES = (
+    "all",
+    "processing",
+    "skipped",
+    "error",
+    "sent",
+    "delivered",
+    "read",
+)
+
+
+class SendDataExportEmailSerializer(serializers.Serializer):
+    user_email = serializers.EmailField(required=True)
+    file_url = serializers.URLField(required=True)
+    start_date = serializers.DateField(required=True)
+    end_date = serializers.DateField(required=True)
+    template = serializers.CharField(required=True)
+    status = serializers.ListField(
+        child=serializers.ChoiceField(choices=DATA_EXPORT_STATUSES),
+        required=True,
+        allow_empty=False,
+    )
+    language = serializers.ChoiceField(
+        choices=settings.LANGUAGES,
+        required=False,
+        allow_null=True,
+        default=None,
+    )
