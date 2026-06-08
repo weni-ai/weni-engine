@@ -20,6 +20,9 @@ from connect.api.v2.projects.serializers import (
 )
 from connect.usecases.project import ProjectEDAPublisher
 from connect.usecases.project.get_project_detail import GetProjectDetailUseCase
+from connect.usecases.project.list_authorized_projects import (
+    ListAuthorizedProjectsUseCase,
+)
 
 from django.utils import timezone
 from connect.api.v2.paginations import (
@@ -46,13 +49,20 @@ class ProjectViewSet(
         if getattr(self, "swagger_fake_view", False):
             return Project.objects.none()  # pragma: no cover
 
-        if self.kwargs.get("organization_uuid"):
-            return (
-                super()
-                .get_queryset()
-                .filter(organization__uuid=self.kwargs["organization_uuid"])
+        organization_uuid = self.kwargs.get("organization_uuid")
+
+        # Detail actions rely on object-level (organization) permissions; only
+        # listing needs to be scoped to the user's authorized projects.
+        if self.action == "list":
+            return ListAuthorizedProjectsUseCase().execute(
+                user=self.request.user,
+                organization_uuid=organization_uuid,
             )
-        return super().get_queryset()
+
+        queryset = super().get_queryset()
+        if organization_uuid:
+            queryset = queryset.filter(organization__uuid=organization_uuid)
+        return queryset
 
     def get_ordering(self):
         valid_fields = (org_fields.name for org_fields in Project._meta.get_fields())
