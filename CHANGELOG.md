@@ -1,3 +1,6 @@
+# 3.47.1
+  - fix: Scope v2 project list to user authorized projects
+
 # 3.47.0
   - feat: Implement Send Data Export Email functionality
 
