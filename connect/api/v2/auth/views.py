@@ -5,9 +5,10 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from connect.api.v2.auth.serializers import KeycloakAuthSerializer
+from connect.api.v2.auth.serializers import GetTokenSerializer, KeycloakAuthSerializer
 from connect.common.models import ProjectAuthorization
 from connect.middleware import WeniOIDCAuthentication
+from connect.usecases.auth.generate_session_token import GenerateSessionTokenUseCase
 from connect.usecases.keycloak.authenticate import KeycloakAuthenticateUseCase
 
 User = get_user_model()
@@ -70,3 +71,27 @@ class ProjectAuthView(views.APIView):
             "available_roles": self.get_available_roles(),
         }
         return Response(response)
+
+
+class GetTokenView(views.APIView):
+    authentication_classes = [WeniOIDCAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request: Request, project_uuid: str = None):
+        serializer = GetTokenSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        user = request.user
+
+        try:
+            user.project_authorizations_user.get(project__uuid=project_uuid)
+        except ProjectAuthorization.DoesNotExist:
+            raise NotFound("Project authorization not found")
+
+        token_hash = GenerateSessionTokenUseCase().execute(
+            project_uuid=project_uuid,
+            user_email=user.email,
+            duration=serializer.validated_data["duration"],
+        )
+
+        return Response({"hash": token_hash}, status=status.HTTP_200_OK)

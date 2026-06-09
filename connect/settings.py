@@ -87,6 +87,8 @@ env = environ.Env(
     PLAN_TRIAL_PRICE=(int, 0),
     PLAN_TRIAL_LIMIT=(int, 100),
     PLAN_STATUS_CACHE_TTL=(int, 900),
+    SESSION_TOKEN_MIN_DURATION=(int, 60),
+    SESSION_TOKEN_MAX_DURATION=(int, 86400),
     PLAN_START_LIMIT=(int, 200),
     PLAN_START_PRICE=(int, 390),
     PLAN_SCALE_LIMIT=(int, 500),
@@ -518,6 +520,9 @@ PLAN_TRIAL_LIMIT = env.int("PLAN_TRIAL_LIMIT")
 # internal `plan-status` endpoint. Cache entries are also invalidated proactively
 # via signals whenever a BillingPlan or Organization.is_suspended changes.
 PLAN_STATUS_CACHE_TTL = env.int("PLAN_STATUS_CACHE_TTL")
+
+SESSION_TOKEN_MIN_DURATION = env.int("SESSION_TOKEN_MIN_DURATION")
+SESSION_TOKEN_MAX_DURATION = env.int("SESSION_TOKEN_MAX_DURATION")
 
 PLAN_START_LIMIT = env.int("PLAN_START_LIMIT")
 PLAN_START_PRICE = env.int("PLAN_START_PRICE")
