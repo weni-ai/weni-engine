@@ -265,7 +265,8 @@ class CreateVtexProjectUseCaseTestCase(APITestCase):
     @patch("connect.billing.get_gateway")
     def test_publisher_called_on_creation(self, mock_gateway):
         """When a new project is created, both EDA events should be published:
-        one for org creation (orgs.topic) and one for project creation (projects.topic)."""
+        one for org creation (orgs.topic) and one for project creation (projects.topic).
+        """
         mock_gateway.return_value = StripeMockGateway()
 
         dto = CreateVtexProjectDTO(
@@ -296,20 +297,18 @@ class CreateVtexProjectUseCaseTestCase(APITestCase):
         the user via Keycloak and send the access password email."""
         mock_gateway.return_value = StripeMockGateway()
         new_email = "brand_new@vtex.com"
-        new_user = User.objects.create(email=new_email, username="brand_new_vtex")
+        created_users = []
+
+        def create_user_via_keycloak():
+            user = User.objects.create(email=new_email, username="brand_new_vtex")
+            user.send_email_access_password = Mock()
+            created_users.append(user)
+            return {"user": user, "password": "TempPass1!"}
 
         with patch(
             "connect.usecases.commerce.create_vtex_project.CreateKeycloakUserUseCase"
-        ) as mock_kc, patch(
-            "connect.usecases.commerce.create_vtex_project.User.objects.get",
-            side_effect=User.DoesNotExist,
-        ):
-            mock_kc_instance = mock_kc.return_value
-            mock_kc_instance.execute.return_value = {
-                "user": new_user,
-                "password": "TempPass1!",
-            }
-            new_user.send_email_access_password = Mock()
+        ) as mock_kc:
+            mock_kc.return_value.execute.side_effect = create_user_via_keycloak
 
             dto = CreateVtexProjectDTO(
                 user_email=new_email,
@@ -321,6 +320,7 @@ class CreateVtexProjectUseCaseTestCase(APITestCase):
             use_case = CreateVtexProjectUseCase(eda_publisher=self.mock_eda)
             result = use_case.execute(dto)
 
+        new_user = created_users[0]
         self.assertEqual(result["user_uuid"], str(new_user.pk))
         mock_kc.assert_called_once()
         new_user.send_email_access_password.assert_called_once_with("TempPass1!")
@@ -507,9 +507,7 @@ class SetVtexHostStoreViewTestCase(APITestCase):
         uid = project_uuid or str(self.project.uuid)
         return reverse("set-vtex-host-store", kwargs={"project_uuid": uid})
 
-    @patch(
-        "connect.usecases.commerce.set_vtex_host_store.UpdateProjectUseCase"
-    )
+    @patch("connect.usecases.commerce.set_vtex_host_store.UpdateProjectUseCase")
     def test_set_vtex_host_store_successfully(self, mock_update_uc):
         """Sets vtex_host_store in project config and returns 200."""
         mock_update_uc.return_value = Mock()
@@ -531,9 +529,7 @@ class SetVtexHostStoreViewTestCase(APITestCase):
             "https://www.mystore.com.br/",
         )
 
-    @patch(
-        "connect.usecases.commerce.set_vtex_host_store.UpdateProjectUseCase"
-    )
+    @patch("connect.usecases.commerce.set_vtex_host_store.UpdateProjectUseCase")
     def test_preserves_existing_config_keys(self, mock_update_uc):
         """Setting vtex_host_store should not overwrite other config keys."""
         mock_update_uc.return_value = Mock()
@@ -555,9 +551,7 @@ class SetVtexHostStoreViewTestCase(APITestCase):
             "https://www.mystore.com.br/",
         )
 
-    @patch(
-        "connect.usecases.commerce.set_vtex_host_store.UpdateProjectUseCase"
-    )
+    @patch("connect.usecases.commerce.set_vtex_host_store.UpdateProjectUseCase")
     def test_publishes_eda_event(self, mock_update_uc):
         """After saving config, the use case should publish an EDA update event."""
         mock_instance = Mock()
@@ -649,9 +643,7 @@ class SetVtexHostStoreUseCaseTestCase(APITestCase):
         mock_update = Mock()
         use_case = SetVtexHostStoreUseCase(update_project_usecase=mock_update)
 
-        result = use_case.execute(
-            str(self.project.uuid), "https://www.example.com/"
-        )
+        result = use_case.execute(str(self.project.uuid), "https://www.example.com/")
 
         self.project.refresh_from_db()
         self.assertEqual(
@@ -722,9 +714,7 @@ class UpdateProjectConfigViewTestCase(APITestCase):
         uid = project_uuid or str(self.project.uuid)
         return reverse("update-project-config", kwargs={"project_uuid": uid})
 
-    @patch(
-        "connect.usecases.commerce.update_project_config.UpdateProjectUseCase"
-    )
+    @patch("connect.usecases.commerce.update_project_config.UpdateProjectUseCase")
     def test_update_config_successfully(self, mock_update_uc):
         """PATCH with valid config dict returns 200 and persists the values."""
         mock_update_uc.return_value = Mock()
@@ -747,9 +737,7 @@ class UpdateProjectConfigViewTestCase(APITestCase):
             "https://www.mystore.com.br/",
         )
 
-    @patch(
-        "connect.usecases.commerce.update_project_config.UpdateProjectUseCase"
-    )
+    @patch("connect.usecases.commerce.update_project_config.UpdateProjectUseCase")
     def test_merges_with_existing_config(self, mock_update_uc):
         """New keys should be added without removing existing ones."""
         mock_update_uc.return_value = Mock()
@@ -771,9 +759,7 @@ class UpdateProjectConfigViewTestCase(APITestCase):
             "https://www.mystore.com.br/",
         )
 
-    @patch(
-        "connect.usecases.commerce.update_project_config.UpdateProjectUseCase"
-    )
+    @patch("connect.usecases.commerce.update_project_config.UpdateProjectUseCase")
     def test_overwrite_existing_key(self, mock_update_uc):
         """Sending an existing key with a new value should overwrite it."""
         mock_update_uc.return_value = Mock()
@@ -793,9 +779,7 @@ class UpdateProjectConfigViewTestCase(APITestCase):
 
     def test_empty_config_returns_400(self):
         """Sending an empty config dict should fail validation."""
-        response = self.client.patch(
-            self._url(), {"config": {}}, format="json"
-        )
+        response = self.client.patch(self._url(), {"config": {}}, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_missing_config_returns_400(self):

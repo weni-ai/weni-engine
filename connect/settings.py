@@ -241,7 +241,12 @@ LANGUAGE_CODE = env.str("LANGUAGE_CODE")
 # -----------------------------------------------------------------------------------
 # Available languages for translation
 # -----------------------------------------------------------------------------------
-LANGUAGES = (("en-us", _("English")), ("pt-br", _("Portuguese")), ("es", _("Spanish")), ("ro", _("Romanian")))
+LANGUAGES = (
+    ("en-us", _("English")),
+    ("pt-br", _("Portuguese")),
+    ("es", _("Spanish")),
+    ("ro", _("Romanian")),
+)
 
 MODELTRANSLATION_DEFAULT_LANGUAGE = "en-us"
 
@@ -266,6 +271,13 @@ STATIC_URL = env.str("STATIC_URL")
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+if TESTING:
+    # The manifest storage resolves assets through a manifest built by
+    # `collectstatic`, which is not run for the test suite. Fall back to the
+    # plain storage so tests that render admin pages don't fail on missing
+    # manifest entries.
+    STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
@@ -504,7 +516,7 @@ example:
 """
 
 BILLING_TEST_MODE = env.bool("BILLING_TEST_MODE")
-BILLING_SETTINGS = env.json("BILLING_SETTINGS")
+BILLING_SETTINGS = env.json("BILLING_SETTINGS", default={})
 BILLING_COST_PER_WHATSAPP = env.float("BILLING_COST_PER_WHATSAPP")
 
 TOKEN_EXTERNAL_AUTHENTICATION = env.str("TOKEN_EXTERNAL_AUTHENTICATION")
