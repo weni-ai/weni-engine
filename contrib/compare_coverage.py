@@ -1,7 +1,7 @@
 import subprocess
 
 from dataclasses import dataclass
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import requests
 
@@ -49,17 +49,29 @@ class CoverageService:
         return int(output)
 
     @classmethod
-    def get_main_coverage(cls, commit_hash: str) -> Dict[str, Any]:
-        """Get coverage data from Codecov API for main branch."""
+    def get_main_coverage(cls, commit_hash: str) -> Optional[Dict[str, Any]]:
+        """Get coverage data from Codecov API for the main branch.
+
+        Returns None when the data is unavailable (e.g. the main commit has not
+        been uploaded to Codecov yet). Callers must treat None as 'no baseline'
+        and skip the comparison instead of failing the build.
+        """
         response = requests.get(f"{cls.BASE_URL}{commit_hash}")
 
         if response.status_code != 200:
-            raise Exception("Failed to fetch coverage data from Codecov API")
+            print(
+                f"Codecov returned HTTP {response.status_code} for main commit "
+                f"{commit_hash}: no coverage report available yet."
+            )
+            return None
 
         try:
             return response.json()
-        except ValueError as e:
-            raise Exception(f"Error parsing JSON response from Codecov API: {e}")
+        except ValueError:
+            print(
+                f"Could not parse the Codecov response for main commit {commit_hash}."
+            )
+            return None
 
 
 class CoverageComparator:
@@ -92,15 +104,19 @@ def main() -> None:
 
         main_coverage = coverage_service.get_main_coverage(main_commit)
 
-        if "totals" not in main_coverage:
-            raise Exception("Invalid JSON response from Codecov API")
-
-        main_misses = main_coverage["totals"].get("misses")
+        main_misses = (main_coverage or {}).get("totals", {}).get("misses")
 
         if main_misses is None:
-            raise Exception("Missing 'misses' value in JSON response from Codecov API")
+            print(
+                f"[Main]: no baseline coverage data found for commit {main_commit}. "
+                "This is expected until main is uploaded to Codecov at least once. "
+                "Skipping comparison (not a failure)."
+            )
+            exit(0)
 
-        coverage_data = CoverageData(local_misses=local_misses, main_misses=main_misses)
+        coverage_data = CoverageData(
+            local_misses=local_misses, main_misses=int(main_misses)
+        )
         CoverageComparator.compare_coverage(coverage_data)
 
     except Exception as e:
