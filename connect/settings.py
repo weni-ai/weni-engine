@@ -431,6 +431,16 @@ CACHES = {
     }
 }
 
+if TESTING:
+    # Tests must not depend on a running Redis; use an in-process cache so
+    # cache.clear()/delete_many() never reach external infrastructure.
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "LOCATION": "weni-engine-tests",
+        }
+    }
+
 # AWS
 
 AWS_ACCESS_KEY_ID = env.str("AWS_ACCESS_KEY_ID")
