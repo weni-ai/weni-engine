@@ -40,7 +40,7 @@ class CoverageService:
         """Get number of missed lines from local coverage report."""
         output = (
             subprocess.check_output(
-                "coverage report -m | awk 'END {print $3}'", shell=True
+                "coverage report -m | awk '/^TOTAL/ {print $3}'", shell=True
             )
             .decode("utf-8")
             .replace("\n", "\n ")
