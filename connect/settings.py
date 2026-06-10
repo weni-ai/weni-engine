@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
+import json
 import os
 import sys
 
@@ -516,7 +517,10 @@ example:
 """
 
 BILLING_TEST_MODE = env.bool("BILLING_TEST_MODE")
-BILLING_SETTINGS = env.json("BILLING_SETTINGS", default={})
+# Read as a raw string so an unset OR empty value both resolve to {} — env.json
+# would raise JSONDecodeError on an empty string (e.g. a blank CI secret).
+_billing_settings_raw = env.str("BILLING_SETTINGS", default="").strip()
+BILLING_SETTINGS = json.loads(_billing_settings_raw) if _billing_settings_raw else {}
 BILLING_COST_PER_WHATSAPP = env.float("BILLING_COST_PER_WHATSAPP")
 
 TOKEN_EXTERNAL_AUTHENTICATION = env.str("TOKEN_EXTERNAL_AUTHENTICATION")
