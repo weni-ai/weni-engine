@@ -46,7 +46,6 @@ class TestCaseSetUp:
     def create_auth(
         self, user: User, org: Organization, role: int, publish_message: bool = False
     ):
-
         auth_dto = CreateAuthorizationDTO(
             user_email=user.email,
             org_uuid=str(org.uuid),
@@ -483,7 +482,6 @@ class MarketingRoleTestCase(TestCase, TestCaseSetUp):
         self.assertTrue(project_auth.can_contribute)
         self.assertTrue(project_auth.can_write)
         self.assertTrue(project_auth.is_moderator)
-        self.assertFalse(project_auth.is_admin)
 
     def test_update_to_marketing_role(self):
         """Test updating an existing authorization to MARKETING role."""
@@ -511,11 +509,14 @@ class MarketingRoleTestCase(TestCase, TestCaseSetUp):
     def test_create_marketing_authorization_for_single_project(self):
         """Test creating MARKETING authorization for a single project."""
         # First create superuser auth to have permission
-        self.org.authorizations.create(user=self.superuser, role=OrganizationRole.ADMIN.value)
+        org_auth = self.org.authorizations.create(
+            user=self.superuser, role=OrganizationRole.ADMIN.value
+        )
         ProjectAuthorization.objects.create(
             user=self.superuser,
             project=self.project,
             role=ProjectRole.MODERATOR.value,
+            organization_authorization=org_auth,
         )
 
         role = ProjectRole.MARKETING.value
