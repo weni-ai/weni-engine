@@ -27,7 +27,7 @@ class GitService:
                 .strip()
             )
         except subprocess.CalledProcessError as e:
-            raise Exception(f"Error executing git command: {e}")
+            raise RuntimeError(f"Error executing git command: {e}")
 
 
 class CoverageService:

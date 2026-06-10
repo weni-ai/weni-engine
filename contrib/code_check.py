@@ -59,7 +59,7 @@ def execute(cmd: str, cmd_output: bool = False) -> Optional[str]:
 def main() -> None:
     """Main execution function."""
     if not os.getcwd().endswith("weni-engine"):
-        raise Exception("The command need be executed in weni-engine")
+        raise RuntimeError("This command must be executed in weni-engine")
 
     log("Make any missing migrations", LogStyle.BOLD)
 
