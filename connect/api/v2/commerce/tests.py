@@ -265,7 +265,8 @@ class CreateVtexProjectUseCaseTestCase(APITestCase):
     @patch("connect.billing.get_gateway")
     def test_publisher_called_on_creation(self, mock_gateway):
         """When a new project is created, both EDA events should be published:
-        one for org creation (orgs.topic) and one for project creation (projects.topic)."""
+        one for org creation (orgs.topic) and one for project creation (projects.topic).
+        """
         mock_gateway.return_value = StripeMockGateway()
 
         dto = CreateVtexProjectDTO(
@@ -296,20 +297,18 @@ class CreateVtexProjectUseCaseTestCase(APITestCase):
         the user via Keycloak and send the access password email."""
         mock_gateway.return_value = StripeMockGateway()
         new_email = "brand_new@vtex.com"
-        new_user = User.objects.create(email=new_email, username="brand_new_vtex")
+        created_users = []
+
+        def create_user_via_keycloak():
+            user = User.objects.create(email=new_email, username="brand_new_vtex")
+            user.send_email_access_password = Mock()
+            created_users.append(user)
+            return {"user": user, "password": "TempPass1!"}
 
         with patch(
             "connect.usecases.commerce.create_vtex_project.CreateKeycloakUserUseCase"
-        ) as mock_kc, patch(
-            "connect.usecases.commerce.create_vtex_project.User.objects.get",
-            side_effect=User.DoesNotExist,
-        ):
-            mock_kc_instance = mock_kc.return_value
-            mock_kc_instance.execute.return_value = {
-                "user": new_user,
-                "password": "TempPass1!",
-            }
-            new_user.send_email_access_password = Mock()
+        ) as mock_kc:
+            mock_kc.return_value.execute.side_effect = create_user_via_keycloak
 
             dto = CreateVtexProjectDTO(
                 user_email=new_email,
@@ -321,6 +320,7 @@ class CreateVtexProjectUseCaseTestCase(APITestCase):
             use_case = CreateVtexProjectUseCase(eda_publisher=self.mock_eda)
             result = use_case.execute(dto)
 
+        new_user = created_users[0]
         self.assertEqual(result["user_uuid"], str(new_user.pk))
         mock_kc.assert_called_once()
         new_user.send_email_access_password.assert_called_once_with("TempPass1!")
@@ -507,9 +507,7 @@ class SetVtexHostStoreViewTestCase(APITestCase):
         uid = project_uuid or str(self.project.uuid)
         return reverse("set-vtex-host-store", kwargs={"project_uuid": uid})
 
-    @patch(
-        "connect.usecases.commerce.set_vtex_host_store.UpdateProjectUseCase"
-    )
+    @patch("connect.usecases.commerce.set_vtex_host_store.UpdateProjectUseCase")
     def test_set_vtex_host_store_successfully(self, mock_update_uc):
         """Sets vtex_host_store in project config and returns 200."""
         mock_update_uc.return_value = Mock()
@@ -531,9 +529,7 @@ class SetVtexHostStoreViewTestCase(APITestCase):
             "https://www.mystore.com.br/",
         )
 
-    @patch(
-        "connect.usecases.commerce.set_vtex_host_store.UpdateProjectUseCase"
-    )
+    @patch("connect.usecases.commerce.set_vtex_host_store.UpdateProjectUseCase")
     def test_preserves_existing_config_keys(self, mock_update_uc):
         """Setting vtex_host_store should not overwrite other config keys."""
         mock_update_uc.return_value = Mock()
@@ -555,9 +551,7 @@ class SetVtexHostStoreViewTestCase(APITestCase):
             "https://www.mystore.com.br/",
         )
 
-    @patch(
-        "connect.usecases.commerce.set_vtex_host_store.UpdateProjectUseCase"
-    )
+    @patch("connect.usecases.commerce.set_vtex_host_store.UpdateProjectUseCase")
     def test_publishes_eda_event(self, mock_update_uc):
         """After saving config, the use case should publish an EDA update event."""
         mock_instance = Mock()
@@ -649,9 +643,7 @@ class SetVtexHostStoreUseCaseTestCase(APITestCase):
         mock_update = Mock()
         use_case = SetVtexHostStoreUseCase(update_project_usecase=mock_update)
 
-        result = use_case.execute(
-            str(self.project.uuid), "https://www.example.com/"
-        )
+        result = use_case.execute(str(self.project.uuid), "https://www.example.com/")
 
         self.project.refresh_from_db()
         self.assertEqual(
@@ -722,9 +714,7 @@ class UpdateProjectConfigViewTestCase(APITestCase):
         uid = project_uuid or str(self.project.uuid)
         return reverse("update-project-config", kwargs={"project_uuid": uid})
 
-    @patch(
-        "connect.usecases.commerce.update_project_config.UpdateProjectUseCase"
-    )
+    @patch("connect.usecases.commerce.update_project_config.UpdateProjectUseCase")
     def test_update_config_successfully(self, mock_update_uc):
         """PATCH with valid config dict returns 200 and persists the values."""
         mock_update_uc.return_value = Mock()
@@ -747,9 +737,7 @@ class UpdateProjectConfigViewTestCase(APITestCase):
             "https://www.mystore.com.br/",
         )
 
-    @patch(
-        "connect.usecases.commerce.update_project_config.UpdateProjectUseCase"
-    )
+    @patch("connect.usecases.commerce.update_project_config.UpdateProjectUseCase")
     def test_merges_with_existing_config(self, mock_update_uc):
         """New keys should be added without removing existing ones."""
         mock_update_uc.return_value = Mock()
@@ -771,9 +759,7 @@ class UpdateProjectConfigViewTestCase(APITestCase):
             "https://www.mystore.com.br/",
         )
 
-    @patch(
-        "connect.usecases.commerce.update_project_config.UpdateProjectUseCase"
-    )
+    @patch("connect.usecases.commerce.update_project_config.UpdateProjectUseCase")
     def test_overwrite_existing_key(self, mock_update_uc):
         """Sending an existing key with a new value should overwrite it."""
         mock_update_uc.return_value = Mock()
@@ -793,9 +779,7 @@ class UpdateProjectConfigViewTestCase(APITestCase):
 
     def test_empty_config_returns_400(self):
         """Sending an empty config dict should fail validation."""
-        response = self.client.patch(
-            self._url(), {"config": {}}, format="json"
-        )
+        response = self.client.patch(self._url(), {"config": {}}, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_missing_config_returns_400(self):
@@ -877,3 +861,60 @@ class UpdateProjectConfigUseCaseTestCase(APITestCase):
 
         with self.assertRaises(Project.DoesNotExist):
             use_case.execute(str(uuid.uuid4()), {"key": "value"})
+
+
+class SendDataExportEmailViewTestCase(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user, self.token = create_user_and_token("dataexportuser")
+
+        content_type = ContentType.objects.get_for_model(User)
+        permission, _ = Permission.objects.get_or_create(
+            codename="can_communicate_internally",
+            name="can communicate internally",
+            content_type=content_type,
+        )
+        self.user.user_permissions.add(permission)
+        self.client.force_authenticate(user=self.user)
+
+        self.url = reverse("commerce-send-data-export-email")
+        self.payload = {
+            "user_email": "customer@example.com",
+            "file_url": "https://files.example.com/export.csv",
+            "start_date": "2026-04-01",
+            "end_date": "2026-05-01",
+            "template": "all",
+            "status": ["sent", "delivered", "read"],
+        }
+
+    @patch("connect.api.v2.commerce.views.SendDataExportEmailUseCase")
+    def test_returns_200_and_dispatches(self, use_case_class):
+        use_case_class.return_value.execute.return_value = True
+
+        response = self.client.post(self.url, self.payload, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json(), {"sent": True})
+
+        dto = use_case_class.return_value.execute.call_args.args[0]
+        self.assertEqual(dto.user_email, "customer@example.com")
+        self.assertEqual(dto.status, ["sent", "delivered", "read"])
+        self.assertEqual(dto.template, "all")
+
+    @patch("connect.api.v2.commerce.views.SendDataExportEmailUseCase")
+    def test_rejects_invalid_status(self, use_case_class):
+        payload = {**self.payload, "status": ["unknown"]}
+
+        response = self.client.post(self.url, payload, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        use_case_class.return_value.execute.assert_not_called()
+
+    def test_returns_403_without_internal_permission(self):
+        other_user, _ = create_user_and_token("nopermission")
+        client = APIClient()
+        client.force_authenticate(user=other_user)
+
+        response = client.post(self.url, self.payload, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

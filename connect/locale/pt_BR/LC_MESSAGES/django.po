@@ -1637,6 +1637,77 @@ msgstr "Português"
 msgid "Spanish"
 msgstr "Espanhol"
 
+#: connect/usecases/commerce/send_data_export_email.py
+msgid "Your data export is ready"
+msgstr "Sua exportação de dados está pronta"
+
+#: connect/common/templates/common/emails/data_export/email.html
+#: connect/common/templates/common/emails/data_export/email.txt
+msgid "Your data export has been processed and ready for download."
+msgstr "A exportação dos seus dados foi processada e está pronta para download."
+
+#: connect/common/templates/common/emails/data_export/email.html
+#: connect/common/templates/common/emails/data_export/email.txt
+msgid "Here's what you requested:"
+msgstr "Veja o que você solicitou:"
+
+#: connect/common/templates/common/emails/data_export/email.html
+#: connect/common/templates/common/emails/data_export/email.txt
+msgid "Period"
+msgstr "Período"
+
+#: connect/common/templates/common/emails/data_export/email.html
+#: connect/common/templates/common/emails/data_export/email.txt
+msgid "Template"
+msgstr "Template"
+
+#: connect/common/templates/common/emails/data_export/email.html
+#: connect/common/templates/common/emails/data_export/email.txt
+msgid "Status"
+msgstr "Status"
+
+#: connect/common/templates/common/emails/data_export/email.html
+#: connect/common/templates/common/emails/data_export/email.txt
+msgid ""
+"If the data doesn't match what you expected, you can go back to the platform "
+"and generate a new export with adjusted filters."
+msgstr ""
+"Se os dados não corresponderem ao esperado, volte à plataforma e gere uma "
+"nova exportação com filtros ajustados."
+
+#: connect/common/templates/common/emails/data_export/email.html
+#: connect/common/templates/common/emails/data_export/email.txt
+msgid "Download File"
+msgstr "Baixar arquivo"
+
+#: connect/usecases/commerce/send_data_export_email.py
+msgid "All"
+msgstr "Todos"
+
+#: connect/usecases/commerce/send_data_export_email.py
+msgid "Processing"
+msgstr "Processando"
+
+#: connect/usecases/commerce/send_data_export_email.py
+msgid "Skipped"
+msgstr "Ignorado"
+
+#: connect/usecases/commerce/send_data_export_email.py
+msgid "Error"
+msgstr "Erro"
+
+#: connect/usecases/commerce/send_data_export_email.py
+msgid "Sent"
+msgstr "Enviado"
+
+#: connect/usecases/commerce/send_data_export_email.py
+msgid "Delivered"
+msgstr "Entregue"
+
+#: connect/usecases/commerce/send_data_export_email.py
+msgid "Read"
+msgstr "Lido"
+
 #~ msgid "WhatsApp"
 #~ msgstr "WhatsApp"
 msgid ""

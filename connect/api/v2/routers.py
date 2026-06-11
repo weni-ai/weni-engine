@@ -30,6 +30,7 @@ from connect.api.v2.template_projects.views import (
 from connect.api.v2.commerce.views import (
     CommerceOrganizationViewSet,
     CreateVtexProjectView,
+    SendDataExportEmailView,
     SetVtexHostStoreView,
     UpdateProjectConfigView,
 )
@@ -173,6 +174,11 @@ urlpatterns = [
         "commerce/projects/<project_uuid>/config/",
         UpdateProjectConfigView.as_view(),
         name="update-project-config",
+    ),
+    path(
+        "commerce/send-data-export-email/",
+        SendDataExportEmailView.as_view(),
+        name="commerce-send-data-export-email",
     ),
     path("auth/", KeycloakAuthView.as_view(), name="keycloak-auth"),
 ]

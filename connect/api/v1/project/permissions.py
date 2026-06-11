@@ -1,12 +1,16 @@
 from rest_framework import permissions
 
 from connect.api.v1 import READ_METHODS, WRITE_METHODS
+from connect.common.exceptions import OrganizationAuthorizationException
 from connect.common.models import Project, ProjectRole
 
 
 class ProjectHasPermission(permissions.BasePermission):  # pragma: no cover
     def has_object_permission(self, request, view, obj):
-        authorization = obj.organization.get_user_authorization(request.user)
+        try:
+            authorization = obj.organization.get_user_authorization(request.user)
+        except OrganizationAuthorizationException:
+            return False
         if request.method in READ_METHODS and not request.user.is_authenticated:
             return authorization.can_read
 
@@ -34,7 +38,10 @@ class IsProjectAdmin(permissions.BasePermission):
         except Project.DoesNotExist:
             return True
 
-        authorization = project.organization.get_user_authorization(request.user)
+        try:
+            authorization = project.organization.get_user_authorization(request.user)
+        except OrganizationAuthorizationException:
+            return False
         return authorization.is_admin
 
 

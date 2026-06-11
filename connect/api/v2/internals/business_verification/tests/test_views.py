@@ -5,16 +5,20 @@ from unittest.mock import patch
 
 from django.test import TestCase
 from rest_framework import status
-from rest_framework.test import APIRequestFactory
+from rest_framework.test import APIRequestFactory, force_authenticate
 
 from connect.api.v2.internals.business_verification.views import (
     NotifyBusinessVerificationView,
 )
+from connect.authentication.models import User
 
 
 class NotifyBusinessVerificationViewTestCase(TestCase):
     def setUp(self):
         self.factory = APIRequestFactory()
+        self.user = User.objects.create(
+            email="internal@example.com", username="internal_user"
+        )
 
     def _post(self, payload):
         request = self.factory.post(
@@ -22,6 +26,7 @@ class NotifyBusinessVerificationViewTestCase(TestCase):
             data=json.dumps(payload),
             content_type="application/json",
         )
+        force_authenticate(request, user=self.user)
         view = NotifyBusinessVerificationView.as_view()
         response = view(request)
         response.render()

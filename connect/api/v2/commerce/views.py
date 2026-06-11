@@ -9,13 +9,15 @@ from connect.api.v2.commerce.permissions import CanCommunicateInternally
 from connect.api.v2.commerce.serializers import (
     CommerceSerializer,
     CreateVtexProjectSerializer,
+    SendDataExportEmailSerializer,
     SetVtexHostStoreSerializer,
     UpdateProjectConfigSerializer,
 )
 from connect.api.v2.paginations import CustomCursorPagination
 from connect.common.models import Organization, Project
 from connect.usecases.commerce.create_vtex_project import CreateVtexProjectUseCase
-from connect.usecases.commerce.dto import CreateVtexProjectDTO
+from connect.usecases.commerce.dto import CreateVtexProjectDTO, SendDataExportEmailDTO
+from connect.usecases.commerce.send_data_export_email import SendDataExportEmailUseCase
 from connect.usecases.commerce.set_vtex_host_store import SetVtexHostStoreUseCase
 from connect.usecases.commerce.update_project_config import UpdateProjectConfigUseCase
 
@@ -75,6 +77,19 @@ class SetVtexHostStoreView(views.APIView):
             )
 
         return Response(result, status=status.HTTP_200_OK)
+
+
+class SendDataExportEmailView(views.APIView):
+    permission_classes = [CanCommunicateInternally]
+
+    def post(self, request):
+        serializer = SendDataExportEmailSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        dto = SendDataExportEmailDTO(**serializer.validated_data)
+        sent = SendDataExportEmailUseCase().execute(dto)
+
+        return Response({"sent": bool(sent)}, status=status.HTTP_200_OK)
 
 
 class UpdateProjectConfigView(views.APIView):
