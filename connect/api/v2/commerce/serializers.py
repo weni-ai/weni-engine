@@ -1,3 +1,6 @@
+import base64
+import binascii
+
 from django.conf import settings
 from django.contrib.auth import get_user_model
 
@@ -86,7 +89,7 @@ class CommerceSerializer(serializers.Serializer):
             "brain_on": True,
             "project_type": instance.project_type.value,
             "vtex_account": instance.vtex_account,
-            "inline_agent_switch": inline_agent_switch
+            "inline_agent_switch": inline_agent_switch,
         }
         rabbitmq_publisher = RabbitmqPublisher()
         rabbitmq_publisher.send_message(
@@ -195,3 +198,45 @@ class SendDataExportEmailSerializer(serializers.Serializer):
         allow_null=True,
         default=None,
     )
+
+
+# Reserve space for subject, body_html, field names and JSON framing within
+# Django's in-memory request body limit (DATA_UPLOAD_MAX_MEMORY_SIZE). Base64
+# inflates the PDF by ~33%, so the decoded limit is derived from the remaining
+# budget to avoid RequestDataTooBig before serializer validation runs.
+_CONTRACT_EMAIL_JSON_OVERHEAD_BYTES = 256 * 1024
+
+
+def _contract_pdf_max_size_bytes() -> int:
+    max_request_bytes = getattr(settings, "DATA_UPLOAD_MAX_MEMORY_SIZE", 2_621_440)
+    max_base64_bytes = max(max_request_bytes - _CONTRACT_EMAIL_JSON_OVERHEAD_BYTES, 0)
+    return int(max_base64_bytes * 3 / 4)
+
+
+CONTRACT_PDF_MAX_SIZE_BYTES = _contract_pdf_max_size_bytes()
+
+
+class SendContractAcceptanceEmailSerializer(serializers.Serializer):
+    user_email = serializers.EmailField(required=True)
+    acceptance_id = serializers.UUIDField(required=True)
+    subject = serializers.CharField(required=True)
+    body_html = serializers.CharField(required=True)
+    file_name = serializers.CharField(required=True)
+    file_base64 = serializers.CharField(required=True)
+
+    def validate_file_base64(self, value: str) -> str:
+        try:
+            decoded = base64.b64decode(value, validate=True)
+        except (binascii.Error, ValueError):
+            raise serializers.ValidationError("Invalid base64-encoded file.")
+
+        if not decoded:
+            raise serializers.ValidationError("Decoded file is empty.")
+
+        if len(decoded) > CONTRACT_PDF_MAX_SIZE_BYTES:
+            raise serializers.ValidationError(
+                f"Attachment exceeds the maximum size of "
+                f"{CONTRACT_PDF_MAX_SIZE_BYTES} bytes."
+            )
+
+        return value
