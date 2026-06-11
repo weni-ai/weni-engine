@@ -17,9 +17,13 @@ from connect.common.models import (
 )
 from connect.api.v1.organization.permissions import (
     Has2FA,
+    HasSSOAccess,
     OrganizationHasPermission,
     IsCRMUser,
     _is_orm_user,
+)
+from connect.usecases.organizations.sso_access import (
+    FilterAccessibleOrganizationsUseCase,
 )
 from connect.api.v2.paginations import CustomCursorPagination
 from connect.api.v2.organizations.serializers import (
@@ -39,7 +43,6 @@ class OrganizationViewSet(
     mixins.DestroyModelMixin,
     GenericViewSet,
 ):
-
     queryset = Organization.objects.all()
     serializer_class = OrganizationSeralizer
     lookup_field = "uuid"
@@ -47,6 +50,7 @@ class OrganizationViewSet(
         IsAuthenticated,
         OrganizationHasPermission | IsCRMUser,
         Has2FA,
+        HasSSOAccess,
     ]
     pagination_class = CustomCursorPagination
 
@@ -61,7 +65,13 @@ class OrganizationViewSet(
             .values("organization")
         )
 
-        return self.queryset.filter(pk__in=auth)
+        queryset = self.queryset.filter(pk__in=auth)
+        session_identity_provider = getattr(
+            self.request, "session_identity_provider", None
+        )
+        return FilterAccessibleOrganizationsUseCase().execute(
+            queryset, self.request.user, session_identity_provider
+        )
 
     def get_object(self):
         if _is_orm_user(self.request.user):

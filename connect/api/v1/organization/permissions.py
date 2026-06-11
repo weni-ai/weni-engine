@@ -3,6 +3,9 @@ from rest_framework import permissions
 
 from connect.api.v1 import READ_METHODS, WRITE_METHODS
 from connect.common.models import Organization, Project
+from connect.usecases.organizations.sso_access import (
+    EvaluateOrganizationSSOAccessUseCase,
+)
 from django.conf import settings
 
 
@@ -68,6 +71,36 @@ class Has2FA(permissions.BasePermission):
             return auth.has_2fa
         else:
             return True
+
+
+class HasSSOAccess(permissions.BasePermission):
+    """Blocks deep links into SSO-enforcing organizations the current session
+    does not comply with (the list endpoints hide such organizations, this
+    closes object-level and project-list access)."""
+
+    def has_permission(self, request, view):
+        uuid = request.query_params.get("organization")
+        if uuid:
+            organization = get_object_or_404(Organization, uuid=uuid)
+            return self._is_compliant(request, organization)
+        return True
+
+    def has_object_permission(self, request, view, obj):
+        if isinstance(obj, Organization):
+            organization = obj
+        elif isinstance(obj, Project):
+            organization = obj.organization
+        else:
+            return True
+        return self._is_compliant(request, organization)
+
+    def _is_compliant(self, request, organization):
+        session_identity_provider = getattr(request, "session_identity_provider", None)
+        return EvaluateOrganizationSSOAccessUseCase().execute(
+            organization=organization,
+            user=request.user,
+            session_identity_provider=session_identity_provider,
+        )
 
 
 def _is_orm_user(user):

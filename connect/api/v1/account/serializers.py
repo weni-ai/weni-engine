@@ -102,7 +102,7 @@ class UserSerializer(serializers.ModelSerializer):
         if not obj.identity_provider.exists():
             return True
         auth_orgs = OrganizationAuthorization.objects.filter(
-            user=obj, organization__require_external_provider_for_access=True
+            user=obj, organization__sso_config__is_enabled=True
         )
         return not auth_orgs.exists()
 

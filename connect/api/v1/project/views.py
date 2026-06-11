@@ -21,7 +21,7 @@ from rest_framework.viewsets import GenericViewSet
 from connect.api.v1.internal.flows.flows_rest_client import FlowsRESTClient
 from connect.api.v1.internal.permissions import ModuleHasPermission
 from connect.api.v1.metadata import Metadata
-from connect.api.v1.organization.permissions import Has2FA
+from connect.api.v1.organization.permissions import Has2FA, HasSSOAccess
 from connect.api.v1.project.filters import ProjectOrgFilter
 from connect.api.v1.project.permissions import (
     CanChangeProjectStatus,
@@ -83,7 +83,7 @@ class ProjectViewSet(
 ):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
-    permission_classes = [IsAuthenticated, ProjectHasPermission, Has2FA]
+    permission_classes = [IsAuthenticated, ProjectHasPermission, Has2FA, HasSSOAccess]
     filter_class = ProjectOrgFilter
     filter_backends = [OrderingFilter, SearchFilter, DjangoFilterBackend]
     lookup_field = "uuid"
@@ -169,7 +169,6 @@ class ProjectViewSet(
         url_path="grpc/get-contact-active-detailed/(?P<project_uuid>[^/.]+)",
     )
     def get_contact_active_detailed(self, request, project_uuid):
-
         before = request.query_params.get("before")
         after = request.query_params.get("after")
 
