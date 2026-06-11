@@ -73,6 +73,11 @@ class KeycloakControl:  # pragma: no cover
         else:
             return "User not found"
 
+    def has_password_credential(self, email: str) -> bool:
+        """Whether the Keycloak user has a password credential configured."""
+        credentials = self.get_credentials(email)
+        return any(credential.get("type") == "password" for credential in credentials)
+
     def get_credentials(self, email):
         # using requests until we update python-keycloak version
         token = self.instance._token["access_token"]

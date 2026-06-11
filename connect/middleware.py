@@ -113,6 +113,10 @@ class WeniOIDCAuthentication(OIDCAuthentication):
             instance[1], options={"verify_signature": False}
         ).get("identity_provider")
 
+        # Expose the current session's SSO provider so SSO-access enforcement
+        # reads the live claim instead of the append-only provider history.
+        request.session_identity_provider = identity_provider
+
         if not instance[0] or instance[0].is_anonymous:
             return instance
 

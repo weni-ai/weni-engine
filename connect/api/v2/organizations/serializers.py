@@ -20,6 +20,7 @@ from connect.common.models import (
 from connect.api.v1.organization.serializers import (
     BillingPlanSerializer,
     OrganizationAuthorizationSerializer,
+    serialize_organization_sso_config,
 )
 from connect.api.v1.project.validators import CanContributeInOrganizationValidator
 from connect.internals.event_driven.producer.rabbitmq_publisher import RabbitmqPublisher
@@ -45,6 +46,7 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
             "extra_integration",
             "enforce_2fa",
             "show_chat_help",
+            "sso_config",
         ]
         ref_name = None
 
@@ -77,6 +79,7 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
     )
 
     show_chat_help = serializers.SerializerMethodField()
+    sso_config = serializers.SerializerMethodField()
 
     def validate_name(self, value):
         stripped_value = strip_tags(value)
@@ -145,7 +148,6 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
             )
 
     def publish_create_org_message(self, instance: Organization, user: User):
-
         authorizations = []
         for authorization in instance.authorizations.all():
             if authorization.can_contribute:
@@ -172,6 +174,9 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
             "E-commerce",
             "Comercio electrónico",
         ]
+
+    def get_sso_config(self, obj):
+        return serialize_organization_sso_config(obj)
 
 
 class PendingAuthorizationOrganizationSerializer(serializers.ModelSerializer):
