@@ -277,9 +277,9 @@ msgstr "Permite receber emails de marketing"
 msgid "Two factor authentication"
 msgstr "Autenticação de dois fatores"
 
-#| msgid "contact name"
 #: connect/authentication/models.py:113
 #, fuzzy
+#| msgid "contact name"
 msgid "company name"
 msgstr "nome da empresa"
 
@@ -311,15 +311,15 @@ msgstr "segmento da organização"
 msgid "the segment of your company"
 msgstr "segmento da sua organização"
 
-#| msgid "company sector"
 #: connect/authentication/models.py:145
 #, fuzzy
+#| msgid "company sector"
 msgid "company position"
 msgstr "cargo na empresa"
 
-#| msgid "number of people working in this company"
 #: connect/authentication/models.py:146
 #, fuzzy
+#| msgid "number of people working in this company"
 msgid "Your position in the company"
 msgstr "Seu cargo na empresa"
 
@@ -487,10 +487,10 @@ msgstr "nome do contato"
 msgid "A credit card has been added to the organization"
 msgstr "Um cartão de crédito foi adicionado à organização"
 
-#| msgid "Your organization is suspended"
 #: connect/billing/templates/billing/emails/advanced_plan_is_about_to_expire.html:41
 #: connect/billing/templates/billing/emails/advanced_plan_is_about_to_expire.txt:3
 #, fuzzy
+#| msgid "Your organization is suspended"
 msgid "Your organization is close to 1,000 attendances"
 msgstr "Sua organização está próxima de 1.000 atendimentos"
 
@@ -612,6 +612,8 @@ msgstr "que esteja alinhado aos seus objetivos."
 
 #: connect/billing/templates/billing/emails/free-plan-expired.html:79
 #: connect/billing/templates/billing/emails/free-plan-expired.txt:11
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:92
+#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:6
 msgid "We're here to support you every step of the way!"
 msgstr "Estamos aqui para te apoiar em cada passo!"
 
@@ -624,10 +626,10 @@ msgstr "Estamos aqui para te apoiar em cada passo!"
 msgid "Your organization"
 msgstr "Sua organização"
 
-#| msgid "Your organization is suspended"
 #: connect/billing/templates/billing/emails/plan_expired_due_attendence_limit_en.html:41
 #: connect/billing/templates/billing/emails/plan_expired_due_attendence_limit_en.txt:3
 #, fuzzy
+#| msgid "Your organization is suspended"
 msgid "has reached the"
 msgstr "atingiu o"
 
@@ -677,9 +679,9 @@ msgstr "Quando você atingir"
 msgid "attendances, your access on the platform continues, but your chatbot will not be able to fire messages to your users."
 msgstr "atendimentos, seu acesso à plataforma continua, mas seu chatbot não poderá enviar mensagens aos usuários."
 
-#| msgid "Your organization is suspended"
 #: connect/billing/templates/billing/emails/plan_is_about_to_expire_en.txt:3
 #, fuzzy
+#| msgid "Your organization is suspended"
 msgid "Your organization is close to"
 msgstr "Sua organização está próxima de"
 
@@ -704,15 +706,14 @@ msgid "It's wonderful to have your team back"
 msgstr "Que bom ter sua equipe de volta"
 
 #: connect/billing/templates/billing/emails/reactived-plan.txt:2
-msgid "Hi,"
-msgstr "Oi,"
-
 #: connect/authentication/templates/authentication/emails/change_password.html:17
 #: connect/authentication/templates/authentication/emails/change_password.txt:2
 #: connect/authentication/templates/authentication/emails/first_password.html:16
 #: connect/authentication/templates/authentication/emails/first_password.txt:2
+#: connect/common/templates/common/emails/organization/invite_organization.html:17
+#: connect/common/templates/common/emails/organization/invite_organization.txt:2
 msgid "Hi,"
-msgstr "Olá,"
+msgstr "Oi,"
 
 #: connect/authentication/templates/authentication/emails/change_password.html:20
 #: connect/authentication/templates/authentication/emails/change_password.txt:3
@@ -853,11 +854,6 @@ msgstr "Cobrança."
 msgid " section."
 msgstr " "
 
-#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:92
-#: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:6
-msgid "We're here to support you every step of the way!"
-msgstr "Vamos manter seus agentes a todo vapor!"
-
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:107
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:7
 #: connect/billing/templates/billing/emails/finished-plan.html:91
@@ -953,9 +949,9 @@ msgstr "Somente usuários com autenticação de dois fatores ativada podem acess
 msgid "Invitation to join organization"
 msgstr "Convite para participar da organização"
 
-#| msgid "You are leaving"
 #: connect/common/models.py:197
 #, fuzzy, python-brace-format
+#| msgid "You are leaving"
 msgid "You are leaving {self.name}"
 msgstr "Você está saindo da organização "
 
@@ -963,15 +959,15 @@ msgstr "Você está saindo da organização "
 msgid "You have been removed from"
 msgstr "Você foi removido(a) de "
 
-#| msgid "You just gave life to"
 #: connect/common/models.py:264
 #, fuzzy, python-brace-format
+#| msgid "You just gave life to"
 msgid "You just gave life to {self.name}"
 msgstr "Você acaba de criar"
 
-#| msgid "Organization {} does not exist"
 #: connect/common/models.py:337
 #, fuzzy
+#| msgid "Organization {} does not exist"
 msgid "The organization { self.name } no longer exists"
 msgstr "A organização {self.name} não existe mais"
 
@@ -984,9 +980,9 @@ msgstr "{prev_name} agora se chama {new_name}!"
 msgid "You've received an access code for VTEX CX Platform"
 msgstr "Código de acesso à VTEX CX Platform"
 
-#| msgid "has updated your permission"
 #: connect/common/models.py:450
 #, fuzzy
+#| msgid "has updated your permission"
 msgid "An administrator of {self.name } has updated your permission"
 msgstr "Um administrador de {self.name} atualizou sua permissão"
 
@@ -1092,9 +1088,9 @@ msgstr "Integrações de WhatsApp"
 msgid "Template type"
 msgstr "Tipo de template"
 
-#| msgid "Project Name"
 #: connect/common/models.py:724
 #, fuzzy
+#| msgid "Project Name"
 msgid "Project template type"
 msgstr "Tipo de template de projeto"
 
@@ -1123,9 +1119,9 @@ msgstr "agente"
 msgid "service manager"
 msgstr "gerente de serviços"
 
-#| msgid "service manager"
 #: connect/common/models.py:1085
 #, fuzzy
+#| msgid "service manager"
 msgid "service_manager"
 msgstr "gerente de serviços"
 
@@ -1133,9 +1129,9 @@ msgstr "gerente de serviços"
 msgid "moderator"
 msgstr "moderador"
 
-#| msgid "photo user"
 #: connect/common/models.py:1121
 #, fuzzy
+#| msgid "photo user"
 msgid "Chat user"
 msgstr "Usuário de chat"
 
@@ -1263,9 +1259,9 @@ msgstr "boleto"
 msgid "trial"
 msgstr "trial"
 
-#| msgid "started at"
 #: connect/common/models.py:1389
 #, fuzzy
+#| msgid "started at"
 msgid "start"
 msgstr "início"
 
@@ -1273,9 +1269,9 @@ msgstr "início"
 msgid "scale"
 msgstr "scale"
 
-#| msgid "canceled"
 #: connect/common/models.py:1391
 #, fuzzy
+#| msgid "canceled"
 msgid "advanced"
 msgstr "avançado"
 
@@ -1283,9 +1279,9 @@ msgstr "avançado"
 msgid "enterprise"
 msgstr "enterprise"
 
-#| msgid "active contact count"
 #: connect/common/models.py:1400
 #, fuzzy
+#| msgid "active contact count"
 msgid "active_contacts"
 msgstr "contatos ativos"
 
@@ -1309,9 +1305,9 @@ msgstr "administrador de notas"
 msgid "fixed discount"
 msgstr "desconto fixo"
 
-#| msgid "payment method"
 #: connect/common/models.py:1423
 #, fuzzy
+#| msgid "payment method"
 msgid "plan_method"
 msgstr "método de pagamento"
 
@@ -1359,9 +1355,9 @@ msgstr "Informações adicionais de faturamento"
 msgid "Card is valid"
 msgstr "O cartão é válido"
 
-#| msgid "paid date"
 #: connect/common/models.py:1464
 #, fuzzy
+#| msgid "paid date"
 msgid "Trial end date"
 msgstr "Data de término do trial"
 
@@ -1373,9 +1369,9 @@ msgstr "Não foi possível realizar o pagamento"
 msgid "A credit card has been updated in the organization"
 msgstr "Um cartão de crédito foi atualizado na organização"
 
-#| msgid "Your organization's plan has expired"
 #: connect/common/models.py:1764
 #, fuzzy
+#| msgid "Your organization's plan has expired"
 msgid "Your organization's plan has ended"
 msgstr "O plano da sua organização foi encerrado"
 
@@ -1411,9 +1407,9 @@ msgstr "Plano encerrado na VTEX CX Platform"
 msgid "Your organization's plan has been updated"
 msgstr "O seu plano foi atualizado"
 
-#| msgid "Your organization's plan has expired"
 #: connect/common/models.py:1925 connect/common/models.py:1946
 #, fuzzy
+#| msgid "Your organization's plan has expired"
 msgid "Your trial plan has expired"
 msgstr "Seu plano trial expirou"
 
@@ -1422,27 +1418,27 @@ msgstr "Seu plano trial expirou"
 msgid "You reached {self.plan_limit} attendances"
 msgstr "Você atingiu {self.plan_limit} atendimentos"
 
-#| msgid "You reached {self.plan_limit} attendances"
 #: connect/common/models.py:1995
 #, fuzzy, python-brace-format
+#| msgid "You reached {self.plan_limit} attendances"
 msgid "Você atingiu {self.plan_limit} atendimentos"
 msgstr "Você atingiu {self.plan_limit} atendimentos"
 
-#| msgid "Your organization is suspended"
 #: connect/common/models.py:2041
 #, fuzzy, python-brace-format
+#| msgid "Your organization is suspended"
 msgid "Your organization is close to {self.plan_limit} attendances"
 msgstr "Sua organização foi pausada"
 
-#| msgid "Your organization is suspended"
 #: connect/common/models.py:2045
 #, fuzzy, python-brace-format
+#| msgid "Your organization is suspended"
 msgid "Sua organização estã proxima de {self.plan_limit} atendimentos"
 msgstr "Sua organização está próxima de {self.plan_limit} atendimentos"
 
-#| msgid "Your organization is suspended"
 #: connect/common/models.py:2064
 #, fuzzy
+#| msgid "Your organization is suspended"
 msgid "Your trial period has ended"
 msgstr "Seu período de trial chegou ao fim"
 
@@ -1550,9 +1546,9 @@ msgstr "De 50001 a 100000 contatos ativos"
 msgid "From 100001 to 250000 active contacts"
 msgstr "De 100001 a 250000 contatos ativos"
 
-#| msgid "created at"
 #: connect/common/models.py:2378
 #, fuzzy
+#| msgid "created at"
 msgid "created on"
 msgstr "criado em"
 
@@ -1585,11 +1581,6 @@ msgstr "Que bom ter você com a gente!"
 msgid "You've been invited to join "
 msgstr "Você foi convidado para a organização "
 
-#: connect/common/templates/common/emails/organization/invite_organization.html:17
-#: connect/common/templates/common/emails/organization/invite_organization.txt:2
-msgid "Hi,"
-msgstr "Boas-vindas,"
-
 #: connect/common/templates/common/emails/organization/invite_organization.html:32
 msgid "Welcome! We're excited to have you onboard."
 msgstr " "
@@ -1609,10 +1600,10 @@ msgstr "enviou um convite para você se juntar à organização na VTEX CX Platf
 msgid "To accept, simply click the button below and complete your registration. If you're already registered, just log in you account."
 msgstr "Para aceitar, clique no botão abaixo para concluir seu cadastro. Se já concluiu, faça login na sua conta."
 
-#| msgid "You have been invited to join the organization"
 #: connect/common/templates/common/emails/project/invite_project.html:18
 #: connect/common/templates/common/emails/project/invite_project.txt:2
 #, fuzzy
+#| msgid "You have been invited to join the organization"
 msgid "You have been invited to join the project"
 msgstr "Você foi convidado para participar do projeto"
 
@@ -1707,197 +1698,3 @@ msgstr "Entregue"
 #: connect/usecases/commerce/send_data_export_email.py
 msgid "Read"
 msgstr "Lido"
-
-#~ msgid "WhatsApp"
-#~ msgstr "WhatsApp"
-msgid ""
-msgstr ""
-
-#~ msgid "Telegram"
-#~ msgstr "Telegram"
-msgid ""
-msgstr ""
-
-#~ msgid "channel_type"
-#~ msgstr "tipo de canal"
-msgid ""
-msgstr ""
-
-#~ msgid "channel id"
-#~ msgstr "id do canal"
-msgid ""
-msgstr ""
-
-#~ msgid "Organization created!"
-#~ msgstr "Organização criada!"
-msgid ""
-msgstr ""
-
-#~ msgid "no longer exists!"
-#~ msgstr "não existe mais"
-msgid ""
-msgstr ""
-
-#~ msgid "is now"
-#~ msgstr "agora se chama"
-msgid ""
-msgstr ""
-
-#~ msgid "You have been invited to join the {self.name} organization"
-#~ msgstr "Você foi convidado a ingressar na organização {self.name}"
-#, python-brace-format
-msgid ""
-msgstr ""
-
-#~| msgid "Your organization's plan has been reactivated."
-#~ msgid "Your organization has reached the Advanced plan"
-#~ msgstr "O plano da sua organização foi reativado com sucesso."
-#, fuzzy
-msgid ""
-msgstr ""
-
-#~ msgid "Your"
-#~ msgstr "Seu"
-msgid ""
-msgstr ""
-
-#~ msgid "The platform is ready to receive and use our resources"
-#~ msgstr "A plataforma está apta a receber e usar nossos recursos"
-msgid ""
-msgstr ""
-
-#~ msgid "has expired"
-#~ msgstr "se encerrou"
-msgid ""
-msgstr ""
-
-#~ msgid ""
-#~ "When you complete 200 attendances, your access on the platform continues, "
-#~ "but your chatbot will not be able to fire messages to your users."
-#~ msgstr ""
-#~ "Quando você completa 200 atendimentos, seu acesso na plataforma "
-#~ "continuamas seu chatbot não será capaz de disparar mensagens para seus "
-#~ "usuários."
-msgid ""
-msgstr ""
-
-#~| msgid "Your organization's plan has been reactivated."
-#~ msgid "Your organization has reached the Scale plan"
-#~ msgstr "O plano da sua organização foi reativado com sucesso."
-#, fuzzy
-msgid ""
-msgstr ""
-
-#~| msgid "Your organization is suspended"
-#~ msgid "Your organization is close to 500 attendances"
-#~ msgstr "Sua organização está suspensa"
-#, fuzzy
-msgid ""
-msgstr ""
-
-#~| msgid "Your organization's plan has been reactivated."
-#~ msgid "Your organization has reached the Start plan"
-#~ msgstr "O plano da sua organização foi reativado com sucesso."
-#, fuzzy
-msgid ""
-msgstr ""
-
-#~ msgid "custom"
-#~ msgstr "customizado"
-msgid ""
-msgstr ""
-
-#~ msgid ""
-#~ "Your Intelligences, created Flows and the Chat module are back again. "
-#~ "It's wonderful to have your team back"
-#~ msgstr ""
-#~ "Suas Inteligências, Fluxos criados e o módulo de chat voltaram a "
-#~ "funcionar normalmente. É maravilhoso ter sua equipe de volta."
-msgid ""
-msgstr ""
-
-#~ msgid "Your Intelligences, created Flows and the Chat module"
-#~ msgstr "Suas inteligências, Fluxos criados e módulo de Chat"
-msgid ""
-msgstr ""
-
-#~ msgid "came back to work again"
-#~ msgstr "volte a tabalhar novamente"
-msgid ""
-msgstr ""
-
-#~ msgid ""
-#~ "Your {{ organization_name }} organization's plan has been reactivated"
-#~ msgstr "O plano da {{organization_name}} foi reativado com sucesso"
-msgid ""
-msgstr ""
-
-#~ msgid "An admistrator removed the register data from credit card "
-#~ msgstr "Um administrador removeu os dados cadastrados do cartão de crédito "
-msgid ""
-msgstr ""
-
-#~ msgid "to perform billing of organization plan"
-#~ msgstr "para realizar o faturamento do plano de organização"
-msgid ""
-msgstr ""
-
-#~ msgid "at the moment the operation of yours "
-#~ msgstr "no momento o funcionamento do seu "
-msgid ""
-msgstr ""
-
-#~ msgid "Intelligences and Flows created and the chat module is freeze."
-#~ msgstr "Inteligências e fluxos criados e o módulo de chat está bloquado."
-msgid ""
-msgstr ""
-
-#~ msgid "To continue using the VTEX CX Platform request the"
-#~ msgstr "Para continuar usando a VTEX CX Platform solicite o"
-msgid ""
-msgstr ""
-
-#~ msgid " organization administrator add a valid credit card "
-#~ msgstr ""
-#~ " administrador da organização adicionar um cartão de crédito válido "
-msgid ""
-msgstr ""
-
-#~ msgid "in the billing section, we want you to stay with us"
-#~ msgstr "na seção de faturamente, nós queremos que você continue conosco"
-msgid ""
-msgstr ""
-
-#~ msgid "Your {self.organization.name} organization's plan has ended"
-#~ msgstr "O plano da sua organização {self.organization.name} foi encerrado"
-msgid ""
-msgstr ""
-
-#~ msgid ""
-#~ "Your {self.organization.name} organization's plan has been reactivated."
-#~ msgstr ""
-#~ "O plano da sua organização {self.organization.name} foi reativado com "
-#~ "sucesso"
-msgid ""
-msgstr ""
-
-#~ msgid ""
-#~ "The organization {self.organization.name} has already surpassed 200 "
-#~ "active contacts"
-#~ msgstr ""
-#~ "A organização {self.organization.name} passou de 200 contatos ativos"
-msgid ""
-msgstr ""
-
-#~ msgid ""
-#~ "Your {self.organization.name} organization has the {plan.title()} Plan"
-#~ msgstr "Sua organização {self.organization.name} tem o plano {plan.title()}"
-msgid ""
-msgstr ""
-
-#~ msgid "Your {self.organization.name} organization's plan has been changed."
-#~ msgstr ""
-#~ "O plano da sua organização {self.organization.name} foi alterado com "
-#~ "sucesso."
-msgid ""
-msgstr ""
