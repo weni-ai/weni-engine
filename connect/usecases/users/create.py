@@ -5,6 +5,7 @@ import string
 from django.contrib.auth import get_user_model
 
 from connect.api.v1.keycloak import KeycloakControl
+from connect.services.keycloak.service import KeycloakCredentialsService
 
 from connect.usecases.users.user_dto import KeycloakUserDTO
 
@@ -65,6 +66,8 @@ class CreateKeycloakUserUseCase:
                 email=self.user_dto.username,
                 company_name=self.user_dto.company_name,
             )
+
+            KeycloakCredentialsService().invalidate(self.user_dto.username)
 
             return {
                 "user": user,

@@ -7,7 +7,7 @@ from django.http import JsonResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import mixins, status
 from rest_framework.decorators import action
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
@@ -21,6 +21,7 @@ from connect.api.v1.organization.filters import (
 )
 from connect.api.v1.organization.permissions import (
     Has2FA,
+    HasSSOAccess,
     OrganizationHasPermission,
     OrganizationAdminManagerAuthorization,
     IsCRMUser,
@@ -28,6 +29,7 @@ from connect.api.v1.organization.permissions import (
 )
 from connect.api.v1.organization.serializers import (
     OrganizationSeralizer,
+    OrganizationSSOConfigSerializer,
     OrganizationAuthorizationSerializer,
     OrganizationAuthorizationRoleSerializer,
     RequestPermissionOrganizationSerializer,
@@ -36,9 +38,11 @@ from ..project.serializers import ProjectSerializer, TemplateProjectSerializer
 
 from connect.authentication.models import User
 from connect.celery import app as celery_app
+from connect.common.exceptions import OrganizationAuthorizationException
 from connect.common.models import (
     Organization,
     OrganizationAuthorization,
+    OrganizationSSOConfig,
     RequestPermissionOrganization,
     GenericBillingData,
     OrganizationRole,
@@ -65,6 +69,14 @@ from connect.usecases.authorizations.dto import (
     UpdateAuthorizationDTO,
 )
 from connect.usecases.authorizations.delete import DeleteAuthorizationUseCase
+from connect.usecases.organizations.exceptions import SSOConfigLockoutError
+from connect.usecases.organizations.sso_access import (
+    FilterAccessibleOrganizationsUseCase,
+)
+from connect.usecases.organizations.update_sso_config import (
+    UpdateOrganizationSSOConfigDTO,
+    UpdateOrganizationSSOConfigUseCase,
+)
 
 
 logger = logging.getLogger(__name__)
@@ -84,6 +96,7 @@ class OrganizationViewSet(
         IsAuthenticated,
         OrganizationHasPermission | IsCRMUser,
         Has2FA,
+        HasSSOAccess,
     ]
     lookup_field = "uuid"
     metadata_class = Metadata
@@ -98,7 +111,13 @@ class OrganizationViewSet(
             .filter(user=self.request.user)
             .values("organization")
         )
-        return self.queryset.filter(pk__in=auth)
+        queryset = self.queryset.filter(pk__in=auth)
+        session_identity_provider = getattr(
+            self.request, "session_identity_provider", None
+        )
+        return FilterAccessibleOrganizationsUseCase().execute(
+            queryset, self.request.user, session_identity_provider
+        )
 
     def get_object(self):
         if _is_orm_user(self.request.user):
@@ -339,7 +358,6 @@ class OrganizationViewSet(
     def get_contact_active(
         self, request, organization_uuid, **kwargs
     ):  # pragma: no cover
-
         organization = get_object_or_404(Organization, uuid=organization_uuid)
 
         before = request.query_params.get("before")
@@ -466,7 +484,6 @@ class OrganizationViewSet(
         url_path="billing/reactivate-plan/(?P<organization_uuid>[^/.]+)",
     )
     def reactivate_plan(self, request, organization_uuid):  # pragma: no cover
-
         organization = get_object_or_404(Organization, uuid=organization_uuid)
         self.check_object_permissions(self.request, organization)
 
@@ -652,6 +669,59 @@ class OrganizationViewSet(
         data = {"2fa_required": organization.enforce_2fa}
         return JsonResponse(data=data, status=status.HTTP_200_OK)
 
+    @action(
+        detail=True,
+        methods=["GET"],
+        url_name="sso-settings",
+        url_path="sso-settings",
+    )
+    def sso_settings(self, request, uuid=None):
+        organization = get_object_or_404(Organization, uuid=uuid)
+        self._assert_admin(request.user, organization)
+
+        config = OrganizationSSOConfig.objects.filter(organization=organization).first()
+        if config is None:
+            return Response(
+                {
+                    "is_enabled": False,
+                    "allowed_email_domains": [],
+                    "allowed_sso_providers": [],
+                }
+            )
+        return Response(OrganizationSSOConfigSerializer(config).data)
+
+    @sso_settings.mapping.patch
+    def update_sso_settings(self, request, uuid=None):
+        organization = get_object_or_404(Organization, uuid=uuid)
+        self._assert_admin(request.user, organization)
+
+        serializer = OrganizationSSOConfigSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        dto = UpdateOrganizationSSOConfigDTO(**serializer.validated_data)
+        session_identity_provider = getattr(request, "session_identity_provider", None)
+        try:
+            config = UpdateOrganizationSSOConfigUseCase().execute(
+                organization=organization,
+                dto=dto,
+                actor=request.user,
+                session_identity_provider=session_identity_provider,
+            )
+        except SSOConfigLockoutError as error:
+            raise ValidationError({"detail": str(error)})
+        return Response(OrganizationSSOConfigSerializer(config).data)
+
+    def _assert_admin(self, user, organization):
+        try:
+            authorization = organization.get_user_authorization(user)
+        except OrganizationAuthorizationException:
+            raise PermissionDenied(
+                _("You do not have permission to manage this organization")
+            )
+        if not authorization.is_admin:
+            raise PermissionDenied(
+                _("Only organization admins can manage SSO settings")
+            )
+
     @action(detail=True, methods=["POST"], url_path="billing/validate-customer-card")
     def validate_customer_card(self, request):
         customer = request.data.get("customer")
@@ -747,7 +817,6 @@ class OrganizationViewSet(
                 data["status"] = "FAILURE"
 
         if data["status"] == "SUCCESS":
-
             change_plan = org_billing.change_plan(plan)
 
             if change_plan:
