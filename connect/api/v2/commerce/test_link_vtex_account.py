@@ -1,6 +1,5 @@
 import uuid
-from contextlib import contextmanager
-from unittest.mock import patch, Mock
+from unittest.mock import MagicMock, patch, Mock
 
 from django.test import override_settings
 from django.urls import reverse
@@ -11,6 +10,7 @@ from rest_framework.test import APITestCase, APIClient
 
 from connect.api.v1.tests.utils import create_user_and_token
 from connect.authentication.models import User
+from connect.common.locks import RedisLockService
 from connect.common.models import (
     BillingPlan,
     Organization,
@@ -25,12 +25,12 @@ from connect.usecases.commerce.exceptions import (
 from connect.usecases.commerce.link_vtex_account import LinkVtexAccountUseCase
 
 
-class _NoOpLockService:
-    """Lock service stub that performs no locking, so tests don't touch Redis."""
-
-    @contextmanager
-    def lock(self, key):
-        yield
+def _mock_lock_service():
+    redis_lock = MagicMock()
+    redis_lock.acquire.return_value = True
+    connection = MagicMock()
+    connection.lock.return_value = redis_lock
+    return RedisLockService(connection=connection)
 
 
 @override_settings(USE_EDA_PERMISSIONS=False)
@@ -55,7 +55,7 @@ class LinkVtexAccountViewTestCase(APITestCase):
 
         lock_patcher = patch(
             "connect.usecases.commerce.link_vtex_account.RedisLockService",
-            return_value=_NoOpLockService(),
+            side_effect=_mock_lock_service,
         )
         self.addCleanup(lock_patcher.stop)
         lock_patcher.start()
@@ -196,7 +196,7 @@ class LinkVtexAccountUseCaseTestCase(APITestCase):
     def _use_case(self):
         return LinkVtexAccountUseCase(
             insights_client=self.insights,
-            lock_service=_NoOpLockService(),
+            lock_service=_mock_lock_service(),
         )
 
     def test_execute_links_and_notifies_insights(self):

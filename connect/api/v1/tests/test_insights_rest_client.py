@@ -12,6 +12,28 @@ class InsightsRESTClientTestCase(SimpleTestCase):
     @patch(
         "connect.api.v1.internal.insights.insights_rest_client.InternalAuthentication"
     )
+    @patch("connect.api.v1.internal.insights.insights_rest_client.requests.post")
+    def test_update_user_language_posts_to_change_language_endpoint(
+        self, mock_post, mock_auth_class
+    ):
+        mock_auth_class.return_value.headers = {"Authorization": "Bearer token"}
+        mock_response = Mock()
+        mock_response.json.return_value = {"status": "ok"}
+        mock_post.return_value = mock_response
+
+        result = InsightsRESTClient().update_user_language("user@example.com", "pt-br")
+
+        mock_post.assert_called_once_with(
+            url="https://insights-engine.weni.ai/v1/internal/users/change-language/",
+            headers={"Authorization": "Bearer token"},
+            json={"email": "user@example.com", "language": "pt-br"},
+            timeout=60,
+        )
+        self.assertEqual(result, {"status": "ok"})
+
+    @patch(
+        "connect.api.v1.internal.insights.insights_rest_client.InternalAuthentication"
+    )
     @patch("connect.api.v1.internal.insights.insights_rest_client.requests.patch")
     def test_notify_vtex_account_migration_patches_project_endpoint(
         self, mock_patch, mock_auth_class
