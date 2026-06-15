@@ -1,3 +1,8 @@
+# 3.47.2
+  - fix: Add clicktracking attribute to download link in email template
+  - add: complete language review. Fix PT and add EN, ES and RO translations
+  - fix: Repair CI/dev environment, add pre-commit and coverage gate
+
 # 3.47.1
   - fix: Scope v2 project list to user authorized projects
 

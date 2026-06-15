@@ -13,9 +13,15 @@ from connect.internals.event_driven.connection.rabbitmq import RabbitMQConnectio
 
 class RabbitmqPublisher:  # pragma: no cover
     def __init__(self) -> None:
-        self.rabbitmq_connection = RabbitMQConnection()
+        # Tests must never reach a real broker (project convention: EDA
+        # publishers are no-ops under settings.TESTING). Skip the connection so
+        # signal/model side effects don't hit external infrastructure.
+        self.rabbitmq_connection = None if settings.TESTING else RabbitMQConnection()
 
     def send_message(self, body: Dict, exchange: str, routing_key: str):
+        if settings.TESTING:
+            return
+
         sended = False
         while not sended:
             try:
