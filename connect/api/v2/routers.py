@@ -31,13 +31,18 @@ from connect.api.v2.commerce.views import (
     CommerceOrganizationViewSet,
     CreateVtexProjectView,
     LinkVtexAccountView,
+    SendDataExportEmailView,
     SetVtexHostStoreView,
     UpdateProjectConfigView,
 )
 from connect.api.v2.organizations import views as organization_views
 from connect.api.v2.projects import views as project_views
 from connect.api.v2.internals import views as connect_internal_views
-from connect.api.v2.auth.views import KeycloakAuthView, ProjectAuthView
+from connect.api.v2.auth.views import (
+    KeycloakAuthView,
+    ProjectAuthView,
+    VtexAccountProjectAuthView,
+)
 
 from connect.api.v2.internals.business_verification.views import (
     NotifyBusinessVerificationView,
@@ -155,6 +160,11 @@ urlpatterns = [
         ProjectAuthView.as_view(),
         name="project-authorizations",
     ),
+    path(
+        "projects/vtex-account/<vtex_account>/authorization",
+        VtexAccountProjectAuthView.as_view(),
+        name="project-vtex-account-authorizations",
+    ),
     path("account/user-is-paying", UserIsPaying.as_view(), name="user-is-paying"),
     path("omie/accounts", OmieAccountAPIView.as_view(), name="omie-accounts"),
     path("omie/origins", OmieOriginAPIView.as_view(), name="omie-origins"),
@@ -184,6 +194,11 @@ urlpatterns = [
         "commerce/projects/<project_uuid>/config/",
         UpdateProjectConfigView.as_view(),
         name="update-project-config",
+    ),
+    path(
+        "commerce/send-data-export-email/",
+        SendDataExportEmailView.as_view(),
+        name="commerce-send-data-export-email",
     ),
     path("auth/", KeycloakAuthView.as_view(), name="keycloak-auth"),
 ]

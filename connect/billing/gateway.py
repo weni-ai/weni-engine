@@ -74,6 +74,13 @@ def get_gateway(gateway, *args, **kwargs):
 
     >>> gateway_cache = {}
     """
+    # During tests there is no real payment provider configured; return an
+    # in-memory mock so the suite never depends on external billing credentials.
+    if settings.TESTING and gateway == "stripe":
+        from connect.common.mocks import StripeMockGateway
+
+        return StripeMockGateway()
+
     # Is the class in the cache?
     instance = gateway_cache.get(gateway, None)
     if not instance:

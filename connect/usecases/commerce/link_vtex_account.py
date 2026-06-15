@@ -76,11 +76,7 @@ class LinkVtexAccountUseCase:
             )
 
     def _notify_insights(self, project: Project) -> None:
-        """Best-effort notification to Insights.
-
-        The Insights endpoint is still temporary, so failures here must not
-        roll back the vtex_account link already persisted in Connect.
-        """
+        """Best-effort sync to Insights; failures do not roll back the Connect link."""
         try:
             self._insights.notify_vtex_account_migration(
                 project_uuid=str(project.uuid),
