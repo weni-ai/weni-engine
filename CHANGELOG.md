@@ -1,3 +1,6 @@
+# 3.48.0
+  - feat: Add VtexAccountProjectAuthView and related use case for project authorization by VTEX account
+
 # 3.47.2
   - fix: Add clicktracking attribute to download link in email template
   - add: complete language review. Fix PT and add EN, ES and RO translations
