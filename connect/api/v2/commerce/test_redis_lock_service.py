@@ -36,7 +36,7 @@ class RedisLockServiceTestCase(TestCase):
 
         with self.assertRaises(LockNotAcquiredError):
             with self.service.lock("my-key"):
-                pass
+                pass  # pragma: no cover
 
         self.redis_lock.release.assert_not_called()
 
