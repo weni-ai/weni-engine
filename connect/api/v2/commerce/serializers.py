@@ -86,7 +86,7 @@ class CommerceSerializer(serializers.Serializer):
             "brain_on": True,
             "project_type": instance.project_type.value,
             "vtex_account": instance.vtex_account,
-            "inline_agent_switch": inline_agent_switch
+            "inline_agent_switch": inline_agent_switch,
         }
         rabbitmq_publisher = RabbitmqPublisher()
         rabbitmq_publisher.send_message(
@@ -157,6 +157,10 @@ class CreateVtexProjectSerializer(serializers.Serializer):
     language = serializers.ChoiceField(required=True, choices=settings.LANGUAGES)
     organization_name = serializers.CharField(required=True)
     project_name = serializers.CharField(required=True)
+
+
+class LinkVtexAccountSerializer(serializers.Serializer):
+    vtex_account = serializers.CharField(required=True, max_length=100)
 
 
 class SetVtexHostStoreSerializer(serializers.Serializer):

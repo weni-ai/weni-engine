@@ -1,4 +1,3 @@
-from django.contrib.auth import get_user_model
 from rest_framework import status, views
 from rest_framework.exceptions import NotFound, PermissionDenied
 from rest_framework.permissions import IsAuthenticated
@@ -9,10 +8,11 @@ from connect.api.v2.auth.serializers import GetTokenSerializer, KeycloakAuthSeri
 from connect.common.models import ProjectAuthorization
 from connect.middleware import WeniOIDCAuthentication
 from connect.usecases.auth.generate_session_token import GenerateSessionTokenUseCase
+from connect.usecases.authorizations.get_project_authorization import (
+    GetProjectAuthorizationUseCase,
+)
 from connect.usecases.keycloak.authenticate import KeycloakAuthenticateUseCase
 from weni_commons.auth import SessionTokenAuthentication
-
-User = get_user_model()
 
 
 class KeycloakAuthView(views.APIView):
@@ -36,42 +36,52 @@ class KeycloakAuthView(views.APIView):
             )
 
 
-class ProjectAuthView(views.APIView):
+class BaseProjectAuthorizationView(views.APIView):
     authentication_classes = [WeniOIDCAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get_available_roles(self):
         return {choice[0]: choice[1] for choice in ProjectAuthorization.ROLE_CHOICES}
 
-    def get(self, request: Request, project_uuid: str = None):
+    def _resolve_target_user_email(self, request: Request) -> str:
         user_email = request.query_params.get("user")
 
-        user = request.user
+        if user_email is None:
+            return request.user.email
 
-        if user_email is not None:
-            if not request.user.has_perm("authentication.can_communicate_internally"):
-                raise PermissionDenied(
-                    "You do not have permission to access other users' data"
-                )
-
-            user = User.objects.filter(email=user_email).first()
-
-            if user is None:
-                raise NotFound("User not found")
-
-        try:
-            project_authorization = user.project_authorizations_user.get(
-                project__uuid=project_uuid
+        if not request.user.has_perm("authentication.can_communicate_internally"):
+            raise PermissionDenied(
+                "You do not have permission to access other users' data"
             )
-        except ProjectAuthorization.DoesNotExist:
-            raise NotFound("Project authorization not found")
 
-        response = {
-            "user": user.email,
-            "project_authorization": project_authorization.role,
-            "available_roles": self.get_available_roles(),
-        }
-        return Response(response)
+        return user_email
+
+    def _build_response(self, authorization: ProjectAuthorization) -> Response:
+        return Response(
+            {
+                "user": authorization.user.email,
+                "project_authorization": authorization.role,
+                "available_roles": self.get_available_roles(),
+            }
+        )
+
+
+class ProjectAuthView(BaseProjectAuthorizationView):
+    def get(self, request: Request, project_uuid: str = None):
+        user_email = self._resolve_target_user_email(request)
+        authorization = GetProjectAuthorizationUseCase().get_by_project_uuid(
+            user_email=user_email, project_uuid=project_uuid
+        )
+        return self._build_response(authorization)
+
+
+class VtexAccountProjectAuthView(BaseProjectAuthorizationView):
+    def get(self, request: Request, vtex_account: str = None):
+        user_email = self._resolve_target_user_email(request)
+        authorization = GetProjectAuthorizationUseCase().get_by_vtex_account(
+            user_email=user_email, vtex_account=vtex_account
+        )
+        return self._build_response(authorization)
 
 
 class GetTokenView(views.APIView):

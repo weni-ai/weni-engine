@@ -1,5 +1,5 @@
 import pendulum
-from rest_framework import mixins, status, exceptions
+from rest_framework import mixins, status, exceptions, views
 from rest_framework.decorators import action
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.response import Response
@@ -15,6 +15,7 @@ from connect.common.models import (
     OrganizationRole,
     BillingPlan,
 )
+from connect.api.v1.internal.permissions import ModuleHasPermission
 from connect.api.v1.organization.permissions import (
     Has2FA,
     OrganizationHasPermission,
@@ -30,6 +31,7 @@ from connect.api.v2.projects.serializers import ProjectSerializer
 from connect.api.v2.organizations.api_schemas import (
     create_organization_schema,
 )
+from connect.usecases.organizations.list_by_user import ListOrgsByUserUseCase
 
 
 class OrganizationViewSet(
@@ -184,3 +186,23 @@ class OrganizationAuthorizationViewSet(
 
     def get_serializer_class(self):
         return NestedAuthorizationOrganizationSerializer
+
+
+class OrgsByUserView(views.APIView):
+    """Lists the organizations a user belongs to (by email), including each
+    organization's projects and active member count.
+
+    Service-to-service endpoint guarded by ``ModuleHasPermission``.
+    """
+
+    permission_classes = [ModuleHasPermission]
+
+    def get(self, request):
+        user_email = request.query_params.get("user_email")
+        if not user_email:
+            raise ValidationError(
+                {"user_email": _("This query parameter is required.")}
+            )
+
+        organizations = ListOrgsByUserUseCase().execute(user_email)
+        return Response({"organizations": organizations}, status=status.HTTP_200_OK)
