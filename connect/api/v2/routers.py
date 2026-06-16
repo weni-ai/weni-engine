@@ -31,6 +31,7 @@ from connect.api.v2.commerce.views import (
     CommerceOrganizationViewSet,
     CreateVtexProjectView,
     LinkVtexAccountView,
+    SendContractAcceptanceEmailView,
     SendDataExportEmailView,
     SetVtexHostStoreView,
     UpdateProjectConfigView,
@@ -199,6 +200,11 @@ urlpatterns = [
         "commerce/send-data-export-email/",
         SendDataExportEmailView.as_view(),
         name="commerce-send-data-export-email",
+    ),
+    path(
+        "commerce/send-contract-acceptance-email/",
+        SendContractAcceptanceEmailView.as_view(),
+        name="commerce-send-contract-acceptance-email",
     ),
     path("auth/", KeycloakAuthView.as_view(), name="keycloak-auth"),
 ]

@@ -1,3 +1,4 @@
+import uuid
 from dataclasses import dataclass
 from datetime import date
 from typing import List, Optional
@@ -21,3 +22,13 @@ class SendDataExportEmailDTO:
     template: str
     status: List[str]
     language: Optional[str] = None
+
+
+@dataclass(frozen=True)
+class SendContractAcceptanceEmailDTO:
+    user_email: str
+    acceptance_id: uuid.UUID
+    subject: str
+    body_html: str
+    file_name: str
+    file_base64: str

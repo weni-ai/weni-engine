@@ -10,6 +10,7 @@ from connect.api.v2.commerce.serializers import (
     CommerceSerializer,
     CreateVtexProjectSerializer,
     LinkVtexAccountSerializer,
+    SendContractAcceptanceEmailSerializer,
     SendDataExportEmailSerializer,
     SetVtexHostStoreSerializer,
     UpdateProjectConfigSerializer,
@@ -17,12 +18,19 @@ from connect.api.v2.commerce.serializers import (
 from connect.api.v2.paginations import CustomCursorPagination
 from connect.common.models import Organization, Project
 from connect.usecases.commerce.create_vtex_project import CreateVtexProjectUseCase
-from connect.usecases.commerce.dto import CreateVtexProjectDTO, SendDataExportEmailDTO
+from connect.usecases.commerce.dto import (
+    CreateVtexProjectDTO,
+    SendContractAcceptanceEmailDTO,
+    SendDataExportEmailDTO,
+)
 from connect.usecases.commerce.exceptions import (
     ProjectAlreadyHasVtexAccountError,
     VtexAccountAlreadyLinkedError,
 )
 from connect.usecases.commerce.link_vtex_account import LinkVtexAccountUseCase
+from connect.usecases.commerce.send_contract_acceptance_email import (
+    SendContractAcceptanceEmailUseCase,
+)
 from connect.usecases.commerce.send_data_export_email import SendDataExportEmailUseCase
 from connect.usecases.commerce.set_vtex_host_store import SetVtexHostStoreUseCase
 from connect.usecases.commerce.update_project_config import UpdateProjectConfigUseCase
@@ -123,6 +131,19 @@ class SendDataExportEmailView(views.APIView):
 
         dto = SendDataExportEmailDTO(**serializer.validated_data)
         sent = SendDataExportEmailUseCase().execute(dto)
+
+        return Response({"sent": bool(sent)}, status=status.HTTP_200_OK)
+
+
+class SendContractAcceptanceEmailView(views.APIView):
+    permission_classes = [CanCommunicateInternally]
+
+    def post(self, request):
+        serializer = SendContractAcceptanceEmailSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        dto = SendContractAcceptanceEmailDTO(**serializer.validated_data)
+        sent = SendContractAcceptanceEmailUseCase().execute(dto)
 
         return Response({"sent": bool(sent)}, status=status.HTTP_200_OK)
 

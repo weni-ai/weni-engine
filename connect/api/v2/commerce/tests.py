@@ -1,3 +1,4 @@
+import base64
 import uuid
 from unittest.mock import MagicMock, patch, Mock
 
@@ -1255,3 +1256,134 @@ class CustomCursorPaginationTestCase(APITestCase):
 
         queryset.order_by.assert_called_once_with("-created_at")
         queryset.order_by.return_value.distinct.assert_called_once_with("project")
+
+
+class SendContractAcceptanceEmailViewTestCase(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user, self.token = create_user_and_token("contractuser")
+
+        content_type = ContentType.objects.get_for_model(User)
+        permission, _ = Permission.objects.get_or_create(
+            codename="can_communicate_internally",
+            name="can communicate internally",
+            content_type=content_type,
+        )
+        self.user.user_permissions.add(permission)
+        self.client.force_authenticate(user=self.user)
+
+        self.url = reverse("commerce-send-contract-acceptance-email")
+        self.payload = {
+            "user_email": "customer@example.com",
+            "acceptance_id": str(uuid.uuid4()),
+            "subject": "Seu contrato Weni",
+            "body_html": "<p>Contrato aceito com sucesso</p>",
+            "file_name": "contract-v2.1.pdf",
+            "file_base64": base64.b64encode(b"%PDF-1.4 fake").decode(),
+        }
+
+    @patch("connect.api.v2.commerce.views.SendContractAcceptanceEmailUseCase")
+    def test_returns_200_and_dispatches(self, use_case_class):
+        use_case_class.return_value.execute.return_value = True
+
+        response = self.client.post(self.url, self.payload, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json(), {"sent": True})
+
+        dto = use_case_class.return_value.execute.call_args.args[0]
+        self.assertEqual(dto.user_email, "customer@example.com")
+        self.assertEqual(dto.subject, "Seu contrato Weni")
+        self.assertEqual(dto.body_html, "<p>Contrato aceito com sucesso</p>")
+        self.assertEqual(dto.file_name, "contract-v2.1.pdf")
+
+    @patch("connect.api.v2.commerce.views.SendContractAcceptanceEmailUseCase")
+    def test_rejects_invalid_base64(self, use_case_class):
+        payload = {**self.payload, "file_base64": "not-valid-base64!!!"}
+
+        response = self.client.post(self.url, payload, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        use_case_class.return_value.execute.assert_not_called()
+
+    @patch("connect.api.v2.commerce.views.SendContractAcceptanceEmailUseCase")
+    def test_rejects_invalid_acceptance_id(self, use_case_class):
+        payload = {**self.payload, "acceptance_id": "not-a-uuid"}
+
+        response = self.client.post(self.url, payload, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        use_case_class.return_value.execute.assert_not_called()
+
+    @patch("connect.api.v2.commerce.views.SendContractAcceptanceEmailUseCase")
+    def test_rejects_missing_required_fields(self, use_case_class):
+        response = self.client.post(self.url, {}, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        use_case_class.return_value.execute.assert_not_called()
+
+    def test_returns_403_without_internal_permission(self):
+        other_user, _ = create_user_and_token("nopermission-contract")
+        client = APIClient()
+        client.force_authenticate(user=other_user)
+
+        response = client.post(self.url, self.payload, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+class SendContractAcceptanceEmailSerializerTestCase(APITestCase):
+    def _data(self, **overrides):
+        data = {
+            "user_email": "customer@example.com",
+            "acceptance_id": str(uuid.uuid4()),
+            "subject": "Seu contrato Weni",
+            "body_html": "<p>Contrato aceito com sucesso</p>",
+            "file_name": "contract-v2.1.pdf",
+            "file_base64": base64.b64encode(b"%PDF-1.4 fake").decode(),
+        }
+        data.update(overrides)
+        return data
+
+    def test_rejects_attachment_above_max_size(self):
+        from connect.api.v2.commerce.serializers import (
+            CONTRACT_PDF_MAX_SIZE_BYTES,
+            SendContractAcceptanceEmailSerializer,
+        )
+
+        oversized = base64.b64encode(b"a" * (CONTRACT_PDF_MAX_SIZE_BYTES + 1)).decode()
+        serializer = SendContractAcceptanceEmailSerializer(
+            data=self._data(file_base64=oversized)
+        )
+
+        self.assertFalse(serializer.is_valid())
+        self.assertIn("file_base64", serializer.errors)
+
+    def test_rejects_empty_decoded_file(self):
+        from connect.api.v2.commerce.serializers import (
+            SendContractAcceptanceEmailSerializer,
+        )
+
+        serializer = SendContractAcceptanceEmailSerializer(
+            data=self._data(file_base64="")
+        )
+
+        self.assertFalse(serializer.is_valid())
+        self.assertIn("file_base64", serializer.errors)
+
+    def test_pdf_limit_matches_request_body_budget(self):
+        from django.conf import settings
+
+        from connect.api.v2.commerce.serializers import (
+            CONTRACT_PDF_MAX_SIZE_BYTES,
+            _CONTRACT_EMAIL_JSON_OVERHEAD_BYTES,
+        )
+
+        max_request_bytes = settings.DATA_UPLOAD_MAX_MEMORY_SIZE
+        max_base64_bytes = max(
+            max_request_bytes - _CONTRACT_EMAIL_JSON_OVERHEAD_BYTES, 0
+        )
+        expected = int(max_base64_bytes * 3 / 4)
+
+        self.assertEqual(CONTRACT_PDF_MAX_SIZE_BYTES, expected)
+        self.assertLess(CONTRACT_PDF_MAX_SIZE_BYTES, 5 * 1024 * 1024)
