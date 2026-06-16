@@ -37,7 +37,12 @@ from connect.api.v2.commerce.views import (
 from connect.api.v2.organizations import views as organization_views
 from connect.api.v2.projects import views as project_views
 from connect.api.v2.internals import views as connect_internal_views
-from connect.api.v2.auth.views import GetTokenView, KeycloakAuthView, ProjectAuthView
+from connect.api.v2.auth.views import (
+    GetTokenView,
+    KeycloakAuthView,
+    ProjectAuthView,
+    ValidateSessionTokenView,
+)
 
 from connect.api.v2.internals.business_verification.views import (
     NotifyBusinessVerificationView,
@@ -154,6 +159,11 @@ urlpatterns = [
         "projects/<project_uuid>/get-token",
         GetTokenView.as_view(),
         name="get-token",
+    ),
+    path(
+        "projects/<project_uuid>/validate-session-token",
+        ValidateSessionTokenView.as_view(),
+        name="validate-session-token",
     ),
     path("account/user-is-paying", UserIsPaying.as_view(), name="user-is-paying"),
     path("omie/accounts", OmieAccountAPIView.as_view(), name="omie-accounts"),

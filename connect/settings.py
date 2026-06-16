@@ -108,6 +108,8 @@ env = environ.Env(
     RATE_LIMIT_REQUESTS=(int, 10),
     RATE_LIMIT_WINDOW=(int, 60),
     RATE_LIMIT_BLOCK_TIME=(int, 300),
+    GROWTHBOOK_CLIENT_KEY=(str, "local-dev-key"),
+    GROWTHBOOK_HOST_BASE_URL=(str, "https://growthbook.example.com"),
 )
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -161,6 +163,7 @@ INSTALLED_APPS = [
     "django_grpc_framework",
     "stripe",
     "django_prometheus",
+    "weni.feature_flags",
 ]
 
 MIDDLEWARE = [
@@ -523,6 +526,10 @@ PLAN_STATUS_CACHE_TTL = env.int("PLAN_STATUS_CACHE_TTL")
 
 SESSION_TOKEN_MIN_DURATION = env.int("SESSION_TOKEN_MIN_DURATION")
 SESSION_TOKEN_MAX_DURATION = env.int("SESSION_TOKEN_MAX_DURATION")
+
+# weni-commons / weni-feature-flags (required on import)
+GROWTHBOOK_CLIENT_KEY = env.str("GROWTHBOOK_CLIENT_KEY")
+GROWTHBOOK_HOST_BASE_URL = env.str("GROWTHBOOK_HOST_BASE_URL")
 
 PLAN_START_LIMIT = env.int("PLAN_START_LIMIT")
 PLAN_START_PRICE = env.int("PLAN_START_PRICE")

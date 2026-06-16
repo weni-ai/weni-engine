@@ -10,6 +10,7 @@ from connect.common.models import ProjectAuthorization
 from connect.middleware import WeniOIDCAuthentication
 from connect.usecases.auth.generate_session_token import GenerateSessionTokenUseCase
 from connect.usecases.keycloak.authenticate import KeycloakAuthenticateUseCase
+from weni_commons.auth import SessionTokenAuthentication
 
 User = get_user_model()
 
@@ -95,3 +96,20 @@ class GetTokenView(views.APIView):
         )
 
         return Response({"hash": token_hash}, status=status.HTTP_200_OK)
+
+
+class ValidateSessionTokenView(views.APIView):
+    authentication_classes = [SessionTokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request: Request, project_uuid: str = None):
+        session = request.auth
+        return Response(
+            {
+                "projeto": session.projeto,
+                "user": session.user,
+                "expire_at": session.expire_at,
+                "project_uuid": str(project_uuid),
+            },
+            status=status.HTTP_200_OK,
+        )
