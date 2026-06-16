@@ -1,3 +1,5 @@
+from typing import Optional
+
 import requests
 
 from django.conf import settings
@@ -27,4 +29,20 @@ class InsightsRESTClient:
             timeout=60,
         )
 
+        return response.json()
+
+    def notify_vtex_account_migration(
+        self, project_uuid: str, vtex_account: Optional[str]
+    ) -> dict:
+        """Sync the project VTEX account to Insights after a Connect migration."""
+        response = requests.patch(
+            url=f"{self.base_url}/v1/internal/projects/{project_uuid}/vtex-account",
+            headers=self.authentication_instance.headers,
+            json={"vtex_account": vtex_account},
+            timeout=60,
+        )
+        response.raise_for_status()
+
+        if not response.content:
+            return {}
         return response.json()

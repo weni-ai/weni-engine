@@ -9,6 +9,7 @@ from connect.api.v2.commerce.permissions import CanCommunicateInternally
 from connect.api.v2.commerce.serializers import (
     CommerceSerializer,
     CreateVtexProjectSerializer,
+    LinkVtexAccountSerializer,
     SendDataExportEmailSerializer,
     SetVtexHostStoreSerializer,
     UpdateProjectConfigSerializer,
@@ -17,6 +18,11 @@ from connect.api.v2.paginations import CustomCursorPagination
 from connect.common.models import Organization, Project
 from connect.usecases.commerce.create_vtex_project import CreateVtexProjectUseCase
 from connect.usecases.commerce.dto import CreateVtexProjectDTO, SendDataExportEmailDTO
+from connect.usecases.commerce.exceptions import (
+    ProjectAlreadyHasVtexAccountError,
+    VtexAccountAlreadyLinkedError,
+)
+from connect.usecases.commerce.link_vtex_account import LinkVtexAccountUseCase
 from connect.usecases.commerce.send_data_export_email import SendDataExportEmailUseCase
 from connect.usecases.commerce.set_vtex_host_store import SetVtexHostStoreUseCase
 from connect.usecases.commerce.update_project_config import UpdateProjectConfigUseCase
@@ -54,6 +60,35 @@ class CreateVtexProjectView(views.APIView):
 
         dto = CreateVtexProjectDTO(**serializer.validated_data)
         result = CreateVtexProjectUseCase().execute(dto)
+
+        return Response(result, status=status.HTTP_200_OK)
+
+
+class LinkVtexAccountView(views.APIView):
+    permission_classes = [CanCommunicateInternally]
+
+    def post(self, request, project_uuid):
+        serializer = LinkVtexAccountSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            result = LinkVtexAccountUseCase().execute(
+                project_uuid=project_uuid,
+                vtex_account=serializer.validated_data["vtex_account"],
+            )
+        except Project.DoesNotExist:
+            return Response(
+                {"detail": "Project not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        except (
+            ProjectAlreadyHasVtexAccountError,
+            VtexAccountAlreadyLinkedError,
+        ) as exc:
+            return Response(
+                {"detail": str(exc)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         return Response(result, status=status.HTTP_200_OK)
 

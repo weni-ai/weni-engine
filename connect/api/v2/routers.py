@@ -30,6 +30,7 @@ from connect.api.v2.template_projects.views import (
 from connect.api.v2.commerce.views import (
     CommerceOrganizationViewSet,
     CreateVtexProjectView,
+    LinkVtexAccountView,
     SendDataExportEmailView,
     SetVtexHostStoreView,
     UpdateProjectConfigView,
@@ -123,6 +124,11 @@ urlpatterns = [
         ),
         name="list-organization-authorizations",
     ),
+    path(
+        "orgs-by-user",
+        organization_views.OrgsByUserView.as_view(),
+        name="orgs-by-user",
+    ),
     path("projects/channels", ListChannelsAPIView.as_view(), name="list-channels"),
     path(
         "projects/<project_uuid>/create-wac-channel",
@@ -173,6 +179,11 @@ urlpatterns = [
         "commerce/create-vtex-project/",
         CreateVtexProjectView.as_view(),
         name="create-vtex-project",
+    ),
+    path(
+        "commerce/projects/<project_uuid>/link-vtex-account/",
+        LinkVtexAccountView.as_view(),
+        name="link-vtex-account",
     ),
     path(  # TODO: deprecated, can be removed in the near future
         "commerce/projects/<project_uuid>/set-vtex-host-store/",

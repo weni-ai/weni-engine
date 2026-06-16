@@ -1,4 +1,5 @@
 import subprocess
+import sys
 
 from dataclasses import dataclass
 from typing import Any, Dict, Optional
@@ -38,15 +39,14 @@ class CoverageService:
     @staticmethod
     def get_local_misses() -> int:
         """Get number of missed lines from local coverage report."""
-        output = (
-            subprocess.check_output(
-                "coverage report -m | awk '/^TOTAL/ {print $3}'", shell=True
-            )
-            .decode("utf-8")
-            .replace("\n", "\n ")
-            .strip()
+        output = subprocess.check_output(
+            [sys.executable, "-m", "coverage", "report", "-m"],
+            text=True,
         )
-        return int(output)
+        for line in output.splitlines():
+            if line.startswith("TOTAL"):
+                return int(line.split()[2])
+        raise RuntimeError("TOTAL line not found in coverage report")
 
     @classmethod
     def get_main_coverage(cls, commit_hash: str) -> Optional[Dict[str, Any]]:
