@@ -1,3 +1,23 @@
+# 3.48.0
+  - feat: Add VtexAccountProjectAuthView and related use case for project authorization by VTEX account
+
+# 3.47.2
+  - fix: Add clicktracking attribute to download link in email template
+  - add: complete language review. Fix PT and add EN, ES and RO translations
+  - fix: Repair CI/dev environment, add pre-commit and coverage gate
+
+# 3.47.1
+  - fix: Scope v2 project list to user authorized projects
+
+# 3.47.0
+  - feat: Implement Send Data Export Email functionality
+
+# 3.46.2
+  - fix: uuid type 
+
+# 3.46.1
+  - Add custom non-inline organizations
+
 # 3.46.0
   - feat: Adds business verification result notification endpoint
 

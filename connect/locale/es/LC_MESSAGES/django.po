@@ -1,4 +1,4 @@
-# Portuguese (Brazil) translations for weni-engine.
+# Spanish translations for weni-engine.
 #
 msgid ""
 msgstr ""
@@ -6,12 +6,12 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-05-29 19:16+0000\n"
 "PO-Revision-Date: 2026-05-29 19:16+0000\n"
-"Language-Team: Portuguese (Brazil)\n"
-"Language: pt_BR\n"
+"Language-Team: Spanish\n"
+"Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: connect/api/v1/account/serializers.py:35
 msgid "ID"
@@ -19,7 +19,7 @@ msgstr "Identificador"
 
 #: connect/api/v1/account/serializers.py:36
 msgid "Username"
-msgstr "Nome do usuário"
+msgstr "Nombre de usuario"
 
 #: connect/api/v1/account/serializers.py:37
 #: connect/api/v1/organization/serializers.py:267
@@ -34,27 +34,27 @@ msgstr "Email"
 #: connect/api/v1/project/serializers.py:350
 #: connect/api/v2/organizations/serializers.py:228
 msgid "User photo"
-msgstr "Foto do usuário"
+msgstr "Foto del usuario"
 
 #: connect/api/v1/account/serializers.py:41 connect/authentication/models.py:90
 msgid "Phone Prefix Country"
-msgstr "Prefixo de telefone do país"
+msgstr "Prefijo telefónico del país"
 
 #: connect/api/v1/account/serializers.py:42 connect/authentication/models.py:91
 msgid "Phone prefix of the user"
-msgstr "Prefixo do telefone do usuário"
+msgstr "Prefijo telefónico del usuario"
 
 #: connect/api/v1/account/serializers.py:46 connect/authentication/models.py:96
 msgid "Telephone Number"
-msgstr "Telefone"
+msgstr "Teléfono"
 
 #: connect/api/v1/account/serializers.py:47 connect/authentication/models.py:97
 msgid "Phone number of the user; include area code"
-msgstr "Telefone do usuário com DDD"
+msgstr "Teléfono del usuario con código de área"
 
 #: connect/api/v1/account/serializers.py:99
 msgid "Password"
-msgstr "Senha"
+msgstr "Contraseña"
 
 #: connect/api/v1/account/serializers.py:104
 #: connect/authentication/models.py:77
@@ -63,93 +63,93 @@ msgstr "Idioma"
 
 #: connect/api/v1/account/views.py:104 connect/api/v1/account/views.py:109
 msgid "We accept images only in the formats: .png, .jpeg, .gif"
-msgstr "São permitidas somente imagens nos formatos PNG, JPEG e GIF"
+msgstr "Solo se permiten imágenes en formatos PNG, JPEG y GIF"
 
 #: connect/api/v1/account/views.py:146
 msgid "System temporarily unavailable, please try again later."
-msgstr "Sistema temporariamente indisponível. Tente novamente mais tarde."
+msgstr "Sistema temporalmente no disponible. Vuelve a intentarlo más tarde."
 
 #: connect/api/v1/account/views.py:337
 msgid "The search field needed the text to search."
-msgstr "O campo de pesquisa precisa do texto para buscar."
+msgstr "El campo de búsqueda no puede estar vacío"
 
 #: connect/api/v1/dashboard/filters.py:19
 msgid "Project's UUID"
-msgstr "UUID do projeto"
+msgstr "UUID del proyecto"
 
 #: connect/api/v1/dashboard/filters.py:31
 msgid "Project {} does not exist"
-msgstr "O projeto {} não existe"
+msgstr "El proyecto {} no existe"
 
 #: connect/api/v1/dashboard/filters.py:33
 msgid "Invalid project UUID"
-msgstr "UUID do projeto inválido"
+msgstr "UUID de proyecto no válido"
 
 #: connect/api/v1/dashboard/serializers.py:45
 msgid "Type Service"
-msgstr "Tipo de serviço"
+msgstr "Tipo de servicio"
 
 #: connect/api/v1/invoice/filters.py:18
 #: connect/api/v1/organization/filters.py:23
 #: connect/api/v1/organization/filters.py:53
 #: connect/api/v1/project/filters.py:18
 msgid "Organization's UUID"
-msgstr "UUID da organização"
+msgstr "UUID de la organización"
 
 #: connect/api/v1/invoice/filters.py:36
 #: connect/api/v1/organization/filters.py:40
 #: connect/api/v1/organization/filters.py:67
 #: connect/api/v1/project/filters.py:31
 msgid "Organization {} does not exist"
-msgstr "A organização {} não existe"
+msgstr "La organización {} no existe"
 
 #: connect/api/v1/invoice/filters.py:38 connect/api/v1/project/filters.py:33
 msgid "Invalid organization UUID"
-msgstr "UUID da organização inválido"
+msgstr "UUID de la organización no válido"
 
 #: connect/api/v1/organization/filters.py:42
 #: connect/api/v1/organization/filters.py:69
 msgid "Invalid Organization UUID"
-msgstr "O UUID da organização é inválido"
+msgstr "El UUID de la organización no es válido"
 
 #: connect/api/v1/organization/serializers.py:58 connect/common/models.py:1407
 msgid "billing cycle"
-msgstr "ciclo de pagamento"
+msgstr "ciclo de pago"
 
 #: connect/api/v1/organization/serializers.py:63 connect/common/models.py:1413
 #: connect/common/models.py:2130
 msgid "payment method"
-msgstr "meio de pagamento"
+msgstr "medio de pago"
 
 #: connect/api/v1/organization/serializers.py:69
 #: connect/api/v1/organization/serializers.py:129
 #: connect/api/v2/organizations/serializers.py:55 connect/common/models.py:1422
 msgid "plan"
-msgstr "plano"
+msgstr "plan"
 
 #: connect/api/v1/organization/serializers.py:97
 msgid "Total active contacts and current invoice amount before closing"
-msgstr "Total de contatos ativos e valor atual da fatura antes do fechamento"
+msgstr "Total de contactos activos y valor de la factura actual antes del cierre"
 
 #: connect/api/v1/organization/serializers.py:135
 #: connect/api/v2/organizations/serializers.py:61
 msgid "is suspended"
-msgstr "está suspensa"
+msgstr "está suspendida"
 
 #: connect/api/v1/organization/serializers.py:138
 #: connect/api/v2/organizations/serializers.py:64 connect/common/models.py:135
 msgid "Whether this organization is currently suspended."
-msgstr "Se esta organização estiver suspensa no momento"
+msgstr "Si esta organización se encuentra actualmente suspendida"
 
 #: connect/api/v1/organization/serializers.py:142
 #: connect/api/v2/organizations/serializers.py:68
 msgid "enforce 2fa"
-msgstr "Habilitar autenticação de dois fatores"
+msgstr "Activar la autenticación de dos factores"
 
 #: connect/api/v1/organization/serializers.py:144
 #: connect/api/v2/organizations/serializers.py:71
 msgid "if this field is true, only users with 2fa activated can access the org"
-msgstr "Se estiver habilitado, apenas usuários com autenticação de dois fatores ativada podem acessar a organização."
+msgstr "Si está activa, solo los usuarios con autenticación de dos factores habilitada pueden acceder a la organización."
 
 #: connect/api/v1/organization/serializers.py:282
 #: connect/api/v1/organization/serializers.py:306
@@ -160,64 +160,64 @@ msgstr "Se estiver habilitado, apenas usuários com autenticação de dois fator
 #: connect/api/v2/internals/serializers.py:154
 #: connect/api/v2/organizations/serializers.py:179
 msgid "You cannot set user role 0"
-msgstr "Você não tem permissão para definir a função do usuário 0"
+msgstr "No tienes permiso para definir el rol del usuario 0"
 
 #: connect/api/v1/organization/serializers.py:312
 #: connect/api/v1/project/serializers.py:313
 #: connect/api/v2/organizations/serializers.py:173
 msgid "Email field cannot have spaces"
-msgstr "O campo de e-mail não pode conter espaços"
+msgstr "El campo de email no puede contener espacios"
 
 #: connect/api/v1/organization/serializers.py:317
 #: connect/api/v1/project/serializers.py:318
 #: connect/api/v2/organizations/serializers.py:175
 msgid "Email field cannot have uppercase characters"
-msgstr "O campo de e-mail não pode conter letras maiúsculas"
+msgstr "El campo de email no puede contener caracteres en mayúscula"
 
 #: connect/api/v1/organization/views.py:339 connect/api/v1/project/views.py:160
 msgid "Need to pass 'before' and 'after' in query params"
-msgstr "Os campos 'before' e 'after' devem ser passados nos parâmetros de consulta"
+msgstr "Los campos 'antes' y 'después' deben incluirse como parámetros de consulta"
 
 #: connect/api/v1/organization/views.py:404
 msgid "Need to pass 'organization_uuid'"
-msgstr "solicitar permissão da organização"
+msgstr "solicitar permiso de la organización"
 
 #: connect/api/v1/organization/views.py:605
 msgid "No changes received"
-msgstr "Nenhuma alteração recebida"
+msgstr "No se recibieron cambios"
 
 #: connect/api/v1/project/serializers.py:280
 msgid "Text Search"
-msgstr "Pesquisa de texto"
+msgstr "Búsqueda de texto"
 
 #: connect/api/v1/project/serializers.py:282
 msgid "Project UUID"
-msgstr "UUID do projeto"
+msgstr "UUID del proyecto"
 
 #: connect/api/v1/project/validators.py:10 connect/api/v1/project/views.py:136
 msgid "You can't contribute in this organization"
-msgstr "Você não pode contribuir nesta organização"
+msgstr "No puedes contribuir en esta organización"
 
 #: connect/api/v1/project/validators.py:15
 msgid "Your organization is suspended"
-msgstr "Sua organização está suspensa"
+msgstr "Tu organización está suspendida"
 
 #: connect/authentication/models.py:49 connect/common/models.py:1027
 #: connect/common/models.py:1082
 msgid "user"
-msgstr "usuário"
+msgstr "usuario"
 
 #: connect/authentication/models.py:50
 msgid "users"
-msgstr "usuários"
+msgstr "usuarios"
 
 #: connect/authentication/models.py:55
 msgid "first name"
-msgstr "primeiro nome"
+msgstr "nombre"
 
 #: connect/authentication/models.py:56
 msgid "last name"
-msgstr "sobrenome"
+msgstr "apellido"
 
 #: connect/authentication/models.py:57 connect/common/models.py:1188
 #: connect/common/models.py:1199 connect/common/models.py:1306
@@ -227,109 +227,109 @@ msgstr "email"
 
 #: connect/authentication/models.py:57
 msgid "User's email."
-msgstr "Email do usuário"
+msgstr "Email del usuario"
 
 #: connect/authentication/models.py:60
 msgid "username"
-msgstr "nome do usuário"
+msgstr "nombre de usuario"
 
 #: connect/authentication/models.py:64
 msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr "Campo obrigatório. Use até 150 caracteres. São permitidos apenas letras, dígitos e os caracteres @ / . / + / - / _"
+msgstr "Campo obligatorio. Ingresa hasta 150 caracteres. Solo se permiten letras, dígitos y los siguientes caracteres: @ / . + - _ "
 
 #: connect/authentication/models.py:68
 msgid "A user with that username already exists."
-msgstr "Já existe um usuário com esse nome"
+msgstr "Ya existe un usuario con ese nombre de usuario"
 
 #: connect/authentication/models.py:73
 msgid "photo user"
-msgstr "foto do usuário"
+msgstr "foto del usuario"
 
 #: connect/authentication/models.py:81
 msgid "The primary language used by this user"
-msgstr "Idioma principal utilizado por este usuário"
+msgstr "Idioma principal utilizado por este usuario"
 
 #: connect/authentication/models.py:84
 msgid "staff status"
-msgstr "status da equipe"
+msgstr "status del equipo"
 
 #: connect/authentication/models.py:85
 msgid "active"
-msgstr "ativo"
+msgstr "activo"
 
 #: connect/authentication/models.py:87
 msgid "joined at"
-msgstr "entrou em"
+msgstr "se unió el"
 
 #: connect/authentication/models.py:102
 msgid "Last Updated Profile"
-msgstr "Última atualização do perfil"
+msgstr "Última actualización del perfil"
 
 #: connect/authentication/models.py:106
 msgid "UTM Marketing"
-msgstr "UTM de marketing"
+msgstr "Parámetros UTM de marketing"
 
 #: connect/authentication/models.py:108
 msgid "Allows receiving marketing emails"
-msgstr "Permite receber emails de marketing"
+msgstr "Permite recibir emails de marketing"
 
 #: connect/authentication/models.py:110
 msgid "Two factor authentication"
-msgstr "Autenticação de dois fatores"
+msgstr "Autenticación de dos factores"
 
 #: connect/authentication/models.py:113
 #, fuzzy
 #| msgid "contact name"
 msgid "company name"
-msgstr "nome da empresa"
+msgstr "nombre de la empresa"
 
 #: connect/authentication/models.py:119
 msgid "number of people"
-msgstr "número de pessoas"
+msgstr "número de personas"
 
 #: connect/authentication/models.py:120
 msgid "number of people working in this company"
-msgstr "número de pessoas trabalhando nesta organização"
+msgstr "número de personas que trabajan en esta organización"
 
 #: connect/authentication/models.py:125
 msgid "company sector"
-msgstr "setor da organização"
+msgstr "departamento de la organización"
 
 #: connect/authentication/models.py:131
 msgid "VTEX CX Platform helps"
-msgstr "A VTEX CX Platform ajuda a"
+msgstr "VTEX CX Platform ayuda a"
 
 #: connect/authentication/models.py:132
 msgid "how the VTEX CX Platform will help your team"
-msgstr "como a VTEX CX Platform vai ajudar sua equipe"
+msgstr "cómo VTEX CX Platform ayudará a tu equipo"
 
 #: connect/authentication/models.py:138
 msgid "company segment"
-msgstr "segmento da organização"
+msgstr "sector de la organización"
 
 #: connect/authentication/models.py:139
 msgid "the segment of your company"
-msgstr "segmento da sua organização"
+msgstr "el sector de tu organización"
 
 #: connect/authentication/models.py:145
 #, fuzzy
 #| msgid "company sector"
 msgid "company position"
-msgstr "cargo na empresa"
+msgstr "cargo en la empresa"
 
 #: connect/authentication/models.py:146
 #, fuzzy
 #| msgid "number of people working in this company"
 msgid "Your position in the company"
-msgstr "Seu cargo na empresa"
+msgstr "Tu cargo en la empresa"
 
 #: connect/authentication/models.py:181
 msgid "Your password has been changed"
-msgstr "Sua senha foi alterada"
+msgstr "Se cambió tu contraseña"
 
 #: connect/authentication/models.py:186
 msgid "Nickname changed"
-msgstr "Nome de usuário alterado"
+msgstr "Nombre de usuario cambiado"
 
 #: connect/authentication/templates/authentication/emails/change_password.html:6
 #: connect/authentication/templates/authentication/emails/change_password.txt:2
@@ -345,79 +345,79 @@ msgstr "Nome de usuário alterado"
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.html:16
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:2
 msgid "Hi"
-msgstr "Olá"
+msgstr "Hola"
 
 #: connect/authentication/templates/authentication/emails/access_code.html:15
 #: connect/authentication/templates/authentication/emails/access_code.txt:2
 msgid "Welcome to VTEX CX Platform, an AI powered customer experience solution for brands and retailers."
-msgstr "Boas-vindas à VTEX CX Platform, uma plataforma de experiência do cliente impulsionada por IA para marcas e lojistas."
+msgstr "Te damos la bienvenida a VTEX CX Platform, una plataforma de experiencia de cliente impulsada por IA para marcas y retailers."
 
 #: connect/authentication/templates/authentication/emails/access_code.html:28
 #: connect/authentication/templates/authentication/emails/access_code.txt:3
 msgid "Your temporary password is:"
-msgstr "Sua senha temporária é:"
+msgstr "Tu contraseña temporal es:"
 
 #: connect/authentication/templates/authentication/emails/access_code.html:54
 #: connect/authentication/templates/authentication/emails/access_code.txt:3
 msgid "We wish you a fantastic experience with VTEX CX Platform!"
-msgstr "Esperamos que você tenha uma ótima experiência com a VTEX CX Platform!"
+msgstr "¡Esperamos que tengas una fantástica experiencia con VTEX CX Platform!"
 
 #: connect/authentication/templates/authentication/emails/base.html:31
 msgid "Our site"
-msgstr "Nosso site"
+msgstr "Nuestro sitio web"
 
 #: connect/authentication/templates/authentication/emails/base.html:45
 msgid "2026 © VTEX CX Platform. All rights reserved."
-msgstr "2026 © VTEX CX Platform. Todos os direitos reservados."
+msgstr "2026 © VTEX CX Platform. Todos los derechos reservados."
 
 #: connect/authentication/templates/authentication/emails/base.html:53
 msgid "Privacy Policy"
-msgstr "Política de Privacidade"
+msgstr "Política de privacidad"
 
 #: connect/authentication/templates/authentication/emails/base.html:57
 msgid "Terms of use"
-msgstr "Termos de Uso"
+msgstr "Términos de uso"
 
 #: connect/authentication/templates/authentication/emails/base.html:61
 msgid "Help Center"
-msgstr "Central de ajuda"
+msgstr "Help Center"
 
 #: connect/authentication/templates/authentication/emails/base.html:65
 msgid "Unsubscribe"
-msgstr "Descadastrar"
+msgstr "Cancelar suscripción"
 
 #: connect/authentication/templates/authentication/emails/base.html:89
 msgid "You are receiving this mail because you registered in VTEX CX Platform. This also shows that you agree to our Terms of use and Privacy Policies. If you no longer want to receive mails from use, click the unsubscribe link below to unsubscribe."
-msgstr "Você está recebendo este email porque se cadastrou na VTEX CX Platform. Isso também indica que você concorda com nossos Termos de Uso e nossas Políticas de Privacidade. Se não quiser mais receber nossos emails, clique no link de descadastramento abaixo."
+msgstr "Estás recibiendo este email porque te registraste en VTEX CX Platform. Al hacerlo, aceptaste nuestros Términos de uso y nuestra Política de privacidad. Si ya no deseas recibir nuestros emails, haz clic en el link a continuación para cancelar la suscripción."
 
 #: connect/authentication/templates/authentication/emails/change_password.html:8
 #: connect/authentication/templates/authentication/emails/change_password.txt:3
 msgid "Your password has been successfully changed 😉"
-msgstr "Senha alterada com sucesso"
+msgstr "Contraseña cambiada con éxito"
 
 #: connect/authentication/templates/authentication/emails/change_password.html:10
 #: connect/authentication/templates/authentication/emails/change_password.txt:4
 msgid "Your password has been changed. Remember not to share it with anyone to maintain your security and privacy."
-msgstr "Sua senha foi alterada. Lembre-se de não compartilhá-la com ninguém para proteger sua segurança e privacidade."
+msgstr "Tu contraseña se ha cambiado. Recuerda no compartirla con nadie para proteger tu seguridad y privacidad."
 
 #: connect/authentication/models.py:221
 msgid "Your VTEX CX Platform account is ready! Log in now"
-msgstr "Seu cadastro na VTEX CX Platform foi concluído! Acesse agora"
+msgstr "¡Tu registro en VTEX CX Platform se ha completado con éxito! Accede ahora"
 
 #: connect/authentication/templates/authentication/emails/first_password.html:42
 #: connect/authentication/templates/authentication/emails/first_password.txt:3
 msgid "Welcome to"
-msgstr "Boas-vindas à"
+msgstr "Te damos la bienvenida a"
 
 #: connect/authentication/templates/authentication/emails/first_password.html:57
 #: connect/authentication/templates/authentication/emails/first_password.txt:6
 msgid "Your registration was successful! To log in for the first time, please use the temporary password below:"
-msgstr "Seu cadastro foi concluído com sucesso! Para acessar a plataforma pela primeira vez, use a senha temporária abaixo:"
+msgstr "¡Tu registro se completó con éxito! Para acceder a la plataforma por primera vez ingresa la contraseña temporal a continuación:"
 
 #: connect/authentication/templates/authentication/emails/first_password.html:85
 #: connect/authentication/templates/authentication/emails/first_password.txt:8
 msgid "When logging in for the first time, you’ll be prompted to set a new password of your choice."
-msgstr "Ao fazer login pela primeira vez, será solicitado que você defina uma nova senha."
+msgstr "Cuando inicies sesión por primera vez, tendrás que establecer una nueva contraseña."
 
 #: connect/authentication/templates/authentication/emails/first_password.html:99
 #: connect/authentication/templates/authentication/emails/first_password.txt:10
@@ -427,12 +427,12 @@ msgstr "Importante: "
 #: connect/authentication/templates/authentication/emails/first_password.html:100
 #: connect/authentication/templates/authentication/emails/first_password.txt:11
 msgid "Your password is personal and confidential. We recommend keeping it secure to protect your account."
-msgstr "Sua senha é pessoal e confidencial. Recomendamos mantê-la segura para proteger sua conta."
+msgstr "Tu contraseña es personal y confidencial. Te recomendamos mantenerla segura para proteger tu cuenta."
 
 #: connect/authentication/templates/authentication/emails/first_password.html:114
 #: connect/authentication/templates/authentication/emails/first_password.txt:13
 msgid "We hope you have a fantastic experience with VTEX CX Platform!"
-msgstr "Desejamos que você tenha uma experiência incrível com a VTEX CX Platform!"
+msgstr "¡Te deseamos una experiencia increíble con VTEX CX Platform!"
 
 #: connect/billing/models.py:18 connect/billing/models.py:52
 #: connect/billing/models.py:66 connect/common/models.py:126
@@ -444,27 +444,27 @@ msgstr "UUID"
 
 #: connect/billing/models.py:21
 msgid "Whether this task succeded or not."
-msgstr "Se a tarefa foi realizada com sucesso"
+msgstr "Si la tarea se completó con éxito"
 
 #: connect/billing/models.py:24
 msgid "Whether this task retry or not."
-msgstr "Se deve tentar realizar a tarefa novamente"
+msgstr "Si la tarea debe reintentarse"
 
 #: connect/billing/models.py:26
 msgid "Manager fail messages"
-msgstr "Mensagens de erro do gerente"
+msgstr "Mensajes de error del manager"
 
 #: connect/billing/models.py:27
 msgid "task type"
-msgstr "tipo de tarefa"
+msgstr "tipo de tarea"
 
 #: connect/billing/models.py:28
 msgid "started at"
-msgstr "criada em"
+msgstr "creada el"
 
 #: connect/billing/models.py:29
 msgid "finished at"
-msgstr "finalizada em"
+msgstr "finalizada el"
 
 #: connect/billing/models.py:30
 msgid "before"
@@ -472,103 +472,103 @@ msgstr "antes"
 
 #: connect/billing/models.py:31
 msgid "after"
-msgstr "depois"
+msgstr "después"
 
 #: connect/billing/models.py:54 connect/billing/models.py:72
 #: connect/common/models.py:698
 msgid "flow identification UUID"
-msgstr "UUID de identificação do fluxo"
+msgstr "UUID de identificación del flujo"
 
 #: connect/billing/models.py:55 connect/billing/models.py:71
 msgid "contact name"
-msgstr "nome do contato"
+msgstr "nombre de contacto"
 
 #: connect/common/models.py:1715
 msgid "A credit card has been added to the organization"
-msgstr "Um cartão de crédito foi adicionado à organização"
+msgstr "Se ha agregado una tarjeta de crédito a la organización"
 
 #: connect/billing/templates/billing/emails/advanced_plan_is_about_to_expire.html:41
 #: connect/billing/templates/billing/emails/advanced_plan_is_about_to_expire.txt:3
 #, fuzzy
 #| msgid "Your organization is suspended"
 msgid "Your organization is close to 1,000 attendances"
-msgstr "Sua organização está próxima de 1.000 atendimentos"
+msgstr "Tu organización está cerca de 1,000 chats de soporte"
 
 #: connect/billing/templates/billing/emails/advanced_plan_is_about_to_expire.html:55
 #: connect/billing/templates/billing/emails/advanced_plan_is_about_to_expire.txt:4
 msgid "When you complete 1,000 attendances, your access on the platform continues, but your chatbot will not be able to fire messages to your users."
-msgstr "Quando você completar 1.000 atendimentos, ainda terá acesso à plataforma, mas seu chatbot não poderá enviar mensagens aos usuários."
+msgstr "Una vez que se completan 1,000 chats, el acceso a la plataforma permanece disponible, pero tu chatbot no podrá enviar mensajes a los usuarios."
 
 #: connect/billing/templates/billing/emails/advanced_plan_is_about_to_expire.html:69
 #: connect/billing/templates/billing/emails/plan_is_about_to_expire_en.html:69
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.html:84
 msgid "Avoid blocking your chatbot by accessing "
-msgstr "Evite o bloqueio do seu chatbot acessando"
+msgstr "Evita el bloqueo de tu chatbot accediendo"
 
 #: connect/billing/templates/billing/emails/advanced_plan_is_about_to_expire.html:71
 #: connect/billing/templates/billing/emails/plan_is_about_to_expire_en.html:71
 msgid " and choose a plan that fits your business needs."
-msgstr " e escolha um plano que atenda às necessidades do seu negócio."
+msgstr " y eligiendo un plan que se ajuste a las necesidades de tu negocio."
 
 #: connect/billing/templates/billing/emails/advanced_plan_is_about_to_expire.txt:5
 #: connect/billing/templates/billing/emails/plan_is_about_to_expire_en.txt:5
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:6
 msgid "Avoid blocking your chatbot by accessing"
-msgstr "Evite o bloqueio do seu chatbot acessando"
+msgstr "Evita el bloqueo de tu chatbot accediendo"
 
 #: connect/billing/templates/billing/emails/advanced_plan_is_about_to_expire.txt:5
 #: connect/billing/templates/billing/emails/plan_is_about_to_expire_en.txt:5
 msgid "and choose a plan that fits your business needs."
-msgstr " e escolha um plano que atenda às necessidades do seu negócio."
+msgstr " y eligiendo un plan que se ajuste a las necesidades de tu negocio."
 
 #: connect/billing/templates/billing/emails/finished-plan.html:17
 #: connect/billing/templates/billing/emails/finished-plan.txt:2
 msgid "Oh no,"
-msgstr "Infelizmente"
+msgstr "Desafortunadamente"
 
 #: connect/billing/templates/billing/emails/finished-plan.html:43
 #: connect/billing/templates/billing/emails/finished-plan.txt:3
 msgid "The plan for your organization"
-msgstr "o plano da sua organização"
+msgstr "el plan de tu organización"
 
 #: connect/billing/templates/billing/emails/finished-plan.html:45
 #: connect/billing/templates/billing/emails/finished-plan.txt:3
 msgid "has ended. As a result,"
-msgstr "foi encerrado. Por isso,"
+msgstr "ha terminado. Como resultado,"
 
 #: connect/billing/templates/billing/emails/finished-plan.html:46
 #: connect/billing/templates/billing/emails/finished-plan.txt:3
 msgid "your intelligent agents are currently offline."
-msgstr "seus agentes inteligentes estão offline no momento."
+msgstr "tus agentes inteligentes están actualmente offline."
 
 #: connect/billing/templates/billing/emails/finished-plan.html:60
 #: connect/billing/templates/billing/emails/finished-plan.txt:4
 msgid "To keep using the VTEX CX Platform, simply ask your organization's administrator"
-msgstr "Para continuar usando a VTEX CX Platform, solicite que o administrador da organização"
+msgstr "Para continuar usando VTEX CX Platform, solicita al administrador de la organización"
 
 #: connect/billing/templates/billing/emails/finished-plan.html:61
 #: connect/billing/templates/billing/emails/finished-plan.txt:4
 msgid "to reactivate the plan"
-msgstr "reative o plano"
+msgstr "que reactive el plan"
 
 #: connect/billing/templates/billing/emails/finished-plan.html:62
 #: connect/billing/templates/billing/emails/finished-plan.txt:4
 msgid "or select a new one that meets your business needs."
-msgstr "ou escolha um novo plano que atenda às necessidades do seu negócio."
+msgstr "o seleccionar uno nuevo que se ajuste a las necesidades de tu negocio."
 
 #: connect/billing/templates/billing/emails/finished-plan.html:76
 #: connect/billing/templates/billing/emails/finished-plan.txt:5
 msgid "Our goal is to continue growing alongside you!"
-msgstr "Nosso objetivo é caminharmos juntos!"
+msgstr "¡Nuestro objetivo es continuar creciendo contigo!"
 
 #: connect/common/models.py:1861
 msgid "has already surpassed 200 active contacts"
-msgstr "já ultrapassou 200 contatos ativos"
+msgstr "ya se han superado los 200 contactos activos"
 
 #: connect/billing/templates/billing/emails/free-plan-expired.html:16
 #: connect/billing/templates/billing/emails/free-plan-expired.txt:2
 msgid "Your projects are growing,"
-msgstr "Seus projetos estão crescendo,"
+msgstr "Tus proyectos están creciendo,"
 
 #: connect/billing/templates/billing/emails/free-plan-expired.html:18
 #: connect/billing/templates/billing/emails/free-plan-expired.txt:2
@@ -578,44 +578,44 @@ msgstr " "
 #: connect/billing/templates/billing/emails/free-plan-expired.html:32
 #: connect/billing/templates/billing/emails/free-plan-expired.txt:3
 msgid "Your organization has"
-msgstr "Sua organização"
+msgstr "Tu organización"
 
 #: connect/billing/templates/billing/emails/free-plan-expired.html:33
 #: connect/billing/templates/billing/emails/free-plan-expired.txt:3
 msgid "surpassed 200 active contacts."
-msgstr "ultrapassou 200 contatos ativos. Parabéns!"
+msgstr "ha superado los 200 contactos activos. ¡Felicitaciones!"
 
 #: connect/billing/templates/billing/emails/free-plan-expired.html:47
 #: connect/billing/templates/billing/emails/free-plan-expired.txt:4
 msgid "This means that our free plan is no longer enough to keep up with the growth of"
-msgstr "Isso significa que nosso plano gratuito não é mais suficiente para acompanhar o crescimento da"
+msgstr "Esto significa que el plan gratuito ya no es suficiente para seguir el ritmo de crecimiento de"
 
 #: connect/billing/templates/billing/emails/free-plan-expired.html:62
 #: connect/billing/templates/billing/emails/free-plan-expired.txt:6
 msgid "To continue using your intelligent agents,"
-msgstr "Para continuar utilizando seus agentes inteligentes,"
+msgstr "Para continuar con tus agentes inteligentes,"
 
 #: connect/billing/templates/billing/emails/free-plan-expired.html:63
 #: connect/billing/templates/billing/emails/free-plan-expired.txt:7
 msgid "artificial intelligence, and all the other features of the VTEX CX Platform,"
-msgstr "inteligência artificial e aproveitar todos os outros recursos da VTEX CX Platform,"
+msgstr "la inteligencia artificial y todas las demás funcionalidades de VTEX CX Platform,"
 
 #: connect/billing/templates/billing/emails/free-plan-expired.html:64
 #: connect/billing/templates/billing/emails/free-plan-expired.txt:8
 msgid "choose a plan"
-msgstr "escolha um plano"
+msgstr "elige un plan"
 
 #: connect/billing/templates/billing/emails/free-plan-expired.html:65
 #: connect/billing/templates/billing/emails/free-plan-expired.txt:9
 msgid "that aligns with your goals."
-msgstr "que esteja alinhado aos seus objetivos."
+msgstr "que se ajuste a tus objetivos."
 
 #: connect/billing/templates/billing/emails/free-plan-expired.html:79
 #: connect/billing/templates/billing/emails/free-plan-expired.txt:11
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:92
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:6
 msgid "We're here to support you every step of the way!"
-msgstr "Estamos aqui para te apoiar em cada passo!"
+msgstr "¡Estamos aquí para apoyarte en cada paso!"
 
 #: connect/billing/templates/billing/emails/plan_expired_due_attendence_limit_en.html:41
 #: connect/billing/templates/billing/emails/plan_expired_due_attendence_limit_en.txt:3
@@ -624,86 +624,86 @@ msgstr "Estamos aqui para te apoiar em cada passo!"
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:3
 #: connect/common/models.py:1859 connect/common/models.py:1881
 msgid "Your organization"
-msgstr "Sua organização"
+msgstr "Tu organización"
 
 #: connect/billing/templates/billing/emails/plan_expired_due_attendence_limit_en.html:41
 #: connect/billing/templates/billing/emails/plan_expired_due_attendence_limit_en.txt:3
 #, fuzzy
 #| msgid "Your organization is suspended"
 msgid "has reached the"
-msgstr "atingiu o"
+msgstr "ha alcanzado el"
 
 #: connect/billing/templates/billing/emails/plan_expired_due_attendence_limit_en.html:41
 #: connect/billing/templates/billing/emails/plan_expired_due_attendence_limit_en.txt:3
 msgid "plan's limit of 100 attendances."
-msgstr "limite de 100 atendimentos do plano."
+msgstr "límite de 100 chats de soporte para el plan"
 
 #: connect/billing/templates/billing/emails/plan_expired_due_attendence_limit_en.html:55
 #: connect/billing/templates/billing/emails/plan_expired_due_attendence_limit_en.txt:4
 msgid "You still have access to the platform, but your chatbot will not be able to fire messages to your users."
-msgstr "Você ainda tem acesso à plataforma, mas seu chatbot não poderá enviar mensagens aos usuários."
+msgstr "Aún tienes acceso a la plataforma, pero tu chatbot no podrá enviar mensajes a los usuarios."
 
 #: connect/billing/templates/billing/emails/plan_expired_due_attendence_limit_en.html:69
 msgid "To prevent this from happening, access "
-msgstr "Para evitar que isso aconteça, acesse "
+msgstr "Para evitarlo, accede a "
 
 #: connect/billing/templates/billing/emails/plan_expired_due_attendence_limit_en.html:71
 msgid " and choose a plan that fits your business the needs of your business."
-msgstr " e escolha um plano que atenda às necessidades do seu negócio."
+msgstr " y elige un plan que se ajuste a las necesidades de tu negocio."
 
 #: connect/billing/templates/billing/emails/plan_expired_due_attendence_limit_en.txt:5
 msgid "To prevent this from happening, access"
-msgstr "Para evitar que isso aconteça, acesse"
+msgstr "Para evitarlo, accede a"
 
 #: connect/billing/templates/billing/emails/plan_expired_due_attendence_limit_en.txt:5
 msgid "and choose a plan that fits your business the needs of your business."
-msgstr "e escolha um plano que atenda às necessidades do seu negócio."
+msgstr "y elige un plan que se ajuste a las necesidades de tu negocio."
 
 #: connect/billing/templates/billing/emails/plan_is_about_to_expire_en.html:41
 msgid "is close to"
-msgstr "está perto de"
+msgstr "está cerca de"
 
 #: connect/billing/templates/billing/emails/plan_is_about_to_expire_en.html:41
 #: connect/billing/templates/billing/emails/plan_is_about_to_expire_en.txt:3
 #: connect/common/models.py:1399
 msgid "attendances"
-msgstr "atendimentos"
+msgstr "chats de soporte"
 
 #: connect/billing/templates/billing/emails/plan_is_about_to_expire_en.html:55
 #: connect/billing/templates/billing/emails/plan_is_about_to_expire_en.txt:4
 msgid "When you complete"
-msgstr "Quando você atingir"
+msgstr "Cuando alcances"
 
 #: connect/billing/templates/billing/emails/plan_is_about_to_expire_en.html:55
 #: connect/billing/templates/billing/emails/plan_is_about_to_expire_en.txt:4
 msgid "attendances, your access on the platform continues, but your chatbot will not be able to fire messages to your users."
-msgstr "atendimentos, seu acesso à plataforma continua, mas seu chatbot não poderá enviar mensagens aos usuários."
+msgstr "chats de soporte, el acceso a la plataforma permanece disponible, pero tu chatbot no podrá enviar mensajes a los usuarios."
 
 #: connect/billing/templates/billing/emails/plan_is_about_to_expire_en.txt:3
 #, fuzzy
 #| msgid "Your organization is suspended"
 msgid "Your organization is close to"
-msgstr "Sua organização está próxima de"
+msgstr "Tu organización está cerca de"
 
 #: connect/billing/templates/billing/emails/reactived-plan.html:40
 #: connect/billing/templates/billing/emails/reactived-plan.txt:3
 msgid "was reactivated"
-msgstr "foi reativado"
+msgstr "se ha reactivado"
 
 #: connect/billing/templates/billing/emails/reactived-plan.html:54
 #: connect/billing/templates/billing/emails/reactived-plan.txt:4
 msgid "An administrator has reactivated the organization plan for "
-msgstr "Um administrador reativou o plano da organização para "
+msgstr "Un administrador ha reactivado el plan de la organización a "
 
 #: connect/billing/templates/billing/emails/reactived-plan.html:56
 #: connect/billing/templates/billing/emails/reactived-plan.txt:6
 msgid "Your Intelligences, created Flows and the Chat module are back again"
-msgstr "Suas inteligências, fluxos criados e módulo de chat voltaram a funcionar"
+msgstr "Tus inteligencias, flujos creados y el módulo de chat han vuelto a funcionar"
 
 #: connect/billing/templates/billing/emails/reactived-plan.html:57
 #: connect/billing/templates/billing/emails/reactived-plan.txt:7
 msgid "It's wonderful to have your team back"
-msgstr "Que bom ter sua equipe de volta"
+msgstr "Es genial tener a tu equipo de vuelta"
 
 #: connect/billing/templates/billing/emails/reactived-plan.txt:2
 #: connect/authentication/templates/authentication/emails/change_password.html:17
@@ -713,79 +713,79 @@ msgstr "Que bom ter sua equipe de volta"
 #: connect/common/templates/common/emails/organization/invite_organization.html:17
 #: connect/common/templates/common/emails/organization/invite_organization.txt:2
 msgid "Hi,"
-msgstr "Oi,"
+msgstr "Hola,"
 
 #: connect/authentication/templates/authentication/emails/change_password.html:20
 #: connect/authentication/templates/authentication/emails/change_password.txt:3
 msgid "Your password has been successfully changed. For your security and privacy, remember not to share it with anyone."
-msgstr "Sua senha foi alterada com sucesso. Para proteger sua segurança e privacidade, lembre-se de não compartilhá-la com ninguém."
+msgstr "Tu contraseña se ha cambiado con éxito. Por tu seguridad y privacidad, recuerda no compartirla con nadie."
 
 #: connect/authentication/templates/authentication/emails/change_password.html:23
 #: connect/authentication/templates/authentication/emails/change_password.txt:4
 msgid "If you didn't request this change, please contact our support team immediately."
-msgstr "Se você não solicitou esta alteração, entre em contato com nossa equipe de Suporte imediatamente."
+msgstr "Si no solicitaste este cambio, ponte en contacto con el equipo de soporte inmediatamente."
 
 #: connect/billing/templates/billing/emails/removed_card.html:42
 #: connect/billing/templates/billing/emails/removed_card.txt:3
 msgid "Your account needs urgent attention!"
-msgstr "Sua conta precisa de atenção com urgência"
+msgstr "Tu cuenta necesita atención"
 
 #: connect/billing/templates/billing/emails/removed_card.html:56
 #: connect/billing/templates/billing/emails/removed_card.txt:5
 msgid "The credit card for"
-msgstr "O cartão de crédito de"
+msgstr "La tarjeta de crédito de"
 
 #: connect/billing/templates/billing/emails/removed_card.html:58
 #: connect/billing/templates/billing/emails/removed_card.txt:7
 msgid "has been removed. This change has paused your plan's billing and deactivated you agents."
-msgstr "foi removido. Essa alteração pausou a cobrança do seu plano e desativou seus agentes."
+msgstr "ha sido removida. Este cambio pausó la facturación de tu plan y desactivó tus agentes."
 
 #: connect/billing/templates/billing/emails/removed_card.html:72
 #: connect/billing/templates/billing/emails/removed_card.txt:9
 msgid "To continue using the VTEX CX Platform, simply ask the administrator to update the card in the"
-msgstr "Para continuar usando a VTEX CX Platform, solicite ao administrador para atualizar o cartão na"
+msgstr "Para seguir utilizando VTEX CX Platform solicita al administrador que actualice la tarjeta en la"
 
 #: connect/billing/templates/billing/emails/removed_card.html:74
 #: connect/billing/templates/billing/emails/removed_card.txt:11
 msgid "section. Once updated, everything will be back to normal!"
-msgstr "seção. Após a atualização, tudo voltará ao normal!"
+msgstr "sección. Una vez que se actualice el plan todo volverá a la normalidad."
 
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.html:42
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:3
 msgid "has reached the time limit of Trial plan."
-msgstr "Atingiu o limite de tempo do plano Trial"
+msgstr "Esta cuenta ha alcanzado el límite de tiempo del plan de prueba"
 
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.html:56
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:4
 msgid "You have reached the 30-day limit to use all features of the VTEX CX Platform for free."
-msgstr "Você atingiu o limite de 30 dias para usar todas as funcionalidades da VTEX CX Platform gratuitamente"
+msgstr "Alcanzaste el límite de 30 días de acceso gratuito a todas las funcionalidades de VTEX CX Platform"
 
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.html:70
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:5
 msgid "Your access to the platform continues, but your chatbot will not be able to trigger messages to your users."
-msgstr "Você ainda tem acesso à plataforma, mas seu chatbot não poderá enviar mensagens aos usuários."
+msgstr "Aún tienes acceso a la plataforma, pero tu chatbot no podrá enviar mensajes a los usuarios."
 
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.html:86
 msgid " and choose a plan that fits according to your business needs."
-msgstr " e escolha um plano que atenda às necessidades do seu negócio."
+msgstr " y elige un plan que se adapte a las necesidades de tu negocio."
 
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:6
 msgid "and choose a plan that fits according to your business needs."
-msgstr "e escolha um plano que atenda às necessidades do seu negócio."
+msgstr "y elige un plan que se adapte a las necesidades de tu negocio."
 
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:14
 msgid "Olá"
-msgstr "Olá"
+msgstr "Hola"
 
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:16
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:2
 msgid "Hey"
-msgstr "Poxa,"
+msgstr "Hola,"
 
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:30
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:2
 msgid "your Trial Plan has come to an end!"
-msgstr "seu plano Trial chegou ao fim."
+msgstr "tu plan de prueba ha terminado."
 
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:44
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:3
@@ -795,12 +795,12 @@ msgstr "A"
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:44
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:3
 msgid "has enjoyed the 30-day free trial,"
-msgstr "aproveitou os 30 dias gratuitos da VTEX CX Platform,"
+msgstr "disfrutaste de la prueba gratuita de 30 días de VTEX CX Platform,"
 
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:44
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:3
 msgid "it's time to move forward to the next stage."
-msgstr "agora é hora de dar o próximo passo."
+msgstr "es hora de dar el siguiente paso."
 
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:58
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:4
@@ -810,44 +810,44 @@ msgstr " "
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:58
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:4
 msgid "your agents are currently unable to send messages"
-msgstr "Seus agentes não podem mais enviar mensagens"
+msgstr "Tus agentes no pueden enviar mensajes"
 
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:58
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:4
 msgid " until you select a plan that best suits your business needs."
-msgstr "até você escolher um plano que se encaixe ao seu negócio."
+msgstr "hasta que selecciones un plan que se ajuste mejor a las necesidades de tu negocio."
 
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:72
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:5
 msgid "Rest assured, "
-msgstr "Mas não se preocupe,"
+msgstr "Pero no te preocupes,"
 
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:73
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:5
 msgid "you still have access to the platform."
-msgstr "você ainda pode acessar a plataforma."
+msgstr "aún tienes acceso a la plataforma."
 
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:74
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:5
 msgid "To reactivate your agents and continue enjoying all the benefits, simply "
-msgstr "Para reativar seus agentes e continuar aproveitando todos os benefícios,"
+msgstr "Para reactivar a tus agentes y continuar utilizando todos los beneficios,"
 
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:75
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:5
 msgid "choose the most suitable plan"
-msgstr "escolha o plano mais adequado"
+msgstr "elige el plan que mejor se adapte a ti"
 
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:76
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:5
 msgid "in the"
-msgstr "na seção de"
+msgstr "en"
 
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:77
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:5
 #: connect/billing/templates/billing/emails/removed_card.html:73
 #: connect/billing/templates/billing/emails/removed_card.txt:10
 msgid "Billing"
-msgstr "Cobrança."
+msgstr "Facturación."
 
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:78
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:5
@@ -865,7 +865,7 @@ msgstr " "
 #: connect/authentication/templates/authentication/emails/change_password.html:70
 #: connect/authentication/templates/authentication/emails/change_password.txt:5
 msgid "Best regards,"
-msgstr "Atenciosamente,"
+msgstr "Atentamente,"
 
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_pt_BR.html:109
 #: connect/billing/templates/billing/emails/trial_plan_expired_due_time_limit_en.txt:8
@@ -878,7 +878,7 @@ msgstr "Atenciosamente,"
 #: connect/authentication/templates/authentication/emails/change_password.html:72
 #: connect/authentication/templates/authentication/emails/change_password.txt:6
 msgid "VTEX CX Team"
-msgstr "Equipe VTEX CX Platform"
+msgstr "Equipo VTEX CX Platform"
 
 #: connect/common/models.py:41
 msgid "newsletter"
@@ -886,7 +886,7 @@ msgstr "newsletter"
 
 #: connect/common/models.py:42
 msgid "newsletters"
-msgstr "boletins informativos"
+msgstr "newsletters"
 
 #: connect/common/models.py:44 connect/common/models.py:67
 #: connect/common/models.py:133 connect/common/models.py:568
@@ -895,15 +895,15 @@ msgstr "boletins informativos"
 #: connect/common/models.py:1258 connect/common/models.py:1284
 #: connect/common/models.py:1295 connect/common/models.py:2432
 msgid "created at"
-msgstr "criado em"
+msgstr "creado el"
 
 #: connect/common/models.py:52
 msgid "dashboard newsletter language"
-msgstr "idioma da newsletter"
+msgstr "idioma del newsletter del dashboard"
 
 #: connect/common/models.py:53
 msgid "newsletter languages"
-msgstr "idiomas da newsletter"
+msgstr "idiomas del newsletter"
 
 #: connect/common/models.py:57
 msgid "language"
@@ -915,93 +915,93 @@ msgstr "título"
 
 #: connect/common/models.py:63 connect/common/models.py:2425
 msgid "description"
-msgstr "descrição"
+msgstr "descripción"
 
 #: connect/common/models.py:122
 msgid "organization"
-msgstr "organização"
+msgstr "organización"
 
 #: connect/common/models.py:123
 msgid "organizations"
-msgstr "organizações"
+msgstr "organizaciones"
 
 #: connect/common/models.py:128
 msgid "organization name"
-msgstr "nome da organização"
+msgstr "nombre de la organización"
 
 #: connect/common/models.py:129
 msgid "organization description"
-msgstr "descrição da organização"
+msgstr "descripción de la organización"
 
 #: connect/common/models.py:131
 msgid "inteligence organization id"
-msgstr "ID da organização de inteligência"
+msgstr "ID de la organización de la inteligencia"
 
 #: connect/common/models.py:137 connect/common/models.py:2151
 msgid "Whatsapp Extra Integration"
-msgstr "Integração extra de WhatsApp"
+msgstr "Integración extra de WhatsApp"
 
 #: connect/common/models.py:138
 msgid "Only users with 2fa can access the organization"
-msgstr "Somente usuários com autenticação de dois fatores ativada podem acessar a organização"
+msgstr "Solo usuarios con autenticación de dos factores activada pueden acceder a la organización"
 
 #: connect/common/models.py:171 connect/common/models.py:995
 msgid "Invitation to join organization"
-msgstr "Convite para participar da organização"
+msgstr "Invitación para unirse a la organización"
 
 #: connect/common/models.py:197
 #, fuzzy, python-brace-format
 #| msgid "You are leaving"
 msgid "You are leaving {self.name}"
-msgstr "Você está saindo da organização "
+msgstr "Estás saliendo de la organización "
 
 #: connect/common/models.py:219 connect/common/models.py:291
 msgid "You have been removed from"
-msgstr "Você foi removido(a) de "
+msgstr "Has sido removido de "
 
 #: connect/common/models.py:264
 #, fuzzy, python-brace-format
 #| msgid "You just gave life to"
 msgid "You just gave life to {self.name}"
-msgstr "Você acaba de criar"
+msgstr "Acabas de crear"
 
 #: connect/common/models.py:337
 #, fuzzy
 #| msgid "Organization {} does not exist"
 msgid "The organization { self.name } no longer exists"
-msgstr "A organização {self.name} não existe mais"
+msgstr "La organización {self.name} ya no existe"
 
 #: connect/common/models.py:389
 #, python-brace-format
 msgid "{prev_name} is now named {new_name}!"
-msgstr "{prev_name} agora se chama {new_name}!"
+msgstr "¡{prev_name} ahora se llama {new_name}!"
 
 #: connect/common/models.py:432
 msgid "You've received an access code for VTEX CX Platform"
-msgstr "Código de acesso à VTEX CX Platform"
+msgstr "Código de acceso a VTEX CX Platform"
 
 #: connect/common/models.py:450
 #, fuzzy
 #| msgid "has updated your permission"
 msgid "An administrator of {self.name } has updated your permission"
-msgstr "Um administrador de {self.name} atualizou sua permissão"
+msgstr "Un administrador de {self.name} ha actualizado tu permiso"
 
 #: connect/common/models.py:545
 msgid "organization authorization"
-msgstr "autorização da organização"
+msgstr "autorización de la organización"
 
 #: connect/common/models.py:546
 msgid "organization authorizations"
-msgstr "autorizações da organização"
+msgstr "autorizaciones de la organización"
 
 #: connect/common/models.py:550 connect/common/models.py:1026
 #: connect/common/models.py:1081 connect/common/models.py:1116
 msgid "not set"
-msgstr "não configurado"
+msgstr "no configurado"
 
 #: connect/common/models.py:551 connect/common/models.py:1118
 msgid "contributor"
-msgstr "contribuinte"
+msgstr "colaborador"
 
 #: connect/common/models.py:552 connect/common/models.py:1028
 #: connect/common/models.py:1084
@@ -1014,27 +1014,27 @@ msgstr "visualizador"
 
 #: connect/common/models.py:554
 msgid "financial"
-msgstr "financeiro"
+msgstr "financiero"
 
 #: connect/common/models.py:555 connect/common/models.py:671
 #: connect/common/models.py:1120
 msgid "support"
-msgstr "suporte"
+msgstr "soporte"
 
 #: connect/common/models.py:566 connect/common/models.py:1034
 #: connect/common/models.py:1088 connect/common/models.py:1142
 #: connect/common/models.py:1190 connect/common/models.py:1201
 #: connect/common/models.py:1309 connect/common/models.py:1324
 msgid "role"
-msgstr "função"
+msgstr "rol"
 
 #: connect/common/models.py:569
 msgid "2 factor authentication"
-msgstr "autenticação de dois fatores"
+msgstr "autenticación de dos factores"
 
 #: connect/common/models.py:652
 msgid "project"
-msgstr "projeto"
+msgstr "proyecto"
 
 #: connect/common/models.py:672
 msgid "lead capture"
@@ -1046,70 +1046,70 @@ msgstr "lead_capture+chatgpt"
 
 #: connect/common/models.py:686
 msgid "project name"
-msgstr "Nome do projeto"
+msgstr "Nombre del proyecto"
 
 #: connect/common/models.py:690
 msgid "Timezone"
-msgstr "Fuso horário"
+msgstr "Zona horaria"
 
 #: connect/common/models.py:692
 msgid "Date Format"
-msgstr "Formato de data"
+msgstr "Formato de la fecha"
 
 #: connect/common/models.py:696
 msgid "Whether day comes first or month comes first in dates"
-msgstr "O dia ou o mês vem primeiro nas datas"
+msgstr "Determina si en la fecha va antes el día o el mes"
 
 #: connect/common/models.py:700
 msgid "flow identification ID"
-msgstr "ID de identificação do fluxo"
+msgstr "ID de identificación de flujo"
 
 #: connect/common/models.py:702
 msgid "Intelligence count"
-msgstr "Contagem de inteligência"
+msgstr "Recuento de inteligencias"
 
 #: connect/common/models.py:703
 msgid "Flows count"
-msgstr "Contagem de fluxos"
+msgstr "Recuento de flujos"
 
 #: connect/common/models.py:704
 msgid "Contacts count"
-msgstr "Contagem de contatos"
+msgstr "Recuento de contactos"
 
 #: connect/common/models.py:706
 msgid "Contacts count of all time"
-msgstr "Total de contatos"
+msgstr "Total de contactos"
 
 #: connect/common/models.py:710
 msgid "Whatsapp Integrations"
-msgstr "Integrações de WhatsApp"
+msgstr "Integraciones de WhatsApp"
 
 #: connect/common/models.py:721
 msgid "Template type"
-msgstr "Tipo de template"
+msgstr "Tipo de plantilla"
 
 #: connect/common/models.py:724
 #, fuzzy
 #| msgid "Project Name"
 msgid "Project template type"
-msgstr "Tipo de template de projeto"
+msgstr "Tipo de plantilla de proyecto"
 
 #: connect/common/models.py:805
 msgid "Your project has been successfully created!"
-msgstr "Seu projeto foi criado com sucesso"
+msgstr "Tu proyecto se creó con éxito"
 
 #: connect/common/models.py:857
 #, python-brace-format
 msgid "The project {self.name} has changed"
-msgstr "O projeto {self.name} foi editado"
+msgstr "El proyecto {self.name} ha sido editado"
 
 #: connect/common/models.py:877
 msgid "A project was deleted..."
-msgstr "Um projeto foi excluído"
+msgstr "Un proyecto fue eliminado"
 
 #: connect/common/models.py:1009
 msgid "Day"
-msgstr "Dia"
+msgstr "Día"
 
 #: connect/common/models.py:1029 connect/common/models.py:1083
 msgid "agent"
@@ -1117,13 +1117,13 @@ msgstr "agente"
 
 #: connect/common/models.py:1030
 msgid "service manager"
-msgstr "gerente de serviços"
+msgstr "manager de servicios"
 
 #: connect/common/models.py:1085
 #, fuzzy
 #| msgid "service manager"
 msgid "service_manager"
-msgstr "gerente de serviços"
+msgstr "manager de servicios"
 
 #: connect/common/models.py:1119
 msgid "moderator"
@@ -1133,91 +1133,91 @@ msgstr "moderador"
 #, fuzzy
 #| msgid "photo user"
 msgid "Chat user"
-msgstr "Usuário de chat"
+msgstr "Usuario de chat"
 
 #: connect/common/models.py:1211
 msgid "service"
-msgstr "serviço"
+msgstr "servicio"
 
 #: connect/common/models.py:1220
 msgid "Flows service"
-msgstr "Serviço de fluxos"
+msgstr "Servicio de flujos"
 
 #: connect/common/models.py:1224
 msgid "Inteligence Service"
-msgstr "Serviço de inteligência"
+msgstr "Servicio de inteligencia"
 
 #: connect/common/models.py:1228
 msgid "Chat Service"
-msgstr "Serviço de chat"
+msgstr "Servicio de chat"
 
 #: connect/common/models.py:1239
 msgid "Region Ireland"
-msgstr "Região: Irlanda"
+msgstr "Región: Irlanda"
 
 #: connect/common/models.py:1243
 msgid "Region Virginia"
-msgstr "Região: Virgínia"
+msgstr "Región: Virginia"
 
 #: connect/common/models.py:1247
 msgid "Region São Paulo"
-msgstr "Região: São Paulo"
+msgstr "Región: São Paulo"
 
 #: connect/common/models.py:1251
 msgid "service url"
-msgstr "URL do serviço"
+msgstr "URL de servicio"
 
 #: connect/common/models.py:1253
 msgid "service type"
-msgstr "tipo de serviço"
+msgstr "tipo de servicio"
 
 #: connect/common/models.py:1259
 msgid "standard service for all projects"
-msgstr "serviço padrão para todos os projetos"
+msgstr "servicio predeterminado disponible en todos los proyectos"
 
 #: connect/common/models.py:1261
 msgid "service region"
-msgstr "Região do serviço"
+msgstr "Región del servicio"
 
 #: connect/common/models.py:1267
 msgid "Define if the service is under maintenance"
-msgstr "Defina se o serviço está em manutenção"
+msgstr "Define si el servicio está en mantenimiento"
 
 #: connect/common/models.py:1270
 msgid "date start maintenance"
-msgstr "data de início da manutenção"
+msgstr "fecha de inicio del mantenimiento"
 
 #: connect/common/models.py:1279
 msgid "log service"
-msgstr "serviço de log"
+msgstr "servicio de log"
 
 #: connect/common/models.py:1280
 msgid "log services"
-msgstr "serviços de log"
+msgstr "servicios de log"
 
 #: connect/common/models.py:1283
 msgid "status service"
-msgstr "serviço de status"
+msgstr "servicio de status"
 
 #: connect/common/models.py:1289
 msgid "service status"
-msgstr "status do serviço"
+msgstr "status del servicio"
 
 #: connect/common/models.py:1303
 msgid "request permission organization"
-msgstr "solicitar permissão à organização"
+msgstr "solicitar permiso a la organización"
 
 #: connect/common/models.py:1318
 msgid "request permission project"
-msgstr "Solicitação de permissão do projeto"
+msgstr "Solicitud de permiso del proyecto"
 
 #: connect/common/models.py:1336
 msgid "organization billing plan"
-msgstr "Plano de faturamento da organização"
+msgstr "Plan de facturación de la organización"
 
 #: connect/common/models.py:1349 connect/common/models.py:1387
 msgid "free"
-msgstr "grátis"
+msgstr "gratuito"
 
 #: connect/common/models.py:1350
 msgid "single"
@@ -1225,7 +1225,7 @@ msgstr "único"
 
 #: connect/common/models.py:1351
 msgid "monthly"
-msgstr "mensal"
+msgstr "mensual"
 
 #: connect/common/models.py:1352
 msgid "quarterly"
@@ -1249,7 +1249,7 @@ msgstr "trienal"
 
 #: connect/common/models.py:1374
 msgid "credit card"
-msgstr "cartão de crédito"
+msgstr "tarjeta de crédito"
 
 #: connect/common/models.py:1375
 msgid "payment slip"
@@ -1257,13 +1257,13 @@ msgstr "boleto"
 
 #: connect/common/models.py:1388
 msgid "trial"
-msgstr "trial"
+msgstr "prueba"
 
 #: connect/common/models.py:1389
 #, fuzzy
 #| msgid "started at"
 msgid "start"
-msgstr "início"
+msgstr "inicio"
 
 #: connect/common/models.py:1390
 msgid "scale"
@@ -1273,7 +1273,7 @@ msgstr "scale"
 #, fuzzy
 #| msgid "canceled"
 msgid "advanced"
-msgstr "avançado"
+msgstr "avanzado"
 
 #: connect/common/models.py:1392
 msgid "enterprise"
@@ -1283,19 +1283,19 @@ msgstr "enterprise"
 #, fuzzy
 #| msgid "active contact count"
 msgid "active_contacts"
-msgstr "contatos ativos"
+msgstr "contactos activos"
 
 #: connect/common/models.py:1415
 msgid "last invoice"
-msgstr "última fatura"
+msgstr "última factura"
 
 #: connect/common/models.py:1416
 msgid "next due date"
-msgstr "próximo vencimento"
+msgstr "próximo vencimiento"
 
 #: connect/common/models.py:1417
 msgid "termination date"
-msgstr "data de finalização"
+msgstr "fecha de finalización"
 
 #: connect/common/models.py:1419
 msgid "notes administration"
@@ -1303,21 +1303,21 @@ msgstr "administrador de notas"
 
 #: connect/common/models.py:1421
 msgid "fixed discount"
-msgstr "desconto fixo"
+msgstr "descuento fijo"
 
 #: connect/common/models.py:1423
 #, fuzzy
 #| msgid "payment method"
 msgid "plan_method"
-msgstr "método de pagamento"
+msgstr "método de pago"
 
 #: connect/common/models.py:1424
 msgid "date of contract plan"
-msgstr "data de contratação do plano"
+msgstr "fecha de contratación del plan"
 
 #: connect/common/models.py:1425
 msgid "active plan"
-msgstr "plano ativo"
+msgstr "plan activo"
 
 #: connect/common/models.py:1427
 msgid "Stripe Customer"
@@ -1325,134 +1325,134 @@ msgstr "Cliente Stripe"
 
 #: connect/common/models.py:1431
 msgid "Our Stripe customer id for your organization"
-msgstr "Nosso ID do cliente Stripe para sua organização"
+msgstr "Nuestro ID de cliente Stripe para tu organización"
 
 #: connect/common/models.py:1434
 msgid "Stripe Customer Configured Card"
-msgstr "Cartão do cliente na Stripe configurado"
+msgstr "Tarjeta de cliente configurada en Stripe"
 
 #: connect/common/models.py:1437
 msgid "Final Card Number"
-msgstr "números finais do cartão"
+msgstr "últimos dígitos de la tarjeta"
 
 #: connect/common/models.py:1440
 msgid "Card Expiration Date"
-msgstr "Data de expiração do cartão"
+msgstr "Fecha de vencimiento de la tarjeta"
 
 #: connect/common/models.py:1443
 msgid "Cardholder Name"
-msgstr "Nome no cartão"
+msgstr "Nombre impreso en la tarjeta"
 
 #: connect/common/models.py:1446
 msgid "Card Brand"
-msgstr "Bandeira do cartão"
+msgstr "Red de la tarjeta"
 
 #: connect/common/models.py:1457
 msgid "Additional billing information"
-msgstr "Informações adicionais de faturamento"
+msgstr "Información adicional de facturación"
 
 #: connect/common/models.py:1463
 msgid "Card is valid"
-msgstr "O cartão é válido"
+msgstr "La tarjeta es válida"
 
 #: connect/common/models.py:1464
 #, fuzzy
 #| msgid "paid date"
 msgid "Trial end date"
-msgstr "Data de término do trial"
+msgstr "Fecha de finalización del período de prueba"
 
 #: connect/common/models.py:1600
 msgid "Unable to make payment"
-msgstr "Não foi possível realizar o pagamento"
+msgstr "No se pudo procesar el pago"
 
 #: connect/common/models.py:1733
 msgid "A credit card has been updated in the organization"
-msgstr "Um cartão de crédito foi atualizado na organização"
+msgstr "Se actualizó una tarjeta de crédito en la organización"
 
 #: connect/common/models.py:1764
 #, fuzzy
 #| msgid "Your organization's plan has expired"
 msgid "Your organization's plan has ended"
-msgstr "O plano da sua organização foi encerrado"
+msgstr "El plan de tu organización ha finalizado"
 
 #: connect/common/models.py:1800
 msgid "Your organization's plan has been reactivated."
-msgstr "Plano reativado com sucesso"
+msgstr "Plan reactivado con éxito"
 
 #: connect/common/models.py:1804
 msgid "O plano da sua organização foi reativado."
-msgstr "O plano da sua organização foi reativado."
+msgstr "El plan de tu organización ha sido reactivado."
 
 #: connect/common/models.py:1836
 msgid "Your organization's credit card was removed"
-msgstr "O cartão de crédito da sua organização foi excluído com sucesso"
+msgstr "La tarjeta de crédito de tu organización ha sido removida con éxito"
 
 #: connect/common/models.py:1840
 msgid "O cartão de crédito vinculado a sua organização foi removido"
-msgstr "O cartão de crédito da sua organização foi removido"
+msgstr "La tarjeta de crédito vinculada a tu organización ha sido removida"
 
 #: connect/common/models.py:1883
 msgid "has the plan"
-msgstr "tem o seguinte plano"
+msgstr "tiene el siguiente plan"
 
 #: connect/common/models.py:1897
 msgid "Plan ended on VTEX CX Platform"
-msgstr "Plano encerrado na VTEX CX Platform"
+msgstr "Plan finalizado en VTEX CX Platform"
 
 #: connect/common/models.py:1899
 msgid "Plano encerrado na VTEX CX Platform"
-msgstr "Plano encerrado na VTEX CX Platform"
+msgstr "Plan finalizado en VTEX CX Platform"
 
 #: connect/common/models.py:1904
 msgid "Your organization's plan has been updated"
-msgstr "O seu plano foi atualizado"
+msgstr "Tu plan ha sido actualizado"
 
 #: connect/common/models.py:1925 connect/common/models.py:1946
 #, fuzzy
 #| msgid "Your organization's plan has expired"
 msgid "Your trial plan has expired"
-msgstr "Seu plano trial expirou"
+msgstr "Tu plan de prueba ha expirado"
 
 #: connect/common/models.py:1993
 #, python-brace-format
 msgid "You reached {self.plan_limit} attendances"
-msgstr "Você atingiu {self.plan_limit} atendimentos"
+msgstr "Has alcanzado {self.plan_limit} chats de soporte"
 
 #: connect/common/models.py:1995
 #, fuzzy, python-brace-format
 #| msgid "You reached {self.plan_limit} attendances"
 msgid "Você atingiu {self.plan_limit} atendimentos"
-msgstr "Você atingiu {self.plan_limit} atendimentos"
+msgstr "Has alcanzado {self.plan_limit} chats de soporte"
 
 #: connect/common/models.py:2041
 #, fuzzy, python-brace-format
 #| msgid "Your organization is suspended"
 msgid "Your organization is close to {self.plan_limit} attendances"
-msgstr "Sua organização foi pausada"
+msgstr "Tu organización ha sido pausada"
 
 #: connect/common/models.py:2045
 #, fuzzy, python-brace-format
 #| msgid "Your organization is suspended"
 msgid "Sua organização estã proxima de {self.plan_limit} atendimentos"
-msgstr "Sua organização está próxima de {self.plan_limit} atendimentos"
+msgstr "Tu organización está cerca de los {self.plan_limit} chats de soporte"
 
 #: connect/common/models.py:2064
 #, fuzzy
 #| msgid "Your organization is suspended"
 msgid "Your trial period has ended"
-msgstr "Seu período de trial chegou ao fim"
+msgstr "Tu período de prueba ha finalizado"
 
 #: connect/common/models.py:2103
 msgid "organization billing invoice"
-msgstr "Fatura de cobrança da organização"
+msgstr "Factura de la organización"
 
 #: connect/common/models.py:2111
 msgid "pending"
-msgstr "pendente"
+msgstr "pendiente"
 
 #: connect/common/models.py:2112
 msgid "paid"
-msgstr "pago"
+msgstr "pagado"
 
 #: connect/common/models.py:2113
 msgid "canceled"
@@ -1464,47 +1464,47 @@ msgstr "fraude"
 
 #: connect/common/models.py:2120
 msgid "incremental invoice amount"
-msgstr "Valor adicional da fatura"
+msgstr "Valor adicional de la factura"
 
 #: connect/common/models.py:2121
 msgid "due date"
-msgstr "Data de vencimento"
+msgstr "Fecha de vencimiento"
 
 #: connect/common/models.py:2122
 msgid "paid date"
-msgstr "data de pagamento"
+msgstr "fecha de pago"
 
 #: connect/common/models.py:2124
 msgid "payment status"
-msgstr "status do pagamento"
+msgstr "status del pago"
 
 #: connect/common/models.py:2135
 msgid "discount"
-msgstr "Desconto"
+msgstr "Descuento"
 
 #: connect/common/models.py:2136
 msgid "notes"
-msgstr "Notas"
+msgstr "Observaciones"
 
 #: connect/common/models.py:2138
 msgid "Stripe Charge Id"
-msgstr "ID de cobrança do Stripe"
+msgstr "ID de cargo en Stripe"
 
 #: connect/common/models.py:2142
 msgid "The Stripe charge id for this charge"
-msgstr "O ID de cobrança da Stripe para esta cobrança"
+msgstr "El ID de cargo en Stripe para este cargo"
 
 #: connect/common/models.py:2147
 msgid "Controls whether the system will capture the payment, if not successful, the user will receive an alert to adjust the payment data"
-msgstr "Controla se o sistema tenta capturar o pagamento. Se a tentativa não for bem-sucedida, o usuário recebe um alerta para atualizar os dados de pagamento."
+msgstr "Controla si el sistema intenta procesar el pago. Si el intento no tiene éxito, el usuario recibe una alerta para actualizar los datos de pago."
 
 #: connect/common/models.py:2153
 msgid "cost per whatsapp"
-msgstr "custo por WhatsApp"
+msgstr "costo por WhatsApp"
 
 #: connect/common/models.py:2185
 msgid "organization billing invoice project"
-msgstr "fatura de cobrança do projeto na organização"
+msgstr "factura del proyecto en la organización"
 
 #: connect/common/models.py:2192
 msgid "amount"
@@ -1512,74 +1512,74 @@ msgstr "valor"
 
 #: connect/common/models.py:2194
 msgid "active contact count"
-msgstr "Contagem de contatos ativos"
+msgstr "Número de contactos activos"
 
 #: connect/common/models.py:2199
 msgid "Free active contacts limit"
-msgstr "limite de contatos ativos grátis"
+msgstr "límite de contactos activos gratis"
 
 #: connect/common/models.py:2202
 msgid "From 1 to 1000 active contacts"
-msgstr "De 1 a 1000 contatos ativos"
+msgstr "De 1 a 1,000 contactos activos"
 
 #: connect/common/models.py:2208
 msgid "From 1001 to 5000 active contacts"
-msgstr "De 1001 a 5000 contatos ativos"
+msgstr "De 1,001 a 5,000 contactos activos"
 
 #: connect/common/models.py:2214
 msgid "From 5001 to 10000 active contacts"
-msgstr "De 5001 a 10000 contatos ativos"
+msgstr "De 5,001 a 10,000 contactos activos"
 
 #: connect/common/models.py:2220
 msgid "From 10001 to 30000 active contacts"
-msgstr "De 10001 a 30000 contatos ativos"
+msgstr "De 10,001 a 30,000 contactos activos"
 
 #: connect/common/models.py:2226
 msgid "From 30001 to 50000 active contacts"
-msgstr "De 30001 a 50000 contatos ativos"
+msgstr "De 30 001 a 50 000 contactos activos"
 
 #: connect/common/models.py:2232
 msgid "From 50001 to 100000 active contacts"
-msgstr "De 50001 a 100000 contatos ativos"
+msgstr "De 50,001 a 100,000 contactos activos"
 
 #: connect/common/models.py:2238 connect/common/models.py:2244
 msgid "From 100001 to 250000 active contacts"
-msgstr "De 100001 a 250000 contatos ativos"
+msgstr "De 100,001 a 250,000 contactos activos"
 
 #: connect/common/models.py:2378
 #, fuzzy
 #| msgid "created at"
 msgid "created on"
-msgstr "criado em"
+msgstr "creado el"
 
 #: connect/common/templates/common/emails/project/invite_project.html:39
 msgid "Uhuuul, now you are one of us"
-msgstr "Que bom ter você com a gente!"
+msgstr "¡Es un placer tenerte con nosotros!"
 
 #: connect/common/templates/common/emails/project/invite_project.html:42
 #: connect/common/templates/common/emails/project/invite_project.txt:4
 msgid "A member of the organization"
-msgstr "Um membro da organização"
+msgstr "Un miembro de la organización"
 
 #: connect/common/templates/common/emails/project/invite_project.html:42
 #: connect/common/templates/common/emails/project/invite_project.txt:4
 msgid "just sent you an invitation to join them in the organization. To do so, just click the button below and you will be redirected to the registration page. In case you are already registered, you don't have to do anything, just login and you'll be set "
-msgstr "acabou de enviar um convite para você entrar na organização. Para isso, clique no botão abaixo para ser redirecionado à página de cadastro. Caso já tenha cadastro, faça login para começar a usar."
+msgstr "acaba de enviarte una invitación para unirte a la organización. Para hacerlo, haz clic en el botón a continuación y serás redirigido a la página de registro. Si ya tienes una cuenta inicia sesión para comenzar a usarla."
 
 #: connect/common/templates/common/emails/project/invite_project.html:79
 #: connect/common/templates/common/emails/project/invite_project.txt:5
 #: connect/common/templates/common/emails/organization/invite_organization.html:82
 #: connect/common/templates/common/emails/organization/invite_organization.txt:7
 msgid "Join org"
-msgstr "Entrar na organização"
+msgstr "Unirse a la organización"
 
 #: connect/common/templates/common/emails/project/invite_project.txt:3
 msgid "Uhuuul, now you are one of us!"
-msgstr "Que bom ter você com a gente!"
+msgstr "¡Es un placer tenerte con nosotros!"
 
 #: connect/common/models.py:188
 msgid "You've been invited to join "
-msgstr "Você foi convidado para a organização "
+msgstr "Te han invitado a unirte a la organización "
 
 #: connect/common/templates/common/emails/organization/invite_organization.html:32
 msgid "Welcome! We're excited to have you onboard."
@@ -1588,113 +1588,42 @@ msgstr " "
 #: connect/common/templates/common/emails/organization/invite_organization.html:32
 #: connect/common/templates/common/emails/organization/invite_organization.txt:3
 msgid "A member of"
-msgstr "Um membro de"
+msgstr "Un miembro de"
 
 #: connect/common/templates/common/emails/organization/invite_organization.html:34
 #: connect/common/templates/common/emails/organization/invite_organization.txt:3
 msgid "has sent you an invitation to join their organization."
-msgstr "enviou um convite para você se juntar à organização na VTEX CX Platform."
+msgstr "te ha enviado una invitación para unirte a su organización en VTEX CX Platform."
 
 #: connect/common/templates/common/emails/organization/invite_organization.html:48
 #: connect/common/templates/common/emails/organization/invite_organization.txt:4
 msgid "To accept, simply click the button below and complete your registration. If you're already registered, just log in you account."
-msgstr "Para aceitar, clique no botão abaixo para concluir seu cadastro. Se já concluiu, faça login na sua conta."
+msgstr "Para aceptar, haz clic en el botón de abajo para completar tu registro. Si ya lo completaste, inicia sesión en tu cuenta."
 
 #: connect/common/templates/common/emails/project/invite_project.html:18
 #: connect/common/templates/common/emails/project/invite_project.txt:2
 #, fuzzy
 #| msgid "You have been invited to join the organization"
 msgid "You have been invited to join the project"
-msgstr "Você foi convidado para participar do projeto"
+msgstr "Has sido invitado a unirte al proyecto"
 
 #: connect/common/templates/common/emails/project/invite_project.html:18
 #: connect/common/templates/common/emails/project/invite_project.txt:2
 msgid "from the organization"
-msgstr "da organização"
+msgstr "de la organización"
 
 #: connect/settings.py:228
 msgid "An error has occurred"
-msgstr "Ocorreu um erro"
+msgstr "Se produjo un error"
 
 #: connect/settings.py:236
 msgid "English"
-msgstr "Inglês"
+msgstr "Inglés"
 
 #: connect/settings.py:237
 msgid "Portuguese"
-msgstr "Português"
+msgstr "Portugués"
 
 #: connect/settings.py:238
 msgid "Spanish"
-msgstr "Espanhol"
-
-#: connect/usecases/commerce/send_data_export_email.py
-msgid "Your data export is ready"
-msgstr "Sua exportação de dados está pronta"
-
-#: connect/common/templates/common/emails/data_export/email.html
-#: connect/common/templates/common/emails/data_export/email.txt
-msgid "Your data export has been processed and ready for download."
-msgstr "A exportação dos seus dados foi processada e está pronta para download."
-
-#: connect/common/templates/common/emails/data_export/email.html
-#: connect/common/templates/common/emails/data_export/email.txt
-msgid "Here's what you requested:"
-msgstr "Veja o que você solicitou:"
-
-#: connect/common/templates/common/emails/data_export/email.html
-#: connect/common/templates/common/emails/data_export/email.txt
-msgid "Period"
-msgstr "Período"
-
-#: connect/common/templates/common/emails/data_export/email.html
-#: connect/common/templates/common/emails/data_export/email.txt
-msgid "Template"
-msgstr "Template"
-
-#: connect/common/templates/common/emails/data_export/email.html
-#: connect/common/templates/common/emails/data_export/email.txt
-msgid "Status"
-msgstr "Status"
-
-#: connect/common/templates/common/emails/data_export/email.html
-#: connect/common/templates/common/emails/data_export/email.txt
-msgid ""
-"If the data doesn't match what you expected, you can go back to the platform "
-"and generate a new export with adjusted filters."
-msgstr ""
-"Se os dados não corresponderem ao esperado, volte à plataforma e gere uma "
-"nova exportação com filtros ajustados."
-
-#: connect/common/templates/common/emails/data_export/email.html
-#: connect/common/templates/common/emails/data_export/email.txt
-msgid "Download File"
-msgstr "Baixar arquivo"
-
-#: connect/usecases/commerce/send_data_export_email.py
-msgid "All"
-msgstr "Todos"
-
-#: connect/usecases/commerce/send_data_export_email.py
-msgid "Processing"
-msgstr "Processando"
-
-#: connect/usecases/commerce/send_data_export_email.py
-msgid "Skipped"
-msgstr "Ignorado"
-
-#: connect/usecases/commerce/send_data_export_email.py
-msgid "Error"
-msgstr "Erro"
-
-#: connect/usecases/commerce/send_data_export_email.py
-msgid "Sent"
-msgstr "Enviado"
-
-#: connect/usecases/commerce/send_data_export_email.py
-msgid "Delivered"
-msgstr "Entregue"
-
-#: connect/usecases/commerce/send_data_export_email.py
-msgid "Read"
-msgstr "Lido"
+msgstr "Español"
