@@ -1,5 +1,5 @@
 import uuid
-from unittest.mock import patch, Mock
+from unittest.mock import MagicMock, patch, Mock
 
 from django.test import override_settings
 from django.urls import reverse
@@ -20,11 +20,25 @@ from connect.common.models import (
     BillingPlan,
     TypeProject,
 )
+from connect.common.locks import RedisLockService
 from connect.common.mocks import StripeMockGateway
 from connect.usecases.commerce.create_vtex_project import CreateVtexProjectUseCase
 from connect.usecases.commerce.dto import CreateVtexProjectDTO
+from connect.usecases.commerce.exceptions import (
+    ProjectAlreadyHasVtexAccountError,
+    VtexAccountAlreadyLinkedError,
+)
+from connect.usecases.commerce.link_vtex_account import LinkVtexAccountUseCase
 from connect.usecases.commerce.set_vtex_host_store import SetVtexHostStoreUseCase
 from connect.usecases.commerce.update_project_config import UpdateProjectConfigUseCase
+
+
+def _mock_lock_service():
+    redis_lock = MagicMock()
+    redis_lock.acquire.return_value = True
+    connection = MagicMock()
+    connection.lock.return_value = redis_lock
+    return RedisLockService(connection=connection)
 
 
 @override_settings(USE_EDA_PERMISSIONS=False)  # Disable EDA to avoid RabbitMQ issues
@@ -918,3 +932,326 @@ class SendDataExportEmailViewTestCase(APITestCase):
         response = client.post(self.url, self.payload, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+class CommerceOrganizationViewSetCreateTestCase(APITestCase):
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway):
+        mock_get_gateway.return_value = StripeMockGateway()
+        self.client = APIClient()
+        self.user, _ = create_user_and_token("commerceorguser")
+
+        content_type = ContentType.objects.get_for_model(User)
+        permission, _ = Permission.objects.get_or_create(
+            codename="can_communicate_internally",
+            name="can communicate internally",
+            content_type=content_type,
+        )
+        self.user.user_permissions.add(permission)
+        self.client.force_authenticate(user=self.user)
+        self.url = reverse("commerce-organizations-list")
+
+    @patch("connect.api.v2.commerce.views.CommerceOrganizationViewSet.get_serializer")
+    def test_create_returns_organization_and_project_uuids(self, mock_get_serializer):
+        organization = Organization.objects.create(
+            name="commerce-org",
+            description="Organization commerce-org",
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan=BillingPlan.PLAN_TRIAL,
+        )
+        project = Project.objects.create(
+            name="commerce-project",
+            organization=organization,
+            flow_organization=uuid.uuid4(),
+            project_type=TypeProject.COMMERCE,
+        )
+        serializer = Mock()
+        serializer.is_valid.return_value = True
+        serializer.save.return_value = {
+            "organization": organization,
+            "project": project,
+        }
+        mock_get_serializer.return_value = serializer
+
+        response = self.client.post(
+            self.url,
+            {
+                "user_email": "new@commerce.user",
+                "organization_name": "commerce-org",
+                "project_name": "commerce-project",
+                "vtex_account": "store",
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(
+            response.json(),
+            {
+                "organization_uuid": str(organization.uuid),
+                "project_uuid": str(project.uuid),
+            },
+        )
+
+
+class LinkVtexAccountViewTestCase(APITestCase):
+    """Tests for POST /v2/commerce/projects/<uuid>/link-vtex-account/"""
+
+    @patch("connect.authentication.signals.RabbitmqPublisher")
+    @patch("connect.common.signals.RabbitmqPublisher")
+    @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.billing.get_gateway")
+    def setUp(
+        self,
+        mock_get_gateway,
+        mock_permission,
+        mock_rabbitmq_common,
+        mock_rabbitmq_auth,
+    ):
+        mock_get_gateway.return_value = StripeMockGateway()
+        mock_permission.return_value = True
+        mock_rabbitmq_common.return_value = Mock()
+        mock_rabbitmq_auth.return_value = Mock()
+
+        lock_patcher = patch(
+            "connect.usecases.commerce.link_vtex_account.RedisLockService",
+            side_effect=_mock_lock_service,
+        )
+        self.addCleanup(lock_patcher.stop)
+        lock_patcher.start()
+
+        self.client = APIClient()
+        self.user, _ = create_user_and_token("linkuser")
+
+        content_type = ContentType.objects.get_for_model(User)
+        permission, _ = Permission.objects.get_or_create(
+            codename="can_communicate_internally",
+            name="can communicate internally",
+            content_type=content_type,
+        )
+        self.user.user_permissions.add(permission)
+        self.client.force_authenticate(user=self.user)
+
+        self.organization = Organization.objects.create(
+            name="link-org",
+            description="Organization link-org",
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan=BillingPlan.PLAN_TRIAL,
+        )
+        self.project = Project.objects.create(
+            name="link-project",
+            organization=self.organization,
+            flow_organization=uuid.uuid4(),
+            project_type=TypeProject.COMMERCE,
+        )
+
+    def _url(self, project_uuid=None):
+        uid = project_uuid or str(self.project.uuid)
+        return reverse("link-vtex-account", kwargs={"project_uuid": uid})
+
+    @patch("connect.usecases.commerce.link_vtex_account.InsightsRESTClient")
+    def test_link_vtex_account_successfully(self, mock_insights):
+        response = self.client.post(
+            self._url(),
+            {"vtex_account": "mystore"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, {"success": True})
+
+        self.project.refresh_from_db()
+        self.assertEqual(self.project.vtex_account, "mystore")
+
+    @patch("connect.usecases.commerce.link_vtex_account.InsightsRESTClient")
+    def test_project_already_has_vtex_account_returns_400(self, mock_insights):
+        self.project.vtex_account = "existing"
+        self.project.save(update_fields=["vtex_account"])
+
+        response = self.client.post(
+            self._url(),
+            {"vtex_account": "mystore"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    @patch("connect.usecases.commerce.link_vtex_account.InsightsRESTClient")
+    def test_vtex_account_already_linked_returns_400(self, mock_insights):
+        Project.objects.create(
+            name="other-project",
+            organization=self.organization,
+            vtex_account="mystore",
+            flow_organization=uuid.uuid4(),
+            project_type=TypeProject.COMMERCE,
+        )
+
+        response = self.client.post(
+            self._url(),
+            {"vtex_account": "mystore"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_project_not_found_returns_404(self):
+        response = self.client.post(
+            self._url(str(uuid.uuid4())),
+            {"vtex_account": "mystore"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_missing_vtex_account_returns_400(self):
+        response = self.client.post(self._url(), {}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_unauthenticated_request_returns_403(self):
+        unauth_client = APIClient()
+        other_user, _ = create_user_and_token("noperm-link")
+        unauth_client.force_authenticate(user=other_user)
+
+        response = unauth_client.post(
+            self._url(),
+            {"vtex_account": "mystore"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+@override_settings(USE_EDA_PERMISSIONS=False)
+class LinkVtexAccountUseCaseTestCase(APITestCase):
+    """Unit tests for LinkVtexAccountUseCase."""
+
+    @patch("connect.authentication.signals.RabbitmqPublisher")
+    @patch("connect.common.signals.RabbitmqPublisher")
+    @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.billing.get_gateway")
+    def setUp(
+        self,
+        mock_get_gateway,
+        mock_permission,
+        mock_rabbitmq_common,
+        mock_rabbitmq_auth,
+    ):
+        mock_get_gateway.return_value = StripeMockGateway()
+        mock_permission.return_value = True
+        mock_rabbitmq_common.return_value = Mock()
+        mock_rabbitmq_auth.return_value = Mock()
+
+        self.organization = Organization.objects.create(
+            name="uc-link-org",
+            description="Organization uc-link-org",
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan=BillingPlan.PLAN_TRIAL,
+        )
+        self.project = Project.objects.create(
+            name="uc-link-project",
+            organization=self.organization,
+            flow_organization=uuid.uuid4(),
+            project_type=TypeProject.COMMERCE,
+        )
+        self.insights = Mock()
+
+    def _use_case(self):
+        return LinkVtexAccountUseCase(
+            insights_client=self.insights,
+            lock_service=_mock_lock_service(),
+        )
+
+    def test_execute_links_and_notifies_insights(self):
+        result = self._use_case().execute(str(self.project.uuid), "mystore")
+
+        self.assertEqual(result, {"success": True})
+        self.project.refresh_from_db()
+        self.assertEqual(self.project.vtex_account, "mystore")
+
+        self.insights.notify_vtex_account_migration.assert_called_once_with(
+            project_uuid=str(self.project.uuid),
+            vtex_account="mystore",
+        )
+
+    def test_execute_raises_when_project_already_linked(self):
+        self.project.vtex_account = "existing"
+        self.project.save(update_fields=["vtex_account"])
+
+        with self.assertRaises(ProjectAlreadyHasVtexAccountError):
+            self._use_case().execute(str(self.project.uuid), "mystore")
+
+        self.insights.notify_vtex_account_migration.assert_not_called()
+
+    def test_execute_raises_when_account_used_by_another_project(self):
+        Project.objects.create(
+            name="other",
+            organization=self.organization,
+            vtex_account="mystore",
+            flow_organization=uuid.uuid4(),
+            project_type=TypeProject.COMMERCE,
+        )
+
+        with self.assertRaises(VtexAccountAlreadyLinkedError):
+            self._use_case().execute(str(self.project.uuid), "mystore")
+
+    def test_execute_raises_when_project_not_found(self):
+        with self.assertRaises(Project.DoesNotExist):
+            self._use_case().execute(str(uuid.uuid4()), "mystore")
+
+    def test_insights_notification_failure_does_not_break_link(self):
+        self.insights.notify_vtex_account_migration.side_effect = Exception(
+            "insights down"
+        )
+
+        result = self._use_case().execute(str(self.project.uuid), "mystore")
+
+        self.assertEqual(result, {"success": True})
+        self.project.refresh_from_db()
+        self.assertEqual(self.project.vtex_account, "mystore")
+
+
+class CanCommunicateInternallyPermissionTestCase(APITestCase):
+    def test_has_object_permission_delegates_to_has_permission(self):
+        from connect.api.v2.commerce.permissions import CanCommunicateInternally
+
+        permission = CanCommunicateInternally()
+        request = Mock()
+        request.user.has_perm.return_value = True
+
+        self.assertTrue(permission.has_object_permission(request, None, Mock()))
+        request.user.has_perm.assert_called_with(
+            "authentication.can_communicate_internally"
+        )
+
+
+class CustomCursorPaginationTestCase(APITestCase):
+    def test_custom_cursor_pagination_uses_view_ordering(self):
+        from connect.api.v2.paginations import CustomCursorPagination
+
+        pagination = CustomCursorPagination()
+        view = Mock()
+        view.get_ordering.return_value = ["name"]
+
+        with patch(
+            "connect.api.v2.paginations.CursorPagination.paginate_queryset",
+            return_value=[],
+        ):
+            pagination.paginate_queryset(Mock(), Mock(), view=view)
+
+        self.assertEqual(pagination.ordering, ["name"])
+
+    def test_opened_project_pagination_orders_distinct_projects(self):
+        from connect.api.v2.paginations import OpenedProjectCustomCursorPagination
+
+        pagination = OpenedProjectCustomCursorPagination()
+        view = Mock()
+        view.get_ordering.return_value = ["-created_at"]
+        queryset = Mock()
+        queryset.order_by.return_value.distinct.return_value = queryset
+
+        with patch(
+            "connect.api.v2.paginations.CursorPagination.paginate_queryset",
+            return_value=[],
+        ):
+            pagination.paginate_queryset(queryset, Mock(), view=view)
+
+        queryset.order_by.assert_called_once_with("-created_at")
+        queryset.order_by.return_value.distinct.assert_called_once_with("project")
