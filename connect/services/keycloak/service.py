@@ -44,7 +44,8 @@ class KeycloakCredentialsService:
             logger.error(f"Failed to read Keycloak credentials for {email}: {error}")
             return None
 
-        cache.set(cache_key, has_password, settings.SSO_PASSWORD_CACHE_TTL)
+        if has_password:
+            cache.set(cache_key, True, settings.SSO_PASSWORD_CACHE_TTL)
         return has_password
 
     def invalidate(self, email: str) -> None:

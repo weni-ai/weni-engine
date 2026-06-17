@@ -68,6 +68,9 @@ from connect.usecases.authorizations.exceptions import (
     UserHasNoPermissionToManageProject,
 )
 from connect.usecases.project.update_project import UpdateProjectUseCase
+from connect.usecases.organizations.sso_access import (
+    ExcludeNonCompliantOrganizationProjectsUseCase,
+)
 from connect.utils import count_contacts, rate_limit
 
 logger = logging.getLogger(__name__)
@@ -104,11 +107,18 @@ class ProjectViewSet(
             & ~Q(project_authorizations__role=0)
             & Q(opened_project__user=self.request.user)
         )
-        return (
+        queryset = (
             self.queryset.filter(organization__pk__in=auth)
             .filter(filter)
             .order_by("-opened_project__day")
         )
+        if self.action == "list":
+            queryset = ExcludeNonCompliantOrganizationProjectsUseCase().execute(
+                queryset,
+                self.request.user,
+                getattr(self.request, "session_identity_provider", None),
+            )
+        return queryset
 
     def perform_destroy(self, instance):
         flow_organization = instance.flow_organization
@@ -144,7 +154,8 @@ class ProjectViewSet(
         serializer = ProjectSearchSerializer(data=request.query_params)
         serializer.is_valid(raise_exception=True)
 
-        project = Project.objects.get(pk=serializer.data.get("project_uuid"))
+        project = serializer.validated_data["project_uuid"]
+        self.check_object_permissions(request, project)
 
         user_authorization = project.organization.get_user_authorization(
             self.request.user
@@ -180,6 +191,7 @@ class ProjectViewSet(
         before = pendulum.parse(before, strict=False).end_of("day")
         after = pendulum.parse(after, strict=False).start_of("day")
         project = Project.objects.get(uuid=project_uuid)
+        self.check_object_permissions(request, project)
 
         contact_count = count_contacts(project, str(before), str(after))
         contacts = (
@@ -441,7 +453,7 @@ class ProjectViewSet(
         detail=True,
         methods=["PATCH"],
         url_name="update-status",
-        permission_classes=[IsAuthenticated, CanChangeProjectStatus],
+        permission_classes=[IsAuthenticated, CanChangeProjectStatus, HasSSOAccess],
         serializer_class=UpdateProjectStatusSerializer,
     )
     def update_status(self, request, *args, **kwargs) -> Response:

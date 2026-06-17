@@ -21,6 +21,7 @@ from connect.api.v1.organization.serializers import (
     BillingPlanSerializer,
     OrganizationAuthorizationSerializer,
     serialize_organization_sso_config,
+    serialize_organization_access_status,
 )
 from connect.api.v1.project.validators import CanContributeInOrganizationValidator
 from connect.internals.event_driven.producer.rabbitmq_publisher import RabbitmqPublisher
@@ -47,6 +48,8 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
             "enforce_2fa",
             "show_chat_help",
             "sso_config",
+            "access_status",
+            "access_disabled_reason",
         ]
         ref_name = None
 
@@ -80,6 +83,8 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
 
     show_chat_help = serializers.SerializerMethodField()
     sso_config = serializers.SerializerMethodField()
+    access_status = serializers.SerializerMethodField()
+    access_disabled_reason = serializers.SerializerMethodField()
 
     def validate_name(self, value):
         stripped_value = strip_tags(value)
@@ -177,6 +182,16 @@ class OrganizationSeralizer(serializers.HyperlinkedModelSerializer):
 
     def get_sso_config(self, obj):
         return serialize_organization_sso_config(obj)
+
+    def get_access_status(self, obj):
+        return serialize_organization_access_status(
+            obj, self.context.get("sso_access_results")
+        )["access_status"]
+
+    def get_access_disabled_reason(self, obj):
+        return serialize_organization_access_status(
+            obj, self.context.get("sso_access_results")
+        )["access_disabled_reason"]
 
 
 class PendingAuthorizationOrganizationSerializer(serializers.ModelSerializer):

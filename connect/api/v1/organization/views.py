@@ -71,7 +71,7 @@ from connect.usecases.authorizations.dto import (
 from connect.usecases.authorizations.delete import DeleteAuthorizationUseCase
 from connect.usecases.organizations.exceptions import SSOConfigLockoutError
 from connect.usecases.organizations.sso_access import (
-    FilterAccessibleOrganizationsUseCase,
+    enrich_serializer_context_with_sso_access,
 )
 from connect.usecases.organizations.update_sso_config import (
     UpdateOrganizationSSOConfigDTO,
@@ -112,12 +112,11 @@ class OrganizationViewSet(
             .values("organization")
         )
         queryset = self.queryset.filter(pk__in=auth)
-        session_identity_provider = getattr(
-            self.request, "session_identity_provider", None
-        )
-        return FilterAccessibleOrganizationsUseCase().execute(
-            queryset, self.request.user, session_identity_provider
-        )
+        return queryset
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        return enrich_serializer_context_with_sso_access(self, context)
 
     def get_object(self):
         if _is_orm_user(self.request.user):
@@ -678,6 +677,7 @@ class OrganizationViewSet(
     def sso_settings(self, request, uuid=None):
         organization = get_object_or_404(Organization, uuid=uuid)
         self._assert_admin(request.user, organization)
+        self.check_object_permissions(request, organization)
 
         config = OrganizationSSOConfig.objects.filter(organization=organization).first()
         if config is None:
@@ -694,8 +694,9 @@ class OrganizationViewSet(
     def update_sso_settings(self, request, uuid=None):
         organization = get_object_or_404(Organization, uuid=uuid)
         self._assert_admin(request.user, organization)
+        self.check_object_permissions(request, organization)
 
-        serializer = OrganizationSSOConfigSerializer(data=request.data)
+        serializer = OrganizationSSOConfigSerializer(data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         dto = UpdateOrganizationSSOConfigDTO(**serializer.validated_data)
         session_identity_provider = getattr(request, "session_identity_provider", None)
@@ -867,7 +868,7 @@ class OrganizationAuthorizationViewSet(
     ]
     ordering = ["-user__first_name"]
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, HasSSOAccess]
 
     def get_queryset(self, *args, **kwargs):
         if getattr(self, "swagger_fake_view", False):
@@ -895,6 +896,7 @@ class OrganizationAuthorizationViewSet(
         self.permission_classes = [
             IsAuthenticated,
             OrganizationAdminManagerAuthorization,
+            HasSSOAccess,
         ]
         data = self.request.data
 
@@ -918,6 +920,7 @@ class OrganizationAuthorizationViewSet(
         self.permission_classes = [
             IsAuthenticated,
             OrganizationAdminManagerAuthorization,
+            HasSSOAccess,
         ]
         obj = self.get_object()
         self.filter_class = None
@@ -962,6 +965,10 @@ class RequestPermissionOrganizationViewSet(
 ):
     queryset = RequestPermissionOrganization.objects
     serializer_class = RequestPermissionOrganizationSerializer
-    permission_classes = [IsAuthenticated, OrganizationAdminManagerAuthorization]
+    permission_classes = [
+        IsAuthenticated,
+        OrganizationAdminManagerAuthorization,
+        HasSSOAccess,
+    ]
     filter_class = RequestPermissionOrganizationFilter
     metadata_class = Metadata

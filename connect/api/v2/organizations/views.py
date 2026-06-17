@@ -24,7 +24,7 @@ from connect.api.v1.organization.permissions import (
     _is_orm_user,
 )
 from connect.usecases.organizations.sso_access import (
-    FilterAccessibleOrganizationsUseCase,
+    enrich_serializer_context_with_sso_access,
 )
 from connect.api.v2.paginations import CustomCursorPagination
 from connect.api.v2.organizations.serializers import (
@@ -68,12 +68,11 @@ class OrganizationViewSet(
         )
 
         queryset = self.queryset.filter(pk__in=auth)
-        session_identity_provider = getattr(
-            self.request, "session_identity_provider", None
-        )
-        return FilterAccessibleOrganizationsUseCase().execute(
-            queryset, self.request.user, session_identity_provider
-        )
+        return queryset
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        return enrich_serializer_context_with_sso_access(self, context)
 
     def get_object(self):
         if _is_orm_user(self.request.user):
@@ -191,7 +190,8 @@ class OrganizationAuthorizationViewSet(
     GenericViewSet,
 ):
     queryset = Organization.objects
-    permission_classes = [IsAuthenticated, OrganizationHasPermission]
+    permission_classes = [IsAuthenticated, OrganizationHasPermission, HasSSOAccess]
+    sso_allow_read_without_compliance = False
     lookup_field = "uuid"
 
     def get_serializer_class(self):

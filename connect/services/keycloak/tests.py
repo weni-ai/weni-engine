@@ -34,7 +34,7 @@ class KeycloakCredentialsServiceTestCase(TestCase):
         self.assertFalse(self.service.has_password_credential("user@weni.ai"))
         self.assertFalse(self.service.has_password_credential("user@weni.ai"))
 
-        self.keycloak_client.has_password_credential.assert_called_once()
+        self.assertEqual(self.keycloak_client.has_password_credential.call_count, 2)
 
     def test_cache_key_is_case_insensitive(self):
         self.keycloak_client.has_password_credential.return_value = True

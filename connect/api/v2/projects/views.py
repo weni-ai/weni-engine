@@ -228,7 +228,9 @@ class OpenedProjectViewSet(mixins.ListModelMixin, GenericViewSet):
 
 
 class ProjectDetailView(views.APIView):
-    permission_classes = [ModuleHasPermission | (IsAuthenticated & IsProjectAdmin)]
+    permission_classes = [
+        ModuleHasPermission | (IsAuthenticated & IsProjectAdmin & HasSSOAccess),
+    ]
 
     def get(self, request, uuid):
         use_case = GetProjectDetailUseCase()

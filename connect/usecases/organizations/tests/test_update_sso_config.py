@@ -1,3 +1,4 @@
+from typing import Optional
 from unittest.mock import patch
 
 from django.test import TestCase, override_settings
@@ -18,7 +19,7 @@ from connect.usecases.organizations.update_sso_config import (
 
 
 class FakeCredentialsService:
-    def __init__(self, has_password=False):
+    def __init__(self, has_password: Optional[bool] = False):
         self._has_password = has_password
 
     def has_password_credential(self, email):
@@ -43,7 +44,9 @@ class UpdateOrganizationSSOConfigUseCaseTestCase(TestCase):
         )
         self.provider = "google"
 
-    def execute(self, dto, session_identity_provider, has_password=False):
+    def execute(
+        self, dto, session_identity_provider, has_password: Optional[bool] = False
+    ):
         usecase = UpdateOrganizationSSOConfigUseCase(
             credentials_service=FakeCredentialsService(has_password=has_password)
         )
@@ -116,6 +119,25 @@ class UpdateOrganizationSSOConfigUseCaseTestCase(TestCase):
         dto = UpdateOrganizationSSOConfigDTO(is_enabled=True)
         with self.assertRaises(SSOConfigLockoutError):
             self.execute(dto, "google", has_password=True)
+
+    def test_enabling_raises_lockout_when_credential_unavailable(self):
+        dto = UpdateOrganizationSSOConfigDTO(is_enabled=True)
+        with self.assertRaises(SSOConfigLockoutError):
+            self.execute(dto, "google", has_password=None)
+
+    def test_partial_disable_preserves_existing_allowlists(self):
+        OrganizationSSOConfig.objects.create(
+            organization=self.organization,
+            is_enabled=True,
+            allowed_sso_providers=["google"],
+            allowed_email_domains=["example.com"],
+        )
+        dto = UpdateOrganizationSSOConfigDTO(is_enabled=False)
+        config = self.execute(dto, None, has_password=True)
+
+        self.assertFalse(config.is_enabled)
+        self.assertEqual(config.allowed_sso_providers, ["google"])
+        self.assertEqual(config.allowed_email_domains, ["example.com"])
 
     def test_lockout_does_not_persist_config_changes(self):
         dto = UpdateOrganizationSSOConfigDTO(is_enabled=True)

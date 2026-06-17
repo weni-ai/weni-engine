@@ -1,3 +1,4 @@
+import uuid
 from unittest.mock import patch
 
 from django.test import TestCase, override_settings
@@ -9,11 +10,20 @@ from connect.common.models import (
     Organization,
     OrganizationRole,
     OrganizationSSOConfig,
+    Project,
 )
 from connect.usecases.organizations.sso_access import (
+    BuildOrganizationSSOAccessMapUseCase,
     EvaluateOrganizationSSOAccessUseCase,
-    FilterAccessibleOrganizationsUseCase,
+    ExcludeNonCompliantOrganizationProjectsUseCase,
+    OrganizationSSOAccessDisabledReason,
+    enrich_serializer_context_with_sso_access,
     resolve_sso_provider,
+)
+
+HAS_PASSWORD_CREDENTIAL = (
+    "connect.services.keycloak.service.KeycloakCredentialsService."
+    "has_password_credential"
 )
 
 
@@ -67,11 +77,14 @@ class EvaluateOrganizationSSOAccessUseCaseTestCase(TestCase):
             organization=self.organization, **kwargs
         )
 
-    def execute(self, session_identity_provider, has_password=False):
+    def evaluate(self, session_identity_provider, has_password=False):
         usecase = EvaluateOrganizationSSOAccessUseCase(
             credentials_service=FakeCredentialsService(has_password=has_password)
         )
-        return usecase.execute(self.organization, self.user, session_identity_provider)
+        return usecase.evaluate(self.organization, self.user, session_identity_provider)
+
+    def execute(self, session_identity_provider, has_password=False):
+        return self.evaluate(session_identity_provider, has_password).is_compliant
 
     def test_allows_organization_without_sso_config(self):
         self.assertTrue(self.execute("google"))
@@ -82,11 +95,21 @@ class EvaluateOrganizationSSOAccessUseCaseTestCase(TestCase):
 
     def test_blocks_non_sso_session(self):
         self.create_sso_config(is_enabled=True)
-        self.assertFalse(self.execute(None))
+        result = self.evaluate(None)
+        self.assertFalse(result.is_compliant)
+        self.assertEqual(
+            result.disabled_reason,
+            OrganizationSSOAccessDisabledReason.SSO_SESSION_REQUIRED.value,
+        )
 
     def test_blocks_provider_not_in_allowlist(self):
         self.create_sso_config(is_enabled=True, allowed_sso_providers=["microsoft"])
-        self.assertFalse(self.execute("google"))
+        result = self.evaluate("google")
+        self.assertFalse(result.is_compliant)
+        self.assertEqual(
+            result.disabled_reason,
+            OrganizationSSOAccessDisabledReason.SSO_PROVIDER_NOT_ALLOWED.value,
+        )
 
     def test_allows_any_provider_when_allowlist_is_empty(self):
         self.create_sso_config(is_enabled=True, allowed_sso_providers=[])
@@ -94,7 +117,12 @@ class EvaluateOrganizationSSOAccessUseCaseTestCase(TestCase):
 
     def test_blocks_email_domain_not_in_allowlist(self):
         self.create_sso_config(is_enabled=True, allowed_email_domains=["weni.ai"])
-        self.assertFalse(self.execute("google"))
+        result = self.evaluate("google")
+        self.assertFalse(result.is_compliant)
+        self.assertEqual(
+            result.disabled_reason,
+            OrganizationSSOAccessDisabledReason.SSO_EMAIL_DOMAIN_NOT_ALLOWED.value,
+        )
 
     def test_allows_email_domain_in_allowlist_case_insensitively(self):
         self.create_sso_config(is_enabled=True, allowed_email_domains=["USER.com"])
@@ -102,11 +130,21 @@ class EvaluateOrganizationSSOAccessUseCaseTestCase(TestCase):
 
     def test_blocks_user_with_password_credential(self):
         self.create_sso_config(is_enabled=True)
-        self.assertFalse(self.execute("google", has_password=True))
+        result = self.evaluate("google", has_password=True)
+        self.assertFalse(result.is_compliant)
+        self.assertEqual(
+            result.disabled_reason,
+            OrganizationSSOAccessDisabledReason.SSO_PASSWORD_CONFIGURED.value,
+        )
 
     def test_blocks_when_credential_state_is_unknown(self):
         self.create_sso_config(is_enabled=True)
-        self.assertFalse(self.execute("google", has_password=None))
+        result = self.evaluate("google", has_password=None)
+        self.assertFalse(result.is_compliant)
+        self.assertEqual(
+            result.disabled_reason,
+            OrganizationSSOAccessDisabledReason.SSO_CREDENTIAL_UNAVAILABLE.value,
+        )
 
     def test_allows_fully_compliant_user(self):
         self.create_sso_config(
@@ -114,7 +152,9 @@ class EvaluateOrganizationSSOAccessUseCaseTestCase(TestCase):
             allowed_email_domains=["user.com"],
             allowed_sso_providers=["google"],
         )
-        self.assertTrue(self.execute("google"))
+        result = self.evaluate("google")
+        self.assertTrue(result.is_compliant)
+        self.assertIsNone(result.disabled_reason)
 
     def test_memoizes_credential_lookup_per_email(self):
         self.create_sso_config(is_enabled=True)
@@ -130,7 +170,7 @@ class EvaluateOrganizationSSOAccessUseCaseTestCase(TestCase):
 
 
 @override_settings(USE_EDA_PERMISSIONS=False)
-class FilterAccessibleOrganizationsUseCaseTestCase(TestCase):
+class BuildOrganizationSSOAccessMapUseCaseTestCase(TestCase):
     @patch("connect.billing.get_gateway")
     def setUp(self, mock_get_gateway):
         mock_get_gateway.return_value = StripeMockGateway()
@@ -149,9 +189,9 @@ class FilterAccessibleOrganizationsUseCaseTestCase(TestCase):
             user=self.user, role=OrganizationRole.ADMIN.value
         )
 
-    def execute_uuids(self, session_identity_provider, has_password=False):
+    def build_map(self, session_identity_provider, has_password=False):
         credentials_service = FakeCredentialsService(has_password=has_password)
-        usecase = FilterAccessibleOrganizationsUseCase(
+        usecase = BuildOrganizationSSOAccessMapUseCase(
             evaluate_usecase=EvaluateOrganizationSSOAccessUseCase(
                 credentials_service=credentials_service
             )
@@ -161,16 +201,111 @@ class FilterAccessibleOrganizationsUseCaseTestCase(TestCase):
         )
         result = usecase.execute(queryset, self.user, session_identity_provider)
         self.credentials_service = credentials_service
-        return {str(org.uuid) for org in result}
+        return result
 
-    def test_hides_only_enforcing_org_from_non_compliant_session(self):
-        uuids = self.execute_uuids(None)
-        self.assertEqual(uuids, {str(self.open_org.uuid)})
+    def test_maps_disabled_reason_for_non_compliant_session(self):
+        access_map = self.build_map(None)
+        self.assertIn(self.enforcing_org.pk, access_map)
+        self.assertFalse(access_map[self.enforcing_org.pk].is_compliant)
+        self.assertEqual(
+            access_map[self.enforcing_org.pk].disabled_reason,
+            OrganizationSSOAccessDisabledReason.SSO_SESSION_REQUIRED.value,
+        )
+        self.assertNotIn(self.open_org.pk, access_map)
 
-    def test_keeps_all_orgs_for_compliant_session(self):
-        uuids = self.execute_uuids("google")
-        self.assertEqual(uuids, {str(self.enforcing_org.uuid), str(self.open_org.uuid)})
+    def test_maps_compliant_enforcing_org(self):
+        access_map = self.build_map("google")
+        self.assertTrue(access_map[self.enforcing_org.pk].is_compliant)
+        self.assertNotIn(self.open_org.pk, access_map)
 
     def test_does_not_query_credentials_for_non_sso_session(self):
-        self.execute_uuids(None)
+        self.build_map(None)
         self.assertEqual(self.credentials_service.calls, [])
+
+
+@override_settings(USE_EDA_PERMISSIONS=False)
+class ExcludeNonCompliantOrganizationProjectsUseCaseTestCase(TestCase):
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway):
+        mock_get_gateway.return_value = StripeMockGateway()
+        self.user, _ = create_user_and_token("sso_exclude_projects_user")
+
+        self.enforcing_org = create_organization("Exclude Enforcing Org")
+        self.enforcing_org.authorizations.create(
+            user=self.user, role=OrganizationRole.ADMIN.value
+        )
+        OrganizationSSOConfig.objects.create(
+            organization=self.enforcing_org, is_enabled=True
+        )
+
+        self.open_org = create_organization("Exclude Open Org")
+        self.open_org.authorizations.create(
+            user=self.user, role=OrganizationRole.ADMIN.value
+        )
+
+        self.enforcing_project = Project.objects.create(
+            name="Exclude Enforcing Project",
+            flow_organization=uuid.uuid4(),
+            organization=self.enforcing_org,
+        )
+        self.open_project = Project.objects.create(
+            name="Exclude Open Project",
+            flow_organization=uuid.uuid4(),
+            organization=self.open_org,
+        )
+
+    def execute(self, session_identity_provider):
+        queryset = Project.objects.filter(
+            pk__in=[self.enforcing_project.pk, self.open_project.pk]
+        )
+        return ExcludeNonCompliantOrganizationProjectsUseCase().execute(
+            queryset, self.user, session_identity_provider
+        )
+
+    def test_excludes_projects_from_non_compliant_enforcing_org(self):
+        result = self.execute(None)
+        result_pks = set(result.values_list("pk", flat=True))
+        self.assertEqual(result_pks, {self.open_project.pk})
+
+    @patch(HAS_PASSWORD_CREDENTIAL, return_value=False)
+    def test_keeps_all_projects_for_compliant_session(self, _mock_has_password):
+        result = self.execute("google")
+        result_pks = set(result.values_list("pk", flat=True))
+        self.assertEqual(result_pks, {self.enforcing_project.pk, self.open_project.pk})
+
+
+@override_settings(USE_EDA_PERMISSIONS=False)
+class EnrichSerializerContextWithSSOAccessTestCase(TestCase):
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway):
+        mock_get_gateway.return_value = StripeMockGateway()
+        self.user, _ = create_user_and_token("sso_enrich_user")
+
+        self.enforcing_org = create_organization("Enrich Enforcing Org")
+        OrganizationSSOConfig.objects.create(
+            organization=self.enforcing_org, is_enabled=True
+        )
+
+    def test_retrieve_evaluates_sso_for_org_outside_membership_queryset(self):
+        class FakeView:
+            action = "retrieve"
+            kwargs = {"uuid": str(self.enforcing_org.uuid)}
+
+            def get_queryset(self):
+                return Organization.objects.none()
+
+        view = FakeView()
+        view.request = type(
+            "Request",
+            (),
+            {"user": self.user, "session_identity_provider": None},
+        )()
+
+        context = enrich_serializer_context_with_sso_access(view, {})
+        result = context["sso_access_results"][self.enforcing_org.pk]
+
+        self.assertFalse(result.is_compliant)
+        self.assertEqual(
+            result.disabled_reason,
+            OrganizationSSOAccessDisabledReason.SSO_SESSION_REQUIRED.value,
+        )

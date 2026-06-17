@@ -207,7 +207,7 @@ WSGI_APPLICATION = "connect.wsgi.application"
 
 DATABASES = {
     "default": env.db(
-        var="DEFAULT_DATABASE", default="postgres://weni:weni@database:5432/weni"
+        var="DEFAULT_DATABASE", default="postgres://weni:weni@localhost:5432/weni"
     )
 }
 
@@ -629,5 +629,6 @@ PROJECTS_PAGE_SIZE = env.int("PROJECTS_PAGE_SIZE", default=100)
 # Temporary nexus settings
 NEXUS_AB1_ORGANIZATIONS = env.list("NEXUS_AB1_ORGANIZATIONS", default=[])
 
-# TTL for the cached "user has a Keycloak password" lookup used by SSO enforcement
+# TTL for cached positive Keycloak password lookups used by SSO enforcement.
+# Only has_password=True is cached; negative results are always re-fetched.
 SSO_PASSWORD_CACHE_TTL = env.int("SSO_PASSWORD_CACHE_TTL", default=300)

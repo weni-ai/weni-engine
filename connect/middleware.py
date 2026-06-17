@@ -15,6 +15,7 @@ from connect.celery import app as celery_app
 from connect.utils import check_module_permission
 
 from connect.authentication.models import User
+from connect.services.keycloak.service import KeycloakCredentialsService
 
 LOGGER = logging.getLogger("weni_django_oidc")
 
@@ -127,6 +128,7 @@ class WeniOIDCAuthentication(OIDCAuthentication):
         translation.activate(user_language)
 
         user = instance[0]
+        KeycloakCredentialsService().invalidate(user.email)
 
         if user.first_login and not user.first_login_token:
             user.save_first_login_token(instance[1])

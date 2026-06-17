@@ -1,5 +1,5 @@
 import logging
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import List, Optional
 
 from connect.common.models import Organization, OrganizationSSOConfig
@@ -12,9 +12,9 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class UpdateOrganizationSSOConfigDTO:
-    is_enabled: bool
-    allowed_email_domains: List[str] = field(default_factory=list)
-    allowed_sso_providers: List[str] = field(default_factory=list)
+    is_enabled: Optional[bool] = None
+    allowed_email_domains: Optional[List[str]] = None
+    allowed_sso_providers: Optional[List[str]] = None
 
 
 class UpdateOrganizationSSOConfigUseCase:
@@ -33,11 +33,14 @@ class UpdateOrganizationSSOConfigUseCase:
         sso_config, _ = OrganizationSSOConfig.objects.get_or_create(
             organization=organization
         )
-        sso_config.is_enabled = dto.is_enabled
-        sso_config.allowed_email_domains = dto.allowed_email_domains
-        sso_config.allowed_sso_providers = dto.allowed_sso_providers
+        if dto.is_enabled is not None:
+            sso_config.is_enabled = dto.is_enabled
+        if dto.allowed_email_domains is not None:
+            sso_config.allowed_email_domains = dto.allowed_email_domains
+        if dto.allowed_sso_providers is not None:
+            sso_config.allowed_sso_providers = dto.allowed_sso_providers
 
-        if dto.is_enabled:
+        if sso_config.is_enabled:
             self._validate_actor_not_locked_out(
                 sso_config, actor, session_identity_provider
             )
@@ -45,7 +48,7 @@ class UpdateOrganizationSSOConfigUseCase:
         sso_config.save()
         logger.info(
             f"SSO config updated for organization {organization.uuid} "
-            f"by {actor.email}: enabled={dto.is_enabled}"
+            f"by {actor.email}: enabled={sso_config.is_enabled}"
         )
         return sso_config
 
@@ -70,5 +73,10 @@ class UpdateOrganizationSSOConfigUseCase:
             raise SSOConfigLockoutError(
                 "Your email domain is not in the allowed domains"
             )
-        if self.credentials_service.has_password_credential(actor.email):
+        has_password = self.credentials_service.has_password_credential(actor.email)
+        if has_password is True:
             raise SSOConfigLockoutError("Your account still has a password configured")
+        if has_password is None:
+            raise SSOConfigLockoutError(
+                "Your password state could not be verified; try again later"
+            )
