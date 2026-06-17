@@ -210,7 +210,11 @@ WSGI_APPLICATION = "connect.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
-DATABASES = {"default": env.db(var="DEFAULT_DATABASE", default="sqlite:///db.sqlite3")}
+DATABASES = {
+    "default": env.db(
+        var="DEFAULT_DATABASE", default="postgres://weni:weni@localhost:5432/weni"
+    )
+}
 
 
 # Auth
@@ -641,3 +645,7 @@ PROJECTS_PAGE_SIZE = env.int("PROJECTS_PAGE_SIZE", default=100)
 
 # Temporary nexus settings
 NEXUS_AB1_ORGANIZATIONS = env.list("NEXUS_AB1_ORGANIZATIONS", default=[])
+
+# TTL for cached positive Keycloak password lookups used by SSO enforcement.
+# Only has_password=True is cached; negative results are always re-fetched.
+SSO_PASSWORD_CACHE_TTL = env.int("SSO_PASSWORD_CACHE_TTL", default=300)

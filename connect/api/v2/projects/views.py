@@ -6,7 +6,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 
 from connect.api.v1.internal.permissions import ModuleHasPermission
-from connect.api.v1.organization.permissions import Has2FA
+from connect.api.v1.organization.permissions import Has2FA, HasSSOAccess
 from connect.api.v1.project.permissions import IsProjectAdmin, ProjectHasPermission
 
 from connect.common.models import Project, OpenedProject, TypeProject
@@ -42,7 +42,7 @@ class ProjectViewSet(
     queryset = Project.objects
     serializer_class = ProjectSerializer
     lookup_field = "uuid"
-    permission_classes = [IsAuthenticated, ProjectHasPermission, Has2FA]
+    permission_classes = [IsAuthenticated, ProjectHasPermission, Has2FA, HasSSOAccess]
     pagination_class = CustomCursorPagination
 
     def get_queryset(self, **kwargs):
@@ -192,14 +192,14 @@ class ProjectViewSet(
 class ProjectAuthorizationViewSet(mixins.RetrieveModelMixin, GenericViewSet):
     queryset = Project.objects
     serializer_class = ProjectListAuthorizationSerializer
-    permission_classes = [IsAuthenticated, ProjectHasPermission, Has2FA]
+    permission_classes = [IsAuthenticated, ProjectHasPermission, Has2FA, HasSSOAccess]
     lookup_field = "uuid"
 
 
 class OpenedProjectViewSet(mixins.ListModelMixin, GenericViewSet):
     queryset = OpenedProject.objects.select_related("project", "user")
     serializer_class = OpenedProjectSerializer
-    permission_classes = [IsAuthenticated, ProjectHasPermission, Has2FA]
+    permission_classes = [IsAuthenticated, ProjectHasPermission, Has2FA, HasSSOAccess]
     lookup_field = "uuid"
     pagination_class = OpenedProjectCustomCursorPagination
 
@@ -228,7 +228,9 @@ class OpenedProjectViewSet(mixins.ListModelMixin, GenericViewSet):
 
 
 class ProjectDetailView(views.APIView):
-    permission_classes = [ModuleHasPermission | (IsAuthenticated & IsProjectAdmin)]
+    permission_classes = [
+        ModuleHasPermission | (IsAuthenticated & IsProjectAdmin & HasSSOAccess),
+    ]
 
     def get(self, request, uuid):
         use_case = GetProjectDetailUseCase()
