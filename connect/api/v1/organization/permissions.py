@@ -137,13 +137,16 @@ class HasSSOAccess(permissions.BasePermission):
     def _organization_uuid_from_write_body(self, request):
         try:
             organization_uuid = request.data.get("organization")
-            if organization_uuid:
+            if isinstance(organization_uuid, str) and organization_uuid:
                 return organization_uuid
         except Exception:
             pass
 
         underlying = getattr(request, "_request", request)
-        return getattr(underlying, "POST", {}).get("organization")
+        organization_uuid = getattr(underlying, "POST", {}).get("organization")
+        if isinstance(organization_uuid, str) and organization_uuid:
+            return organization_uuid
+        return None
 
     def has_object_permission(self, request, view, obj):
         if isinstance(obj, Organization):

@@ -449,6 +449,28 @@ class HasSSOAccessPermissionTestCase(TestCase):
         request.session_identity_provider = None
         self.assertFalse(self.permission.has_permission(request, view=None))
 
+    def test_allows_write_with_organization_object_in_body(self):
+        request = Request(
+            self.factory.post(
+                "/",
+                data=json.dumps(
+                    {
+                        "organization": {
+                            "name": "z",
+                            "description": "z",
+                            "organization_billing_plan": "trial",
+                            "authorizations": [],
+                        },
+                        "project": {"name": "a"},
+                    }
+                ),
+                content_type="application/json",
+            )
+        )
+        request.user = self.user
+        request.session_identity_provider = None
+        self.assertTrue(self.permission.has_permission(request, view=None))
+
     def test_allows_organization_read_for_non_compliant_session(self):
         request = self.build_request()
         self.assertTrue(
