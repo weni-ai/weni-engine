@@ -307,12 +307,60 @@ class Organization(models.Model):
         return created, data
 
 
+class OrganizationSSOConfig(models.Model):
+    class Meta:
+        verbose_name = _("organization SSO configuration")
+        verbose_name_plural = _("organization SSO configurations")
+
+    PROVIDER_GOOGLE = "google"
+    PROVIDER_MICROSOFT = "microsoft"
+    PROVIDER_CHOICES = [
+        (PROVIDER_GOOGLE, "Google"),
+        (PROVIDER_MICROSOFT, "Microsoft"),
+    ]
+
+    uuid = models.UUIDField(default=uuid4.uuid4, editable=False, unique=True)
+    organization = models.OneToOneField(
+        Organization, models.CASCADE, related_name="sso_config"
+    )
+    is_enabled = models.BooleanField(
+        _("SSO-only access enabled"),
+        default=False,
+        help_text=_(
+            "When enabled, members can only access this organization through an "
+            "allowed SSO provider and without a password configured in Keycloak."
+        ),
+    )
+    allowed_email_domains = models.JSONField(default=list, blank=True)
+    allowed_sso_providers = models.JSONField(default=list, blank=True)
+    created_at = models.DateTimeField(_("created at"), auto_now_add=True)
+    updated_at = models.DateTimeField(_("updated at"), auto_now=True)
+
+    def __str__(self):
+        return f"SSO config for {self.organization.name}"
+
+    def is_provider_allowed(self, provider: str) -> bool:
+        if not provider:
+            return False
+        if not self.allowed_sso_providers:
+            return True
+        return provider in self.allowed_sso_providers
+
+    def is_email_domain_allowed(self, email: str) -> bool:
+        if not self.allowed_email_domains:
+            return True
+        domain = email.rsplit("@", 1)[-1].lower()
+        return domain in [d.lower() for d in self.allowed_email_domains]
+
+
 class OrganizationLevelRole(Enum):
     NOTHING, VIEWER, CONTRIBUTOR, ADMIN, FINANCIAL, SUPPORT, MARKETING = list(range(7))
 
 
 class OrganizationRole(Enum):
-    NOT_SETTED, VIEWER, CONTRIBUTOR, ADMIN, FINANCIAL, SUPPORT, MARKETING = list(range(7))
+    NOT_SETTED, VIEWER, CONTRIBUTOR, ADMIN, FINANCIAL, SUPPORT, MARKETING = list(
+        range(7)
+    )
 
 
 class OrganizationAuthorization(models.Model):
@@ -897,11 +945,15 @@ class ChatsAuthorization(models.Model):
 
 
 class ProjectRole(Enum):
-    NOT_SETTED, VIEWER, CONTRIBUTOR, MODERATOR, SUPPORT, CHAT_USER, MARKETING = list(range(7))
+    NOT_SETTED, VIEWER, CONTRIBUTOR, MODERATOR, SUPPORT, CHAT_USER, MARKETING = list(
+        range(7)
+    )
 
 
 class ProjectRoleLevel(Enum):
-    NOTHING, VIEWER, CONTRIBUTOR, MODERATOR, SUPPORT, CHAT_USER, MARKETING = list(range(7))
+    NOTHING, VIEWER, CONTRIBUTOR, MODERATOR, SUPPORT, CHAT_USER, MARKETING = list(
+        range(7)
+    )
 
 
 class ProjectAuthorization(models.Model):
