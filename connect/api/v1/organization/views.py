@@ -77,6 +77,7 @@ from connect.usecases.organizations.update_sso_config import (
     UpdateOrganizationSSOConfigDTO,
     UpdateOrganizationSSOConfigUseCase,
 )
+from connect.usecases.project import ProjectEDAPublisher
 
 
 logger = logging.getLogger(__name__)
@@ -262,11 +263,20 @@ class OrganizationViewSet(
 
     def perform_destroy(self, instance):
         intelligence_organization = instance.inteligence_organization
+        user_email = self.request.user.email
+
+        eda_publisher = ProjectEDAPublisher()
+        for project in instance.project.all():
+            eda_publisher.publish_project_deleted(
+                project_uuid=project.uuid,
+                user_email=user_email,
+            )
+
         instance.delete()
         ai_client = IntelligenceRESTClient()
         ai_client.delete_organization(
             organization_id=intelligence_organization,
-            user_email=self.request.user.email,
+            user_email=user_email,
         )
 
     def update(self, request, *args, **kwargs):

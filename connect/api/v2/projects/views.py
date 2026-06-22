@@ -125,16 +125,11 @@ class ProjectViewSet(
         return super(ProjectViewSet, self).create(request, *args, **kwargs)
 
     def perform_destroy(self, instance):
-        user_email = self.request.user.email
-        project_uuid = instance.uuid
-
-        # Publish delete event via EDA to notify Flows and Billing
         eda_publisher = ProjectEDAPublisher()
         eda_publisher.publish_project_deleted(
-            project_uuid=project_uuid,
-            user_email=user_email,
+            project_uuid=instance.uuid,
+            user_email=self.request.user.email,
         )
-
         instance.delete()
 
     @action(detail=True, methods=["POST"], url_name="set-type")
