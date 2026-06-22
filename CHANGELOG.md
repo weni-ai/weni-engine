@@ -1,3 +1,6 @@
+# 3.50.0
+  - feat: Per-organization SSO-only access enforcement
+
 # 3.49.0
   - feat: add orgs-by-user listing and link-vtex-account endpoints
 
