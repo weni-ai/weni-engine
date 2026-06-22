@@ -1,3 +1,6 @@
+# 3.51.0
+  - feat: Publish project deleted EDA on v1 organization destroy
+
 # 3.50.0
   - feat: Per-organization SSO-only access enforcement
 
