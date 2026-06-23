@@ -90,9 +90,6 @@ env = environ.Env(
     PLAN_STATUS_CACHE_TTL=(int, 900),
     SESSION_TOKEN_MIN_DURATION=(int, 60),
     SESSION_TOKEN_MAX_DURATION=(int, 86400),
-    WENI_SESSION_TOKEN_DYNAMODB_TABLE=(str, None),
-    WENI_SESSION_TOKEN_DYNAMODB_REGION=(str, None),
-    WENI_SESSION_TOKEN_MAX_REDIS_TTL=(int, 86400),
     PLAN_START_LIMIT=(int, 200),
     PLAN_START_PRICE=(int, 390),
     PLAN_SCALE_LIMIT=(int, 500),
@@ -557,10 +554,10 @@ SESSION_TOKEN_MIN_DURATION = env.int("SESSION_TOKEN_MIN_DURATION")
 SESSION_TOKEN_MAX_DURATION = env.int("SESSION_TOKEN_MAX_DURATION")
 
 # Session tokens are stored in a shared DynamoDB table (source of truth) and
-# cached in the local Redis with a TTL capped at WENI_SESSION_TOKEN_MAX_REDIS_TTL.
-WENI_SESSION_TOKEN_DYNAMODB_TABLE = env.str("WENI_SESSION_TOKEN_DYNAMODB_TABLE")
-WENI_SESSION_TOKEN_DYNAMODB_REGION = env.str("WENI_SESSION_TOKEN_DYNAMODB_REGION")
-WENI_SESSION_TOKEN_MAX_REDIS_TTL = env.int("WENI_SESSION_TOKEN_MAX_REDIS_TTL")
+# cached in the local Redis. The table name, region and Redis TTL cap are
+# centralized in weni-commons (weni_commons.auth.constants). Define
+# WENI_SESSION_TOKEN_DYNAMODB_TABLE / _REGION / WENI_SESSION_TOKEN_MAX_REDIS_TTL
+# here only if this service needs to override those defaults.
 
 # weni-commons / weni-feature-flags (required on import)
 GROWTHBOOK_CLIENT_KEY = env.str("GROWTHBOOK_CLIENT_KEY")
