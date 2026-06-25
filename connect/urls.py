@@ -131,6 +131,16 @@ if settings.DEBUG:
                             project_name="TestProject",
                         ),
                     ),
+                    path(
+                        "content-ia",
+                        render_template(
+                            "common/emails/organization/content_ia_max_length.html",
+                            base_url=settings.BASE_URL,
+                            webapp_base_url=settings.WEBAPP_BASE_URL,
+                            ai_name="Teste",
+                            user_name="Alisson"
+                        )
+                    ),
                 ]
             ),
         )
