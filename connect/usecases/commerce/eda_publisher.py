@@ -37,7 +37,7 @@ class CommerceEDAPublisher:
         self._publisher.send_message(
             body=body, exchange="projects.topic", routing_key=""
         )
-        
+
         # TEMPORARY[EDA Migration]: This needs to be adjusted after the migration is complete.
         amazonmq_publisher = EDAPublisher(AMQConnectionParamsFactory)
         amazonmq_publisher.send_message(
