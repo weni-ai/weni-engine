@@ -1,11 +1,13 @@
 import json
 import uuid
+from datetime import timedelta
 from unittest.mock import MagicMock, Mock, patch
 
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase, override_settings
 from django.urls import reverse
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APIClient, APIRequestFactory, APITestCase, force_authenticate
 
@@ -74,20 +76,31 @@ class GetTokenViewTestCase(TestCase):
             force_authenticate(request, user=user, token=user.auth_token)
         return self.view(request, project_uuid=project_uuid)
 
+    @patch(
+        "connect.usecases.auth.generate_session_token.DynamoDBSessionTokenRepository"
+    )
     @patch("connect.usecases.auth.generate_session_token.get_redis_connection")
-    def test_get_token_success(self, mock_get_redis_connection):
+    def test_get_token_success(self, mock_get_redis_connection, mock_repo_cls):
         mock_redis = MagicMock()
         mock_get_redis_connection.return_value = mock_redis
+        mock_repo = MagicMock()
+        mock_repo_cls.return_value = mock_repo
 
         response = self._request(user=self.user)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("hash", response.data)
 
+        mock_repo.put.assert_called_once()
+        put_kwargs = mock_repo.put.call_args.kwargs
+        self.assertEqual(put_kwargs["token_hash"], response.data["hash"])
+        self.assertEqual(put_kwargs["projeto"], str(self.project.uuid))
+        self.assertEqual(put_kwargs["user"], self.user.email)
+
         mock_redis.setex.assert_called_once()
         redis_key, ttl, payload = mock_redis.setex.call_args[0]
         self.assertEqual(redis_key, build_cache_key(response.data["hash"]))
-        self.assertEqual(ttl, 3600)
+        self.assertTrue(0 < ttl <= 3600)
 
         stored_data = json.loads(payload)
         self.assertEqual(stored_data["projeto"], str(self.project.uuid))
@@ -175,15 +188,43 @@ class ValidateSessionTokenViewTestCase(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
+    @patch("weni_commons.auth.session.DynamoDBSessionTokenRepository")
     @patch("weni_commons.auth.session.get_redis_connection")
-    def test_validate_session_token_invalid_hash(self, mock_get_redis_connection):
+    def test_validate_session_token_invalid_hash(
+        self, mock_get_redis_connection, mock_repo_cls
+    ):
         mock_redis = MagicMock()
         mock_redis.get.return_value = None
         mock_get_redis_connection.return_value = mock_redis
+        mock_repo_cls.return_value.get.return_value = None
 
         response = self._request(token_hash="invalid-hash")
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    @patch("weni_commons.auth.session.DynamoDBSessionTokenRepository")
+    @patch("weni_commons.auth.session.get_redis_connection")
+    def test_validate_session_token_falls_back_to_dynamodb(
+        self, mock_get_redis_connection, mock_repo_cls
+    ):
+        mock_redis = MagicMock()
+        mock_redis.get.return_value = None
+        mock_get_redis_connection.return_value = mock_redis
+
+        expire_at = (timezone.now() + timedelta(seconds=3600)).isoformat()
+        mock_repo_cls.return_value.get.return_value = {
+            "projeto": str(self.project.uuid),
+            "user": self.user.email,
+            "expire_at": expire_at,
+        }
+
+        response = self._request(token_hash="dynamo-hash")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["user"], self.user.email)
+        mock_redis.setex.assert_called_once()
+        _, ttl, _ = mock_redis.setex.call_args[0]
+        self.assertTrue(0 < ttl <= 3600)
 
 
 @override_settings(USE_EDA_PERMISSIONS=False)
