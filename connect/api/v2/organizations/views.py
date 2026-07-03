@@ -1,5 +1,5 @@
 import pendulum
-from rest_framework import mixins, status, exceptions
+from rest_framework import mixins, status, exceptions, views
 from rest_framework.decorators import action
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.response import Response
@@ -15,11 +15,16 @@ from connect.common.models import (
     OrganizationRole,
     BillingPlan,
 )
+from connect.api.v1.internal.permissions import ModuleHasPermission
 from connect.api.v1.organization.permissions import (
     Has2FA,
+    HasSSOAccess,
     OrganizationHasPermission,
     IsCRMUser,
     _is_orm_user,
+)
+from connect.usecases.organizations.sso_access import (
+    enrich_serializer_context_with_sso_access,
 )
 from connect.api.v2.paginations import CustomCursorPagination
 from connect.api.v2.organizations.serializers import (
@@ -30,6 +35,7 @@ from connect.api.v2.projects.serializers import ProjectSerializer
 from connect.api.v2.organizations.api_schemas import (
     create_organization_schema,
 )
+from connect.usecases.organizations.list_by_user import ListOrgsByUserUseCase
 
 
 class OrganizationViewSet(
@@ -39,7 +45,6 @@ class OrganizationViewSet(
     mixins.DestroyModelMixin,
     GenericViewSet,
 ):
-
     queryset = Organization.objects.all()
     serializer_class = OrganizationSeralizer
     lookup_field = "uuid"
@@ -47,6 +52,7 @@ class OrganizationViewSet(
         IsAuthenticated,
         OrganizationHasPermission | IsCRMUser,
         Has2FA,
+        HasSSOAccess,
     ]
     pagination_class = CustomCursorPagination
 
@@ -61,7 +67,12 @@ class OrganizationViewSet(
             .values("organization")
         )
 
-        return self.queryset.filter(pk__in=auth)
+        queryset = self.queryset.filter(pk__in=auth)
+        return queryset
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        return enrich_serializer_context_with_sso_access(self, context)
 
     def get_object(self):
         if _is_orm_user(self.request.user):
@@ -179,8 +190,29 @@ class OrganizationAuthorizationViewSet(
     GenericViewSet,
 ):
     queryset = Organization.objects
-    permission_classes = [IsAuthenticated, OrganizationHasPermission]
+    permission_classes = [IsAuthenticated, OrganizationHasPermission, HasSSOAccess]
+    sso_allow_read_without_compliance = False
     lookup_field = "uuid"
 
     def get_serializer_class(self):
         return NestedAuthorizationOrganizationSerializer
+
+
+class OrgsByUserView(views.APIView):
+    """Lists the organizations a user belongs to (by email), including each
+    organization's projects and active member count.
+
+    Service-to-service endpoint guarded by ``ModuleHasPermission``.
+    """
+
+    permission_classes = [ModuleHasPermission]
+
+    def get(self, request):
+        user_email = request.query_params.get("user_email")
+        if not user_email:
+            raise ValidationError(
+                {"user_email": _("This query parameter is required.")}
+            )
+
+        organizations = ListOrgsByUserUseCase().execute(user_email)
+        return Response({"organizations": organizations}, status=status.HTTP_200_OK)

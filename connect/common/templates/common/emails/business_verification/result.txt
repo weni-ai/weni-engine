@@ -1,0 +1,15 @@
+{% load i18n %}{% if is_approved %}{% trans 'Great news!' %}
+
+{% trans "Your business has been verified by Meta. Your account now has access to WhatsApp's advanced features." %}
+
+{% trans 'If you have any questions, our support team is here to help.' %}
+{% else %}{% trans 'Your business verification was not approved' %}
+
+{% trans 'Unfortunately, Meta was unable to verify your business based on the submitted documents. This may have happened due to missing or incorrect information.' %}
+
+{% trans 'Our support team can help you identify what went wrong and prepare a new submission.' %}
+
+{% trans "You'll be able to try again in 24 hours." %}
+
+{% trans 'Contact CS Team' %}: {{ support_url }}
+{% endif %}

@@ -30,13 +30,24 @@ from connect.api.v2.template_projects.views import (
 from connect.api.v2.commerce.views import (
     CommerceOrganizationViewSet,
     CreateVtexProjectView,
+    LinkVtexAccountView,
+    SendDataExportEmailView,
     SetVtexHostStoreView,
     UpdateProjectConfigView,
 )
 from connect.api.v2.organizations import views as organization_views
 from connect.api.v2.projects import views as project_views
 from connect.api.v2.internals import views as connect_internal_views
-from connect.api.v2.auth.views import KeycloakAuthView, ProjectAuthView
+from connect.api.v2.auth.views import (
+    KeycloakAuthView,
+    ProjectAuthView,
+    VtexAccountProjectAuthView,
+)
+
+from connect.api.v2.internals.business_verification.views import (
+    NotifyBusinessVerificationView,
+)
+
 
 router = routers.SimpleRouter()
 router.register(
@@ -113,6 +124,11 @@ urlpatterns = [
         ),
         name="list-organization-authorizations",
     ),
+    path(
+        "orgs-by-user",
+        organization_views.OrgsByUserView.as_view(),
+        name="orgs-by-user",
+    ),
     path("projects/channels", ListChannelsAPIView.as_view(), name="list-channels"),
     path(
         "projects/<project_uuid>/create-wac-channel",
@@ -144,6 +160,11 @@ urlpatterns = [
         ProjectAuthView.as_view(),
         name="project-authorizations",
     ),
+    path(
+        "projects/vtex-account/<vtex_account>/authorization",
+        VtexAccountProjectAuthView.as_view(),
+        name="project-vtex-account-authorizations",
+    ),
     path("account/user-is-paying", UserIsPaying.as_view(), name="user-is-paying"),
     path("omie/accounts", OmieAccountAPIView.as_view(), name="omie-accounts"),
     path("omie/origins", OmieOriginAPIView.as_view(), name="omie-origins"),
@@ -159,6 +180,11 @@ urlpatterns = [
         CreateVtexProjectView.as_view(),
         name="create-vtex-project",
     ),
+    path(
+        "commerce/projects/<project_uuid>/link-vtex-account/",
+        LinkVtexAccountView.as_view(),
+        name="link-vtex-account",
+    ),
     path(  # TODO: deprecated, can be removed in the near future
         "commerce/projects/<project_uuid>/set-vtex-host-store/",
         SetVtexHostStoreView.as_view(),
@@ -168,6 +194,11 @@ urlpatterns = [
         "commerce/projects/<project_uuid>/config/",
         UpdateProjectConfigView.as_view(),
         name="update-project-config",
+    ),
+    path(
+        "commerce/send-data-export-email/",
+        SendDataExportEmailView.as_view(),
+        name="commerce-send-data-export-email",
     ),
     path("auth/", KeycloakAuthView.as_view(), name="keycloak-auth"),
 ]
@@ -191,5 +222,10 @@ urlpatterns += [
         "internals/connect/projects/<project_uuid>/plan-status",
         connect_internal_views.InternalProjectPlanStatusView.as_view(),
         name="internal-project-plan-status",
+    ),
+    path(
+        "internals/business-verification/notify/",
+        NotifyBusinessVerificationView.as_view(),
+        name="internal-business-verification-notify",
     ),
 ]

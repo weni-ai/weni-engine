@@ -20,6 +20,7 @@ from connect.api.v1.account.serializers import (
     UserEmailSetupSerializer,
 )
 from connect.api.v1.keycloak import KeycloakControl
+from connect.services.keycloak.service import KeycloakCredentialsService
 from connect.authentication.models import User
 from connect.common.models import OrganizationAuthorization, Service
 from connect.utils import upload_photo_rocket
@@ -142,6 +143,7 @@ class MyUserProfileViewSet(
             keycloak_instance.instance.set_user_password(
                 user_id=user_id, password=request.data.get("password"), temporary=False
             )
+            KeycloakCredentialsService().invalidate(self.request.user.email)
             self.request.user.send_change_password_email()
         except KeycloakGetError or ValidationError:
             raise ValidationError(
@@ -193,7 +195,6 @@ class MyUserProfileViewSet(
     )
     def add_additional_information(self, request, **kwargs):
         try:
-
             user = request.user
 
             company_info = request.data.get("company")
@@ -300,7 +301,6 @@ class MyUserProfileViewSet(
         response = []
 
         for authorization in authorizations:
-
             organization = authorization.organization
             first_user = organization.authorizations.order_by("created_at").first().user
 

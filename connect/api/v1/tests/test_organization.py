@@ -969,7 +969,6 @@ class GetOrganizationStripeDataTestCase(TestCase):
     @patch("connect.api.v1.organization.views.StripeGateway")
     @patch("connect.common.models.BillingPlan.get_stripe_customer")
     def test_get_stripe_card_data(self, mock_stripe_customer, mock_get_gateway):
-
         mock_response = Mock()
         mock_response.id = ""
 
@@ -1044,7 +1043,6 @@ class RequestPermissionOrganizationSerializerTestCase(TestCase):
         return super().setUp()
 
     def test_fail_uppercase_email_validation(self):
-
         with self.assertRaises(ValidationError) as context:
             self.test_serializer.validate(
                 {
@@ -1058,7 +1056,6 @@ class RequestPermissionOrganizationSerializerTestCase(TestCase):
         )
 
     def test_simple_validation(self):
-
         simple_validation = self.test_serializer.validate(
             {
                 "email": "test@test.com",
@@ -1069,7 +1066,6 @@ class RequestPermissionOrganizationSerializerTestCase(TestCase):
         self.assertEqual(simple_validation["role"], OrganizationRole.ADMIN.value)
 
     def test_fail_white_space_email_validation(self):
-
         with self.assertRaises(ValidationError) as context:
             self.test_serializer.validate(
                 {
@@ -1083,7 +1079,6 @@ class RequestPermissionOrganizationSerializerTestCase(TestCase):
 
     @unittest.skip("Test broken, need to be fixed")
     def test_get_existing_user_data(self):
-
         request_permission = RequestPermissionOrganization.objects.create(
             email="test@test.com",
             role=OrganizationRole.ADMIN.value,
@@ -1097,7 +1092,6 @@ class RequestPermissionOrganizationSerializerTestCase(TestCase):
         )
 
     def test_get_non_existing_user_data(self):
-
         non_existing_email = "test2@test.com"
 
         request_permission = RequestPermissionOrganization.objects.create(
@@ -1117,19 +1111,18 @@ class OrganizationFieldTrackerTestCase(TestCase):
     def setUp(self):
         self.user, self.token = create_user_and_token("test_user")
         self.organization = Organization.objects.create(
-            name="Test Organization", description="Test Description", is_suspended=False
-        )
-        BillingPlan.objects.create(
-            organization=self.organization,
-            plan=BillingPlan.PLAN_FREE,
-            gateway=StripeMockGateway(),
+            name="Test Organization",
+            description="Test Description",
+            is_suspended=False,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan=BillingPlan.PLAN_TRIAL,
         )
 
     def test_field_tracker_detects_suspension_changes(self):
         """Test that FieldTracker correctly detects changes to is_suspended field"""
         # Initially, no changes should be detected
         self.assertFalse(self.organization.tracker.has_changed("is_suspended"))
-        self.assertIsNone(self.organization.tracker.previous("is_suspended"))
+        self.assertEqual(self.organization.tracker.previous("is_suspended"), False)
 
         # Change the suspension status
         self.organization.is_suspended = True

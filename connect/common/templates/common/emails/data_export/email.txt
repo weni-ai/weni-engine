@@ -1,0 +1,13 @@
+{% load i18n %}{% trans 'Your data export has been processed and ready for download.' %}
+
+{% trans "Here's what you requested:" %}
+
+- {% trans 'Period' %}: {{ period }}
+- {% trans 'Template' %}: {{ template_label }}
+- {% trans 'Status' %}: {{ status_label }}
+
+{% trans "If the data doesn't match what you expected, you can go back to the platform and generate a new export with adjusted filters." %}
+
+{% trans 'Download File' %}: {{ file_url }}
+
+VTEX CX Team

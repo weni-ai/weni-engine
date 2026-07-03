@@ -11,6 +11,8 @@
 
 [Environment Variables List](#environment-variables-list)
 
+[Pre-commit hooks](#pre-commit-hooks)
+
 [License](#license)
 
 [Contributing](#contributing)
@@ -35,7 +37,7 @@ Keycloak will be running on `http://localhost:8080`
 
 1. [Create a new realm](https://www.keycloak.org/getting-started/getting-started-docker#_create_a_realm), not recommended to use master realm
 
-2. Setup the clients 
+2. Setup the clients
 
 Each service uses a client
 
@@ -53,7 +55,7 @@ Each service uses a client
 
 ### Environment Variables
 
-`OIDC_RP_CLIENT_ID` and `OIDC_RP_CLIENT_SECRET` refers to backend client credentials 
+`OIDC_RP_CLIENT_ID` and `OIDC_RP_CLIENT_SECRET` refers to backend client credentials
 
 `<KEYCLOAK-SERVER-URL>` could be `https://<your-keycloak-host>/` or `https://your-keycloak-host/auth/` depending on the keycloak version
 
@@ -163,8 +165,40 @@ Execute `docker-compose build` to build application
 
 Execute `docker-compose up` to up the server
 
-Very good, your application is running :rocket:                                   
+Very good, your application is running :rocket:
 
+
+## Pre-commit hooks
+
+This project uses [pre-commit](https://pre-commit.com/) to automatically run
+formatting (`black`), linting (`flake8`), file checks and the unit test suite
+before each commit.
+
+Install the git hooks once after cloning the project:
+
+```sh
+poetry install
+poetry run pre-commit install
+```
+
+From now on the hooks run automatically on every `git commit`. To run them
+manually against the whole codebase (recommended right after installing, since
+`black` may reformat several files on the first run):
+
+```sh
+poetry run pre-commit run --all-files
+```
+
+Notes:
+
+- `black` may reformat files and abort the commit. When that happens, stage the
+  changes (`git add -u`) and commit again.
+- The `tests` hook runs the full test suite and requires PostgreSQL to be up
+  (start the local infra with `cd docker && docker compose up -d`). Pre-commit
+  buffers hook output, so for live test progress run the suite directly:
+  `poetry run python manage.py test -v2`.
+- Commits directly to `main` are blocked by the `no-commit-to-branch` hook;
+  always work on a feature branch.
 
 ## Contributing
 
@@ -172,8 +206,9 @@ Contributions are what make the open source community such an amazing place to b
 
 1. Fork the Project
 2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+3. Install the pre-commit hooks (see [Pre-commit hooks](#pre-commit-hooks))
+4. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+5. Push to the Branch (`git push origin feature/AmazingFeature`)
+6. Open a Pull Request
 
 To see more go to the [Weni Platform central repository](https://github.com/Ilhasoft/weni-platform).

@@ -6,7 +6,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 
 from connect.api.v1.internal.permissions import ModuleHasPermission
-from connect.api.v1.organization.permissions import Has2FA
+from connect.api.v1.organization.permissions import Has2FA, HasSSOAccess
 from connect.api.v1.project.permissions import IsProjectAdmin, ProjectHasPermission
 
 from connect.common.models import Project, OpenedProject, TypeProject
@@ -20,6 +20,9 @@ from connect.api.v2.projects.serializers import (
 )
 from connect.usecases.project import ProjectEDAPublisher
 from connect.usecases.project.get_project_detail import GetProjectDetailUseCase
+from connect.usecases.project.list_authorized_projects import (
+    ListAuthorizedProjectsUseCase,
+)
 
 from django.utils import timezone
 from connect.api.v2.paginations import (
@@ -39,20 +42,27 @@ class ProjectViewSet(
     queryset = Project.objects
     serializer_class = ProjectSerializer
     lookup_field = "uuid"
-    permission_classes = [IsAuthenticated, ProjectHasPermission, Has2FA]
+    permission_classes = [IsAuthenticated, ProjectHasPermission, Has2FA, HasSSOAccess]
     pagination_class = CustomCursorPagination
 
     def get_queryset(self, **kwargs):
         if getattr(self, "swagger_fake_view", False):
             return Project.objects.none()  # pragma: no cover
 
-        if self.kwargs.get("organization_uuid"):
-            return (
-                super()
-                .get_queryset()
-                .filter(organization__uuid=self.kwargs["organization_uuid"])
+        organization_uuid = self.kwargs.get("organization_uuid")
+
+        # Detail actions rely on object-level (organization) permissions; only
+        # listing needs to be scoped to the user's authorized projects.
+        if self.action == "list":
+            return ListAuthorizedProjectsUseCase().execute(
+                user=self.request.user,
+                organization_uuid=organization_uuid,
             )
-        return super().get_queryset()
+
+        queryset = super().get_queryset()
+        if organization_uuid:
+            queryset = queryset.filter(organization__uuid=organization_uuid)
+        return queryset
 
     def get_ordering(self):
         valid_fields = (org_fields.name for org_fields in Project._meta.get_fields())
@@ -115,16 +125,11 @@ class ProjectViewSet(
         return super(ProjectViewSet, self).create(request, *args, **kwargs)
 
     def perform_destroy(self, instance):
-        user_email = self.request.user.email
-        project_uuid = instance.uuid
-
-        # Publish delete event via EDA to notify Flows and Billing
         eda_publisher = ProjectEDAPublisher()
         eda_publisher.publish_project_deleted(
-            project_uuid=project_uuid,
-            user_email=user_email,
+            project_uuid=instance.uuid,
+            user_email=self.request.user.email,
         )
-
         instance.delete()
 
     @action(detail=True, methods=["POST"], url_name="set-type")
@@ -182,14 +187,14 @@ class ProjectViewSet(
 class ProjectAuthorizationViewSet(mixins.RetrieveModelMixin, GenericViewSet):
     queryset = Project.objects
     serializer_class = ProjectListAuthorizationSerializer
-    permission_classes = [IsAuthenticated, ProjectHasPermission, Has2FA]
+    permission_classes = [IsAuthenticated, ProjectHasPermission, Has2FA, HasSSOAccess]
     lookup_field = "uuid"
 
 
 class OpenedProjectViewSet(mixins.ListModelMixin, GenericViewSet):
     queryset = OpenedProject.objects.select_related("project", "user")
     serializer_class = OpenedProjectSerializer
-    permission_classes = [IsAuthenticated, ProjectHasPermission, Has2FA]
+    permission_classes = [IsAuthenticated, ProjectHasPermission, Has2FA, HasSSOAccess]
     lookup_field = "uuid"
     pagination_class = OpenedProjectCustomCursorPagination
 
@@ -218,7 +223,9 @@ class OpenedProjectViewSet(mixins.ListModelMixin, GenericViewSet):
 
 
 class ProjectDetailView(views.APIView):
-    permission_classes = [ModuleHasPermission | (IsAuthenticated & IsProjectAdmin)]
+    permission_classes = [
+        ModuleHasPermission | (IsAuthenticated & IsProjectAdmin & HasSSOAccess),
+    ]
 
     def get(self, request, uuid):
         use_case = GetProjectDetailUseCase()

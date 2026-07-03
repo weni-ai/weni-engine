@@ -4,7 +4,7 @@ import uuid
 from django.core.cache import cache
 from django.test import TestCase
 from rest_framework import status
-from rest_framework.test import APIRequestFactory
+from rest_framework.test import APIRequestFactory, force_authenticate
 from unittest.mock import patch
 
 from connect.api.v1.tests.utils import create_user_and_token
@@ -27,9 +27,7 @@ class InternalProjectPlanStatusViewTestCase(TestCase):
     @patch(
         "connect.api.v1.internal.integrations.integrations_rest_client.IntegrationsRESTClient.update_user_permission_project"
     )
-    def setUp(
-        self, integrations_rest, flows_rest, mock_get_gateway, mock_permission
-    ):
+    def setUp(self, integrations_rest, flows_rest, mock_get_gateway, mock_permission):
         integrations_rest.side_effect = [200, 200]
         flows_rest.side_effect = [200, 200]
         mock_get_gateway.return_value = StripeMockGateway()
@@ -61,6 +59,7 @@ class InternalProjectPlanStatusViewTestCase(TestCase):
     def _request(self, project_uuid):
         path = f"/v2/internals/connect/projects/{project_uuid}/plan-status"
         request = self.factory.get(path)
+        force_authenticate(request, user=self.user)
         view = InternalProjectPlanStatusView.as_view()
         response = view(request, project_uuid=project_uuid)
         response.render()

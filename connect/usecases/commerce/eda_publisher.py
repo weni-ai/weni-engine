@@ -44,7 +44,6 @@ class CommerceEDAPublisher:
             body, exchange="projects.topic", routing_key="project.created"
         )
 
-
     def _build_org_body(self, organization: Organization, user: User) -> Dict:
         return {
             "uuid": str(organization.uuid),
