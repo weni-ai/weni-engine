@@ -3009,14 +3009,14 @@ files = [
 
 [[package]]
 name = "weni-eda"
-version = "0.2.0a9"
+version = "0.2.0a10"
 description = "Python library to simplify Event-Driven Architecture (EDA) with Django and RabbitMQ"
 optional = false
 python-versions = ">=3.8"
 groups = ["main"]
 files = [
-    {file = "weni_eda-0.2.0a9-py3-none-any.whl", hash = "sha256:8d194032316c138535ff1c3cb958aba6cac04613a1e489b13f8089b543ca6983"},
-    {file = "weni_eda-0.2.0a9.tar.gz", hash = "sha256:e1e64138f9dd179e95b05f59009ecd32c207a0697b1cfe2d6b91f0b5be1688bb"},
+    {file = "weni_eda-0.2.0a10-py3-none-any.whl", hash = "sha256:afade51a4b511185b5980cb34d75e83699765f5559942be4ef7b71e4624cd806"},
+    {file = "weni_eda-0.2.0a10.tar.gz", hash = "sha256:1e9f83f785b8fce77de8f31cd219f19418abc2e4c261ee1c8ba47516d9267e8e"},
 ]
 
 [package.dependencies]
@@ -3221,4 +3221,4 @@ testing = ["coverage[toml]", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.1"
 python-versions = "~=3.8"
-content-hash = "02a399f247a65921e5f7d8e1b2b4004d3e37af821b4e61853b9498e4f8758ce9"
+content-hash = "44fbab190e8edfd3516ded67cf9dccc9b7c9497898f6fe81bbc419dccfaa2f0e"
