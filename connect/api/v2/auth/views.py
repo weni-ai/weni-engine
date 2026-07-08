@@ -1,16 +1,18 @@
 from rest_framework import status, views
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import NotFound, PermissionDenied
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from connect.api.v2.auth.serializers import KeycloakAuthSerializer
+from connect.api.v2.auth.serializers import GetTokenSerializer, KeycloakAuthSerializer
 from connect.common.models import ProjectAuthorization
 from connect.middleware import WeniOIDCAuthentication
+from connect.usecases.auth.generate_session_token import GenerateSessionTokenUseCase
 from connect.usecases.authorizations.get_project_authorization import (
     GetProjectAuthorizationUseCase,
 )
 from connect.usecases.keycloak.authenticate import KeycloakAuthenticateUseCase
+from weni_commons.auth import SessionTokenAuthentication
 
 
 class KeycloakAuthView(views.APIView):
@@ -80,3 +82,44 @@ class VtexAccountProjectAuthView(BaseProjectAuthorizationView):
             user_email=user_email, vtex_account=vtex_account
         )
         return self._build_response(authorization)
+
+
+class GetTokenView(views.APIView):
+    authentication_classes = [WeniOIDCAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request: Request, project_uuid: str = None):
+        serializer = GetTokenSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        user = request.user
+
+        try:
+            user.project_authorizations_user.get(project__uuid=project_uuid)
+        except ProjectAuthorization.DoesNotExist:
+            raise NotFound("Project authorization not found")
+
+        token_hash = GenerateSessionTokenUseCase().execute(
+            project_uuid=project_uuid,
+            user_email=user.email,
+            duration=serializer.validated_data["duration"],
+        )
+
+        return Response({"hash": token_hash}, status=status.HTTP_200_OK)
+
+
+class ValidateSessionTokenView(views.APIView):
+    authentication_classes = [SessionTokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request: Request, project_uuid: str = None):
+        session = request.auth
+        return Response(
+            {
+                "projeto": session.projeto,
+                "user": session.user,
+                "expire_at": session.expire_at,
+                "project_uuid": str(project_uuid),
+            },
+            status=status.HTTP_200_OK,
+        )
