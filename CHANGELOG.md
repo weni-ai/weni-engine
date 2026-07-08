@@ -1,3 +1,6 @@
+# 3.52.0
+  - feat: Add contract acceptance email endpoint with PDF attachment
+
 # 3.51.0
   - feat: Publish project deleted EDA on v1 organization destroy
 
