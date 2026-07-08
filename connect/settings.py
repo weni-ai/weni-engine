@@ -600,10 +600,11 @@ if USE_EDA:
     EDA_VIRTUAL_HOST = env.str("EDA_VIRTUAL_HOST", default="/")
     EDA_WAIT_TIME_RETRY = env.int("EDA_WAIT_TIME_RETRY", default=5)
 
-    AMQ_BROKER_HOST = env.str("AMQ_BROKER_HOST", "localhost:5672")
-    AMQ_BROKER_USER = env.str("AMQ_BROKER_USER", "guest")
-    AMQ_BROKER_PASSWORD = env.str("AMQ_BROKER_PASSWORD", "guest")
-    AMQ_VIRTUAL_HOST = env.str("AMQ_VIRTUAL_HOST", "/")
+    AMQ_BROKER_HOST = env.str("AMQ_BROKER_HOST", default="localhost")
+    AMQ_BROKER_PORT = env.int("AMQ_BROKER_PORT", default=5671)
+    AMQ_BROKER_USER = env.str("AMQ_BROKER_USER", default="guest")
+    AMQ_BROKER_PASSWORD = env.str("AMQ_BROKER_PASSWORD", default="guest")
+    AMQ_VIRTUAL_HOST = env.str("AMQ_VIRTUAL_HOST", default="/")
 
 NEW_ATTENDANCE_DATE = env.str("NEW_ATTENDANCE_DATE", default="2023-09-30")
 
