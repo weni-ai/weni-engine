@@ -2,9 +2,11 @@ import json
 from typing import Dict
 from unittest import skipIf
 import unittest
+from unittest.mock import patch
 
 from django.test import TestCase, RequestFactory
 
+from connect.common.mocks import StripeMockGateway
 from connect.common.models import (
     BillingPlan,
     Organization,
@@ -20,6 +22,15 @@ from connect.common.models import (
 from connect.usecases.authorizations.create import CreateAuthorizationUseCase
 from connect.usecases.authorizations.update import UpdateAuthorizationUseCase
 from connect.usecases.authorizations.delete import DeleteAuthorizationUseCase
+from connect.usecases.authorizations.get_project_authorization import (
+    GetProjectAuthorizationUseCase,
+)
+from connect.usecases.authorizations.exceptions import (
+    MultipleProjectsForVtexAccountError,
+    ProjectAuthorizationNotFoundError,
+    UserNotFoundError,
+)
+from connect.usecases.project.exceptions import ProjectNotFoundError
 
 from connect.usecases.authorizations.dto import (
     CreateAuthorizationDTO,
@@ -530,3 +541,91 @@ class MarketingRoleTestCase(TestCase, TestCaseSetUp):
         project_auth = usecase.create_authorization_for_a_single_project(auth_dto)
 
         self.assertEqual(project_auth.role, role)
+
+
+class GetProjectAuthorizationUseCaseTest(TestCase):
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway):
+        mock_get_gateway.return_value = StripeMockGateway()
+
+        self.user = User.objects.create(
+            email="member@test.user", username="member"
+        )
+        self.org = Organization.objects.create(
+            name="Get auth test org",
+            description="Get auth test org",
+            inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan=BillingPlan.PLAN_TRIAL,
+        )
+        self.project = self.org.project.create(
+            name="Get auth test project", vtex_account="mystore"
+        )
+        self.org_authorization = self.org.authorizations.create(
+            user=self.user,
+            role=OrganizationRole.CONTRIBUTOR.value,
+        )
+        self.authorization = ProjectAuthorization.objects.create(
+            user=self.user,
+            project=self.project,
+            role=ProjectRole.CONTRIBUTOR.value,
+            organization_authorization=self.org_authorization,
+        )
+        self.usecase = GetProjectAuthorizationUseCase()
+
+    def test_get_by_project_uuid_returns_authorization(self):
+        authorization = self.usecase.get_by_project_uuid(
+            user_email=self.user.email, project_uuid=str(self.project.uuid)
+        )
+        self.assertEqual(authorization, self.authorization)
+
+    def test_get_by_vtex_account_returns_authorization(self):
+        authorization = self.usecase.get_by_vtex_account(
+            user_email=self.user.email, vtex_account="mystore"
+        )
+        self.assertEqual(authorization, self.authorization)
+
+    def test_get_by_project_uuid_raises_when_user_not_found(self):
+        with self.assertRaises(UserNotFoundError):
+            self.usecase.get_by_project_uuid(
+                user_email="ghost@test.user",
+                project_uuid=str(self.project.uuid),
+            )
+
+    def test_get_by_vtex_account_raises_when_user_not_found(self):
+        with self.assertRaises(UserNotFoundError):
+            self.usecase.get_by_vtex_account(
+                user_email="ghost@test.user", vtex_account="mystore"
+            )
+
+    def test_get_by_project_uuid_raises_when_authorization_not_found(self):
+        outsider = User.objects.create(
+            email="outsider@test.user", username="outsider"
+        )
+        with self.assertRaises(ProjectAuthorizationNotFoundError):
+            self.usecase.get_by_project_uuid(
+                user_email=outsider.email,
+                project_uuid=str(self.project.uuid),
+            )
+
+    def test_get_by_vtex_account_raises_when_authorization_not_found(self):
+        outsider = User.objects.create(
+            email="outsider@test.user", username="outsider"
+        )
+        with self.assertRaises(ProjectAuthorizationNotFoundError):
+            self.usecase.get_by_vtex_account(
+                user_email=outsider.email, vtex_account="mystore"
+            )
+
+    def test_get_by_vtex_account_raises_when_project_not_found(self):
+        with self.assertRaises(ProjectNotFoundError):
+            self.usecase.get_by_vtex_account(
+                user_email=self.user.email, vtex_account="unknown"
+            )
+
+    def test_get_by_vtex_account_raises_when_multiple_projects(self):
+        self.org.project.create(name="Duplicated project", vtex_account="mystore")
+        with self.assertRaises(MultipleProjectsForVtexAccountError):
+            self.usecase.get_by_vtex_account(
+                user_email=self.user.email, vtex_account="mystore"
+            )

@@ -1,3 +1,15 @@
+# 3.51.0
+  - feat: Publish project deleted EDA on v1 organization destroy
+
+# 3.50.0
+  - feat: Per-organization SSO-only access enforcement
+
+# 3.49.0
+  - feat: add orgs-by-user listing and link-vtex-account endpoints
+
+# 3.48.0
+  - feat: Add VtexAccountProjectAuthView and related use case for project authorization by VTEX account
+
 # 3.47.2
   - fix: Add clicktracking attribute to download link in email template
   - add: complete language review. Fix PT and add EN, ES and RO translations
@@ -10,7 +22,7 @@
   - feat: Implement Send Data Export Email functionality
 
 # 3.46.2
-  - fix: uuid type 
+  - fix: uuid type
 
 # 3.46.1
   - Add custom non-inline organizations
@@ -354,7 +366,7 @@
 # 3.14.0
 ## *Change*
   - update project using usecase to send all messages
-  - send organization uuid when send eda project creation message 
+  - send organization uuid when send eda project creation message
   - ensure that the image is more secure and effective, using a non-administrative user, using high ports (now using 8000), using multi-stage build, only one process per container, writing to /tmp and state check endpoints
 
 ## *Remove*:
@@ -384,7 +396,7 @@
   - change counting method for new attendances
 
 # 3.11.0
-  - Configure OIDC middleware to send user token to cache 
+  - Configure OIDC middleware to send user token to cache
   - improve query in get_paginated_contacts
 # 3.10.1
   - improve elasticsearch query
@@ -497,7 +509,7 @@
 
 # 3.1.0
 
-## *update* 
+## *update*
   - Update UserIsPaying viewset query params and authorizations
 
 ## *Delete*
@@ -527,7 +539,7 @@
 
 ## *Add*
   - Improve views testing coverage
-  - Adding a timeout to requests using ElasticFlow 
+  - Adding a timeout to requests using ElasticFlow
 
 # 2.18.0
 
@@ -545,7 +557,7 @@
 ## *Add*
   - model to management of the send emails from organization and project by user
   - recovery data if that user receive emails on user serializer
-  - Add new unit tests to improve serializer coverage 
+  - Add new unit tests to improve serializer coverage
 
 ## *Delete*
 
@@ -566,7 +578,7 @@
 
 ## *Add*
 
-  - Add new unit tests to improve models coverage 
+  - Add new unit tests to improve models coverage
 
 # 2.15.1
 
