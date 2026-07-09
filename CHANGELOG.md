@@ -1,3 +1,6 @@
+# 3.53.0
+  - feat: Add AMQ Project Publisher
+
 # 3.52.0
   - feat: Add contract acceptance email endpoint with PDF attachment
 
