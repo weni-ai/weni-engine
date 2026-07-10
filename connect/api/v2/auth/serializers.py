@@ -7,6 +7,10 @@ class KeycloakAuthSerializer(serializers.Serializer):
     password = serializers.CharField(required=True)
 
 
+class InvalidateSessionTokenSerializer(serializers.Serializer):
+    hash = serializers.CharField(required=True)
+
+
 class GetTokenSerializer(serializers.Serializer):
     duration = serializers.IntegerField(required=True)
 

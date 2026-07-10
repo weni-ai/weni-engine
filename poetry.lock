@@ -2727,13 +2727,13 @@ six = ">=1.5"
 
 [[package]]
 name = "python-discovery"
-version = "1.4.3"
+version = "1.4.4"
 description = "Python interpreter discovery"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "python_discovery-1.4.3-py3-none-any.whl", hash = "sha256:b6e1e4a7d9e3f6948c39746ffe8218225162d738ba39d05ab1d2f6c1cac4878c"},
-    {file = "python_discovery-1.4.3.tar.gz", hash = "sha256:ad57d7045a862460d4a235986c33f13ed707d3aeb9153fa47eb7dfd0d4673289"},
+    {file = "python_discovery-1.4.4-py3-none-any.whl", hash = "sha256:abebe9120b43453b68c908acfb1e72a19d1a959ed2cb620ad38fc57d08056dbe"},
+    {file = "python_discovery-1.4.4.tar.gz", hash = "sha256:5cad33982d412c1f3ffb8f9ca4ea292c9680bca3942451d30b69c37fce53a4a3"},
 ]
 
 [package.dependencies]
@@ -3257,13 +3257,13 @@ files = [
 
 [[package]]
 name = "tzdata"
-version = "2026.2"
+version = "2026.3"
 description = "Provider of IANA time zone data"
 optional = false
 python-versions = ">=2"
 files = [
-    {file = "tzdata-2026.2-py2.py3-none-any.whl", hash = "sha256:bbe9af844f658da81a5f95019480da3a89415801f6cc966806612cc7169bffe7"},
-    {file = "tzdata-2026.2.tar.gz", hash = "sha256:9173fde7d80d9018e02a662e168e5a2d04f87c41ea174b139fbef642eda62d10"},
+    {file = "tzdata-2026.3-py2.py3-none-any.whl", hash = "sha256:dc096730c87af6cab1b171c9d532be840741ff5d459015e7f6947bd7d7e54931"},
+    {file = "tzdata-2026.3.tar.gz", hash = "sha256:4a1518b8993086a7982523e071643f3c0e5f213e75b21318e78bcabfff9d1415"},
 ]
 
 [[package]]
@@ -3338,13 +3338,13 @@ files = [
 
 [[package]]
 name = "weni-commons"
-version = "1.2.0a7"
+version = "1.2.0a8"
 description = "Weni's common utilities for Python backends"
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "weni_commons-1.2.0a7-py3-none-any.whl", hash = "sha256:cfcd28b724a57731dad508bcf3f041bd120a43e7f739a21904a19295c2ff8176"},
-    {file = "weni_commons-1.2.0a7.tar.gz", hash = "sha256:80e5988d1857c3ef9a5f3f921bf245aca56718789c9a29add1ed2640dfc481f3"},
+    {file = "weni_commons-1.2.0a8-py3-none-any.whl", hash = "sha256:d9a904c908515c01c9b34d686333341d310e3f683aafa4570a446cad9bb93708"},
+    {file = "weni_commons-1.2.0a8.tar.gz", hash = "sha256:b1210c0b52f2d62f9ec41df2be4650d8168d55b252d014c95c40e11b3e892034"},
 ]
 
 [package.dependencies]
@@ -3695,4 +3695,4 @@ testing = ["coverage[toml]", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = "~=3.8"
-content-hash = "c82fd37161e06e5484ac6f285adbd0bde79f5f2f00ff45ce424c6b6ccd2f96a7"
+content-hash = "4f4d58e33966f6f45ba45a5136ea5493354ff15c0d1a1f2a6d155f28ad82b8cd"
