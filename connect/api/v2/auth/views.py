@@ -4,10 +4,19 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from connect.api.v2.auth.serializers import GetTokenSerializer, KeycloakAuthSerializer
+from connect.api.v2.auth.serializers import (
+    GetTokenSerializer,
+    InvalidateSessionTokenSerializer,
+    KeycloakAuthSerializer,
+)
 from connect.common.models import ProjectAuthorization
 from connect.middleware import WeniOIDCAuthentication
 from connect.usecases.auth.generate_session_token import GenerateSessionTokenUseCase
+from connect.usecases.auth.invalidate_session_token import (
+    InvalidateSessionTokenUseCase,
+    SessionTokenNotFound,
+    SessionTokenProjectMismatch,
+)
 from connect.usecases.authorizations.get_project_authorization import (
     GetProjectAuthorizationUseCase,
 )
@@ -123,3 +132,28 @@ class ValidateSessionTokenView(views.APIView):
             },
             status=status.HTTP_200_OK,
         )
+
+
+class InvalidateSessionTokenView(views.APIView):
+    authentication_classes = [SessionTokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request: Request, project_uuid: str = None):
+        serializer = InvalidateSessionTokenSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        session = request.auth
+
+        try:
+            InvalidateSessionTokenUseCase().execute(
+                token_hash=serializer.validated_data["hash"],
+                requester_projeto=session.projeto,
+            )
+        except SessionTokenNotFound:
+            raise NotFound("Session token not found")
+        except SessionTokenProjectMismatch:
+            raise PermissionDenied(
+                "Session token does not belong to this project"
+            )
+
+        return Response(status=status.HTTP_204_NO_CONTENT)

@@ -12,7 +12,11 @@ from rest_framework import status
 from rest_framework.test import APIClient, APIRequestFactory, APITestCase, force_authenticate
 
 from connect.api.v1.tests.utils import create_user_and_token
-from connect.api.v2.auth.views import GetTokenView, ValidateSessionTokenView
+from connect.api.v2.auth.views import (
+    GetTokenView,
+    InvalidateSessionTokenView,
+    ValidateSessionTokenView,
+)
 from connect.authentication.models import User
 from connect.common.mocks import StripeMockGateway
 from connect.common.models import (
@@ -225,6 +229,158 @@ class ValidateSessionTokenViewTestCase(TestCase):
         mock_redis.setex.assert_called_once()
         _, ttl, _ = mock_redis.setex.call_args[0]
         self.assertTrue(0 < ttl <= 3600)
+
+
+@override_settings(USE_EDA_PERMISSIONS=False)
+class InvalidateSessionTokenViewTestCase(TestCase):
+    @patch(
+        "connect.internals.event_driven.producer.rabbitmq_publisher.RabbitmqPublisher.send_message"
+    )
+    @patch("connect.common.signals.update_user_permission_project")
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway, mock_permission, mock_publisher):
+        mock_get_gateway.return_value = StripeMockGateway()
+        mock_permission.return_value = True
+
+        self.factory = APIRequestFactory()
+        self.user, _ = create_user_and_token("user")
+        self.view = InvalidateSessionTokenView.as_view()
+
+        self.organization = Organization.objects.create(
+            name="test organization",
+            description="",
+            inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan="free",
+        )
+        self.project = Project.objects.create(
+            name="test project",
+            flow_organization=uuid.uuid4(),
+            organization=self.organization,
+        )
+        self.other_project = Project.objects.create(
+            name="other project",
+            flow_organization=uuid.uuid4(),
+            organization=self.organization,
+        )
+
+    def _payload(self, projeto, user=None, seconds=3600):
+        return json.dumps(
+            {
+                "projeto": str(projeto),
+                "user": user or self.user.email,
+                "expire_at": (timezone.now() + timedelta(seconds=seconds)).isoformat(),
+            }
+        ).encode("utf-8")
+
+    def _request(self, token_hash=None, data=None, project_uuid=None):
+        project_uuid = project_uuid or str(self.project.uuid)
+        headers = {}
+        if token_hash is not None:
+            headers["HTTP_AUTHORIZATION"] = f"Bearer {token_hash}"
+
+        request = self.factory.post(
+            f"/v2/projects/{project_uuid}/invalidate-session-token",
+            data if data is not None else {"hash": "target-hash"},
+            format="json",
+            **headers,
+        )
+        return self.view(request, project_uuid=project_uuid)
+
+    @patch(
+        "connect.usecases.auth.invalidate_session_token.DynamoDBSessionTokenRepository"
+    )
+    @patch("connect.usecases.auth.invalidate_session_token.get_redis_connection")
+    @patch("weni_commons.auth.session.get_redis_connection")
+    def test_invalidate_session_token_success(
+        self,
+        mock_session_get_redis_connection,
+        mock_usecase_get_redis_connection,
+        mock_repo_cls,
+    ):
+        mock_redis = MagicMock()
+        mock_redis.get.side_effect = lambda key: {
+            build_cache_key("session-hash"): self._payload(self.project.uuid),
+            build_cache_key("target-hash"): self._payload(self.project.uuid),
+        }.get(key)
+        mock_session_get_redis_connection.return_value = mock_redis
+        mock_usecase_get_redis_connection.return_value = mock_redis
+        mock_repo_cls.return_value = MagicMock()
+
+        response = self._request(token_hash="session-hash")
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        mock_redis.delete.assert_called_once_with(build_cache_key("target-hash"))
+        mock_repo_cls.return_value.delete.assert_called_once_with("target-hash")
+
+    @patch(
+        "connect.usecases.auth.invalidate_session_token.DynamoDBSessionTokenRepository"
+    )
+    @patch("connect.usecases.auth.invalidate_session_token.get_redis_connection")
+    @patch("weni_commons.auth.session.get_redis_connection")
+    def test_invalidate_session_token_different_project_returns_403(
+        self,
+        mock_session_get_redis_connection,
+        mock_usecase_get_redis_connection,
+        mock_repo_cls,
+    ):
+        mock_redis = MagicMock()
+        mock_redis.get.side_effect = lambda key: {
+            build_cache_key("session-hash"): self._payload(self.project.uuid),
+            build_cache_key("target-hash"): self._payload(self.other_project.uuid),
+        }.get(key)
+        mock_session_get_redis_connection.return_value = mock_redis
+        mock_usecase_get_redis_connection.return_value = mock_redis
+        mock_repo_cls.return_value = MagicMock()
+
+        response = self._request(token_hash="session-hash")
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        mock_redis.delete.assert_not_called()
+        mock_repo_cls.return_value.delete.assert_not_called()
+
+    @patch(
+        "connect.usecases.auth.invalidate_session_token.DynamoDBSessionTokenRepository"
+    )
+    @patch("connect.usecases.auth.invalidate_session_token.get_redis_connection")
+    @patch("weni_commons.auth.session.get_redis_connection")
+    def test_invalidate_session_token_not_found_returns_404(
+        self,
+        mock_session_get_redis_connection,
+        mock_usecase_get_redis_connection,
+        mock_repo_cls,
+    ):
+        mock_redis = MagicMock()
+        mock_redis.get.side_effect = lambda key: {
+            build_cache_key("session-hash"): self._payload(self.project.uuid),
+        }.get(key)
+        mock_session_get_redis_connection.return_value = mock_redis
+        mock_usecase_get_redis_connection.return_value = mock_redis
+        mock_repo_cls.return_value = MagicMock()
+        mock_repo_cls.return_value.get.return_value = None
+
+        response = self._request(token_hash="session-hash")
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        mock_redis.delete.assert_not_called()
+        mock_repo_cls.return_value.delete.assert_not_called()
+
+    @patch("weni_commons.auth.session.get_redis_connection")
+    def test_invalidate_session_token_missing_hash_returns_400(
+        self, mock_session_get_redis_connection
+    ):
+        mock_redis = MagicMock()
+        mock_redis.get.return_value = self._payload(self.project.uuid)
+        mock_session_get_redis_connection.return_value = mock_redis
+
+        response = self._request(token_hash="session-hash", data={})
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_invalidate_session_token_without_authentication_returns_401(self):
+        response = self._request()
+
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
 @override_settings(USE_EDA_PERMISSIONS=False)
