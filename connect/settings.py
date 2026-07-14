@@ -600,11 +600,23 @@ if USE_EDA:
     EDA_VIRTUAL_HOST = env.str("EDA_VIRTUAL_HOST", default="/")
     EDA_WAIT_TIME_RETRY = env.int("EDA_WAIT_TIME_RETRY", default=5)
 
+USE_PROJECT_MIGRATION_PUBLISHER = env.bool(
+    "USE_PROJECT_MIGRATION_PUBLISHER", default=False
+)
+PROJECT_MIGRATION_EXPECTED_MODULES = env.list(
+    "PROJECT_MIGRATION_EXPECTED_MODULES", default=[]
+)
+
+# AmazonMQ (SSL) settings — used by weni-eda EDAPublisher / AMQConnectionParamsFactory.
+# Available whenever EDA or the project-migration publisher is enabled.
+if USE_EDA or USE_PROJECT_MIGRATION_PUBLISHER:
     AMQ_BROKER_HOST = env.str("AMQ_BROKER_HOST", default="localhost")
     AMQ_BROKER_PORT = env.int("AMQ_BROKER_PORT", default=5671)
     AMQ_BROKER_USER = env.str("AMQ_BROKER_USER", default="guest")
     AMQ_BROKER_PASSWORD = env.str("AMQ_BROKER_PASSWORD", default="guest")
     AMQ_VIRTUAL_HOST = env.str("AMQ_VIRTUAL_HOST", default="/")
+    AMQ_BROKER_SSL_SERVER_HOSTNAME = env("AMQ_BROKER_SSL_SERVER_HOSTNAME", default=None)
+    AMQ_BROKER_HEARTBEAT = env.int("AMQ_BROKER_HEARTBEAT", default=300)
 
 NEW_ATTENDANCE_DATE = env.str("NEW_ATTENDANCE_DATE", default="2023-09-30")
 
