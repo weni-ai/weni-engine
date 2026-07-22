@@ -130,6 +130,16 @@ WEBAPP_BASE_URL = env.str("WEBAPP_BASE_URL")
 
 TESTING = len(sys.argv) > 1 and sys.argv[1] == "test"
 
+if TESTING:
+    # freezegun scans attributes of every imported module when a clock is
+    # frozen. weni_commons re-exports FeatureFlagsService lazily through a
+    # module-level __getattr__, so the scan would import the feature-flags stack
+    # (which requires GrowthBook settings this project does not use). Ignoring
+    # the package keeps freeze_time() from triggering that import.
+    import freezegun
+
+    freezegun.configure(extend_ignore_list=["weni_commons"])
+
 
 # Application definition
 
@@ -393,6 +403,10 @@ OIDC_DRF_AUTH_BACKEND = env.str(
     default="connect.middleware.WeniOIDCAuthenticationBackend",
 )
 OIDC_RP_SCOPES = env.str("OIDC_RP_SCOPES", default="openid email")
+
+# weni-commons auth: public key used to validate App IO / inter-module JWTs
+# (RS256). Only required by routes that adopt WeniAuthentication.
+JWT_PUBLIC_KEY = env.str("JWT_PUBLIC_KEY", default="")
 
 OIDC_CACHE_TOKEN = env.bool(
     "OIDC_CACHE_TOKEN", default=False

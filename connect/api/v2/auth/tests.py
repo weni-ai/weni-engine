@@ -1,12 +1,17 @@
+import datetime
 import uuid
 from unittest.mock import Mock, patch
 
+import jwt
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import rsa
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.test import override_settings
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
+from weni_commons.auth import TOKEN_TYPE_KEYCLOAK, WeniAuthContext
 
 from connect.api.v1.tests.utils import create_user_and_token
 from connect.authentication.models import User
@@ -20,6 +25,25 @@ from connect.common.models import (
     ProjectRole,
     TypeProject,
 )
+
+_JWT_PRIVATE_KEY_OBJ = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+JWT_PRIVATE_KEY = _JWT_PRIVATE_KEY_OBJ.private_bytes(
+    encoding=serialization.Encoding.PEM,
+    format=serialization.PrivateFormat.PKCS8,
+    encryption_algorithm=serialization.NoEncryption(),
+).decode()
+JWT_PUBLIC_KEY = (
+    _JWT_PRIVATE_KEY_OBJ.public_key()
+    .public_bytes(
+        encoding=serialization.Encoding.PEM,
+        format=serialization.PublicFormat.SubjectPublicKeyInfo,
+    )
+    .decode()
+)
+
+
+def build_weni_jwt(**claims) -> str:
+    return jwt.encode(claims, JWT_PRIVATE_KEY, algorithm="RS256")
 
 
 @override_settings(USE_EDA_PERMISSIONS=False)
@@ -95,6 +119,7 @@ class ProjectAuthViewTestCase(ProjectAuthorizationViewTestCaseSetUp):
             response.data["project_authorization"], ProjectRole.CONTRIBUTOR.value
         )
         self.assertIn("available_roles", response.data)
+        self.assertNotIn("project_uuid", response.data)
 
     def test_other_user_lookup_with_internal_permission_returns_role(self):
         self.client.force_authenticate(user=self.internal_user)
@@ -116,6 +141,7 @@ class ProjectAuthViewTestCase(ProjectAuthorizationViewTestCaseSetUp):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
+@override_settings(JWT_PUBLIC_KEY=JWT_PUBLIC_KEY)
 class VtexAccountProjectAuthViewTestCase(ProjectAuthorizationViewTestCaseSetUp):
     def _url(self, vtex_account="mystore"):
         return reverse(
@@ -123,39 +149,69 @@ class VtexAccountProjectAuthViewTestCase(ProjectAuthorizationViewTestCaseSetUp):
             kwargs={"vtex_account": vtex_account},
         )
 
-    def test_self_lookup_returns_role(self):
-        self.client.force_authenticate(user=self.member)
-        response = self.client.get(self._url())
+    def _get(self, url, token=None, **query):
+        headers = {"HTTP_X_WENI_AUTH": token} if token else {}
+        return self.client.get(url, query, **headers)
+
+    def test_valid_jwt_returns_role_and_project_uuid(self):
+        token = build_weni_jwt(vtex_account="mystore", user_email=self.member.email)
+        response = self._get(self._url(), token=token)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["user"], self.member.email)
         self.assertEqual(
             response.data["project_authorization"], ProjectRole.CONTRIBUTOR.value
         )
+        self.assertEqual(response.data["project_uuid"], str(self.project.uuid))
         self.assertIn("available_roles", response.data)
 
-    def test_other_user_lookup_with_internal_permission_returns_role(self):
-        self.client.force_authenticate(user=self.internal_user)
-        response = self.client.get(self._url(), {"user": self.member.email})
+    def test_jwt_resolves_tenant_from_token_ignoring_path(self):
+        token = build_weni_jwt(vtex_account="mystore", user_email=self.member.email)
+        response = self._get(self._url(vtex_account="unknown"), token=token)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["project_uuid"], str(self.project.uuid))
+
+    def test_target_user_query_param_overrides_token_identity(self):
+        token = build_weni_jwt(
+            vtex_account="mystore", user_email=self.internal_user.email
+        )
+        response = self._get(self._url(), token=token, user=self.member.email)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["user"], self.member.email)
 
-    def test_other_user_lookup_without_permission_returns_403(self):
-        self.client.force_authenticate(user=self.regular_user)
-        response = self.client.get(self._url(), {"user": self.member.email})
+    def test_missing_vtex_account_claim_returns_403(self):
+        token = build_weni_jwt(project_uuid=str(self.project.uuid))
+        response = self._get(self._url(), token=token)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_expired_token_is_rejected_without_fallback(self):
+        expired_at = datetime.datetime.utcnow() - datetime.timedelta(minutes=5)
+        token = build_weni_jwt(
+            vtex_account="mystore",
+            user_email=self.member.email,
+            exp=expired_at,
+        )
+        response = self._get(self._url(), token=token)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_missing_token_is_rejected(self):
+        response = self._get(self._url())
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_user_not_found_returns_404(self):
-        self.client.force_authenticate(user=self.internal_user)
-        response = self.client.get(self._url(), {"user": "ghost@test.user"})
+        token = build_weni_jwt(vtex_account="mystore", user_email=self.member.email)
+        response = self._get(self._url(), token=token, user="ghost@test.user")
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_project_not_found_returns_404(self):
-        self.client.force_authenticate(user=self.member)
-        response = self.client.get(self._url(vtex_account="unknown"))
+        token = build_weni_jwt(vtex_account="unknown", user_email=self.member.email)
+        response = self._get(self._url(vtex_account="unknown"), token=token)
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
@@ -167,7 +223,31 @@ class VtexAccountProjectAuthViewTestCase(ProjectAuthorizationViewTestCaseSetUp):
             flow_organization=uuid.uuid4(),
             project_type=TypeProject.COMMERCE,
         )
-        self.client.force_authenticate(user=self.internal_user)
-        response = self.client.get(self._url(), {"user": self.member.email})
+        token = build_weni_jwt(vtex_account="mystore", user_email=self.member.email)
+        response = self._get(self._url(), token=token)
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def _patch_keycloak_caller(self, user):
+        context = WeniAuthContext(
+            vtex_account="mystore",
+            user_email=user.email,
+            token_type=TOKEN_TYPE_KEYCLOAK,
+        )
+        return patch(
+            "weni_commons.auth.authenticators.WeniAuthentication.authenticate",
+            return_value=(user, context),
+        )
+
+    def test_keycloak_other_user_lookup_without_permission_returns_403(self):
+        with self._patch_keycloak_caller(self.regular_user):
+            response = self._get(self._url(), token="ignored", user=self.member.email)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_keycloak_other_user_lookup_with_internal_permission_returns_role(self):
+        with self._patch_keycloak_caller(self.internal_user):
+            response = self._get(self._url(), token="ignored", user=self.member.email)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["user"], self.member.email)
