@@ -2,7 +2,7 @@ from rest_framework import status, views
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
-from weni_commons.auth import IsWeniAuthenticated, WeniAuthentication, WeniAuthViewMixin
+from weni_commons.auth import WeniAuthentication, WeniAuthViewMixin
 
 from connect.api.v2.auth.permissions import (
     TARGET_USER_QUERY_PARAM,
@@ -71,14 +71,10 @@ class VtexAccountProjectAuthView(
     WeniAuthViewMixin, ProjectAuthorizationResponseMixin, views.APIView
 ):
     authentication_classes = [WeniAuthentication]
-    permission_classes = [IsWeniAuthenticated, CanResolveTargetUser]
 
     def get(self, request: Request, vtex_account: str = None):
-        target_user_email = (
-            request.query_params.get(TARGET_USER_QUERY_PARAM) or self.user_email
-        )
         authorization = GetProjectAuthorizationUseCase().get_by_vtex_account(
-            user_email=target_user_email, vtex_account=self.auth.vtex_account
+            user_email=self.auth.user_email, vtex_account=self.auth.vtex_account
         )
         return self._build_response(authorization)
 

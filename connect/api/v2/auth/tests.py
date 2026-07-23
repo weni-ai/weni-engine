@@ -11,7 +11,6 @@ from django.test import override_settings
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
-from weni_commons.auth import TOKEN_TYPE_KEYCLOAK, WeniAuthContext
 
 from connect.api.v1.tests.utils import create_user_and_token
 from connect.authentication.models import User
@@ -172,11 +171,9 @@ class VtexAccountProjectAuthViewTestCase(ProjectAuthorizationViewTestCaseSetUp):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["project_uuid"], str(self.project.uuid))
 
-    def test_target_user_query_param_overrides_token_identity(self):
-        token = build_weni_jwt(
-            vtex_account="mystore", user_email=self.internal_user.email
-        )
-        response = self._get(self._url(), token=token, user=self.member.email)
+    def test_query_param_user_is_ignored_resolving_token_identity(self):
+        token = build_weni_jwt(vtex_account="mystore", user_email=self.member.email)
+        response = self._get(self._url(), token=token, user=self.internal_user.email)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["user"], self.member.email)
@@ -204,8 +201,8 @@ class VtexAccountProjectAuthViewTestCase(ProjectAuthorizationViewTestCaseSetUp):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_user_not_found_returns_404(self):
-        token = build_weni_jwt(vtex_account="mystore", user_email=self.member.email)
-        response = self._get(self._url(), token=token, user="ghost@test.user")
+        token = build_weni_jwt(vtex_account="mystore", user_email="ghost@test.user")
+        response = self._get(self._url(), token=token)
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
@@ -227,27 +224,3 @@ class VtexAccountProjectAuthViewTestCase(ProjectAuthorizationViewTestCaseSetUp):
         response = self._get(self._url(), token=token)
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
-    def _patch_keycloak_caller(self, user):
-        context = WeniAuthContext(
-            vtex_account="mystore",
-            user_email=user.email,
-            token_type=TOKEN_TYPE_KEYCLOAK,
-        )
-        return patch(
-            "weni_commons.auth.authenticators.WeniAuthentication.authenticate",
-            return_value=(user, context),
-        )
-
-    def test_keycloak_other_user_lookup_without_permission_returns_403(self):
-        with self._patch_keycloak_caller(self.regular_user):
-            response = self._get(self._url(), token="ignored", user=self.member.email)
-
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-
-    def test_keycloak_other_user_lookup_with_internal_permission_returns_role(self):
-        with self._patch_keycloak_caller(self.internal_user):
-            response = self._get(self._url(), token="ignored", user=self.member.email)
-
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["user"], self.member.email)
