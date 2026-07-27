@@ -40,6 +40,8 @@ from connect.api.v2.organizations import views as organization_views
 from connect.api.v2.projects import views as project_views
 from connect.api.v2.internals import views as connect_internal_views
 from connect.api.v2.auth.views import (
+    GetTokenView,
+    InvalidateSessionTokenView,
     KeycloakAuthView,
     ProjectAuthView,
     VtexAccountProjectAuthView,
@@ -160,6 +162,16 @@ urlpatterns = [
         "projects/<project_uuid>/authorization",
         ProjectAuthView.as_view(),
         name="project-authorizations",
+    ),
+    path(
+        "projects/<project_uuid>/get-token",
+        GetTokenView.as_view(),
+        name="get-token",
+    ),
+    path(
+        "projects/<project_uuid>/invalidate-session-token",
+        InvalidateSessionTokenView.as_view(),
+        name="invalidate-session-token",
     ),
     path(
         "projects/vtex-account/<vtex_account>/authorization",
