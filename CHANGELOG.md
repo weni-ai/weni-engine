@@ -1,3 +1,15 @@
+# 3.53.0
+  - feat: Add AMQ Project Publisher
+
+# 3.52.0
+  - feat: Add contract acceptance email endpoint with PDF attachment
+
+# 3.51.0
+  - feat: Publish project deleted EDA on v1 organization destroy
+
+# 3.50.0
+  - feat: Per-organization SSO-only access enforcement
+
 # 3.49.0
   - feat: add orgs-by-user listing and link-vtex-account endpoints
 

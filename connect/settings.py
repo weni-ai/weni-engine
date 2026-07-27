@@ -210,7 +210,11 @@ WSGI_APPLICATION = "connect.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
-DATABASES = {"default": env.db(var="DEFAULT_DATABASE", default="sqlite:///db.sqlite3")}
+DATABASES = {
+    "default": env.db(
+        var="DEFAULT_DATABASE", default="postgres://weni:weni@localhost:5432/weni"
+    )
+}
 
 
 # Auth
@@ -614,6 +618,12 @@ if USE_EDA:
     EDA_VIRTUAL_HOST = env.str("EDA_VIRTUAL_HOST", default="/")
     EDA_WAIT_TIME_RETRY = env.int("EDA_WAIT_TIME_RETRY", default=5)
 
+    AMQ_BROKER_HOST = env.str("AMQ_BROKER_HOST", default="localhost")
+    AMQ_BROKER_PORT = env.int("AMQ_BROKER_PORT", default=5671)
+    AMQ_BROKER_USER = env.str("AMQ_BROKER_USER", default="guest")
+    AMQ_BROKER_PASSWORD = env.str("AMQ_BROKER_PASSWORD", default="guest")
+    AMQ_VIRTUAL_HOST = env.str("AMQ_VIRTUAL_HOST", default="/")
+
 NEW_ATTENDANCE_DATE = env.str("NEW_ATTENDANCE_DATE", default="2023-09-30")
 
 
@@ -642,3 +652,7 @@ PROJECTS_PAGE_SIZE = env.int("PROJECTS_PAGE_SIZE", default=100)
 
 # Temporary nexus settings
 NEXUS_AB1_ORGANIZATIONS = env.list("NEXUS_AB1_ORGANIZATIONS", default=[])
+
+# TTL for cached positive Keycloak password lookups used by SSO enforcement.
+# Only has_password=True is cached; negative results are always re-fetched.
+SSO_PASSWORD_CACHE_TTL = env.int("SSO_PASSWORD_CACHE_TTL", default=300)
