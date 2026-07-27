@@ -31,7 +31,9 @@ class GenerateSessionTokenUseCase:
 
     def execute(self, project_uuid: str, user, duration: int) -> str:
         try:
-            user.project_authorizations_user.get(project__uuid=project_uuid)
+            if not user.project_authorizations_user.filter(project__uuid=project_uuid).exists():
+                raise ProjectAuthorizationNotFound()
+
         except ProjectAuthorization.DoesNotExist:
             raise ProjectAuthorizationNotFound()
 
