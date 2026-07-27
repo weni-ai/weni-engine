@@ -137,7 +137,7 @@ urlpatterns = [
         name="create-wac-channel",
     ),
     path(
-        "projects/<uuid>/detail",
+        "projects/<project_uuid>/detail",
         project_views.ProjectDetailView.as_view(),
         name="project-detail",
     ),

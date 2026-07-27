@@ -2,7 +2,7 @@ from rest_framework import status, views
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
-from weni_commons.auth import WeniAuthentication, WeniAuthViewMixin
+from weni_commons.auth import WeniAuthViewMixin
 
 from connect.api.v2.auth.permissions import (
     TARGET_USER_QUERY_PARAM,
@@ -10,7 +10,7 @@ from connect.api.v2.auth.permissions import (
 )
 from connect.api.v2.auth.serializers import KeycloakAuthSerializer
 from connect.common.models import ProjectAuthorization
-from connect.middleware import WeniOIDCAuthentication
+from connect.middleware import WeniAuthentication, WeniOIDCAuthentication
 from connect.usecases.authorizations.get_project_authorization import (
     GetProjectAuthorizationUseCase,
 )
