@@ -75,10 +75,9 @@ class GetTokenViewTestCase(TestCase):
 
     def _request(self, data=None, user=None, project_uuid=None):
         project_uuid = project_uuid or str(self.project.uuid)
-        request = self.factory.post(
+        request = self.factory.get(
             f"/v2/projects/{project_uuid}/get-token",
             data or {"duration": 3600},
-            format="json",
         )
         if user is not None:
             force_authenticate(request, user=user, token=user.auth_token)

@@ -11,7 +11,10 @@ from connect.api.v2.auth.serializers import (
 )
 from connect.common.models import ProjectAuthorization
 from connect.middleware import WeniOIDCAuthentication
-from connect.usecases.auth.generate_session_token import GenerateSessionTokenUseCase
+from connect.usecases.auth.generate_session_token import (
+    GenerateSessionTokenUseCase,
+    ProjectAuthorizationNotFound,
+)
 from connect.usecases.auth.invalidate_session_token import (
     InvalidateSessionTokenUseCase,
     SessionTokenNotFound,
@@ -97,9 +100,8 @@ class GetTokenView(views.APIView):
     authentication_classes = [WeniOIDCAuthentication]
     permission_classes = [IsAuthenticated]
 
-
-    def post(self, request: Request, project_uuid: str = None):
-        serializer = GetTokenSerializer(data=request.data)
+    def get(self, request: Request, project_uuid: str = None):
+        serializer = GetTokenSerializer(data=request.query_params)
         serializer.is_valid(raise_exception=True)
 
         try:
@@ -112,7 +114,6 @@ class GetTokenView(views.APIView):
             raise NotFound("Project authorization not found")
 
         return Response({"hash": token_hash}, status=status.HTTP_200_OK)
-
 
 
 class InvalidateSessionTokenView(views.APIView):
