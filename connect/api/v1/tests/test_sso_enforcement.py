@@ -4,8 +4,9 @@ from unittest.mock import patch
 
 from django.test import RequestFactory, TestCase, override_settings
 from rest_framework import status
-from rest_framework.request import Request
+from rest_framework.request import ForcedAuthentication, Request
 from rest_framework.test import APIClient, force_authenticate
+from weni_commons.auth import TOKEN_TYPE_KEYCLOAK, WeniAuthContext
 
 from connect.api.v1.organization.permissions import HasSSOAccess
 from connect.api.v1.organization.views import (
@@ -329,9 +330,19 @@ class SSOEnforcementV2ProjectAccessTestCase(TestCase):
             organization=self.enforcing_org,
         )
         request = self.factory.get(f"/v2/projects/{project.uuid}/detail")
-        force_authenticate(request, user=self.user, token=self.token)
+        force_authenticate(
+            request,
+            user=self.user,
+            token=WeniAuthContext(
+                project_uuid=str(project.uuid),
+                user_email=self.user.email,
+                token_type=TOKEN_TYPE_KEYCLOAK,
+            ),
+        )
         request.session_identity_provider = None
-        response = ProjectDetailView.as_view()(request, uuid=str(project.uuid))
+
+        response = ProjectDetailView.as_view()(request, project_uuid=str(project.uuid))
+
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 
@@ -358,9 +369,17 @@ class HasSSOAccessPermissionTestCase(TestCase):
             organization=self.enforcing_org, is_enabled=True
         )
 
-    def build_request(self, path="/", session_identity_provider=None):
-        request = Request(self.factory.get(path))
-        request.user = self.user
+    def build_request(self, path="/", session_identity_provider=None, method="get"):
+        """Build a request whose authentication is already resolved.
+
+        Permissions only run after authentication in production; leaving ``auth``
+        unresolved here would make any read of it re-authenticate the request
+        and replace the test user with ``AnonymousUser``.
+        """
+        request = Request(
+            getattr(self.factory, method)(path),
+            authenticators=[ForcedAuthentication(self.user, None)],
+        )
         request.session_identity_provider = session_identity_provider
         return request
 
@@ -380,9 +399,7 @@ class HasSSOAccessPermissionTestCase(TestCase):
         self.assertFalse(self.permission.has_permission(request, view=view))
 
     def test_blocks_uuid_kwarg_for_non_compliant_session(self):
-        request = Request(self.factory.patch("/"))
-        request.user = self.user
-        request.session_identity_provider = None
+        request = self.build_request(method="patch")
         view = type("View", (), {"kwargs": {"uuid": str(self.enforcing_org.uuid)}})()
         self.assertFalse(self.permission.has_permission(request, view=view))
 
@@ -407,9 +424,7 @@ class HasSSOAccessPermissionTestCase(TestCase):
             flow_organization=uuid.uuid4(),
             organization=self.enforcing_org,
         )
-        request = Request(self.factory.post("/"))
-        request.user = self.user
-        request.session_identity_provider = None
+        request = self.build_request(method="post")
         view = type("View", (), {"kwargs": {"uuid": str(project.uuid)}})()
         self.assertFalse(self.permission.has_permission(request, view=view))
 
@@ -422,10 +437,34 @@ class HasSSOAccessPermissionTestCase(TestCase):
             flow_organization=uuid.uuid4(),
             organization=self.enforcing_org,
         )
-        request = Request(self.factory.post("/"))
-        request.user = self.user
-        request.session_identity_provider = "google"
+        request = self.build_request(method="post", session_identity_provider="google")
         view = type("View", (), {"kwargs": {"uuid": str(project.uuid)}})()
+        self.assertTrue(self.permission.has_permission(request, view=view))
+
+    def test_blocks_project_uuid_kwarg_for_non_compliant_session(self):
+        project = Project.objects.create(
+            name="SSO Project Kwarg",
+            flow_organization=uuid.uuid4(),
+            organization=self.enforcing_org,
+        )
+        request = self.build_request()
+        view = type("View", (), {"kwargs": {"project_uuid": str(project.uuid)}})()
+        self.assertFalse(self.permission.has_permission(request, view=view))
+
+    @patch(HAS_PASSWORD_CREDENTIAL, return_value=False)
+    def test_allows_project_uuid_kwarg_for_compliant_session(self, _mock_has_password):
+        project = Project.objects.create(
+            name="SSO Compliant Project Kwarg",
+            flow_organization=uuid.uuid4(),
+            organization=self.enforcing_org,
+        )
+        request = self.build_request(session_identity_provider="google")
+        view = type("View", (), {"kwargs": {"project_uuid": str(project.uuid)}})()
+        self.assertTrue(self.permission.has_permission(request, view=view))
+
+    def test_allows_project_uuid_kwarg_of_unknown_project(self):
+        request = self.build_request()
+        view = type("View", (), {"kwargs": {"project_uuid": str(uuid.uuid4())}})()
         self.assertTrue(self.permission.has_permission(request, view=view))
 
     def test_blocks_organization_double_underscore_uuid_kwarg_for_non_compliant_session(

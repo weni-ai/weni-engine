@@ -1,15 +1,20 @@
 import json
 import uuid
+from datetime import timedelta
 from rest_framework import status
 from rest_framework.request import Request
-from rest_framework.test import APIRequestFactory, force_authenticate
+from rest_framework.test import APIClient, APIRequestFactory, force_authenticate
 
 from django.core.cache import cache
 from django.test import TestCase, override_settings
+from django.urls import reverse
+from django.utils import timezone
 from unittest.mock import patch
 import unittest
+from weni_commons.auth import TOKEN_TYPE_KEYCLOAK, WeniAuthContext
 
 from connect.api.v1.tests.utils import create_user_and_token
+from connect.api.v2.auth.tests import JWT_PUBLIC_KEY, build_weni_jwt
 from connect.common.models import (
     Organization,
     BillingPlan,
@@ -575,14 +580,31 @@ class ProjectDetailViewTestCase(TestCase):
             config={"nexus_ai_enabled": True, "vtex_store_type": "io"},
         )
 
-    def _make_request(self, project_uuid, user=None):
+    def _keycloak_auth(self, project_uuid, user):
+        return WeniAuthContext(
+            project_uuid=project_uuid,
+            user_email=user.email,
+            token_type=TOKEN_TYPE_KEYCLOAK,
+        )
+
+    def _make_request(self, project_uuid, user=None, auth=None):
         url = f"/v2/projects/{project_uuid}/detail"
         request = self.factory.get(url)
         if user:
-            force_authenticate(request, user=user, token=user.auth_token)
-        response = ProjectDetailView.as_view()(request, uuid=project_uuid)
+            force_authenticate(
+                request,
+                user=user,
+                token=auth or self._keycloak_auth(project_uuid, user),
+            )
+        response = ProjectDetailView.as_view()(request, project_uuid=project_uuid)
         response.render()
         return response, json.loads(response.content) if response.content else {}
+
+    def _detail_url(self, project_uuid):
+        return reverse("project-detail", kwargs={"project_uuid": project_uuid})
+
+    def _make_jwt_request(self, path_uuid, token):
+        return APIClient().get(self._detail_url(path_uuid), HTTP_X_WENI_AUTH=token)
 
     def test_returns_200_with_project_data(self):
         response, data = self._make_request(str(self.project.uuid), self.user)
@@ -646,6 +668,90 @@ class ProjectDetailViewTestCase(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(data["uuid"], str(self.project.uuid))
+
+    def test_keycloak_without_resolved_tenant_returns_403(self):
+        auth = WeniAuthContext(
+            user_email=self.user.email, token_type=TOKEN_TYPE_KEYCLOAK
+        )
+
+        response, _ = self._make_request(str(self.project.uuid), self.user, auth=auth)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    @patch("connect.middleware.WeniOIDCAuthentication")
+    def test_keycloak_resolves_tenant_from_the_url(self, mock_oidc):
+        mock_oidc.return_value.authenticate.return_value = (self.user, "keycloak-token")
+        mock_oidc.return_value.backend.verify_token.return_value = {
+            "email": self.user.email
+        }
+
+        response = APIClient().get(
+            self._detail_url(str(self.project.uuid)),
+            HTTP_AUTHORIZATION="Bearer keycloak-token",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["uuid"], str(self.project.uuid))
+
+    @override_settings(JWT_PUBLIC_KEY=JWT_PUBLIC_KEY)
+    def test_internal_jwt_uses_token_project_ignoring_path(self):
+        token = build_weni_jwt(
+            project_uuid=str(self.project.uuid),
+            user_email=self.user.email,
+            can_communicate_internally=True,
+        )
+
+        response = self._make_jwt_request(str(uuid.uuid4()), token)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["uuid"], str(self.project.uuid))
+
+    @override_settings(JWT_PUBLIC_KEY=JWT_PUBLIC_KEY)
+    def test_jwt_authorizes_org_admin_resolved_from_the_token_email(self):
+        token = build_weni_jwt(
+            project_uuid=str(self.project.uuid), user_email=self.user.email
+        )
+
+        response = self._make_jwt_request(str(self.project.uuid), token)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["uuid"], str(self.project.uuid))
+
+    @override_settings(JWT_PUBLIC_KEY=JWT_PUBLIC_KEY)
+    def test_jwt_with_non_admin_email_returns_403(self):
+        contributor_user, _ = create_user_and_token("jwt_contributor")
+        self.org.authorizations.create(
+            user=contributor_user, role=OrganizationRole.CONTRIBUTOR.value
+        )
+        token = build_weni_jwt(
+            project_uuid=str(self.project.uuid), user_email=contributor_user.email
+        )
+
+        response = self._make_jwt_request(str(self.project.uuid), token)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    @override_settings(JWT_PUBLIC_KEY=JWT_PUBLIC_KEY)
+    def test_jwt_with_email_without_django_user_returns_403(self):
+        token = build_weni_jwt(
+            project_uuid=str(self.project.uuid), user_email="stranger@weni.ai"
+        )
+
+        response = self._make_jwt_request(str(self.project.uuid), token)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    @override_settings(JWT_PUBLIC_KEY=JWT_PUBLIC_KEY)
+    def test_expired_jwt_returns_401(self):
+        token = build_weni_jwt(
+            project_uuid=str(self.project.uuid),
+            can_communicate_internally=True,
+            exp=timezone.now() - timedelta(minutes=5),
+        )
+
+        response = self._make_jwt_request(str(self.project.uuid), token)
+
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
 @override_settings(
