@@ -6,7 +6,6 @@ from django_redis import get_redis_connection
 
 from weni_commons.auth import (
     DynamoDBSessionTokenRepository,
-    build_cache_key,
     compute_redis_ttl,
     warm_cache,
 )

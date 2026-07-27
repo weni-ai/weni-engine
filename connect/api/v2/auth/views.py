@@ -117,23 +117,6 @@ class GetTokenView(views.APIView):
         return Response({"hash": token_hash}, status=status.HTTP_200_OK)
 
 
-class ValidateSessionTokenView(views.APIView):
-    authentication_classes = [SessionTokenAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request: Request, project_uuid: str = None):
-        session = request.auth
-        return Response(
-            {
-                "projeto": session.projeto,
-                "user": session.user,
-                "expire_at": session.expire_at,
-                "project_uuid": str(project_uuid),
-            },
-            status=status.HTTP_200_OK,
-        )
-
-
 class InvalidateSessionTokenView(views.APIView):
     authentication_classes = [SessionTokenAuthentication]
     permission_classes = [IsAuthenticated]
@@ -152,8 +135,6 @@ class InvalidateSessionTokenView(views.APIView):
         except SessionTokenNotFound:
             raise NotFound("Session token not found")
         except SessionTokenProjectMismatch:
-            raise PermissionDenied(
-                "Session token does not belong to this project"
-            )
+            raise PermissionDenied("Session token does not belong to this project")
 
         return Response(status=status.HTTP_204_NO_CONTENT)

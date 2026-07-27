@@ -43,7 +43,6 @@ from connect.api.v2.auth.views import (
     InvalidateSessionTokenView,
     KeycloakAuthView,
     ProjectAuthView,
-    ValidateSessionTokenView,
     VtexAccountProjectAuthView,
 )
 
@@ -167,11 +166,6 @@ urlpatterns = [
         "projects/<project_uuid>/get-token",
         GetTokenView.as_view(),
         name="get-token",
-    ),
-    path(
-        "projects/<project_uuid>/validate-session-token",
-        ValidateSessionTokenView.as_view(),
-        name="validate-session-token",
     ),
     path(
         "projects/<project_uuid>/invalidate-session-token",
