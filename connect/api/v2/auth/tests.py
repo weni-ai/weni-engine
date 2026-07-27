@@ -193,12 +193,12 @@ class VtexAccountProjectAuthViewTestCase(ProjectAuthorizationViewTestCaseSetUp):
         )
         response = self._get(self._url(), token=token)
 
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_missing_token_is_rejected(self):
         response = self._get(self._url())
 
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_user_not_found_returns_404(self):
         token = build_weni_jwt(vtex_account="mystore", user_email="ghost@test.user")
