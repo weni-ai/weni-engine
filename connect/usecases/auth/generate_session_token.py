@@ -39,14 +39,14 @@ class GenerateSessionTokenUseCase:
         expire_at = (timezone.now() + timedelta(seconds=duration)).isoformat()
 
         payload = {
-            "projeto": str(project_uuid),
+            "project": str(project_uuid),
             "user": user.email,
             "expire_at": expire_at,
         }
 
         self._get_dynamodb_repository().put(
             token_hash=token_hash,
-            projeto=str(project_uuid),
+            project=str(project_uuid),
             user=user.email,
             expire_at=expire_at,
         )

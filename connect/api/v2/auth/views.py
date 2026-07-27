@@ -129,7 +129,7 @@ class InvalidateSessionTokenView(views.APIView):
         try:
             InvalidateSessionTokenUseCase().execute(
                 token_hash=serializer.validated_data["hash"],
-                requester_projeto=session.projeto,
+                requester_project=session.project,
             )
         except SessionTokenNotFound:
             raise NotFound("Session token not found")

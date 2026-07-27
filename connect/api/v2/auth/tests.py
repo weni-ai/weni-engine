@@ -101,7 +101,7 @@ class GetTokenViewTestCase(TestCase):
         mock_repo.put.assert_called_once()
         put_kwargs = mock_repo.put.call_args.kwargs
         self.assertEqual(put_kwargs["token_hash"], response.data["hash"])
-        self.assertEqual(put_kwargs["projeto"], str(self.project.uuid))
+        self.assertEqual(put_kwargs["project"], str(self.project.uuid))
         self.assertEqual(put_kwargs["user"], self.user.email)
 
         mock_redis.setex.assert_called_once()
@@ -110,7 +110,7 @@ class GetTokenViewTestCase(TestCase):
         self.assertTrue(0 < ttl <= 3600)
 
         stored_data = json.loads(payload)
-        self.assertEqual(stored_data["projeto"], str(self.project.uuid))
+        self.assertEqual(stored_data["project"], str(self.project.uuid))
         self.assertEqual(stored_data["user"], self.user.email)
         self.assertIn("expire_at", stored_data)
 
@@ -165,10 +165,10 @@ class InvalidateSessionTokenViewTestCase(TestCase):
             organization=self.organization,
         )
 
-    def _payload(self, projeto, user=None, seconds=3600):
+    def _payload(self, project, user=None, seconds=3600):
         return json.dumps(
             {
-                "projeto": str(projeto),
+                "project": str(project),
                 "user": user or self.user.email,
                 "expire_at": (timezone.now() + timedelta(seconds=seconds)).isoformat(),
             }

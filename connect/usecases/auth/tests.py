@@ -76,7 +76,7 @@ class GenerateSessionTokenUseCaseTestCase(TestCase):
         mock_repo.put.assert_called_once()
         put_kwargs = mock_repo.put.call_args.kwargs
         self.assertEqual(put_kwargs["token_hash"], token_hash)
-        self.assertEqual(put_kwargs["projeto"], str(self.project.uuid))
+        self.assertEqual(put_kwargs["project"], str(self.project.uuid))
         self.assertEqual(put_kwargs["user"], self.user.email)
         mock_redis.setex.assert_called_once()
 
