@@ -97,24 +97,22 @@ class GetTokenView(views.APIView):
     authentication_classes = [WeniOIDCAuthentication]
     permission_classes = [IsAuthenticated]
 
+
     def post(self, request: Request, project_uuid: str = None):
         serializer = GetTokenSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        user = request.user
-
         try:
-            user.project_authorizations_user.get(project__uuid=project_uuid)
-        except ProjectAuthorization.DoesNotExist:
+            token_hash = GenerateSessionTokenUseCase().execute(
+                project_uuid=project_uuid,
+                user=request.user,
+                duration=serializer.validated_data["duration"],
+            )
+        except ProjectAuthorizationNotFound:
             raise NotFound("Project authorization not found")
 
-        token_hash = GenerateSessionTokenUseCase().execute(
-            project_uuid=project_uuid,
-            user_email=user.email,
-            duration=serializer.validated_data["duration"],
-        )
-
         return Response({"hash": token_hash}, status=status.HTTP_200_OK)
+
 
 
 class InvalidateSessionTokenView(views.APIView):
