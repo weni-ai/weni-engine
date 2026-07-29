@@ -66,7 +66,7 @@ class CommerceEDAPublisherTestCase(TestCase):
             exchange="projects.topic",
             routing_key="project.created",
         )
-        self.assertEqual(amazonmq_body["event_type"], "engine.project.created")
+        self.assertEqual(amazonmq_body["event_type"], "project.created")
         self.assertEqual(
             amazonmq_body["data"],
             publisher._build_project_body(self.project),

@@ -177,7 +177,6 @@ class ProjectSerializer(serializers.ModelSerializer):
         return instance
 
     def publish_create_project_message(self, instance, brain_on: bool = False):
-
         authorizations = []
         for authorization in instance.organization.authorizations.all():
             if authorization.can_contribute:
@@ -216,7 +215,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             "brain_on": brain_on,
             "project_type": instance.project_type.value,
             "vtex_account": instance.vtex_account,
-            "inline_agent_switch": inline_agent_switch
+            "inline_agent_switch": inline_agent_switch,
         }
         rabbitmq_publisher = RabbitmqPublisher()
         rabbitmq_publisher.send_message(
@@ -226,7 +225,7 @@ class ProjectSerializer(serializers.ModelSerializer):
         # TEMPORARY[EDA Migration]: This needs to be adjusted after the migration is complete.
         amazonmq_publisher = EDAPublisher(AMQConnectionParamsFactory)
         event = Event.build(
-            "engine.project.created",
+            "project.created",
             message_body,
             producer=settings.EDA_PRODUCER,
         )
@@ -237,7 +236,6 @@ class ProjectSerializer(serializers.ModelSerializer):
         )
 
     def send_request_flow_product(self, user):
-
         if Project.objects.filter(created_by=user).count() == 1:
             data = dict(
                 send_request_flow=settings.SEND_REQUEST_FLOW_PRODUCT,
@@ -411,7 +409,6 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
 
         data = {}
         if project.template_type in Project.HAS_GLOBALS:
-
             common_templates = [
                 Project.TYPE_SAC_CHAT_GPT,
                 Project.TYPE_LEAD_CAPTURE_CHAT_GPT,
@@ -468,7 +465,6 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
         return template
 
     def create_globals(self, project_uuid: str, user_email: str):  # pragma: no cover
-
         data = self.context._data
 
         if data.get("project_view"):

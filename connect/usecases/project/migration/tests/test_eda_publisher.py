@@ -62,7 +62,7 @@ class ProjectMigrationEDAPublisherTestCase(TestCase):
         mock_instance.send_message.assert_called_once_with(
             {
                 "event_id": str(self.event_id),
-                "event_type": "engine.project.migrated",
+                "event_type": "project.migrated",
                 "producer": "weni-engine",
                 "timestamp": "2026-05-20T11:15:00Z",
                 "data": expected_data,

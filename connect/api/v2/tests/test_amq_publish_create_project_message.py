@@ -16,7 +16,7 @@ from connect.common.models import (
 )
 
 
-@override_settings(USE_EDA_PERMISSIONS=False)
+@override_settings(USE_EDA_PERMISSIONS=False, EDA_PRODUCER="connect-test-producer")
 class PublishCreateProjectMessageTestCase(TestCase):
     @patch("connect.billing.get_gateway")
     def setUp(self, mock_get_gateway):
@@ -54,9 +54,9 @@ class PublishCreateProjectMessageTestCase(TestCase):
         serializer = CommerceSerializer()
         serializer.publish_create_project_message(self.project, self.user)
 
-        rabbitmq_body = mock_rabbitmq_instance.send_message.call_args.kwargs["body"]
+        rabbitmq_body = mock_rabbitmq_instance.send_message.call_args.args[0]
         mock_rabbitmq_instance.send_message.assert_called_once_with(
-            body=rabbitmq_body,
+            rabbitmq_body,
             exchange="projects.topic",
             routing_key="",
         )
@@ -67,7 +67,8 @@ class PublishCreateProjectMessageTestCase(TestCase):
             exchange="projects.topic",
             routing_key="project.created",
         )
-        self.assertEqual(amazonmq_body["event_type"], "engine.project.created")
+        self.assertEqual(amazonmq_body["event_type"], "project.created")
+        self.assertEqual(amazonmq_body["producer"], "connect-test-producer")
         self.assertEqual(amazonmq_body["data"], rabbitmq_body)
 
     @patch("connect.api.v2.projects.serializers.EDAPublisher")
@@ -85,9 +86,9 @@ class PublishCreateProjectMessageTestCase(TestCase):
         serializer = ProjectSerializer(context={"request": request})
         serializer.publish_create_project_message(self.project, brain_on=True)
 
-        rabbitmq_body = mock_rabbitmq_instance.send_message.call_args.kwargs["body"]
+        rabbitmq_body = mock_rabbitmq_instance.send_message.call_args.args[0]
         mock_rabbitmq_instance.send_message.assert_called_once_with(
-            body=rabbitmq_body,
+            rabbitmq_body,
             exchange="projects.topic",
             routing_key="",
         )
@@ -99,5 +100,6 @@ class PublishCreateProjectMessageTestCase(TestCase):
             exchange="projects.topic",
             routing_key="project.created",
         )
-        self.assertEqual(amazonmq_body["event_type"], "engine.project.created")
+        self.assertEqual(amazonmq_body["event_type"], "project.created")
+        self.assertEqual(amazonmq_body["producer"], "connect-test-producer")
         self.assertEqual(amazonmq_body["data"], rabbitmq_body)

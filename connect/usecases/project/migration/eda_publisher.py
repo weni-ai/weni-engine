@@ -16,7 +16,7 @@ class ProjectMigrationEDAPublisher:
 
     EXCHANGE = "projects.topic"
     ROUTING_KEY = "project.migrated"
-    EVENT_TYPE = "engine.project.migrated"
+    EVENT_TYPE = "project.migrated"
 
     def __init__(self):
         if settings.USE_PROJECT_MIGRATION_PUBLISHER and not settings.TESTING:

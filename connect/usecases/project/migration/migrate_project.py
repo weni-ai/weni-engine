@@ -35,7 +35,7 @@ class MigrateProjectUseCase:
 
     The engine is the source of truth: reassigns Project.organization,
     reconciles ProjectAuthorization, persists a ProjectMigration record,
-    then publishes engine.project.migrated on commit.
+    then publishes project.migrated on commit.
     """
 
     ACTIVE_STATUSES = [

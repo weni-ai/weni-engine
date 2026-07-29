@@ -204,6 +204,76 @@ class ProjectMigrationViewsTestCase(TestCase):
         mock_publisher.publish_project_migrated.assert_called_once()
 
     @patch("connect.api.v1.internal.permissions.ModuleHasPermission.has_permission")
+    def test_get_migration_not_found(self, module_has_permission):
+        module_has_permission.return_value = True
+
+        request = self.factory.get(
+            f"/v2/internals/connect/project-migrations/{uuid.uuid4()}"
+        )
+        force_authenticate(request, user=self.user)
+        response = ProjectMigrationDetailView.as_view()(
+            request, event_id=uuid.uuid4()
+        )
+        response.render()
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    @patch("connect.api.v1.internal.permissions.ModuleHasPermission.has_permission")
+    def test_create_rejects_invalid_payload(self, module_has_permission):
+        module_has_permission.return_value = True
+
+        request = self.factory.post(
+            "/v2/internals/connect/project-migrations",
+            {"project_uuid": "invalid", "org_to": str(self.org_to.uuid)},
+            format="json",
+        )
+        force_authenticate(request, user=self.user)
+        response = ProjectMigrationCreateView.as_view()(request)
+        response.render()
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    @patch("connect.api.v1.internal.permissions.ModuleHasPermission.has_permission")
+    def test_register_module_status_rejects_invalid_payload(self, module_has_permission):
+        module_has_permission.return_value = True
+        migration = ProjectMigration.objects.create(
+            project=self.project,
+            org_from=self.org_from.uuid,
+            org_to=self.org_to.uuid,
+            status=ProjectMigrationStatus.IN_PROGRESS,
+        )
+
+        request = self.factory.post(
+            f"/v2/internals/connect/project-migrations/{migration.uuid}/status",
+            {"module": "billing", "status": "pending"},
+            format="json",
+        )
+        force_authenticate(request, user=self.user)
+        response = ProjectMigrationStatusView.as_view()(
+            request, event_id=migration.uuid
+        )
+        response.render()
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    @patch("connect.api.v1.internal.permissions.ModuleHasPermission.has_permission")
+    def test_republish_not_found(self, module_has_permission):
+        module_has_permission.return_value = True
+
+        request = self.factory.post(
+            f"/v2/internals/connect/project-migrations/{uuid.uuid4()}/republish",
+            {},
+            format="json",
+        )
+        force_authenticate(request, user=self.user)
+        response = ProjectMigrationRepublishView.as_view()(
+            request, event_id=uuid.uuid4()
+        )
+        response.render()
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    @patch("connect.api.v1.internal.permissions.ModuleHasPermission.has_permission")
     def test_create_requires_module_permission(self, module_has_permission):
         module_has_permission.return_value = False
 

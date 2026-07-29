@@ -102,7 +102,7 @@ class CommerceSerializer(serializers.Serializer):
         # TEMPORARY[EDA Migration]: This needs to be adjusted after the migration is complete.
         amazonmq_publisher = EDAPublisher(AMQConnectionParamsFactory)
         event = Event.build(
-            "engine.project.created",
+            "project.created",
             message_body,
             producer=settings.EDA_PRODUCER,
         )
