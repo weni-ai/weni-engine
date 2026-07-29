@@ -39,12 +39,12 @@ from connect.api.v2.commerce.views import (
 from connect.api.v2.organizations import views as organization_views
 from connect.api.v2.projects import views as project_views
 from connect.api.v2.internals import views as connect_internal_views
+from connect.api.v2.internals.migration import views as migration_views
 from connect.api.v2.auth.views import (
     GetTokenView,
     InvalidateSessionTokenView,
     KeycloakAuthView,
     ProjectAuthView,
-    ValidateSessionTokenView,
     VtexAccountProjectAuthView,
 )
 
@@ -170,11 +170,6 @@ urlpatterns = [
         name="get-token",
     ),
     path(
-        "projects/<project_uuid>/validate-session-token",
-        ValidateSessionTokenView.as_view(),
-        name="validate-session-token",
-    ),
-    path(
         "projects/<project_uuid>/invalidate-session-token",
         InvalidateSessionTokenView.as_view(),
         name="invalidate-session-token",
@@ -251,5 +246,25 @@ urlpatterns += [
         "internals/business-verification/notify/",
         NotifyBusinessVerificationView.as_view(),
         name="internal-business-verification-notify",
+    ),
+    path(
+        "internals/connect/project-migrations",
+        migration_views.ProjectMigrationCreateView.as_view(),
+        name="internal-project-migration-create",
+    ),
+    path(
+        "internals/connect/project-migrations/<uuid:event_id>",
+        migration_views.ProjectMigrationDetailView.as_view(),
+        name="internal-project-migration-detail",
+    ),
+    path(
+        "internals/connect/project-migrations/<uuid:event_id>/status",
+        migration_views.ProjectMigrationStatusView.as_view(),
+        name="internal-project-migration-status",
+    ),
+    path(
+        "internals/connect/project-migrations/<uuid:event_id>/republish",
+        migration_views.ProjectMigrationRepublishView.as_view(),
+        name="internal-project-migration-republish",
     ),
 ]
