@@ -60,10 +60,16 @@ class CommerceEDAPublisherTestCase(TestCase):
             routing_key="",
         )
         mock_eda_publisher.assert_called_once_with(AMQConnectionParamsFactory)
+        amazonmq_body = mock_amazonmq_instance.send_message.call_args.args[0]
         mock_amazonmq_instance.send_message.assert_called_once_with(
-            publisher._build_project_body(self.project),
+            amazonmq_body,
             exchange="projects.topic",
             routing_key="project.created",
+        )
+        self.assertEqual(amazonmq_body["event_type"], "engine.project.created")
+        self.assertEqual(
+            amazonmq_body["data"],
+            publisher._build_project_body(self.project),
         )
 
     @override_settings(USE_EDA=False, TESTING=False)

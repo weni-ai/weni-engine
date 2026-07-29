@@ -61,11 +61,14 @@ class PublishCreateProjectMessageTestCase(TestCase):
             routing_key="",
         )
         mock_eda_publisher.assert_called_once_with(AMQConnectionParamsFactory)
+        amazonmq_body = mock_amazonmq_instance.send_message.call_args.args[0]
         mock_amazonmq_instance.send_message.assert_called_once_with(
-            rabbitmq_body,
+            amazonmq_body,
             exchange="projects.topic",
             routing_key="project.created",
         )
+        self.assertEqual(amazonmq_body["event_type"], "engine.project.created")
+        self.assertEqual(amazonmq_body["data"], rabbitmq_body)
 
     @patch("connect.api.v2.projects.serializers.EDAPublisher")
     @patch("connect.api.v2.projects.serializers.RabbitmqPublisher")
@@ -90,8 +93,11 @@ class PublishCreateProjectMessageTestCase(TestCase):
         )
         self.assertTrue(rabbitmq_body["brain_on"])
         mock_eda_publisher.assert_called_once_with(AMQConnectionParamsFactory)
+        amazonmq_body = mock_amazonmq_instance.send_message.call_args.args[0]
         mock_amazonmq_instance.send_message.assert_called_once_with(
-            rabbitmq_body,
+            amazonmq_body,
             exchange="projects.topic",
             routing_key="project.created",
         )
+        self.assertEqual(amazonmq_body["event_type"], "engine.project.created")
+        self.assertEqual(amazonmq_body["data"], rabbitmq_body)

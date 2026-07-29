@@ -7,6 +7,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from weni.eda.eda_publisher import EDAPublisher
 from weni.eda.django.connection_params import AMQConnectionParamsFactory
+from weni.eda.events import Event
 
 from connect.celery import app as celery_app
 from connect.internals.event_driven.producer.rabbitmq_publisher import RabbitmqPublisher
@@ -100,8 +101,15 @@ class CommerceSerializer(serializers.Serializer):
 
         # TEMPORARY[EDA Migration]: This needs to be adjusted after the migration is complete.
         amazonmq_publisher = EDAPublisher(AMQConnectionParamsFactory)
+        event = Event.build(
+            "engine.project.created",
+            message_body,
+            producer=settings.EDA_PRODUCER,
+        )
         amazonmq_publisher.send_message(
-            message_body, exchange="projects.topic", routing_key="project.created"
+            event.to_dict(),
+            exchange="projects.topic",
+            routing_key="project.created",
         )
 
     def create(self, validated_data):

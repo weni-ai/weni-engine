@@ -3,6 +3,7 @@ from typing import Dict, List
 from django.conf import settings
 from weni.eda.eda_publisher import EDAPublisher
 from weni.eda.django.connection_params import AMQConnectionParamsFactory
+from weni.eda.events import Event
 
 from connect.authentication.models import User
 from connect.common.models import Organization, Project
@@ -40,8 +41,15 @@ class CommerceEDAPublisher:
 
         # TEMPORARY[EDA Migration]: This needs to be adjusted after the migration is complete.
         amazonmq_publisher = EDAPublisher(AMQConnectionParamsFactory)
+        event = Event.build(
+            "engine.project.created",
+            body,
+            producer=settings.EDA_PRODUCER,
+        )
         amazonmq_publisher.send_message(
-            body, exchange="projects.topic", routing_key="project.created"
+            event.to_dict(),
+            exchange="projects.topic",
+            routing_key="project.created",
         )
 
     def _build_org_body(self, organization: Organization, user: User) -> Dict:
