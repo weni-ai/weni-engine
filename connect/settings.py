@@ -624,6 +624,7 @@ USE_PROJECT_MIGRATION_PUBLISHER = env.bool(
 PROJECT_MIGRATION_EXPECTED_MODULES = env.list(
     "PROJECT_MIGRATION_EXPECTED_MODULES", default=[]
 )
+EDA_PRODUCER = env.str("EDA_PRODUCER", default="weni-engine")
 
 # AmazonMQ (SSL) settings — used by weni-eda EDAPublisher / AMQConnectionParamsFactory.
 # Available whenever EDA or the project-migration publisher is enabled.

@@ -3331,8 +3331,8 @@ files = [
 [package.dependencies]
 distlib = ">=0.3.7,<1"
 filelock = [
-    {version = ">=3.24.2,<4", markers = "python_version >= \"3.10\""},
     {version = ">=3.16.1,<=3.19.1", markers = "python_version < \"3.10\""},
+    {version = ">=3.24.2,<4", markers = "python_version >= \"3.10\""},
 ]
 platformdirs = ">=3.9.1,<5"
 python-discovery = ">=1.4.2"
@@ -3351,13 +3351,13 @@ files = [
 
 [[package]]
 name = "weni-commons"
-version = "1.3.2a12"
+version = "1.3.2a13"
 description = "Weni's common utilities for Python backends"
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "weni_commons-1.3.2a12-py3-none-any.whl", hash = "sha256:c10703c35c38d041598e7d0bfb3e8f11fb64cef37232197aee28f837b95a9802"},
-    {file = "weni_commons-1.3.2a12.tar.gz", hash = "sha256:bd5a50c24ca310eb7440ce1be01243340ad763a3bbcba980c9025224572c2f93"},
+    {file = "weni_commons-1.3.2a13-py3-none-any.whl", hash = "sha256:367cf5474a4bfb082bb0b1cb5059b5fa7305d1f9bf1731a339a31ccd4ca76b65"},
+    {file = "weni_commons-1.3.2a13.tar.gz", hash = "sha256:072906a403d7df3c02bca623041976931ee159aaeeaecf3176c3d55841ea410b"},
 ]
 
 [package.dependencies]
@@ -3367,18 +3367,18 @@ django = ">=3.2.22,<6.0"
 django-redis = ">=4.0.0,<=6.0"
 djangorestframework = ">=3.12.0,<4.0"
 requests = ">=2.25.0"
-weni-eda = ">=0.1.2,<0.3.0"
+weni-eda = ">=0.1.2"
 weni-feature-flags = ">=2.2.0,<3.0.0"
 
 [[package]]
 name = "weni-eda"
-version = "0.2.0"
+version = "0.3.0a1"
 description = "Python library to simplify Event-Driven Architecture (EDA) with Django and RabbitMQ"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "weni_eda-0.2.0-py3-none-any.whl", hash = "sha256:a4a1b17f676d0da23205568beadba96fe054c2d7e4c1f5991af1a131850bf511"},
-    {file = "weni_eda-0.2.0.tar.gz", hash = "sha256:1aaf1f3398c3ab96edcf6dce978ecb7a02b1cbb91fec2247495d9d720723654e"},
+    {file = "weni_eda-0.3.0a1-py3-none-any.whl", hash = "sha256:2f672abdd09a3621498889c5cfbd844333ee45faa784e1db65029c048e6e7d4d"},
+    {file = "weni_eda-0.3.0a1.tar.gz", hash = "sha256:7447898545fc0cb642c961b955047bbc26880511963d9abcae4be34aeebfd065"},
 ]
 
 [package.dependencies]
@@ -3710,4 +3710,4 @@ testing = ["coverage[toml]", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = "~=3.8"
-content-hash = "e0c9baba193581906a4cd5adb256bd25bc84bbef324e7e197f361caea4ec7953"
+content-hash = "582c0fd3ee294b08632d30d63a2f1970fcd26b74dcb0da3e77b63fab669a08b4"
