@@ -1,3 +1,6 @@
+# 3.54.2
+  - fix: Adding missing dynamo db ambient variables
+
 # 3.54.1
   - feat: Implement internal staff email bypass for SSO enforcement
 
