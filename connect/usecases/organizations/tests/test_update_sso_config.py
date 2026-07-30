@@ -115,6 +115,20 @@ class UpdateOrganizationSSOConfigUseCaseTestCase(TestCase):
         with self.assertRaises(SSOConfigLockoutError):
             self.execute(dto, "google")
 
+    def test_enabling_allows_internal_bypass_domain_actor(self):
+        self.actor.email = "staff@weni.ai"
+        self.actor.save(update_fields=["email"])
+        dto = UpdateOrganizationSSOConfigDTO(
+            is_enabled=True,
+            allowed_email_domains=["customer.com"],
+            allowed_sso_providers=["microsoft"],
+        )
+        config = self.execute(dto, None, has_password=True)
+
+        self.assertTrue(config.is_enabled)
+        self.assertEqual(config.allowed_email_domains, ["customer.com"])
+        self.assertEqual(config.allowed_sso_providers, ["microsoft"])
+
     def test_enabling_raises_lockout_when_actor_has_password(self):
         dto = UpdateOrganizationSSOConfigDTO(is_enabled=True)
         with self.assertRaises(SSOConfigLockoutError):
