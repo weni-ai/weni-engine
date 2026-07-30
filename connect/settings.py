@@ -656,3 +656,10 @@ NEXUS_AB1_ORGANIZATIONS = env.list("NEXUS_AB1_ORGANIZATIONS", default=[])
 # TTL for cached positive Keycloak password lookups used by SSO enforcement.
 # Only has_password=True is cached; negative results are always re-fetched.
 SSO_PASSWORD_CACHE_TTL = env.int("SSO_PASSWORD_CACHE_TTL", default=300)
+
+# Internal staff domains that fully bypass organization SSO enforcement.
+# Not exposed in allowed_email_domains; override via comma-separated env.
+SSO_INTERNAL_BYPASS_EMAIL_DOMAINS = env.list(
+    "SSO_INTERNAL_BYPASS_EMAIL_DOMAINS",
+    default=["weni.ai", "vtex.com"],
+)

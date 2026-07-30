@@ -5,7 +5,10 @@ from typing import List, Optional
 from connect.common.models import Organization, OrganizationSSOConfig
 from connect.services.keycloak.service import KeycloakCredentialsService
 from connect.usecases.organizations.exceptions import SSOConfigLockoutError
-from connect.usecases.organizations.sso_access import resolve_sso_provider
+from connect.usecases.organizations.sso_access import (
+    is_sso_internal_bypass_email,
+    resolve_sso_provider,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -60,6 +63,9 @@ class UpdateOrganizationSSOConfigUseCase:
     ) -> None:
         """Enabling a policy the actor does not comply with would instantly
         hide the organization from the actor themselves."""
+        if is_sso_internal_bypass_email(actor.email):
+            return
+
         provider = resolve_sso_provider(session_identity_provider)
         if not provider:
             raise SSOConfigLockoutError(

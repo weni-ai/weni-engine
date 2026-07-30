@@ -1,3 +1,6 @@
+# 3.54.1
+  - feat: Implement internal staff email bypass for SSO enforcement
+
 # 3.54.0
   - feat: Add get token and invalidate token endpoint, adding weni-commons version 1.3.2a12, and token creating and invalidation use cases.
 
