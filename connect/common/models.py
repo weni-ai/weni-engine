@@ -2281,3 +2281,54 @@ class NewsletterOrganization(models.Model):
         for newsletter in organization_newsletters:
             if isinstance(newsletter, NewsletterOrganization):
                 newsletter.delete()
+
+
+class ProjectMigrationStatus(models.TextChoices):
+    PENDING = "PENDING", _("pending")
+    PUBLISH_FAILED = "PUBLISH_FAILED", _("publish failed")
+    IN_PROGRESS = "IN_PROGRESS", _("in progress")
+    PARTIAL_ERROR = "PARTIAL_ERROR", _("partial error")
+    COMPLETED = "COMPLETED", _("completed")
+
+
+class ProjectMigration(models.Model):
+    class Meta:
+        verbose_name = _("project migration")
+        verbose_name_plural = _("project migrations")
+        indexes = [
+            models.Index(
+                fields=["project", "status"],
+                name="projectmigration_proj_status",
+            ),
+        ]
+
+    uuid = models.UUIDField(
+        _("UUID"), primary_key=True, default=uuid4.uuid4, editable=False
+    )
+    project = models.ForeignKey(
+        Project,
+        on_delete=models.CASCADE,
+        related_name="migrations",
+    )
+    org_from = models.UUIDField(_("source organization UUID"))
+    org_to = models.UUIDField(_("destination organization UUID"))
+    status = models.CharField(
+        _("status"),
+        max_length=20,
+        choices=ProjectMigrationStatus.choices,
+        default=ProjectMigrationStatus.PENDING,
+    )
+    modules_status = models.JSONField(_("modules status"), default=dict, blank=True)
+    requested_by = models.CharField(
+        _("requested by"), max_length=255, null=True, blank=True
+    )
+    published_at = models.DateTimeField(_("published at"), null=True, blank=True)
+    created_at = models.DateTimeField(_("created at"), auto_now_add=True)
+    updated_at = models.DateTimeField(_("updated at"), auto_now=True)
+
+    def __str__(self):
+        return f"ProjectMigration {self.uuid} ({self.status})"
+
+    @property
+    def is_active(self) -> bool:
+        return self.status != ProjectMigrationStatus.COMPLETED

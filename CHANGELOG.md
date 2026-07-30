@@ -1,3 +1,6 @@
+# 3.55.0
+  - feat: Add project migration publisher with module status tracking
+
 # 3.54.2
   - fix: Adding missing dynamo db ambient variables
 
