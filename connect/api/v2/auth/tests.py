@@ -24,7 +24,6 @@ from connect.api.v1.tests.utils import create_user_and_token
 from connect.api.v2.auth.views import (
     GetTokenView,
     InvalidateSessionTokenView,
-    ValidateSessionTokenView,
 )
 from connect.authentication.models import User
 from connect.common.mocks import StripeMockGateway
@@ -37,7 +36,7 @@ from connect.common.models import (
     ProjectRole,
     TypeProject,
 )
-from connect.usecases.auth.generate_session_token import build_cache_key
+from weni_commons.auth import build_cache_key
 
 _JWT_PRIVATE_KEY_OBJ = rsa.generate_private_key(public_exponent=65537, key_size=2048)
 JWT_PRIVATE_KEY = _JWT_PRIVATE_KEY_OBJ.private_bytes(
@@ -99,10 +98,9 @@ class GetTokenViewTestCase(TestCase):
 
     def _request(self, data=None, user=None, project_uuid=None):
         project_uuid = project_uuid or str(self.project.uuid)
-        request = self.factory.post(
+        request = self.factory.get(
             f"/v2/projects/{project_uuid}/get-token",
             data or {"duration": 3600},
-            format="json",
         )
         if user is not None:
             force_authenticate(request, user=user, token=user.auth_token)
@@ -126,7 +124,7 @@ class GetTokenViewTestCase(TestCase):
         mock_repo.put.assert_called_once()
         put_kwargs = mock_repo.put.call_args.kwargs
         self.assertEqual(put_kwargs["token_hash"], response.data["hash"])
-        self.assertEqual(put_kwargs["projeto"], str(self.project.uuid))
+        self.assertEqual(put_kwargs["project"], str(self.project.uuid))
         self.assertEqual(put_kwargs["user"], self.user.email)
 
         mock_redis.setex.assert_called_once()
@@ -135,7 +133,7 @@ class GetTokenViewTestCase(TestCase):
         self.assertTrue(0 < ttl <= 3600)
 
         stored_data = json.loads(payload)
-        self.assertEqual(stored_data["projeto"], str(self.project.uuid))
+        self.assertEqual(stored_data["project"], str(self.project.uuid))
         self.assertEqual(stored_data["user"], self.user.email)
         self.assertIn("expire_at", stored_data)
 
@@ -155,108 +153,6 @@ class GetTokenViewTestCase(TestCase):
         response = self._request(data={"duration": 10}, user=self.user)
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
-
-@override_settings(USE_EDA_PERMISSIONS=False)
-class ValidateSessionTokenViewTestCase(TestCase):
-    @patch(
-        "connect.internals.event_driven.producer.rabbitmq_publisher.RabbitmqPublisher.send_message"
-    )
-    @patch("connect.common.signals.update_user_permission_project")
-    @patch("connect.billing.get_gateway")
-    def setUp(self, mock_get_gateway, mock_permission, mock_publisher):
-        mock_get_gateway.return_value = StripeMockGateway()
-        mock_permission.return_value = True
-
-        self.factory = APIRequestFactory()
-        self.user, _ = create_user_and_token("user")
-        self.view = ValidateSessionTokenView.as_view()
-
-        self.organization = Organization.objects.create(
-            name="test organization",
-            description="",
-            inteligence_organization=1,
-            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
-            organization_billing__plan="free",
-        )
-        self.project = Project.objects.create(
-            name="test project",
-            flow_organization=uuid.uuid4(),
-            organization=self.organization,
-        )
-
-    def _request(self, token_hash=None, project_uuid=None):
-        project_uuid = project_uuid or str(self.project.uuid)
-        headers = {}
-        if token_hash is not None:
-            headers["HTTP_AUTHORIZATION"] = f"Bearer {token_hash}"
-
-        request = self.factory.get(
-            f"/v2/projects/{project_uuid}/validate-session-token",
-            **headers,
-        )
-        return self.view(request, project_uuid=project_uuid)
-
-    @patch("weni_commons.auth.session.get_redis_connection")
-    def test_validate_session_token_success(self, mock_get_redis_connection):
-        mock_redis = MagicMock()
-        payload = {
-            "projeto": str(self.project.uuid),
-            "user": self.user.email,
-            "expire_at": "2026-06-10T12:00:00+00:00",
-        }
-        mock_redis.get.return_value = json.dumps(payload).encode("utf-8")
-        mock_get_redis_connection.return_value = mock_redis
-
-        response = self._request(token_hash="valid-hash")
-
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["projeto"], str(self.project.uuid))
-        self.assertEqual(response.data["user"], self.user.email)
-        self.assertEqual(response.data["project_uuid"], str(self.project.uuid))
-
-    def test_validate_session_token_without_authorization(self):
-        response = self._request()
-
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-
-    @patch("weni_commons.auth.session.DynamoDBSessionTokenRepository")
-    @patch("weni_commons.auth.session.get_redis_connection")
-    def test_validate_session_token_invalid_hash(
-        self, mock_get_redis_connection, mock_repo_cls
-    ):
-        mock_redis = MagicMock()
-        mock_redis.get.return_value = None
-        mock_get_redis_connection.return_value = mock_redis
-        mock_repo_cls.return_value.get.return_value = None
-
-        response = self._request(token_hash="invalid-hash")
-
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-
-    @patch("weni_commons.auth.session.DynamoDBSessionTokenRepository")
-    @patch("weni_commons.auth.session.get_redis_connection")
-    def test_validate_session_token_falls_back_to_dynamodb(
-        self, mock_get_redis_connection, mock_repo_cls
-    ):
-        mock_redis = MagicMock()
-        mock_redis.get.return_value = None
-        mock_get_redis_connection.return_value = mock_redis
-
-        expire_at = (timezone.now() + timedelta(seconds=3600)).isoformat()
-        mock_repo_cls.return_value.get.return_value = {
-            "projeto": str(self.project.uuid),
-            "user": self.user.email,
-            "expire_at": expire_at,
-        }
-
-        response = self._request(token_hash="dynamo-hash")
-
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["user"], self.user.email)
-        mock_redis.setex.assert_called_once()
-        _, ttl, _ = mock_redis.setex.call_args[0]
-        self.assertTrue(0 < ttl <= 3600)
 
 
 @override_settings(USE_EDA_PERMISSIONS=False)
@@ -292,10 +188,10 @@ class InvalidateSessionTokenViewTestCase(TestCase):
             organization=self.organization,
         )
 
-    def _payload(self, projeto, user=None, seconds=3600):
+    def _payload(self, project, user=None, seconds=3600):
         return json.dumps(
             {
-                "projeto": str(projeto),
+                "project": str(project),
                 "user": user or self.user.email,
                 "expire_at": (timezone.now() + timedelta(seconds=seconds)).isoformat(),
             }

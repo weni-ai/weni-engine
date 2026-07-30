@@ -4,14 +4,19 @@ from datetime import timedelta
 from django.utils import timezone
 from django_redis import get_redis_connection
 
+from connect.common.models import ProjectAuthorization
 from weni_commons.auth import (
     DynamoDBSessionTokenRepository,
-    build_cache_key,
     compute_redis_ttl,
     warm_cache,
 )
 
 CACHE_KEY_TEMPLATE = "auth:session-token:{hash}"
+SESSION_TOKEN_NBYTES = 32
+
+
+class ProjectAuthorizationNotFound(Exception):
+    pass
 
 
 class GenerateSessionTokenUseCase:
@@ -24,20 +29,27 @@ class GenerateSessionTokenUseCase:
             self._dynamodb_repository = DynamoDBSessionTokenRepository()
         return self._dynamodb_repository
 
-    def execute(self, project_uuid: str, user_email: str, duration: int) -> str:
-        token_hash = secrets.token_urlsafe(32)
+    def execute(self, project_uuid: str, user, duration: int) -> str:
+        try:
+            if not user.project_authorizations_user.filter(project__uuid=project_uuid).exists():
+                raise ProjectAuthorizationNotFound()
+
+        except ProjectAuthorization.DoesNotExist:
+            raise ProjectAuthorizationNotFound()
+
+        token_hash = secrets.token_urlsafe(SESSION_TOKEN_NBYTES)
         expire_at = (timezone.now() + timedelta(seconds=duration)).isoformat()
 
         payload = {
-            "projeto": str(project_uuid),
-            "user": user_email,
+            "project": str(project_uuid),
+            "user": user.email,
             "expire_at": expire_at,
         }
 
         self._get_dynamodb_repository().put(
             token_hash=token_hash,
-            projeto=str(project_uuid),
-            user=user_email,
+            project=str(project_uuid),
+            user=user.email,
             expire_at=expire_at,
         )
 

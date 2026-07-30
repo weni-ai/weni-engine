@@ -15,8 +15,11 @@ from connect.api.v2.auth.serializers import (
     KeycloakAuthSerializer,
 )
 from connect.common.models import ProjectAuthorization
-from connect.middleware import WeniAuthentication, WeniOIDCAuthentication
-from connect.usecases.auth.generate_session_token import GenerateSessionTokenUseCase
+from connect.middleware import WeniOIDCAuthentication
+from connect.usecases.auth.generate_session_token import (
+    GenerateSessionTokenUseCase,
+    ProjectAuthorizationNotFound,
+)
 from connect.usecases.auth.invalidate_session_token import (
     InvalidateSessionTokenUseCase,
     SessionTokenNotFound,
@@ -99,41 +102,20 @@ class GetTokenView(views.APIView):
     authentication_classes = [WeniOIDCAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def post(self, request: Request, project_uuid: str = None):
-        serializer = GetTokenSerializer(data=request.data)
+    def get(self, request: Request, project_uuid: str = None):
+        serializer = GetTokenSerializer(data=request.query_params)
         serializer.is_valid(raise_exception=True)
 
-        user = request.user
-
         try:
-            user.project_authorizations_user.get(project__uuid=project_uuid)
-        except ProjectAuthorization.DoesNotExist:
+            token_hash = GenerateSessionTokenUseCase().execute(
+                project_uuid=project_uuid,
+                user=request.user,
+                duration=serializer.validated_data["duration"],
+            )
+        except ProjectAuthorizationNotFound:
             raise NotFound("Project authorization not found")
 
-        token_hash = GenerateSessionTokenUseCase().execute(
-            project_uuid=project_uuid,
-            user_email=user.email,
-            duration=serializer.validated_data["duration"],
-        )
-
         return Response({"hash": token_hash}, status=status.HTTP_200_OK)
-
-
-class ValidateSessionTokenView(views.APIView):
-    authentication_classes = [SessionTokenAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request: Request, project_uuid: str = None):
-        session = request.auth
-        return Response(
-            {
-                "projeto": session.projeto,
-                "user": session.user,
-                "expire_at": session.expire_at,
-                "project_uuid": str(project_uuid),
-            },
-            status=status.HTTP_200_OK,
-        )
 
 
 class InvalidateSessionTokenView(views.APIView):
@@ -149,7 +131,7 @@ class InvalidateSessionTokenView(views.APIView):
         try:
             InvalidateSessionTokenUseCase().execute(
                 token_hash=serializer.validated_data["hash"],
-                requester_projeto=session.projeto,
+                requester_project=session.project,
             )
         except SessionTokenNotFound:
             raise NotFound("Session token not found")

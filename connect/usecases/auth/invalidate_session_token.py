@@ -36,12 +36,12 @@ class InvalidateSessionTokenUseCase:
             )
         return self._validator
 
-    def execute(self, token_hash: str, requester_projeto: str) -> None:
+    def execute(self, token_hash: str, requester_project: str) -> None:
         session = self._get_validator().execute(token_hash)
         if session is None:
             raise SessionTokenNotFound()
 
-        if session.projeto != str(requester_projeto):
+        if session.project != str(requester_project):
             raise SessionTokenProjectMismatch()
 
         redis_connection = self._redis or get_redis_connection()

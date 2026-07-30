@@ -21,6 +21,7 @@ from connect.api.v2.omie.views import (
     OmieUsersAPIView,
 )
 from connect.api.v2.recent_activity.views import RecentActivityViewSet
+from connect.api.v2.change_history.views import ProjectChangeHistoryViewSet
 
 from connect.api.v2.template_projects.views import (
     TemplateTypeViewSet,
@@ -44,7 +45,6 @@ from connect.api.v2.auth.views import (
     InvalidateSessionTokenView,
     KeycloakAuthView,
     ProjectAuthView,
-    ValidateSessionTokenView,
     VtexAccountProjectAuthView,
 )
 
@@ -170,11 +170,6 @@ urlpatterns = [
         name="get-token",
     ),
     path(
-        "projects/<project_uuid>/validate-session-token",
-        ValidateSessionTokenView.as_view(),
-        name="validate-session-token",
-    ),
-    path(
         "projects/<project_uuid>/invalidate-session-token",
         InvalidateSessionTokenView.as_view(),
         name="invalidate-session-token",
@@ -193,6 +188,16 @@ urlpatterns = [
         "recent-activities",
         RecentActivityViewSet.as_view({"post": "create", "get": "list"}),
         name="recent-activities",
+    ),
+    path(
+        "projects/<project_uuid>/change-history",
+        ProjectChangeHistoryViewSet.as_view({"get": "list"}),
+        name="change-history",
+    ),
+    path(
+        "projects/<project_uuid>/change-history/<uuid:pk>",
+        ProjectChangeHistoryViewSet.as_view({"get": "retrieve"}),
+        name="change-history-detail",
     ),
     path(
         "commerce/create-vtex-project/",

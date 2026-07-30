@@ -167,6 +167,7 @@ INSTALLED_APPS = [
     "connect.template_projects",
     "connect.alerts",
     "connect.sentry",
+    "connect.change_history",
     "django_celery_results",
     "django_celery_beat",
     "storages",
@@ -175,6 +176,7 @@ INSTALLED_APPS = [
     "stripe",
     "django_prometheus",
     "weni.feature_flags",
+    "weni.eda.django.eda_app",
 ]
 
 MIDDLEWARE = [
