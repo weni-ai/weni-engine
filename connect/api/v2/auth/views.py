@@ -15,7 +15,7 @@ from connect.api.v2.auth.serializers import (
     KeycloakAuthSerializer,
 )
 from connect.common.models import ProjectAuthorization
-from connect.middleware import WeniOIDCAuthentication
+from connect.middleware import WeniAuthentication, WeniOIDCAuthentication
 from connect.usecases.auth.generate_session_token import (
     GenerateSessionTokenUseCase,
     ProjectAuthorizationNotFound,
