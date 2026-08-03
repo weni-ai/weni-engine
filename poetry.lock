@@ -6018,14 +6018,14 @@ files = [
 
 [[package]]
 name = "weni-commons"
-version = "1.3.2a15"
+version = "1.3.2a16"
 description = "Weni's common utilities for Python backends"
 optional = false
 python-versions = "<4.0,>=3.8"
 groups = ["main"]
 files = [
-    {file = "weni_commons-1.3.2a15-py3-none-any.whl", hash = "sha256:567aa3a10c45a2898e27018db0fe45c0469c8c2ddb451528ca903d735187a6df"},
-    {file = "weni_commons-1.3.2a15.tar.gz", hash = "sha256:7b0bf91f250d968cd96000d3ec304509e0bb4092869c1ffb2c2b96092e31c6f7"},
+    {file = "weni_commons-1.3.2a16-py3-none-any.whl", hash = "sha256:d071dcde2eccf19efbdb8c7cb779e21a4e89881278fe659871f1e7ca0634e1c9"},
+    {file = "weni_commons-1.3.2a16.tar.gz", hash = "sha256:6a126b954416f6f376d371b15464dfe344174396ba7dae74a791c2c6aa7d02f4"},
 ]
 
 [package.dependencies]
@@ -6037,7 +6037,7 @@ djangorestframework = ">=3.12.0,<4.0"
 mozilla-django-oidc = ">=2.0.0,<5.0"
 pyjwt = ">=2.8.0,<3.0"
 requests = ">=2.25.0"
-weni-eda = ">=0.1.2"
+weni-eda = ">=0.1.2a0"
 weni-feature-flags = ">=2.2.0,<3.0.0"
 
 [[package]]
@@ -6798,4 +6798,4 @@ testing = ["coverage[toml]", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.1"
 python-versions = "~=3.8"
-content-hash = "024f5db0b9f8b3a1299f193a97e4a9e06420296fa03e07ad8edf40aa8bccaaf7"
+content-hash = "8f93c0a2cec6ee3901a9fd98702afbc97bb214136c21fffdb5dc4cd7ec0e075f"
