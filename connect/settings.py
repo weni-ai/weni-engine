@@ -88,6 +88,11 @@ env = environ.Env(
     PLAN_TRIAL_PRICE=(int, 0),
     PLAN_TRIAL_LIMIT=(int, 100),
     PLAN_STATUS_CACHE_TTL=(int, 900),
+    SESSION_TOKEN_MIN_DURATION=(int, 60),
+    SESSION_TOKEN_MAX_DURATION=(int, 86400),
+    WENI_SESSION_TOKEN_DYNAMODB_TABLE=(str, "weni-session-tokens"),
+    WENI_SESSION_TOKEN_DYNAMODB_REGION=(str, "sa-east-1"),
+    WENI_SESSION_TOKEN_MAX_REDIS_TTL=(int, 3600),
     PLAN_START_LIMIT=(int, 200),
     PLAN_START_PRICE=(int, 390),
     PLAN_SCALE_LIMIT=(int, 500),
@@ -107,6 +112,8 @@ env = environ.Env(
     RATE_LIMIT_REQUESTS=(int, 10),
     RATE_LIMIT_WINDOW=(int, 60),
     RATE_LIMIT_BLOCK_TIME=(int, 300),
+    GROWTHBOOK_CLIENT_KEY=(str, "local-dev-key"),
+    GROWTHBOOK_HOST_BASE_URL=(str, "https://growthbook.example.com"),
 )
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -170,6 +177,7 @@ INSTALLED_APPS = [
     "django_grpc_framework",
     "stripe",
     "django_prometheus",
+    "weni.feature_flags",
 ]
 
 MIDDLEWARE = [
@@ -563,6 +571,20 @@ PLAN_TRIAL_LIMIT = env.int("PLAN_TRIAL_LIMIT")
 # via signals whenever a BillingPlan or Organization.is_suspended changes.
 PLAN_STATUS_CACHE_TTL = env.int("PLAN_STATUS_CACHE_TTL")
 
+SESSION_TOKEN_MIN_DURATION = env.int("SESSION_TOKEN_MIN_DURATION")
+SESSION_TOKEN_MAX_DURATION = env.int("SESSION_TOKEN_MAX_DURATION")
+
+# Session tokens are stored in a shared DynamoDB table (source of truth) and
+# cached in the local Redis. Defaults match weni-commons
+# (weni_commons.auth.constants); override per environment via env vars.
+WENI_SESSION_TOKEN_DYNAMODB_TABLE = env.str("WENI_SESSION_TOKEN_DYNAMODB_TABLE")
+WENI_SESSION_TOKEN_DYNAMODB_REGION = env.str("WENI_SESSION_TOKEN_DYNAMODB_REGION")
+WENI_SESSION_TOKEN_MAX_REDIS_TTL = env.int("WENI_SESSION_TOKEN_MAX_REDIS_TTL")
+
+# weni-commons / weni-feature-flags (required on import)
+GROWTHBOOK_CLIENT_KEY = env.str("GROWTHBOOK_CLIENT_KEY")
+GROWTHBOOK_HOST_BASE_URL = env.str("GROWTHBOOK_HOST_BASE_URL")
+
 PLAN_START_LIMIT = env.int("PLAN_START_LIMIT")
 PLAN_START_PRICE = env.int("PLAN_START_PRICE")
 
@@ -614,11 +636,24 @@ if USE_EDA:
     EDA_VIRTUAL_HOST = env.str("EDA_VIRTUAL_HOST", default="/")
     EDA_WAIT_TIME_RETRY = env.int("EDA_WAIT_TIME_RETRY", default=5)
 
+USE_PROJECT_MIGRATION_PUBLISHER = env.bool(
+    "USE_PROJECT_MIGRATION_PUBLISHER", default=False
+)
+PROJECT_MIGRATION_EXPECTED_MODULES = env.list(
+    "PROJECT_MIGRATION_EXPECTED_MODULES", default=[]
+)
+EDA_PRODUCER = env.str("EDA_PRODUCER", default="weni-engine")
+
+# AmazonMQ (SSL) settings — used by weni-eda EDAPublisher / AMQConnectionParamsFactory.
+# Available whenever EDA or the project-migration publisher is enabled.
+if USE_EDA or USE_PROJECT_MIGRATION_PUBLISHER:
     AMQ_BROKER_HOST = env.str("AMQ_BROKER_HOST", default="localhost")
     AMQ_BROKER_PORT = env.int("AMQ_BROKER_PORT", default=5671)
     AMQ_BROKER_USER = env.str("AMQ_BROKER_USER", default="guest")
     AMQ_BROKER_PASSWORD = env.str("AMQ_BROKER_PASSWORD", default="guest")
     AMQ_VIRTUAL_HOST = env.str("AMQ_VIRTUAL_HOST", default="/")
+    AMQ_BROKER_SSL_SERVER_HOSTNAME = env("AMQ_BROKER_SSL_SERVER_HOSTNAME", default=None)
+    AMQ_BROKER_HEARTBEAT = env.int("AMQ_BROKER_HEARTBEAT", default=300)
 
 NEW_ATTENDANCE_DATE = env.str("NEW_ATTENDANCE_DATE", default="2023-09-30")
 
@@ -652,3 +687,10 @@ NEXUS_AB1_ORGANIZATIONS = env.list("NEXUS_AB1_ORGANIZATIONS", default=[])
 # TTL for cached positive Keycloak password lookups used by SSO enforcement.
 # Only has_password=True is cached; negative results are always re-fetched.
 SSO_PASSWORD_CACHE_TTL = env.int("SSO_PASSWORD_CACHE_TTL", default=300)
+
+# Internal staff domains that fully bypass organization SSO enforcement.
+# Not exposed in allowed_email_domains; override via comma-separated env.
+SSO_INTERNAL_BYPASS_EMAIL_DOMAINS = env.list(
+    "SSO_INTERNAL_BYPASS_EMAIL_DOMAINS",
+    default=["weni.ai", "vtex.com"],
+)

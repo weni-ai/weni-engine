@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Dict, Optional
 
+from django.conf import settings
 from django.db.models import QuerySet
 
 from connect.common.models import Organization, OrganizationSSOConfig
@@ -62,14 +63,31 @@ def resolve_sso_provider(broker_alias: str) -> Optional[str]:
     return BROKER_ALIAS_TO_PROVIDER.get(alias, alias)
 
 
+def is_sso_internal_bypass_email(email: str) -> bool:
+    """Return True when the email belongs to an internal staff domain.
+
+    Domains come from ``SSO_INTERNAL_BYPASS_EMAIL_DOMAINS`` and fully bypass
+    organization SSO enforcement without appearing in ``allowed_email_domains``.
+    """
+    if not email or "@" not in email:
+        return False
+    domain = email.rsplit("@", 1)[-1].lower()
+    bypass_domains = [
+        d.lower() for d in getattr(settings, "SSO_INTERNAL_BYPASS_EMAIL_DOMAINS", [])
+    ]
+    return domain in bypass_domains
+
+
 class EvaluateOrganizationSSOAccessUseCase:
     """Decides whether a user's current session may access an organization.
 
     A user complies with an SSO-enforcing organization when the current
     session is brokered through an allowed SSO provider, the user's email
     domain is allowed, and the user has no password configured in Keycloak.
-    Organizations without an enabled policy always comply, which keeps the
-    rule isolated per organization in a multi-tenant setup.
+    Internal staff domains from ``SSO_INTERNAL_BYPASS_EMAIL_DOMAINS`` always
+    comply without those checks. Organizations without an enabled policy
+    always comply, which keeps the rule isolated per organization in a
+    multi-tenant setup.
     """
 
     def __init__(
@@ -88,6 +106,9 @@ class EvaluateOrganizationSSOAccessUseCase:
     ) -> OrganizationSSOAccessResult:
         config = getattr(organization, "sso_config", None)
         if config is None or not config.is_enabled:
+            return OrganizationSSOAccessResult.compliant()
+
+        if is_sso_internal_bypass_email(user.email):
             return OrganizationSSOAccessResult.compliant()
 
         provider = resolve_sso_provider(session_identity_provider)
