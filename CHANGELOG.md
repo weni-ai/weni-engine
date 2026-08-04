@@ -1,3 +1,6 @@
+# 3.56.0
+  - feat: Add JWT auth and project_uuid to VTEX account authorization
+
 # 3.55.0
   - feat: Add project migration publisher with module status tracking
 
