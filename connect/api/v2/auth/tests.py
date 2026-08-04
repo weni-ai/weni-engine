@@ -287,6 +287,7 @@ class InvalidateSessionTokenViewTestCase(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
+
 _JWT_PRIVATE_KEY_OBJ = rsa.generate_private_key(public_exponent=65537, key_size=2048)
 JWT_PRIVATE_KEY = _JWT_PRIVATE_KEY_OBJ.private_bytes(
     encoding=serialization.Encoding.PEM,
