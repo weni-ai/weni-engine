@@ -9,6 +9,7 @@ from mozilla_django_oidc.auth import OIDCAuthenticationBackend
 from mozilla_django_oidc.contrib.drf import OIDCAuthentication
 from rest_framework import HTTP_HEADER_ENCODING, exceptions
 from rest_framework.authentication import BaseAuthentication, get_authorization_header
+from weni_commons.auth import WeniAuthentication as BaseWeniAuthentication
 
 from connect.celery import app as celery_app
 
@@ -148,6 +149,53 @@ class WeniOIDCAuthentication(OIDCAuthentication):
 
         if user.first_login and user_token != request_token:
             user.set_verify_email()
+
+
+class WeniAuthentication(BaseWeniAuthentication):
+    """The shared Weni authentication, wired to Connect's Keycloak session setup.
+
+    Every Connect route that adopts the shared authentication uses this class,
+    so the JWT flow stays exactly the library's while Keycloak callers keep the
+    per-session work ``WeniOIDCAuthentication`` does — most importantly exposing
+    ``session_identity_provider``, the live claim SSO enforcement relies on,
+    plus language activation and first-login verification. Keycloak tokens must
+    therefore arrive in ``Authorization: Bearer``, the only header that wrapper
+    reads.
+
+    The private hook is overridden deliberately: weni-commons has no public
+    extension point for the Keycloak branch yet.
+    """
+
+    def __init__(self, oidc_backend=None, oidc_authentication=None):
+        """Initialize the authenticator.
+
+        Args:
+            oidc_backend: Optional OIDC backend. When given, the library's own
+                Keycloak flow is used, skipping Connect's session setup.
+            oidc_authentication: Optional Connect OIDC wrapper, injected by
+                tests; built lazily otherwise so the JWT flow never depends on
+                the OIDC configuration.
+        """
+        super().__init__(oidc_backend=oidc_backend)
+        self._oidc_authentication = oidc_authentication
+
+    def _authenticate_with_keycloak(self, request, token):
+        if self._oidc_backend is not None:
+            return super()._authenticate_with_keycloak(request, token)
+
+        oidc_authentication = self._get_oidc_authentication()
+        instance = oidc_authentication.authenticate(request)
+        if instance is None:
+            raise exceptions.AuthenticationFailed("Invalid token.")
+
+        user = instance[0]
+        claims = self._extract_keycloak_claims(token, oidc_authentication.backend, user)
+        return user, self._build_keycloak_auth_context(request, user, claims)
+
+    def _get_oidc_authentication(self):
+        if self._oidc_authentication is None:
+            self._oidc_authentication = WeniOIDCAuthentication()
+        return self._oidc_authentication
 
 
 class ExternalAuthentication(BaseAuthentication):

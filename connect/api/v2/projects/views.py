@@ -4,10 +4,11 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
+from weni_commons.auth import CanCommunicateInternally, WeniAuthViewMixin
 
-from connect.api.v1.internal.permissions import ModuleHasPermission
 from connect.api.v1.organization.permissions import Has2FA, HasSSOAccess
 from connect.api.v1.project.permissions import IsProjectAdmin, ProjectHasPermission
+from connect.middleware import WeniAuthentication
 
 from connect.common.models import Project, OpenedProject, TypeProject
 from connect.api.v2.projects.serializers import (
@@ -222,13 +223,24 @@ class OpenedProjectViewSet(mixins.ListModelMixin, GenericViewSet):
         return ordering or ["project", "day"]
 
 
-class ProjectDetailView(views.APIView):
+class ProjectDetailView(WeniAuthViewMixin, views.APIView):
+    """Project detail for the dashboard (Keycloak) and for App IO (internal JWT)."""
+
+    authentication_classes = [WeniAuthentication]
     permission_classes = [
-        ModuleHasPermission | (IsAuthenticated & IsProjectAdmin & HasSSOAccess),
+        CanCommunicateInternally | (IsAuthenticated & IsProjectAdmin & HasSSOAccess),
     ]
 
-    def get(self, request, uuid):
+    def get(self, request, project_uuid):
+        """Return the project detail.
+
+        The ``project_uuid`` argument only exists because the URL declares it and
+        must not be used: it is raw request data. The project always comes from
+        ``self.auth.project_uuid``, which weni-commons resolved and validated
+        while authenticating — for an internal JWT that is the tenant the token
+        was issued for, not whatever the caller typed in the path.
+        """
         use_case = GetProjectDetailUseCase()
-        project = use_case.execute(project_uuid=uuid)
+        project = use_case.execute(project_uuid=self.auth.project_uuid)
         serializer = ProjectDetailSerializer(project)
         return Response(serializer.data)
