@@ -18,6 +18,7 @@ from connect.usecases.organizations.sso_access import (
     ExcludeNonCompliantOrganizationProjectsUseCase,
     OrganizationSSOAccessDisabledReason,
     enrich_serializer_context_with_sso_access,
+    is_sso_internal_bypass_email,
     resolve_sso_provider,
 )
 
@@ -156,6 +157,40 @@ class EvaluateOrganizationSSOAccessUseCaseTestCase(TestCase):
         self.assertTrue(result.is_compliant)
         self.assertIsNone(result.disabled_reason)
 
+    def test_allows_internal_bypass_domain_without_sso_session(self):
+        self.user.email = "staff@weni.ai"
+        self.user.save(update_fields=["email"])
+        self.create_sso_config(
+            is_enabled=True,
+            allowed_email_domains=["customer.com"],
+            allowed_sso_providers=["microsoft"],
+        )
+        result = self.evaluate(None, has_password=True)
+        self.assertTrue(result.is_compliant)
+        self.assertIsNone(result.disabled_reason)
+
+    def test_allows_vtex_internal_bypass_domain(self):
+        self.user.email = "staff@vtex.com"
+        self.user.save(update_fields=["email"])
+        self.create_sso_config(
+            is_enabled=True,
+            allowed_email_domains=["customer.com"],
+        )
+        result = self.evaluate(None, has_password=True)
+        self.assertTrue(result.is_compliant)
+
+    @override_settings(SSO_INTERNAL_BYPASS_EMAIL_DOMAINS=[])
+    def test_blocks_internal_domain_when_bypass_list_is_empty(self):
+        self.user.email = "staff@weni.ai"
+        self.user.save(update_fields=["email"])
+        self.create_sso_config(is_enabled=True)
+        result = self.evaluate(None)
+        self.assertFalse(result.is_compliant)
+        self.assertEqual(
+            result.disabled_reason,
+            OrganizationSSOAccessDisabledReason.SSO_SESSION_REQUIRED.value,
+        )
+
     def test_memoizes_credential_lookup_per_email(self):
         self.create_sso_config(is_enabled=True)
         credentials_service = FakeCredentialsService(has_password=False)
@@ -167,6 +202,23 @@ class EvaluateOrganizationSSOAccessUseCaseTestCase(TestCase):
         usecase.execute(self.organization, self.user, "google")
 
         self.assertEqual(len(credentials_service.calls), 1)
+
+
+class IsSSOInternalBypassEmailTestCase(TestCase):
+    def test_matches_default_bypass_domains_case_insensitively(self):
+        self.assertTrue(is_sso_internal_bypass_email("staff@weni.ai"))
+        self.assertTrue(is_sso_internal_bypass_email("staff@WENI.AI"))
+        self.assertTrue(is_sso_internal_bypass_email("staff@vtex.com"))
+
+    def test_rejects_non_bypass_domains(self):
+        self.assertFalse(is_sso_internal_bypass_email("staff@user.com"))
+        self.assertFalse(is_sso_internal_bypass_email(""))
+        self.assertFalse(is_sso_internal_bypass_email("not-an-email"))
+
+    @override_settings(SSO_INTERNAL_BYPASS_EMAIL_DOMAINS=["custom.io"])
+    def test_uses_settings_override(self):
+        self.assertTrue(is_sso_internal_bypass_email("a@custom.io"))
+        self.assertFalse(is_sso_internal_bypass_email("staff@weni.ai"))
 
 
 @override_settings(USE_EDA_PERMISSIONS=False)

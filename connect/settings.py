@@ -90,6 +90,9 @@ env = environ.Env(
     PLAN_STATUS_CACHE_TTL=(int, 900),
     SESSION_TOKEN_MIN_DURATION=(int, 60),
     SESSION_TOKEN_MAX_DURATION=(int, 86400),
+    WENI_SESSION_TOKEN_DYNAMODB_TABLE=(str, "weni-session-tokens"),
+    WENI_SESSION_TOKEN_DYNAMODB_REGION=(str, "sa-east-1"),
+    WENI_SESSION_TOKEN_MAX_REDIS_TTL=(int, 3600),
     PLAN_START_LIMIT=(int, 200),
     PLAN_START_PRICE=(int, 390),
     PLAN_SCALE_LIMIT=(int, 500),
@@ -560,10 +563,11 @@ SESSION_TOKEN_MIN_DURATION = env.int("SESSION_TOKEN_MIN_DURATION")
 SESSION_TOKEN_MAX_DURATION = env.int("SESSION_TOKEN_MAX_DURATION")
 
 # Session tokens are stored in a shared DynamoDB table (source of truth) and
-# cached in the local Redis. The table name, region and Redis TTL cap are
-# centralized in weni-commons (weni_commons.auth.constants). Define
-# WENI_SESSION_TOKEN_DYNAMODB_TABLE / _REGION / WENI_SESSION_TOKEN_MAX_REDIS_TTL
-# here only if this service needs to override those defaults.
+# cached in the local Redis. Defaults match weni-commons
+# (weni_commons.auth.constants); override per environment via env vars.
+WENI_SESSION_TOKEN_DYNAMODB_TABLE = env.str("WENI_SESSION_TOKEN_DYNAMODB_TABLE")
+WENI_SESSION_TOKEN_DYNAMODB_REGION = env.str("WENI_SESSION_TOKEN_DYNAMODB_REGION")
+WENI_SESSION_TOKEN_MAX_REDIS_TTL = env.int("WENI_SESSION_TOKEN_MAX_REDIS_TTL")
 
 # weni-commons / weni-feature-flags (required on import)
 GROWTHBOOK_CLIENT_KEY = env.str("GROWTHBOOK_CLIENT_KEY")
@@ -620,11 +624,24 @@ if USE_EDA:
     EDA_VIRTUAL_HOST = env.str("EDA_VIRTUAL_HOST", default="/")
     EDA_WAIT_TIME_RETRY = env.int("EDA_WAIT_TIME_RETRY", default=5)
 
+USE_PROJECT_MIGRATION_PUBLISHER = env.bool(
+    "USE_PROJECT_MIGRATION_PUBLISHER", default=False
+)
+PROJECT_MIGRATION_EXPECTED_MODULES = env.list(
+    "PROJECT_MIGRATION_EXPECTED_MODULES", default=[]
+)
+EDA_PRODUCER = env.str("EDA_PRODUCER", default="weni-engine")
+
+# AmazonMQ (SSL) settings — used by weni-eda EDAPublisher / AMQConnectionParamsFactory.
+# Available whenever EDA or the project-migration publisher is enabled.
+if USE_EDA or USE_PROJECT_MIGRATION_PUBLISHER:
     AMQ_BROKER_HOST = env.str("AMQ_BROKER_HOST", default="localhost")
     AMQ_BROKER_PORT = env.int("AMQ_BROKER_PORT", default=5671)
     AMQ_BROKER_USER = env.str("AMQ_BROKER_USER", default="guest")
     AMQ_BROKER_PASSWORD = env.str("AMQ_BROKER_PASSWORD", default="guest")
     AMQ_VIRTUAL_HOST = env.str("AMQ_VIRTUAL_HOST", default="/")
+    AMQ_BROKER_SSL_SERVER_HOSTNAME = env("AMQ_BROKER_SSL_SERVER_HOSTNAME", default=None)
+    AMQ_BROKER_HEARTBEAT = env.int("AMQ_BROKER_HEARTBEAT", default=300)
 
 NEW_ATTENDANCE_DATE = env.str("NEW_ATTENDANCE_DATE", default="2023-09-30")
 
@@ -658,3 +675,10 @@ NEXUS_AB1_ORGANIZATIONS = env.list("NEXUS_AB1_ORGANIZATIONS", default=[])
 # TTL for cached positive Keycloak password lookups used by SSO enforcement.
 # Only has_password=True is cached; negative results are always re-fetched.
 SSO_PASSWORD_CACHE_TTL = env.int("SSO_PASSWORD_CACHE_TTL", default=300)
+
+# Internal staff domains that fully bypass organization SSO enforcement.
+# Not exposed in allowed_email_domains; override via comma-separated env.
+SSO_INTERNAL_BYPASS_EMAIL_DOMAINS = env.list(
+    "SSO_INTERNAL_BYPASS_EMAIL_DOMAINS",
+    default=["weni.ai", "vtex.com"],
+)
