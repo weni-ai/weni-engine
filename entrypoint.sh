@@ -72,13 +72,24 @@ elif [[ "healthcheck-celery-worker" == "$1" ]]; then
     grep -F -qs "${celery_queue}@${HOSTNAME}: OK" <<< "${HEALTHCHECK_OUT}" || exit 1
     exit 0
 elif [[ "edaconsume" == "$1" ]]; then
+    shift 1
     echo "Running edaconsume"
-    do_gosu "${APP_USER}:${APP_GROUP}" exec python manage.py edaconsume
+    do_gosu "${APP_USER}:${APP_GROUP}" exec python manage.py edaconsume \
+        --handle "connect.handle.handle_edaconsume" \
+        "$@"
 elif [[ "rmqedaconsume" == "$1" ]]; then
+    # RabbitMQ (no SSL) — alias kept for existing deployments.
+    shift 1
     echo "Running rmqedaconsume"
-    do_gosu "${APP_USER}:${APP_GROUP}" exec python manage.py rmqedaconsume
+    do_gosu "${APP_USER}:${APP_GROUP}" exec python manage.py edaconsume \
+        --handle "connect.handle.handle_edaconsume" \
+        "$@"
 elif [[ "edaconsume-amq" == "$1" ]]; then
+    shift 1
     echo "Running edaconsume-amq"
-    do_gosu "${APP_USER}:${APP_GROUP}" exec python manage.py edaconsume
+    do_gosu "${APP_USER}:${APP_GROUP}" exec python manage.py edaconsume \
+        --handle "connect.handle.handle_edaconsume_amq" \
+        --params-class "weni.eda.django.AMQConnectionParamsFactory" \
+        "$@"
 fi
 exec "$@"
