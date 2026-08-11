@@ -10,8 +10,6 @@ from rest_framework.test import (
     force_authenticate,
 )
 
-from django.contrib.auth.models import Permission
-from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils.crypto import get_random_string
@@ -19,7 +17,8 @@ from django.utils.crypto import get_random_string
 from unittest.mock import Mock, patch
 
 from connect.api.v1.tests.utils import create_user_and_token
-from connect.authentication.models import User, UserEmailSetup
+from connect.api.v2.auth.tests import JWT_PUBLIC_KEY, build_weni_jwt
+from connect.authentication.models import UserEmailSetup
 from connect.common.models import (
     BillingPlan,
     Organization,
@@ -553,23 +552,27 @@ class ListOrgsByUserUseCaseTestCase(OrgsByUserBaseTestCase):
         self.assertEqual(result, [])
 
 
+@override_settings(JWT_PUBLIC_KEY=JWT_PUBLIC_KEY)
 class OrgsByUserViewTestCase(OrgsByUserBaseTestCase):
     def setUp(self):
         super().setUp()
         self.client = APIClient()
-
-        content_type = ContentType.objects.get_for_model(User)
-        permission, _ = Permission.objects.get_or_create(
-            codename="can_communicate_internally",
-            name="can communicate internally",
-            content_type=content_type,
-        )
-        self.member.user_permissions.add(permission)
-        self.client.force_authenticate(user=self.member)
         self.url = reverse("orgs-by-user")
 
+    def _token(self, **claims):
+        payload = {
+            "vtex_account": "mystore",
+            "user_email": self.member.email,
+        }
+        payload.update(claims)
+        return build_weni_jwt(**payload)
+
+    def _get(self, token=None, **query):
+        headers = {"HTTP_X_WENI_AUTH": token} if token is not None else {}
+        return self.client.get(self.url, query, **headers)
+
     def test_returns_200_with_organizations(self):
-        response = self.client.get(self.url, {"user_email": self.member.email})
+        response = self._get(token=self._token())
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["organizations"]), 1)
@@ -578,17 +581,33 @@ class OrgsByUserViewTestCase(OrgsByUserBaseTestCase):
             str(self.organization.uuid),
         )
 
-    def test_missing_user_email_returns_400(self):
-        response = self.client.get(self.url)
+    def test_missing_user_email_claim_returns_400(self):
+        token = build_weni_jwt(vtex_account="mystore")
+        response = self._get(token=token)
+
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_unauthenticated_request_returns_403(self):
-        unauth_client = APIClient()
-        no_perm, _ = create_user_and_token("orgnoperm")
-        unauth_client.force_authenticate(user=no_perm)
+    def test_missing_token_returns_401(self):
+        response = self._get()
 
-        response = unauth_client.get(self.url, {"user_email": self.member.email})
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_query_param_user_email_is_ignored(self):
+        token = self._token(user_email=self.member.email)
+        response = self._get(token=token, user_email=self.other.email)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data["organizations"]), 1)
+        self.assertEqual(
+            response.data["organizations"][0]["uuid"],
+            str(self.organization.uuid),
+        )
+
+    def test_jwt_without_tenant_claim_returns_401(self):
+        token = build_weni_jwt(user_email=self.member.email)
+        response = self._get(token=token)
+
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
 class OrganizationAuthorizationViewSetTestCase(TestCase):

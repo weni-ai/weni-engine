@@ -1,3 +1,6 @@
+# 3.56.1
+  - refactor: Replace ModuleHasPermission with JWT-based WeniAuthentication for OrgsByUserView
+
 # 3.56.0
   - feat: Add JWT auth and project_uuid to VTEX account authorization
 
