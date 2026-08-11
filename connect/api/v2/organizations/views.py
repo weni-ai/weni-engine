@@ -15,7 +15,8 @@ from connect.common.models import (
     OrganizationRole,
     BillingPlan,
 )
-from connect.api.v1.internal.permissions import ModuleHasPermission
+from weni_commons.auth import WeniAuthViewMixin
+
 from connect.api.v1.organization.permissions import (
     Has2FA,
     HasSSOAccess,
@@ -23,6 +24,7 @@ from connect.api.v1.organization.permissions import (
     IsCRMUser,
     _is_orm_user,
 )
+from connect.middleware import WeniAuthentication
 from connect.usecases.organizations.sso_access import (
     enrich_serializer_context_with_sso_access,
 )
@@ -198,20 +200,21 @@ class OrganizationAuthorizationViewSet(
         return NestedAuthorizationOrganizationSerializer
 
 
-class OrgsByUserView(views.APIView):
-    """Lists the organizations a user belongs to (by email), including each
+class OrgsByUserView(WeniAuthViewMixin, views.APIView):
+    """Lists the organizations a user belongs to, including each
     organization's projects and active member count.
 
-    Service-to-service endpoint guarded by ``ModuleHasPermission``.
+    Identity comes from the signed ``X-Weni-Auth`` JWT (``user_email`` claim),
+    never from query params — same trust boundary as other App IO routes.
     """
 
-    permission_classes = [ModuleHasPermission]
+    authentication_classes = [WeniAuthentication]
 
     def get(self, request):
-        user_email = request.query_params.get("user_email")
+        user_email = self.auth.user_email
         if not user_email:
             raise ValidationError(
-                {"user_email": _("This query parameter is required.")}
+                {"user_email": _("This claim is required in the auth token.")}
             )
 
         organizations = ListOrgsByUserUseCase().execute(user_email)
