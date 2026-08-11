@@ -18,7 +18,7 @@ from unittest.mock import Mock, patch
 
 from connect.api.v1.tests.utils import create_user_and_token
 from connect.api.v2.auth.tests import JWT_PUBLIC_KEY, build_weni_jwt
-from connect.authentication.models import User, UserEmailSetup
+from connect.authentication.models import UserEmailSetup
 from connect.common.models import (
     BillingPlan,
     Organization,
