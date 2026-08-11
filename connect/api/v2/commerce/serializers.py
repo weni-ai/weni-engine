@@ -92,6 +92,7 @@ class CommerceSerializer(serializers.Serializer):
             "brain_on": True,
             "project_type": instance.project_type.value,
             "vtex_account": instance.vtex_account,
+            "config": instance.config or {},
             "inline_agent_switch": inline_agent_switch,
         }
         rabbitmq_publisher = RabbitmqPublisher()
