@@ -138,6 +138,7 @@ class ProjectEDAPublisherTestCase(TestCase):
             "timezone": "America/Sao_Paulo",
             "date_format": "DD/MM/YYYY",
             "config": None,
+            "vtex_account": None,
             "timestamp": custom_timestamp.to_iso8601_string(),
         }
 
@@ -175,6 +176,7 @@ class ProjectEDAPublisherTestCase(TestCase):
             "timezone": None,
             "date_format": None,
             "config": None,
+            "vtex_account": None,
             "timestamp": mock_timestamp.to_iso8601_string(),
         }
 
@@ -213,6 +215,49 @@ class ProjectEDAPublisherTestCase(TestCase):
             "timezone": "UTC",
             "date_format": None,
             "config": None,
+            "vtex_account": None,
+            "timestamp": custom_timestamp.to_iso8601_string(),
+        }
+
+        mock_publisher_instance.send_message.assert_called_once_with(
+            body=expected_body,
+            exchange="update-projects.topic",
+            routing_key="",
+        )
+
+    @override_settings(USE_EDA=True, TESTING=False)
+    @patch("connect.usecases.project.eda_publisher.RabbitmqPublisher")
+    def test_publish_project_updated_with_vtex_fields(self, mock_rabbitmq):
+        """Test publishing project updated event with VTEX account and config"""
+        mock_publisher_instance = Mock()
+        mock_rabbitmq.return_value = mock_publisher_instance
+
+        publisher = ProjectEDAPublisher()
+        custom_timestamp = pendulum.parse("2024-01-15T15:00:00Z")
+        config = {
+            "storefront_type": "vtex_io",
+            "vtex_host_store": "https://www.mystore.com.br",
+        }
+
+        publisher.publish_project_updated(
+            project_uuid=self.project_uuid,
+            user_email=self.user_email,
+            config=config,
+            vtex_account="mystore",
+            updated_at=custom_timestamp,
+        )
+
+        expected_body = {
+            "project_uuid": str(self.project_uuid),
+            "action": "updated",
+            "user_email": self.user_email,
+            "name": None,
+            "description": None,
+            "language": None,
+            "timezone": None,
+            "date_format": None,
+            "config": config,
+            "vtex_account": "mystore",
             "timestamp": custom_timestamp.to_iso8601_string(),
         }
 

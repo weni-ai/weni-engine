@@ -215,6 +215,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             "brain_on": brain_on,
             "project_type": instance.project_type.value,
             "vtex_account": instance.vtex_account,
+            "config": instance.config or {},
             "inline_agent_switch": inline_agent_switch,
         }
         rabbitmq_publisher = RabbitmqPublisher()

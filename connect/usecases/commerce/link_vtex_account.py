@@ -9,6 +9,7 @@ from connect.usecases.commerce.exceptions import (
     ProjectAlreadyHasVtexAccountError,
     VtexAccountAlreadyLinkedError,
 )
+from connect.usecases.project.update_project import UpdateProjectUseCase
 
 logger = logging.getLogger(__name__)
 
@@ -28,16 +29,18 @@ class LinkVtexAccountUseCase:
     different projects (a time-of-check/time-of-use race). A per-account Redis
     lock serializes those requests, and the work runs inside a single
     transaction. After the link is committed, Insights is notified about the
-    migration.
+    migration and an EDA project.updated event is published.
     """
 
     def __init__(
         self,
         insights_client: InsightsRESTClient = None,
         lock_service: RedisLockService = None,
+        update_project_usecase: UpdateProjectUseCase = None,
     ):
         self._insights = insights_client or InsightsRESTClient()
         self._lock = lock_service or RedisLockService()
+        self._update_project = update_project_usecase or UpdateProjectUseCase()
 
     def execute(self, project_uuid: str, vtex_account: str) -> dict:
         with self._lock.lock(self._lock_key(vtex_account)):
@@ -50,6 +53,7 @@ class LinkVtexAccountUseCase:
 
         logger.info(f"Linked vtex_account={vtex_account} to project={project.uuid}")
 
+        self._update_project.send_updated_project(project, user_email="")
         self._notify_insights(project)
 
         return {"success": True}
