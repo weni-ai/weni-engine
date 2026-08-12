@@ -1,3 +1,6 @@
+# 3.57.0
+  - fix: Filter orgs-by-user to linkable projects only
+
 # 3.56.1
   - refactor: Replace ModuleHasPermission with JWT-based WeniAuthentication for OrgsByUserView
 
