@@ -201,8 +201,11 @@ class OrganizationAuthorizationViewSet(
 
 
 class OrgsByUserView(WeniAuthViewMixin, views.APIView):
-    """Lists the organizations a user belongs to, including each
-    organization's projects and active member count.
+    """Lists the organizations a user belongs to, including projects eligible
+    for VTEX account linking and each organization's active member count.
+
+    Only projects without a ``vtex_account`` are returned so consumers can
+    present options that will not fail on link.
 
     Identity comes from the signed ``X-Weni-Auth`` JWT (``user_email`` claim),
     never from query params — same trust boundary as other App IO routes.
