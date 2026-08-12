@@ -503,6 +503,21 @@ class OrgsByUserBaseTestCase(APITestCase):
 
 
 class ListOrgsByUserUseCaseTestCase(OrgsByUserBaseTestCase):
+    def _create_project(self, name, *, vtex_account=None, organization=None):
+        return Project.objects.create(
+            name=name,
+            organization=organization or self.organization,
+            flow_organization=uuid.uuid4(),
+            project_type=TypeProject.COMMERCE,
+            vtex_account=vtex_account,
+        )
+
+    def _project_payload(self, project):
+        return {"uuid": str(project.uuid), "name": project.name}
+
+    def _projects_for_member(self):
+        return ListOrgsByUserUseCase().execute(self.member.email)[0]["projects"]
+
     def test_returns_orgs_with_projects_and_member_count(self):
         result = ListOrgsByUserUseCase().execute(self.member.email)
 
@@ -531,6 +546,61 @@ class ListOrgsByUserUseCaseTestCase(OrgsByUserBaseTestCase):
     def test_returns_empty_for_unknown_user(self):
         result = ListOrgsByUserUseCase().execute("missing@user.com")
         self.assertEqual(result, [])
+
+    def test_excludes_projects_with_vtex_account(self):
+        self._create_project(name="linked-project", vtex_account="mystore")
+
+        projects = self._projects_for_member()
+
+        self.assertEqual(projects, [self._project_payload(self.project)])
+
+    def test_includes_projects_with_blank_vtex_account(self):
+        self.project.vtex_account = ""
+        self.project.save(update_fields=["vtex_account"])
+
+        projects = self._projects_for_member()
+
+        self.assertEqual(projects, [self._project_payload(self.project)])
+
+    def test_includes_projects_with_null_vtex_account(self):
+        linkable = self._create_project(name="null-vtex-project", vtex_account=None)
+        self._create_project(name="linked-project", vtex_account="mystore")
+
+        projects = self._projects_for_member()
+
+        self.assertCountEqual(
+            projects,
+            [
+                self._project_payload(self.project),
+                self._project_payload(linkable),
+            ],
+        )
+
+    def test_returns_empty_projects_when_all_projects_are_linked(self):
+        self.project.vtex_account = "existing-store"
+        self.project.save(update_fields=["vtex_account"])
+        self._create_project(name="another-linked-project", vtex_account="other-store")
+
+        projects = self._projects_for_member()
+
+        self.assertEqual(projects, [])
+
+    def test_filters_mixed_linkable_and_linked_projects(self):
+        linkable_alpha = self._create_project(name="alpha-project")
+        linkable_beta = self._create_project(name="beta-project", vtex_account="")
+        self._create_project(name="linked-alpha", vtex_account="store-alpha")
+        self._create_project(name="linked-beta", vtex_account="store-beta")
+
+        projects = self._projects_for_member()
+
+        self.assertCountEqual(
+            projects,
+            [
+                self._project_payload(self.project),
+                self._project_payload(linkable_alpha),
+                self._project_payload(linkable_beta),
+            ],
+        )
 
     @patch("connect.billing.get_gateway")
     def test_returns_empty_when_only_not_setted_role(self, mock_gateway):
@@ -579,6 +649,23 @@ class OrgsByUserViewTestCase(OrgsByUserBaseTestCase):
         self.assertEqual(
             response.data["organizations"][0]["uuid"],
             str(self.organization.uuid),
+        )
+
+    def test_excludes_projects_with_vtex_account_from_response(self):
+        Project.objects.create(
+            name="linked-project",
+            organization=self.organization,
+            flow_organization=uuid.uuid4(),
+            project_type=TypeProject.COMMERCE,
+            vtex_account="mystore",
+        )
+
+        response = self._get(token=self._token())
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            response.data["organizations"][0]["projects"],
+            [{"uuid": str(self.project.uuid), "name": "member-project"}],
         )
 
     def test_missing_user_email_claim_returns_400(self):
