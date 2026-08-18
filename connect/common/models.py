@@ -26,6 +26,7 @@ from connect.api.v1.internal.intelligence.intelligence_rest_client import (
 )
 from connect.authentication.models import User
 from connect.billing.gateways.stripe_gateway import StripeGateway
+from connect.common.currencies import ISO_4217_CODE_LENGTH
 from connect.common.exceptions import (
     OrganizationAuthorizationException,
     ProjectAuthorizationException,
@@ -638,7 +639,7 @@ class Project(models.Model):
         default=settings.DEFAULT_LANGUAGE,
     )
     currency = models.CharField(
-        _("Project currency"), max_length=3, null=True, blank=True
+        _("Project currency"), max_length=ISO_4217_CODE_LENGTH, null=True, blank=True
     )
     config = models.JSONField(
         _("Project configuration"),

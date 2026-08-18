@@ -2,6 +2,8 @@ from functools import lru_cache
 
 import pycountry
 
+ISO_4217_CODE_LENGTH = 3
+
 
 @lru_cache(maxsize=1)
 def list_currency_codes() -> tuple:

@@ -3,7 +3,7 @@ import six
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from connect.common.currencies import is_valid_currency
+from connect.common.currencies import ISO_4217_CODE_LENGTH, is_valid_currency
 
 
 class PasswordField(serializers.CharField):
@@ -37,7 +37,7 @@ class TimezoneField(serializers.Field):
 
 class CurrencyField(serializers.CharField):
     def __init__(self, **kwargs):
-        kwargs.setdefault("max_length", 3)
+        kwargs.setdefault("max_length", ISO_4217_CODE_LENGTH)
         super().__init__(**kwargs)
 
     def to_internal_value(self, data):
