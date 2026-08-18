@@ -65,6 +65,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             "project_mode",
             "vtex_account",
             "status",
+            "currency",
         ]
         ref_name = None
 
@@ -97,6 +98,7 @@ class ProjectSerializer(serializers.ModelSerializer):
         choices=ProjectMode.choices,
         default=ProjectMode.WENI_FRAMEWORK,
     )
+    currency = fields.CurrencyField(required=False, allow_null=True, allow_blank=True)
 
     def validate_name(self, value):
         stripped_value = strip_tags(value)
@@ -217,6 +219,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             "vtex_account": instance.vtex_account,
             "config": instance.config or {},
             "inline_agent_switch": inline_agent_switch,
+            "currency": instance.currency,
         }
         rabbitmq_publisher = RabbitmqPublisher()
         rabbitmq_publisher.send_message(
@@ -505,7 +508,15 @@ class TemplateProjectSerializer(serializers.ModelSerializer):
 class ProjectUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
-        fields = ["name", "timezone", "date_format", "uuid", "description", "language"]
+        fields = [
+            "name",
+            "timezone",
+            "date_format",
+            "uuid",
+            "description",
+            "language",
+            "currency",
+        ]
         ref_name = None
 
     name = serializers.CharField(max_length=500, required=False)
@@ -513,6 +524,7 @@ class ProjectUpdateSerializer(serializers.ModelSerializer):
     timezone = fields.TimezoneField(required=False)
     date_format = serializers.CharField(max_length=1, required=False)
     language = serializers.CharField(max_length=64, required=False)
+    currency = fields.CurrencyField(required=False, allow_null=True, allow_blank=True)
 
     def update(self, instance, validated_data):  # pragma: no cover
         data = validated_data
@@ -668,6 +680,7 @@ class ProjectDetailSerializer(serializers.Serializer):
     project_type = serializers.IntegerField()
     project_mode = serializers.IntegerField()
     vtex_account = serializers.CharField()
+    currency = serializers.CharField(allow_null=True)
     organization_billing = serializers.SerializerMethodField()
 
     def get_organization_billing(self, obj):

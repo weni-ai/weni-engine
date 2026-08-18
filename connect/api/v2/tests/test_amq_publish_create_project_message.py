@@ -82,6 +82,7 @@ class PublishCreateProjectMessageTestCase(TestCase):
                 "vtex_host_store": "https://www.mystore.com.br",
             },
         )
+        self.assertIn("currency", rabbitmq_body)
 
     @patch("connect.api.v2.projects.serializers.EDAPublisher")
     @patch("connect.api.v2.projects.serializers.RabbitmqPublisher")
@@ -123,3 +124,4 @@ class PublishCreateProjectMessageTestCase(TestCase):
         self.assertEqual(amazonmq_body["event_type"], "project.created")
         self.assertEqual(amazonmq_body["producer"], "connect-test-producer")
         self.assertEqual(amazonmq_body["data"], rabbitmq_body)
+        self.assertIn("currency", rabbitmq_body)

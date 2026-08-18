@@ -94,6 +94,7 @@ class CommerceSerializer(serializers.Serializer):
             "vtex_account": instance.vtex_account,
             "config": instance.config or {},
             "inline_agent_switch": inline_agent_switch,
+            "currency": instance.currency,
         }
         rabbitmq_publisher = RabbitmqPublisher()
         rabbitmq_publisher.send_message(
