@@ -71,6 +71,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             "template_type",
             "status",
             "language",
+            "currency",
         ]
         ref_name = None
 
@@ -93,6 +94,7 @@ class ProjectSerializer(serializers.ModelSerializer):
         required=False, read_only=True, style={"show": False}
     )
     description = serializers.CharField(max_length=1000, required=False)
+    currency = fields.CurrencyField(required=False, allow_null=True, allow_blank=True)
     authorizations = serializers.SerializerMethodField(style={"show": False})
     pending_authorizations = serializers.SerializerMethodField(style={"show": False})
     authorization = serializers.SerializerMethodField(style={"show": False})

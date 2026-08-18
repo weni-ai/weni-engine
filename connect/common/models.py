@@ -637,6 +637,9 @@ class Project(models.Model):
         choices=settings.LANGUAGES,
         default=settings.DEFAULT_LANGUAGE,
     )
+    currency = models.CharField(
+        _("Project currency"), max_length=3, null=True, blank=True
+    )
     config = models.JSONField(
         _("Project configuration"),
         default=dict,

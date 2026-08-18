@@ -3,6 +3,8 @@ import six
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
+from connect.common.currencies import is_valid_currency
+
 
 class PasswordField(serializers.CharField):
     def __init__(self, *args, **kwargs):
@@ -31,6 +33,21 @@ class TimezoneField(serializers.Field):
             return pytz.timezone(str(data))
         except pytz.exceptions.UnknownTimeZoneError:
             raise ValidationError("Unknown timezone")
+
+
+class CurrencyField(serializers.CharField):
+    def __init__(self, **kwargs):
+        kwargs.setdefault("max_length", 3)
+        super().__init__(**kwargs)
+
+    def to_internal_value(self, data):
+        value = super().to_internal_value(data)
+        if not value:
+            return value
+        value = value.upper()
+        if not is_valid_currency(value):
+            raise ValidationError("Unknown currency code")
+        return value
 
 
 # class OrganizationBillingRelatedField(serializers.ModelSerializer):
