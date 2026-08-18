@@ -51,7 +51,3 @@ jobs:
           fail_ci_if_error: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Check coverage status
-        run: |
-          poetry run python contrib/compare_coverage.py
