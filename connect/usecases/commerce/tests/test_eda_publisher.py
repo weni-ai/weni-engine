@@ -71,6 +71,15 @@ class CommerceEDAPublisherTestCase(TestCase):
             amazonmq_body["data"],
             publisher._build_project_body(self.project),
         )
+        self.assertIn("currency", publisher._build_project_body(self.project))
+
+    def test_build_project_body_includes_currency(self):
+        self.project.currency = "BRL"
+        self.project.save(update_fields=["currency"])
+
+        body = CommerceEDAPublisher()._build_project_body(self.project)
+
+        self.assertEqual(body["currency"], "BRL")
 
     @override_settings(USE_EDA=False, TESTING=False)
     @patch("connect.usecases.commerce.eda_publisher.EDAPublisher")

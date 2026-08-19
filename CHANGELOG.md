@@ -1,3 +1,6 @@
+# 3.58.0
+  - feat: Add currency field to projects with ISO 4217 validation and listing endpoint
+
 # 3.57.0
   - fix: Filter orgs-by-user to linkable projects only
 

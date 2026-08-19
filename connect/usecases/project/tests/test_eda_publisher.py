@@ -125,6 +125,7 @@ class ProjectEDAPublisherTestCase(TestCase):
             language="pt-br",
             timezone="America/Sao_Paulo",
             date_format="DD/MM/YYYY",
+            currency="BRL",
             updated_at=custom_timestamp,
         )
 
@@ -138,6 +139,7 @@ class ProjectEDAPublisherTestCase(TestCase):
             "timezone": "America/Sao_Paulo",
             "date_format": "DD/MM/YYYY",
             "config": None,
+            "currency": "BRL",
             "timestamp": custom_timestamp.to_iso8601_string(),
         }
 
@@ -175,6 +177,7 @@ class ProjectEDAPublisherTestCase(TestCase):
             "timezone": None,
             "date_format": None,
             "config": None,
+            "currency": None,
             "timestamp": mock_timestamp.to_iso8601_string(),
         }
 
@@ -213,6 +216,7 @@ class ProjectEDAPublisherTestCase(TestCase):
             "timezone": "UTC",
             "date_format": None,
             "config": None,
+            "currency": None,
             "timestamp": custom_timestamp.to_iso8601_string(),
         }
 

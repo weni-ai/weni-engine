@@ -16,6 +16,7 @@ class UpdateProjectUseCase:
             timezone=str(project.timezone) if project.timezone else None,
             date_format=project.date_format,
             config=project.config,
+            currency=project.currency,
         )
 
     def send_updated_project_status(self, project: Project, user_email: str):
