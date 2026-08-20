@@ -51,6 +51,7 @@ from connect.api.v2.auth.views import (
 from connect.api.v2.internals.business_verification.views import (
     NotifyBusinessVerificationView,
 )
+from connect.api.v2.currencies.views import CurrenciesView
 
 
 router = routers.SimpleRouter()
@@ -220,6 +221,7 @@ urlpatterns = [
         name="commerce-send-contract-acceptance-email",
     ),
     path("auth/", KeycloakAuthView.as_view(), name="keycloak-auth"),
+    path("currencies", CurrenciesView.as_view(), name="currencies"),
 ]
 urlpatterns += [
     path("", include(projects_router.urls)),

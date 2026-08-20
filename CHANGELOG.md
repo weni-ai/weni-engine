@@ -1,3 +1,12 @@
+# 3.58.0
+  - feat: Add currency field to projects with ISO 4217 validation and listing endpoint
+
+# 3.57.0
+  - fix: Filter orgs-by-user to linkable projects only
+
+# 3.56.1
+  - refactor: Replace ModuleHasPermission with JWT-based WeniAuthentication for OrgsByUserView
+
 # 3.56.0
   - feat: Add JWT auth and project_uuid to VTEX account authorization
 

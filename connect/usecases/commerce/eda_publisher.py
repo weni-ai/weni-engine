@@ -85,6 +85,7 @@ class CommerceEDAPublisher:
             "vtex_account": project.vtex_account,
             "config": project.config or {},
             "language": project.language,
+            "currency": project.currency,
         }
 
     @staticmethod
