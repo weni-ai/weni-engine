@@ -1,3 +1,6 @@
+# 3.59.0
+  - feat: Enhance project and commerce serializers with config field
+
 # 3.58.0
   - feat: Add currency field to projects with ISO 4217 validation and listing endpoint
 
