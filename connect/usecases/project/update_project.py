@@ -16,6 +16,7 @@ class UpdateProjectUseCase:
             timezone=str(project.timezone) if project.timezone else None,
             date_format=project.date_format,
             config=project.config,
+            vtex_account=project.vtex_account,
             currency=project.currency,
         )
 

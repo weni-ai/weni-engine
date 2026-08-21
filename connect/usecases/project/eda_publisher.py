@@ -67,6 +67,7 @@ class ProjectEDAPublisher:
         timezone: Optional[str] = None,
         date_format: Optional[str] = None,
         config: Optional[dict] = None,
+        vtex_account: Optional[str] = None,
         currency: Optional[str] = None,
         updated_at: Optional[pendulum.DateTime] = None,
     ) -> None:
@@ -82,6 +83,7 @@ class ProjectEDAPublisher:
             timezone: New project timezone
             date_format: New project date format
             config: Project configuration dict
+            vtex_account: Linked VTEX account identifier
             currency: New project ISO 4217 currency code
             updated_at: Timestamp of update (defaults to now)
         """
@@ -101,6 +103,7 @@ class ProjectEDAPublisher:
             "timezone": timezone,
             "date_format": date_format,
             "config": config,
+            "vtex_account": vtex_account,
             "currency": currency,
             "timestamp": updated_at.to_iso8601_string(),
         }

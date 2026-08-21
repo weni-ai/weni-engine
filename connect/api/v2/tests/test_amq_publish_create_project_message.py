@@ -39,6 +39,10 @@ class PublishCreateProjectMessageTestCase(TestCase):
             vtex_account="amq-store",
             project_type=TypeProject.COMMERCE,
             language="pt-br",
+            config={
+                "storefront_type": "vtex_io",
+                "vtex_host_store": "https://www.mystore.com.br",
+            },
         )
 
     @patch("connect.api.v2.commerce.serializers.EDAPublisher")
@@ -70,6 +74,14 @@ class PublishCreateProjectMessageTestCase(TestCase):
         self.assertEqual(amazonmq_body["event_type"], "project.created")
         self.assertEqual(amazonmq_body["producer"], "connect-test-producer")
         self.assertEqual(amazonmq_body["data"], rabbitmq_body)
+        self.assertEqual(rabbitmq_body["vtex_account"], "amq-store")
+        self.assertEqual(
+            rabbitmq_body["config"],
+            {
+                "storefront_type": "vtex_io",
+                "vtex_host_store": "https://www.mystore.com.br",
+            },
+        )
         self.assertIn("currency", rabbitmq_body)
 
     @patch("connect.api.v2.projects.serializers.EDAPublisher")
@@ -94,6 +106,14 @@ class PublishCreateProjectMessageTestCase(TestCase):
             routing_key="",
         )
         self.assertTrue(rabbitmq_body["brain_on"])
+        self.assertEqual(rabbitmq_body["vtex_account"], "amq-store")
+        self.assertEqual(
+            rabbitmq_body["config"],
+            {
+                "storefront_type": "vtex_io",
+                "vtex_host_store": "https://www.mystore.com.br",
+            },
+        )
         mock_eda_publisher.assert_called_once_with(AMQConnectionParamsFactory)
         amazonmq_body = mock_amazonmq_instance.send_message.call_args.args[0]
         mock_amazonmq_instance.send_message.assert_called_once_with(

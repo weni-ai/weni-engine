@@ -52,5 +52,6 @@ class UpdateProjectUseCaseTestCase(TestCase):
             timezone=str(self.project.timezone) if self.project.timezone else None,
             date_format=self.project.date_format,
             config=self.project.config,
+            vtex_account=self.project.vtex_account,
             currency="BRL",
         )

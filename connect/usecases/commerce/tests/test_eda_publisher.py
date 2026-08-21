@@ -38,6 +38,10 @@ class CommerceEDAPublisherTestCase(TestCase):
             vtex_account="test-store",
             project_type=TypeProject.COMMERCE,
             language="pt-br",
+            config={
+                "storefront_type": "vtex_io",
+                "vtex_host_store": "https://www.mystore.com.br",
+            },
         )
 
     @override_settings(USE_EDA=True, TESTING=False)
@@ -70,6 +74,14 @@ class CommerceEDAPublisherTestCase(TestCase):
         self.assertEqual(
             amazonmq_body["data"],
             publisher._build_project_body(self.project),
+        )
+        self.assertEqual(amazonmq_body["data"]["vtex_account"], "test-store")
+        self.assertEqual(
+            amazonmq_body["data"]["config"],
+            {
+                "storefront_type": "vtex_io",
+                "vtex_host_store": "https://www.mystore.com.br",
+            },
         )
         self.assertIn("currency", publisher._build_project_body(self.project))
 

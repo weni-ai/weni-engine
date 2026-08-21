@@ -1183,19 +1183,30 @@ class LinkVtexAccountUseCaseTestCase(APITestCase):
         )
         self.insights = Mock()
 
-    def _use_case(self):
+    def _use_case(self, update_project=None):
         return LinkVtexAccountUseCase(
             insights_client=self.insights,
             lock_service=_mock_lock_service(),
+            update_project_usecase=update_project or Mock(),
         )
 
     def test_execute_links_and_notifies_insights(self):
-        result = self._use_case().execute(str(self.project.uuid), "mystore")
+        update_project = Mock()
+        result = self._use_case(update_project).execute(
+            str(self.project.uuid), "mystore"
+        )
 
         self.assertEqual(result, {"success": True})
         self.project.refresh_from_db()
         self.assertEqual(self.project.vtex_account, "mystore")
 
+        update_project.send_updated_project.assert_called_once()
+        published_project = update_project.send_updated_project.call_args.args[0]
+        self.assertEqual(published_project.uuid, self.project.uuid)
+        self.assertEqual(published_project.vtex_account, "mystore")
+        self.assertEqual(
+            update_project.send_updated_project.call_args.kwargs["user_email"], ""
+        )
         self.insights.notify_vtex_account_migration.assert_called_once_with(
             project_uuid=str(self.project.uuid),
             vtex_account="mystore",
