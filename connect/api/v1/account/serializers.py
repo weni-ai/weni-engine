@@ -16,6 +16,7 @@ from connect.api.v1.internal.chats.chats_rest_client import ChatsRESTClient
 from connect.api.v1.internal.integrations.integrations_rest_client import (
     IntegrationsRESTClient,
 )
+from connect.usecases.organizations.sso_access import is_sso_internal_bypass_email
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -99,6 +100,8 @@ class UserSerializer(serializers.ModelSerializer):
         return update_instance
 
     def get_can_update_password(self, obj):
+        if is_sso_internal_bypass_email(obj.email):
+            return True
         if not obj.identity_provider.exists():
             return True
         auth_orgs = OrganizationAuthorization.objects.filter(
