@@ -17,6 +17,10 @@ PROVIDER_MICROSOFT = OrganizationSSOConfig.PROVIDER_MICROSOFT
 ACCESS_STATUS_ACTIVE = "active"
 ACCESS_STATUS_DISABLED = "disabled"
 
+# Admission rule: entries are permitted only for providers that are a
+# single global tenant. Per-customer brokers must pass through unmapped;
+# adding a vendor-family key (for example "okta") would collapse distinct
+# customer sources into one.
 BROKER_ALIAS_TO_PROVIDER = {
     "google": PROVIDER_GOOGLE,
     "microsoft": PROVIDER_MICROSOFT,
@@ -33,6 +37,7 @@ class OrganizationSSOAccessDisabledReason(str, Enum):
     SSO_EMAIL_DOMAIN_NOT_ALLOWED = "sso_email_domain_not_allowed"
     SSO_PASSWORD_CONFIGURED = "sso_password_configured"
     SSO_CREDENTIAL_UNAVAILABLE = "sso_credential_unavailable"
+    SSO_POLICY_INCOMPLETE = "sso_policy_incomplete"
 
 
 @dataclass(frozen=True)
@@ -111,25 +116,72 @@ class EvaluateOrganizationSSOAccessUseCase:
         if is_sso_internal_bypass_email(user.email):
             return OrganizationSSOAccessResult.compliant()
 
+        if self._refuse_incomplete_policy(config):
+            return self._refuse(
+                OrganizationSSOAccessDisabledReason.SSO_POLICY_INCOMPLETE,
+                organization,
+                user,
+                resolve_sso_provider(session_identity_provider),
+            )
+
         provider = resolve_sso_provider(session_identity_provider)
         if not provider:
-            return OrganizationSSOAccessResult.non_compliant(
-                OrganizationSSOAccessDisabledReason.SSO_SESSION_REQUIRED
+            return self._refuse(
+                OrganizationSSOAccessDisabledReason.SSO_SESSION_REQUIRED,
+                organization,
+                user,
+                provider,
             )
         if not config.is_provider_allowed(provider):
-            return OrganizationSSOAccessResult.non_compliant(
-                OrganizationSSOAccessDisabledReason.SSO_PROVIDER_NOT_ALLOWED
+            return self._refuse(
+                OrganizationSSOAccessDisabledReason.SSO_PROVIDER_NOT_ALLOWED,
+                organization,
+                user,
+                provider,
             )
         if not config.is_email_domain_allowed(user.email):
-            return OrganizationSSOAccessResult.non_compliant(
-                OrganizationSSOAccessDisabledReason.SSO_EMAIL_DOMAIN_NOT_ALLOWED
+            return self._refuse(
+                OrganizationSSOAccessDisabledReason.SSO_EMAIL_DOMAIN_NOT_ALLOWED,
+                organization,
+                user,
+                provider,
             )
 
         password_block_reason = self._get_password_block_reason(user.email)
         if password_block_reason:
-            return OrganizationSSOAccessResult.non_compliant(password_block_reason)
+            return self._refuse(
+                password_block_reason, organization, user, provider
+            )
 
         return OrganizationSSOAccessResult.compliant()
+
+    def _refuse_incomplete_policy(self, config: OrganizationSSOConfig) -> bool:
+        if not config.requires_customer_identity_source:
+            return False
+        return not config.allowed_sso_providers or not config.allowed_email_domains
+
+    def _refuse(
+        self,
+        reason: OrganizationSSOAccessDisabledReason,
+        organization: Organization,
+        user,
+        provider: Optional[str],
+    ) -> OrganizationSSOAccessResult:
+        """Record org, member, and resolved source so every refusal is recoverable.
+
+        The response body does not carry the identity source (FR-028). Incomplete
+        policy is a misconfiguration, so it is a warning; session refusals are info.
+        """
+        message = (
+            f"SSO access refused: reason={reason.value} "
+            f"organization={organization.uuid} member={user.email} "
+            f"identity_source={provider}"
+        )
+        if reason is OrganizationSSOAccessDisabledReason.SSO_POLICY_INCOMPLETE:
+            logger.warning(message)
+        else:
+            logger.info(message)
+        return OrganizationSSOAccessResult.non_compliant(reason)
 
     def _get_password_block_reason(
         self, email: str

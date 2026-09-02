@@ -25,6 +25,10 @@ from connect.common.models import (
 from connect.api.v1.internal.intelligence.intelligence_rest_client import (
     IntelligenceRESTClient,
 )
+from connect.usecases.organizations.sso_policy import (
+    normalize_email_domain,
+    normalize_identity_source,
+)
 
 User = get_user_model()
 logger = logging.getLogger(__name__)
@@ -41,13 +45,16 @@ class OrganizationSSOConfigSerializer(serializers.ModelSerializer):
         child=serializers.CharField(), required=False, default=list
     )
     allowed_sso_providers = serializers.ListField(
-        child=serializers.ChoiceField(choices=OrganizationSSOConfig.PROVIDER_CHOICES),
+        child=serializers.CharField(),
         required=False,
         default=list,
     )
 
     def validate_allowed_email_domains(self, value):
-        return [domain.strip().lower() for domain in value if domain.strip()]
+        return [normalize_email_domain(entry) for entry in value]
+
+    def validate_allowed_sso_providers(self, value):
+        return [normalize_identity_source(entry) for entry in value]
 
 
 def serialize_organization_sso_config(organization) -> dict:
