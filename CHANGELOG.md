@@ -1,3 +1,6 @@
+# 3.60.0
+  - feat: Enforces per-customer Okta identity source on organization access
+
 # 3.59.0
   - feat: Enhance project and commerce serializers with config field
 
