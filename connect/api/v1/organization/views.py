@@ -69,7 +69,10 @@ from connect.usecases.authorizations.dto import (
     UpdateAuthorizationDTO,
 )
 from connect.usecases.authorizations.delete import DeleteAuthorizationUseCase
-from connect.usecases.organizations.exceptions import SSOConfigLockoutError
+from connect.usecases.organizations.exceptions import (
+    SSOConfigLockoutError,
+    SSOPolicyValidationError,
+)
 from connect.usecases.organizations.sso_access import (
     enrich_serializer_context_with_sso_access,
 )
@@ -707,17 +710,17 @@ class OrganizationViewSet(
         self.check_object_permissions(request, organization)
 
         serializer = OrganizationSSOConfigSerializer(data=request.data, partial=True)
-        serializer.is_valid(raise_exception=True)
-        dto = UpdateOrganizationSSOConfigDTO(**serializer.validated_data)
         session_identity_provider = getattr(request, "session_identity_provider", None)
         try:
+            serializer.is_valid(raise_exception=True)
+            dto = UpdateOrganizationSSOConfigDTO(**serializer.validated_data)
             config = UpdateOrganizationSSOConfigUseCase().execute(
                 organization=organization,
                 dto=dto,
                 actor=request.user,
                 session_identity_provider=session_identity_provider,
             )
-        except SSOConfigLockoutError as error:
+        except (SSOConfigLockoutError, SSOPolicyValidationError) as error:
             raise ValidationError({"detail": str(error)})
         return Response(OrganizationSSOConfigSerializer(config).data)
 
