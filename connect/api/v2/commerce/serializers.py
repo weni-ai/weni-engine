@@ -95,6 +95,10 @@ class CommerceSerializer(serializers.Serializer):
             "config": instance.config or {},
             "inline_agent_switch": inline_agent_switch,
             "currency": instance.currency,
+            "is_live_desk_copilot": instance.is_live_desk_copilot,
+            "parent_project_uuid": (
+                str(instance.parent_project_id) if instance.parent_project_id else None
+            ),
         }
         rabbitmq_publisher = RabbitmqPublisher()
         rabbitmq_publisher.send_message(

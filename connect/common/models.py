@@ -516,6 +516,15 @@ class Project(models.Model):
     class Meta:
         verbose_name = _("project")
         unique_together = ["flow_organization"]
+        constraints = [
+            models.CheckConstraint(
+                check=(
+                    models.Q(is_live_desk_copilot=False, parent_project__isnull=True)
+                    | models.Q(is_live_desk_copilot=True, parent_project__isnull=False)
+                ),
+                name="common_project_copilot_requires_parent",
+            ),
+        ]
 
     DATE_FORMAT_DAY_FIRST = "D"
     DATE_FORMAT_MONTH_FIRST = "M"
@@ -624,6 +633,22 @@ class Project(models.Model):
     )
     vtex_account = models.CharField(
         _("VTEX account"), null=True, blank=True, max_length=100
+    )
+    is_live_desk_copilot = models.BooleanField(
+        _("Is live desk copilot"),
+        default=False,
+    )
+    parent_project = models.ForeignKey(
+        "self",
+        on_delete=models.PROTECT,
+        related_name="copilot_projects",
+        null=True,
+        blank=True,
+        verbose_name=_("Parent project"),
+        help_text=_(
+            "Source of truth for VTEX account lookups when this project "
+            "is a live desk copilot."
+        ),
     )
     status = models.CharField(
         _("Project status"),

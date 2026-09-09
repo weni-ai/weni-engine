@@ -86,6 +86,10 @@ class CommerceEDAPublisher:
             "config": project.config or {},
             "language": project.language,
             "currency": project.currency,
+            "is_live_desk_copilot": project.is_live_desk_copilot,
+            "parent_project_uuid": (
+                str(project.parent_project_id) if project.parent_project_id else None
+            ),
         }
 
     @staticmethod

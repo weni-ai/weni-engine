@@ -66,6 +66,8 @@ class ProjectSerializer(serializers.ModelSerializer):
             "vtex_account",
             "status",
             "currency",
+            "is_live_desk_copilot",
+            "parent_project_uuid",
         ]
         ref_name = None
 
@@ -99,6 +101,13 @@ class ProjectSerializer(serializers.ModelSerializer):
         default=ProjectMode.WENI_FRAMEWORK,
     )
     currency = fields.CurrencyField(required=False, allow_null=True, allow_blank=True)
+    is_live_desk_copilot = serializers.BooleanField(required=False, default=False)
+    parent_project_uuid = serializers.UUIDField(
+        source="parent_project_id",
+        required=False,
+        allow_null=True,
+        default=None,
+    )
 
     def validate_name(self, value):
         stripped_value = strip_tags(value)
@@ -113,6 +122,60 @@ class ProjectSerializer(serializers.ModelSerializer):
                 raise ValidationError(_("Description cannot contain only HTML tags"))
             return stripped_value
         return value
+
+    def validate(self, attrs):
+        self._validate_live_desk_copilot(attrs)
+        return attrs
+
+    def _validate_live_desk_copilot(self, attrs: dict) -> None:
+        is_copilot = attrs.get("is_live_desk_copilot", False)
+        parent_id = attrs.get("parent_project_id")
+        organization = attrs.get("organization")
+
+        if not is_copilot:
+            if parent_id:
+                raise ValidationError(
+                    {
+                        "parent_project_uuid": _(
+                            "This field is only allowed when is_live_desk_copilot is true."
+                        )
+                    }
+                )
+            return
+
+        if not parent_id:
+            raise ValidationError(
+                {
+                    "parent_project_uuid": _(
+                        "This field is required when is_live_desk_copilot is true."
+                    )
+                }
+            )
+
+        try:
+            parent = Project.objects.get(pk=parent_id)
+        except Project.DoesNotExist:
+            raise ValidationError(
+                {"parent_project_uuid": _("Parent project not found.")}
+            )
+
+        if organization and parent.organization_id != organization.pk:
+            raise ValidationError(
+                {
+                    "parent_project_uuid": _(
+                        "Parent project must belong to the same organization."
+                    )
+                }
+            )
+
+        if parent.is_live_desk_copilot:
+            raise ValidationError(
+                {
+                    "parent_project_uuid": _(
+                        "Parent project cannot be a live desk copilot."
+                    )
+                }
+            )
 
     def get_project_template_type(self, obj):
         if obj.is_template:
@@ -154,7 +217,14 @@ class ProjectSerializer(serializers.ModelSerializer):
             project_mode=validated_data.get(
                 "project_mode", ProjectMode.WENI_FRAMEWORK.value
             ),
+            is_live_desk_copilot=validated_data.get("is_live_desk_copilot", False),
+            parent_project_id=validated_data.get("parent_project_id"),
         )
+        if instance.is_live_desk_copilot:
+            logger.info(
+                f"Created live desk copilot project uuid={instance.uuid} "
+                f"parent_project_uuid={instance.parent_project_id}"
+            )
 
         self.send_request_flow_product(user)
         self.publish_create_project_message(instance, brain_on)
@@ -220,6 +290,10 @@ class ProjectSerializer(serializers.ModelSerializer):
             "config": instance.config or {},
             "inline_agent_switch": inline_agent_switch,
             "currency": instance.currency,
+            "is_live_desk_copilot": instance.is_live_desk_copilot,
+            "parent_project_uuid": (
+                str(instance.parent_project_id) if instance.parent_project_id else None
+            ),
         }
         rabbitmq_publisher = RabbitmqPublisher()
         rabbitmq_publisher.send_message(
@@ -681,6 +755,10 @@ class ProjectDetailSerializer(serializers.Serializer):
     project_mode = serializers.IntegerField()
     vtex_account = serializers.CharField()
     currency = serializers.CharField(allow_null=True)
+    is_live_desk_copilot = serializers.BooleanField()
+    parent_project_uuid = serializers.UUIDField(
+        source="parent_project_id", allow_null=True
+    )
     organization_billing = serializers.SerializerMethodField()
 
     def get_organization_billing(self, obj):

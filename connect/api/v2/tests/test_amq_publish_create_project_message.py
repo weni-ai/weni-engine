@@ -83,6 +83,8 @@ class PublishCreateProjectMessageTestCase(TestCase):
             },
         )
         self.assertIn("currency", rabbitmq_body)
+        self.assertFalse(rabbitmq_body["is_live_desk_copilot"])
+        self.assertIsNone(rabbitmq_body["parent_project_uuid"])
 
     @patch("connect.api.v2.projects.serializers.EDAPublisher")
     @patch("connect.api.v2.projects.serializers.RabbitmqPublisher")
@@ -125,3 +127,5 @@ class PublishCreateProjectMessageTestCase(TestCase):
         self.assertEqual(amazonmq_body["producer"], "connect-test-producer")
         self.assertEqual(amazonmq_body["data"], rabbitmq_body)
         self.assertIn("currency", rabbitmq_body)
+        self.assertFalse(rabbitmq_body["is_live_desk_copilot"])
+        self.assertIsNone(rabbitmq_body["parent_project_uuid"])
