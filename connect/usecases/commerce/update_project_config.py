@@ -1,5 +1,7 @@
 import logging
 
+from django.conf import settings
+
 from connect.common.models import Project
 from connect.usecases.project.update_project import UpdateProjectUseCase
 
@@ -18,6 +20,8 @@ class UpdateProjectConfigUseCase:
         project.config.update(config)
         project.save(update_fields=["config"])
 
-        self._update_project.send_updated_project(project, user_email="")
+        self._update_project.send_updated_project(
+            project, user_email=settings.CONNECT_INTERNAL_USER_EMAIL
+        )
 
         return {"project_uuid": str(project.uuid), "config": project.config}

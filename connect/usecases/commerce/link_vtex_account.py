@@ -1,5 +1,6 @@
 import logging
 
+from django.conf import settings
 from django.db import transaction
 
 from connect.api.v1.internal.insights.insights_rest_client import InsightsRESTClient
@@ -53,7 +54,9 @@ class LinkVtexAccountUseCase:
 
         logger.info(f"Linked vtex_account={vtex_account} to project={project.uuid}")
 
-        self._update_project.send_updated_project(project, user_email="")
+        self._update_project.send_updated_project(
+            project, user_email=settings.CONNECT_INTERNAL_USER_EMAIL
+        )
         self._notify_insights(project)
 
         return {"success": True}

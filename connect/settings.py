@@ -114,6 +114,7 @@ env = environ.Env(
     RATE_LIMIT_BLOCK_TIME=(int, 300),
     GROWTHBOOK_CLIENT_KEY=(str, "local-dev-key"),
     GROWTHBOOK_HOST_BASE_URL=(str, "https://growthbook.example.com"),
+    CONNECT_INTERNAL_USER_EMAIL=(str, "connect@weni.ai"),
 )
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -664,6 +665,9 @@ if ALLOW_CRM_ACCESS:
     CRM_EMAILS_LIST = env.list("CRM_EMAILS_LIST", default=[])
 
 USE_EDA_PERMISSIONS = env.bool("USE_EDA_PERMISSIONS", default=True)
+
+# Actor email on internal project EDA updates that have no real user.
+CONNECT_INTERNAL_USER_EMAIL = env.str("CONNECT_INTERNAL_USER_EMAIL")
 
 KC_DB_NAME = env.str("KC_DB_NAME", default="")
 KC_DB_USER = env.str("KC_DB_USER", default="")
