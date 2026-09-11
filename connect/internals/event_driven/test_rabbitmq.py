@@ -1,9 +1,14 @@
 from unittest.mock import Mock, patch
 
 from django.test import TestCase, override_settings
-from pika.exceptions import StreamLostError
+from pika.exceptions import AMQPConnectionError, StreamLostError
 
-from connect.internals.event_driven.connection.rabbitmq import RabbitMQConnection
+from connect.internals.event_driven.connection.rabbitmq import (
+    BLOCKED_CONNECTION_TIMEOUT,
+    CONNECT_RETRY_DELAY,
+    RabbitMQConnection,
+    SOCKET_TIMEOUT,
+)
 from connect.internals.event_driven.producer.rabbitmq_publisher import (
     MAX_PUBLISH_RETRIES,
     RabbitmqPublisher,
@@ -130,6 +135,67 @@ class RabbitMQConnectionTestCase(TestCase):
 
         params = mock_blocking.call_args.args[0]
         self.assertEqual(params.heartbeat, 0)
+        self.assertEqual(params.blocked_connection_timeout, BLOCKED_CONNECTION_TIMEOUT)
+        self.assertEqual(params.socket_timeout, SOCKET_TIMEOUT)
+
+    @patch("connect.internals.event_driven.connection.rabbitmq.time.sleep")
+    @patch("connect.internals.event_driven.connection.rabbitmq.BlockingConnection")
+    def test_connect_retries_once_on_amqp_connection_error(
+        self, mock_blocking, mock_sleep
+    ):
+        live_connection = Mock()
+        live_connection.is_open = True
+        live_channel = Mock()
+        live_channel.is_open = True
+        live_connection.channel.return_value = live_channel
+        mock_blocking.side_effect = [
+            AMQPConnectionError("broker down"),
+            live_connection,
+        ]
+
+        with self._override_broker_settings():
+            connection = RabbitMQConnection()
+
+        mock_sleep.assert_called_once_with(CONNECT_RETRY_DELAY)
+        self.assertEqual(connection.connection, live_connection)
+        self.assertEqual(mock_blocking.call_count, 2)
+
+    @patch("connect.internals.event_driven.connection.rabbitmq.time.sleep")
+    @patch("connect.internals.event_driven.connection.rabbitmq.BlockingConnection")
+    def test_connect_reraises_when_retry_also_fails(self, mock_blocking, mock_sleep):
+        mock_blocking.side_effect = AMQPConnectionError("broker down")
+
+        with self._override_broker_settings():
+            with self.assertRaises(AMQPConnectionError):
+                RabbitMQConnection()
+
+        mock_sleep.assert_called_once_with(CONNECT_RETRY_DELAY)
+        self.assertEqual(mock_blocking.call_count, 2)
+
+    @patch("connect.internals.event_driven.connection.rabbitmq.BlockingConnection")
+    def test_connect_reraises_unexpected_errors(self, mock_blocking):
+        mock_blocking.side_effect = ValueError("bad config")
+
+        with self._override_broker_settings():
+            with self.assertRaises(ValueError):
+                RabbitMQConnection()
+
+        self.assertEqual(mock_blocking.call_count, 1)
+
+    @patch("connect.internals.event_driven.connection.rabbitmq.BlockingConnection")
+    def test_close_closes_open_connection(self, mock_blocking):
+        live_connection = Mock()
+        live_connection.is_open = True
+        live_channel = Mock()
+        live_channel.is_open = True
+        live_connection.channel.return_value = live_channel
+        mock_blocking.return_value = live_connection
+
+        with self._override_broker_settings():
+            connection = RabbitMQConnection()
+            connection.close()
+
+        live_connection.close.assert_called_once()
 
 
 class RabbitmqPublisherTestCase(TestCase):

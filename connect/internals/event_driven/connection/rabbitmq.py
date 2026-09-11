@@ -3,10 +3,15 @@ import threading
 import time
 
 from pika import BlockingConnection, ConnectionParameters, PlainCredentials
+from pika.exceptions import AMQPConnectionError
 
 from django.conf import settings
 
 logger = logging.getLogger(__name__)
+
+BLOCKED_CONNECTION_TIMEOUT = 10
+SOCKET_TIMEOUT = 10
+CONNECT_RETRY_DELAY = 5
 
 
 class RabbitMQConnection:
@@ -42,9 +47,9 @@ class RabbitMQConnection:
         try:
             if not self._is_ready():
                 self._establish_connection()
-        except Exception as exc:
+        except AMQPConnectionError as exc:
             logger.error(f"Error while connecting to RabbitMQ: {exc}")
-            time.sleep(5)
+            time.sleep(CONNECT_RETRY_DELAY)
             self._establish_connection()
 
     def publish_message(self, exchange: str, routing_key: str, body: bytes, properties):
@@ -58,7 +63,8 @@ class RabbitMQConnection:
             )
 
     def close(self):
-        self._close_quietly()
+        with self._lock:
+            self._close_quietly()
 
     def _is_ready(self) -> bool:
         connection = getattr(self, "connection", None)
@@ -94,8 +100,8 @@ class RabbitMQConnection:
                 ),
                 virtual_host=settings.EDA_VIRTUAL_HOST,
                 heartbeat=0,
-                blocked_connection_timeout=10,
-                socket_timeout=10,
+                blocked_connection_timeout=BLOCKED_CONNECTION_TIMEOUT,
+                socket_timeout=SOCKET_TIMEOUT,
             )
         )
         self.channel = self.connection.channel()
