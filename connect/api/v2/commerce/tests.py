@@ -682,6 +682,7 @@ class SetVtexHostStoreUseCaseTestCase(APITestCase):
             project_type=TypeProject.COMMERCE,
         )
 
+    @override_settings(CONNECT_INTERNAL_USER_EMAIL="connect@weni.ai")
     def test_execute_sets_config_and_publishes(self):
         """execute() should persist vtex_host_store in config and call EDA publisher."""
         mock_update = Mock()
@@ -696,7 +697,7 @@ class SetVtexHostStoreUseCaseTestCase(APITestCase):
         )
         self.assertEqual(result["vtex_host_store"], "https://www.example.com/")
         mock_update.send_updated_project.assert_called_once_with(
-            self.project, user_email=""
+            self.project, user_email="connect@weni.ai"
         )
 
     def test_execute_raises_for_nonexistent_project(self):
@@ -876,6 +877,7 @@ class UpdateProjectConfigUseCaseTestCase(APITestCase):
             project_type=TypeProject.COMMERCE,
         )
 
+    @override_settings(CONNECT_INTERNAL_USER_EMAIL="connect@weni.ai")
     def test_execute_merges_config_and_publishes(self):
         """execute() should merge config keys and call EDA publisher."""
         mock_update = Mock()
@@ -895,7 +897,7 @@ class UpdateProjectConfigUseCaseTestCase(APITestCase):
         self.assertEqual(result["config"]["existing_key"], "existing_value")
         self.assertEqual(result["config"]["new_key"], "new_value")
         mock_update.send_updated_project.assert_called_once_with(
-            self.project, user_email=""
+            self.project, user_email="connect@weni.ai"
         )
 
     def test_project_not_found_raises(self):
@@ -1190,6 +1192,7 @@ class LinkVtexAccountUseCaseTestCase(APITestCase):
             update_project_usecase=update_project or Mock(),
         )
 
+    @override_settings(CONNECT_INTERNAL_USER_EMAIL="connect@weni.ai")
     def test_execute_links_and_notifies_insights(self):
         update_project = Mock()
         result = self._use_case(update_project).execute(
@@ -1205,7 +1208,8 @@ class LinkVtexAccountUseCaseTestCase(APITestCase):
         self.assertEqual(published_project.uuid, self.project.uuid)
         self.assertEqual(published_project.vtex_account, "mystore")
         self.assertEqual(
-            update_project.send_updated_project.call_args.kwargs["user_email"], ""
+            update_project.send_updated_project.call_args.kwargs["user_email"],
+            "connect@weni.ai",
         )
         self.insights.notify_vtex_account_migration.assert_called_once_with(
             project_uuid=str(self.project.uuid),
