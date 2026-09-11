@@ -1,3 +1,6 @@
+# 3.60.1
+  - feat: Replace empty string with configurable internal user email for EDA project updates
+
 # 3.60.0
   - feat: Enforces per-customer Okta identity source on organization access
 
