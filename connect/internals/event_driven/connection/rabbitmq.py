@@ -47,8 +47,8 @@ class RabbitMQConnection:
         try:
             if not self._is_ready():
                 self._establish_connection()
-        except AMQPConnectionError as exc:
-            logger.error(f"Error while connecting to RabbitMQ: {exc}")
+        except AMQPConnectionError:
+            logger.exception("Error while connecting to RabbitMQ")
             time.sleep(CONNECT_RETRY_DELAY)
             self._establish_connection()
 

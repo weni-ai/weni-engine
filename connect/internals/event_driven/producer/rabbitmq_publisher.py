@@ -5,7 +5,7 @@ from time import sleep
 from django.conf import settings
 
 from pika import BasicProperties
-from pika.exceptions import AMQPError, StreamLostError
+from pika.exceptions import AMQPError
 
 from connect.internals.event_driven.connection.rabbitmq import RabbitMQConnection
 
@@ -31,11 +31,11 @@ class RabbitmqPublisher:
                 self._publish(body, exchange, routing_key)
                 logger.info(f"Published message to exchange={exchange}")
                 return
-            except (StreamLostError, AMQPError, OSError) as exc:
+            except (AMQPError, OSError) as exc:
                 last_error = exc
-                logger.error(
+                logger.exception(
                     f"Failed to publish to exchange={exchange} "
-                    f"(attempt {attempt}/{MAX_PUBLISH_RETRIES}): {exc}"
+                    f"(attempt {attempt}/{MAX_PUBLISH_RETRIES})"
                 )
                 self.rabbitmq_connection.make_connection()
                 if attempt < MAX_PUBLISH_RETRIES:
