@@ -1,3 +1,6 @@
+# 3.60.2
+  - feat: Enhance RabbitMQ connection handling and EDA event publishing
+
 # 3.60.1
   - feat: Replace empty string with configurable internal user email for EDA project updates
 
