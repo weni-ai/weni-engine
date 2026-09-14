@@ -1,3 +1,6 @@
+# 3.60.3
+  - fix: Use `int()` for `project_type` serialization to handle DB round-trip values
+
 # 3.60.2
   - feat: Enhance RabbitMQ connection handling and EDA event publishing
 
