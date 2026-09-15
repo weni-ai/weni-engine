@@ -343,12 +343,12 @@ class CreateVtexProjectUseCaseTestCase(APITestCase):
         new_user.send_email_access_password.assert_called_once_with("TempPass1!")
 
     @patch("connect.billing.get_gateway")
-    def test_publisher_not_called_on_existing_project(self, mock_gateway):
-        """When the project already exists (idempotent call), no EDA events
-        should be published — avoids duplicate events on Retail side."""
+    def test_publisher_called_on_existing_project(self, mock_gateway):
+        """Idempotent retries must still publish EDA events so a previous
+        attempt that persisted the project but failed to notify downstream
+        modules can recover."""
         mock_gateway.return_value = StripeMockGateway()
 
-        # Pre-create org + project to simulate an already-existing vtex_account
         organization = Organization.objects.create(
             name="existing",
             description="Organization existing",
@@ -373,9 +373,43 @@ class CreateVtexProjectUseCaseTestCase(APITestCase):
         use_case = CreateVtexProjectUseCase(eda_publisher=self.mock_eda)
         use_case.execute(dto)
 
-        # No events should be fired for an existing project
-        self.mock_eda.publish_org_created.assert_not_called()
-        self.mock_eda.publish_project_created.assert_not_called()
+        self.mock_eda.publish_org_created.assert_called_once()
+        self.mock_eda.publish_project_created.assert_called_once()
+
+    @patch(
+        "connect.usecases.commerce.create_vtex_project.CreateVtexProjectUseCase._send_request_flow_product"
+    )
+    @patch("connect.billing.get_gateway")
+    def test_eda_failure_after_create_keeps_project_and_retry_republishes(
+        self, mock_gateway, mock_send_flow
+    ):
+        mock_gateway.return_value = StripeMockGateway()
+        self.mock_eda.publish_project_created.side_effect = OSError(
+            32, "Broken pipe"
+        )
+
+        dto = CreateVtexProjectDTO(
+            user_email=self.user.email,
+            vtex_account="broken-pipe-store",
+            language="pt-br",
+            organization_name="Broken Pipe Org",
+            project_name="Broken Pipe Project",
+        )
+        use_case = CreateVtexProjectUseCase(eda_publisher=self.mock_eda)
+
+        with self.assertRaises(OSError):
+            use_case.execute(dto)
+
+        self.assertTrue(
+            Project.objects.filter(vtex_account="broken-pipe-store").exists()
+        )
+        mock_send_flow.assert_not_called()
+
+        self.mock_eda.publish_project_created.side_effect = None
+        use_case.execute(dto)
+
+        self.assertEqual(self.mock_eda.publish_project_created.call_count, 2)
+        self.assertEqual(self.mock_eda.publish_org_created.call_count, 2)
 
     @patch("connect.billing.get_gateway")
     def test_permissions_created_via_request_permission(self, mock_gateway):
@@ -682,6 +716,7 @@ class SetVtexHostStoreUseCaseTestCase(APITestCase):
             project_type=TypeProject.COMMERCE,
         )
 
+    @override_settings(CONNECT_INTERNAL_USER_EMAIL="connect@weni.ai")
     def test_execute_sets_config_and_publishes(self):
         """execute() should persist vtex_host_store in config and call EDA publisher."""
         mock_update = Mock()
@@ -696,7 +731,7 @@ class SetVtexHostStoreUseCaseTestCase(APITestCase):
         )
         self.assertEqual(result["vtex_host_store"], "https://www.example.com/")
         mock_update.send_updated_project.assert_called_once_with(
-            self.project, user_email=""
+            self.project, user_email="connect@weni.ai"
         )
 
     def test_execute_raises_for_nonexistent_project(self):
@@ -876,6 +911,7 @@ class UpdateProjectConfigUseCaseTestCase(APITestCase):
             project_type=TypeProject.COMMERCE,
         )
 
+    @override_settings(CONNECT_INTERNAL_USER_EMAIL="connect@weni.ai")
     def test_execute_merges_config_and_publishes(self):
         """execute() should merge config keys and call EDA publisher."""
         mock_update = Mock()
@@ -895,7 +931,7 @@ class UpdateProjectConfigUseCaseTestCase(APITestCase):
         self.assertEqual(result["config"]["existing_key"], "existing_value")
         self.assertEqual(result["config"]["new_key"], "new_value")
         mock_update.send_updated_project.assert_called_once_with(
-            self.project, user_email=""
+            self.project, user_email="connect@weni.ai"
         )
 
     def test_project_not_found_raises(self):
@@ -1190,6 +1226,7 @@ class LinkVtexAccountUseCaseTestCase(APITestCase):
             update_project_usecase=update_project or Mock(),
         )
 
+    @override_settings(CONNECT_INTERNAL_USER_EMAIL="connect@weni.ai")
     def test_execute_links_and_notifies_insights(self):
         update_project = Mock()
         result = self._use_case(update_project).execute(
@@ -1205,7 +1242,8 @@ class LinkVtexAccountUseCaseTestCase(APITestCase):
         self.assertEqual(published_project.uuid, self.project.uuid)
         self.assertEqual(published_project.vtex_account, "mystore")
         self.assertEqual(
-            update_project.send_updated_project.call_args.kwargs["user_email"], ""
+            update_project.send_updated_project.call_args.kwargs["user_email"],
+            "connect@weni.ai",
         )
         self.insights.notify_vtex_account_migration.assert_called_once_with(
             project_uuid=str(self.project.uuid),

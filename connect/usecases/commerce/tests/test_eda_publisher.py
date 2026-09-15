@@ -96,6 +96,14 @@ class CommerceEDAPublisherTestCase(TestCase):
 
         self.assertEqual(body["currency"], "BRL")
 
+    def test_build_project_body_serializes_project_type_after_db_round_trip(self):
+        project = Project.objects.get(uuid=self.project.uuid)
+
+        body = CommerceEDAPublisher()._build_project_body(project)
+
+        self.assertEqual(body["project_type"], TypeProject.COMMERCE)
+        self.assertIsInstance(body["project_type"], int)
+
     @override_settings(USE_EDA=False, TESTING=False)
     @patch("connect.usecases.commerce.eda_publisher.EDAPublisher")
     @patch("connect.usecases.commerce.eda_publisher.RabbitmqPublisher")

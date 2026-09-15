@@ -1,3 +1,18 @@
+# 3.60.4
+  - chore: Update weni commons to 1.6.0 so connect is able to use the open api documentation plugin
+
+# 3.60.3
+  - fix: Use `int()` for `project_type` serialization to handle DB round-trip values
+
+# 3.60.2
+  - feat: Enhance RabbitMQ connection handling and EDA event publishing
+
+# 3.60.1
+  - feat: Replace empty string with configurable internal user email for EDA project updates
+
+# 3.60.0
+  - feat: Enforces per-customer Okta identity source on organization access
+
 # 3.59.0
   - feat: Enhance project and commerce serializers with config field
 

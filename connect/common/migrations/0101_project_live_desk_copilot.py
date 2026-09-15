@@ -4,7 +4,7 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("common", "0099_project_currency"),
+        ("common", "0100_organizationssoconfig_requires_customer_identity_source"),
     ]
 
     operations = [

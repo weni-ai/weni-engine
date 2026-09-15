@@ -1,3 +1,4 @@
+import logging
 from typing import Tuple
 
 from django.conf import settings
@@ -19,6 +20,8 @@ from connect.usecases.commerce.eda_publisher import CommerceEDAPublisher
 from connect.usecases.users.create import CreateKeycloakUserUseCase
 from connect.usecases.users.user_dto import KeycloakUserDTO
 
+logger = logging.getLogger(__name__)
+
 
 class CreateVtexProjectUseCase:
     """Orchestrates the idempotent creation of a VTEX commerce project.
@@ -39,15 +42,30 @@ class CreateVtexProjectUseCase:
             organization = project.organization
             self._ensure_permissions(user, project, organization)
 
+        logger.info(
+            f"VTEX project ready project_uuid={project.uuid} "
+            f"vtex_account={dto.vtex_account} created={project_created}"
+        )
+        self._notify_downstream_modules(organization, user, project)
+
         if project_created:
-            self._eda.publish_org_created(organization, user)
-            self._eda.publish_project_created(project)
             self._send_request_flow_product(user)
 
         return {
             "project_uuid": str(project.uuid),
             "user_uuid": str(user.pk),
         }
+
+    def _notify_downstream_modules(
+        self, organization: Organization, user: User, project: Project
+    ) -> None:
+        """Publish org/project created even on idempotent retries.
+
+        A previous attempt may have committed the project and then lost the
+        RabbitMQ publish (stale connection). Downstream consumers upsert by uuid.
+        """
+        self._eda.publish_org_created(organization, user)
+        self._eda.publish_project_created(project)
 
     def _get_or_create_user(
         self, email: str, company_name: str

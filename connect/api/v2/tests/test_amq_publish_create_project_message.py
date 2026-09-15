@@ -85,6 +85,23 @@ class PublishCreateProjectMessageTestCase(TestCase):
         self.assertIn("currency", rabbitmq_body)
         self.assertFalse(rabbitmq_body["is_live_desk_copilot"])
         self.assertIsNone(rabbitmq_body["parent_project_uuid"])
+        self.assertEqual(rabbitmq_body["project_type"], TypeProject.COMMERCE)
+
+    @patch("connect.api.v2.commerce.serializers.EDAPublisher")
+    @patch("connect.api.v2.commerce.serializers.RabbitmqPublisher")
+    def test_commerce_serializer_serializes_project_type_after_db_round_trip(
+        self, mock_rabbitmq, mock_eda_publisher
+    ):
+        mock_rabbitmq.return_value = Mock()
+        mock_eda_publisher.return_value = Mock()
+        project = Project.objects.get(uuid=self.project.uuid)
+
+        serializer = CommerceSerializer()
+        serializer.publish_create_project_message(project, self.user)
+
+        rabbitmq_body = mock_rabbitmq.return_value.send_message.call_args.args[0]
+        self.assertEqual(rabbitmq_body["project_type"], TypeProject.COMMERCE)
+        self.assertIsInstance(rabbitmq_body["project_type"], int)
 
     @patch("connect.api.v2.projects.serializers.EDAPublisher")
     @patch("connect.api.v2.projects.serializers.RabbitmqPublisher")
@@ -129,3 +146,22 @@ class PublishCreateProjectMessageTestCase(TestCase):
         self.assertIn("currency", rabbitmq_body)
         self.assertFalse(rabbitmq_body["is_live_desk_copilot"])
         self.assertIsNone(rabbitmq_body["parent_project_uuid"])
+        self.assertEqual(rabbitmq_body["project_type"], TypeProject.COMMERCE)
+
+    @patch("connect.api.v2.projects.serializers.EDAPublisher")
+    @patch("connect.api.v2.projects.serializers.RabbitmqPublisher")
+    def test_project_serializer_serializes_project_type_after_db_round_trip(
+        self, mock_rabbitmq, mock_eda_publisher
+    ):
+        mock_rabbitmq.return_value = Mock()
+        mock_eda_publisher.return_value = Mock()
+        project = Project.objects.get(uuid=self.project.uuid)
+
+        request = MagicMock()
+        request.data = {}
+        serializer = ProjectSerializer(context={"request": request})
+        serializer.publish_create_project_message(project, brain_on=True)
+
+        rabbitmq_body = mock_rabbitmq.return_value.send_message.call_args.args[0]
+        self.assertEqual(rabbitmq_body["project_type"], TypeProject.COMMERCE)
+        self.assertIsInstance(rabbitmq_body["project_type"], int)
