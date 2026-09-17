@@ -1,20 +1,25 @@
 from typing import List
 
 from django.contrib.auth import get_user_model
-from django.db.models import Count, Q
+from django.db.models import Count, Prefetch, Q
 
 from connect.common.models import (
     Organization,
     OrganizationAuthorization,
     OrganizationRole,
+    Project,
 )
 
 User = get_user_model()
 
 
 class ListOrgsByUserUseCase:
-    """Lists the organizations a user belongs to, including their projects
-    and the active member count of each organization.
+    """Lists the organizations a user belongs to, including projects that
+    are eligible for VTEX account linking, and the active member count of
+    each organization.
+
+    Only projects without a ``vtex_account`` are returned so consumers can
+    present a list where every option can be linked without error.
 
     The lookup is performed by email so it can be consumed by internal
     services that only hold the user's email.
@@ -33,9 +38,14 @@ class ListOrgsByUserUseCase:
             .exclude(role__in=self._EXCLUDED_ROLES)
             .values_list("organization", flat=True)
         )
+        linkable_projects = Project.objects.filter(
+            Q(vtex_account__isnull=True) | Q(vtex_account="")
+        )
         organizations = (
             Organization.objects.filter(pk__in=organization_ids)
-            .prefetch_related("project")
+            .prefetch_related(
+                Prefetch("project", queryset=linkable_projects),
+            )
             .annotate(
                 member_count=Count(
                     "authorizations",

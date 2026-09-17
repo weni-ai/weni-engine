@@ -105,6 +105,10 @@ class HasSSOAccess(permissions.BasePermission):
                     )
                     return self._is_compliant(request, organization)
 
+            project_uuid = view.kwargs.get("project_uuid")
+            if project_uuid:
+                return self._evaluate_project_uuid(request, project_uuid)
+
             candidate_uuid = view.kwargs.get("uuid")
             if candidate_uuid:
                 return self._evaluate_uuid_kwarg(request, view, candidate_uuid)
@@ -118,21 +122,26 @@ class HasSSOAccess(permissions.BasePermission):
         return True
 
     def _evaluate_uuid_kwarg(self, request, view, candidate_uuid):
+        """Evaluate a ``uuid`` kwarg, which names an organization on organization
+        routes and a project on project routes, so the owner is discovered by
+        lookup."""
         organization = Organization.objects.filter(uuid=candidate_uuid).first()
         if organization:
             if request.method in READ_METHODS:
                 return self._allows_organization_read(request, view, organization)
             return self._is_compliant(request, organization)
 
+        return self._evaluate_project_uuid(request, candidate_uuid)
+
+    def _evaluate_project_uuid(self, request, project_uuid):
         project = (
             Project.objects.select_related("organization")
-            .filter(uuid=candidate_uuid)
+            .filter(uuid=project_uuid)
             .first()
         )
-        if project:
-            return self._is_compliant(request, project.organization)
-
-        return True
+        if not project:
+            return True
+        return self._is_compliant(request, project.organization)
 
     def _organization_uuid_from_write_body(self, request):
         try:

@@ -26,6 +26,7 @@ from connect.api.v1.internal.intelligence.intelligence_rest_client import (
 )
 from connect.authentication.models import User
 from connect.billing.gateways.stripe_gateway import StripeGateway
+from connect.common.currencies import ISO_4217_CODE_LENGTH
 from connect.common.exceptions import (
     OrganizationAuthorizationException,
     ProjectAuthorizationException,
@@ -333,6 +334,7 @@ class OrganizationSSOConfig(models.Model):
     )
     allowed_email_domains = models.JSONField(default=list, blank=True)
     allowed_sso_providers = models.JSONField(default=list, blank=True)
+    requires_customer_identity_source = models.BooleanField(default=False)
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
     updated_at = models.DateTimeField(_("updated at"), auto_now=True)
 
@@ -636,6 +638,9 @@ class Project(models.Model):
         null=True,
         choices=settings.LANGUAGES,
         default=settings.DEFAULT_LANGUAGE,
+    )
+    currency = models.CharField(
+        _("Project currency"), max_length=ISO_4217_CODE_LENGTH, null=True, blank=True
     )
     config = models.JSONField(
         _("Project configuration"),

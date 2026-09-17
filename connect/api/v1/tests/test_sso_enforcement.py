@@ -2,11 +2,15 @@ import json
 import uuid
 from unittest.mock import patch
 
+from django.contrib import admin
+from django.core.cache import cache
 from django.test import RequestFactory, TestCase, override_settings
 from rest_framework import status
-from rest_framework.request import Request
+from rest_framework.request import ForcedAuthentication, Request
 from rest_framework.test import APIClient, force_authenticate
+from weni_commons.auth import TOKEN_TYPE_KEYCLOAK, WeniAuthContext
 
+from connect.api.v1.account.views import MyUserProfileViewSet
 from connect.api.v1.organization.permissions import HasSSOAccess
 from connect.api.v1.organization.views import (
     OrganizationAuthorizationViewSet as OrganizationAuthorizationV1ViewSet,
@@ -16,6 +20,10 @@ from connect.api.v1.project.views import ProjectViewSet as ProjectV1ViewSet
 from connect.api.v1.tests.utils import create_user_and_token
 from connect.usecases.organizations.sso_access import (
     EvaluateOrganizationSSOAccessUseCase,
+)
+from connect.usecases.organizations.tests.test_sso_access import FakeCredentialsService
+from connect.usecases.organizations.update_sso_config import (
+    UpdateOrganizationSSOConfigUseCase,
 )
 from connect.api.v2.organizations.views import (
     OrganizationAuthorizationViewSet,
@@ -39,12 +47,32 @@ HAS_PASSWORD_CREDENTIAL = (
     "has_password_credential"
 )
 
+SSO_CONFIG_KEYS = {"is_enabled", "allowed_email_domains", "allowed_sso_providers"}
 
-@override_settings(USE_EDA_PERMISSIONS=False)
+LOC_MEM_CACHE = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "sso-enforcement-tests",
+    }
+}
+
+
+def _use_case_with_fake_credentials(*_args, **_kwargs):
+    return UpdateOrganizationSSOConfigUseCase(
+        credentials_service=FakeCredentialsService(has_password=False)
+    )
+
+
+@override_settings(
+    USE_EDA_PERMISSIONS=False,
+    CACHES=LOC_MEM_CACHE,
+    SSO_INTERNAL_BYPASS_EMAIL_DOMAINS=["weni.ai", "vtex.com"],
+)
 class SSOEnforcementViewTestCase(TestCase):
     @patch("connect.billing.get_gateway")
     def setUp(self, mock_get_gateway):
         mock_get_gateway.return_value = StripeMockGateway()
+        cache.clear()
         self.factory = RequestFactory()
         self.admin, self.admin_token = create_user_and_token("sso_admin")
         self.viewer, self.viewer_token = create_user_and_token("sso_viewer")
@@ -248,6 +276,103 @@ class SSOEnforcementViewTestCase(TestCase):
         self.assertEqual(content["allowed_sso_providers"], ["google"])
         self.assertEqual(content["allowed_email_domains"], ["user.com"])
 
+    @patch(
+        "connect.api.v1.organization.views.UpdateOrganizationSSOConfigUseCase",
+        _use_case_with_fake_credentials,
+    )
+    def test_sso_settings_patch_accepts_custom_identity_source(self):
+        response = self._sso_settings_request(
+            "patch",
+            self.open_org,
+            self.admin_token,
+            data={"allowed_sso_providers": ["okta-acme"]},
+        )
+        response.render()
+        content = json.loads(response.content)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(set(content), SSO_CONFIG_KEYS)
+        self.assertEqual(content["allowed_sso_providers"], ["okta-acme"])
+
+    @patch(HAS_PASSWORD_CREDENTIAL, return_value=False)
+    @patch(
+        "connect.api.v1.organization.views.UpdateOrganizationSSOConfigUseCase",
+        _use_case_with_fake_credentials,
+    )
+    def test_sso_settings_patch_still_accepts_google_on_legacy_org(
+        self, _mock_has_password
+    ):
+        request = self.factory.patch(
+            f"/v1/organization/org/{self.enforcing_org.uuid}/sso-settings/",
+            data=json.dumps({"allowed_sso_providers": ["google"]}),
+            content_type="application/json",
+            HTTP_AUTHORIZATION=f"Token {self.admin_token.key}",
+        )
+        request.session_identity_provider = "google"
+        response = OrganizationViewSet.as_view({"patch": "update_sso_settings"})(
+            request, uuid=str(self.enforcing_org.uuid)
+        )
+        response.render()
+        content = json.loads(response.content)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(set(content), SSO_CONFIG_KEYS)
+        self.assertEqual(content["allowed_sso_providers"], ["google"])
+
+    def test_sso_settings_patch_rejects_malformed_identity_source(self):
+        response = self._sso_settings_request(
+            "patch",
+            self.open_org,
+            self.admin_token,
+            data={"allowed_sso_providers": ["Okta Acme!"]},
+        )
+        response.render()
+        content = json.loads(response.content)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(list(content.keys()), ["detail"])
+        self.assertTrue(content["detail"])
+        self.assertFalse(
+            OrganizationSSOConfig.objects.filter(organization=self.open_org).exists()
+        )
+
+    def test_refused_customer_session_reads_org_and_blocks_deep_access(self):
+        OrganizationSSOConfig.objects.filter(organization=self.enforcing_org).update(
+            allowed_sso_providers=["okta-acme"],
+            allowed_email_domains=["acme.com"],
+            requires_customer_identity_source=True,
+        )
+        project = Project.objects.create(
+            name="Acme Deep Access Project",
+            flow_organization=uuid.uuid4(),
+            organization=self.enforcing_org,
+        )
+
+        response, content = self._retrieve_org(
+            self.enforcing_org,
+            self.admin_token,
+            session_identity_provider="okta-beta",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(content["access_status"], "disabled")
+        self.assertEqual(content["access_disabled_reason"], "sso_provider_not_allowed")
+
+        request = self.factory.get(f"/v2/projects/{project.uuid}/detail")
+        force_authenticate(
+            request,
+            user=self.admin,
+            token=WeniAuthContext(
+                project_uuid=str(project.uuid),
+                user_email=self.admin.email,
+                token_type=TOKEN_TYPE_KEYCLOAK,
+            ),
+        )
+        request.session_identity_provider = "okta-beta"
+        deep_response = ProjectDetailView.as_view()(
+            request, project_uuid=str(project.uuid)
+        )
+        self.assertEqual(deep_response.status_code, status.HTTP_403_FORBIDDEN)
+
 
 @override_settings(USE_EDA_PERMISSIONS=False)
 class SSOEnforcementV2ProjectAccessTestCase(TestCase):
@@ -329,9 +454,19 @@ class SSOEnforcementV2ProjectAccessTestCase(TestCase):
             organization=self.enforcing_org,
         )
         request = self.factory.get(f"/v2/projects/{project.uuid}/detail")
-        force_authenticate(request, user=self.user, token=self.token)
+        force_authenticate(
+            request,
+            user=self.user,
+            token=WeniAuthContext(
+                project_uuid=str(project.uuid),
+                user_email=self.user.email,
+                token_type=TOKEN_TYPE_KEYCLOAK,
+            ),
+        )
         request.session_identity_provider = None
-        response = ProjectDetailView.as_view()(request, uuid=str(project.uuid))
+
+        response = ProjectDetailView.as_view()(request, project_uuid=str(project.uuid))
+
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 
@@ -358,9 +493,17 @@ class HasSSOAccessPermissionTestCase(TestCase):
             organization=self.enforcing_org, is_enabled=True
         )
 
-    def build_request(self, path="/", session_identity_provider=None):
-        request = Request(self.factory.get(path))
-        request.user = self.user
+    def build_request(self, path="/", session_identity_provider=None, method="get"):
+        """Build a request whose authentication is already resolved.
+
+        Permissions only run after authentication in production; leaving ``auth``
+        unresolved here would make any read of it re-authenticate the request
+        and replace the test user with ``AnonymousUser``.
+        """
+        request = Request(
+            getattr(self.factory, method)(path),
+            authenticators=[ForcedAuthentication(self.user, None)],
+        )
         request.session_identity_provider = session_identity_provider
         return request
 
@@ -380,9 +523,7 @@ class HasSSOAccessPermissionTestCase(TestCase):
         self.assertFalse(self.permission.has_permission(request, view=view))
 
     def test_blocks_uuid_kwarg_for_non_compliant_session(self):
-        request = Request(self.factory.patch("/"))
-        request.user = self.user
-        request.session_identity_provider = None
+        request = self.build_request(method="patch")
         view = type("View", (), {"kwargs": {"uuid": str(self.enforcing_org.uuid)}})()
         self.assertFalse(self.permission.has_permission(request, view=view))
 
@@ -407,9 +548,7 @@ class HasSSOAccessPermissionTestCase(TestCase):
             flow_organization=uuid.uuid4(),
             organization=self.enforcing_org,
         )
-        request = Request(self.factory.post("/"))
-        request.user = self.user
-        request.session_identity_provider = None
+        request = self.build_request(method="post")
         view = type("View", (), {"kwargs": {"uuid": str(project.uuid)}})()
         self.assertFalse(self.permission.has_permission(request, view=view))
 
@@ -422,10 +561,34 @@ class HasSSOAccessPermissionTestCase(TestCase):
             flow_organization=uuid.uuid4(),
             organization=self.enforcing_org,
         )
-        request = Request(self.factory.post("/"))
-        request.user = self.user
-        request.session_identity_provider = "google"
+        request = self.build_request(method="post", session_identity_provider="google")
         view = type("View", (), {"kwargs": {"uuid": str(project.uuid)}})()
+        self.assertTrue(self.permission.has_permission(request, view=view))
+
+    def test_blocks_project_uuid_kwarg_for_non_compliant_session(self):
+        project = Project.objects.create(
+            name="SSO Project Kwarg",
+            flow_organization=uuid.uuid4(),
+            organization=self.enforcing_org,
+        )
+        request = self.build_request()
+        view = type("View", (), {"kwargs": {"project_uuid": str(project.uuid)}})()
+        self.assertFalse(self.permission.has_permission(request, view=view))
+
+    @patch(HAS_PASSWORD_CREDENTIAL, return_value=False)
+    def test_allows_project_uuid_kwarg_for_compliant_session(self, _mock_has_password):
+        project = Project.objects.create(
+            name="SSO Compliant Project Kwarg",
+            flow_organization=uuid.uuid4(),
+            organization=self.enforcing_org,
+        )
+        request = self.build_request(session_identity_provider="google")
+        view = type("View", (), {"kwargs": {"project_uuid": str(project.uuid)}})()
+        self.assertTrue(self.permission.has_permission(request, view=view))
+
+    def test_allows_project_uuid_kwarg_of_unknown_project(self):
+        request = self.build_request()
+        view = type("View", (), {"kwargs": {"project_uuid": str(uuid.uuid4())}})()
         self.assertTrue(self.permission.has_permission(request, view=view))
 
     def test_blocks_organization_double_underscore_uuid_kwarg_for_non_compliant_session(
@@ -1035,3 +1198,306 @@ class SSOEnforcementV2OrganizationAccessTestCase(TestCase):
             organization_uuid=str(self.enforcing_org.uuid),
         )
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+@override_settings(
+    USE_EDA_PERMISSIONS=False,
+    CACHES=LOC_MEM_CACHE,
+    SSO_INTERNAL_BYPASS_EMAIL_DOMAINS=["weni.ai", "vtex.com"],
+)
+class IncompletePolicySerializerSurfaceTestCase(TestCase):
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway):
+        mock_get_gateway.return_value = StripeMockGateway()
+        cache.clear()
+        self.factory = RequestFactory()
+        self.user, self.token = create_user_and_token("sso_incomplete_surface")
+
+        self.organization = Organization.objects.create(
+            name="Incomplete Policy Org",
+            description="Incomplete Policy Org",
+            inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan=BillingPlan.PLAN_TRIAL,
+        )
+        self.organization.authorizations.create(
+            user=self.user, role=OrganizationRole.ADMIN.value
+        )
+        OrganizationSSOConfig.objects.create(
+            organization=self.organization,
+            is_enabled=True,
+            allowed_sso_providers=[],
+            allowed_email_domains=[],
+            requires_customer_identity_source=True,
+        )
+
+    def _list_v1(self):
+        request = self.factory.get(
+            "/v1/organization/org/",
+            HTTP_AUTHORIZATION=f"Token {self.token.key}",
+        )
+        request.session_identity_provider = None
+        response = OrganizationViewSet.as_view({"get": "list"})(request)
+        response.render()
+        return response, json.loads(response.content)
+
+    def _list_v2(self):
+        request = self.factory.get(
+            "/v2/organizations/",
+            HTTP_AUTHORIZATION=f"Token {self.token.key}",
+        )
+        request.session_identity_provider = None
+        response = OrganizationV2ViewSet.as_view({"get": "list"})(request)
+        response.render()
+        return response, json.loads(response.content)
+
+    def test_sso_policy_incomplete_surfaces_on_v1_and_v2_serializers(self):
+        payloads = (
+            ("v1", self._list_v1()),
+            ("v2", self._list_v2()),
+        )
+        for version, (_, content) in payloads:
+            with self.subTest(version=version):
+                orgs_by_name = {org["name"]: org for org in content["results"]}
+                org = orgs_by_name["Incomplete Policy Org"]
+                self.assertEqual(org["access_status"], "disabled")
+                self.assertEqual(
+                    org["access_disabled_reason"], "sso_policy_incomplete"
+                )
+                self.assertEqual(set(org["sso_config"]), SSO_CONFIG_KEYS)
+                self.assertNotIn(
+                    "requires_customer_identity_source", org["sso_config"]
+                )
+
+
+@override_settings(
+    USE_EDA_PERMISSIONS=False,
+    CACHES=LOC_MEM_CACHE,
+    SSO_INTERNAL_BYPASS_EMAIL_DOMAINS=["weni.ai", "vtex.com"],
+)
+class CustomerIdentitySourceSurfaceTestCase(TestCase):
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway):
+        mock_get_gateway.return_value = StripeMockGateway()
+        cache.clear()
+        self.factory = RequestFactory()
+        self.admin, self.admin_token = create_user_and_token("sso_surface_admin")
+        self.organization = Organization.objects.create(
+            name="Customer Identity Surface Org",
+            description="Customer Identity Surface Org",
+            inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan=BillingPlan.PLAN_TRIAL,
+        )
+        self.organization.authorizations.create(
+            user=self.admin, role=OrganizationRole.ADMIN.value
+        )
+        OrganizationSSOConfig.objects.create(
+            organization=self.organization,
+            is_enabled=True,
+            allowed_email_domains=["user.com"],
+            allowed_sso_providers=["google"],
+            requires_customer_identity_source=True,
+        )
+
+    def _sso_settings(self):
+        request = self.factory.get(
+            f"/v1/organization/org/{self.organization.uuid}/sso-settings/",
+            HTTP_AUTHORIZATION=f"Token {self.admin_token.key}",
+        )
+        request.session_identity_provider = None
+        response = OrganizationViewSet.as_view({"get": "sso_settings"})(
+            request, uuid=str(self.organization.uuid)
+        )
+        response.render()
+        return response, json.loads(response.content)
+
+    def _retrieve_v1(self):
+        request = self.factory.get(
+            f"/v1/organization/org/{self.organization.uuid}/",
+            HTTP_AUTHORIZATION=f"Token {self.admin_token.key}",
+        )
+        request.session_identity_provider = None
+        response = OrganizationViewSet.as_view({"get": "retrieve"})(
+            request, uuid=str(self.organization.uuid)
+        )
+        response.render()
+        return json.loads(response.content)
+
+    def _retrieve_v2(self):
+        request = self.factory.get(
+            f"/v2/organizations/{self.organization.uuid}/",
+            HTTP_AUTHORIZATION=f"Token {self.admin_token.key}",
+        )
+        request.session_identity_provider = None
+        response = OrganizationV2ViewSet.as_view({"get": "retrieve"})(
+            request, uuid=str(self.organization.uuid)
+        )
+        response.render()
+        return json.loads(response.content)
+
+    def test_requires_customer_identity_source_has_no_product_surface(self):
+        self.assertNotIn(OrganizationSSOConfig, admin.site._registry)
+
+        response, sso_content = self._sso_settings()
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(set(sso_content), SSO_CONFIG_KEYS)
+        self.assertNotIn("requires_customer_identity_source", sso_content)
+
+        payloads = (
+            ("v1", self._retrieve_v1()),
+            ("v2", self._retrieve_v2()),
+        )
+        for version, content in payloads:
+            with self.subTest(version=version):
+                self.assertNotIn("requires_customer_identity_source", content)
+                self.assertEqual(set(content["sso_config"]), SSO_CONFIG_KEYS)
+                self.assertNotIn(
+                    "requires_customer_identity_source", content["sso_config"]
+                )
+
+
+@override_settings(
+    USE_EDA_PERMISSIONS=False,
+    CACHES=LOC_MEM_CACHE,
+    SSO_INTERNAL_BYPASS_EMAIL_DOMAINS=["weni.ai", "vtex.com"],
+)
+class CanUpdatePasswordProfileTestCase(TestCase):
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway):
+        mock_get_gateway.return_value = StripeMockGateway()
+        cache.clear()
+        self.factory = RequestFactory()
+        self.enforcing_org = Organization.objects.create(
+            name="Password Flag Org",
+            description="Password Flag Org",
+            inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan=BillingPlan.PLAN_TRIAL,
+        )
+        OrganizationSSOConfig.objects.create(
+            organization=self.enforcing_org, is_enabled=True
+        )
+
+    def _member(self, nickname, email):
+        user, token = create_user_and_token(nickname)
+        user.email = email
+        user.save(update_fields=["email"])
+        user.set_identity_providers(identity_provider="google")
+        self.enforcing_org.authorizations.create(
+            user=user, role=OrganizationRole.ADMIN.value
+        )
+        return user, token
+
+    def _get_profile(self, token):
+        request = self.factory.get(
+            "/v1/account/my-profile/",
+            HTTP_AUTHORIZATION=f"Token {token.key}",
+        )
+        response = MyUserProfileViewSet.as_view({"get": "retrieve"})(request)
+        response.render()
+        return response, json.loads(response.content)
+
+    def test_support_domain_member_can_update_password_on_enforcing_org(self):
+        _, token = self._member("pwd_weni", "staff@weni.ai")
+        response, content = self._get_profile(token)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(content["can_update_password"])
+
+    def test_lookalike_domains_keep_pre_delivery_can_update_password(self):
+        cases = (
+            ("pwd_notweni", "staff@notweni.ai"),
+            ("pwd_vtex_br", "staff@vtex.com.br"),
+        )
+        for nickname, email in cases:
+            with self.subTest(email=email):
+                _, token = self._member(nickname, email)
+                response, content = self._get_profile(token)
+                self.assertEqual(response.status_code, status.HTTP_200_OK)
+                self.assertFalse(content["can_update_password"])
+
+    def test_member_without_identity_provider_can_update_password(self):
+        user, token = create_user_and_token("pwd_no_idp")
+        user.email = "member@partner.com"
+        user.save(update_fields=["email"])
+        self.enforcing_org.authorizations.create(
+            user=user, role=OrganizationRole.ADMIN.value
+        )
+        response, content = self._get_profile(token)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(content["can_update_password"])
+
+
+@override_settings(
+    USE_EDA_PERMISSIONS=False,
+    CACHES=LOC_MEM_CACHE,
+    SSO_INTERNAL_BYPASS_EMAIL_DOMAINS=["weni.ai", "vtex.com"],
+)
+class MappedDomainAuthenticationGrantsNoMembershipTestCase(TestCase):
+    @patch("connect.billing.get_gateway")
+    def setUp(self, mock_get_gateway):
+        mock_get_gateway.return_value = StripeMockGateway()
+        cache.clear()
+        self.factory = RequestFactory()
+        self.user, self.token = create_user_and_token("mapped_domain_outsider")
+        self.user.email = "maria@acme.com"
+        self.user.save(update_fields=["email"])
+
+        self.customer_org = Organization.objects.create(
+            name="Mapped Domain Customer Org",
+            description="Mapped Domain Customer Org",
+            inteligence_organization=1,
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan=BillingPlan.PLAN_TRIAL,
+        )
+        OrganizationSSOConfig.objects.create(
+            organization=self.customer_org,
+            is_enabled=True,
+            allowed_sso_providers=["okta-acme"],
+            allowed_email_domains=["acme.com"],
+            requires_customer_identity_source=True,
+        )
+        self.project = Project.objects.create(
+            name="Mapped Domain Project",
+            flow_organization=uuid.uuid4(),
+            organization=self.customer_org,
+        )
+
+    @patch(HAS_PASSWORD_CREDENTIAL, return_value=False)
+    def test_mapped_domain_user_without_authorization_cannot_access_customer_org(
+        self, _mock_has_password
+    ):
+        self.assertFalse(
+            OrganizationAuthorization.objects.filter(
+                user=self.user, organization=self.customer_org
+            ).exists()
+        )
+
+        request = self.factory.get(
+            "/v1/organization/org/",
+            HTTP_AUTHORIZATION=f"Token {self.token.key}",
+        )
+        request.session_identity_provider = "okta-acme"
+        list_response = OrganizationViewSet.as_view({"get": "list"})(request)
+        list_response.render()
+        content = json.loads(list_response.content)
+        names = {org["name"] for org in content["results"]}
+        uuids = {org["uuid"] for org in content["results"]}
+        self.assertNotIn("Mapped Domain Customer Org", names)
+        self.assertNotIn(str(self.customer_org.uuid), uuids)
+
+        deep_request = self.factory.get(f"/v2/projects/{self.project.uuid}/detail")
+        force_authenticate(
+            deep_request,
+            user=self.user,
+            token=WeniAuthContext(
+                project_uuid=str(self.project.uuid),
+                user_email=self.user.email,
+                token_type=TOKEN_TYPE_KEYCLOAK,
+            ),
+        )
+        deep_request.session_identity_provider = "okta-acme"
+        deep_response = ProjectDetailView.as_view()(
+            deep_request, project_uuid=str(self.project.uuid)
+        )
+        self.assertEqual(deep_response.status_code, status.HTTP_403_FORBIDDEN)

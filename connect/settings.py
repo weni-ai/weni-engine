@@ -114,6 +114,7 @@ env = environ.Env(
     RATE_LIMIT_BLOCK_TIME=(int, 300),
     GROWTHBOOK_CLIENT_KEY=(str, "local-dev-key"),
     GROWTHBOOK_HOST_BASE_URL=(str, "https://growthbook.example.com"),
+    CONNECT_INTERNAL_USER_EMAIL=(str, "connect@weni.ai"),
 )
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -136,6 +137,16 @@ BASE_URL = env.str("BASE_URL")
 WEBAPP_BASE_URL = env.str("WEBAPP_BASE_URL")
 
 TESTING = len(sys.argv) > 1 and sys.argv[1] == "test"
+
+if TESTING:
+    # freezegun scans attributes of every imported module when a clock is
+    # frozen. weni_commons re-exports FeatureFlagsService lazily through a
+    # module-level __getattr__, so the scan would import the feature-flags stack
+    # (which requires GrowthBook settings this project does not use). Ignoring
+    # the package keeps freeze_time() from triggering that import.
+    import freezegun
+
+    freezegun.configure(extend_ignore_list=["weni_commons"])
 
 
 # Application definition
@@ -404,6 +415,10 @@ OIDC_DRF_AUTH_BACKEND = env.str(
 )
 OIDC_RP_SCOPES = env.str("OIDC_RP_SCOPES", default="openid email")
 
+# weni-commons auth: public key used to validate App IO / inter-module JWTs
+# (RS256). Only required by routes that adopt WeniAuthentication.
+JWT_PUBLIC_KEY = env.str("JWT_PUBLIC_KEY", default="")
+
 OIDC_CACHE_TOKEN = env.bool(
     "OIDC_CACHE_TOKEN", default=False
 )  # Enable/disable user token caching (default: False).
@@ -647,6 +662,9 @@ if ALLOW_CRM_ACCESS:
     CRM_EMAILS_LIST = env.list("CRM_EMAILS_LIST", default=[])
 
 USE_EDA_PERMISSIONS = env.bool("USE_EDA_PERMISSIONS", default=True)
+
+# Actor email on internal project EDA updates that have no real user.
+CONNECT_INTERNAL_USER_EMAIL = env.str("CONNECT_INTERNAL_USER_EMAIL")
 
 KC_DB_NAME = env.str("KC_DB_NAME", default="")
 KC_DB_USER = env.str("KC_DB_USER", default="")

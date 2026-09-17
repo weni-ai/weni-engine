@@ -4,6 +4,7 @@ from rest_framework import status, views
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.mixins import CreateModelMixin
+from weni_commons.auth import WeniAuthViewMixin
 
 from connect.api.v2.commerce.permissions import CanCommunicateInternally
 from connect.api.v2.commerce.serializers import (
@@ -16,7 +17,9 @@ from connect.api.v2.commerce.serializers import (
     UpdateProjectConfigSerializer,
 )
 from connect.api.v2.paginations import CustomCursorPagination
+from connect.api.v2.permissions import IsProjectContributor
 from connect.common.models import Organization, Project
+from connect.middleware import WeniAuthentication
 from connect.usecases.commerce.create_vtex_project import CreateVtexProjectUseCase
 from connect.usecases.commerce.dto import (
     CreateVtexProjectDTO,
@@ -101,8 +104,9 @@ class LinkVtexAccountView(views.APIView):
         return Response(result, status=status.HTTP_200_OK)
 
 
-class SetVtexHostStoreView(views.APIView):
-    permission_classes = [CanCommunicateInternally]
+class SetVtexHostStoreView(WeniAuthViewMixin, views.APIView):
+    authentication_classes = [WeniAuthentication]
+    permission_classes = [IsProjectContributor]
 
     def patch(self, request, project_uuid):
         serializer = SetVtexHostStoreSerializer(data=request.data)
@@ -110,7 +114,7 @@ class SetVtexHostStoreView(views.APIView):
 
         try:
             result = SetVtexHostStoreUseCase().execute(
-                project_uuid=project_uuid,
+                project_uuid=self.auth.project_uuid,
                 vtex_host_store=serializer.validated_data["vtex_host_store"],
             )
         except Project.DoesNotExist:

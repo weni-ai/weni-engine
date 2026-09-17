@@ -3,14 +3,19 @@ from rest_framework.exceptions import NotFound, PermissionDenied
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
+from weni_commons.auth import WeniAuthViewMixin, SessionTokenAuthentication
 
+from connect.api.v2.auth.permissions import (
+    TARGET_USER_QUERY_PARAM,
+    CanResolveTargetUser,
+)
 from connect.api.v2.auth.serializers import (
     GetTokenSerializer,
     InvalidateSessionTokenSerializer,
     KeycloakAuthSerializer,
 )
 from connect.common.models import ProjectAuthorization
-from connect.middleware import WeniOIDCAuthentication
+from connect.middleware import WeniAuthentication, WeniOIDCAuthentication
 from connect.usecases.auth.generate_session_token import (
     GenerateSessionTokenUseCase,
     ProjectAuthorizationNotFound,
@@ -24,7 +29,6 @@ from connect.usecases.authorizations.get_project_authorization import (
     GetProjectAuthorizationUseCase,
 )
 from connect.usecases.keycloak.authenticate import KeycloakAuthenticateUseCase
-from weni_commons.auth import SessionTokenAuthentication
 
 
 class KeycloakAuthView(views.APIView):
@@ -48,52 +52,50 @@ class KeycloakAuthView(views.APIView):
             )
 
 
-class BaseProjectAuthorizationView(views.APIView):
-    authentication_classes = [WeniOIDCAuthentication]
-    permission_classes = [IsAuthenticated]
-
+class ProjectAuthorizationResponseMixin:
     def get_available_roles(self):
         return {choice[0]: choice[1] for choice in ProjectAuthorization.ROLE_CHOICES}
 
-    def _resolve_target_user_email(self, request: Request) -> str:
-        user_email = request.query_params.get("user")
-
-        if user_email is None:
-            return request.user.email
-
-        if not request.user.has_perm("authentication.can_communicate_internally"):
-            raise PermissionDenied(
-                "You do not have permission to access other users' data"
-            )
-
-        return user_email
+    def _build_response_data(self, authorization: ProjectAuthorization) -> dict:
+        return {
+            "user": authorization.user.email,
+            "project_authorization": authorization.role,
+            "available_roles": self.get_available_roles(),
+        }
 
     def _build_response(self, authorization: ProjectAuthorization) -> Response:
-        return Response(
-            {
-                "user": authorization.user.email,
-                "project_authorization": authorization.role,
-                "available_roles": self.get_available_roles(),
-            }
-        )
+        return Response(self._build_response_data(authorization))
 
 
-class ProjectAuthView(BaseProjectAuthorizationView):
+class ProjectAuthView(ProjectAuthorizationResponseMixin, views.APIView):
+    authentication_classes = [WeniOIDCAuthentication]
+    permission_classes = [IsAuthenticated, CanResolveTargetUser]
+
     def get(self, request: Request, project_uuid: str = None):
-        user_email = self._resolve_target_user_email(request)
+        target_user_email = (
+            request.query_params.get(TARGET_USER_QUERY_PARAM) or request.user.email
+        )
         authorization = GetProjectAuthorizationUseCase().get_by_project_uuid(
-            user_email=user_email, project_uuid=project_uuid
+            user_email=target_user_email, project_uuid=project_uuid
         )
         return self._build_response(authorization)
 
 
-class VtexAccountProjectAuthView(BaseProjectAuthorizationView):
+class VtexAccountProjectAuthView(
+    WeniAuthViewMixin, ProjectAuthorizationResponseMixin, views.APIView
+):
+    authentication_classes = [WeniAuthentication]
+
     def get(self, request: Request, vtex_account: str = None):
-        user_email = self._resolve_target_user_email(request)
         authorization = GetProjectAuthorizationUseCase().get_by_vtex_account(
-            user_email=user_email, vtex_account=vtex_account
+            user_email=self.auth.user_email, vtex_account=self.auth.vtex_account
         )
         return self._build_response(authorization)
+
+    def _build_response(self, authorization: ProjectAuthorization) -> Response:
+        data = self._build_response_data(authorization)
+        data["project_uuid"] = str(authorization.project.uuid)
+        return Response(data)
 
 
 class GetTokenView(views.APIView):

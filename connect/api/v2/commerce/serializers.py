@@ -90,9 +90,11 @@ class CommerceSerializer(serializers.Serializer):
             "description": "Commerce project",
             "organization_uuid": str(instance.organization.uuid),
             "brain_on": True,
-            "project_type": instance.project_type.value,
+            "project_type": int(instance.project_type),
             "vtex_account": instance.vtex_account,
+            "config": instance.config or {},
             "inline_agent_switch": inline_agent_switch,
+            "currency": instance.currency,
         }
         rabbitmq_publisher = RabbitmqPublisher()
         rabbitmq_publisher.send_message(
