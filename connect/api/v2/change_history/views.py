@@ -28,6 +28,20 @@ class ProjectChangeHistoryViewSet(
         return self.serializers_map[self.action]
 
     def get_queryset(self):
-        return super().get_queryset().filter(
+        queryset = super().get_queryset().filter(
             project_uuid=self.kwargs["project_uuid"]
         )
+
+        object_name = self.request.query_params.get("object_name")
+        if object_name:
+            queryset = queryset.filter(object_name__icontains=object_name)
+
+        module = self.request.query_params.get("module")
+        if module:
+            queryset = queryset.filter(module__iexact=module)
+
+        entity = self.request.query_params.get("entity")
+        if entity:
+            queryset = queryset.filter(entity__iexact=entity)
+
+        return queryset
