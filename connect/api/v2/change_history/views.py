@@ -38,10 +38,10 @@ class ProjectChangeHistoryViewSet(
 
         module = self.request.query_params.get("module")
         if module:
-            queryset = queryset.filter(module=module)
+            queryset = queryset.filter(module__iexact=module)
 
         entity = self.request.query_params.get("entity")
         if entity:
-            queryset = queryset.filter(entity=entity)
+            queryset = queryset.filter(entity__iexact=entity)
 
         return queryset
