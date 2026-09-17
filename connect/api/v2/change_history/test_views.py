@@ -132,6 +132,38 @@ class ProjectChangeHistoryViewSetTestCase(APITestCase):
         self.assertEqual(len(response.data["results"]), 1)
         self.assertEqual(response.data["results"][0]["entity"], "CAMPAIGN")
 
+    def test_list_change_history_filters_by_module_ignoring_case(self):
+        self.client.force_authenticate(user=self.owner)
+
+        response = self.client.get(self.url, {"module": "nexus"}, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data["results"]), 1)
+        self.assertEqual(response.data["results"][0]["module"], "NEXUS")
+
+    def test_list_change_history_filters_by_entity_ignoring_case(self):
+        self.client.force_authenticate(user=self.owner)
+        self._create_event(
+            object_name="Campaign launch",
+            module="LIVE_DESK",
+            entity="CAMPAIGN",
+        )
+
+        response = self.client.get(self.url, {"entity": "campaign"}, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data["results"]), 1)
+        self.assertEqual(response.data["results"][0]["entity"], "CAMPAIGN")
+
+    def test_list_change_history_accepts_page_size(self):
+        self.client.force_authenticate(user=self.owner)
+
+        response = self.client.get(self.url, {"page_size": 1}, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data["results"]), 1)
+        self.assertIsNotNone(response.data["next"])
+
     def test_list_change_history_filters_by_module_and_entity(self):
         self.client.force_authenticate(user=self.owner)
 
