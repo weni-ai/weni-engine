@@ -1,5 +1,6 @@
 import secrets
 from datetime import timedelta
+from typing import Optional
 
 from django.utils import timezone
 from django_redis import get_redis_connection
@@ -29,7 +30,7 @@ class GenerateSessionTokenUseCase:
             self._dynamodb_repository = DynamoDBSessionTokenRepository()
         return self._dynamodb_repository
 
-    def execute(self, project_uuid: str, user, duration: int) -> str:
+    def execute(self, project_uuid: str, user, duration: Optional[int] = None) -> str:
         try:
             if not user.project_authorizations_user.filter(project__uuid=project_uuid).exists():
                 raise ProjectAuthorizationNotFound()
@@ -38,13 +39,16 @@ class GenerateSessionTokenUseCase:
             raise ProjectAuthorizationNotFound()
 
         token_hash = secrets.token_urlsafe(SESSION_TOKEN_NBYTES)
-        expire_at = (timezone.now() + timedelta(seconds=duration)).isoformat()
+        expire_at = None
+        if duration is not None:
+            expire_at = (timezone.now() + timedelta(seconds=duration)).isoformat()
 
         payload = {
             "project": str(project_uuid),
             "user": user.email,
-            "expire_at": expire_at,
         }
+        if expire_at is not None:
+            payload["expire_at"] = expire_at
 
         self._get_dynamodb_repository().put(
             token_hash=token_hash,
