@@ -14,6 +14,7 @@ from connect.api.v2.auth.serializers import (
     InvalidateSessionTokenSerializer,
     KeycloakAuthSerializer,
 )
+from connect.authentication.models import User
 from connect.common.models import ProjectAuthorization
 from connect.middleware import WeniAuthentication, WeniOIDCAuthentication
 from connect.usecases.auth.generate_session_token import (
@@ -98,24 +99,38 @@ class VtexAccountProjectAuthView(
         return Response(data)
 
 
-class GetTokenView(views.APIView):
-    authentication_classes = [WeniOIDCAuthentication]
-    permission_classes = [IsAuthenticated]
+class GetTokenView(WeniAuthViewMixin, views.APIView):
+    authentication_classes = [WeniAuthentication]
 
-    def get(self, request: Request, project_uuid: str = None):
+    def get(self, request: Request):
+        """Issue a session token for the project carried by the auth token."""
         serializer = GetTokenSerializer(data=request.query_params)
         serializer.is_valid(raise_exception=True)
 
         try:
             token_hash = GenerateSessionTokenUseCase().execute(
-                project_uuid=project_uuid,
-                user=request.user,
+                project_uuid=self.auth.project_uuid,
+                user=self._resolve_user(request),
                 duration=serializer.validated_data["duration"],
             )
         except ProjectAuthorizationNotFound:
             raise NotFound("Project authorization not found")
 
         return Response({"hash": token_hash}, status=status.HTTP_200_OK)
+
+    def _resolve_user(self, request: Request):
+        user = request.user
+        if hasattr(user, "project_authorizations_user"):
+            return user
+
+        email = self.user_email
+        if not email:
+            raise NotFound("Project authorization not found")
+
+        try:
+            return User.objects.get(email=email)
+        except User.DoesNotExist:
+            raise NotFound("Project authorization not found")
 
 
 class InvalidateSessionTokenView(views.APIView):
