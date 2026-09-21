@@ -12,9 +12,12 @@ class InvalidateSessionTokenSerializer(serializers.Serializer):
 
 
 class GetTokenSerializer(serializers.Serializer):
-    duration = serializers.IntegerField(required=True)
+    duration = serializers.IntegerField(required=False, allow_null=True, default=None)
 
     def validate_duration(self, value):
+        if value is None:
+            return value
+
         min_duration = getattr(settings, "SESSION_TOKEN_MIN_DURATION", 60)
         max_duration = getattr(settings, "SESSION_TOKEN_MAX_DURATION", 86400)
 
