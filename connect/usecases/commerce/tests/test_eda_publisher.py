@@ -84,6 +84,9 @@ class CommerceEDAPublisherTestCase(TestCase):
             },
         )
         self.assertIn("currency", publisher._build_project_body(self.project))
+        body = publisher._build_project_body(self.project)
+        self.assertFalse(body["is_live_desk_copilot"])
+        self.assertIsNone(body["parent_project_uuid"])
 
     def test_build_project_body_includes_currency(self):
         self.project.currency = "BRL"
