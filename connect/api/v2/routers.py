@@ -167,7 +167,7 @@ urlpatterns = [
         name="project-authorizations",
     ),
     path(
-        "projects/<project_uuid>/get-token",
+        "projects/get-token",
         GetTokenView.as_view(),
         name="get-token",
     ),
