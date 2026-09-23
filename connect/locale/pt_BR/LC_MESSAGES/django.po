@@ -1698,3 +1698,37 @@ msgstr "Entregue"
 #: connect/usecases/commerce/send_data_export_email.py
 msgid "Read"
 msgstr "Lido"
+
+#: connect/usecases/commerce/send_contract_acceptance_email.py
+msgid "Your contract"
+msgstr "Seu contrato"
+
+#: connect/common/templates/common/emails/contract_acceptance.html
+#: connect/common/templates/common/emails/contract_acceptance.txt
+msgid "Hello,"
+msgstr "Olá,"
+
+#: connect/common/templates/common/emails/contract_acceptance.html
+#: connect/common/templates/common/emails/contract_acceptance.txt
+msgid "Your contract acceptance has been registered."
+msgstr "Seu aceite de contrato foi registrado."
+
+#: connect/common/templates/common/emails/contract_acceptance.html
+#: connect/common/templates/common/emails/contract_acceptance.txt
+msgid "Plan"
+msgstr "Plano"
+
+#: connect/common/templates/common/emails/contract_acceptance.html
+#: connect/common/templates/common/emails/contract_acceptance.txt
+msgid "Version"
+msgstr "Versão"
+
+#: connect/common/templates/common/emails/contract_acceptance.html
+#: connect/common/templates/common/emails/contract_acceptance.txt
+msgid "Date"
+msgstr "Data"
+
+#: connect/common/templates/common/emails/contract_acceptance.html
+#: connect/common/templates/common/emails/contract_acceptance.txt
+msgid "The accepted document is attached to this email."
+msgstr "O documento aceito está anexado a este e-mail."
