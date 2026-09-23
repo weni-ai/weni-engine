@@ -1,3 +1,6 @@
+# 3.61.0
+  - feat: Support live desk copilot project creation
+
 # 3.60.4
   - chore: Update weni commons to 1.6.0 so connect is able to use the open api documentation plugin
 

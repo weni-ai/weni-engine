@@ -1,0 +1,60 @@
+{% extends 'authentication/emails/base.html' %}
+{% load i18n %}
+{% block main-content %}
+
+<section style="margin: 24px auto; padding: 0 32px;">
+  <div
+    style="
+      font-family: 'Lato', sans-serif;
+      font-weight: 400;
+      font-size: 14px;
+      line-height: 22px;
+      color: #3B414D;
+    "
+  >
+    {% trans "Hello," %}
+  </div>
+
+  <div
+    style="
+      font-family: 'Lato', sans-serif;
+      font-weight: 400;
+      font-size: 14px;
+      line-height: 22px;
+      color: #3B414D;
+      margin-top: 12px;
+    "
+  >
+    {% trans "Your contract acceptance has been registered." %}
+  </div>
+
+  <div
+    style="
+      font-family: 'Lato', sans-serif;
+      font-weight: 400;
+      font-size: 14px;
+      line-height: 22px;
+      color: #3B414D;
+      margin-top: 12px;
+    "
+  >
+    {% trans "Plan" %}: {{ plan }}<br/>
+    {% trans "Version" %}: {{ version }}<br/>
+    {% trans "Date" %}: {{ date }}
+  </div>
+
+  <div
+    style="
+      font-family: 'Lato', sans-serif;
+      font-weight: 400;
+      font-size: 14px;
+      line-height: 22px;
+      color: #3B414D;
+      margin-top: 12px;
+    "
+  >
+    {% trans "The accepted document is attached to this email." %}
+  </div>
+</section>
+
+{% endblock %}

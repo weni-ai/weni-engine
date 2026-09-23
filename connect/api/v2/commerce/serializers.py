@@ -226,10 +226,10 @@ class SendDataExportEmailSerializer(serializers.Serializer):
     )
 
 
-# Reserve space for subject, body_html, field names and JSON framing within
-# Django's in-memory request body limit (DATA_UPLOAD_MAX_MEMORY_SIZE). Base64
-# inflates the PDF by ~33%, so the decoded limit is derived from the remaining
-# budget to avoid RequestDataTooBig before serializer validation runs.
+# Reserve space for the email fields and JSON framing within Django's
+# in-memory request body limit (DATA_UPLOAD_MAX_MEMORY_SIZE). Base64 inflates
+# the PDF by ~33%, so the decoded limit is derived from the remaining budget
+# to avoid RequestDataTooBig before serializer validation runs.
 _CONTRACT_EMAIL_JSON_OVERHEAD_BYTES = 256 * 1024
 
 
@@ -245,8 +245,10 @@ CONTRACT_PDF_MAX_SIZE_BYTES = _contract_pdf_max_size_bytes()
 class SendContractAcceptanceEmailSerializer(serializers.Serializer):
     user_email = serializers.EmailField(required=True)
     acceptance_id = serializers.UUIDField(required=True)
-    subject = serializers.CharField(required=True)
-    body_html = serializers.CharField(required=True)
+    language = serializers.CharField(required=False, allow_blank=True, default="")
+    plan_name = serializers.CharField(required=False, allow_blank=True, default="")
+    contract_version = serializers.CharField(required=True)
+    accepted_at = serializers.DateTimeField(required=True)
     file_name = serializers.CharField(required=True)
     file_base64 = serializers.CharField(required=True)
 
