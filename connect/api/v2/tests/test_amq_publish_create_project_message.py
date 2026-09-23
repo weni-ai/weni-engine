@@ -39,6 +39,10 @@ class PublishCreateProjectMessageTestCase(TestCase):
             vtex_account="amq-store",
             project_type=TypeProject.COMMERCE,
             language="pt-br",
+            config={
+                "storefront_type": "vtex_io",
+                "vtex_host_store": "https://www.mystore.com.br",
+            },
         )
 
     @patch("connect.api.v2.commerce.serializers.EDAPublisher")
@@ -70,6 +74,34 @@ class PublishCreateProjectMessageTestCase(TestCase):
         self.assertEqual(amazonmq_body["event_type"], "project.created")
         self.assertEqual(amazonmq_body["producer"], "connect-test-producer")
         self.assertEqual(amazonmq_body["data"], rabbitmq_body)
+        self.assertEqual(rabbitmq_body["vtex_account"], "amq-store")
+        self.assertEqual(
+            rabbitmq_body["config"],
+            {
+                "storefront_type": "vtex_io",
+                "vtex_host_store": "https://www.mystore.com.br",
+            },
+        )
+        self.assertIn("currency", rabbitmq_body)
+        self.assertFalse(rabbitmq_body["is_live_desk_copilot"])
+        self.assertIsNone(rabbitmq_body["parent_project_uuid"])
+        self.assertEqual(rabbitmq_body["project_type"], TypeProject.COMMERCE)
+
+    @patch("connect.api.v2.commerce.serializers.EDAPublisher")
+    @patch("connect.api.v2.commerce.serializers.RabbitmqPublisher")
+    def test_commerce_serializer_serializes_project_type_after_db_round_trip(
+        self, mock_rabbitmq, mock_eda_publisher
+    ):
+        mock_rabbitmq.return_value = Mock()
+        mock_eda_publisher.return_value = Mock()
+        project = Project.objects.get(uuid=self.project.uuid)
+
+        serializer = CommerceSerializer()
+        serializer.publish_create_project_message(project, self.user)
+
+        rabbitmq_body = mock_rabbitmq.return_value.send_message.call_args.args[0]
+        self.assertEqual(rabbitmq_body["project_type"], TypeProject.COMMERCE)
+        self.assertIsInstance(rabbitmq_body["project_type"], int)
 
     @patch("connect.api.v2.projects.serializers.EDAPublisher")
     @patch("connect.api.v2.projects.serializers.RabbitmqPublisher")
@@ -93,6 +125,14 @@ class PublishCreateProjectMessageTestCase(TestCase):
             routing_key="",
         )
         self.assertTrue(rabbitmq_body["brain_on"])
+        self.assertEqual(rabbitmq_body["vtex_account"], "amq-store")
+        self.assertEqual(
+            rabbitmq_body["config"],
+            {
+                "storefront_type": "vtex_io",
+                "vtex_host_store": "https://www.mystore.com.br",
+            },
+        )
         mock_eda_publisher.assert_called_once_with(AMQConnectionParamsFactory)
         amazonmq_body = mock_amazonmq_instance.send_message.call_args.args[0]
         mock_amazonmq_instance.send_message.assert_called_once_with(
@@ -103,3 +143,25 @@ class PublishCreateProjectMessageTestCase(TestCase):
         self.assertEqual(amazonmq_body["event_type"], "project.created")
         self.assertEqual(amazonmq_body["producer"], "connect-test-producer")
         self.assertEqual(amazonmq_body["data"], rabbitmq_body)
+        self.assertIn("currency", rabbitmq_body)
+        self.assertFalse(rabbitmq_body["is_live_desk_copilot"])
+        self.assertIsNone(rabbitmq_body["parent_project_uuid"])
+        self.assertEqual(rabbitmq_body["project_type"], TypeProject.COMMERCE)
+
+    @patch("connect.api.v2.projects.serializers.EDAPublisher")
+    @patch("connect.api.v2.projects.serializers.RabbitmqPublisher")
+    def test_project_serializer_serializes_project_type_after_db_round_trip(
+        self, mock_rabbitmq, mock_eda_publisher
+    ):
+        mock_rabbitmq.return_value = Mock()
+        mock_eda_publisher.return_value = Mock()
+        project = Project.objects.get(uuid=self.project.uuid)
+
+        request = MagicMock()
+        request.data = {}
+        serializer = ProjectSerializer(context={"request": request})
+        serializer.publish_create_project_message(project, brain_on=True)
+
+        rabbitmq_body = mock_rabbitmq.return_value.send_message.call_args.args[0]
+        self.assertEqual(rabbitmq_body["project_type"], TypeProject.COMMERCE)
+        self.assertIsInstance(rabbitmq_body["project_type"], int)

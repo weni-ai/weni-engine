@@ -9,6 +9,10 @@ from connect.usecases.organizations.sso_access import (
     is_sso_internal_bypass_email,
     resolve_sso_provider,
 )
+from connect.usecases.organizations.sso_policy import (
+    OrganizationSSOPolicyDTO,
+    ValidateOrganizationSSOPolicyUseCase,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -36,12 +40,31 @@ class UpdateOrganizationSSOConfigUseCase:
         sso_config, _ = OrganizationSSOConfig.objects.get_or_create(
             organization=organization
         )
-        if dto.is_enabled is not None:
-            sso_config.is_enabled = dto.is_enabled
-        if dto.allowed_email_domains is not None:
-            sso_config.allowed_email_domains = dto.allowed_email_domains
-        if dto.allowed_sso_providers is not None:
-            sso_config.allowed_sso_providers = dto.allowed_sso_providers
+        resulting = OrganizationSSOPolicyDTO(
+            is_enabled=(
+                sso_config.is_enabled if dto.is_enabled is None else dto.is_enabled
+            ),
+            allowed_email_domains=(
+                sso_config.allowed_email_domains
+                if dto.allowed_email_domains is None
+                else dto.allowed_email_domains
+            ),
+            allowed_sso_providers=(
+                sso_config.allowed_sso_providers
+                if dto.allowed_sso_providers is None
+                else dto.allowed_sso_providers
+            ),
+            requires_customer_identity_source=(
+                sso_config.requires_customer_identity_source
+            ),
+        )
+        normalized = ValidateOrganizationSSOPolicyUseCase().execute(
+            organization, resulting
+        )
+
+        sso_config.is_enabled = normalized.is_enabled
+        sso_config.allowed_email_domains = normalized.allowed_email_domains
+        sso_config.allowed_sso_providers = normalized.allowed_sso_providers
 
         if sso_config.is_enabled:
             self._validate_actor_not_locked_out(

@@ -81,9 +81,15 @@ class CommerceEDAPublisher:
             "description": "Commerce project",
             "organization_uuid": str(project.organization.uuid),
             "brain_on": True,
-            "project_type": project.project_type.value,
+            "project_type": int(project.project_type),
             "vtex_account": project.vtex_account,
+            "config": project.config or {},
             "language": project.language,
+            "currency": project.currency,
+            "is_live_desk_copilot": project.is_live_desk_copilot,
+            "parent_project_uuid": (
+                str(project.parent_project_id) if project.parent_project_id else None
+            ),
         }
 
     @staticmethod

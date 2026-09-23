@@ -38,6 +38,10 @@ class CommerceEDAPublisherTestCase(TestCase):
             vtex_account="test-store",
             project_type=TypeProject.COMMERCE,
             language="pt-br",
+            config={
+                "storefront_type": "vtex_io",
+                "vtex_host_store": "https://www.mystore.com.br",
+            },
         )
 
     @override_settings(USE_EDA=True, TESTING=False)
@@ -71,6 +75,34 @@ class CommerceEDAPublisherTestCase(TestCase):
             amazonmq_body["data"],
             publisher._build_project_body(self.project),
         )
+        self.assertEqual(amazonmq_body["data"]["vtex_account"], "test-store")
+        self.assertEqual(
+            amazonmq_body["data"]["config"],
+            {
+                "storefront_type": "vtex_io",
+                "vtex_host_store": "https://www.mystore.com.br",
+            },
+        )
+        self.assertIn("currency", publisher._build_project_body(self.project))
+        body = publisher._build_project_body(self.project)
+        self.assertFalse(body["is_live_desk_copilot"])
+        self.assertIsNone(body["parent_project_uuid"])
+
+    def test_build_project_body_includes_currency(self):
+        self.project.currency = "BRL"
+        self.project.save(update_fields=["currency"])
+
+        body = CommerceEDAPublisher()._build_project_body(self.project)
+
+        self.assertEqual(body["currency"], "BRL")
+
+    def test_build_project_body_serializes_project_type_after_db_round_trip(self):
+        project = Project.objects.get(uuid=self.project.uuid)
+
+        body = CommerceEDAPublisher()._build_project_body(project)
+
+        self.assertEqual(body["project_type"], TypeProject.COMMERCE)
+        self.assertIsInstance(body["project_type"], int)
 
     @override_settings(USE_EDA=False, TESTING=False)
     @patch("connect.usecases.commerce.eda_publisher.EDAPublisher")

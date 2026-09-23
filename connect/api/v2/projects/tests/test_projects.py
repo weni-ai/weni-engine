@@ -620,6 +620,24 @@ class ProjectDetailViewTestCase(TestCase):
         self.assertIn("project_type", data)
         self.assertIn("project_mode", data)
         self.assertIn("organization_billing", data)
+        self.assertFalse(data["is_live_desk_copilot"])
+        self.assertIsNone(data["parent_project_uuid"])
+
+    def test_returns_copilot_parent_fields(self):
+        copilot = Project.objects.create(
+            name="Detail Copilot",
+            flow_organization=uuid.uuid4(),
+            organization=self.org,
+            is_live_desk_copilot=True,
+            parent_project=self.project,
+        )
+
+        response, data = self._make_request(str(copilot.uuid), self.user)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(data["is_live_desk_copilot"])
+        self.assertEqual(data["parent_project_uuid"], str(self.project.uuid))
+        self.assertIsNone(data["vtex_account"])
 
     def test_unauthenticated_returns_401(self):
         response, _ = self._make_request(str(self.project.uuid), user=None)

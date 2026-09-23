@@ -1,3 +1,4 @@
+import json
 import uuid
 from unittest.mock import MagicMock, patch
 
@@ -78,7 +79,40 @@ class GenerateSessionTokenUseCaseTestCase(TestCase):
         self.assertEqual(put_kwargs["token_hash"], token_hash)
         self.assertEqual(put_kwargs["project"], str(self.project.uuid))
         self.assertEqual(put_kwargs["user"], self.user.email)
+        self.assertIsNotNone(put_kwargs["expire_at"])
         mock_redis.setex.assert_called_once()
+
+    @patch(
+        "connect.usecases.auth.generate_session_token.DynamoDBSessionTokenRepository"
+    )
+    @patch("connect.usecases.auth.generate_session_token.get_redis_connection")
+    @patch(
+        "connect.usecases.auth.generate_session_token.compute_redis_ttl",
+        return_value=3600,
+    )
+    def test_execute_generates_token_without_expiration(
+        self, mock_compute_ttl, mock_get_redis_connection, mock_repo_cls
+    ):
+        mock_redis = MagicMock()
+        mock_get_redis_connection.return_value = mock_redis
+        mock_repo = MagicMock()
+        mock_repo_cls.return_value = mock_repo
+
+        token_hash = GenerateSessionTokenUseCase().execute(
+            project_uuid=str(self.project.uuid),
+            user=self.user,
+        )
+
+        self.assertTrue(token_hash)
+        put_kwargs = mock_repo.put.call_args.kwargs
+        self.assertEqual(put_kwargs["token_hash"], token_hash)
+        self.assertIsNone(put_kwargs["expire_at"])
+        mock_compute_ttl.assert_called_once_with(None)
+
+        _, ttl, payload = mock_redis.setex.call_args[0]
+        self.assertEqual(ttl, 3600)
+        stored_data = json.loads(payload)
+        self.assertNotIn("expire_at", stored_data)
 
     def test_execute_raises_when_user_has_no_project_authorization(self):
         other_user, _ = create_user_and_token("other")

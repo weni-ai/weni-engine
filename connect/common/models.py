@@ -26,6 +26,7 @@ from connect.api.v1.internal.intelligence.intelligence_rest_client import (
 )
 from connect.authentication.models import User
 from connect.billing.gateways.stripe_gateway import StripeGateway
+from connect.common.currencies import ISO_4217_CODE_LENGTH
 from connect.common.exceptions import (
     OrganizationAuthorizationException,
     ProjectAuthorizationException,
@@ -333,6 +334,7 @@ class OrganizationSSOConfig(models.Model):
     )
     allowed_email_domains = models.JSONField(default=list, blank=True)
     allowed_sso_providers = models.JSONField(default=list, blank=True)
+    requires_customer_identity_source = models.BooleanField(default=False)
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
     updated_at = models.DateTimeField(_("updated at"), auto_now=True)
 
@@ -515,6 +517,15 @@ class Project(models.Model):
     class Meta:
         verbose_name = _("project")
         unique_together = ["flow_organization"]
+        constraints = [
+            models.CheckConstraint(
+                check=(
+                    models.Q(is_live_desk_copilot=False, parent_project__isnull=True)
+                    | models.Q(is_live_desk_copilot=True, parent_project__isnull=False)
+                ),
+                name="common_project_copilot_requires_parent",
+            ),
+        ]
 
     DATE_FORMAT_DAY_FIRST = "D"
     DATE_FORMAT_MONTH_FIRST = "M"
@@ -624,6 +635,22 @@ class Project(models.Model):
     vtex_account = models.CharField(
         _("VTEX account"), null=True, blank=True, max_length=100
     )
+    is_live_desk_copilot = models.BooleanField(
+        _("Is live desk copilot"),
+        default=False,
+    )
+    parent_project = models.ForeignKey(
+        "self",
+        on_delete=models.PROTECT,
+        related_name="copilot_projects",
+        null=True,
+        blank=True,
+        verbose_name=_("Parent project"),
+        help_text=_(
+            "Source of truth for VTEX account lookups when this project "
+            "is a live desk copilot."
+        ),
+    )
     status = models.CharField(
         _("Project status"),
         choices=ProjectStatus.choices,
@@ -636,6 +663,9 @@ class Project(models.Model):
         null=True,
         choices=settings.LANGUAGES,
         default=settings.DEFAULT_LANGUAGE,
+    )
+    currency = models.CharField(
+        _("Project currency"), max_length=ISO_4217_CODE_LENGTH, null=True, blank=True
     )
     config = models.JSONField(
         _("Project configuration"),

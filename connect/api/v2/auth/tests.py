@@ -98,9 +98,10 @@ class GetTokenViewTestCase(TestCase):
 
     def _request(self, data=None, user=None, project_uuid=None):
         project_uuid = project_uuid or str(self.project.uuid)
+        query = {"duration": 3600} if data is None else data
         request = self.factory.get(
             f"/v2/projects/{project_uuid}/get-token",
-            data or {"duration": 3600},
+            query,
         )
         if user is not None:
             force_authenticate(request, user=user, token=user.auth_token)
@@ -153,6 +154,40 @@ class GetTokenViewTestCase(TestCase):
         response = self._request(data={"duration": 10}, user=self.user)
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    @patch(
+        "connect.usecases.auth.generate_session_token.DynamoDBSessionTokenRepository"
+    )
+    @patch("connect.usecases.auth.generate_session_token.get_redis_connection")
+    @patch(
+        "connect.usecases.auth.generate_session_token.compute_redis_ttl",
+        return_value=3600,
+    )
+    def test_get_token_without_duration_has_no_expiration(
+        self, mock_compute_ttl, mock_get_redis_connection, mock_repo_cls
+    ):
+        mock_redis = MagicMock()
+        mock_get_redis_connection.return_value = mock_redis
+        mock_repo = MagicMock()
+        mock_repo_cls.return_value = mock_repo
+
+        response = self._request(data={}, user=self.user)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("hash", response.data)
+
+        put_kwargs = mock_repo.put.call_args.kwargs
+        self.assertIsNone(put_kwargs["expire_at"])
+        mock_compute_ttl.assert_called_once_with(None)
+
+        redis_key, ttl, payload = mock_redis.setex.call_args[0]
+        self.assertEqual(redis_key, build_cache_key(response.data["hash"]))
+        self.assertEqual(ttl, 3600)
+
+        stored_data = json.loads(payload)
+        self.assertEqual(stored_data["project"], str(self.project.uuid))
+        self.assertEqual(stored_data["user"], self.user.email)
+        self.assertNotIn("expire_at", stored_data)
 
 
 @override_settings(USE_EDA_PERMISSIONS=False)
