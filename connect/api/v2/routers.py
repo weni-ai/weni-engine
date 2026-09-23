@@ -21,7 +21,6 @@ from connect.api.v2.omie.views import (
     OmieUsersAPIView,
 )
 from connect.api.v2.recent_activity.views import RecentActivityViewSet
-from connect.api.v2.change_history.views import ProjectChangeHistoryViewSet
 
 from connect.api.v2.template_projects.views import (
     TemplateTypeViewSet,
@@ -167,7 +166,7 @@ urlpatterns = [
         name="project-authorizations",
     ),
     path(
-        "projects/get-token",
+        "projects/<project_uuid>/get-token",
         GetTokenView.as_view(),
         name="get-token",
     ),
@@ -190,16 +189,6 @@ urlpatterns = [
         "recent-activities",
         RecentActivityViewSet.as_view({"post": "create", "get": "list"}),
         name="recent-activities",
-    ),
-    path(
-        "projects/<project_uuid>/change-history",
-        ProjectChangeHistoryViewSet.as_view({"get": "list"}),
-        name="change-history",
-    ),
-    path(
-        "projects/<project_uuid>/change-history/<uuid:pk>",
-        ProjectChangeHistoryViewSet.as_view({"get": "retrieve"}),
-        name="change-history-detail",
     ),
     path(
         "commerce/create-vtex-project/",

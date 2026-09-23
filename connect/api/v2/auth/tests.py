@@ -17,10 +17,14 @@ from rest_framework.test import (
     APIClient,
     APIRequestFactory,
     APITestCase,
+    force_authenticate,
 )
 
 from connect.api.v1.tests.utils import create_user_and_token
-from connect.api.v2.auth.views import InvalidateSessionTokenView
+from connect.api.v2.auth.views import (
+    GetTokenView,
+    InvalidateSessionTokenView,
+)
 from connect.authentication.models import User
 from connect.common.mocks import StripeMockGateway
 from connect.common.models import (
@@ -34,47 +38,8 @@ from connect.common.models import (
 )
 from weni_commons.auth import build_cache_key
 
-_JWT_PRIVATE_KEY_OBJ = rsa.generate_private_key(public_exponent=65537, key_size=2048)
-JWT_PRIVATE_KEY = _JWT_PRIVATE_KEY_OBJ.private_bytes(
-    encoding=serialization.Encoding.PEM,
-    format=serialization.PrivateFormat.PKCS8,
-    encryption_algorithm=serialization.NoEncryption(),
-).decode()
-JWT_PUBLIC_KEY = (
-    _JWT_PRIVATE_KEY_OBJ.public_key()
-    .public_bytes(
-        encoding=serialization.Encoding.PEM,
-        format=serialization.PublicFormat.SubjectPublicKeyInfo,
-    )
-    .decode()
-)
 
-
-def build_weni_jwt(**claims) -> str:
-    return jwt.encode(claims, JWT_PRIVATE_KEY, algorithm="RS256")
-
-
-_JWT_PRIVATE_KEY_OBJ = rsa.generate_private_key(public_exponent=65537, key_size=2048)
-JWT_PRIVATE_KEY = _JWT_PRIVATE_KEY_OBJ.private_bytes(
-    encoding=serialization.Encoding.PEM,
-    format=serialization.PrivateFormat.PKCS8,
-    encryption_algorithm=serialization.NoEncryption(),
-).decode()
-JWT_PUBLIC_KEY = (
-    _JWT_PRIVATE_KEY_OBJ.public_key()
-    .public_bytes(
-        encoding=serialization.Encoding.PEM,
-        format=serialization.PublicFormat.SubjectPublicKeyInfo,
-    )
-    .decode()
-)
-
-
-def build_weni_jwt(**claims) -> str:
-    return jwt.encode(claims, JWT_PRIVATE_KEY, algorithm="RS256")
-
-
-@override_settings(USE_EDA_PERMISSIONS=False, JWT_PUBLIC_KEY=JWT_PUBLIC_KEY)
+@override_settings(USE_EDA_PERMISSIONS=False)
 class GetTokenViewTestCase(TestCase):
     @patch(
         "connect.internals.event_driven.producer.rabbitmq_publisher.RabbitmqPublisher.send_message"
@@ -85,8 +50,9 @@ class GetTokenViewTestCase(TestCase):
         mock_get_gateway.return_value = StripeMockGateway()
         mock_permission.return_value = True
 
-        self.client = APIClient()
+        self.factory = APIRequestFactory()
         self.user, self.user_token = create_user_and_token("user")
+        self.view = GetTokenView.as_view()
 
         self.organization = Organization.objects.create(
             name="test organization",
@@ -111,22 +77,16 @@ class GetTokenViewTestCase(TestCase):
             organization_authorization=self.org_auth,
         )
 
-    def _token(self, project_uuid=None, user=None, **claims):
-        user = user or self.user
-        payload = {"user_email": user.email}
-        if project_uuid is not None:
-            payload["project_uuid"] = project_uuid
-        elif "project_uuid" not in claims and "vtex_account" not in claims:
-            payload["project_uuid"] = str(self.project.uuid)
-        payload.update(claims)
-        return build_weni_jwt(**payload)
-
-    def _request(self, data=None, token=None, authenticated=True):
+    def _request(self, data=None, user=None, project_uuid=None):
+        project_uuid = project_uuid or str(self.project.uuid)
         query = {"duration": 3600} if data is None else data
-        headers = {}
-        if authenticated:
-            headers["HTTP_X_WENI_AUTH"] = token if token is not None else self._token()
-        return self.client.get("/v2/projects/get-token", query, **headers)
+        request = self.factory.get(
+            f"/v2/projects/{project_uuid}/get-token",
+            query,
+        )
+        if user is not None:
+            force_authenticate(request, user=user, token=user.auth_token)
+        return self.view(request, project_uuid=project_uuid)
 
     @patch(
         "connect.usecases.auth.generate_session_token.DynamoDBSessionTokenRepository"
@@ -138,7 +98,7 @@ class GetTokenViewTestCase(TestCase):
         mock_repo = MagicMock()
         mock_repo_cls.return_value = mock_repo
 
-        response = self._request()
+        response = self._request(user=self.user)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("hash", response.data)
@@ -159,57 +119,20 @@ class GetTokenViewTestCase(TestCase):
         self.assertEqual(stored_data["user"], self.user.email)
         self.assertIn("expire_at", stored_data)
 
-    @patch("connect.middleware.KeycloakCredentialsService")
-    @patch("mozilla_django_oidc.contrib.drf.OIDCAuthentication.authenticate")
-    @patch(
-        "connect.usecases.auth.generate_session_token.DynamoDBSessionTokenRepository"
-    )
-    @patch("connect.usecases.auth.generate_session_token.get_redis_connection")
-    def test_oidc_token_uses_claim_project(
-        self,
-        mock_get_redis_connection,
-        mock_repo_cls,
-        mock_oidc_authenticate,
-        _mock_credentials,
-    ):
-        mock_get_redis_connection.return_value = MagicMock()
-        mock_repo_cls.return_value = MagicMock()
-        access_token = jwt.encode(
-            {
-                "email": self.user.email,
-                "project_uuid": str(self.project.uuid),
-                "identity_provider": "google",
-            },
-            "secret",
-            algorithm="HS256",
-        )
-        mock_oidc_authenticate.return_value = (self.user, access_token)
-
-        response = self.client.get(
-            "/v2/projects/get-token",
-            {"duration": 3600},
-            HTTP_AUTHORIZATION=f"Bearer {access_token}",
-        )
-
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        put_kwargs = mock_repo_cls.return_value.put.call_args.kwargs
-        self.assertEqual(put_kwargs["project"], str(self.project.uuid))
-        self.assertEqual(put_kwargs["user"], self.user.email)
-
     def test_get_token_without_authentication(self):
-        response = self._request(authenticated=False)
+        response = self._request()
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_get_token_without_project_authorization(self):
         other_user, _ = create_user_and_token("other")
 
-        response = self._request(token=self._token(user=other_user))
+        response = self._request(user=other_user)
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_get_token_invalid_duration(self):
-        response = self._request(data={"duration": 10})
+        response = self._request(data={"duration": 10}, user=self.user)
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -229,7 +152,7 @@ class GetTokenViewTestCase(TestCase):
         mock_repo = MagicMock()
         mock_repo_cls.return_value = mock_repo
 
-        response = self._request(data={})
+        response = self._request(data={}, user=self.user)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("hash", response.data)
@@ -398,6 +321,26 @@ class InvalidateSessionTokenViewTestCase(TestCase):
         response = self._request()
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+
+_JWT_PRIVATE_KEY_OBJ = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+JWT_PRIVATE_KEY = _JWT_PRIVATE_KEY_OBJ.private_bytes(
+    encoding=serialization.Encoding.PEM,
+    format=serialization.PrivateFormat.PKCS8,
+    encryption_algorithm=serialization.NoEncryption(),
+).decode()
+JWT_PUBLIC_KEY = (
+    _JWT_PRIVATE_KEY_OBJ.public_key()
+    .public_bytes(
+        encoding=serialization.Encoding.PEM,
+        format=serialization.PublicFormat.SubjectPublicKeyInfo,
+    )
+    .decode()
+)
+
+
+def build_weni_jwt(**claims) -> str:
+    return jwt.encode(claims, JWT_PRIVATE_KEY, algorithm="RS256")
 
 
 @override_settings(USE_EDA_PERMISSIONS=False)
