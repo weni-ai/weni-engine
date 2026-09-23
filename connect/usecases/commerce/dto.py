@@ -1,6 +1,6 @@
 import uuid
 from dataclasses import dataclass
-from datetime import date
+from datetime import date, datetime
 from typing import List, Optional
 
 
@@ -28,7 +28,9 @@ class SendDataExportEmailDTO:
 class SendContractAcceptanceEmailDTO:
     user_email: str
     acceptance_id: uuid.UUID
-    subject: str
-    body_html: str
+    language: str
+    plan_name: str
+    contract_version: str
+    accepted_at: datetime
     file_name: str
     file_base64: str

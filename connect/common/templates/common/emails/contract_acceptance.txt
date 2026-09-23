@@ -1,0 +1,9 @@
+{% load i18n %}{% trans "Hello," %}
+
+{% trans "Your contract acceptance has been registered." %}
+
+{% trans "Plan" %}: {{ plan }}
+{% trans "Version" %}: {{ version }}
+{% trans "Date" %}: {{ date }}
+
+{% trans "The accepted document is attached to this email." %}

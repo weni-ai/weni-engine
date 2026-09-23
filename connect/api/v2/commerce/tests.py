@@ -1354,8 +1354,10 @@ class SendContractAcceptanceEmailViewTestCase(APITestCase):
         self.payload = {
             "user_email": "customer@example.com",
             "acceptance_id": str(uuid.uuid4()),
-            "subject": "Seu contrato Weni",
-            "body_html": "<p>Contrato aceito com sucesso</p>",
+            "language": "pt-br",
+            "plan_name": "Growth",
+            "contract_version": "v2.1",
+            "accepted_at": "2026-06-10T14:32:00Z",
             "file_name": "contract-v2.1.pdf",
             "file_base64": base64.b64encode(b"%PDF-1.4 fake").decode(),
         }
@@ -1371,8 +1373,10 @@ class SendContractAcceptanceEmailViewTestCase(APITestCase):
 
         dto = use_case_class.return_value.execute.call_args.args[0]
         self.assertEqual(dto.user_email, "customer@example.com")
-        self.assertEqual(dto.subject, "Seu contrato Weni")
-        self.assertEqual(dto.body_html, "<p>Contrato aceito com sucesso</p>")
+        self.assertEqual(dto.language, "pt-br")
+        self.assertEqual(dto.plan_name, "Growth")
+        self.assertEqual(dto.contract_version, "v2.1")
+        self.assertEqual(dto.accepted_at.isoformat(), "2026-06-10T14:32:00+00:00")
         self.assertEqual(dto.file_name, "contract-v2.1.pdf")
 
     @patch("connect.api.v2.commerce.views.SendContractAcceptanceEmailUseCase")
@@ -1415,8 +1419,10 @@ class SendContractAcceptanceEmailSerializerTestCase(APITestCase):
         data = {
             "user_email": "customer@example.com",
             "acceptance_id": str(uuid.uuid4()),
-            "subject": "Seu contrato Weni",
-            "body_html": "<p>Contrato aceito com sucesso</p>",
+            "language": "pt-br",
+            "plan_name": "Growth",
+            "contract_version": "v2.1",
+            "accepted_at": "2026-06-10T14:32:00Z",
             "file_name": "contract-v2.1.pdf",
             "file_base64": base64.b64encode(b"%PDF-1.4 fake").decode(),
         }

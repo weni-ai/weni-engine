@@ -1627,3 +1627,37 @@ msgstr "Portugués"
 #: connect/settings.py:238
 msgid "Spanish"
 msgstr "Español"
+
+#: connect/usecases/commerce/send_contract_acceptance_email.py
+msgid "Your contract"
+msgstr "Tu contrato"
+
+#: connect/common/templates/common/emails/contract_acceptance.html
+#: connect/common/templates/common/emails/contract_acceptance.txt
+msgid "Hello,"
+msgstr "Hola,"
+
+#: connect/common/templates/common/emails/contract_acceptance.html
+#: connect/common/templates/common/emails/contract_acceptance.txt
+msgid "Your contract acceptance has been registered."
+msgstr "Tu aceptación de contrato fue registrada."
+
+#: connect/common/templates/common/emails/contract_acceptance.html
+#: connect/common/templates/common/emails/contract_acceptance.txt
+msgid "Plan"
+msgstr "Plan"
+
+#: connect/common/templates/common/emails/contract_acceptance.html
+#: connect/common/templates/common/emails/contract_acceptance.txt
+msgid "Version"
+msgstr "Versión"
+
+#: connect/common/templates/common/emails/contract_acceptance.html
+#: connect/common/templates/common/emails/contract_acceptance.txt
+msgid "Date"
+msgstr "Fecha"
+
+#: connect/common/templates/common/emails/contract_acceptance.html
+#: connect/common/templates/common/emails/contract_acceptance.txt
+msgid "The accepted document is attached to this email."
+msgstr "El documento aceptado está adjunto a este correo."
