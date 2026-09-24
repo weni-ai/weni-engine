@@ -40,7 +40,7 @@ if [[ "start" == "$1" ]]; then
     echo "Running collectstatic"
     do_gosu "${APP_USER}:${APP_GROUP}" python manage.py collectstatic --noinput
     echo "Starting server"
-    do_gosu "${APP_USER}:${APP_GROUP}" exec gunicorn "${GUNICORN_APP}" -c "${GUNICORN_CONF}"   
+    do_gosu "${APP_USER}:${APP_GROUP}" exec gunicorn "${GUNICORN_APP}" -c "${GUNICORN_CONF}"
 elif [[ "celery-worker" == "$1" ]]; then
     celery_queue="celery"
     if [ "${2}" ] ; then
@@ -71,5 +71,14 @@ elif [[ "healthcheck-celery-worker" == "$1" ]]; then
     echo "${HEALTHCHECK_OUT}"
     grep -F -qs "${celery_queue}@${HOSTNAME}: OK" <<< "${HEALTHCHECK_OUT}" || exit 1
     exit 0
+elif [[ "edaconsume" == "$1" ]]; then
+    echo "Running edaconsume"
+    do_gosu "${APP_USER}:${APP_GROUP}" exec python manage.py edaconsume
+elif [[ "rmqedaconsume" == "$1" ]]; then
+    echo "Running rmqedaconsume"
+    do_gosu "${APP_USER}:${APP_GROUP}" exec python manage.py rmqedaconsume
+elif [[ "edaconsume-amq" == "$1" ]]; then
+    echo "Running edaconsume-amq"
+    do_gosu "${APP_USER}:${APP_GROUP}" exec python manage.py edaconsume
 fi
 exec "$@"
