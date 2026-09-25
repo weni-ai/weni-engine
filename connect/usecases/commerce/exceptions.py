@@ -4,3 +4,7 @@ class ProjectAlreadyHasVtexAccountError(Exception):
 
 class VtexAccountAlreadyLinkedError(Exception):
     """Raised when the vtex_account is already linked to another project."""
+
+
+class ProjectAuthorizationMissingError(Exception):
+    """Raised when VTEX project create would return without ProjectAuthorization."""
