@@ -183,27 +183,58 @@ class ProjectSerializer(serializers.ModelSerializer):
         else:
             return "blank"
 
-    def create(self, validated_data):
-        user = self.context["request"].user
-        extra_data = self.context["request"].data.get("project", {})
+    def _read_create_request_context(self) -> dict:
+        request_data = self.context["request"].data
+        extra_data = request_data.get("project", {})
 
-        template_uuid = self.context["request"].data.get("uuid")
-        is_template = self.context["request"].data.get("template", False)
-        brain_on = self.context["request"].data.get("brain_on", False)
+        template_uuid = request_data.get("uuid")
+        is_template = request_data.get("template", False)
+        brain_on = request_data.get("brain_on", False)
 
         if extra_data:
             template_uuid = extra_data.get("uuid", template_uuid)
             is_template = extra_data.get("template", is_template)
             brain_on = extra_data.get("brain_on", False)
-        project_template_type = None
-        template_name = "blank"
-        if is_template:
-            project_template_type_queryset = TemplateType.objects.filter(
-                uuid=template_uuid
-            )
-            if project_template_type_queryset.exists():
-                project_template_type = project_template_type_queryset.first()
-                template_name = project_template_type.name
+
+        return {
+            "extra_data": extra_data,
+            "template_uuid": template_uuid,
+            "is_template": is_template,
+            "brain_on_from_request": brain_on,
+        }
+
+    @staticmethod
+    def _resolve_brain_on_for_create(
+        validated_data: dict, brain_on_from_request: bool
+    ) -> bool:
+        if validated_data.get("is_live_desk_copilot", False):
+            return True
+        return brain_on_from_request
+
+    def _resolve_template_metadata(
+        self, template_uuid, is_template: bool
+    ) -> tuple[TemplateType | None, str]:
+        if not is_template:
+            return None, "blank"
+
+        project_template_type_queryset = TemplateType.objects.filter(uuid=template_uuid)
+        if not project_template_type_queryset.exists():
+            return None, "blank"
+
+        project_template_type = project_template_type_queryset.first()
+        return project_template_type, project_template_type.name
+
+    def create(self, validated_data):
+        user = self.context["request"].user
+        create_context = self._read_create_request_context()
+        extra_data = create_context["extra_data"]
+        is_template = create_context["is_template"]
+        brain_on = self._resolve_brain_on_for_create(
+            validated_data, create_context["brain_on_from_request"]
+        )
+        project_template_type, template_name = self._resolve_template_metadata(
+            create_context["template_uuid"], is_template
+        )
         instance = Project.objects.create(
             name=validated_data.get("name"),
             timezone=str(validated_data.get("timezone")),

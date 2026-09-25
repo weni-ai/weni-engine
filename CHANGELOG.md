@@ -1,3 +1,6 @@
+# 3.62.0
+  - feat: Replace raw subject/body fields with structured facts and server-side template rendering for contract acceptance email
+
 # 3.61.0
   - feat: Support live desk copilot project creation
 
