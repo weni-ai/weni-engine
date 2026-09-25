@@ -105,6 +105,7 @@ class LiveDeskCopilotProjectSerializerTestCase(TestCase):
 
         rabbitmq_body = mock_rabbitmq_instance.send_message.call_args.args[0]
         self.assertTrue(rabbitmq_body["is_live_desk_copilot"])
+        self.assertTrue(rabbitmq_body["brain_on"])
         self.assertEqual(
             rabbitmq_body["parent_project_uuid"], str(self.parent_project.uuid)
         )
@@ -139,6 +140,7 @@ class LiveDeskCopilotProjectSerializerTestCase(TestCase):
         self.assertIsNone(instance.parent_project_id)
         rabbitmq_body = mock_rabbitmq_instance.send_message.call_args.args[0]
         self.assertFalse(rabbitmq_body["is_live_desk_copilot"])
+        self.assertFalse(rabbitmq_body["brain_on"])
         self.assertIsNone(rabbitmq_body["parent_project_uuid"])
 
     def test_copilot_without_parent_is_invalid(self):
