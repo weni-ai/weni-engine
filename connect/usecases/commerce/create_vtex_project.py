@@ -11,12 +11,14 @@ from connect.common.models import (
     Organization,
     OrganizationRole,
     Project,
-    ProjectAuthorization,
-    RequestPermissionOrganization,
     TypeProject,
 )
+from connect.internals.event_driven.producer.rabbitmq_publisher import RabbitmqPublisher
+from connect.usecases.authorizations.create import CreateAuthorizationUseCase
+from connect.usecases.authorizations.dto import CreateAuthorizationDTO
 from connect.usecases.commerce.dto import CreateVtexProjectDTO
 from connect.usecases.commerce.eda_publisher import CommerceEDAPublisher
+from connect.usecases.commerce.exceptions import ProjectAuthorizationMissingError
 from connect.usecases.users.create import CreateKeycloakUserUseCase
 from connect.usecases.users.user_dto import KeycloakUserDTO
 
@@ -30,8 +32,13 @@ class CreateVtexProjectUseCase:
     into a single atomic operation with EDA event publishing.
     """
 
-    def __init__(self, eda_publisher: CommerceEDAPublisher = None):
+    def __init__(
+        self,
+        eda_publisher: CommerceEDAPublisher = None,
+        auth_message_publisher=None,
+    ):
         self._eda = eda_publisher or CommerceEDAPublisher()
+        self._auth_message_publisher = auth_message_publisher
 
     def execute(self, dto: CreateVtexProjectDTO) -> dict:
         with transaction.atomic():
@@ -40,7 +47,7 @@ class CreateVtexProjectUseCase:
             )
             project, project_created = self._get_or_create_project(dto, user)
             organization = project.organization
-            self._ensure_permissions(user, project, organization)
+            self._ensure_permissions(user, organization)
 
         logger.info(
             f"VTEX project ready project_uuid={project.uuid} "
@@ -117,28 +124,38 @@ class CreateVtexProjectUseCase:
             organization_billing__cycle=BillingPlan._meta.get_field("cycle").default,
         )
 
-    def _ensure_permissions(
-        self, user: User, project: Project, organization: Organization
-    ) -> None:
-        """Ensures user has org + project authorization.
+    def _ensure_permissions(self, user: User, organization: Organization) -> None:
+        """Grant ADMIN org auth and project auth for every org project.
 
-        If the user already has ProjectAuth, no action is taken.
-        Otherwise, creates a RequestPermissionOrganization which triggers
-        a post_save signal that handles OrgAuth + ProjectAuth creation
-        for all org projects, EDA auth events, and org invitation email.
+        Always calls CreateAuthorizationUseCase so retries republish auth
+        events after a previous grant that rolled back on publish failure.
         """
-        has_permission = ProjectAuthorization.objects.filter(
-            project=project, user=user
-        ).exists()
-        if has_permission:
-            return
-
-        RequestPermissionOrganization.objects.create(
-            email=user.email,
-            organization=organization,
+        auth_dto = CreateAuthorizationDTO(
+            user_email=user.email,
+            org_uuid=str(organization.uuid),
             role=OrganizationRole.ADMIN.value,
-            created_by=user,
         )
+        CreateAuthorizationUseCase(
+            message_publisher=self._auth_publisher(),
+            publish_message=True,
+        ).create_authorization(auth_dto)
+        self._require_authorizations(user, organization)
+
+    def _require_authorizations(self, user: User, organization: Organization) -> None:
+        if not organization.authorizations.filter(user=user).exists():
+            raise ProjectAuthorizationMissingError(
+                f"OrganizationAuthorization missing after create "
+                f"org_uuid={organization.uuid} user_email={user.email}"
+            )
+        for project in organization.project.all():
+            if not project.project_authorizations.filter(user=user).exists():
+                raise ProjectAuthorizationMissingError(
+                    f"ProjectAuthorization missing after create "
+                    f"project_uuid={project.uuid} user_email={user.email}"
+                )
+
+    def _auth_publisher(self):
+        return self._auth_message_publisher or RabbitmqPublisher()
 
     @staticmethod
     def _send_request_flow_product(user: User) -> None:

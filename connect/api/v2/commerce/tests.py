@@ -29,6 +29,7 @@ from connect.usecases.commerce.create_vtex_project import CreateVtexProjectUseCa
 from connect.usecases.commerce.dto import CreateVtexProjectDTO
 from connect.usecases.commerce.exceptions import (
     ProjectAlreadyHasVtexAccountError,
+    ProjectAuthorizationMissingError,
     VtexAccountAlreadyLinkedError,
 )
 from connect.usecases.commerce.link_vtex_account import LinkVtexAccountUseCase
@@ -411,12 +412,34 @@ class CreateVtexProjectUseCaseTestCase(APITestCase):
         self.assertEqual(self.mock_eda.publish_project_created.call_count, 2)
         self.assertEqual(self.mock_eda.publish_org_created.call_count, 2)
 
+    def _auth_exchanges(self, mock_publisher):
+        exchanges = []
+        for call in mock_publisher.send_message.call_args_list:
+            if call.kwargs.get("exchange"):
+                exchanges.append(call.kwargs["exchange"])
+            elif len(call.args) > 1:
+                exchanges.append(call.args[1])
+        return exchanges
+
+    def _auth_project_uuids(self, mock_publisher):
+        project_uuids = []
+        for call in mock_publisher.send_message.call_args_list:
+            body = call.kwargs.get("body")
+            if body is None and call.args:
+                body = call.args[0]
+            if isinstance(body, dict) and body.get("project"):
+                project_uuids.append(body["project"])
+        return project_uuids
+
+    @patch(
+        "connect.common.models.Organization.send_email_invite_organization"
+    )
     @patch("connect.billing.get_gateway")
-    def test_permissions_created_via_request_permission(self, mock_gateway):
-        """When user has no permissions on an existing project, _ensure_permissions
-        should create a RequestPermissionOrganization which triggers the signal
-        to create OrgAuth + ProjectAuth — replicating the legacy check-project flow."""
+    def test_permissions_created_without_request_permission(
+        self, mock_gateway, mock_invite_email
+    ):
         mock_gateway.return_value = StripeMockGateway()
+        mock_auth_publisher = Mock()
 
         organization = Organization.objects.create(
             name="perm-test-org",
@@ -439,12 +462,13 @@ class CreateVtexProjectUseCaseTestCase(APITestCase):
             organization_name="Perm Test Org",
             project_name="Perm Test Project",
         )
-        use_case = CreateVtexProjectUseCase(eda_publisher=self.mock_eda)
+        use_case = CreateVtexProjectUseCase(
+            eda_publisher=self.mock_eda,
+            auth_message_publisher=mock_auth_publisher,
+        )
         result = use_case.execute(dto)
 
         self.assertEqual(result["project_uuid"], str(project.uuid))
-
-        # Signal should have created OrgAuth (ADMIN) and ProjectAuth
         self.assertTrue(
             OrganizationAuthorization.objects.filter(
                 user=self.user,
@@ -457,13 +481,267 @@ class CreateVtexProjectUseCaseTestCase(APITestCase):
                 user=self.user, project=project
             ).exists()
         )
-
-        # RequestPermissionOrganization should have been deleted by the signal
         self.assertFalse(
             RequestPermissionOrganization.objects.filter(
                 email=self.user.email, organization=organization
             ).exists()
         )
+        mock_invite_email.assert_not_called()
+        self.assertEqual(
+            self._auth_exchanges(mock_auth_publisher),
+            ["orgs-auths.topic", "project-auths.topic"],
+        )
+        self.mock_eda.publish_org_created.assert_called_once()
+        self.mock_eda.publish_project_created.assert_called_once()
+
+    @patch("connect.billing.get_gateway")
+    def test_existing_project_authorization_republishes_auth(self, mock_gateway):
+        mock_gateway.return_value = StripeMockGateway()
+        mock_auth_publisher = Mock()
+
+        organization = Organization.objects.create(
+            name="existing-auth-org",
+            description="Organization existing-auth-org",
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan=BillingPlan.PLAN_TRIAL,
+        )
+        org_auth = organization.authorizations.create(
+            user=self.user,
+            role=OrganizationRole.ADMIN.value,
+        )
+        project = Project.objects.create(
+            name="existing-auth-project",
+            organization=organization,
+            vtex_account="existing-auth-store",
+            flow_organization=uuid.uuid4(),
+            project_type=TypeProject.COMMERCE,
+        )
+        ProjectAuthorization.objects.filter(user=self.user, project=project).delete()
+        ProjectAuthorization.objects.create(
+            user=self.user,
+            project=project,
+            role=ProjectRole.MODERATOR.value,
+            organization_authorization=org_auth,
+        )
+
+        dto = CreateVtexProjectDTO(
+            user_email=self.user.email,
+            vtex_account="existing-auth-store",
+            language="pt-br",
+            organization_name="Existing Auth Org",
+            project_name="Existing Auth Project",
+        )
+        use_case = CreateVtexProjectUseCase(
+            eda_publisher=self.mock_eda,
+            auth_message_publisher=mock_auth_publisher,
+        )
+        use_case.execute(dto)
+
+        self.assertEqual(
+            self._auth_exchanges(mock_auth_publisher),
+            ["orgs-auths.topic", "project-auths.topic"],
+        )
+        self.assertEqual(
+            self._auth_project_uuids(mock_auth_publisher),
+            [str(project.uuid)],
+        )
+        self.mock_eda.publish_org_created.assert_called_once()
+        self.mock_eda.publish_project_created.assert_called_once()
+
+    @patch("connect.billing.get_gateway")
+    def test_publishes_auth_for_every_org_project(self, mock_gateway):
+        mock_gateway.return_value = StripeMockGateway()
+        mock_auth_publisher = Mock()
+
+        organization = Organization.objects.create(
+            name="multi-project-org",
+            description="Organization multi-project-org",
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan=BillingPlan.PLAN_TRIAL,
+        )
+        vtex_project = Project.objects.create(
+            name="multi-vtex-project",
+            organization=organization,
+            vtex_account="multi-vtex-store",
+            flow_organization=uuid.uuid4(),
+            project_type=TypeProject.COMMERCE,
+        )
+        sibling_project = Project.objects.create(
+            name="multi-sibling-project",
+            organization=organization,
+            flow_organization=uuid.uuid4(),
+            project_type=TypeProject.COMMERCE,
+        )
+
+        dto = CreateVtexProjectDTO(
+            user_email=self.user.email,
+            vtex_account="multi-vtex-store",
+            language="pt-br",
+            organization_name="Multi Project Org",
+            project_name="Multi Vtex Project",
+        )
+        use_case = CreateVtexProjectUseCase(
+            eda_publisher=self.mock_eda,
+            auth_message_publisher=mock_auth_publisher,
+        )
+        use_case.execute(dto)
+
+        self.assertEqual(
+            self._auth_exchanges(mock_auth_publisher),
+            ["orgs-auths.topic", "project-auths.topic", "project-auths.topic"],
+        )
+        self.assertCountEqual(
+            self._auth_project_uuids(mock_auth_publisher),
+            [str(vtex_project.uuid), str(sibling_project.uuid)],
+        )
+        self.assertTrue(
+            ProjectAuthorization.objects.filter(
+                user=self.user, project=sibling_project
+            ).exists()
+        )
+
+    @patch("connect.billing.get_gateway")
+    def test_auth_publish_failure_rolls_back_and_retry_republishes(
+        self, mock_gateway
+    ):
+        mock_gateway.return_value = StripeMockGateway()
+        mock_auth_publisher = Mock()
+        mock_auth_publisher.send_message.side_effect = OSError(32, "Broken pipe")
+
+        organization = Organization.objects.create(
+            name="auth-retry-org",
+            description="Organization auth-retry-org",
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan=BillingPlan.PLAN_TRIAL,
+        )
+        project = Project.objects.create(
+            name="auth-retry-project",
+            organization=organization,
+            vtex_account="auth-retry-store",
+            flow_organization=uuid.uuid4(),
+            project_type=TypeProject.COMMERCE,
+        )
+        dto = CreateVtexProjectDTO(
+            user_email=self.user.email,
+            vtex_account="auth-retry-store",
+            language="pt-br",
+            organization_name="Auth Retry Org",
+            project_name="Auth Retry Project",
+        )
+        use_case = CreateVtexProjectUseCase(
+            eda_publisher=self.mock_eda,
+            auth_message_publisher=mock_auth_publisher,
+        )
+
+        with self.assertRaises(OSError):
+            use_case.execute(dto)
+
+        self.assertFalse(
+            OrganizationAuthorization.objects.filter(
+                user=self.user, organization=organization
+            ).exists()
+        )
+        self.assertFalse(
+            ProjectAuthorization.objects.filter(user=self.user, project=project).exists()
+        )
+        self.mock_eda.publish_org_created.assert_not_called()
+        self.mock_eda.publish_project_created.assert_not_called()
+
+        mock_auth_publisher.send_message.side_effect = None
+        use_case.execute(dto)
+
+        self.assertEqual(
+            self._auth_exchanges(mock_auth_publisher),
+            ["orgs-auths.topic", "orgs-auths.topic", "project-auths.topic"],
+        )
+        self.mock_eda.publish_org_created.assert_called_once()
+        self.mock_eda.publish_project_created.assert_called_once()
+
+    @patch("connect.billing.get_gateway")
+    def test_missing_project_authorization_fails_create(self, mock_gateway):
+        mock_gateway.return_value = StripeMockGateway()
+
+        organization = Organization.objects.create(
+            name="missing-auth-org",
+            description="Organization missing-auth-org",
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan=BillingPlan.PLAN_TRIAL,
+        )
+        Project.objects.create(
+            name="missing-auth-project",
+            organization=organization,
+            vtex_account="missing-auth-store",
+            flow_organization=uuid.uuid4(),
+            project_type=TypeProject.COMMERCE,
+        )
+        dto = CreateVtexProjectDTO(
+            user_email=self.user.email,
+            vtex_account="missing-auth-store",
+            language="pt-br",
+            organization_name="Missing Auth Org",
+            project_name="Missing Auth Project",
+        )
+        use_case = CreateVtexProjectUseCase(eda_publisher=self.mock_eda)
+
+        with patch(
+            "connect.usecases.commerce.create_vtex_project.CreateAuthorizationUseCase"
+        ) as mock_create_auth:
+            mock_create_auth.return_value.create_authorization.return_value = None
+            with self.assertRaises(ProjectAuthorizationMissingError):
+                use_case.execute(dto)
+
+        self.assertFalse(
+            ProjectAuthorization.objects.filter(
+                user=self.user, project__vtex_account="missing-auth-store"
+            ).exists()
+        )
+        self.mock_eda.publish_org_created.assert_not_called()
+
+    @patch("connect.billing.get_gateway")
+    def test_missing_project_authorization_when_org_auth_exists(self, mock_gateway):
+        mock_gateway.return_value = StripeMockGateway()
+
+        organization = Organization.objects.create(
+            name="org-only-auth-org",
+            description="Organization org-only-auth-org",
+            organization_billing__cycle=BillingPlan.BILLING_CYCLE_MONTHLY,
+            organization_billing__plan=BillingPlan.PLAN_TRIAL,
+        )
+        project = Project.objects.create(
+            name="org-only-auth-project",
+            organization=organization,
+            vtex_account="org-only-auth-store",
+            flow_organization=uuid.uuid4(),
+            project_type=TypeProject.COMMERCE,
+        )
+        dto = CreateVtexProjectDTO(
+            user_email=self.user.email,
+            vtex_account="org-only-auth-store",
+            language="pt-br",
+            organization_name="Org Only Auth Org",
+            project_name="Org Only Auth Project",
+        )
+        use_case = CreateVtexProjectUseCase(eda_publisher=self.mock_eda)
+
+        def create_org_auth_only(*args, **kwargs):
+            return organization.authorizations.create(
+                user=self.user, role=OrganizationRole.ADMIN.value
+            )
+
+        with patch(
+            "connect.usecases.commerce.create_vtex_project.CreateAuthorizationUseCase"
+        ) as mock_create_auth:
+            mock_create_auth.return_value.create_authorization.side_effect = (
+                create_org_auth_only
+            )
+            with self.assertRaises(ProjectAuthorizationMissingError) as raised:
+                use_case.execute(dto)
+
+        self.assertIn("ProjectAuthorization missing", str(raised.exception))
+        self.assertFalse(
+            ProjectAuthorization.objects.filter(user=self.user, project=project).exists()
+        )
+        self.mock_eda.publish_org_created.assert_not_called()
 
     @patch("connect.billing.get_gateway")
     def test_multiple_projects_same_vtex_account_raises_error(self, mock_gateway):
