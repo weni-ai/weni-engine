@@ -1,5 +1,6 @@
 import logging
 import json
+from typing import Optional, Tuple
 
 from django.contrib.auth import get_user_model
 from django.conf import settings
@@ -194,7 +195,7 @@ class ProjectSerializer(serializers.ModelSerializer):
         if extra_data:
             template_uuid = extra_data.get("uuid", template_uuid)
             is_template = extra_data.get("template", is_template)
-            brain_on = extra_data.get("brain_on", False)
+            brain_on = extra_data.get("brain_on", brain_on)
 
         return {
             "extra_data": extra_data,
@@ -213,7 +214,7 @@ class ProjectSerializer(serializers.ModelSerializer):
 
     def _resolve_template_metadata(
         self, template_uuid, is_template: bool
-    ) -> tuple[TemplateType | None, str]:
+    ) -> Tuple[Optional[TemplateType], str]:
         if not is_template:
             return None, "blank"
 
