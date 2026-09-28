@@ -195,7 +195,7 @@ class ProjectSerializer(serializers.ModelSerializer):
         if extra_data:
             template_uuid = extra_data.get("uuid", template_uuid)
             is_template = extra_data.get("template", is_template)
-            brain_on = extra_data.get("brain_on", False)
+            brain_on = extra_data.get("brain_on", brain_on)
 
         return {
             "extra_data": extra_data,
