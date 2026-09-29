@@ -105,6 +105,7 @@ class LiveDeskCopilotProjectSerializerTestCase(TestCase):
 
         rabbitmq_body = mock_rabbitmq_instance.send_message.call_args.args[0]
         self.assertTrue(rabbitmq_body["is_live_desk_copilot"])
+        self.assertTrue(rabbitmq_body["brain_on"])
         self.assertEqual(
             rabbitmq_body["parent_project_uuid"], str(self.parent_project.uuid)
         )
@@ -139,7 +140,46 @@ class LiveDeskCopilotProjectSerializerTestCase(TestCase):
         self.assertIsNone(instance.parent_project_id)
         rabbitmq_body = mock_rabbitmq_instance.send_message.call_args.args[0]
         self.assertFalse(rabbitmq_body["is_live_desk_copilot"])
+        self.assertFalse(rabbitmq_body["brain_on"])
         self.assertIsNone(rabbitmq_body["parent_project_uuid"])
+
+    def _save_and_published_body(self, payload):
+        serializer = self._build_serializer(payload)
+        with patch(
+            "connect.api.v2.projects.serializers.RabbitmqPublisher"
+        ) as mock_rabbitmq, patch(
+            "connect.api.v2.projects.serializers.EDAPublisher"
+        ) as mock_eda:
+            mock_rabbitmq_instance = Mock()
+            mock_rabbitmq.return_value = mock_rabbitmq_instance
+            mock_eda.return_value = Mock()
+            self.assertTrue(serializer.is_valid(), serializer.errors)
+            serializer.save()
+        return mock_rabbitmq_instance.send_message.call_args.args[0]
+
+    def test_nested_project_keeps_top_level_brain_on_when_key_is_absent(self):
+        rabbitmq_body = self._save_and_published_body(
+            {
+                "name": "Regular Project",
+                "timezone": "America/Sao_Paulo",
+                "organization": str(self.organization.uuid),
+                "brain_on": True,
+                "project": {"globals": {}},
+            }
+        )
+        self.assertTrue(rabbitmq_body["brain_on"])
+
+    def test_nested_project_brain_on_overrides_top_level_value(self):
+        rabbitmq_body = self._save_and_published_body(
+            {
+                "name": "Regular Project",
+                "timezone": "America/Sao_Paulo",
+                "organization": str(self.organization.uuid),
+                "brain_on": True,
+                "project": {"brain_on": False},
+            }
+        )
+        self.assertFalse(rabbitmq_body["brain_on"])
 
     def test_copilot_without_parent_is_invalid(self):
         serializer = self._build_serializer(
