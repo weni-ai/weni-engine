@@ -1,3 +1,6 @@
+# 3.63.0
+  - feat: Enable brain_on on live desk copilot project creation
+
 # 3.62.1
   - refactor: Replace RequestPermissionOrganization signal-based auth with direct CreateAuthorizationUseCase and explicit RabbitMQ event publishing for VTEX project creation
 
