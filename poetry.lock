@@ -3385,13 +3385,13 @@ files = [
 
 [[package]]
 name = "weni-commons"
-version = "1.6.0"
+version = "1.6.2"
 description = "Weni's common utilities for Python backends"
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "weni_commons-1.6.0-py3-none-any.whl", hash = "sha256:7a10018107898c6dc556b0400da648372f821689d9e1ed7655d2bae623449e5e"},
-    {file = "weni_commons-1.6.0.tar.gz", hash = "sha256:b1ad780dee1410ee86284f98849484e86d82aeeb29ec1844698e79ef4cf382ca"},
+    {file = "weni_commons-1.6.2-py3-none-any.whl", hash = "sha256:ac5c2db31c5649db87edbcfb4fa1c7641cb6c4661ddb2b885c218427ed2c8474"},
+    {file = "weni_commons-1.6.2.tar.gz", hash = "sha256:4fc9d815c61d459ef9430849f4a8e4ad840f31431419f11fea6b13793eb14163"},
 ]
 
 [package.dependencies]
@@ -3765,4 +3765,4 @@ testing = ["coverage[toml]", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = "~=3.8"
-content-hash = "5bdcd91e70f3f95d9465102249b95eb22eda57cf7b8ebf8508b55992c8171936"
+content-hash = "d327ff34b13904305d268593f5cfa6ec1ddade57e75c45b6f4f529cc59c7166c"

@@ -1,4 +1,3 @@
-from django.conf import settings
 from rest_framework import serializers
 
 
@@ -12,14 +11,4 @@ class InvalidateSessionTokenSerializer(serializers.Serializer):
 
 
 class GetTokenSerializer(serializers.Serializer):
-    duration = serializers.IntegerField(required=True)
-
-    def validate_duration(self, value):
-        min_duration = getattr(settings, "SESSION_TOKEN_MIN_DURATION", 60)
-        max_duration = getattr(settings, "SESSION_TOKEN_MAX_DURATION", 86400)
-
-        if value < min_duration or value > max_duration:
-            raise serializers.ValidationError(
-                f"Duration must be between {min_duration} and {max_duration} seconds"
-            )
-        return value
+    duration = serializers.IntegerField(required=False, allow_null=True, default=None)

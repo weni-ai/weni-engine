@@ -88,8 +88,6 @@ env = environ.Env(
     PLAN_TRIAL_PRICE=(int, 0),
     PLAN_TRIAL_LIMIT=(int, 100),
     PLAN_STATUS_CACHE_TTL=(int, 900),
-    SESSION_TOKEN_MIN_DURATION=(int, 60),
-    SESSION_TOKEN_MAX_DURATION=(int, 86400),
     WENI_SESSION_TOKEN_DYNAMODB_TABLE=(str, "weni-session-tokens"),
     WENI_SESSION_TOKEN_DYNAMODB_REGION=(str, "sa-east-1"),
     WENI_SESSION_TOKEN_MAX_REDIS_TTL=(int, 3600),
@@ -571,9 +569,6 @@ PLAN_TRIAL_LIMIT = env.int("PLAN_TRIAL_LIMIT")
 # internal `plan-status` endpoint. Cache entries are also invalidated proactively
 # via signals whenever a BillingPlan or Organization.is_suspended changes.
 PLAN_STATUS_CACHE_TTL = env.int("PLAN_STATUS_CACHE_TTL")
-
-SESSION_TOKEN_MIN_DURATION = env.int("SESSION_TOKEN_MIN_DURATION")
-SESSION_TOKEN_MAX_DURATION = env.int("SESSION_TOKEN_MAX_DURATION")
 
 # Session tokens are stored in a shared DynamoDB table (source of truth) and
 # cached in the local Redis. Defaults match weni-commons
