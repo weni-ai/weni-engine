@@ -1,3 +1,6 @@
+# 3.63.1
+  - fix: removing limitation on sessio token duration
+
 # 3.63.0
   - feat: Enable brain_on on live desk copilot project creation
 
